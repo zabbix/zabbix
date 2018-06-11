@@ -759,7 +759,9 @@ else {
 		'httpTestsLastData' => [],
 		'paging' => null,
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.httpconf.filter',
+		'active_tab' => CProfile::get('web.httpconf.filter.active', 1)
 	];
 
 	// show the error column only for hosts

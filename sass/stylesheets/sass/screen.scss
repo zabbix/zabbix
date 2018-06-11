@@ -463,6 +463,7 @@ ul.top-nav-icons {
 
 .arrow-up {
 	@extend %arrow;
+	border: none;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-bottom: 6px solid $font-color;
@@ -470,6 +471,7 @@ ul.top-nav-icons {
 
 .arrow-down {
 	@extend %arrow;
+	border: none;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
 	border-top: 6px solid $font-color;
@@ -576,15 +578,17 @@ article {
 
 // Object Group Navigation
 .object-group {
-	margin: 0 0 10px 0;
+	min-height: 24px;
+	line-height: 24px;
+	margin-bottom: 5px;
 
 	li {
-		display: inline-block;
-		padding: 0 5px 0 0;
-		vertical-align: middle;
+		float: left;
+		margin-right: 5px;
 
 		span {
-			padding: 4px 7px;
+			display: inline-block;
+			padding: 0 7px;
 		}
 
 		.status-container, .rel-container {
@@ -620,6 +624,31 @@ article {
 		&:last-child {
 			margin: 0;
 		}
+	}
+
+	.object-group {
+		margin: 0;
+	}
+}
+
+// Breadcrumbs inline with filter block
+.filter-breadcrumb {
+	display: inline-block;
+	max-width: calc(100% - 100px);
+	position: relative;
+	top: 0;
+	z-index: 3;
+
+	& > li:first-child {
+		float: left;
+		max-width: 256px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	& + .filter-space {
+		margin-top: -33px;
 	}
 }
 
@@ -1251,14 +1280,16 @@ output {
 
 // Filters
 .filter-btn-container {
-	text-align: center;
+	position: relative;
+	text-align: right;
 }
 
 .filter-container {
-	padding: 10px 0;
-	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
+	margin: 0 0 10px 0;
+	padding: 10px 0;
+	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -1489,158 +1520,6 @@ output {
 .suggest-found {
 	font-weight: bold;
 	color: $dark-yellow;
-}
-
-// Timeline
-.scrollbar {
-	position: relative;
-	margin: 0 auto;
-	margin-bottom: 10px;
-	line-height: 1em;
-	height: 52px;
-
-	.selected {
-		font-weight: bold;
-	}
-}
-
-.sublevel {
-	height: 22px;
-	border: 1px solid $table-border-color;
-	background-color: $table-border-color;
-	margin: 5px 0;
-	@include border-radius(2px);
-
-	button {
-
-		&:first-child {
-			float: left;
-			margin-left: -1px;
-		}
-
-		&:last-child {
-			float: right;
-			margin-right: -1px;
-		}
-	}
-
-	.btn-grey {
-		height: 22px;
-		line-height: 22px;
-		background-color: $btn-form-bg-color;
-		margin-top: -1px;
-	}
-}
-
-.info {
-	height: 14px;
-
-	.zoom {
-		float: left;
-		white-space: nowrap;
-
-		a {
-			margin: 0 4px;
-		}
-	}
-
-	.timeline {
-		float: right;
-		white-space: nowrap;
-	}
-}
-
-.overlevel {
-	position: absolute;
-	top: 14px;
-	left: 30px;
-	height: 24px;
-	margin: 5px 0;
-}
-
-.bar {
-	position: absolute;
-	z-index: 1;
-	height: 22px;
-	border: 1px solid $form-border-color;
-	@include border-radius(2px);
-}
-
-.icon {
-	position: relative;
-	height: 22px;
-	background-color: $form-bg-color;
-	border-color: $form-border-color;
-	@include border-radius(2px);
-	@include transition(background-color .2s ease-out);
-
-	&:hover {
-		background-color: $ui-hover-color;
-	}
-
-	&:focus {
-		background-color: $ui-hover-color;
-		border-color: $form-border-focus-color;
-	}
-
-	&:active {
-		background-color: $ui-hover-color;
-		border-color: $form-border-focus-color;
-	}
-
-	.center {
-		width: 10px;
-		height: 22px;
-		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
-		margin: 0 auto;
-	}
-}
-
-.ghost {
-	position: absolute;
-	top: 0;
-	height: 22px;
-	line-height: 22px;
-	border: 1px solid $form-border-color;
-	@include border-radius(2px);
-}
-
-.left_arr {
-	position: absolute;
-	top: 1px;
-	width: auto;
-	height: 22px;
-	line-height: 22px;
-	padding: 0 5px;
-	z-index: 99;
-	cursor: e-resize;
-}
-
-.right_arr {
-	@extend .left_arr;
-}
-
-.subline {
-	height: 14px;
-
-	.nav_links {
-		float: left;
-		@extend .zoom;
-
-		a {
-			margin: 0 4px;
-		}
-	}
-
-	.period {
-		float: right;
-		text-align: right;
-		margin-left: 8px;
-	}
-
-	.info_period {
-		@extend .period;
-	}
 }
 
 // Forms
@@ -2234,7 +2113,6 @@ button {
 	&:focus {
 		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
 	}
 
 	&:active {
@@ -2390,36 +2268,6 @@ button {
 	}
 }
 
-.filter-trigger {
-	position: relative;
-	margin: 0;
-	padding-right: 21px;
-	min-width: 94px;
-	@include border-radius(2px 2px 0 0);
-
-	&.filter-active {
-		color: $font-color;
-		background-color: $ui-bg-color;
-		border: 1px solid $ui-border-color;
-		border-bottom: none;
-		margin-bottom: -1px;
-
-		.arrow-up {
-			position: absolute;
-			top: 45%;
-			margin: 0 0 0 6px;
-			border-bottom-color: $font-color;
-		}
-	}
-
-	.arrow-down {
-		position: absolute;
-		top: 45%;
-		margin: 0 0 0 6px;
-		border-top-color: $white;
-	}
-}
-
 $icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
 	kiosk: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -79px -259px,
@@ -2428,9 +2276,7 @@ $icon-btn: (
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -329px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
-	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
-
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px
 );
 
 @each $icon-btn, $bgimage in $icon-btn {
@@ -2459,18 +2305,311 @@ $icon-widget-btn: (
 	}
 }
 
+// TIME SELECTION
+.ui-tabs-nav {
+	.btn-time,
+	.filter-trigger {
+		@include border-radius(2px);
+		color: $btn-font-color;
+		background-color: $btn-bg-color;
+		border: 1px solid $btn-bg-color;
+		position: relative;
+		margin: 0 0 0 6px;
+		min-height: 24px;
+		vertical-align: bottom;
+
+		&:after {
+			content: "";
+			position: absolute;
+		}
+
+		&:focus,
+		&:hover {
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+	}
+
+	.btn-time {
+		padding: 0 34px 0 10px;
+
+		&:after {
+			margin: 0 5px;
+			right: 0;
+			top: 0;
+			height: 24px;
+			width: 24px;
+			background: url(../img/icon-sprite.svg) no-repeat -87px -583px;
+		}
+	}
+
+	.filter-trigger {
+		padding: 0 34px 0 10px;
+
+		&:after {
+			margin: 0 5px;
+			right: 0;
+			top: 0;
+			height: 24px;
+			width: 24px;
+			background: url(../img/icon-sprite.svg) no-repeat -87px -547px;
+		}
+	}
+
+	.ui-state-focus {
+		.btn-time,
+		.filter-trigger {
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
+			@include btn-hover-active($btn-font-color, $btn-bg-color);
+		}
+	}
+
+	.ui-tabs-active {
+		.btn-time,
+		.filter-trigger {
+			color: $font-color;
+			background-color: $ui-bg-color;
+			border: 1px solid $ui-border-color;
+			border-bottom: none;
+			margin: 0 0 0 6px;
+			padding: 0 34px 7px 10px;
+			@include border-radius(2px 2px 0 0);
+		}
+
+		.btn-time {
+			&:after {
+				background-position: -246px -583px;
+			}
+		}
+
+		.filter-trigger {
+			&:after {
+				background-position: -246px -547px;
+			}
+		}
+	}
+
+	.ui-state-hover {
+		&.ui-tabs-active {
+			.btn-time,
+			.filter-trigger  {
+				background-color: $action-hover-color;
+			}
+		}
+	}
+
+	.ui-state-focus {
+		&.ui-tabs-active {
+			.btn-time,
+			.filter-trigger {
+				@include box-shadow(0 0 0 2px rgba($blue, .35));
+			}
+		}
+	}
+}
+
+.filter-space {
+	box-sizing: border-box;
+
+	li a.ui-tabs-anchor {
+		vertical-align: top;
+	}
+
+	ul.ui-tabs-nav li:focus {
+		outline: none;
+	}
+
+	.filter-btn-container {
+		height: 29px;
+		z-index: 2;
+	}
+
+	.ui-tabs-nav {
+		height: 29px;
+		border-bottom: none;
+
+		a {
+			display: inline-block;
+			box-sizing: border-box;
+			line-height: 22px;
+			margin-bottom: 5px;
+			text-align: center;
+		}
+	}
+}
+
+.btn-time-left,
+.btn-time-right {
+	background: url(../img/icon-sprite.svg) no-repeat;
+	content: "";
+	border: none;
+	height: 24px;
+	width: 24px;
+	vertical-align: top;
+
+	&:focus,
+	&:hover {
+		border: 1px solid $ui-border-color;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:disabled {
+		border: none;
+		opacity: 0.4;
+	}
+}
+
+.btn-time-right {
+	background-position: -83px -623px;
+
+	&:focus,
+	&:hover {
+		background-position: -396px -624px;
+	}
+
+	&:disabled {
+		background-position: -83px -623px;
+	}
+}
+
+.btn-time-left {
+	background-position: -85px -657px;
+
+	&:focus,
+	&:hover {
+		background-position: -398px -658px;
+	}
+
+	&:disabled {
+		background-position: -85px -657px;
+	}
+}
+
+.btn-time-out {
+	background: none;
+	border: 1px solid transparent;
+	color: $font-color;
+	height: 24px;
+	margin: 0 5px;
+	vertical-align: top;
+
+	&:disabled {
+		background: transparent !important;
+		border-color: transparent !important;
+		opacity: 0.8;
+	}
+}
+
+
+.time-quick {
+	font-size: 12px;
+	line-height: 20px;
+
+	li {
+
+		&:last-of-type {
+			a {
+				margin-bottom: 0;
+			}
+		}
+
+		a {
+			display: inline-block;
+			padding: 2px 10px;
+			margin-bottom: 2px;
+			margin-left: -10px;
+			border-bottom: 0;
+
+			&:hover,
+			&:focus,
+			&.selected {
+				@include border-radius(2px);
+				border-bottom: 0;
+			}
+
+			&:hover {
+				background: $action-hover-color;
+				@include transition(background-color .2s ease-out);
+			}
+
+			&:focus {
+				@include box-shadow(0 0 0 2px rgba($blue, .35));
+			}
+
+			&.selected {
+				background: $ui-bg-selected-color;
+				color: $white;
+				@include transition(background-color .2s ease-out);
+			}
+		}
+	}
+}
+
+.time-selection-container {
+	display: flex;
+	justify-content: flex-end;
+
+	.time-input {
+		border-right: 1px solid $ui-border-color;
+		padding: 0 30px 0 10px;
+		text-align: right;
+		white-space: nowrap;
+
+		.time-input-error {
+			margin: -8px 29px 0 0;
+		}
+
+		ul {
+			padding: 0 0 10px 0;
+		}
+
+		li {
+			display: inline-block;
+			vertical-align: baseline;
+			padding: 0 0 0 10px;
+
+			.icon-cal {
+				position: relative;
+				vertical-align: middle;
+				margin-left: -5px;
+			}
+		}
+	}
+
+	.time-quick-range {
+		text-align: right;
+		white-space: nowrap;
+		margin: 0 0 0 20px;
+
+		.cell {
+			display: inline-flex;
+			vertical-align: top;
+			text-align: left;
+			margin: 0 10px 0 10px;
+		}
+
+		.time-quick-selected {
+			display: inline-block;
+			padding: 2px 10px;
+			margin-left: -10px;
+			color: $font-selected-color;
+			background-color: $ui-bg-selected-color;
+			border-bottom: 0;
+		}
+	}
+}
+
 .btn-dashbrd-conf {
 	background: url(../img/icon-sprite.svg) no-repeat -42px -619px;
 	@extend %btn-dashbrd;
 }
 
 .btn-dashbrd-normal {
+	@include box-shadow(1px 1px 2px $action-shadow-color);
+	@include opacity(1);
 	position: fixed;
 	right: 45px;
 	top: 5px;
 	z-index: 1010;
-	@include box-shadow(1px 1px 2px $action-shadow-color);
-	@include opacity(1);
 	@include transition(opacity 1s);
 
 	&.hidden {
@@ -2926,7 +3065,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
-	margin: 0 -.25rem;
+	margin: -.25rem;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -2937,19 +3076,20 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-empty-placeholder {
-	width: 16%;
-	height: 200px;
-	background-color: $ui-bg-color;
-	border-style: solid;
-	border-width: 1px;
-	border-color: $ui-border-color;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% / 6 - .65rem);
+	height: 200px;
 	margin: .25rem;
-	padding: 10px;
 
 	h1 {
+		padding: 10px;
 		text-align: center;
 	}
 }
@@ -3861,11 +4001,6 @@ $form-icon-btn: (
 }
 
 // Maps, Screens, Graphs
-.box_on {
-	position: absolute;
-	z-index: 99;
-}
-
 .screen-table {
 	background-color: $ui-bg-color;
 	width: 100%;
@@ -4909,6 +5044,58 @@ a.overlay-close-btn {
 		div {
 			background: $form-disabled-font-color !important;
 		}
+	}
+}
+
+.in-progress {
+	position: relative;
+
+	img {
+		user-select: none;
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+	}
+
+	&:before {
+		z-index: 3;
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: rgba($ui-bg-color, 0.6);
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		animation: fadein 2s ease-in 0.5s normal forwards;
+	}
+
+	&.delayed-15s::before {
+		@extend .in-progress::before;
+		animation-delay: 15s;
+	}
+
+	&:after {
+		z-index: 3;
+		content: '';
+		display: block;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin: -12px 0 0 -12px;
+		@include border-radius(50%);
+		width: 20px;
+		height: 20px;
+		border: 2px solid #ccd5d9;
+		border-bottom: 2px solid #0275b8;
+		opacity: 0;
+		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
+	}
+
+	&.delayed-15s::after {
+		@extend .in-progress::after;
+		animation-delay: 15s;
 	}
 }
 

@@ -5,8 +5,7 @@
 		<?php endif ?>
 
 		<?php if (isset($page['scripts']) && in_array('flickerfreescreen.js', $page['scripts'])): ?>
-			window.flickerfreeScreenShadow.timeout = <?php echo SCREEN_REFRESH_TIMEOUT * 1000; ?> ;
-			window.flickerfreeScreenShadow.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
+			window.flickerfreeScreen.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
 		<?php endif ?>
 
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies

@@ -39,21 +39,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null],
-	'hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null],
-	'elementid' =>		[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null],
-	'step' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
-	'period' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
-	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
-	'reset' =>			[T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null],
-	'fullscreen' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null],
+	'groupid' =>			[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,	null],
+	'hostid' =>				[T_ZBX_INT,			O_OPT, P_SYS,	DB_ID,	null],
+	'elementid' =>			[T_ZBX_INT,			O_OPT, P_SYS|P_NZERO, DB_ID, null],
+	'step' =>				[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(0, 65535), null],
+	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'reset' =>				[T_ZBX_STR,			O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>			[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'), null],
 	// ajax
-	'widgetRefresh' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'widgetRefreshRate' => [T_ZBX_STR, O_OPT, P_ACT, null,	null],
-	'upd_counter' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
+	'widgetRefresh' =>		[T_ZBX_STR,			O_OPT, null,	null,	null],
+	'widgetRefreshRate' =>	[T_ZBX_STR,			O_OPT, P_ACT, null,	null],
+	'upd_counter' =>		[T_ZBX_INT,			O_OPT, P_ACT,	null,	null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -105,12 +105,11 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 			$screenBuilder = new CScreenBuilder([
 				'screen' => $dbScreen,
 				'mode' => SCREEN_MODE_PREVIEW,
-				'profileIdx' => 'web.slides',
+				'profileIdx' => 'web.slides.filter',
 				'profileIdx2' => $elementId,
 				'hostid' => getRequest('hostid'),
-				'period' => getRequest('period'),
-				'stime' => getRequest('stime'),
-				'isNow' => getRequest('isNow')
+				'from' => getRequest('from'),
+				'to' => getRequest('to')
 			]);
 
 			CScreenBuilder::insertScreenCleanJs();
@@ -119,11 +118,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['s
 				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 				->toString();
 
-			CScreenBuilder::insertScreenStandardJs([
-				'timeline' => $screenBuilder->timeline,
-				'profileIdx' => $screenBuilder->profileIdx,
-				'profileIdx2' => $screenBuilder->profileIdx2
-			]);
+			CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 
 			insertPagePostJs();
 		}
@@ -175,6 +170,16 @@ else {
 	}
 }
 
+$timeselector_options = [
+	'profileIdx' => 'web.slides.filter',
+	'profileIdx2' => $data['elementId'],
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+];
+updateTimeSelectorPeriod($timeselector_options);
+
+$data['timeline'] = getTimeSelectorPeriod($timeselector_options);
+$data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
 $data['fullscreen'] = getRequest('fullscreen');
 
 if ($data['screen']) {

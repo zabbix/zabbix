@@ -30,11 +30,6 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		$this->zbxTestClickButtonText('Reset');
 
-		// Check the calendar button for 'From' field
-		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
-		// Check the calendar button for 'Till' field
-		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li[2]/div[2]/button');
-
 		// Check selected severities
 		$severities = ['Not classified', 'Warning', 'High', 'Information', 'Average', 'Disaster'];
 		foreach ($severities as $severity) {

@@ -19,8 +19,10 @@
 **/
 
 
-$filter = (new CFilter('web.httpconf.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Status'),
 				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
@@ -29,8 +31,7 @@ $filter = (new CFilter('web.httpconf.filter.state'))
 					->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 					->setModern(true)
 			)
-	)
-	->addNavigator();
+	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
@@ -63,7 +64,9 @@ $widget = (new CWidget())
 	]));
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$breadcrumb = get_header_host_table('web', $this->data['hostid']);
+	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+	$widget->addItem($breadcrumb);
 }
 
 $widget->addItem($filter);
