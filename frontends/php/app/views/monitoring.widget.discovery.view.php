@@ -32,7 +32,11 @@ else {
 
 	foreach ($data['drules'] as $drule) {
 		$table->addRow([
-			new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
+			new CLink($drule['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'discovery.view')
+				->setArgument('druleid', $drule['druleid'])
+				->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+			),
 			($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
 			($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
 		]);

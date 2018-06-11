@@ -132,7 +132,7 @@ var CViewSwitcher = Class.create({
 				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
 
 			case 'INPUT':
-				if (obj.getAttribute('type') === 'CHECKBOX') {
+				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
 					return obj.checked ? obj.value : null;
 				}
 

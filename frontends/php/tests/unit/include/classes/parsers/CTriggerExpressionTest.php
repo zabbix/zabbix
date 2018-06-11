@@ -133,6 +133,10 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			['-not 1', null, false],
 			['- not1', null, false],
 			['-not1', null, false],
+			['1 not 1', null, false],
+			['(1) not 1', null, false],
+			['1not1', null, false],
+			['(1)not1', null, false],
 
 			// operator cases
 			['Not 1', null, false],
@@ -157,7 +161,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			['{host:key[こんにちは、世界].str(こんにちは、世界)}', null, true],
 
 			['{host:key[a,,"b",,[c,d,,"e",],,[f]].count(1,,"b",3)}', null, true],
-			['{host:key[a,,"b",,[[c,d,,"e"],[]],,[f]].count(1,,"b",3)}', null, true],
+			['{host:key[a,,"b",,[[c,d,,"e"],[]],,[f]].count(1,,"b",3)}', null, false],
 			['{host:key[a,,"b",,[c,d,,"e",,,[f]].count(1,,"b",3)}', null, false],
 			['{host:key[a,,"b",,[c,d,,"e",],,f]].count(1,,"b",3)}', null, false],
 

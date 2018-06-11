@@ -52,8 +52,8 @@ foreach ($data['alerts'] as $alert) {
 	}
 
 	$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $data['db_users']))
-		? [bold(getUserFullname($data['db_users'][$alert['userid']])), BR(), $alert['sendto']]
-		: $alert['sendto'];
+		? [bold(getUserFullname($data['db_users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+		: zbx_nl2br($alert['sendto']);
 
 	$info_icons = [];
 	if ($alert['error'] !== '') {

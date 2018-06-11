@@ -9,33 +9,44 @@ if (hasRequest('conditions')) {
 include dirname(__FILE__).'/common.item.edit.js.php';
 ?>
 <script type="text/x-jquery-tmpl" id="condition-row">
-	<tr class="form_row">
-		<td>
-			<span class="formulaid">#{formulaId}</span>
-			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
-		</td>
-		<td>
-			<input class="<?= ZBX_STYLE_UPPERCASE ?> macro" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
-		</td>
-		<td>
-			<span><?= _('matches') ?></span>
-		</td>
-		<td>
-			<input type="text" id="conditions_#{rowNum}_value" name="conditions[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('regular expression') ?>">
-		</td>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?=
+		(new CRow([[
+				new CSpan('#{formulaId}'),
+				new CVar('conditions[#{rowNum}][formulaid]', '#{formulaId}')
+			],
+			(new CTextBox('conditions[#{rowNum}][macro]', '', false, 64))
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->addClass(ZBX_STYLE_UPPERCASE)
+				->addClass('macro')
+				->setAttribute('placeholder', '{#MACRO}')
+				->setAttribute('data-formulaid', '#{formulaId}'),
+			(new CComboBox('conditions[#{rowNum}][operator]', CONDITION_OPERATOR_REGEXP, null, [
+				CONDITION_OPERATOR_REGEXP => _('matches'),
+				CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
+			]))->addClass('operator'),
+			(new CTextBox('conditions[#{rowNum}][value]', '', false, 255))
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setAttribute('placeholder', _('regular expression')),
+			(new CCol(
+				(new CButton('conditions_#{rowNum}_remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
 </script>
 <script type="text/javascript">
 	(function($) {
 		$(function() {
 			function updateExpression() {
 				var conditions = [];
+
 				$('#conditions .macro').each(function(index, macroInput) {
 					macroInput = $(macroInput);
 					macroInput.val(macroInput.val().toUpperCase());
+
 					conditions.push({
 						id: macroInput.data('formulaid'),
 						type: macroInput.val()
@@ -57,12 +68,15 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				})
 				.bind('tableupdate.dynamicRows', function(event, options) {
 					$('#conditionRow').toggle($(options.row, $(this)).length > 1);
-				})
-				.bind('rowremove.dynamicRows', function() {
-					updateExpression();
+
+					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+						updateExpression();
+					}
 				})
 				.on('change', '.macro', function() {
-					updateExpression();
+					if ($('#evaltype').val() != <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+						updateExpression();
+					}
 				})
 				.ready(function() {
 					$('#conditionRow').toggle($('.form_row', $('#conditions')).size() > 1);

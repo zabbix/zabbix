@@ -125,6 +125,7 @@ else {
 
 	$widget->setControls((new CForm('get'))
 		->cleanItems()
+		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls)
 	);
 
@@ -177,7 +178,7 @@ else {
 			$dateFormat = DATE_FORMAT;
 			array_unshift($header, _('Day'));
 
-			$max = ($year == $currentYear) ? date('z') : DAY_IN_YEAR;
+			$max = ($year == $currentYear) ? date('z') + 1 : date('z', mktime(0, 0, 0, 12, 31, $year)) + 1;
 			for ($i = 1; $i <= $max; $i++) {
 				$intervals[mktime(0, 0, 0, 1, $i, $year)] = mktime(0, 0, 0, 1, $i + 1, $year);
 			}

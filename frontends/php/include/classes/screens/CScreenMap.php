@@ -29,6 +29,10 @@ class CScreenMap extends CScreenBase {
 	public function get() {
 		$map_options = [];
 
+		if (array_key_exists('fullscreen', $this->screenitem)) {
+			$map_options['fullscreen'] = $this->screenitem['fullscreen'];
+		}
+
 		if (array_key_exists('severity_min', $this->screenitem)) {
 			$map_options['severity_min'] = $this->screenitem['severity_min'];
 		}

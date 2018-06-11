@@ -595,8 +595,9 @@ jQuery(function($) {
 			 * @param {numeric} id - widget field ID or 0 when creating new item.
 			 * @param {numeric} parent - ID of parent item under which new item is created.
 			 * @param {numeric} depth - a depth of parent item under which new item is created.
+			 * @param {object}  trigger_elmnt - UI element clicked to open dialog.
 			 */
-			var itemEditDialog = function($obj, id, parent, depth) {
+			var itemEditDialog = function($obj, id, parent, depth, trigger_elmnt) {
 				var url = new Curl('zabbix.php'),
 					item_edit = !!id,
 					ajax_data = {
@@ -614,7 +615,7 @@ jQuery(function($) {
 					ajax_data['map_id'] = getNextId($obj);
 				}
 
-				url.setArgument('action', 'widget.navigationtree.edititemdialog');
+				url.setArgument('action', 'widget.navtree.item.edit');
 
 				jQuery.ajax({
 					url: url.getUrl(),
@@ -642,7 +643,7 @@ jQuery(function($) {
 												mapid: id
 											};
 
-										url.setArgument('action', 'widget.navigationtree.edititem');
+										url.setArgument('action', 'widget.navtree.item.update');
 
 										jQuery.ajax({
 											url: url.getUrl(),
@@ -741,7 +742,7 @@ jQuery(function($) {
 								}
 							],
 							'dialogueid': 'navtreeitem'
-						});
+						}, trigger_elmnt);
 					}
 				});
 			};
@@ -836,7 +837,7 @@ jQuery(function($) {
 
 				link.setAttribute('class', 'item-name');
 				link.setAttribute('title', item.name);
-				link.innerHTML = item.name;
+				link.innerText = item.name;
 
 				var li_item = document.createElement('LI');
 
@@ -896,7 +897,7 @@ jQuery(function($) {
 						}
 
 						if (widget_data.max_depth > +depth) {
-							itemEditDialog($obj, 0, parentId, +depth + 1);
+							itemEditDialog($obj, 0, parentId, +depth + 1, event.target);
 						}
 					});
 					tools.appendChild(btn1);
@@ -907,7 +908,7 @@ jQuery(function($) {
 					btn2.setAttribute('data-id', item.id);
 					btn2.setAttribute('class', 'import-items-btn');
 					btn2.setAttribute('title', t('Add multiple maps'));
-					btn2.addEventListener('click', function() {
+					btn2.addEventListener('click', function(event) {
 						var id = $(this).data('id');
 
 						if (typeof addPopupValues === 'function') {
@@ -947,8 +948,8 @@ jQuery(function($) {
 							srcfld1: 'sysmapid',
 							srcfld2: 'name',
 							multiselect: '1'
+						}, null, event.target);
 						});
-					});
 					tools.appendChild(btn2);
 
 					if (editable) {
@@ -958,12 +959,12 @@ jQuery(function($) {
 						btn3.setAttribute('data-id', item.id);
 						btn3.setAttribute('class', 'edit-item-btn');
 						btn3.setAttribute('title', t('Edit'));
-						btn3.addEventListener('click', function() {
+						btn3.addEventListener('click', function(event) {
 							var id = $(this).data('id'),
 								parent = +$('input[name="map.parent.' + id + '"]', $obj).val(),
 								depth = +$(this).closest('[data-depth]').attr('data-depth');
 
-							itemEditDialog($obj, id, parent, depth);
+							itemEditDialog($obj, id, parent, depth, event.target);
 						});
 						tools.appendChild(btn3);
 

@@ -26,10 +26,11 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 	public function __construct() {
 		parent::__construct();
 
-		$this->setType(WIDGET_DATA_OVERVIEW);
+		$this->setType(WIDGET_DATA_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json'
+			'fields' => 'json',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -41,6 +42,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
 			'style' => $fields['style'],
+			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

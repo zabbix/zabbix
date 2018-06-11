@@ -28,6 +28,7 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "export.h"
 
 #include "timer.h"
 
@@ -95,6 +96,11 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 		zbx_vector_uint64_clear(&triggerids);
 
 		DCfree_triggers(&trigger_order);
+
+		if (SUCCEED == zbx_is_export_enabled())
+			zbx_export_events();
+
+		zbx_clean_events();
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);
@@ -647,6 +653,9 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	if (SUCCEED == zbx_is_export_enabled())
+		zbx_problems_export_init("timer", process_num);
 
 	for (;;)
 	{

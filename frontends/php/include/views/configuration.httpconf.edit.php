@@ -30,6 +30,7 @@ if (!empty($this->data['hostid'])) {
 $httpForm = (new CForm())
 	->setName('httpForm')
 	->setId('httpForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('steps', $this->data['steps'])
@@ -42,7 +43,7 @@ if (!empty($this->data['httptestid'])) {
 /*
  * Scenario tab
  */
-$httpFormList = new CFormList('httpFormList');
+$httpFormList = new CFormList();
 
 // Parent http tests
 if (!empty($this->data['templates'])) {

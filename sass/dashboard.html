@@ -1,314 +1,392 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Zabbix | Hosts</title>
-		<link rel="stylesheet" href="stylesheets/screen.css">
-		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
-        <link rel="icon" href="favicon.ico">
-        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
-        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
-        <meta name="msapplication-TileColor" content="#d40000">
-	</head>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Dashboard</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
 <body>
-	<header role="banner">	
-		<div class="nav" role="navigation">
-			<div class="top-nav-container"><a href="#" class="header-logo"><div class="logo"></div></a><ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 34px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li></li><li><a href="" class="top-nav-help" title="Help"></a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+	<body>
+		<header>
+			<div>
+				<div class="top-nav-container" id="mmenu">
+					<a class="header-logo" href="">
+						<div class="logo"></div>
+					</a>
+					<nav aria-label="Main navigation">
+						<ul class="top-nav">
+							<li class="selected" id="view"><a tabindex="0" role="button" href="javascript:void(0)">Monitoring</a></li>
+							<li id="cm" class=""><a tabindex="0" role="button" href="javascript:void(0)">Inventory</a></li>
+							<li id="reports" class=""><a tabindex="0" role="button" href="javascript:void(0)">Reports</a></li>
+							<li id="config" class=""><a tabindex="0" role="button" href="javascript:void(0)">Configuration</a></li>
+							<li id="admin" class=""><a tabindex="0" role="button" href="javascript:void(0)">Administration</a></li>
+						</ul>
+					</nav>
+					<ul class="top-nav-icons"><li><form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form></li><li><ul role="navigation" aria-label="User menu"><li style="padding-left:0"><a class="top-nav-support" target="_blank" title="Zabbix Technical Support" href="">Support</a></li><li><a class="top-nav-zbbshare" target="_blank" title="Zabbix Share" href="">Share</a></li><li><a class="top-nav-help" target="_blank" title="Help" href="">&nbsp;</a></li><li><a class="top-nav-profile" title="Admin (Zabbix Administrator)" href="">&nbsp;</a></li><li><a class="top-nav-signout" title="Sign out", 'post', 'sid', true)" href="javascript:void(0)">&nbsp;</a></li></ul></li></ul>
+				</div>
+				<nav aria-label="Sub navigation" class="top-subnav-container">
+					<ul class="top-subnav" id="sub_view" style="display: block;">
+						<li><a tabindex="0" class="selected" href="">Dashboard</a></li>
+						<li><a tabindex="0" href="">Problems</a></li>
+						<li><a tabindex="0" href="">Overview</a></li>
+						<li><a tabindex="0" href="">Web</a></li>
+						<li><a tabindex="0" href="">Latest data</a></li>
+						<li><a tabindex="0" href="">Graphs</a></li>
+						<li><a tabindex="0" href="">Screens</a></li>
+						<li><a tabindex="0" href="">Maps</a></li>
+						<li><a tabindex="0" href="">Discovery</a></li>
+						<li><a tabindex="0" href="">Services</a></li>
+					</ul>
+					<div class="server-name">ZABBIX SERVER NAME</div>
+				</nav>
 			</div>
-			<div class="top-subnav-container">
-			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">Services</a></li></ul>
-            <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
-			</div>
-		</div>
-	</header>
-	<div class="article">
+		</header>
+<main>
 	<div class="header-title table">
-  <div class="cell"><h1>Dashboard</h1></div><div class="cell"><form><ul><span class="dashbrd-edit"><li><button type="button" class="btn-alt"><span class="plus-icon"></span>Add widget</button></li><li><button type="button">Save changes</button></li><li><a href="">Cancel</a></li><li></li><li><button type="button" disabled>Edit dashboard</button></li></span><!--<li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li>--><!--<li><button type="button" class="btn-conf" title="Configuration"></button><div class="active-indic" title="Enabled"></div></li>--><li><button type="button" class="btn-max" title="Maximize"></button></li><!--<li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li>--></ul></form>
-  </div></div>
-
-<div class="dashbrd-grid-widget-container">
-
-<div class="dashbrd-grid-widget ui-draggable ui-resizable ui-resizable-autohide" style="top: 300px; left: 0; height: 580px; width: 58.3333%">
-<div class="dashbrd-grid-widget-padding">
-<div class="dashbrd-grid-widget-head cursor-move"><h4>Asdasdad</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li></ul></div>
-<div class="dashbrd-grid-widget-content">
-<div class="preloader-container"><div class="preloader"></div></div>
-<!--
-    <div class="msg-bad">
-        <div class="msg-details">
-            <ul>
-                <li>Undefined index: lastEvent [zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → make_latest_issues() → make_popup_eventlist() in include/events.inc.php:441]</li>
-            </ul>
-        </div>
-        <button type="button" class="overlay-close-btn" title="Close"></button>
-    </div>-->
-    <table class="list-table" id="t587de39d36ef9">
-        <thead>
-            <tr>
-                <th>Host</th>
-                <th>Issue</th>
-                <th>Last change</th>
-                <th>Age</th>
-                <th>Info</th>
-                <th>Ack</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><span class="link-action">development</span></td>
-                    <td class="info-bg">
-                    <span class="link-action">
-                    Zabbix branch frozen: 1.1
-                    </span>
-                </td>
-                <td><a href="">2017-01-16 20:47:17</a></td>
-                <td>14h 40m 40s</td>
-                <td></td>
-                <td>
-                    <a class="link-alt green" href="">
-                    Yes
-                    </a>
-                </td>
-                <td class="nowrap">&nbsp;</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-<div class="dashbrd-grid-widget-foot">
-<ul><li>10 of 10 issues</li><li>Updated 09:28:45</li></ul>
-</div>
-</div>
-<div class="ui-resizable-handle ui-resizable-n">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-n"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-e">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-e"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-s">
-<div class=" ui-resize-dot"></div>
-<div class="ui-resizable-border-s"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-w">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-w"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-se"></div>
-<div class="ui-resizable-handle ui-resizable-sw"></div>
-<div class="ui-resizable-handle ui-resizable-ne"></div>
-<div class="ui-resizable-handle ui-resizable-nw"></div>
-</div>
-
-
-<div class="dashbrd-grid-widget" style="width: 8.3333333333%; height: 70px">
-<div class="dashbrd-grid-widget-padding">
-<div class="dashbrd-grid-widget-content"><div class="preloader-container"><div class="preloader"></div></div>sdfssdfsdfsdfsdfsd</div>
-</div>
-</div>
-
-
-<div class="dashbrd-grid-widget" style="width: 25%; height: 200px; top: 80px">
-<div class="dashbrd-grid-widget-padding">
-<div class="dashbrd-grid-widget-head cursor-move">
-<h4>Asdasdad</h4>
-<ul><li><button type="button" class="btn-widget-edit" title="Edit"></button></li><li><button type="button" class="btn-widget-delete" title="Delete"></button></li></ul>
-</div>
-<div class="dashbrd-grid-widget-content">
-<div class="preloader-container"><div class="preloader"></div></div>
-<table class="list-table"><tbody><tr><td><a href="#">Zabbix server</a><button type="button" class="remove-btn"></button></td></tr><tr><td><a href="#">Zabbix server</a><button type="button" class="remove-btn"></button></td></tr><tr><td><a href="#">Zabbix server</a><button type="button" class="remove-btn"></button></td></tr><tr><td><a href="#">My 2nd megaserver</a><button type="button" class="remove-btn"></button></tr></tbody></table>
-</div>
-<div class="dashbrd-grid-widget-foot">
-<ul><li>10 of 10 issues</li><li>Updated 09:28:45</li></ul>
-</div>
-</div>
-<div class="ui-resizable-handle ui-resizable-n">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-n"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-e">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-e"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-s">
-<div class=" ui-resize-dot"></div>
-<div class="ui-resizable-border-s"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-w">
-<div class="ui-resize-dot"></div>
-<div class="ui-resizable-border-w"></div>
-</div>
-<div class="ui-resizable-handle ui-resizable-se"></div>
-<div class="ui-resizable-handle ui-resizable-sw"></div>
-<div class="ui-resizable-handle ui-resizable-ne"></div>
-<div class="ui-resizable-handle ui-resizable-nw"></div>
-</div>
-<!--
-	<ul class="action-menu" style="top: 156px; left: 669px">
-	<li><h3>Favourite screens</h3></li>
-	<li><a href="" class="action-menu-item">Add</a></li>
-	<li><a href="" class="action-menu-item">Remove<span class="arrow-right"></span></a>
-	<ul class="action-menu" style="top: 47px; left: 204px">
-	<li><a href="" class="action-menu-item">Zabbix server</a></li>
-	</ul></li>
-	<li><a href="" class="action-menu-item">Remove all</a></li>
-	<li><div></div></li>
-	<li><h3>Favourite slide shows</h3></li>
-	<li><a href="" class="action-menu-item selected">Add</a></li>
-	<li><a class="action-menu-item-disabled">Remove</a></li>
-	<li><a class="action-menu-item-disabled">Remove all</a></li>
+		<div class="cell">
+			<h1 id="page-title-general">Dashboard name</h1>
+		</div>
+		<div class="cell nowrap">
+			<ul id="dashbrd-control">
+				<li style="display: none;">
+					<nav aria-label="Content controls">
+						<ul><li><button type="button" id="dashbrd-edit" name="dashbrd-edit">Edit dashboard</button></li><li><button type="button" id="dashbrd-actions" name="" class="btn-action" title="Actions" data-menu-popup="">&nbsp;</button></li><li><button type="button" data-url="" title="Fullscreen" class="btn-max">&nbsp;</button></li></ul>
+					</nav>
+				</li>
+				<li style="">
+					<nav aria-label="Content controls" class="dashbrd-edit">
+						<ul><li><button type="button" id="dashbrd-config" name="dashbrd-config" class="btn-dashbrd-conf"></button></li><li><button type="button" id="dashbrd-add-widget" name="dashbrd-add-widget" class="btn-alt"><span class="plus-icon"></span>Add widget</button></li><li><button type="button" id="dashbrd-save" name="dashbrd-save">Save changes</button></li><li><a id="dashbrd-cancel" href="">Cancel</a></li><li></li></ul>
+					</nav>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<ul role="navigation" aria-label="Breadcrumbs" class="object-group">
+		<li><span><a href="">All dashboards</a></span>/<span class="selected"><a id="dashboard-direct-link" href="">Dashboard name</a></span></li>
 	</ul>
--->
-
-
-<div class="overlay-dialogue" style="top: 300px; left: 10px">
-<button type="button" class="overlay-close-btn"></button>
-<div class="dashbrd-widget-head cursor-move"><h4>Add/Edit widget</h4></div>
-<ul class="table-forms"><li>
-<div class="table-forms-td-left"><label for="HostName">Name</label></div>
-<div class="table-forms-td-right"><input type="text" id="txt_select" name="txt_select" value="" maxlength="255" style="width: 300px;"></div>
-</li>
-<li>
-<div class="table-forms-td-left"><label for="HostName">Resource</label></div>
-<div class="table-forms-td-right"><select id="resourcetype" name="resourcetype" autocomplete="off"><option value="12">Action log</option><option value="7">Clock</option><option value="10">Data overview</option><option value="0" selected="selected">Graph</option><option value="20">Graph prototype</option><option value="13">History of events</option><option value="14">Host group issues</option><option value="4">Host info</option><option value="16">Host issues</option><option value="2">Map</option><option value="3">Plain text</option><option value="8">Screen</option><option value="1">Simple graph</option><option value="19">Simple graph prototype</option><option value="6">Status of Zabbix</option><option value="15">System status</option><option value="5">Trigger info</option><option value="9">Trigger overview</option><option value="11">URL</option></select></div>
-</li>
-<li>
-<div class="table-forms-td-left"><label for="HostName">Graph prototype</label></div>
-<div class="table-forms-td-right"><input type="text" id="caption" name="caption" value="" readonly="readonly" maxlength="255" style="width: 300px;"><div class="form-input-margin"></div><button type="button" id="select" name="select" class="btn-grey">Select</button></div>
-</li>
-<li>
-<div class="table-forms-td-left"></div>
-<div class="table-forms-td-right"><input type="checkbox" id="UseIconmap" class="checkbox-radio"><label for="UseIconmap"><span></span>Dynamic item</label></div>
-</li>
-<!--<li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button type="button">Apply</button><button type="button" class="btn-alt">Remove</button><button type="button" class="btn-alt">Cancel</button></div>
-</li>--></ul>
-<div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Done</button></div>
+	<div class="dashbrd-grid-widget-container" style="height: 210px;">
+		<div class="dashbrd-grid-widget-placeholder" style="left: 954px; top: 0px; width: 636px; height: 210px; display: none;"></div>
+		<div class="dashbrd-grid-empty-placeholder" style="display: none;">
+			<h1><a href="#">Add a new widget</a></h1>
+		</div>
+		<div class="dashbrd-grid-widget ui-draggable ui-resizable ui-resizable-autohide" style="min-height: 70px; min-width: 8.33333%; left: 0%; top: 0px; width: 16.6667%; height: 210px; position: absolute;">
+			<div class="dashbrd-grid-widget-mask" style="display: none;"></div>
+			<div class="dashbrd-grid-widget-padding">
+				<div class="dashbrd-grid-widget-head cursor-move">
+					<h4>Clock</h4>
+					<ul style="display: none;">
+						<li><button type="button" class="btn-widget-action" data-menu-popup=""></button></li>
+					</ul>
+					<ul class="dashbrd-widg-edit">
+						<li><button type="button" class="btn-widget-edit" title="Edit"></button></li>
+						<li><button type="button" class="btn-widget-delete" title="Delete"></button></li>
+					</ul>
+				</div>
+				<div class="dashbrd-grid-widget-content" style="opacity: 1;">
+					<div id="5b0e94c74cfd4" class="clock">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="clock-svg">
+						<circle cx="50" cy="50" r="50" class="clock-face"></circle>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(330 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(300 50 50)" class="clock-lines"></rect>
+						<rect width="2.5" height="7" x="48.75" y="5" transform="rotate(270 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(240 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(210 50 50)" class="clock-lines"></rect>
+						<rect width="2.5" height="7" x="48.75" y="5" transform="rotate(180 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(150 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(120 50 50)" class="clock-lines"></rect>
+						<rect width="2.5" height="7" x="48.75" y="5" transform="rotate(90 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(60 50 50)" class="clock-lines"></rect>
+						<rect width="1.5" height="5" x="49.25" y="5" transform="rotate(30 50 50)" class="clock-lines"></rect>
+						<rect width="2.5" height="7" x="48.75" y="5" transform="rotate(0 50 50)" class="clock-lines"></rect>
+						<rect width="3.25" height="24" x="48.375" y="26" rx="1.5" ry="1.5" class="clock-hand-h clock-hand" transform="rotate(105.05833333333332 50 50)"></rect>
+						<rect width="3.25" height="35" x="48.375" y="15" rx="1.5" ry="1.5" class="clock-hand-m clock-hand" transform="rotate(180.7 50 50)"></rect>
+						<rect width="1.5" height="55" x="49.25" y="5" class="clock-hand-s clock-hand-sec" transform="rotate(42 50 50)"></rect>
+						<circle cx="50" cy="50" r="3.5" class="clock-hand-sec"></circle>
+					</svg>
+					</div>
+				</div>
+				<div class="dashbrd-grid-widget-foot" style="opacity: 1;">
+					<ul>
+						<li>
+							<div class="time-zone-5b0e94c74cfd4 grey">15:30:07</div>
+						</li>
+						<li>Updated: 15:10:47</li>
+					</ul>
+				</div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-n" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-n"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-e" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-e"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-s" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-s"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-w" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-w"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-ne" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-se" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-sw" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-nw" style="display: none;"></div>
+		</div>
+		<div class="dashbrd-grid-widget ui-draggable ui-resizable ui-resizable-autohide" style="min-height: 70px; min-width: 8.33333%; left: 16.6667%; top: 0px; width: 33.3333%; height: 210px; position: absolute;">
+			<div class="dashbrd-grid-widget-mask" style="display: none;"></div>
+			<div class="dashbrd-grid-widget-padding">
+				<div class="dashbrd-grid-widget-head cursor-move">
+					<h4>Problem hosts</h4>
+					<ul style="display: none;">
+						<li><button type="button" class="btn-widget-action" data-menu-popup=""></button></li>
+					</ul>
+					<ul class="dashbrd-widg-edit">
+						<li><button type="button" class="btn-widget-edit" title="Edit"></button></li>
+						<li><button type="button" class="btn-widget-delete" title="Delete"></button></li>
+					</ul>
+				</div>
+				<div class="dashbrd-grid-widget-content" style="opacity: 1;">
+					<table class="list-table" id="t5b0e94c74c7e1461001131">
+						<thead>
+							<tr>
+								<th>Host group<span class="arrow-up"></span></th>
+								<th>Without problems</th>
+								<th>With problems</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><a href="">Zabbix servers</a></td>
+								<td></td>
+								<td class="disaster-bg">
+									<a class="link-action" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">1</a>
+									<div class="hint-box" style="display: none;">
+										<table class="list-table" id="t5b0e94c74c719541823787">
+											<thead>
+												<tr>
+													<th>Host</th>
+													<th>Disaster</th>
+													<th>High</th>
+													<th>Average</th>
+													<th>Warning</th>
+													<th>Information</th>
+													<th>Not classified</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td class="nowrap"><a href="">Zabbix server</a></td>
+													<td class="disaster-bg">1</td>
+													<td class="high-bg">2</td>
+													<td class="average-bg">3</td>
+													<td class="warning-bg">2</td>
+													<td class="info-bg">2</td>
+													<td class="na-bg">2</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</td>
+								<td>1</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="dashbrd-grid-widget-foot" style="opacity: 1;">
+					<ul>
+						<li>Updated: 15:10:47</li>
+					</ul>
+				</div>
+				<div></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-n" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-n"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-e" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-e"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-s" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-s"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-w" style="display: none;">
+				<div class="ui-resize-dot"></div>
+				<div class="ui-resizable-border-w"></div>
+			</div>
+			<div class="ui-resizable-handle ui-resizable-ne" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-se" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-sw" style="display: none;"></div>
+			<div class="ui-resizable-handle ui-resizable-nw" style="display: none;"></div>
+		</div>
+		<div class="dashbrd-grid-widget ui-draggable ui-resizable ui-resizable-autohide" style="min-height: 70px; min-width: 8.33333%; left: 50%; top: 0px; width: 33.3333%; height: 210px; position: absolute;">
+			<div class="dashbrd-grid-widget-mask" style="display: none;"></div>
+			<div class="dashbrd-grid-widget-padding">
+				<div class="dashbrd-grid-widget-head cursor-move">
+					<h4>Action log</h4>
+					<ul style="display: none;"><li><button type="button" class="btn-widget-action" "></button></li></ul>
+					<ul class="dashbrd-widg-edit "><li><button type="button " class="btn-widget-edit " title="Edit "></button></li><li><button type="button " class="btn-widget-delete " title="Delete "></button></li></ul>
 </div>
-
-
-	<div class="overlay-dialogue" style="top: 20px; left: 700px">
-	<button type="button" class="overlay-close-btn"></button>
-		<table class="list-table">
+<div class="preloader-container ">
+	<div class="preloader "></div>
+</div>
+<div class="dashbrd-grid-widget-content " style="opacity: 1; ">
+	<table class="list-table " id="t5b0e94c74a7c7767161919 ">
 		<thead>
-		<tr>
-			<th>Host</th>
-			<th>Disaster</th>
-			<th>High</th>
-			<th>Average</th>
-			<th>Warning</th>
-			<th>Information</th>
-			<th>Not classified</th>
-		</tr>
+			<tr>
+				<th>Time<span class="arrow-down "></span></th>
+				<th>Action</th>
+				<th>Type</th>
+				<th>Recipient</th>
+				<th>Message</th>
+				<th>Status</th>
+				<th>Info</th>
+			</tr>
 		</thead>
 		<tbody>
-			<tr><td><a href="#">vSphere 001</a></td><td class="disaster-bg">25</td><td class="high-bg">7</td><td class="average-bg">0</td><td class="warning-bg">2</td><td class="info-bg">0</td><td class="na-bg">0</td></tr>
-			<tr><td><a href="#">vSphere 002</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-			<tr><td><a href="#">vSphere 003</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-			<tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-			<tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr class="nothing-to-show ">
+				<td colspan="7 ">No data found.</td>
+			</tr>
 		</tbody>
-		</table>
-	</div>
-
-	</div></div>
-	<div class="footer">
-	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
-	</div>
-
-
-	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
-<!--
-	<div id="" class="overlay-dialogue notif" style="top: 128px; right: 13px">
-	<button type="button" class="overlay-close-btn"></button>
-	<div class="dashbrd-widget-head cursor-move">
-	<ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
-	<ul class="notif-body">
-		<li><div class="notif-indic disaster-bg"></div>
-		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic high-bg"></div>
-		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic average-bg"></div>
-		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic warning-bg"></div>
-		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic normal-bg"></div>
-		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic normal-bg"></div>
-		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic normal-bg"></div>
-		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-		<li><div class="notif-indic normal-bg"></div>
-		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
-		</li>
-	</ul>
-	</div>
--->
-<div style="top: 128px; left: 1400px" class="overlay-dialogue"><button type="button" class="overlay-close-btn"></button>
-	<ul class="notif-body">
-		<li><div class="notif-indic normal-bg"></div>
-		<h4>OK</h4>
-		<p class="grey"></p></li>
-		<li><div class="notif-indic na-bg"></div>
-		<h4>Not classified</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic info-bg"></div>
-		<h4>Information</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic warning-bg"></div>
-		<h4>Warning</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic average-bg"></div>
-		<h4>Average</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic high-bg"></div>
-		<h4>High</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic disaster-bg"></div>
-		<h4>Disaster</h4>
-		<p class="grey">Problem</p>
-		</li>
-		<li><div class="notif-indic-container"><div class="notif-indic normal-bg"></div><div class="notif-indic na-bg"></div><div class="notif-indic info-bg"></div><div class="notif-indic warning-bg"></div><div class="notif-indic average-bg"></div><div class="notif-indic high-bg"></div><div class="notif-indic disaster-bg"></div>
-		<p class="grey">Age less then 30 m</p>
-		</div>
-		</li>
-	</ul>
+	</table>
 </div>
-
-<div class="btn-debug"><a href="">Hide Debug</a></div>
+<div class="dashbrd-grid-widget-foot " style="opacity: 1; ">
+	<ul class="dashbrd-widget-foot "><li>Updated: 15:10:47</li></ul>
+</div>
+</div>
+<div class="ui-resizable-handle ui-resizable-n " style="display: flex; ">
+	<div class="ui-resize-dot "></div>
+	<div class="ui-resizable-border-n "></div>
+</div>
+<div class="ui-resizable-handle ui-resizable-e " style="display: flex; ">
+	<div class="ui-resize-dot "></div>
+	<div class="ui-resizable-border-e "></div>
+</div>
+<div class="ui-resizable-handle ui-resizable-s " style="display: flex; ">
+	<div class="ui-resize-dot "></div>
+	<div class="ui-resizable-border-s "></div>
+</div>
+<div class="ui-resizable-handle ui-resizable-w " style="display: flex; ">
+	<div class="ui-resize-dot "></div>
+	<div class="ui-resizable-border-w "></div>
+</div>
+<div class="ui-resizable-handle ui-resizable-ne " style="display: block; "></div>
+<div class="ui-resizable-handle ui-resizable-se " style="display: block; "></div>
+<div class="ui-resizable-handle ui-resizable-sw " style="display: block; "></div>
+<div class="ui-resizable-handle ui-resizable-nw " style="display: block; "></div>
+</div>
+</div>
+</main>
+<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
+<div id="overlay_bg" class="overlay-bg" data-dialogueid="widgetConfg"></div>
+<div id="overlay_dialogue" class="overlay-dialogue modal" data-dialogueid="widgetConfg" role="dialog" aria-modal="true" aria-labeledby="dashbrd-widget-head-title-widgetConfg" style="left: 675px; top: 410px;">
+	<button class="overlay-close-btn"></button>
+	<div class="dashbrd-widget-head">
+		<h4 id="dashbrd-widget-head-title-widgetConfg">Add widget</h4>
+	</div>
+	<div class="overlay-dialogue-body">
+		<form method="post" accept-charset="utf-8" id="widget_dialogue_form" name="widget_dialogue_form" aria-labeledby="dashbrd-widget-head-title-widgetConfg">
+			<ul class="table-forms">
+				<li>
+					<div class="table-forms-td-left"><label for="type">Type</label></div>
+					<div class="table-forms-td-right">
+						<select id="type" name="type" onchange="updateWidgetConfigDialogue()" autocomplete="off">
+							<option value="actionlog" selected="selected">Action log</option>
+							<option value="clock">Clock</option>
+							<option value="dataover">Data overview</option>
+							<option value="discovery">Discovery status</option>
+							<option value="favgraphs">Favourite graphs</option>
+							<option value="favmaps">Favourite maps</option>
+							<option value="favscreens">Favourite screens</option>
+							<option value="graph">Graph</option>
+							<option value="map">Map</option>
+							<option value="navtree">Map navigation tree</option>
+							<option value="plaintext">Plain text</option>
+							<option value="problemhosts">Problem hosts</option>
+							<option value="problems">Problems</option>
+							<option value="problemsbysv">Problems by severity</option>
+							<option value="systeminfo">System information</option>
+							<option value="trigover">Trigger overview</option>
+							<option value="url">URL</option>
+							<option value="web">Web monitoring</option>
+						</select>
+					</div>
+				</li>
+				<li>
+					<div class="table-forms-td-left"><label for="name">Name</label></div>
+					<div class="table-forms-td-right"><input type="text" id="name" name="name" value="" maxlength="255" placeholder="default" style="width: 453px;"></div>
+				</li>
+				<li>
+					<div class="table-forms-td-left"><label for="rf_rate">Refresh interval</label></div>
+					<div class="table-forms-td-right">
+						<select id="rf_rate" name="rf_rate" autocomplete="off">
+							<option value="-1" selected="selected">Default (1 minute)</option>
+							<option value="0">No refresh</option>
+							<option value="10">10 seconds</option>
+							<option value="30">30 seconds</option>
+							<option value="60">1 minute</option>
+							<option value="120">2 minutes</option>
+							<option value="600">10 minutes</option>
+							<option value="900">15 minutes</option>
+						</select>
+					</div>
+				</li>
+				<li>
+					<div class="table-forms-td-left"><label for="sort_triggers">Sort entries by</label></div>
+					<div class="table-forms-td-right">
+						<select id="sort_triggers" name="sort_triggers" autocomplete="off">
+							<option value="4" selected="selected">Time (descending)</option>
+							<option value="3">Time (ascending)</option>
+							<option value="6">Type (descending)</option>
+							<option value="5">Type (ascending)</option>
+							<option value="8">Status (descending)</option>
+							<option value="7">Status (ascending)</option>
+							<option value="12">Recipient (descending)</option>
+							<option value="11">Recipient (ascending)</option>
+						</select>
+					</div>
+				</li>
+				<li>
+					<div class="table-forms-td-left"><label for="show_lines" class="form-label-asterisk">Show lines</label></div>
+					<div class="table-forms-td-right"><input type="text" id="show_lines" name="show_lines" value="25" maxlength="3" style="text-align: right;width: 75px;" onchange="validateNumericBox(this, false, true);" aria-required="true"></div>
+				</li>
+			</ul>
+			<input type="submit" id="dashboard_widget_config_submit" name="dashboard_widget_config_submit" value="" style="display: none;">
+		</form>
+	</div>
+	<div class="overlay-dialogue-footer"><button type="button" class="dialogue-widget-save">Add</button><button type="button" class="btn-alt">Cancel</button></div>
+</div>
 </body>
 </html>

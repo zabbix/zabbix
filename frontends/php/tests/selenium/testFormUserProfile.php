@@ -437,8 +437,8 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//button[@id='start'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//button[@id='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {
@@ -447,8 +447,8 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
-			$this->zbxTestAssertElementNotPresentXpath("//button[@id='start'][@disabled]");
-			$this->zbxTestAssertElementNotPresentXpath("//button[@id='stop'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//button[@name='start'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//button[@name='stop'][@disabled]");
 		}
 		else {
 			$this->zbxTestCheckboxSelect('messages_enabled', false);
@@ -456,8 +456,8 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.repeat'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//button[@id='start'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//button[@id='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 		}
 
 		$this->zbxTestClickWait('update');

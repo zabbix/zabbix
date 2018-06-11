@@ -23,8 +23,10 @@ PROGNAME = $(TARGETDIR)\$(TARGETNAME).$(TARGETEXT)
 
 PDBS = $(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).$(TARGETEXT).pdb
 
-ADD_CFLAGS = $(ADD_CFLAGS) /D WITH_AGENT_METRICS /D WITH_COMMON_METRICS /D WITH_SPECIFIC_METRICS \
-	/D WITH_HOSTNAME_METRIC /D WITH_SIMPLE_METRICS /Zi /Fd$(TARGETNAME).$(TARGETEXT).pdb
+ADD_CFLAGS = $(ADD_CFLAGS) /D WITH_AGENT_METRICS /D WITH_COMMON_METRICS \
+	/D WITH_SPECIFIC_METRICS /D WITH_HOSTNAME_METRIC /D WITH_SIMPLE_METRICS \
+	/Zi /D DEFAULT_CONFIG_FILE="\"C:\\zabbix_agentd.conf\"" \
+	/Fd$(TARGETNAME).$(TARGETEXT).pdb
 
 ADD_LFLAGS = $(ADD_LFLAGS) /DEBUG /OPT:REF /DELAYLOAD:wevtapi.dll
 
@@ -45,6 +47,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
+	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\md5.o \

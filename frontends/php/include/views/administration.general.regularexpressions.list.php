@@ -21,12 +21,15 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
-			->addItem(new CSubmit('form', _('New regular expression')))
-		)
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
+				->addItem(new CSubmit('form', _('New regular expression')))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())->setName('regularExpressionsForm');

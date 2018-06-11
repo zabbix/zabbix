@@ -25,17 +25,23 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
-	)
-	->addItem((new CFilter('web.scripts.filter.state'))
-		->addVar('action', 'script.list')
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
 		))
+			->setAttribute('aria-label', _('Content controls'))
+	)
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+		])
+		->addVar('action', 'script.list')
 	);
 
 $scriptsForm = (new CForm())

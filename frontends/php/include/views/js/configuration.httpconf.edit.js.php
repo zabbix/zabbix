@@ -232,56 +232,6 @@
 			},
 
 			/**
-			 * Merge 'query_fields' values with ones from URL.
-			 *
-			 * @param {string}	formid	Id of current form HTML element.
-			 * @param {string}	type	Type of pairs that should be merged.
-			 * @param {object}	pairs	Object with pair data.
-			 */
-			merge: function (formid, type, pairs) {
-				var	pair,
-					queryFields = [],
-					existingPairs = Object.keys(allPairs);
-
-				if (pairs.length > 0) {
-					this.cleanup(formid, type);
-				}
-
-				for (var p = 0; p < existingPairs.length; p++) {
-					if (typeof allPairs[existingPairs[p]] !== 'undefined'
-							&& allPairs[existingPairs[p]].type === type
-							&& allPairs[existingPairs[p]].formid === formid
-							&& allPairs[existingPairs[p]].name.indexOf('[]') === -1) {
-						queryFields.push(allPairs[existingPairs[p]]);
-					}
-				}
-
-				for (var i = 0; i < pairs.length; i++) {
-					pair = null;
-					for (var p = 0; p < queryFields.length; p++) {
-						if (queryFields[p].name === pairs[i].name) {
-							pair = queryFields[p];
-							break;
-						}
-					}
-
-					if (pair === null) {
-						renderPairRow(formid, createNewPair({
-							formid: formid,
-							type: type,
-							name: pairs[i].name,
-							value: pairs[i].value
-						}));
-					}
-					else {
-						jQuery('#pairs_' + pair.id + '_value').val(pairs[i].value);
-					}
-				}
-
-				refreshContainers();
-			},
-
-			/**
 			 * Removes all new pairs with empty name and value (of given type withing given form).
 			 *
 			 * @param {string}	formid	Id of current form HTML element.
@@ -466,7 +416,7 @@
 
 		// Http step add pop up.
 		<?php if (!$this->data['templated']) : ?>
-			$('#add_step').click(function() {
+			$('#add_step').click(function(event) {
 				var form = $(this).parents('form');
 
 				// Append existing step names.
@@ -480,13 +430,13 @@
 					popup_options['steps_names'] = step_names;
 				}
 
-				return PopUp('popup.httpstep', popup_options);
+				return PopUp('popup.httpstep', popup_options, null, event.target);
 			});
 		<?php endif ?>
 
 		// Http step edit pop up.
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?= $i ?>').click(function() {
+			$('#name_<?= $i ?>').click(function(event) {
 				// Append existing step names.
 				var step_names = [];
 				var form = $(this).parents('form');
@@ -517,7 +467,7 @@
 
 				return PopUp('popup.httpstep',jQuery.extend(popup_options,{
 					stepid: jQuery(this).attr('name_step')
-				}));
+				}), null, event.target);
 			});
 		<?php endforeach ?>
 
@@ -677,84 +627,38 @@
 	 * @param {string}	formid	Id of current form HTML element.
 	 */
 	function parseUrl(formid) {
-		var i,
-			query,
-			index,
-			fields,
-			pair,
-			hasErrors = false,
-			pairs = [],
-			target = jQuery('#url', jQuery('#'+formid)),
-			url = target.val();
+		var target = jQuery('#url', jQuery('#'+formid)),
+			url = parseUrlString(target.val());
 
-		index = url.indexOf('#');
-		if (index !== -1)
-			url = url.substring(0, index);
-
-		index = url.indexOf('?');
-		if (index !== -1) {
-			query = url.substring(index + 1);
-			url = url.substring(0, index);
-
-			fields = query.split('&');
-			for (i = 0; i < fields.length; i++) {
-				if (fields[i].length === 0 || fields[i] === '=')
-					continue;
-
-				pair = {};
-				index = fields[i].indexOf('=');
-				if (index > 0) {
-					pair.name = fields[i].substring(0, index);
-					pair.value = fields[i].substring(index + 1);
-				}
-				else {
-					if (index === 0) {
-						fields[i] = fields[i].substring(1);
-					}
-					pair.name = fields[i];
-					pair.value = '';
-				}
-
-				try {
-					if (/%[01]/.match(pair.name) || /%[01]/.match(pair.value) ) {
-						// Non-printable characters in URL.
-						throw null;
-					}
-					pair.name = decodeURIComponent(pair.name.replace(/\+/g, ' '));
-					pair.value = decodeURIComponent(pair.value.replace(/\+/g, ' '));
-				}
-				catch( e ) {
-					// Malformed url.
-					hasErrors = true;
-					break;
-				}
-
-				pairs.push(pair);
-			}
-
-			if (hasErrors === true) {
-				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Error')); ?>,
-					'content': jQuery('<span>').html(<?=
-						CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
-					?>),
-					'buttons': [
-						{
-							title: <?= CJs::encodeJson(_('Ok')); ?>,
-							class: 'btn-alt',
-							focused: true,
-							action: function() {}
-						}
-					]
+		if (typeof url === 'object') {
+			if (url.pairs.length > 0) {
+				jQuery.each(url.pairs, function(i, pair) {
+					pair.type = 'query_fields';
+					pairManager.addNew(formid, pair);
 				});
-
-				return false;
+				pairManager.cleanup(formid, 'query_fields');
 			}
 
-			pairManager.merge(formid, 'query_fields', pairs);
+			target.val(url.url);
 		}
+		else {
+			overlayDialogue({
+				'title': <?= CJs::encodeJson(_('Error')); ?>,
+				'content': jQuery('<span>').html(<?=
+					CJs::encodeJson(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
+				?>),
+				'buttons': [
+					{
+						title: <?= CJs::encodeJson(_('Ok')); ?>,
+						class: 'btn-alt',
+						focused: true,
+						action: function() {}
+					}
+				]
+			});
 
-		target.val(url);
+			return false;
+		}
 	}
 
 	/**

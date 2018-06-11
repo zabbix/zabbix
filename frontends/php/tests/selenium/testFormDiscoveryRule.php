@@ -245,7 +245,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['form']);
 		}
 		else {
-			$this->zbxTestClickWait('form');
+			$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 		}
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -890,7 +890,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
@@ -916,7 +916,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -929,7 +929,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '1w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -942,7 +942,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '2d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -955,7 +955,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '25h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -968,7 +968,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'delay' => '1441m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -1357,7 +1357,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'discovery-simple-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1366,7 +1367,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1385,7 +1387,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1418,7 +1421,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
 					'key' => 'discovery-zabbix-internal',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1438,7 +1442,8 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'discovery-external-check',
-					'dbCheck' => true
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			],
 			[
@@ -1473,6 +1478,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
+					'formCheck' => true,
 					'remove' => true
 				]
 			],
@@ -1591,7 +1597,7 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
@@ -1729,6 +1735,18 @@ class testFormDiscoveryRule extends CWebTest {
 					break;
 				default:
 					$this->zbxTestAssertNotVisibleId('interfaceid');
+			}
+
+			// "Check now" button availability
+			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent',
+					'Zabbix internal', 'External check', 'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
+					'JMX agent'])) {
+				$this->zbxTestClick('check_now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+				$this->zbxTestCheckFatalErrors();
+			}
+			else {
+				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
 			}
 
 			if (isset($data['ipmi_sensor'])) {

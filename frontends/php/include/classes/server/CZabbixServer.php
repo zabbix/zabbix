@@ -173,7 +173,7 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Retrieve Status of Zabbix information.
+	 * Retrieve System information.
 	 *
 	 * @param $sid
 	 *

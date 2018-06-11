@@ -42,4 +42,23 @@ class ZabbixException extends Exception
 	{
 		super(cause);
 	}
+
+	static Throwable getRootCause(Throwable e)
+	{
+		Throwable cause = null;
+		Throwable result = e;
+
+		while ((null != (cause = result.getCause())) && (result != cause))
+			result = cause;
+
+		return result;
+	}
+	
+	static String getRootCauseMessage(Throwable e)
+	{
+		if (e != null)
+			return getRootCause(e).getMessage();
+
+		return null;
+	}
 }

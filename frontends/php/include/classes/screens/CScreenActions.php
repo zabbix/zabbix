@@ -155,8 +155,8 @@ class CScreenActions extends CScreenBase {
 			}
 
 			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
-				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
-				: $alert['sendto'];
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
+				: zbx_nl2br($alert['sendto']);
 
 			$info_icons = [];
 			if ($alert['error'] !== '') {

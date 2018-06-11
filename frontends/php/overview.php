@@ -130,27 +130,29 @@ $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTI
 /*
  * Display
  */
-$data = [
-	'fullscreen' => $_REQUEST['fullscreen'],
-	'type' => $type,
-	'view_style' => $viewStyle,
-	'config' => $config
-];
-
-$data['pageFilter'] = new CPageFilter([
+$page_filter = new CPageFilter([
 	'groups' => [
-		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
+		($type == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	],
 	'hosts' => [
 		'monitored_hosts' => true,
-		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
+		($type == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	],
 	'hostid' => getRequest('hostid'),
 	'groupid' => getRequest('groupid')
 ]);
 
-$data['groupid'] = $data['pageFilter']->groupid;
-$data['hostid'] = $data['pageFilter']->hostid;
+$data = [
+	'fullscreen' => (bool) getRequest('fullscreen', false),
+	'type' => $type,
+	'view_style' => $viewStyle,
+	'config' => $config,
+	'pageFilter' => $page_filter,
+	'groupid' => $page_filter->groupid,
+	'hostid' => $page_filter->hostid,
+	'profileIdx' => 'web.overview.filter',
+	'active_tab' => CProfile::get('web.overview.filter.active', 1)
+];
 
 // fetch trigger data
 if ($type == SHOW_TRIGGERS) {
@@ -191,7 +193,7 @@ if ($type == SHOW_TRIGGERS) {
 		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
 		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
 		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
-		'maintenance' => !$filter['showMaintenance'] ? false : null,
+		'maintenance' => !$filter['showMaintenance'] ? false : null
 	];
 
 	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];

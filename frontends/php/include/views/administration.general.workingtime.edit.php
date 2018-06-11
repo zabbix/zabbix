@@ -21,9 +21,14 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Working time'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.workingtime.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.workingtime.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $workingTimeView = (new CTabView())
@@ -39,6 +44,7 @@ $workingTimeView = (new CTabView())
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $workingTimeForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($workingTimeView);
 
 $widget->addItem($workingTimeForm);

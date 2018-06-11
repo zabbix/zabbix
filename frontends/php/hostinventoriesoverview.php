@@ -85,20 +85,21 @@ foreach($inventoryFields as $inventoryField){
 	}
 }
 
-$controls = (new CList())
-	->addItem([
-		new CLabel(_('Group'), 'groupid'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$pageFilter->getGroupsCB()
-	])
-	->addItem([
-		new CLabel(_('Grouping by'), 'groupby'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$inventoryFieldsComboBox
-	]);
-
 $hostinvent_wdgt->setControls(
-	(new CForm('get'))->addItem($controls)
+	(new CForm('get'))
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem((new CList())
+			->addItem([
+				new CLabel(_('Group'), 'groupid'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$pageFilter->getGroupsCB()
+			])
+			->addItem([
+				new CLabel(_('Grouping by'), 'groupby'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$inventoryFieldsComboBox
+			])
+		)
 );
 
 $table = (new CTableInfo())

@@ -20,27 +20,35 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
+	->setControls((new CTag('nav', true,
+		(new CForm('get'))
+			->cleanItems()
 			->addItem(
-				new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-					'screens.php' => _('Screens'),
-					'slides.php' => _('Slide shows')
-				])
+				(new CList())
+					->addItem(
+						new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+							'screens.php' => _('Screens'),
+							'slides.php' => _('Slide shows')
+						])
+					)
+					->addItem(new CSubmit('form', _('Create slide show')))
 			)
-			->addItem(new CSubmit('form', _('Create slide show')))
-		)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 // filter
 $widget->addItem(
-	(new CFilter('web.slideconf.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
+	(new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+		])
 );
 
 // Create form.

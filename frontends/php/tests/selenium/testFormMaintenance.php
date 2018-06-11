@@ -34,13 +34,13 @@ class testFormMaintenance extends CWebTest {
 	public $name = 'Test maintenance';
 
 	/**
-	 * Create maintenace with periods and host group.
+	 * Create maintenance with periods and host group.
 	 */
 	public function testFormMaintenance_Create() {
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
 		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckHeader('Maintenance periods');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create maintenance period');
 
 		// Type maintenance name.
 		$this->zbxTestInputTypeWait('mname', $this->name);
@@ -85,8 +85,9 @@ class testFormMaintenance extends CWebTest {
 
 		// Open "Hosts & Groups" tab and add group.
 		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts & Groups');
-		$this->zbxTestDropdownSelect('groupids_right', 'Zabbix servers');
-		$this->zbxTestClickXpath('//table[@name=\'groupids_tweenbox\']//button[@id=\'add\']');
+		$this->zbxTestClickButtonMultiselect('groupids_');
+		$this->zbxTestLaunchOverlayDialog('Host groups');
+		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
 		// Create maintenance and check the results in frontend.
 		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');

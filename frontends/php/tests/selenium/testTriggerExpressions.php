@@ -38,7 +38,7 @@ class testTriggerExpressions extends CWebTest {
 		$this->zbxTestLogin('triggers.php?form=update&hostid=10084&triggerid=13504');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Expression constructor');
-		$this->zbxTestClickWait('test_expression');
+		$this->zbxTestClickButtonText('Test');
 		$this->zbxTestLaunchOverlayDialog('Test');
 
 		// Type values in expression testing form

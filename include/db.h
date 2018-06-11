@@ -140,12 +140,32 @@ struct	_DC_TRIGGER;
 #define ITEM_PRIVATEKEY_LEN_MAX		(ITEM_PRIVATEKEY_LEN + 1)
 #define ITEM_JMX_ENDPOINT_LEN		255
 #define ITEM_JMX_ENDPOINT_LEN_MAX	(ITEM_JMX_ENDPOINT_LEN + 1)
+#define ITEM_TIMEOUT_LEN		255
+#define ITEM_TIMEOUT_LEN_MAX		(ITEM_TIMEOUT_LEN + 1)
+#define ITEM_URL_LEN			2048
+#define ITEM_URL_LEN_MAX		(ITEM_URL_LEN + 1)
+#define ITEM_QUERY_FIELDS_LEN		2048
+#define ITEM_QUERY_FIELDS_LEN_MAX	(ITEM_QUERY_FIELDS_LEN + 1)
+#define ITEM_STATUS_CODES_LEN		255
+#define ITEM_STATUS_CODES_LEN_MAX	(ITEM_STATUS_CODES_LEN + 1)
+#define ITEM_HTTP_PROXY_LEN		255
+#define ITEM_HTTP_PROXY_LEN_MAX		(ITEM_HTTP_PROXY_LEN + 1)
+#define ITEM_SSL_KEY_PASSWORD_LEN	64
+#define ITEM_SSL_KEY_PASSWORD_LEN_MAX	(ITEM_SSL_KEY_PASSWORD_LEN + 1)
+#define ITEM_SSL_CERT_FILE_LEN		255
+#define ITEM_SSL_CERT_FILE_LEN_MAX	(ITEM_SSL_CERT_FILE_LEN + 1)
+#define ITEM_SSL_KEY_FILE_LEN		255
+#define ITEM_SSL_KEY_FILE_LEN_MAX	(ITEM_SSL_KEY_FILE_LEN + 1)
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define ITEM_PARAM_LEN		2048
 #	define ITEM_DESCRIPTION_LEN	2048
+#	define ITEM_POSTS_LEN		2048
+#	define ITEM_HEADERS_LEN		2048
 #else
 #	define ITEM_PARAM_LEN		65535
 #	define ITEM_DESCRIPTION_LEN	65535
+#	define ITEM_POSTS_LEN		65535
+#	define ITEM_HEADERS_LEN		65535
 #endif
 
 #define HISTORY_STR_VALUE_LEN		255
@@ -547,8 +567,8 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
 
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids, char **error);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
@@ -698,12 +718,12 @@ typedef struct
 	const char	*error;
 
 	zbx_uint64_t	flags;
-#define ZBX_FLAGS_ITEM_DIFF_UNSET			0x0000
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE		0x0001
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		0x0002
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		0x0004
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		0x0008
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		0x1000
+#define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE		__UINT64_C(0x0001)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		__UINT64_C(0x0002)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		__UINT64_C(0x0004)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		__UINT64_C(0x0008)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		__UINT64_C(0x1000)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_DB			\
 	(ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR |\
 	ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE)
@@ -718,5 +738,25 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 		zbx_vector_uint64_t *r_eventids);
 
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
+
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	unsigned char	compress;
+	int		version;
+	int		lastaccess;
+
+#define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\
+		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
+	zbx_uint64_t	flags;
+}
+zbx_proxy_diff_t;
 
 #endif

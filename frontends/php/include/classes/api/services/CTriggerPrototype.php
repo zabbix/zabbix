@@ -31,8 +31,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Get trigger prototypes from database.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/get
-	 *
 	 * @param array $options
 	 *
 	 * @return array|int
@@ -215,7 +213,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where'][] = dbConditionString('f.function', $options['functions']);
+			$sqlParts['where'][] = dbConditionString('f.name', $options['functions']);
 		}
 
 		// monitored
@@ -341,7 +339,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['groups'] = 'groups g';
+			$sqlParts['from']['hstgrp'] = 'hstgrp g';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -424,8 +422,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Create new trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/create
-	 *
 	 * @param array $trigger_prototypes
 	 *
 	 * @return array
@@ -460,8 +456,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Update existing trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/update
-	 *
 	 * @param array $trigger_prototypes
 	 *
 	 * @return array
@@ -495,8 +489,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	/**
 	 * Delete existing trigger prototypes.
-	 *
-	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/delete
 	 *
 	 * @param array $triggerPrototypeIds
 	 * @param bool  $nopermissions

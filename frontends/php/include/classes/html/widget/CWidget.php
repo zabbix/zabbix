@@ -78,7 +78,8 @@ class CWidget {
 		$divs = [];
 
 		if ($this->title !== null) {
-			$divs[] = (new CDiv(new CTag('h1', true, $this->title)))->addClass(ZBX_STYLE_CELL);
+			$divs[] = (new CDiv((new CTag('h1', true, $this->title))->setId(ZBX_STYLE_PAGE_TITLE)))
+				->addClass(ZBX_STYLE_CELL);
 		}
 
 		if ($this->controls !== null) {

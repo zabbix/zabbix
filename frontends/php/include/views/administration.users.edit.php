@@ -33,6 +33,7 @@ else {
 // create form
 $userForm = (new CForm())
 	->setName('userForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 
 if ($data['userid'] != 0) {
@@ -43,6 +44,7 @@ if ($data['userid'] != 0) {
  * User tab
  */
 $userFormList = new CFormList('userFormList');
+$form_autofocus = false;
 
 if (!$data['is_profile']) {
 	$userFormList->addRow(
@@ -51,8 +53,9 @@ if (!$data['is_profile']) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
-		->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
+			->setAttribute('maxlength', DB::getFieldLength('users', 'alias'))
 	);
+	$form_autofocus = true;
 	$userFormList->addRow(_x('Name', 'user first name'),
 		(new CTextBox('name', $this->data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -77,15 +80,14 @@ if (!$this->data['is_profile']) {
 		(new CLabel(_('Groups'), 'user_groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'user_groups[]',
-			'objectName' => 'usersGroups',
+			'object_name' => 'usersGroups',
 			'data' => $user_groups,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'usrgrp',
-					'dstfrm' => $userForm->getName(),
-					'dstfld1' => 'user_groups_',
 					'srcfld1' => 'usrgrpid',
-					'multiselect' => '1'
+					'dstfrm' => $userForm->getName(),
+					'dstfld1' => 'user_groups_'
 				]
 			]
 		]))
@@ -97,9 +99,16 @@ if (!$this->data['is_profile']) {
 // append password to form list
 if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
+		$password_box = new CPassBox('password1', $this->data['password1']);
+
+		if (!$form_autofocus) {
+			$form_autofocus = true;
+			$password_box->setAttribute('autofocus', 'autofocus');
+		}
+
 		$userFormList->addRow(
 			(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
-			(new CPassBox('password1', $this->data['password1']))
+			$password_box
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		);
@@ -120,6 +129,11 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 			->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
 			$passwdButton->setAttribute('disabled', 'disabled');
+		}
+
+		if (!$form_autofocus) {
+			$form_autofocus = true;
+			$passwdButton->setAttribute('autofocus', 'autofocus');
 		}
 
 		$userFormList->addRow(_('Password'), $passwdButton);
@@ -164,6 +178,11 @@ elseif (!$allLocalesAvailable) {
 	$languageError = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 }
 
+if (!$form_autofocus && $languageComboBox->getAttribute('disabled') === null) {
+	$languageComboBox->setAttribute('autofocus', 'autofocus');
+	$form_autofocus = true;
+}
+
 $userFormList->addRow(
 	_('Language'),
 	$languageError
@@ -173,7 +192,14 @@ $userFormList->addRow(
 
 // append themes to form list
 $themes = array_merge([THEME_DEFAULT => _('System default')], Z::getThemes());
-$userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], null, $themes));
+$themes_combobox = new CComboBox('theme', $this->data['theme'], null, $themes);
+
+if (!$form_autofocus) {
+	$themes_combobox->setAttribute('autofocus', 'autofocus');
+	$form_autofocus = true;
+}
+
+$userFormList->addRow(_('Theme'), $themes_combobox);
 
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked($data['autologout_visible']);
@@ -257,19 +283,21 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityName = getSeverityName($severity, $this->data['config']);
+			$severity_status_style = getSeverityStatusStyle($severity);
 
 			$mediaActive = ($media['severity'] & (1 << $severity));
 
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
 				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
-				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
+				->addClass($mediaActive ? $severity_status_style : ZBX_STYLE_STATUS_DISABLED_BG);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
 			$media['sendto'] = implode(', ', $media['sendto']);
-			if (strlen($media['sendto']) > 50) {
-				$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
-			}
+		}
+
+		if (mb_strlen($media['sendto']) > 50) {
+			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
 		}
 
 		$mediaTableInfo->addRow(
@@ -279,13 +307,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-				$mediaSeverity,
+				(new CDiv($mediaSeverity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
 				$status,
 				(new CCol(
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).');'),
+							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$id.');')
@@ -302,7 +330,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				->onClick('return PopUp("popup.media",'.
 					CJs::encodeJson([
 						'dstfrm' => $userForm->getName()
-					]).');'
+					]).', null, this);'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK),
 		]))
@@ -352,11 +380,13 @@ if ($this->data['is_profile']) {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.recovery');"),
+					->onClick("javascript: testUserSound('messages_sounds.recovery');")
+					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->onClick('javascript: AudioControl.stop();')
+					->removeId()
 			]
 		]);
 
@@ -386,11 +416,13 @@ if ($this->data['is_profile']) {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick( "javascript: testUserSound('messages_sounds.".$severity."');"),
+					->onClick("javascript: testUserSound('messages_sounds.".$severity."');")
+					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->onClick('javascript: AudioControl.stop();')
+					->removeId()
 			]
 		]);
 
@@ -424,7 +456,7 @@ if (!$data['is_profile']) {
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);
 		$permissionsFormList->addRow(_('User type'), [$userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))]);
-		$userForm->addVar('user_type', $data['user_type']);
+		$userForm->addItem((new CVar('user_type', $data['user_type']))->removeId());
 	}
 	else {
 		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);

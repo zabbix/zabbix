@@ -43,24 +43,19 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 
 		$this->zbxTestClickButtonText('Create proxy');
-		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Hosts', 'Proxy hosts', 'Other hosts', 'Description']);
+		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Proxy address', 'Description']);
 
 		$this->zbxTestAssertElementPresentId('host');
 		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
 		$this->zbxTestAssertElementText("//ul[@id='status']//label[@for='status_0']", 'Active');
 		$this->zbxTestAssertElementText("//ul[@id='status']//label[@for='status_1']", 'Passive');
-		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
-		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
-		$this->zbxTestAssertElementPresentId('add');
-		$this->zbxTestAssertElementPresentId('remove');
 		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// Switch to passive mode
 		$this->zbxTestClickXpathWait("//ul[@id='status']//label[@for='status_1']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ip'));
-		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Hosts', 'Proxy hosts', 'Other hosts', 'Description']);
-		$this->zbxTestTextPresent('Interface');
+		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Interface', 'Description']);
 		$this->zbxTestTextPresent(['IP address', 'DNS name', 'Connect to', 'Port']);
 
 		$this->zbxTestAssertElementPresentId('host');
@@ -72,8 +67,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestAssertAttribute('//input[@id=\'dns\']', 'maxlength', '255');
 		$this->zbxTestAssertElementPresentId('port');
 		$this->zbxTestAssertAttribute('//input[@id=\'port\']', 'maxlength', '64');
-		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
-		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
 		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
 		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 	}
@@ -83,28 +76,27 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// Ok/bad, name, mode, hosts, ip, dns, connect_to, port, error
 		return [
 			[PROXY_GOOD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
-				['ЗАББИКС Сервер'], 0, 0, 'No encryption', 0, ''
+				0, 0, 'No encryption', 0, ''
 			],
 			[PROXY_GOOD, 'New active proxy 2', HOST_STATUS_PROXY_ACTIVE,
-				[], 0, 0, 'PSK', 0, ''
+				0, 0, 'PSK', 0, ''
 			],
 			[PROXY_GOOD, 'New active proxy 3', HOST_STATUS_PROXY_ACTIVE,
-				[], 0, 0, 'Certificate', 0, ''
+				0, 0, 'Certificate', 0, ''
 			],
 			[PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
-				[], '192.168.1.1', 'proxy123.zabbix.com', 'No encryption', 11051, ''
+				'192.168.1.1', 'proxy123.zabbix.com', 'No encryption', 11051, ''
 			],
 			[PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
-				[], '{$PROXY_IP}', 'proxy123.zabbix.com', 'PSK', 11051, ''
+				'{$PROXY_IP}', 'proxy123.zabbix.com', 'PSK', 11051, ''
 			],
 			[PROXY_GOOD, 'New passive proxy with port macro', HOST_STATUS_PROXY_PASSIVE,
-				[], '192.168.1.1', 'proxy123.zabbix.com', 'Certificate', '{$PROXY_PORT}', ''
+				'192.168.1.1', 'proxy123.zabbix.com', 'Certificate', '{$PROXY_PORT}', ''
 			],
 			[
 				PROXY_BAD,
 				'New passive proxy 2',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
@@ -115,7 +107,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 				PROXY_BAD,
 				'%^&',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
@@ -126,7 +117,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 				PROXY_BAD,
 				'Прокси',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'wrong ip',
 				'proxy123.zabbix.com',
 				11051,
@@ -137,7 +127,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 				PROXY_BAD,
 				'New passive proxy 3',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'192.168.1.1',
 				'proxy123.zabbix.com',
 				0,
@@ -147,7 +136,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 			[PROXY_BAD,
 				'Active proxy 1',
 				HOST_STATUS_PROXY_ACTIVE,
-				[],
 				0,
 				0,
 				0,
@@ -157,7 +145,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 			[PROXY_BAD,
 				'New passive proxy with wrong port macro',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'192.168.1.1',
 				'proxy123.zabbix.com',
 				0,
@@ -167,7 +154,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 			[PROXY_BAD,
 				'New passive proxy with wrong IP macro',
 				HOST_STATUS_PROXY_PASSIVE,
-				[],
 				'$PROXY_IP',
 				'proxy123.zabbix.com',
 				0,
@@ -180,7 +166,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $hosts, $ip, $dns, $connect_to, $port, $errormsgs) {
+	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $ip, $dns, $connect_to, $port, $errormsgs) {
 
 		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
@@ -191,11 +177,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 
 		$this->zbxTestInputTypeWait('host', $name);
-		// adding host that will be monitored by this proxy
-		foreach ($hosts as $host) {
-			$this->zbxTestDropdownSelect('proxy_hostids_right', $host);
-			$this->zbxTestClick('add');
-		}
 
 		switch ($mode) {
 			case HOST_STATUS_PROXY_ACTIVE:

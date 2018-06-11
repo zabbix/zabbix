@@ -684,6 +684,10 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 	{
 		strval_dyn = zbx_strdup(strval_dyn, buffer + 5);
 	}
+	else if (0 == strncmp(buffer, "BITS: ", 6))
+	{
+		strval_dyn = zbx_strdup(strval_dyn, buffer + 6);
+	}
 	else
 	{
 		/* snprint_value() escapes hintless ASCII strings, so */

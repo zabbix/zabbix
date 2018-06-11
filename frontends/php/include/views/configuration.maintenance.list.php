@@ -20,30 +20,43 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Maintenance periods'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem(new CSubmit('form', _('Create maintenance period')))
-		))
-	->addItem((new CFilter('web.maintenance.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
-		->addColumn((new CFormList())->addRow(_('State'),
-			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_x('Active', 'maintenance status'), MAINTENANCE_STATUS_ACTIVE)
-				->addValue(_x('Approaching', 'maintenance status'), MAINTENANCE_STATUS_APPROACH)
-				->addValue(_x('Expired', 'maintenance status'), MAINTENANCE_STATUS_EXPIRED)
-				->setModern(true)
-		))
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
+				])
+			),
+		(new CTag('nav', true, new CRedirectButton(_('Create maintenance period'), (new CUrl())
+			->removeArgument('maintenanceid')
+			->setArgument('groupid', $data['pageFilter']->groupid)
+			->setArgument('form', 'create')
+			->getUrl()
+		)))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			),
+			(new CFormList())->addRow(_('State'),
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_x('Active', 'maintenance status'), MAINTENANCE_STATUS_ACTIVE)
+					->addValue(_x('Approaching', 'maintenance status'), MAINTENANCE_STATUS_APPROACH)
+					->addValue(_x('Expired', 'maintenance status'), MAINTENANCE_STATUS_EXPIRED)
+					->setModern(true)
+			)
+		])
 	);
 
 // create form

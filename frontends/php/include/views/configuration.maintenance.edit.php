@@ -24,6 +24,7 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 // create form
 $maintenanceForm = (new CForm())
 	->setName('maintenanceForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);
@@ -92,8 +93,8 @@ else {
 }
 $maintenanceForm->addVar('active_till', $activeTill);
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till'));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since'));
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate));
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -183,34 +184,45 @@ if (isset($_REQUEST['new_timeperiod'])) {
 	);
 }
 
-/*
- * Hosts & groups tab
- */
-$hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))->addRow('',
-	(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
-);
-$hostTweenBox = new CTweenBox($maintenanceForm, 'hostids', $this->data['hostids'], 10);
-foreach ($this->data['hosts'] as $host) {
-	$hostTweenBox->addItem($host['hostid'], $host['name']);
-}
-$groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'submit()');
-foreach ($this->data['all_groups'] as $group) {
-	$groupsComboBox->addItem($group['groupid'], $group['name']);
-}
-$hostTable = (new CTable())
-	->addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
-$hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
+// Hosts and groups tab.
+$hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
+	->addRow('',
+		(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
+	)
+	->addRow(new CLabel(_('Hosts in maintenance'), 'hosts[]'),
+		(new CMultiSelect([
+			'name' => 'hostids[]',
+			'object_name' => 'hosts',
+			'data' => $data['hosts_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
+					'dstfrm' => $maintenanceForm->getName(),
+					'dstfld1' => 'hostids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(new CLabel(_('Groups in maintenance'), 'groups[]'),
+		(new CMultiSelect([
+			'name' => 'groupids[]',
+			'object_name' => 'hostGroup',
+			'data' => $data['groups_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $maintenanceForm->getName(),
+					'dstfld1' => 'groupids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
-$groupTable = new CTable();
-$groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
-foreach ($this->data['all_groups'] as $group) {
-	$groupTweenBox->addItem($group['groupid'], $group['name']);
-}
-$groupTable->addRow($groupTweenBox->get(_('In maintenance'), _('Other groups')));
-
-$hostsAndGroupsFormList->addRow(_('Groups in maintenance'), $groupTable);
-
-// append tabs to form
+// Append tabs to form.
 $maintenanceTab = (new CTabView())
 	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
 	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList)

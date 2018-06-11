@@ -20,8 +20,9 @@
 #include "common.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
-char	*zbx_yaml_assemble_binary_sequence(const char *in, size_t expected)
+char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	fragment, fragments;
@@ -31,8 +32,7 @@ char	*zbx_yaml_assemble_binary_sequence(const char *in, size_t expected)
 
 	buffer = zbx_malloc(NULL, expected);
 
-	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter(in, &fragments)))
-		fail_msg("Cannot get recv data handle: %s", zbx_mock_error_string(error));
+	fragments = zbx_mock_get_parameter_handle(path);
 
 	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(fragments, &fragment))
 	{

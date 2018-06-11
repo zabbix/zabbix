@@ -84,6 +84,19 @@
 #define ZBX_PROTO_TAG_TASKS		"tasks"
 #define ZBX_PROTO_TAG_ALERTID		"alertid"
 #define ZBX_PROTO_TAG_JMX_ENDPOINT	"jmx_endpoint"
+#define ZBX_PROTO_TAG_EVENTID		"eventid"
+#define ZBX_PROTO_TAG_NAME		"name"
+#define ZBX_PROTO_TAG_HOSTS		"hosts"
+#define ZBX_PROTO_TAG_GROUPS		"groups"
+#define ZBX_PROTO_TAG_APPLICATIONS	"applications"
+#define ZBX_PROTO_TAG_TAGS		"tags"
+#define ZBX_PROTO_TAG_TAG		"tag"
+#define ZBX_PROTO_TAG_PROBLEM_EVENTID	"p_eventid"
+#define ZBX_PROTO_TAG_ITEMID		"itemid"
+#define ZBX_PROTO_TAG_COUNT		"count"
+#define ZBX_PROTO_TAG_MIN		"min"
+#define ZBX_PROTO_TAG_AVG		"avg"
+#define ZBX_PROTO_TAG_MAX		"max"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -160,6 +173,8 @@ void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
+void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);
+void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
@@ -175,7 +190,10 @@ int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
 int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
 int		zbx_json_count(const struct zbx_json_parse *jp);
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null);
+void		zbx_json_escape(char **string);
 
+int	zbx_json_path_check(const char *path, char * error, size_t errlen);
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc);
 

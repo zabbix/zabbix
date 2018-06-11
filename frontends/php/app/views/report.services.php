@@ -44,17 +44,18 @@ if ($data['period'] != 'yearly') {
 	]);
 }
 
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
-
-$widget->setControls(
+$widget->setControls(new CList([
 	(new CForm())
 		->cleanItems()
 		->setMethod('get')
 		->addVar('action', 'report.services')
 		->addVar('serviceid', $data['service']['serviceid'])
 		->addVar('fullscreen', $data['fullscreen'])
-		->addItem($controls)
-);
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem($controls),
+	(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+		->setAttribute('aria-label', _('Content controls'))
+]));
 
 $header = [
 	'yearly' => [_('Year'), null, _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')],

@@ -180,3 +180,58 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 
 	return data;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_htole_uint32                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 32 bit                                   *
+ *          from host byte order                                              *
+ *          to little-endian byte order format                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 32 bit in little-endian byte order format   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data)
+{
+	unsigned char	buf[4];
+
+	buf[0] = (unsigned char)data;	data >>= 8;
+	buf[1] = (unsigned char)data;	data >>= 8;
+	buf[2] = (unsigned char)data;	data >>= 8;
+	buf[3] = (unsigned char)data;	data >>= 8;
+
+	memcpy(&data, buf, sizeof(buf));
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_letoh_uint32                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 32 bit                                   *
+ *          from little-endian byte order format                              *
+ *          to host byte order                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 32 bit in host byte order                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data)
+{
+	unsigned char	buf[4];
+
+	memcpy(buf, &data, sizeof(buf));
+
+	data = (zbx_uint32_t)buf[3];	data <<= 8;
+	data |= (zbx_uint32_t)buf[2];	data <<= 8;
+	data |= (zbx_uint32_t)buf[1];	data <<= 8;
+	data |= (zbx_uint32_t)buf[0];
+
+	return data;
+}
+

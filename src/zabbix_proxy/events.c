@@ -76,6 +76,16 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 	return 0;
 }
 
+void	zbx_clean_events(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
+}
+
+void	zbx_export_events(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
+}
+
 int	zbx_flush_correlated_events(void)
 {
 	THIS_SHOULD_NEVER_HAPPEN;

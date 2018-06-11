@@ -14,7 +14,7 @@ fi
 
 JAVA=${JAVA:-java}
 
-JAVA_OPTIONS="-server"
+JAVA_OPTIONS="$JAVA_OPTIONS -server"
 if [ -z "$PID_FILE" ]; then
 	JAVA_OPTIONS="$JAVA_OPTIONS -Dlogback.configurationFile=logback-console.xml"
 fi
@@ -38,12 +38,11 @@ if [ -n "$START_POLLERS" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.startPollers=$START_POLLERS"
 fi
 if [ -n "$TIMEOUT" ]; then
-	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.timeout=$TIMEOUT -Dsun.rmi.transport.tcp.responseTimeout=${TIMEOUT}000"
+	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.timeout=$TIMEOUT"
 fi
 
-# uncomment to enable remote monitoring of the standard JMX objects on the Zabbix Java Gateway itself
-# JAVA_OPTIONS="$JAVA_OPTIONS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=12345
-# 	-Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+tcp_timeout=${TIMEOUT:=3}000
+ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dsun.rmi.transport.tcp.responseTimeout=$tcp_timeout"
 
 COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabbix.gateway.JavaGateway"
 

@@ -66,6 +66,9 @@ AC_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
                    -L*)
                         LIBXML2_LDFLAGS="${LIBXML2_LDFLAGS} $i"
                         ;;
+                   -R*)
+                        LIBXML2_LDFLAGS="${LIBXML2_LDFLAGS} -Wl,$i"
+                        ;;
                 esac
             done
 

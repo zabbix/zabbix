@@ -34,74 +34,74 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
-$help = get_icon('overviewhelp');
-$help->setHint($help_hint);
-
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('Group'), 'groupid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$this->data['pageFilter']->getGroupsCB()
-			])
-			->addItem([
-				new CLabel(_('Type'), 'type'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('type', $this->data['type'], 'submit()', [
-					SHOW_TRIGGERS => _('Triggers'),
-					SHOW_DATA => _('Data')
+	->setControls((new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('Group'), 'groupid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$this->data['pageFilter']->getGroupsCB()
 				])
-			])
-			->addItem([
-				new CLabel(_('Hosts location'), 'view_style'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-					STYLE_TOP => _('Top'),
-					STYLE_LEFT => _('Left')
+				->addItem([
+					new CLabel(_('Type'), 'type'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('type', $this->data['type'], 'submit()', [
+						SHOW_TRIGGERS => _('Triggers'),
+						SHOW_DATA => _('Data')
+					])
 				])
-			])
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
-			->addItem($help)
-		)
-	);
+				->addItem([
+					new CLabel(_('Hosts location'), 'view_style'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+						STYLE_TOP => _('Top'),
+						STYLE_LEFT => _('Left')
+					])
+				])
+		),
+		(new CTag('nav', true, (new CList())
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addItem(get_icon('overviewhelp')->setHint($help_hint))
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	])));
 
 // filter
-$filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $this->data['fullscreen']);
-
-$column = new CFormList();
-
-// application
-$column->addRow(_('Application'), [
-	(new CTextBox('application', $this->data['filter']['application']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('application_name', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
-				'srctbl' => 'applications',
-				'srcfld1' => 'name',
-				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'application',
-				'real_hosts' => '1',
-				'with_applications' => '1'
-			]).');'
-		)
-]);
-
-$filter->addColumn($column);
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+	->addFilterTab(_('Filter'), [
+		(new CFormList())->addRow(_('Application'), [
+			(new CTextBox('application', $data['filter']['application']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('autofocus', 'autofocus'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('application_name', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'application',
+						'real_hosts' => '1',
+						'with_applications' => '1'
+					]).', null, this);'
+				)
+		])
+	]);
 
 $widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
-	$groupids = ($this->data['pageFilter']->groupids !== null) ? $this->data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $this->data['filter']['application'], $this->data['view_style']);
+	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
+	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'], $data['fullscreen']);
 }
 else {
 	$table = new CTableInfo();

@@ -87,7 +87,7 @@ class testPageScreens extends CWebTest {
 	public function testPageScreens_Create() {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create screen');
 
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent(['Owner', 'Name', 'Columns', 'Rows']);

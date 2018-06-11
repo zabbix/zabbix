@@ -107,6 +107,7 @@ $form_list = (new CFormList())
 		(new CFile('import_file'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
@@ -120,8 +121,11 @@ $tab_view->setFooter(makeFormFooter(
 ));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('backurl', $data['backurl'])
 	->addItem($tab_view);
 
 // widget
-return (new CWidget())->addItem($form);
+return (new CWidget())
+	->setTitle(_('Import'))
+	->addItem($form);

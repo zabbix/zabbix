@@ -343,16 +343,6 @@ class CTriggerExpression {
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;
 								break;
 							}
-
-							if (!$afterSpace) {
-								break 3;
-							}
-
-							if ($this->parseUsing($this->notOperatorParser,
-									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
-
-								$state = self::STATE_AFTER_NOT_OPERATOR;
-							}
 							else {
 								break 3;
 							}
@@ -383,12 +373,7 @@ class CTriggerExpression {
 								break 3;
 							}
 
-							if ($this->parseUsing($this->notOperatorParser,
-									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
-
-								$state = self::STATE_AFTER_NOT_OPERATOR;
-							}
-							elseif ($this->parseUsing($this->logicalOperatorParser,
+							if ($this->parseUsing($this->logicalOperatorParser,
 									CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR)) {
 
 								$state = self::STATE_AFTER_LOGICAL_OPERATOR;

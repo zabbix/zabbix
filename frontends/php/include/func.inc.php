@@ -293,14 +293,18 @@ function zbx_date2str($format, $value = null) {
 	return $prefix.$output;
 }
 
-// calculate and convert timestamp to string representation
-function zbx_date2age($startDate, $endDate = 0, $utime = false) {
-	if (!$utime) {
-		$startDate = date('U', $startDate);
-		$endDate = $endDate ? date('U', $endDate) : time();
-	}
+/**
+ * Calculates and converts timestamp to string represenation.
+ *
+ * @param int|string $start_date Start date timestamp.
+ * @param int|string $end_date   End date timestamp.
+ *
+ * @return string
+ */
+function zbx_date2age($start_date, $end_date = 0) {
+	$end_date = ($end_date != 0) ? $end_date : time();
 
-	return convertUnitsS(abs($endDate - $startDate));
+	return convertUnitsS($end_date - $start_date);
 }
 
 function zbxDateToTime($strdate) {
@@ -637,11 +641,11 @@ function convert_units($options = []) {
 	// any other unit
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (preg_match('/^\-?\d+\.\d+$/', $options['value'])) {
-			if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-				$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
-			}
-			$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
+		if (preg_match('/\.\d+$/', $options['value'])) {
+			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
+				? '%.'.ZBX_UNITS_ROUNDOFF_UPPER_LIMIT.'f'
+				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
+			$options['value'] = sprintf($format, $options['value']);
 		}
 		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
 		$options['value'] = rtrim($options['value'], '.');
@@ -1797,8 +1801,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 	if ($messages) {
 		if ($title !== null) {
-			$link_details = (new CSpan())
-				->addClass(ZBX_STYLE_LINK_ACTION)
+			$link_details = (new CLinkAction())
 				->addItem(_('Details'))
 				->addItem(' ') // space
 				->addItem((new CSpan())
@@ -1828,10 +1831,8 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
 
-	$msg_box = (new CDiv())->addClass($class)
-		->addItem($link_details) // Details link should be in front of title
-		->addItem($title)
-		->addItem($msg_details);
+	// Details link should be in front of title.
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1876,16 +1877,20 @@ function filter_messages(array $messages = []) {
 /**
  * Returns the message box when messages are present; null otherwise
  *
- * @global array $ZBX_MESSAGES
+ * @param  boolean	$good			Parameter passed to makeMessageBox to specify message box style.
+ * @param  string	$title			Message box title.
+ * @global array	$ZBX_MESSAGES
  *
  * @return CDiv|null
  */
-function getMessages()
+function getMessages($good = false, $title = null)
 {
 	global $ZBX_MESSAGES;
 
-	$message_box = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES)
-		? makeMessageBox(false, filter_messages($ZBX_MESSAGES))
+	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+
+	$message_box = ($title || $messages)
+		? makeMessageBox($good, $messages, $title)
 		: null;
 
 	$ZBX_MESSAGES = [];
@@ -2316,23 +2321,6 @@ function hasErrorMesssages() {
 }
 
 /**
- * Get all messages as array.
- *
- * @return array
- */
-function getMessagesAsArray() {
-	global $ZBX_MESSAGES;
-
-	$result = [];
-	if (isset($ZBX_MESSAGES)) {
-		foreach ($ZBX_MESSAGES as $message) {
-			$result[] = $message['message'];
-		}
-	}
-	return $result;
-}
-
-/**
  * Clears table rows selection's cookies.
  *
  * @param string $cookieId		parent ID, is used as cookie suffix
@@ -2538,118 +2526,129 @@ function makeUpdateIntervalFilter($field_name, $values) {
 }
 
 /**
- * Calculate timeline data
+ * Update profile with new time selector range.
  *
- * @param array		$options
- * @param string	$options['profileIdx']
- * @param int		$options['profileIdx2']
- * @param boolean	$options['updateProfile']
- * @param int		$options['period']
- * @param string	$options['stime']
- * @param int		$options['isNow']
+ * @param array       $options
+ * @param string      $options['profileIdx']
+ * @param int         $options['profileIdx2']
+ * @param string|null $options['from']
+ * @param string|null $options['to']
+ */
+function updateTimeSelectorPeriod($options) {
+	if ($options['from'] !== null && $options['to'] !== null) {
+		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
+		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);
+	}
+}
+
+/**
+ * Get profile stored 'from' and 'to'. If profileIdx is null then default values will be returned. If one of fields
+ * not exist in $options array 'from' and 'to' value will be read from user profile. Calculates from_ts, to_ts.
+ *
+ * @param array $options  Array with period fields data: profileIdx, profileIdx2, from, to.
  *
  * @return array
  */
-function calculateTime(array $options = []) {
-	$defOptions = [
-		'updateProfile' => false,
-		'profileIdx' => null,
-		'profileIdx2' => 0,
-		'period' => null,
-		'stime' => null,
-		'isNow' => null
+function getTimeSelectorPeriod(array $options) {
+	$profileIdx = array_key_exists('profileIdx', $options) ? $options['profileIdx'] : null;
+	$profileIdx2 = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : null;
+
+	if ($profileIdx === null) {
+		$options['from'] = ZBX_PERIOD_DEFAULT_FROM;
+		$options['to'] = ZBX_PERIOD_DEFAULT_TO;
+	}
+	elseif (!array_key_exists('from', $options) || !array_key_exists('to', $options)
+			|| $options['from'] === null || $options['to'] === null) {
+		$options['from'] = CProfile::get($profileIdx.'.from', ZBX_PERIOD_DEFAULT_FROM, $profileIdx2);
+		$options['to'] = CProfile::get($profileIdx.'.to', ZBX_PERIOD_DEFAULT_TO, $profileIdx2);
+	}
+
+	$range_time_parser = new CRangeTimeParser();
+
+	$range_time_parser->parse($options['from']);
+	$options['from_ts'] = $range_time_parser->getDateTime(true)->getTimestamp();
+	$range_time_parser->parse($options['to']);
+	$options['to_ts'] = $range_time_parser->getDateTime(false)->getTimestamp();
+
+	return $options;
+}
+
+/**
+ * Convert relative date range string to translated string. Function does not check is passed date range correct.
+ *
+ * @param string $from     Start date of date range.
+ * @param string $to       End date of date range.
+ *
+ * @return string
+ */
+function relativeDateToText($from, $to) {
+	$key = $from.':'.$to;
+	$ranges = [
+		'now-1d/d:now-1d/d' => _('Yesterday'),
+		'now-2d/d:now-2d/d' => _('Day before yesterday'),
+		'now-1w/d:now-1w/d' => _('This day last week'),
+		'now-1w/w:now-1w/w' => _('Previous week'),
+		'now-1M/M:now-1M/M' => _('Previous month'),
+		'now-1y/y:now-1y/y' => _('Previous year'),
+		'now/d:now/d' => _('Today'),
+		'now/d:now' => _('Today so far'),
+		'now/w:now/w' => _('This week'),
+		'now/w:now' => _('This week so far'),
+		'now/M:now/M' => _('This month'),
+		'now/M:now' => _('This month so far'),
+		'now/y:now/y' => _('This year'),
+		'now/y:now' => _('This year so far')
 	];
-	$options = zbx_array_merge($defOptions, $options);
 
-	if ($options['profileIdx'] === '') {
-		$options['profileIdx'] = $defOptions['profileIdx'];
-	}
-	if ($options['profileIdx2'] === null || $options['profileIdx2'] === '') {
-		$options['profileIdx2'] = $defOptions['profileIdx2'];
-	}
-	if ($options['stime'] === '') {
-		$options['stime'] = $defOptions['stime'];
+	if (array_key_exists($key, $ranges)) {
+		return $ranges[$key];
 	}
 
-	if ($options['profileIdx'] === null) {
-		$options['updateProfile'] = false;
-	}
+	if ($to === 'now') {
+		$relative_time_parser = new CRelativeTimeParser();
 
-	// period
-	if ($options['period'] === null) {
-		$options['period'] = ($options['profileIdx'] !== null)
-			? CProfile::get($options['profileIdx'].'.period', ZBX_PERIOD_DEFAULT, $options['profileIdx2'])
-			: ZBX_PERIOD_DEFAULT;
-	}
-	else {
-		if ($options['period'] < ZBX_MIN_PERIOD) {
-			error(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.',
-				(int) ZBX_MIN_PERIOD / SEC_PER_MIN
-			));
-			$options['period'] = ZBX_MIN_PERIOD;
-		}
-		elseif ($options['period'] > ZBX_MAX_PERIOD) {
-			error(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.',
-				(int) ZBX_MAX_PERIOD / SEC_PER_DAY
-			));
-			$options['period'] = ZBX_MAX_PERIOD;
-		}
-	}
+		if ($relative_time_parser->parse($from) == CParser::PARSE_SUCCESS) {
+			$tokens = $relative_time_parser->getTokens();
 
-	$time = time();
-	$usertime = null;
+			if (count($tokens) == 1 && $tokens[0]['type'] == CRelativeTimeParser::ZBX_TOKEN_OFFSET
+					&& $tokens[0]['sign'] === '-') {
+				$suffix = $tokens[0]['suffix'];
+				$value = (int) $tokens[0]['value'];
 
-	// isNow
-	if ($options['isNow'] === null) {
-		$options['isNow'] = ($options['stime'] !== null)
-			? 0
-			: ($options['profileIdx'] !== null)
-				? CProfile::get($options['profileIdx'].'.isnow', 1, $options['profileIdx2'])
-				: 1;
-	}
+				switch ($suffix) {
+					case 's':
+						if ($value < 60 || $value % 60 != 0) {
+							return _n('Last %1$d second', 'Last %1$d seconds', $value);
+						}
+						$value /= 60;
+						// break; is not missing here.
 
-	// stime
-	if ($options['isNow'] == 1) {
-		$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
-		$usertime = date(TIMESTAMP_FORMAT, $time);
-	}
-	else {
-		if ($options['stime'] === null) {
-			$options['stime'] = CProfile::get($options['profileIdx'].'.stime', null, $options['profileIdx2']);
+					case 'm':
+						if ($value < 60 || $value % 60 != 0) {
+							return _n('Last %1$d minute', 'Last %1$d minutes', $value);
+						}
+						$value /= 60;
+						// break; is not missing here.
 
-			if ($options['stime'] === null) {
-				$options['isNow'] = 1;
-				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
+					case 'h':
+						if ($value < 24 || $value % 24 != 0) {
+							return _n('Last %1$d hour', 'Last %1$d hours', $value);
+						}
+						$value /= 24;
+						// break; is not missing here.
+
+					case 'd':
+						return _n('Last %1$d day', 'Last %1$d days', $value);
+
+					case 'M':
+						return _n('Last %1$d month', 'Last %1$d months', $value);
+
+					case 'y':
+						return _n('Last %1$d year', 'Last %1$d years', $value);
+				}
 			}
 		}
-
-		$stimeUnix = zbxDateToTime($options['stime']);
-
-		if (zbxAddSecondsToUnixtime($options['period'], $stimeUnix) >= $time) {
-			$options['isNow'] = 1;
-			$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
-			$usertime = date(TIMESTAMP_FORMAT, $time);
-		}
-		else {
-			$usertime = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
-		}
 	}
 
-	if ($options['updateProfile']) {
-		CProfile::update($options['profileIdx'].'.period', $options['period'], PROFILE_TYPE_INT,
-			$options['profileIdx2']
-		);
-		CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-		CProfile::update($options['profileIdx'].'.isnow', $options['isNow'], PROFILE_TYPE_INT, $options['profileIdx2']);
-	}
-
-	return [
-		'period' => $options['period'],
-		'stime' => date(TIMESTAMP_FORMAT, zbxDateToTime($options['stime'])),
-		'starttime' => date(TIMESTAMP_FORMAT, $time - ZBX_MAX_PERIOD),
-		'usertime' => $usertime,
-		'isNow' => $options['isNow']
-	];
+	return $from.' – '.$to;
 }

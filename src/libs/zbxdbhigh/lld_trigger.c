@@ -498,7 +498,7 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select functionid,triggerid,itemid,function,parameter"
+				"select functionid,triggerid,itemid,name,parameter"
 				" from functions"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
@@ -2111,6 +2111,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
+	size_t	len;
+
 	if (0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
 		return;
 
@@ -2128,10 +2130,10 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 				field_utf8);
 		zbx_free(field_utf8);
 	}
-	else if (zbx_strlen_utf8(field) > field_len)
-	{
+	else if ((len = zbx_strlen_utf8(field)) > field_len)
 		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
-	}
+	else if (0 != (flag & ZBX_FLAG_LLD_TAG_UPDATE_TAG) && 0 == len)
+		*error = zbx_strdcatf(*error, "Cannot create trigger tag: empty tag name.\n");
 	else
 		return;
 
@@ -2421,7 +2423,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		functionid = DBget_maxid_num("functions", new_functions);
 
 		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"function", "parameter", NULL);
+				"name", "parameter", NULL);
 	}
 
 	if (0 != new_dependencies)

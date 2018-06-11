@@ -42,11 +42,12 @@
  ******************************************************************************/
 void	load_aliases(char **lines)
 {
-	char	**pline, *r, *c;
+	char	**pline;
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		r = *pline;
+		char		*c;
+		const char	*r = *pline;
 
 		if (SUCCEED != parse_key(&r) || ':' != *r)
 		{
@@ -55,7 +56,7 @@ void	load_aliases(char **lines)
 			exit(EXIT_FAILURE);
 		}
 
-		c = r++;
+		c = (char *)r++;
 
 		if (SUCCEED != parse_key(&r) || '\0' != *r)
 		{

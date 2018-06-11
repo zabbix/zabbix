@@ -131,8 +131,6 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 					host->tls_dc_psk->refcount);
 		}
 #endif
-		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", host->proxy_address);
-
 		for (j = 0; j < host->interfaces_v.values_num; j++)
 		{
 			ZBX_DC_INTERFACE	*interface = (ZBX_DC_INTERFACE *)host->interfaces_v.values[j];
@@ -170,6 +168,9 @@ static void	DCdump_proxies(ZBX_DC_CONFIG *config)
 		proxy = (ZBX_DC_PROXY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " timediff:%d location:%u", proxy->hostid,
 				proxy->timediff, proxy->location);
+		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
+		zabbix_log(LOG_LEVEL_TRACE, "  compres:%d", proxy->auto_compress);
+
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -425,6 +426,27 @@ static void	DCdump_sshitem(const ZBX_DC_SSHITEM *sshitem)
 			sshitem->privatekey);
 }
 
+static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[url:'%s']", httpitem->url);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[query fields:'%s']", httpitem->query_fields);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[headers:'%s']", httpitem->headers);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[posts:'%s']", httpitem->posts);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[timeout:'%s' status codes:'%s' follow redirects:%u post type:%u"
+			" http proxy:'%s' retrieve mode:%u request method:%u output format:%u allow traps:%u"
+			" trapper_hosts:'%s']",
+			httpitem->timeout, httpitem->status_codes, httpitem->follow_redirects, httpitem->post_type,
+			httpitem->http_proxy, httpitem->retrieve_mode, httpitem->request_method,
+			httpitem->output_format, httpitem->allow_traps, httpitem->trapper_hosts);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[username:'%s' password:'%s' authtype:%u]",
+			httpitem->username, httpitem->password, httpitem->authtype);
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[publickey:'%s' privatekey:'%s' ssl key password:'%s' verify peer:%u"
+			" verify host:%u]", httpitem->ssl_cert_file, httpitem->ssl_key_file, httpitem->ssl_key_password,
+			httpitem->verify_peer, httpitem->verify_host);
+}
+
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:[username:'%s' password:'%s' params:'%s']", telnetitem->username,
@@ -505,7 +527,8 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->calcitems, (zbx_dc_dump_func_t)DCdump_calcitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
-		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem}
+		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
+		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
 	};
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
@@ -535,7 +558,7 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "  history:%d", item->history);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
-		zabbix_log(LOG_LEVEL_TRACE, "  unreachable:%u schedulable:%u", item->unreachable, item->schedulable);
+		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

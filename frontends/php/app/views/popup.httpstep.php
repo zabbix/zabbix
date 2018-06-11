@@ -27,21 +27,24 @@ $output = [
 $options = $data['options'];
 
 $http_popup_form = (new CForm())
+	->cleanItems()
 	->setId('http_step')
 	->addVar('dstfrm', $options['dstfrm'])
 	->addVar('stepid', $options['stepid'])
 	->addVar('list_name', $options['list_name'])
-	->addVar('templated', $options['templated'])
+	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('steps_names', $options['steps_names'])
-	->addVar('action', 'popup.httpstep');
+	->addVar('action', 'popup.httpstep')
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'step_name'))->setAsteriskMark(),
 		(new CTextBox('name', $options['name'], (bool) $options['templated'], 64))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('step_name')
 	)
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
@@ -149,22 +152,19 @@ $http_popup_form_list
 		(new CTextBox('status_codes', $options['status_codes']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append tabs to form.
-$http_popup_tab = new CTabView();
-$http_popup_tab->addTab('scenarioStepTab', _('Step of web scenario'), $http_popup_form_list);
-
 $output['buttons'] = [
 	[
 		'title' => ($options['stepid'] == -1) ? _('Add') : _('Update'),
 		'class' => '',
 		'keepOpen' => true,
+		'isSubmit' => true,
 		'action' => 'return validateHttpStep("'.$http_popup_form->getId().'", '.
 						'jQuery(window.document.forms["'.$http_popup_form->getId().'"])' .
 							'.closest("[data-dialogueid]").attr("data-dialogueid"));'
 	]
 ];
 
-$http_popup_form->addItem($http_popup_tab);
+$http_popup_form->addItem($http_popup_form_list);
 
 // HTTP test step editing form.
 $output['body'] = (new CDiv($http_popup_form))->toString();
@@ -180,5 +180,10 @@ $output['script_inline'] .=
 		'cookie.init();'."\n".
 		'chkbxRange.init();'."\n".
 	'});';
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);

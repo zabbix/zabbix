@@ -21,6 +21,8 @@
 
 class CPieGraphDraw extends CGraphDraw {
 
+	const DEFAULT_HEADER_PADDING_TOP = 30;
+
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 		$this->background = false;
@@ -220,9 +222,9 @@ class CPieGraphDraw extends CGraphDraw {
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			$item['source'] = ($item['trends'] == 0
-					|| ($item['history'] * SEC_PER_DAY > time() - ($from_time + $this->period / 2)))
-					? 'history' : 'trends';
+			$item['source'] = ($item['trends'] == 0 || ($item['history'] > time() - ($from_time + $this->period / 2)))
+				? 'history'
+				: 'trends';
 			$items[] = $item;
 		}
 
@@ -233,6 +235,7 @@ class CPieGraphDraw extends CGraphDraw {
 			if (array_key_exists($item['itemid'], $results)) {
 				$result = $results[$item['itemid']];
 				$this->dataFrom = $result['source'];
+				$type = $this->items[$i]['calc_type'];
 
 				foreach ($result['data'] as $row) {
 					$this->data[$item['itemid']][$type]['min'] = $row['min'];
@@ -307,6 +310,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 		// display items
 		$i = 0;
+		$top_padding = $this->with_vertical_padding ? 10 : -(static::DEFAULT_TOP_BOTTOM_PADDING / 2);
 
 		foreach ($this->items as $item) {
 			$color = $this->getColor($item['color'], 0);
@@ -400,9 +404,9 @@ class CPieGraphDraw extends CGraphDraw {
 			imagefilledrectangle(
 				$this->im,
 				$shiftX - 10,
-				$this->shiftY + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 14 * $i,
 				$shiftX,
-				$this->shiftY + 10 + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 10 + 14 * $i,
 				$color
 			);
 
@@ -410,9 +414,9 @@ class CPieGraphDraw extends CGraphDraw {
 			imagerectangle(
 				$this->im,
 				$shiftX - 10,
-				$this->shiftY + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 14 * $i,
 				$shiftX,
-				$this->shiftY + 10 + 10 + 14 * $i,
+				$this->shiftY + $top_padding + 10 + 14 * $i,
 				$this->GetColor('Black No Alpha')
 			);
 
@@ -422,7 +426,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$fontSize,
 				0,
 				$shiftX + 5,
-				$this->shiftY + 10 + 14 * $i + 10,
+				$this->shiftY + $top_padding + 14 * $i + 10,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$strValue
 			);
@@ -463,19 +467,21 @@ class CPieGraphDraw extends CGraphDraw {
 		if ($this->type == GRAPH_TYPE_EXPLODED) {
 			list($sizeX, $sizeY) = $this->calcExplodedRadius($sizeX, $sizeY, count($values));
 		}
-		else {
-			$sizeX = (int) $sizeX * 0.95;
-			$sizeY = (int) $sizeY * 0.95;
-		}
 
 		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
 		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
 
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -549,9 +555,15 @@ class CPieGraphDraw extends CGraphDraw {
 		// bottom angle line
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -559,6 +571,7 @@ class CPieGraphDraw extends CGraphDraw {
 			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x, $y) = $this->calcExplodedCenter($anglestart, $angleend, $xc, $yc, count($values));
 			}
+
 			imagefilledarc(
 				$this->im,
 				$x,
@@ -588,7 +601,12 @@ class CPieGraphDraw extends CGraphDraw {
 		for ($i = $this->graphheight3d; $i > 0; $i--) {
 			$anglestart = 0;
 			$angleend = 0;
+
 			foreach ($values as $item => $value) {
+				if ($value == 0) {
+					continue;
+				}
+
 				$angleend += (int) (360 * $value / $sum) + 1;
 				$angleend = ($angleend > 360) ? 360 : $angleend;
 
@@ -620,9 +638,15 @@ class CPieGraphDraw extends CGraphDraw {
 
 		$anglestart = 0;
 		$angleend = 0;
+
 		foreach ($values as $item => $value) {
+			if ($value == 0) {
+				continue;
+			}
+
 			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
+
 			if (($angleend - $anglestart) < 1) {
 				continue;
 			}
@@ -663,10 +687,10 @@ class CPieGraphDraw extends CGraphDraw {
 			$start_time = microtime(true);
 		}
 		set_image_header();
+		$this->calculateTopPadding();
 
 		$this->selectData();
 
-		$this->shiftY = 30;
 		$this->shiftYLegend = 20;
 		$this->shiftXleft = 10;
 		$this->shiftXright = 0;
@@ -679,15 +703,31 @@ class CPieGraphDraw extends CGraphDraw {
 
 		if ($this->drawLegend == 1) {
 			$this->sizeX -= $this->shiftXleft + $this->shiftXright + $this->shiftlegendright;
-			$this->sizeY -= $this->shiftY + $this->shiftYLegend + 12 * $this->num + 8;
+			$this->sizeY -= $this->shiftY + $this->shiftYLegend + 14 * $this->num + 8;
 		}
-		else {
+		elseif ($this->with_vertical_padding) {
 			$this->sizeX -= $this->shiftXleft * 2;
 			$this->sizeY -= $this->shiftY * 2;
 		}
 
+		if (!$this->with_vertical_padding) {
+			if ($this->drawLegend == 1) {
+				// Increase size of graph by sum of: 8px legend font size and 5px legend item bottom shift.
+				$this->sizeY += 13;
+			}
+			else {
+				// Remove y shift if only graph is rendered (no labels, header, vertical paddings).
+				$this->shiftY = 0;
+			}
+		}
+
 		$this->sizeX = min($this->sizeX, $this->sizeY);
 		$this->sizeY = min($this->sizeX, $this->sizeY);
+
+		if ($this->sizeX + $this->shiftXleft > $this->fullSizeX) {
+			$this->sizeX = $this->fullSizeX - $this->shiftXleft - $this->shiftXleft;
+			$this->sizeY = min($this->sizeX, $this->sizeY);
+		}
 
 		$this->calc3dheight($this->sizeY);
 
@@ -755,16 +795,14 @@ class CPieGraphDraw extends CGraphDraw {
 
 		if ($debug_mode) {
 			$str = sprintf('%0.2f', microtime(true) - $start_time);
-			$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
-			$str_size = imageTextSize(6, 0, $str);
 			imageText(
 				$this->im,
 				6,
-				0,
-				$this->fullSizeX - $str_size['width'] - 5,
+				90,
+				$this->fullSizeX - 2,
 				$this->fullSizeY - 5,
 				$this->getColor('Gray'),
-				$str
+				_s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str)
 			);
 		}
 

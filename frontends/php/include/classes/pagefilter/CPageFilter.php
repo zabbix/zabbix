@@ -854,7 +854,7 @@ class CPageFilter {
 			$options['action'] = 'javascript: submit();';
 		}
 
-		$comboBox = new CComboBox($name, $selectedId, $options['action']);
+		$comboBox = (new CComboBox($name, $selectedId, $options['action']))->removeId();
 
 		natcasesort($items);
 

@@ -111,7 +111,7 @@ class testInheritanceGraph extends CWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'groupid');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'action_buttons');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

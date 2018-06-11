@@ -53,19 +53,20 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		CProfile::delete('web.dashbrd.dashboardid');
 		CProfile::update('web.dashbrd.list_was_opened', 1, PROFILE_TYPE_INT);
 
-		$sortField = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
-		$sortOrder = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
 
-		CProfile::update('web.dashbrd.list.sort', $sortField, PROFILE_TYPE_STR);
-		CProfile::update('web.dashbrd.list.sortorder', $sortOrder, PROFILE_TYPE_STR);
+		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
-			'fullscreen' => $this->getInput('fullscreen', '0'),
-			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
+			'fullscreen' => $fullscreen,
 		];
 
 		// list of dashboards
@@ -76,15 +77,13 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		]);
 
 		// sorting & paging
-		order_result($data['dashboards'], $sortField, $sortOrder);
+		order_result($data['dashboards'], $sort_field, $sort_order);
 
 		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.list');
-		if ($data['fullscreen']) {
-			$url->setArgument('fullscreen', '1');
-		}
+			->setArgument('action', 'dashboard.list')
+			->setArgument('fullscreen', $fullscreen ? '1' : null);
 
-		$data['paging'] = getPagingLine($data['dashboards'], $sortOrder, $url);
+		$data['paging'] = getPagingLine($data['dashboards'], $sort_order, $url);
 
 		if ($data['dashboards']) {
 			$this->prepareEditableFlag($data['dashboards']);

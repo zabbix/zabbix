@@ -457,6 +457,769 @@ static int	DBpatch_3050036(void)
 	return SUCCEED;
 }
 
+extern int	DBpatch_3040007(void);
+
+static int	DBpatch_3050037(void)
+{
+	return DBpatch_3040007();
+}
+
+static int	DBpatch_3050038(void)
+{
+	const ZBX_TABLE table =
+			{"tag_filter", "tag_filterid", 0,
+				{
+					{"tag_filterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050039(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("tag_filter", 1, &field);
+}
+
+static int	DBpatch_3050040(void)
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("tag_filter", 2, &field);
+}
+
+static int	DBpatch_3050041(void)
+{
+	const ZBX_TABLE table =
+			{"task_check_now", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050042(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_check_now", 1, &field);
+}
+
+static int	DBpatch_3050043(void)
+{
+	const char	*sql =
+		"update widget_field"
+		" set value_int=3"
+		" where name='show_tags'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3050044(void)
+{
+	const char	*sql =
+		"delete from profiles"
+		" where idx in ('web.paging.lastpage','web.menu.view.last') and value_str='tr_status.php'"
+			" or idx like 'web.tr_status%'";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3050045(void)
+{
+	const char	*sql = "update users set url='zabbix.php?action=problem.view' where url like '%tr_status.php%'";
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3050046(void)
+{
+	const ZBX_FIELD field = {"timeout", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050047(void)
+{
+	const ZBX_FIELD field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050048(void)
+{
+	const ZBX_FIELD field = {"query_fields", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050049(void)
+{
+	const ZBX_FIELD	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050050(void)
+{
+	const ZBX_FIELD field = {"status_codes", "200", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050051(void)
+{
+	const ZBX_FIELD field = {"follow_redirects", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050052(void)
+{
+	const ZBX_FIELD field = {"post_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050053(void)
+{
+	const ZBX_FIELD field = {"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050054(void)
+{
+	const ZBX_FIELD	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050055(void)
+{
+	const ZBX_FIELD field = {"retrieve_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050056(void)
+{
+	const ZBX_FIELD field = {"request_method", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050057(void)
+{
+	const ZBX_FIELD field = {"output_format", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050058(void)
+{
+	const ZBX_FIELD field = {"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050059(void)
+{
+	const ZBX_FIELD field = {"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050060(void)
+{
+	const ZBX_FIELD field = {"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050061(void)
+{
+	const ZBX_FIELD field = {"verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050062(void)
+{
+	const ZBX_FIELD field = {"verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050063(void)
+{
+	const ZBX_FIELD field = {"allow_traps", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_3050064(void)
+{
+	const ZBX_FIELD	field = {"auto_compress", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_3050065(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE */
+	ret = DBexecute("update hosts set auto_compress=0 where status=5 or status=6");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050066(void)
+{
+	int		i;
+	const char      *types[] = {
+			"actlog", "actionlog",
+			"dscvry", "discovery",
+			"favgrph", "favgraphs",
+			"favmap", "favmaps",
+			"favscr", "favscreens",
+			"hoststat", "problemhosts",
+			"navigationtree", "navtree",
+			"stszbx", "systeminfo",
+			"sysmap", "map",
+			"syssum", "problemsbysv",
+			"webovr", "web",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != types[i]; i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update widget set type='%s' where type='%s'", types[i + 1], types[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050067(void)
+{
+	return DBdrop_field("config", "event_expire");
+}
+
+static int	DBpatch_3050068(void)
+{
+	return DBdrop_field("config", "event_show_max");
+}
+
+static int	DBpatch_3050069(void)
+{
+	int	res;
+
+	res = DBexecute(
+		"update widget_field"
+		" set name='itemids'"
+		" where name='itemid'"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='plaintext'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+/* remove references to table that is about to be renamed, this is required on IBM DB2 */
+
+static int	DBpatch_3050070(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("group_prototype", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050071(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("group_discovery", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050072(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("scripts", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050073(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("opcommand_grp", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050074(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("opgroup", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050075(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("config", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050076(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("hosts_groups", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050077(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("rights", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050078(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("maintenances_groups", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050079(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("tag_filter", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050080(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("corr_condition_group", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050081(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("widget_field", 2);
+#else
+	return SUCCEED;
+#endif
+}
+
+/* groups is reserved keyword since MySQL 8.0 */
+
+static int	DBpatch_3050082(void)
+{
+	return DBrename_table("groups", "hstgrp");
+}
+
+static int	DBpatch_3050083(void)
+{
+	return DBrename_index("hstgrp", "groups_1", "hstgrp_1", "name", 0);
+}
+
+/* restore references after renaming table on IBM DB2 */
+
+static int	DBpatch_3050084(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("group_prototype", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050085(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_discovery", 1, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050086(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("scripts", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050087(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("opcommand_grp", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050088(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("opgroup", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050089(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"discovery_groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("config", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050090(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hosts_groups", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050091(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"id",	NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("rights", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050092(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenances_groups", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050093(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("tag_filter", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050094(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"groupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("corr_condition_group", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050095(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"value_groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 2, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+/* function is reserved keyword since MySQL 8.0 */
+
+static int	DBpatch_3050096(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_foreign_key("functions", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050097(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_index("functions", "functions_2");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050098(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 12, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("functions", "function", &field);
+}
+
+static int	DBpatch_3050099(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBcreate_index("functions", "functions_2", "itemid,name,parameter", 0);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050100(void)
+{
+#ifdef HAVE_IBM_DB2
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("functions", 1, &field);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050101(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == DBindex_exists("hstgrp", "groups_pkey"))
+		return SUCCEED;
+	return DBrename_index("hstgrp", "groups_pkey", "hstgrp_pkey", "groupid", 0);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_3050102(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+
+	zbx_vector_uint64_create(&ids);
+
+	result = DBselect(
+			"select a.autoreg_hostid,a.proxy_hostid,h.proxy_hostid"
+			" from autoreg_host a"
+			" left join hosts h"
+				" on h.host=a.host");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	autoreg_proxy_hostid, host_proxy_hostid;
+
+		ZBX_DBROW2UINT64(autoreg_proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(host_proxy_hostid, row[2]);
+
+		if (autoreg_proxy_hostid != host_proxy_hostid)
+		{
+			zbx_uint64_t	id;
+
+			ZBX_STR2UINT64(id, row[0]);
+			zbx_vector_uint64_append(&ids, id);
+		}
+	}
+	DBfree_result(result);
+
+	if (0 != ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from autoreg_host where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", ids.values, ids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_3050103(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_2", "proxy_hostid", 0);
+}
+
+static int	DBpatch_3050104(void)
+{
+	return DBdrop_index("autoreg_host", "autoreg_host_1");
+}
+
+static int	DBpatch_3050105(void)
+{
+	return DBcreate_index("autoreg_host", "autoreg_host_1", "host", 0);
+}
+
+static int	DBpatch_3050106(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute("update profiles set value_int=2 where idx='web.problem.filter.evaltype' and value_int=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050107(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update widget_field"
+		" set value_int=2"
+		" where name='evaltype'"
+			" and value_int=1"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='problems'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050108(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles"
+		" where idx like '%%.filter.state'"
+			" or idx like '%%.timelinefixed'"
+			" or idx like '%%.period'"
+			" or idx like '%%.stime'"
+			" or idx like '%%.isnow'"
+	);
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -496,5 +1259,77 @@ DBPATCH_ADD(3050033, 0, 1)
 DBPATCH_ADD(3050034, 0, 1)
 DBPATCH_ADD(3050035, 0, 1)
 DBPATCH_ADD(3050036, 0, 1)
+DBPATCH_ADD(3050037, 0, 1)
+DBPATCH_ADD(3050038, 0, 1)
+DBPATCH_ADD(3050039, 0, 1)
+DBPATCH_ADD(3050040, 0, 1)
+DBPATCH_ADD(3050041, 0, 1)
+DBPATCH_ADD(3050042, 0, 1)
+DBPATCH_ADD(3050043, 0, 1)
+DBPATCH_ADD(3050044, 0, 1)
+DBPATCH_ADD(3050045, 0, 1)
+DBPATCH_ADD(3050046, 0, 1)
+DBPATCH_ADD(3050047, 0, 1)
+DBPATCH_ADD(3050048, 0, 1)
+DBPATCH_ADD(3050049, 0, 1)
+DBPATCH_ADD(3050050, 0, 1)
+DBPATCH_ADD(3050051, 0, 1)
+DBPATCH_ADD(3050052, 0, 1)
+DBPATCH_ADD(3050053, 0, 1)
+DBPATCH_ADD(3050054, 0, 1)
+DBPATCH_ADD(3050055, 0, 1)
+DBPATCH_ADD(3050056, 0, 1)
+DBPATCH_ADD(3050057, 0, 1)
+DBPATCH_ADD(3050058, 0, 1)
+DBPATCH_ADD(3050059, 0, 1)
+DBPATCH_ADD(3050060, 0, 1)
+DBPATCH_ADD(3050061, 0, 1)
+DBPATCH_ADD(3050062, 0, 1)
+DBPATCH_ADD(3050063, 0, 1)
+DBPATCH_ADD(3050064, 0, 1)
+DBPATCH_ADD(3050065, 0, 1)
+DBPATCH_ADD(3050066, 0, 1)
+DBPATCH_ADD(3050067, 0, 1)
+DBPATCH_ADD(3050068, 0, 1)
+DBPATCH_ADD(3050069, 0, 1)
+DBPATCH_ADD(3050070, 0, 1)
+DBPATCH_ADD(3050071, 0, 1)
+DBPATCH_ADD(3050072, 0, 1)
+DBPATCH_ADD(3050073, 0, 1)
+DBPATCH_ADD(3050074, 0, 1)
+DBPATCH_ADD(3050075, 0, 1)
+DBPATCH_ADD(3050076, 0, 1)
+DBPATCH_ADD(3050077, 0, 1)
+DBPATCH_ADD(3050078, 0, 1)
+DBPATCH_ADD(3050079, 0, 1)
+DBPATCH_ADD(3050080, 0, 1)
+DBPATCH_ADD(3050081, 0, 1)
+DBPATCH_ADD(3050082, 0, 1)
+DBPATCH_ADD(3050083, 0, 1)
+DBPATCH_ADD(3050084, 0, 1)
+DBPATCH_ADD(3050085, 0, 1)
+DBPATCH_ADD(3050086, 0, 1)
+DBPATCH_ADD(3050087, 0, 1)
+DBPATCH_ADD(3050088, 0, 1)
+DBPATCH_ADD(3050089, 0, 1)
+DBPATCH_ADD(3050090, 0, 1)
+DBPATCH_ADD(3050091, 0, 1)
+DBPATCH_ADD(3050092, 0, 1)
+DBPATCH_ADD(3050093, 0, 1)
+DBPATCH_ADD(3050094, 0, 1)
+DBPATCH_ADD(3050095, 0, 1)
+DBPATCH_ADD(3050096, 0, 1)
+DBPATCH_ADD(3050097, 0, 1)
+DBPATCH_ADD(3050098, 0, 1)
+DBPATCH_ADD(3050099, 0, 1)
+DBPATCH_ADD(3050100, 0, 1)
+DBPATCH_ADD(3050101, 0, 1)
+DBPATCH_ADD(3050102, 0, 1)
+DBPATCH_ADD(3050103, 0, 1)
+DBPATCH_ADD(3050104, 0, 1)
+DBPATCH_ADD(3050105, 0, 1)
+DBPATCH_ADD(3050106, 0, 1)
+DBPATCH_ADD(3050107, 0, 1)
+DBPATCH_ADD(3050108, 0, 1)
 
 DBPATCH_END()

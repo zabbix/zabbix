@@ -23,14 +23,21 @@ include('include/views/js/administration.general.trigger.options.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 $triggerDOFormList = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
-		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED))
+		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
+		->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow((new CLabel(_('Unacknowledged PROBLEM events'), 'problem_unack_color'))->setAsteriskMark(), [
 		(new CColor('problem_unack_color', $data['problem_unack_color']))
 			->setEnabled($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
@@ -86,6 +93,7 @@ $triggerDOFormList = (new CFormList())
 	]);
 
 $severityForm = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)

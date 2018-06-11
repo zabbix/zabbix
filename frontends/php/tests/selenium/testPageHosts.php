@@ -32,7 +32,7 @@ class testPageHosts extends CWebTest {
 			' FROM hosts h'.
 				' LEFT JOIN hosts_groups hg'.
 					' ON hg.hostid=h.hostid'.
-				' LEFT JOIN groups g'.
+				' LEFT JOIN hstgrp g'.
 					' ON g.groupid=hg.groupid'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 			" AND h.name NOT LIKE '%{#%'"
@@ -129,47 +129,6 @@ class testPageHosts extends CWebTest {
 		$this->assertEquals($oldHashHostInventory, DBhash($sqlHostInventory));
 	}
 
-	public function testPageHosts_MassActivateAll() {
-		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('host.massenable');
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
-
-		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
-			" and name NOT LIKE '%{#%'";
-		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts activated but DB does not match");
-	}
-
-	/**
-	* @dataProvider allHosts
-	*/
-	public function testPageHosts_MassActivate($host) {
-		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
-
-		$hostid = $host['hostid'];
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestClickButton('host.massenable');
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host enabled');
-
-		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
-		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
-	}
 
 	public function testPageHosts_MassDisableAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
@@ -211,6 +170,48 @@ class testPageHosts extends CWebTest {
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_MassActivate($host) {
+		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
+
+		$hostid = $host['hostid'];
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestCheckTitle('Configuration of hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+
+		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
+		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestAcceptAlert();
+
+		$this->zbxTestCheckTitle('Configuration of hosts');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host enabled');
+
+		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
+		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
+	}
+
+	public function testPageHosts_MassActivateAll() {
+		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestCheckTitle('Configuration of hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+
+		$this->zbxTestCheckboxSelect('all_hosts');
+		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestAcceptAlert();
+
+		$this->zbxTestCheckTitle('Configuration of hosts');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts enabled');
+
+		$sql = "select host from hosts where status=".HOST_STATUS_NOT_MONITORED.
+			" and name NOT LIKE '%{#%'";
+		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 
 	public function testPageHosts_FilterByName() {

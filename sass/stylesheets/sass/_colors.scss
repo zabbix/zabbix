@@ -3,7 +3,7 @@ $red: #e33734 !default;
 $light-red: #ed9898 !default;
 $lighter-red: #fccacf !default;
 
-$orange: #f24f1d;
+$orange: #f24f1d !default;
 $alt-dark-orange: #e97659;
 
 $dark-yellow: #e99003 !default;
@@ -74,6 +74,8 @@ $form-disabled-border-color: #ccd5d9 !default;
 $scrollbar-track-color: #ebebeb !default;
 $scrollbar-thumb-color: #ccd5d9 !default;
 $scrollbar-thumb-color-darken: 5% !default;
+
+$input-placeholder-color: #9d9d9d !default;
 
 
 // BUTTONS

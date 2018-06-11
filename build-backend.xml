@@ -34,9 +34,9 @@
 		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
 	</target>
 
-	<!-- Cppcheck static analysis target -->
-	<target name="cppcheck-static-analysis">
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+	<!-- Cppcheck static analyzer target -->
+	<target name="cppcheck-static-analyzer">
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="scan-build" failonerror="on">
 			<arg line="./configure"/>
 			<arg line="--enable-server --enable-agent --enable-proxy --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl"/>
@@ -60,7 +60,7 @@
 	<!-- Clang Static Analyzer target with various configuration parameters -->
 	<target name="clang-static-analyzer" depends="init-conf-options">
 		<delete dir="clang-scan-build-reports"/>
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -92,13 +92,10 @@
 		</for>
 	</target>
 
-	<!-- Static analysis container target -->
-	<target name="static-analysis" depends="cppcheck-static-analysis,clang-static-analyzer"/>
-
 	<target name="init">
 		<!-- Create database schema -->
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on"></exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on"/>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
 			<arg line="-j5"/>
@@ -223,27 +220,6 @@
 
 	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
 
-	<target name="make-gcc" depends="init-conf-options">
-		<!-- Build Zabbix with various configuration parameters -->
-		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
-		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>
-				<make args="${@{name}}"/>
-			</sequential>
-		</for>
-	</target>
-
-	<!-- Target "make-gcc" cannot have "init" dependency because it brakes "build-dist" -->
-	<target name="init-make-gcc" depends="init,make-gcc"/>
-
-	<target name="make-clang">
-		<!-- Build Zabbix with clang -->
-		<sequential>
-			<make cc="clang" args="--enable-server --enable-agent --enable-proxy ${with.db} --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		</sequential>
-	</target>
-
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
@@ -275,23 +251,95 @@
 	<!-- Build Zabbix with all supported databases  -->
 	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle,make-db-db2"/>
 
-	<target name="mock-tests">
-		<!-- Build Zabbix server and proxy with C mock tests -->
-		<exec executable="./bootstrap.sh" failonerror="on"></exec>
-		<exec executable="./configure" failonerror="on">
-			<arg line="-q"/>
-			<arg line="--enable-server"/>
-			<arg line="--enable-proxy"/>
-			<arg line="--enable-agent"/>
-			<arg line="--with-mysql"/>
-			<arg line="--with-libxml2"/>
+	<macrodef name="make-tests">
+		<!-- Build Zabbix cmocka tests with the specified command line arguments -->
+		<attribute name="conf"/>
+		<attribute name="conf-name"/>
+		<sequential>
+			<!-- clean, configure and build -->
+			<exec executable="./configure" failonerror="on">
+				<arg line="@{conf}"/>
+			</exec>
+			<trycatch>
+				<try>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="tests_build"/>
+					</exec>
+					<mkdir dir="tests_results/@{conf-name}"/>
+					<exec executable="tests/tests_run.pl" failonerror="on" output="tests_results/@{conf-name}/output.xml">
+						<arg line="-x @{conf-name}"/>
+					</exec>
+				</try>
+				<finally>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="clean"/>
+					</exec>
+					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
+						<arg line="-C"/>
+						<arg line="tests"/>
+						<arg line="clean"/>
+					</exec>
+				</finally>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
+	<target name="init-cmocka-test-conf-options">
+		<!-- Zabbix various configuration parameters for cmocka tests -->
+		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
+			and configuration title: cmocka-<number>-<title> -->
+		<property name="cmocka-1-default" value="-q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-2-agent-only" value="-q --enable-agent"/>
+		<property name="cmocka-3-server-only" value="-q --enable-server --with-mysql"/>
+		<property name="cmocka-4-sanitizer" value="CC=clang CFLAGS='-Wall -Wextra -Wenum-conversion -g -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-jabber --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-mbedtls --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+	</target>
+
+	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
+		<!-- Build Zabbix with cmocka tests -->
+		<delete dir="tests_results"/>
+		<mkdir dir="tests_results"/>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
+				<make-tests conf="${cmocka-@{name}}" conf-name="@{name}"/>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="gen-test-coverage-report">
+		<!-- Generate Zabbix cmocka tests coverage report-->
+		<delete dir="tests_results"/>
+		<mkdir dir="tests_results"/>
+		<mkdir dir="tests_results/html"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="src"/>
+			<arg line="-zerocounters"/>
 		</exec>
-		<exec executable="make" failonerror="on">
-			<arg line="-s"/>
-			<arg line="-j5"/>
-			<arg line="tests_build"/>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--directory"/>
+			<arg line="src"/>
+			<arg line="--capture"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app.info"/>
 		</exec>
-		<exec executable="tests/tests_run.pl" failonerror="on" output="output.xml"></exec>
+		<exec executable="genhtml" failonerror="on">
+			<arg line="-p"/>
+			<arg line="${user.dir}"/>
+			<arg line="-o"/>
+			<arg line="tests_results/html"/>
+			<arg line="tests_results/html/app.info"/>
+		</exec>
 	</target>
 
 	<target name="run-unit-test">
@@ -307,6 +355,17 @@
 	<target name="unit-test" depends="init">
 		<!-- Build Zabbix with C unit tests -->
 		<make args="--enable-server --with-mysql --with-libxml2" target="test" post-action="run-unit-test"/>
+	</target>
+
+	<target name="make-gcc" depends="init-conf-options">
+		<!-- Build Zabbix with various configuration parameters -->
+		<propertyselector property="conf.list" delimiter="," match="conf(\d+)"/>
+		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
+		<for list="${conf.list}" param="name" delimiter=",">
+			<sequential>
+				<make args="${@{name}}"/>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
@@ -330,5 +389,5 @@
 		</sequential>
 	</target>
 
-	<target name="build" depends="init,make-clang,make-dist"/>
+	<target name="build" depends="init,make-dist"/>
 </project>

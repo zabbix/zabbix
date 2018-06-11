@@ -26,23 +26,23 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Audit log');
 $page['file'] = 'auditlogs.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'action' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null],
-	'resourcetype' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 32), null],
-	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'alias' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
-	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'action' =>			[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(-1, 6), null],
+	'resourcetype' =>	[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(-1, 34), null],
+	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_set' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'alias' =>			[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];
 check_fields($fields);
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Ajax
@@ -71,19 +71,21 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
+$timeselector_options = [
+	'profileIdx' => 'web.auditlogs.filter',
+	'profileIdx2' => 0,
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+];
+updateTimeSelectorPeriod($timeselector_options);
+
 $data = [
 	'actions' => [],
 	'action' => CProfile::get('web.auditlogs.filter.action', -1),
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
 	'alias' => CProfile::get('web.auditlogs.filter.alias', ''),
-	'timeline' => calculateTime([
-		'profileIdx' => 'web.auditlogs.timeline',
-		'profileIdx2' => 0,
-		'updateProfile' => (hasRequest('period') || hasRequest('stime') || hasRequest('isNow')),
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime'),
-		'isNow' => getRequest('isNow')
-	])
+	'timeline' => getTimeSelectorPeriod($timeselector_options),
+	'active_tab' => CProfile::get('web.auditlogs.filter.active', 1)
 ];
 
 // get audit
@@ -99,13 +101,12 @@ if ($data['action'] > -1) {
 if ($data['resourcetype'] > -1) {
 	$sqlWhere['resourcetype'] = ' AND a.resourcetype='.zbx_dbstr($data['resourcetype']);
 }
-$sqlWhere['from'] = ' AND a.clock>'.zbx_dbstr(zbxDateToTime($data['timeline']['stime']));
-$sqlWhere['till'] = ' AND a.clock<'.zbx_dbstr(zbxDateToTime($data['timeline']['usertime']));
 
 $sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details'.
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
 			implode('', $sqlWhere).
+			' AND a.clock BETWEEN '.zbx_dbstr($data['timeline']['from_ts']).' AND '.zbx_dbstr($data['timeline']['to_ts']).
 		' ORDER BY a.clock DESC';
 $dbAudit = DBselect($sql, $config['search_limit'] + 1);
 while ($audit = DBfetch($dbAudit)) {
@@ -151,22 +152,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN, new CUrl('auditlogs.php'));
-
-// get timeline
-unset($sqlWhere['from'], $sqlWhere['till']);
-
-$sql = 'SELECT MIN(a.clock) AS clock'.
-		' FROM auditlog a,users u'.
-		' WHERE a.userid=u.userid'.
-			implode('', $sqlWhere);
-$first_audit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
-$min_start_time = ($first_audit) ? $first_audit['clock'] - 1 : null;
-
-// Show shorter timeline.
-if ($min_start_time !== null && $min_start_time > 0) {
-	$data['timeline']['starttime'] = date(TIMESTAMP_FORMAT, $min_start_time);
-}
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_UP, new CUrl('auditlogs.php'));
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

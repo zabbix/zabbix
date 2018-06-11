@@ -78,10 +78,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	zbx_strncpy_alloc(cmd, &cmd_alloc, &cmd_offset, command, pl - command);
 
 	if ('\0' == *pl)	/* no parameters specified */
-	{
-		zbx_strncpy_alloc(param, &param_alloc, &param_offset, "", 0);
 		return ZBX_COMMAND_WITHOUT_PARAMS;
-	}
 
 	if ('[' != *pl)		/* unsupported character */
 		return ZBX_COMMAND_ERROR;
@@ -374,7 +371,8 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			goto out;	/* key is badly formatted */
 	}
 
-	request->key = zbx_strdup(NULL, key);
+	request->key = key;
+	key = NULL;
 
 	ret = SUCCEED;
 out:
@@ -386,15 +384,11 @@ out:
 
 void	test_parameter(const char *key)
 {
-#define	ZBX_COL_WIDTH	45
+#define ZBX_KEY_COLUMN_WIDTH	45
 
 	AGENT_RESULT	result;
-	int		n;
 
-	n = printf("%s", key);
-
-	if (0 < n && ZBX_COL_WIDTH > n)
-		printf("%-*s", ZBX_COL_WIDTH - n, " ");
+	printf("%-*s", ZBX_KEY_COLUMN_WIDTH, key);
 
 	init_result(&result);
 
@@ -428,6 +422,8 @@ void	test_parameter(const char *key)
 	printf("\n");
 
 	fflush(stdout);
+
+#undef ZBX_KEY_COLUMN_WIDTH
 }
 
 void	test_parameters(void)
@@ -1352,11 +1348,19 @@ out:
 }
 #else
 
+ZBX_THREAD_LOCAL static zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
+
+zbx_uint32_t get_thread_global_mutex_flag()
+{
+	return mutex_flag;
+}
+
 typedef struct
 {
 	zbx_metric_func_t	func;
 	AGENT_REQUEST		*request;
 	AGENT_RESULT		*result;
+	zbx_uint32_t		mutex_flag; /* in regular case should always be = ZBX_MUTEX_ALL_ALLOW */
 	int			agent_ret;
 }
 zbx_metric_thread_args_t;
@@ -1364,6 +1368,7 @@ zbx_metric_thread_args_t;
 ZBX_THREAD_ENTRY(agent_metric_thread, data)
 {
 	zbx_metric_thread_args_t	*args = (zbx_metric_thread_args_t *)((zbx_thread_args_t *)data)->args;
+	mutex_flag = args->mutex_flag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for key:'%s'", args->request->key);
 
@@ -1397,7 +1402,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	ZBX_THREAD_HANDLE		thread;
 	zbx_thread_args_t		args;
-	zbx_metric_thread_args_t	metric_args = {metric_func, request, result};
+	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
+							ZBX_MUTEX_LOGGING_DENIED};
 	DWORD				rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);

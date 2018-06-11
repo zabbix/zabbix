@@ -18,25 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-if (empty($this->data['hostid'])) {
-	$create_button = (new CSubmit('form', _('Create item (select host first)')))->setEnabled(false);
-}
-else {
-	$create_button = new CSubmit('form', _('Create item'));
-}
+require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
-		->addItem((new CList())->addItem($create_button))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				($data['hostid'] != 0)
+					? new CRedirectButton(_('Create item'), (new CUrl())
+							->setArgument('form', 'create')
+							->setArgument('hostid', $data['hostid'])
+							->getUrl()
+						)
+					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$breadcrumb = get_header_host_table('items', $this->data['hostid']);
+	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+	$widget->addItem($breadcrumb);
 }
 $widget->addItem($this->data['flicker']);
 
@@ -107,11 +111,17 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_TEAL);
+		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+		}
+		else {
+			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+				'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_TEAL);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -219,8 +229,7 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = (new CSpan(_('Triggers')))
-			->addClass(ZBX_STYLE_LINK_ACTION)
+		$triggerInfo = (new CLinkAction(_('Triggers')))
 			->setHint($triggerHintTable);
 		$triggerInfo = [$triggerInfo];
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
@@ -302,6 +311,7 @@ $itemForm->addItem([
 		[
 			'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?')],
 			'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?')],
+			'item.masscheck_now' => ['name' => _('Check now')],
 			'item.massclearhistory' => ['name' => _('Clear history'),
 				'confirm' => _('Delete history of selected items?')
 			],

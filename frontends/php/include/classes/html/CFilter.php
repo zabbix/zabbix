@@ -19,169 +19,361 @@
 **/
 
 
-class CFilter extends CTag {
+class CFilter extends CDiv {
 
-	private $filterid;
-	private $columns = [];
+	// Filter form object.
 	private $form;
-	private $footer = null;
-	private $navigator = false;
+	// Filter form object name and id attribute.
 	private $name = 'zbx_filter';
-	private $opened = true;
+	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
+	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
+	protected $headers = [];
+	// Array of filter tab content.
+	protected $tabs = [];
+	// jQuery.tabs initialization options.
+	protected $tabs_options = [
+		'collapsible' => true,
+		'active' => false
+	];
+	// Profile data associated with filter object.
+	protected $idx = null;
+	protected $idx2 = 0;
 
-	public function __construct($filterid) {
-		parent::__construct('div', true);
-		$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
-		$this->setId('filter-space');
-		$this->filterid = $filterid;
-		$this->columns = [];
+	/**
+	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
+	 */
+	protected $time_ranges = [
+		[
+			['now-2d', 'now'],
+			['now-7d', 'now'],
+			['now-30d', 'now'],
+			['now-3M', 'now'],
+			['now-6M', 'now'],
+			['now-1y', 'now'],
+			['now-2y', 'now']
+		],
+		[
+			['now-1d/d', 'now-1d/d'],
+			['now-2d/d', 'now-2d/d'],
+			['now-1w/d', 'now-1w/d'],
+			['now-1w/w', 'now-1w/w'],
+			['now-1M/M', 'now-1M/M'],
+			['now-1y/y', 'now-1y/y']
+		],
+		[
+			['now/d', 'now/d'],
+			['now/d', 'now'],
+			['now/w', 'now/w'],
+			['now/w', 'now'],
+			['now/M', 'now/M'],
+			['now/M', 'now'],
+			['now/y', 'now/y'],
+			['now/y', 'now']
+		],
+		[
+			['now-5m', 'now'],
+			['now-15m', 'now'],
+			['now-30m', 'now'],
+			['now-1h', 'now'],
+			['now-3h', 'now'],
+			['now-6h', 'now'],
+			['now-12h', 'now'],
+			['now-24h', 'now']
+		]
+	];
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->addClass('filter-space')
+			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
 			->cleanItems()
 			->setAttribute('name', $this->name)
 			->setId('id', $this->name);
-
-		// filter is opened by default
-		$this->opened = (CProfile::get($this->filterid, 1) == 1);
 	}
 
 	public function getName() {
 		return $this->name;
 	}
 
-	public function addColumn($column) {
-		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
-		return $this;
-	}
-
-	public function setFooter($footer) {
-		$this->footer = $footer;
-		return $this;
-	}
-
-	public function removeButtons() {
-		$this->show_buttons = false;
-		return $this;
-	}
-
-	public function addNavigator() {
-		$this->navigator = true;
-		return $this;
-	}
-
+	/**
+	 * Add variable to filter form.
+	 *
+	 * @param string $name      Variable name.
+	 * @param string $value     Variable value.
+	 *
+	 * @return CFilter
+	 */
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+
 		return $this;
 	}
 
-	private function getHeader() {
-		$span = (new CSpan())->setId('filter-arrow');
+	/**
+	 * Hide filter tab buttons. Should be called before addFilterTab.
+	 */
+	public function hideFilterButtons() {
+		$this->show_buttons = false;
 
-		if ($this->opened) {
-			$span->addClass(ZBX_STYLE_ARROW_UP);
-			$button = (new CSimpleButton(
-				[_('Filter'), $span]
-			))
-				->addClass(ZBX_STYLE_FILTER_TRIGGER)
-				->addClass(ZBX_STYLE_FILTER_ACTIVE)
-				->setId('filter-mode');
-		}
-		else {
-			$span->addClass(ZBX_STYLE_ARROW_DOWN);
-			$button = (new CSimpleButton(
-				[_('Filter'), $span]
-			))
-				->addClass(ZBX_STYLE_FILTER_TRIGGER)
-				->setId('filter-mode');
-			$this->setAttribute('style', 'display: none;');
-		}
-
-		$button->onClick('javascript:
-			jQuery("#filter-space").toggle();
-			jQuery("#filter-mode").toggleClass("filter-active");
-			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
-			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0, []);
-			if (jQuery(".multiselect").length > 0 && jQuery("#filter-arrow").hasClass("arrow-up")) {
-				jQuery(".multiselect").multiSelect("resize");
-			}
-			if (jQuery("#filter-arrow").hasClass("arrow-up")) {
-				jQuery("#filter-space [autofocus=autofocus]").focus();
-			}'
-		);
-
-		$switch = (new CDiv())
-			->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER)
-			->addItem($button);
-
-		return $switch;
+		return $this;
 	}
 
-	private function getTable() {
-		if (!$this->columns) {
-			return null;
-		}
+	/**
+	 * Set profile 'idx' and 'idx2' data.
+	 *
+	 * @param string $idx     Profile 'idx' string.
+	 * @param int    $idx2    Profile 'idx2' identifier, default 0.
+	 *
+	 * @return CFilter
+	 */
+	public function setProfile($idx, $idx2 = 0) {
+		$this->idx = $idx;
+		$this->idx2 = $idx2;
 
+		$this->setAttribute('data-profile-idx', $idx);
+		$this->setAttribute('data-profile-idx2', $idx2);
+
+		return $this;
+	}
+
+	/**
+	 * Adds an item inside the form object.
+	 *
+	 * @param mixed $item  An item to add inside the form object.
+	 *
+	 * @return CFilter
+	 */
+	public function addFormItem($item) {
+		$this->form->addItem($item);
+
+		return $this;
+	}
+
+	/**
+	 * Set active tab.
+	 *
+	 * @param int $tab  1 based index of active tab. If set to 0 all tabs will be collapsed.
+	 *
+	 * @return CFilter
+	 */
+	public function setActiveTab($tab) {
+		$this->tabs_options['active'] = $tab > 0 ? $tab - 1 : false;
+
+		return $this;
+	}
+
+	/**
+	 * Add tab with filter form.
+	 *
+	 * @param string $header    Tab header title string.
+	 * @param array  $columns   Array of filter columns markup.
+	 * @param array  $footer    Additional markup objects for filter tab, default null.
+	 *
+	 * @return CFilter
+	 */
+	public function addFilterTab($header, $columns, $footer = null) {
 		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
-		foreach ($this->columns as $column) {
-			$row->addItem($column);
+		$body = [];
+		$anchor = 'tab_'.count($this->tabs);
+
+		foreach ($columns as $column) {
+			$row->addItem((new CDiv($column))->addClass(ZBX_STYLE_CELL));
 		}
 
-		return (new CDiv())
+		$body[] = (new CDiv())
 			->addClass(ZBX_STYLE_TABLE)
 			->addClass(ZBX_STYLE_FILTER_FORMS)
 			->addItem($row);
-	}
-
-	private function getButtons() {
-		if (!$this->columns) {
-			return null;
-		}
-
-		$url = (new CUrl())
-			->removeArgument('filter_set')
-			->removeArgument('ddreset')
-			->setArgument('filter_rst', 1);
-
-		return (new CDiv())
-			->addClass(ZBX_STYLE_FILTER_FORMS)
-			->addItem(
-				(new CSubmitButton(_('Apply'), 'filter_set', 1))
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			)
-			->addItem(
-				(new CRedirectButton(_('Reset'), $url->getUrl()))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
-			);
-
-		return $buttons;
-	}
-
-	protected function startToString() {
-		$ret = $this->getHeader()->toString();
-		$ret .= parent::startToString();
-		return $ret;
-	}
-
-	protected function endToString() {
-		$this->form->addItem($this->getTable());
 
 		if ($this->show_buttons) {
-			$this->form->addItem($this->getButtons());
+			$url = (new CUrl())
+				->removeArgument('filter_set')
+				->removeArgument('ddreset')
+				->setArgument('filter_rst', 1);
+
+			$body[] = (new CDiv())
+				->addClass(ZBX_STYLE_FILTER_FORMS)
+				->addItem(
+					(new CSubmitButton(_('Apply'), 'filter_set', 1))
+						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+				)
+				->addItem(
+					(new CRedirectButton(_('Reset'), $url->getUrl()))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+				);
 		}
 
-		if ($this->navigator) {
-			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
+		if ($footer !== null) {
+			$body[] = $footer;
 		}
 
-		if ($this->footer !== null) {
-			$this->form->addItem($this->footer);
+		return $this->addTab(
+			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_FILTER_TRIGGER),
+			(new CDiv($body))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->setId($anchor)
+		);
+	}
+
+	/**
+	 * Add time selector specific tab. Should be called before any tab is added. Adds two tabs:
+	 * - time selector range change buttons: back, zoom out, forward.
+	 * - time selector range change form with predefined ranges.
+	 *
+	 * @param string $from      Start date. (can be in relative time format, example: now-1w)
+	 * @param string $to        End date. (can be in relative time format, example: now-1w)
+	 *
+	 * @return CFilter
+	 */
+	public function addTimeSelector($from, $to) {
+		$header = relativeDateToText($from, $to);
+
+		$this->addTab(new CDiv([
+			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+			(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
+			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+		]), null);
+
+		$predefined_ranges = [];
+
+		foreach ($this->time_ranges as $column_ranges) {
+			$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
+
+			foreach ($column_ranges as $range) {
+				$label = relativeDateToText($range[0], $range[1]);
+				$is_selected = ($header === $label);
+
+				$column->addItem((new CLink($label))
+					->setAttribute('data-from', $range[0])
+					->setAttribute('data-to', $range[1])
+					->setAttribute('data-label', $label)
+					->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
+				);
+			}
+
+			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		}
 
-		$ret = $this->form->toString();
+		$anchor = 'tab_'.count($this->tabs);
 
-		$ret .= parent::endToString();
-		return $ret;
+		$this->addTab(
+			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
+			(new CDiv([
+				(new CDiv([
+					new CList([
+						new CLabel(_('From'), 'from'), (new CTextBox('', $from))->setId('from'),
+						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'from')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
+						new CLabel(_('To'), 'to'), (new CTextBox('', $to))->setId('to'),
+						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
+					]),
+					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+						->setAttribute('data-error-for', 'to')
+						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+						->addStyle('display: none'),
+					new CList([
+						(new CButton('apply', _('Apply')))
+					])
+				]))->addClass(ZBX_STYLE_TIME_INPUT),
+				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
+			]))
+				->addClass(ZBX_STYLE_FILTER_CONTAINER)
+				->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
+				->setId($anchor)
+		);
+
+		return $this;
+	}
+
+	/**
+	 * Add tab.
+	 *
+	 * @param string|CTag $header    Tab header title string or CTag contaier.
+	 * @param array  $body           Array of body elements.
+	 *
+	 * @return CFilter
+	 */
+	public function addTab($header, $body) {
+		$this->headers[] = $header;
+		$this->tabs[] = $body;
+
+		return $this;
+	}
+
+	/**
+	 * Return javascript code for jquery-ui initialization.
+	 *
+	 * @return string
+	 */
+	private function getJS() {
+		$id = '#'.$this->getId();
+		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
+			CJs::encodeJson($this->tabs_options).
+		').show().find(".multiselect");'.
+
+		'if (multiselects.length && multiselects.multiSelect) {'.
+			'multiselects.multiSelect("resize");'.
+		'}';
+
+		if ($this->idx !== null && $this->idx !== '') {
+			$idx = $this->idx.'.active';
+			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
+				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0,'.
+					'multiselects = jQuery(".multiselect", ui.newPanel);'.
+				'updateUserProfile("'.$idx.'", active, []);'.
+
+				'if (multiselects.length) {'.
+					'multiselects.multiSelect("resize");'.
+				'}'.
+
+				'if (active) {'.
+					'jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.
+				'}'.
+			'});';
+		}
+
+		return $js;
+	}
+
+	/**
+	 * Render current CFilter object as HTML string.
+	 *
+	 * @return string
+	 */
+	public function toString($destroy = true) {
+		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
+
+		if ($this->tabs_options['active'] !== false
+				&& !array_key_exists($this->tabs_options['active'], $this->headers)) {
+			$this->tabs_options['active'] = 0;
+		}
+
+		foreach ($this->headers as $index => $header) {
+			$headers->addItem($header);
+
+			if ($this->tabs[$index] !== null && $index !== $this->tabs_options['active']) {
+				$this->tabs[$index]->addStyle('display: none');
+			}
+		}
+
+		$this->form->addItem($this->tabs);
+
+		$this
+			->addStyle('display:none')
+			->addItem($headers)
+			->addItem($this->form)
+			->setAttribute('aria-label', _('Filter'));
+
+		return parent::toString($destroy).get_js($this->getJS());
 	}
 }

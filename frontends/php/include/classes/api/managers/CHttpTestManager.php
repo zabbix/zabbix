@@ -274,31 +274,6 @@ class CHttpTestManager {
 			}
 		}
 
-		/*
-		 * Unset unchanged properties, otherwise, host web scenarios will inherit them and their custom applications
-		 * will be overwritten.
-		 */
-		$properties_to_compare = ['applicationid', 'ssl_cert_file', 'ssl_key_password', 'ssl_key_file', 'verify_peer',
-			'verify_host'
-		];
-
-		foreach ($httptests as &$http_test) {
-			foreach ($properties_to_compare as $property) {
-				// Do not compare unexisting properties.
-				if (!array_key_exists($property, $http_test)) {
-					continue;
-				}
-
-				// Unset unchanged properties.
-				if (($property === 'applicationid'
-						&& bccomp($http_test[$property], $db_httptests[$http_test['httptestid']][$property]) == 0)
-						|| $http_test[$property] === $db_httptests[$http_test['httptestid']][$property]) {
-					unset($http_test[$property]);
-				}
-			}
-		}
-		unset($http_test);
-
 		$this->updateHttpTestFields($httptests, 'update');
 
 		return $httptests;

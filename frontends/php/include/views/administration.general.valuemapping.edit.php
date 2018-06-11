@@ -23,12 +23,19 @@ include('include/views/js/administration.general.valuemapping.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())->addVar('form', $data['form']);
+$form = (new CForm())
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('form', $data['form']);
 
 if ($data['valuemapid'] != 0) {
 	$form->addVar('valuemapid', $data['valuemapid']);

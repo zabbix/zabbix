@@ -25,24 +25,30 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Media types'))
-	->setControls((new CForm())
-		->cleanItems()
-		->addItem((new CList())->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit')))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter('web.media_types.filter.state'))
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			),
+			(new CFormList())->addRow(_('Status'),
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_('Enabled'), MEDIA_TYPE_STATUS_ACTIVE)
+					->addValue(_('Disabled'), MEDIA_TYPE_STATUS_DISABLED)
+					->setModern(true)
+			)
+		])
 		->addVar('action', 'mediatype.list')
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
-		->addColumn((new CFormList())->addRow(_('Status'),
-			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_('Enabled'), MEDIA_TYPE_STATUS_ACTIVE)
-				->addValue(_('Disabled'), MEDIA_TYPE_STATUS_DISABLED)
-				->setModern(true)
-		))
 	);
 
 // create form

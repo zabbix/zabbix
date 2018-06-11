@@ -190,7 +190,7 @@ class CControllerAcknowledgeCreate extends CController {
 		}
 
 		if ($result) {
-			$response = new CControllerResponseRedirect($this->getInput('backurl', 'tr_status.php'));
+			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=problem.view'));
 			$response->setMessageOk(_n('Event acknowledged', 'Events acknowledged', count($eventids)));
 		}
 		else {

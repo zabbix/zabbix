@@ -28,9 +28,11 @@
  *                                                                            *
  * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
  *                                                                            *
- * Parameters: sock    - [IN] socket descriptor                               *
- *             result  - [IN] SUCCEED or FAIL                                 *
- *             info    - [IN] info message                                    *
+ * Parameters: sock     - [IN] socket descriptor                              *
+ *             result   - [IN] SUCCEED or FAIL                                *
+ *             info     - [IN] info message (optional)                        *
+ *             version  - [IN] the version data (optional)                    *
+ *             protocol - [IN] the transport protocol                         *
  *             timeout - [IN] timeout for this operation                      *
  *                                                                            *
  * Return value: SUCCEED - data successfully transmited                       *
@@ -41,7 +43,8 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int protocol, int timeout)
+int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
+		int timeout)
 {
 	const char	*__function_name = "zbx_send_response";
 
@@ -60,8 +63,8 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, int 
 	if (NULL != info && '\0' != *info)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
 
-	if (0 != (protocol & ZBX_TCP_COMPONENT_VERSION))
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	if (NULL != version)
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, version, ZBX_JSON_TYPE_STRING);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
 

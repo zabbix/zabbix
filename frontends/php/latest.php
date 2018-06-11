@@ -112,7 +112,7 @@ $hostScripts = [];
 $child_groups = [];
 
 // multiselect host groups
-$multiSelectHostGroupData = [];
+$multiselect_hostgroup_data = [];
 if ($filter['groupids'] !== null) {
 	$filterGroups = API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
@@ -122,7 +122,7 @@ if ($filter['groupids'] !== null) {
 
 	if ($filterGroups) {
 		foreach ($filterGroups as $group) {
-			$multiSelectHostGroupData[] = [
+			$multiselect_hostgroup_data[] = [
 				'id' => $group['groupid'],
 				'name' => $group['name']
 			];
@@ -300,7 +300,7 @@ if ($items) {
 }
 
 // multiselect hosts
-$multiSelectHostData = [];
+$multiselect_host_data = [];
 if ($filter['hostids']) {
 	$filterHosts = API::Host()->get([
 		'output' => ['hostid', 'name'],
@@ -308,7 +308,7 @@ if ($filter['hostids']) {
 	]);
 
 	foreach ($filterHosts as $host) {
-		$multiSelectHostData[] = [
+		$multiselect_host_data[] = [
 			'id' => $host['hostid'],
 			'name' => $host['name']
 		];
@@ -320,27 +320,30 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
-	->setControls((new CList())
+	->setControls((new CTag('nav', true, (new CList())
 		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	))
+		->setAttribute('aria-label', _('Content controls'))
 	);
 
 // Filter
-$filterForm = (new CFilter('web.latest.filter.state'))
+$filterForm = (new CFilter())
+	->setProfile('web.latest.filter')
+	->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())
 	->addRow(_('Host groups'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $multiSelectHostGroupData,
+			'object_name' => 'hostGroup',
+			'data' => $multiselect_hostgroup_data,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -348,16 +351,14 @@ $filterColumn1 = (new CFormList())
 	->addRow(_('Hosts'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'data' => $multiSelectHostData,
+			'object_name' => 'hosts',
+			'data' => $multiselect_host_data,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'hostids_',
 					'srcfld1' => 'hostid',
-					'real_hosts' => '1',
-					'multiselect' => '1'
+					'dstfrm' => 'zbx_filter',
+					'dstfld1' => 'hostids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -375,7 +376,7 @@ $filterColumn1 = (new CFormList())
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).');'
+				]).', null, this);'
 			)
 	]);
 
@@ -386,9 +387,7 @@ $filterColumn2 = (new CFormList())
 	)
 	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 
-$filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+$filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
 
 $widget->addItem($filterForm);
 // End of Filter
@@ -631,8 +630,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
@@ -777,8 +775,7 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$hostName = (new CSpan($host['name']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
+	$hostName = (new CLinkAction($host['name']))
 		->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);

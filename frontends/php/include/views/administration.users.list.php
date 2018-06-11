@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$userGroupComboBox = (new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()'))
+$userGroupComboBox = (new CComboBox('filter_usrgrpid', getRequest('filter_usrgrpid', 0), 'submit()'))
 	->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
@@ -27,37 +27,49 @@ foreach ($this->data['userGroups'] as $userGroup) {
 
 $widget = (new CWidget())
 	->setTitle(_('Users'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem([
-				new CLabel(_('User group'), 'filter_usrgrpid'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$userGroupComboBox
-			])
-			->addItem(new CSubmit('form', _('Create user')))
-		)
-	)
-	->addItem((new CFilter('web.user.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Alias'),
-			(new CTextBox('filter_alias', $data['filter']['alias']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
+	->setControls(new CList([
+		(new CForm('get'))
+			->cleanItems()
+			->setAttribute('aria-label', _('Main filter'))
+			->addItem((new CList())
+				->addItem([
+					new CLabel(_('User group'), 'filter_usrgrpid'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$userGroupComboBox
+				])
+			),
+		(new CTag('nav', true,
+			new CRedirectButton(_('Create user'), (new CUrl())
+				->setArgument('form', 'create')
+				->getUrl()
+			)
 		))
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		))
-		->addColumn((new CFormList())->addRow(_('Surname'),
-			(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		))
-		->addColumn((new CFormList())->addRow(_('User type'),
-			(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
-				->addValue(_('Any'), -1)
-				->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)
-				->addValue(user_type2str(USER_TYPE_ZABBIX_ADMIN), USER_TYPE_ZABBIX_ADMIN)
-				->addValue(user_type2str(USER_TYPE_SUPER_ADMIN), USER_TYPE_SUPER_ADMIN)
-				->setModern(true)
-		))
+			->setAttribute('aria-label', _('Content controls'))
+	]))
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Alias'),
+				(new CTextBox('filter_alias', $data['filter']['alias']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			),
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			),
+			(new CFormList())->addRow(_('Surname'),
+				(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			),
+			(new CFormList())->addRow(_('User type'),
+				(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
+					->addValue(_('Any'), -1)
+					->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)
+					->addValue(user_type2str(USER_TYPE_ZABBIX_ADMIN), USER_TYPE_ZABBIX_ADMIN)
+					->addValue(user_type2str(USER_TYPE_SUPER_ADMIN), USER_TYPE_SUPER_ADMIN)
+					->setModern(true)
+			)
+		])
 	);
 
 // create form

@@ -19,10 +19,11 @@
 **/
 
 
-class CWarning extends CDiv {
+class CWarning extends Ctag {
 
 	public function __construct($header, $messages = [], $buttons = []) {
-		parent::__construct($header);
+		parent::__construct('output', true);
+		$this->addItem($header);
 		$this->addClass(ZBX_STYLE_MSG_BAD);
 		$this->addClass('msg-global');
 		if ($messages) {

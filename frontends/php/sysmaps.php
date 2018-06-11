@@ -420,7 +420,9 @@ else {
 			'name' => CProfile::get('web.sysmapconf.filter_name', '')
 		],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.sysmapconf.filter',
+		'active_tab' => CProfile::get('web.sysmapconf.filter.active', 1)
 	];
 
 	// get maps
@@ -434,8 +436,12 @@ else {
 		'preservekeys' => true
 	]);
 
-	$user_type = CWebUser::getType();
-	if ($user_type != USER_TYPE_SUPER_ADMIN) {
+	order_result($data['maps'], $sortField, $sortOrder);
+
+	// paging
+	$data['paging'] = getPagingLine($data['maps'], $sortOrder, new CUrl('sysmaps.php'));
+
+	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 		$editable_maps = API::Map()->get([
 			'output' => [],
 			'sysmapids' => array_keys($data['maps']),
@@ -448,11 +454,6 @@ else {
 		}
 		unset($map);
 	}
-
-	order_result($data['maps'], $sortField, $sortOrder);
-
-	// paging
-	$data['paging'] = getPagingLine($data['maps'], $sortOrder, new CUrl('sysmaps.php'));
 
 	// render view
 	$mapView = new CView('monitoring.sysmap.list', $data);

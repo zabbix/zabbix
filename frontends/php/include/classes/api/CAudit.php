@@ -57,16 +57,34 @@ class CAudit {
 		];
 
 		switch ($resourcetype) {
+			case AUDIT_RESOURCE_ACTION:
+				$field_name_resourceid = 'actionid';
+				$field_name_resourcename = 'name';
+				$table_name = 'actions';
+				break;
+
 			case AUDIT_RESOURCE_APPLICATION:
 				$field_name_resourceid = 'applicationid';
 				$field_name_resourcename = 'name';
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_CORRELATION:
+				$field_name_resourceid = 'correlationid';
+				$field_name_resourcename = 'name';
+				$table_name = 'correlation';
+				break;
+
 			case AUDIT_RESOURCE_DASHBOARD:
 				$field_name_resourceid = 'dashboardid';
 				$field_name_resourcename = 'name';
 				$table_name = 'dashboard';
+				break;
+
+			case AUDIT_RESOURCE_DISCOVERY_RULE:
+				$field_name_resourceid = 'druleid';
+				$field_name_resourcename = 'name';
+				$table_name = 'drules';
 				break;
 
 			case AUDIT_RESOURCE_ICON_MAP:

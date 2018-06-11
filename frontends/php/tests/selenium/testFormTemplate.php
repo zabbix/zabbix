@@ -47,22 +47,9 @@ class testFormTemplate extends CWebTest {
 					'group' => 'Linux servers',
 					'new_group' => 'Selenium new group',
 					'other_group' => 'Zabbix servers',
-					'hosts' => 'Simple form test host',
 					'description' => 'template description',
 					'dbCheck' => true,
 					'formCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Existing group name',
-					'new_group' => 'Selenium new group',
-					'error_msg' => 'Cannot add template',
-					'errors' => [
-						'Host group "Selenium new group" already exists.',
-					]
-
 				]
 			],
 			[
@@ -104,9 +91,9 @@ class testFormTemplate extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Without groups',
 					'remove_group' => 'Templates',
-					'error_msg' => 'Cannot add template',
+					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Template "Without groups" cannot be without host group.',
+						'Field "groups" is mandatory.',
 					]
 
 				]
@@ -120,7 +107,7 @@ class testFormTemplate extends CWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickWait('form');
+		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
 		$this->zbxTestAssertElementValue('template_name', $data['name']);
 
@@ -129,28 +116,22 @@ class testFormTemplate extends CWebTest {
 			$this->zbxTestAssertElementValue('visiblename', $data['visible_name']);
 		}
 
-		if (isset ($data['group'])) {
-			$this->zbxTestDropdownSelect('groups_right', $data['group']);
-			$this->zbxTestClickXpathWait("//table[@name='groups_tweenbox']//button[@id='add']");
+		if (array_key_exists('group', $data)) {
+			$this->zbxTestClickButtonMultiselect('groups_');
+			$this->zbxTestLaunchOverlayDialog('Host groups');
+			$this->zbxTestClickLinkTextWait($data['group']);
 		}
 
-		if (isset ($data['new_group'])) {
-			$this->zbxTestInputTypeWait('newgroup', $data['new_group']);
-		}
-
-		if (isset ($data['hosts'])) {
-			$this->zbxTestDropdownSelectWait('twb_groupid', $data['other_group']);
-			$this->zbxTestDropdownSelect('hosts_right', $data['hosts']);
-			$this->zbxTestClickXpathWait("//table[@name='hosts_tweenbox']//button[@id='add']");
+		if (array_key_exists('new_group', $data)) {
+			$this->zbxTestMultiselectNew('groups_', $data['new_group']);
 		}
 
 		if (isset ($data['description'])) {
 			$this->zbxTestInputTypeWait('description', $data['description']);
 		}
 
-		if (isset ($data['remove_group'])) {
-			$this->zbxTestDropdownSelect('groups_left', $data['remove_group']);
-			$this->zbxTestClickXpathWait("//table[@name='groups_tweenbox']//button[@id='remove']");
+		if (array_key_exists('remove_group', $data)) {
+			$this->zbxTestMultiselectRemove('groups_', $data['remove_group']);
 		}
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -182,7 +163,7 @@ class testFormTemplate extends CWebTest {
 				}
 			}
 			if (isset ($data['new_group'])) {
-				$this->assertEquals(1, DBcount("SELECT groupid FROM groups WHERE name='".$data['new_group']."'"));
+				$this->assertEquals(1, DBcount("SELECT groupid FROM hstgrp WHERE name='".$data['new_group']."'"));
 			}
 		}
 
@@ -199,21 +180,15 @@ class testFormTemplate extends CWebTest {
 
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
-			$this->zbxTestAssertElementValue('newgroup', '');
 
-			if (isset ($data['new_group'])) {
-				$this->zbxTestDropdownHasOptions('groups_left', ['Templates', $data['new_group']]);
-			}
-			else {
-				$this->zbxTestDropdownHasOptions('groups_left', ['Templates']);
+			$this->zbxTestMultiselectAssertSelected('groups_', 'Templates');
+
+			if (array_key_exists('new_group', $data)) {
+				$this->zbxTestMultiselectAssertSelected('groups_', $data['new_group']);
 			}
 
-			if (isset ($data['group'])) {
-				$this->zbxTestDropdownHasOptions('groups_left', [$data['group']]);
-			}
-
-			if (isset ($data['hosts'])) {
-				$this->zbxTestDropdownHasOptions('hosts_left', [$data['hosts']]);
+			if (array_key_exists('group', $data)) {
+				$this->zbxTestMultiselectAssertSelected('groups_', $data['group']);
 			}
 
 			if (isset ($data['visible_name'])) {

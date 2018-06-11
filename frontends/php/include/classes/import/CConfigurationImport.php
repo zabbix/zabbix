@@ -735,6 +735,24 @@ class CConfigurationImport {
 					unset($item[$xml_itemkey]);
 				}
 
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$headers = [];
+
+					foreach ($item['headers'] as $header) {
+						$headers[$header['name']] = $header['value'];
+					}
+
+					$item['headers'] = $headers;
+
+					$query_fields = [];
+
+					foreach ($item['query_fields'] as $query_field) {
+						$query_fields[] = [$query_field['name'] => $query_field['value']];
+					}
+
+					$item['query_fields'] = $query_fields;
+				}
+
 				$itemsId = $this->referencer->resolveItem($hostId, $item['key_']);
 
 				if ($itemsId) {
@@ -887,6 +905,24 @@ class CConfigurationImport {
 
 				$itemId = $this->referencer->resolveItem($hostId, $item['key_']);
 
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$headers = [];
+
+					foreach ($item['headers'] as $header) {
+						$headers[$header['name']] = $header['value'];
+					}
+
+					$item['headers'] = $headers;
+
+					$query_fields = [];
+
+					foreach ($item['query_fields'] as $query_field) {
+						$query_fields[] = [$query_field['name'] => $query_field['value']];
+					}
+
+					$item['query_fields'] = $query_fields;
+				}
+
 				if ($itemId) {
 					$item['itemid'] = $itemId;
 					$itemsToUpdate[] = $item;
@@ -995,6 +1031,24 @@ class CConfigurationImport {
 					}
 					else {
 						unset($prototype[$xml_itemprototype_key]);
+					}
+
+					if ($prototype['type'] == ITEM_TYPE_HTTPAGENT) {
+						$headers = [];
+
+						foreach ($prototype['headers'] as $header) {
+							$headers[$header['name']] = $header['value'];
+						}
+
+						$prototype['headers'] = $headers;
+
+						$query_fields = [];
+
+						foreach ($prototype['query_fields'] as $query_field) {
+							$query_fields[] = [$query_field['name'] => $query_field['value']];
+						}
+
+						$prototype['query_fields'] = $query_fields;
 					}
 
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);

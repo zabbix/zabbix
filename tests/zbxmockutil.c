@@ -23,6 +23,9 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "module.h"
+
+#include <malloc.h>
 
 const char	*zbx_mock_get_parameter_string(const char *path)
 {
@@ -74,6 +77,34 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 
 	return member;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_value_type                                       *
+ *                                                                            *
+ * Purpose: converts item value type from text format                         *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_mock_str_to_value_type(const char *str)
+{
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_FLOAT"))
+		return ITEM_VALUE_TYPE_FLOAT;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_STR"))
+		return ITEM_VALUE_TYPE_STR;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_LOG"))
+		return ITEM_VALUE_TYPE_LOG;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_UINT64"))
+		return ITEM_VALUE_TYPE_UINT64;
+
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_TEXT"))
+		return ITEM_VALUE_TYPE_TEXT;
+
+	fail_msg("Unknown value type \"%s\"", str);
+	return ITEM_VALUE_TYPE_MAX;
 }
 
 zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
@@ -139,6 +170,11 @@ int	zbx_mock_str_to_return_code(const char *str)
 	if (0 == strcmp(str, "CONFIG_ERROR"))
 		return CONFIG_ERROR;
 
+	if (0 == strcmp(str, "SYSINFO_RET_OK"))
+		return SYSINFO_RET_OK;
+
+	if (0 == strcmp(str, "SYSINFO_RET_FAIL"))
+		return SYSINFO_RET_FAIL;
 
 	fail_msg("Unknown return code  \"%s\"", str);
 	return 0;

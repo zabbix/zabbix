@@ -32,7 +32,8 @@ if ($data['form_refresh'] == 0) {
 $proxyForm = (new CForm())
 	->setId('proxyForm')
 	->addVar('proxyid', $data['proxyid'])
-	->addVar('tls_accept', $data['tls_accept']);
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
@@ -52,24 +53,6 @@ $interfaceTable = (new CTable())
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setAriaRequired()
 	]);
-
-// append hosts to form list
-$hosts_tween_box = new CTweenBox($proxyForm, 'proxy_hostids', $data['proxy_hostids']);
-foreach ($data['all_hosts'] as $host) {
-	// show only normal hosts, and discovered hosts monitored by the current proxy
-	// for new proxies display only normal hosts
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
-			|| ($data['proxyid'] != 0 && bccomp($data['proxyid'], $host['proxy_hostid']) == 0)) {
-
-		$hosts_tween_box->addItem(
-			$host['hostid'],
-			$host['name'],
-			null,
-			$host['proxy_hostid'] == 0
-				|| (bccomp($host['proxy_hostid'], $data['proxyid']) == 0 && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-		);
-	}
-}
 
 $proxy_form_list = (new CFormList('proxyFormList'))
 	->addRow((new CLabel(_('Proxy name'), 'host'))->setAsteriskMark(),
@@ -92,7 +75,6 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 	->addRow(_('Proxy address'),
 		(new CTextBox('proxy_address', $data['proxy_address'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'), $hosts_tween_box->get(_('Proxy hosts'), _('Other hosts')))
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);

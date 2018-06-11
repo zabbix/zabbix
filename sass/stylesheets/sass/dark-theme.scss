@@ -1,3 +1,5 @@
+$theme_name: 'dark';
+
 // NOTIFICATION & ALERT
 $red: #e45959;
 $light-red: #503434;
@@ -109,6 +111,9 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+.status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
+	border-color: rgba($ui-bg-color, .2) !important;
+}
 
 .top-nav-help {
 	background: url(../img/icon-sprite.svg) no-repeat -84px -32px !important;
@@ -122,20 +127,11 @@ $ok-ack-fg-color: #00ff00;
 .top-nav-zbbshare {
 	background: url(../img/icon-sprite.svg) no-repeat -87px -68px !important;
 }
+.top-nav-support {
+	background: url(../img/icon-sprite.svg) no-repeat -245px -32px !important;
+}
 .btn-search {
 	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
-}
-.btn-back-map {
-	.btn-back-map-icon {
-		background: url(../img/icon-sprite.svg) no-repeat -85px -725px !important;
-	}
-}
-
-.list-table {
-
-	thead th {
-		border-color: lighten($table-border-color, 3%) !important;
-	}
 }
 
 .timeline-axis {
@@ -146,5 +142,84 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+.list-table {
+
+	thead th {
+		border-color: lighten($table-border-color, 3%);
+	}
+}
+
+.top-subnav a {
+	&:focus {
+		border-bottom: 4px solid lighten($main-nav-bg-color, 30%) !important;
+		outline: none;
+	}
+}
+
+// TABLES
+.list-table {
+	&.compact-view {
+		tr {
+			&:hover {
+				td {
+					&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+						color: black;
+					}
+				}
+			}
+
+			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+				td {
+					box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+				}
+			}
+		}
+
+		td {
+			&.na-bg, &.info-bg, &.warning-bg, &.average-bg, &.high-bg, &.disaster-bg {
+				color: black;
+				box-shadow: inset 0 -1px 0 0 rgba(black, 0.1);
+			}
+		}
+	}
+}
+
+// GRAPH AND MAP
+.btn-back-map-container {
+	.btn-back-map {
+		.btn-back-map-icon {
+			background-position: -85px -725px;
+		}
+	}
+}
+
+// TIME SELECTION
+.ui-tabs-nav {
+	.ui-tabs-active {
+		.btn-time {
+			&:after {
+				background-position: -87px -583px;
+			}
+		}
+
+		.filter-trigger {
+			&:after {
+				background-position: -87px -547px;
+			}
+		}
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				color: $white;
+			}
+		}
+	}
+}

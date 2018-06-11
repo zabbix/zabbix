@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
 	->addItem(get_header_host_table('', $data['templateid']));
@@ -41,8 +42,8 @@ if ($data['templateid'] != 0) {
 }
 $frmHost = (new CForm())
 	->setName('templatesForm')
-	->addVar('form', $data['form'])
-	->addVar('groupid', $data['groupId']);
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
 	$frmHost->addVar('templateid', $data['templateid']);
@@ -82,92 +83,30 @@ $templateList = (new CFormList('hostlist'))
 	)
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'groups[]',
+			'object_name' => 'hostGroup',
+			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+			'data' => $data['groups_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => 'groups_',
+					'editable' => true
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$groups_tweenbox = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
-
-if ($data['form'] === 'update') {
-	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
-
-	$groupsInList = [];
-
-	foreach ($data['groupsAll'] as $group) {
-		if (isset($data['groupIds'][$group['groupid']])) {
-			$groups_tweenbox->addItem($group['groupid'], $group['name'], true,
-				isset($data['groupsAllowed'][$group['groupid']])
-			);
-			$groupsInList[] = $group['groupid'];
-		}
-	}
-
-	// Add other host groups that user has permissions to, if not yet added to list.
-	foreach ($data['groupsAllowed'] as $group) {
-		if (!in_array($group['groupid'], $groupsInList)) {
-			$groups_tweenbox->addItem($group['groupid'], $group['name']);
-		}
-	}
-}
-else {
-	/*
-	 * When cloning a template or creating a new one, don't show read-only host groups in left box,
-	 * but show empty or posted groups in case of an error
-	 */
-
-	foreach ($data['groupsAllowed'] as $group) {
-		$groups_tweenbox->addItem($group['groupid'], $group['name']);
-	}
-}
-
-$templateList->addRow((new CLabel(_('Groups'), 'groups_tweenbox'))->setAsteriskMark(),
-	$groups_tweenbox->get(_('In groups'), _('Other groups'))
-);
-
-// FORM ITEM : new group text box [  ]
-$new_group = (new CTextBox('newgroup', $newgroup))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-$new_group_label = _('New group');
-if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$new_group_label .= ' '._('(Only super admins can create groups)');
-	$new_group->setReadonly(true);
-}
-$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
-	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-);
-
-// FORM ITEM : linked Hosts tween box [  ] [  ]
-$cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
-foreach ($data['groupsAllowed'] as $group) {
-	$cmbGroups->addItem($group['groupid'], $group['name']);
-}
-
-$hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
-
-foreach ($data['hostsAllowedToAdd'] as $host) {
-	if (bccomp($host['hostid'], $data['templateid']) == 0) {
-		continue;
-	}
-	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
-		continue;
-	}
-	if (array_key_exists($host['hostid'], $data['linkedTemplates'])) {
-		continue;
-	}
-	$hostsTB->addItem($host['hostid'], $host['name']);
-}
-
-foreach ($data['hostsAll'] as $host) {
-	$hostsTB->addItem($host['hostid'], $host['name'], true, isset($data['hostsAllowed'][$host['hostid']]));
-}
-
-$templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
-	_('Other | group').SPACE,
-	$cmbGroups
-]));
-
-$templateList->addRow(_('Description'),
-	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-
-// FULL CLONE {
 if ($data['form'] === 'full_clone') {
 	// template applications
 	$templateApps = API::Application()->get([
@@ -398,18 +337,14 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-$ignoredTemplates = [];
-
-if ($data['templateid'] != 0) {
-	$ignoredTemplates[$data['templateid']] = $data['dbTemplate']['host'];
-}
+$disableids = [];
 
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['linkedTemplates'] as $template) {
-	$tmplList->addVar('templates[]', $template['templateid']);
+	$tmplList->addItem((new CVar('templates[]', $template['templateid']))->removeId());
 
 	if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
@@ -439,11 +374,7 @@ foreach ($data['linkedTemplates'] as $template) {
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], null, 'conditions_'.$template['templateid']);
 
-	$ignoredTemplates[$template['templateid']] = $template['name'];
-}
-
-foreach ($data['hostIdsLinkedTo'] as $templateid) {
-	$ignoredTemplates[$templateid] = '';
+	$disableids[] = $template['templateid'];
 }
 
 $tmplList->addRow(_('Linked templates'),
@@ -457,8 +388,7 @@ $newTemplateTable = (new CTable())
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'add_templates[]',
-			'objectName' => 'templates',
-			'ignored' => $ignoredTemplates,
+			'object_name' => 'templates',
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -466,9 +396,8 @@ $newTemplateTable = (new CTable())
 					'srcfld2' => 'host',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'add_templates_',
-					'templated_hosts' => '1',
-					'multiselect' => '1',
-					'templateid' => $data['templateid']
+					'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
+					'disableids' => $disableids
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

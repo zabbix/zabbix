@@ -54,7 +54,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	char			*procname, *proccomm, *param;
 	struct passwd		*usrinfo;
-	int			proccount = 0, invalid_user = 0, zbx_proc_stat, i, count, idx = 0;
+	int			proccount = 0, invalid_user = 0, zbx_proc_stat, count, idx = 0;
 	struct pst_status	pst[ZBX_BURST];
 
 	if (4 < request->nparam)
@@ -113,6 +113,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx)))
 	{
+		int	i;
+
 		for (i = 0; i < count; i++)
 		{
 			if (NULL != procname && 0 != strcmp(pst[i].pst_ucomm, procname))
@@ -121,8 +123,20 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != usrinfo && usrinfo->pw_uid != pst[i].pst_uid)
 				continue;
 
-			if (NULL != proccomm && NULL == zbx_regexp_match(pst[i].pst_cmd, proccomm, NULL))
-				continue;
+			if (NULL != proccomm)
+			{
+				union pstun	un;
+				char		cmdline[1024];	/* up to 1020 characters from HP-UX */
+
+				/* pstat_getcommandline() is available only from HP-UX 11i v2. */
+				/* To handle HP-UX 11.11 a popular workaround is used. */
+				un.pst_command = cmdline;
+				if (-1 == pstat(PSTAT_GETCOMMANDLINE, un, sizeof(cmdline), 1, pst[i].pst_pid))
+					continue;
+
+				if (NULL == zbx_regexp_match(cmdline, proccomm, NULL))
+					continue;
+			}
 
 			if (FAIL == check_procstate(pst[i], zbx_proc_stat))
 				continue;

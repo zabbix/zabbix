@@ -40,6 +40,14 @@
 #define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0080)
 
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define ZBX_HOST_TLS_OFFSET	4
+#else
+#	define ZBX_HOST_TLS_OFFSET	0
+#endif
+
+
 struct zbx_dbsync;
 
 /******************************************************************************

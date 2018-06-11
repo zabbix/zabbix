@@ -68,6 +68,20 @@ class CVar {
 		foreach ($this->var_container as $item) {
 			$res .= $item->toString();
 		}
+
 		return $res;
+	}
+
+	/**
+	 * Remove ID attribute from tag.
+	 *
+	 * @return CVar
+	 */
+	public function removeId() {
+		foreach ($this->var_container as $item) {
+			$item->removeAttribute('id');
+		}
+
+		return $this;
 	}
 }

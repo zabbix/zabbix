@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # Zabbix
 # Copyright (C) 2001-2018 Zabbix SIA

@@ -115,6 +115,9 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 				-L*)
 					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
 			;;
+				-R*)
+					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS -Wl,$i"
+			;;
 				-l*)
 					LIBCURL_LIBS="$LIBCURL_LIBS $i"
 			;;

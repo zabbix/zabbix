@@ -103,13 +103,6 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 const char	*progname = NULL;
 
-/* default config file location */
-#ifdef _WINDOWS
-#	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
-#else
-#	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
-#endif
-
 /* application TITLE */
 const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
@@ -186,6 +179,11 @@ const char	*help_message[] = {
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
 	"",
+#ifndef _WINDOWS
+	"Default loadable module location:",
+	"  LoadModulePath                 \"" DEFAULT_LOAD_MODULE_PATH "\"",
+	"",
+#endif
 #ifdef _WINDOWS
 	"Example: zabbix_agentd -c C:\\zabbix\\zabbix_agentd.conf",
 #else
@@ -568,7 +566,7 @@ static void	set_defaults(void)
 
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = (char *)"/tmp/zabbix_agentd.pid";
@@ -924,7 +922,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
-
+#ifndef _WINDOWS
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log: %s", error);
@@ -1103,35 +1108,12 @@ void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)
 	{
-		int		i;
-#if !defined(_WINDOWS)
-		sigset_t	set;
-
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work */
-		sigemptyset(&set);
-		sigaddset(&set, SIGCHLD);
-		sigprocmask(SIG_BLOCK, &set, NULL);
-#else
-		/* wait for threads to finish first. although listener threads will never end */
-		WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-#endif
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-				zbx_thread_kill(threads[i]);
-		}
-
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-				zbx_thread_wait(threads[i]);
-
-			threads[i] = ZBX_THREAD_HANDLE_NULL;
-		}
-
+		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
