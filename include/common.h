@@ -1064,7 +1064,13 @@ int	zbx_day_in_month(int year, int mon);
 #endif
 void	__zbx_zbx_error(const char *fmt, ...);
 size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...);
+
+void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 4, 5)));
+#else
+	;
+#endif
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
