@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+#include "../zbxalgo/vectorimpl.h"
 
 typedef struct
 {
@@ -114,6 +115,16 @@ typedef struct
 	zbx_vector_uint64_t	conditionids;
 }
 zbx_lld_rule_map_t;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	applicationid;
+}
+zbx_itemapp_t;
+
+ZBX_VECTOR_DECL(itemapp, zbx_itemapp_t);
+ZBX_VECTOR_IMPL(itemapp, zbx_itemapp_t);
 
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
@@ -950,24 +961,17 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
  ******************************************************************************/
 static void	save_template_item_applications(zbx_vector_ptr_t *items)
 {
-	typedef struct
-	{
-		zbx_uint64_t	itemid;
-		zbx_uint64_t	applicationid;
-	}
-	zbx_itemapp_t;
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
-	zbx_vector_ptr_t	itemapps;
-	zbx_itemapp_t		*itemapp;
+	zbx_vector_itemapp_t	itemapps;
+	zbx_itemapp_t		*itemapp, itemapp_t;
 	int			i;
 	zbx_db_insert_t		db_insert;
 
-	zbx_vector_ptr_create(&itemapps);
+	zbx_vector_itemapp_create(&itemapps);
 	zbx_vector_uint64_create(&itemids);
 
 	for (i = 0; i < items->values_num; i++)
@@ -997,12 +1001,10 @@ static void	save_template_item_applications(zbx_vector_ptr_t *items)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		itemapp = (zbx_itemapp_t *)zbx_malloc(NULL, sizeof(zbx_itemapp_t));
+		ZBX_STR2UINT64(itemapp_t.itemid, row[0]);
+		ZBX_STR2UINT64(itemapp_t.applicationid, row[1]);
 
-		ZBX_STR2UINT64(itemapp->itemid, row[0]);
-		ZBX_STR2UINT64(itemapp->applicationid, row[1]);
-
-		zbx_vector_ptr_append(&itemapps, itemapp);
+		zbx_vector_itemapp_append(&itemapps, itemapp_t);
 	}
 	DBfree_result(result);
 
@@ -1013,7 +1015,7 @@ static void	save_template_item_applications(zbx_vector_ptr_t *items)
 
 	for (i = 0; i < itemapps.values_num; i++)
 	{
-		itemapp = (zbx_itemapp_t *)itemapps.values[i];
+		itemapp = &itemapps.values[i];
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemapp->itemid, itemapp->applicationid);
 	}
@@ -1026,8 +1028,7 @@ out:
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zbx_vector_ptr_clear_ext(&itemapps, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&itemapps);
+	zbx_vector_itemapp_destroy(&itemapps);
 }
 
 /******************************************************************************
