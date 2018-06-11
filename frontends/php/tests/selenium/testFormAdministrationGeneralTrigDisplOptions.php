@@ -312,8 +312,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->assertEquals(1, DBcount('SELECT problem_ack_style FROM config WHERE problem_ack_style=1'));
 		$this->assertEquals(1, DBcount('SELECT ok_unack_style FROM config WHERE ok_unack_style=1'));
 		$this->assertEquals(1, DBcount('SELECT ok_ack_style FROM config WHERE ok_ack_style=1'));
-		$this->assertEquals(1, DBcount("SELECT ok_period FROM config WHERE ok_period='30m'"));
-		$this->assertEquals(1, DBcount("SELECT blink_period FROM config WHERE blink_period='30m'"));
+		$this->assertEquals(1, DBcount("SELECT ok_period FROM config WHERE ok_period='5m'"));
+		$this->assertEquals(1, DBcount("SELECT blink_period FROM config WHERE blink_period='2m'"));
 
 		// hash calculation for the DB fields that should be changed in this report
 		$this->assertEquals($old_hash, DBhash($sql_hash));
