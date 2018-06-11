@@ -62,10 +62,8 @@ switch ($data['filter']['show']) {
 	case TRIGGERS_OPTION_ALL:
 		$options['profileIdx'] = $data['profileIdx'];
 		$options['profileIdx2'] = $data['profileIdx2'];
-		$options['updateProfile'] = $data['updateProfile'];
-		$options['period'] = $data['period'];
-		$options['stime'] = $data['stime'];
-		$options['isNow'] = $data['isNow'];
+		$options['from'] = $data['from'];
+		$options['to'] = $data['to'];
 		break;
 }
 
@@ -221,8 +219,8 @@ if ($data['action'] == 'problem.view') {
 	$filter_tags_table->addRow(
 		(new CCol(
 			(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
-				->addValue(_('AND'), TAG_EVAL_TYPE_AND)
-				->addValue(_('OR'), TAG_EVAL_TYPE_OR)
+				->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+				->addValue(_('Or'), TAG_EVAL_TYPE_OR)
 				->setModern(true)
 		))->setColSpan(4)
 	);
@@ -299,16 +297,18 @@ if ($data['action'] == 'problem.view') {
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		]);
 
-	$filter = (new CFilter('web.problem.filter.state'))
+	$filter = (new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
 		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
-		->addFormItem((new CVar('page', $data['page']))->removeId())
-		->addColumn($filter_column1)
-		->addColumn($filter_column2);
+		->addFormItem((new CVar('page', $data['page']))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$filter->addNavigator();
+		$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
+
+	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 	(new CWidget())
 		->setTitle(_('Problems'))
@@ -341,15 +341,8 @@ if ($data['action'] == 'problem.view') {
 			'id' => 'timeline_1',
 			'loadSBox' => 0,
 			'loadImage' => 0,
-			'loadScroll' => 1,
 			'dynamic' => 0,
-			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.problem.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-			'profile' => [
-				'idx' => 'web.problem.timeline',
-				'idx2' => 0,
-			]
+			'mainObject' => 1
 		];
 
 		$this->addPostJS('timeControl.useTimeRefresh('.zbx_jsvalue(CWebUser::getRefresh()).');');

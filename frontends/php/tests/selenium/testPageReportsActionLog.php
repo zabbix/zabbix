@@ -20,11 +20,13 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAdministrationAuditActions extends CWebTest {
+class testPageReportsActionLog extends CWebTest {
 
-	public function testPageAdministrationAuditActions_CheckLayout() {
-
-		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
+	public function testPageReportsActionLog_CheckLayout() {
+		// from: 2012-02-20 09:00:00
+		// to: 2014-02-19 09:00:00
+		// dates can be in relative format, example: now-1y/y, now-1w, now
+		$this->zbxTestLogin('auditacts.php?from=2012-02-20+09%3A00%3A00&to=2014-02-19+09%3A00%3A00');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
@@ -46,9 +48,10 @@ class testPageAdministrationAuditActions extends CWebTest {
 	/**
 	* @dataProvider allAuditActions
 	*/
-	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
-
-		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000&isNow=0');
+	public function testPageReportsActionLog_CheckValues($auditactions) {
+		// from: 2012-02-20 09:00:00
+		// to: 2014-02-19 09:00:00
+		$this->zbxTestLogin('auditacts.php?from=2012-02-20+09%3A00%3A00&to=2014-02-19+09%3A00%3A00');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
@@ -100,8 +103,9 @@ class testPageAdministrationAuditActions extends CWebTest {
 				]
 		);
 
+		$this->zbxTestExpandFilterTab();
 		$this->zbxTestInputTypeWait('alias', 'guest');
-		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestClickXpathWait("//button[@name='filter_set']");
 		$this->zbxTestTextPresent('No data found.');
 
 		$this->zbxTestClickButtonText('Reset');

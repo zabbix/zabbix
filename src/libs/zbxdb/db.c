@@ -122,7 +122,7 @@ static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
-static ZBX_MUTEX		sqlite_access = ZBX_MUTEX_NULL;
+static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -373,7 +373,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_MYSQL)
+#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
+	bool		mysql_reconnect = 1;
+#else
 	my_bool		mysql_reconnect = 1;
+#endif
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
 	sword		err = OCI_SUCCESS;
@@ -914,7 +918,7 @@ int	zbx_db_begin(void)
 #elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute("%s", "begin;");
 #elif defined(HAVE_SQLITE3)
-	zbx_mutex_lock(&sqlite_access);
+	zbx_mutex_lock(sqlite_access);
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
@@ -976,7 +980,7 @@ int	zbx_db_commit(void)
 	}
 
 #ifdef HAVE_SQLITE3
-	zbx_mutex_unlock(&sqlite_access);
+	zbx_mutex_unlock(sqlite_access);
 #endif
 
 	txn_level--;
@@ -1037,7 +1041,7 @@ int	zbx_db_rollback(void)
 		rc = OCI_handle_sql_error(ERR_Z3005, err, "rollback failed");
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute("%s", "rollback;");
-	zbx_mutex_unlock(&sqlite_access);
+	zbx_mutex_unlock(sqlite_access);
 #endif
 
 	/* There is no way to recover from rollback errors, so there is no need to preserve transaction level / error. */
@@ -1488,7 +1492,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
-		zbx_mutex_lock(&sqlite_access);
+		zbx_mutex_lock(sqlite_access);
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
@@ -1519,7 +1523,7 @@ lbl_exec:
 		ret = sqlite3_changes(conn);
 
 	if (0 == txn_level)
-		zbx_mutex_unlock(&sqlite_access);
+		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
@@ -1834,7 +1838,7 @@ error:
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level)
-		zbx_mutex_lock(&sqlite_access);
+		zbx_mutex_lock(sqlite_access);
 
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->curow = 0;
@@ -1865,7 +1869,7 @@ lbl_get_table:
 	}
 
 	if (0 == txn_level)
-		zbx_mutex_unlock(&sqlite_access);
+		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{

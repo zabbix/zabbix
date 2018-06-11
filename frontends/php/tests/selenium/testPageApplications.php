@@ -122,7 +122,7 @@ class testPageApplications extends CWebTest {
 		if ($data['group'] != 'all') {
 			$group_app= [];
 			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
-					. " WHERE hg.groupid=(SELECT groupid FROM groups WHERE name='".$data['group']."')";
+					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['group']."')";
 			$result = DBselect($sql_all_applications);
 			while ($row = DBfetch($result)) {
 				$group_app[] = $row['name'];

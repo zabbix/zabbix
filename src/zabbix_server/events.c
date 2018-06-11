@@ -545,7 +545,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hg.groupid"
-				" from groups g,hosts_groups hg,items i,functions f"
+				" from hstgrp g,hosts_groups hg,items i,functions f"
 				" where f.triggerid=" ZBX_FS_UI64
 				" and i.itemid=f.itemid"
 				" and hg.hostid=i.hostid"
@@ -1672,7 +1672,7 @@ void	zbx_export_events(void)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct g.name"
-					" from groups g, hosts_groups hg"
+					" from hstgrp g, hosts_groups hg"
 					" where g.groupid=hg.groupid"
 						" and");
 

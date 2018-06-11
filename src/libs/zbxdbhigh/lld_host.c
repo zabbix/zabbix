@@ -862,7 +862,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 	result = DBselect(
 			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name"
 			" from group_prototype gp,group_discovery gd"
-				" join groups g"
+				" join hstgrp g"
 					" on gd.groupid=g.groupid"
 			" where gp.group_prototypeid=gd.parent_group_prototypeid"
 				" and gp.hostid=" ZBX_FS_UI64,
@@ -1164,7 +1164,7 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name from hstgrp where");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
 				(const char **)names.values, names.values_num);
 
@@ -1323,7 +1323,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "id", "permission", "groupid", NULL);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select g.name,r.permission,r.groupid from groups g,rights r"
+			"select g.name,r.permission,r.groupid from hstgrp g,rights r"
 				" where r.id=g.groupid"
 				" and");
 
@@ -1458,9 +1458,9 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 	if (0 != new_groups_num)
 	{
-		groupid = DBget_maxid_num("groups", new_groups_num);
+		groupid = DBget_maxid_num("hstgrp", new_groups_num);
 
-		zbx_db_insert_prepare(&db_insert, "groups", "groupid", "name", "flags", NULL);
+		zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "flags", NULL);
 
 		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupid", "parent_group_prototypeid",
 				"name", NULL);
@@ -1512,7 +1512,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 		{
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 			{
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update groups set ");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
 				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 				{
 					name_esc = DBdyn_escape_string(group->name);

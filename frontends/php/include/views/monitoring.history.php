@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/monitoring.history.js.php';
-
 $historyWidget = new CWidget();
 
 $header = [
@@ -103,9 +101,12 @@ $action_list->addItem([
 $header['right']->addItem($action_list);
 
 // create filter
+$filter_form = new CFilter();
+$filter_tab = [];
+
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
-		$filterForm = (new CFilter('web.history.filter.state'))
+		$filter_form
 			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addVar('action', $data['action']);
 
@@ -168,21 +169,9 @@ if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 			}
 
 			$filterColumn1->addRow(_('Selected'), $tasks);
-			$filterForm->addColumn($filterColumn1);
+			$filter_tab[] = $filterColumn1;
 		}
 	}
-}
-
-// for batch graphs don't remember the time selection in the profiles
-if ($data['action'] == HISTORY_BATCH_GRAPH) {
-	$profileIdx = null;
-	$profileIdx2 = null;
-	$updateProfile = false;
-}
-else {
-	$profileIdx = 'web.item.graph';
-	$profileIdx2 = reset($data['itemids']);
-	$updateProfile = ($data['period'] !== null || $data['stime'] !== null || $data['is_now'] !== null);
 }
 
 // create history screen
@@ -191,12 +180,10 @@ if ($data['itemids']) {
 		'resourcetype' => SCREEN_RESOURCE_HISTORY,
 		'action' => $data['action'],
 		'itemids' => $data['itemids'],
-		'profileIdx' => $profileIdx,
-		'profileIdx2' => $profileIdx2,
-		'updateProfile' => $updateProfile,
-		'period' => $data['period'],
-		'stime' => $data['stime'],
-		'isNow' => $data['is_now'],
+		'profileIdx' => $data['profileIdx'],
+		'profileIdx2' => $data['profileIdx2'],
+		'from' => $data['from'],
+		'to' => $data['to'],
 		'filter' => getRequest('filter'),
 		'filter_task' => getRequest('filter_task'),
 		'mark_color' => getRequest('mark_color'),
@@ -225,48 +212,54 @@ else {
 		->setTitle($header['left'])
 		->setControls((new CTag('nav', true, $header['right']))
 			->setAttribute('aria-label', _('Content controls'))
-	);
+		);
 
-	if (array_key_exists($data['value_type'], $data['iv_string'])) {
-		$filterForm->addNavigator();
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
+		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
-	if (in_array($data['action'], [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
-		if(!isset($filterForm)) {
-			$filterForm = new CFilter('web.history.filter.state');
-		}
-
-		// display the graph type filter for graphs with multiple items
-		if ($data['action'] == HISTORY_BATCH_GRAPH) {
-			$filterForm->addColumn(
-				(new CFormList())->addRow(_('Graph type'),
-					(new CRadioButtonList('graphtype', (int) $data['graphtype']))
-						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
-						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
-						->setModern(true)
-				)
-			);
-			$filterForm->removeButtons();
-			$filterForm->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
-			$filterForm->addVar('action', $data['action']);
-			$filterForm->addVar('itemids', $data['itemids']);
-		}
-
-		$filterForm->addNavigator();
-		$historyWidget->addItem($filterForm);
+	if ($data['action'] == HISTORY_BATCH_GRAPH) {
+		$filter_form
+			->hideFilterButtons()
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addVar('action', $data['action'])
+			->addVar('itemids', $data['itemids']);
+		$filter_tab = [
+			(new CFormList())->addRow(_('Graph type'),
+				(new CRadioButtonList('graphtype', (int) $data['graphtype']))
+					->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
+					->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
+					->setModern(true)
+					->onChange('jQuery(this).closest("form").submit();')
+			)
+		];
 	}
+
+	$filter_form
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab']);
+
+	if ($filter_tab) {
+		$filter_form->addFilterTab(_('Filter'), $filter_tab);
+	}
+
+
 	if ($data['itemids']) {
+		if ($data['action'] !== HISTORY_LATEST) {
+			$historyWidget->addItem($filter_form);
+		}
+
 		$historyWidget->addItem($screen->get());
 
 		if ($data['action'] !== HISTORY_LATEST) {
-			CScreenBuilder::insertScreenStandardJs([
-				'timeline' => $screen->timeline,
-				'profileIdx' => $screen->profileIdx,
-				'profileIdx2' => $screen->profileIdx2
-			]);
+			CScreenBuilder::insertScreenStandardJs($screen->timeline);
 		}
 	}
 	else {
+		if ($filter_tab) {
+			$historyWidget->addItem($filter_form);
+		}
+
 		$historyWidget->addItem(
 			(new CTableInfo())
 				->setHeader([

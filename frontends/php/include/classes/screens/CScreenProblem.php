@@ -47,8 +47,8 @@ class CScreenProblem extends CScreenBase {
 		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
 
 		if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-			$this->data['filter']['period'] = $this->timeline['period'];
-			$this->data['filter']['stime'] = zbxDateToTime($this->timeline['stime']);
+			$this->data['filter']['from'] = $this->timeline['from_ts'];
+			$this->data['filter']['to'] = $this->timeline['to_ts'];
 		}
 
 		$config = select_config();
@@ -151,10 +151,10 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['application']           (optional)
 	 * @param string $filter['name']                  (optional)
 	 * @param int    $filter['show']                  TRIGGERS_OPTION_*
-	 * @param int    $filter['stime']                 (optional) usable together with 'period' and only for
-	 *                                                           TRIGGERS_OPTION_ALL
-	 * @param int    $filter['period']                (optional) usable together with 'stime' and only for
-	 *                                                           TRIGGERS_OPTION_ALL
+	 * @param int    $filter['from']                  (optional) usable together with 'to' and only for
+	 *                                                           TRIGGERS_OPTION_ALL, timestamp.
+	 * @param int    $filter['to']                    (optional) usable together with 'from' and only for
+	 *                                                           TRIGGERS_OPTION_ALL, timestamp.
 	 * @param int    $filter['age_state']             (optional) usable together with 'age' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
@@ -267,9 +267,9 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($filter['show'] == TRIGGERS_OPTION_ALL) {
-				if (array_key_exists('stime', $filter) && array_key_exists('period', $filter)) {
-					$options['time_from'] = $filter['stime'];
-					$options['time_till'] = $filter['stime'] + $filter['period'];
+				if (array_key_exists('from', $filter) && array_key_exists('to', $filter)) {
+					$options['time_from'] = $filter['from'];
+					$options['time_till'] = $filter['to'];
 				}
 			}
 			else {

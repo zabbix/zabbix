@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAdministrationAudit extends CWebTest {
+class testPageReportsAudit extends CWebTest {
 
 	private $actions = [
 		-1 => 'All',
@@ -64,14 +64,14 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_VALUE_MAP => 'Value map'
 	];
 
-	public function testPageAdministrationAudit_CheckLayout() {
+	public function testPageReportsAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
-
+		$this->zbxTestExpandFilterTab();
 		$this->zbxTestAssertElementPresentId('alias');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
 		$this->zbxTestAssertElementPresentId('btn1');
@@ -166,11 +166,12 @@ class testPageAdministrationAudit extends CWebTest {
 	/**
 	* @dataProvider auditActions
 	*/
-	public function testPageAdministrationAudit_Filter($action, $resourcetype) {
+	public function testPageReportsAudit_Filter($action, $resourcetype) {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
+		$this->zbxTestExpandFilterTab();
 		$this->zbxTestInputType('alias', '');
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);

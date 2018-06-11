@@ -87,7 +87,7 @@ class CEvent extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND,
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,
 			'search'					=> null,
@@ -377,55 +377,7 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$where = '';
-			$cnt = count($options['tags']);
-
-			foreach ($options['tags'] as $tag) {
-				if (!array_key_exists('value', $tag)) {
-					$tag['value'] = '';
-				}
-
-				if ($tag['value'] !== '') {
-					if (!array_key_exists('operator', $tag)) {
-						$tag['operator'] = TAG_OPERATOR_LIKE;
-					}
-
-					switch ($tag['operator']) {
-						case TAG_OPERATOR_EQUAL:
-							$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
-							break;
-
-						case TAG_OPERATOR_LIKE:
-						default:
-							$tag['value'] = str_replace('!', '!!', $tag['value']);
-							$tag['value'] = str_replace('%', '!%', $tag['value']);
-							$tag['value'] = str_replace('_', '!_', $tag['value']);
-							$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-							$tag['value'] = ' AND UPPER(et.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-					}
-				}
-				elseif ($tag['operator'] == TAG_OPERATOR_EQUAL) {
-					$tag['value'] = ' AND et.value='.zbx_dbstr($tag['value']);
-				}
-
-				if ($where !== '') {
-					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
-				}
-
-				$where .= 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_tag et'.
-					' WHERE e.eventid=et.eventid'.
-						' AND et.tag='.zbx_dbstr($tag['tag']).$tag['value'].
-				')';
-			}
-
-			// Add closing parenthesis if there are more than one OR statements.
-			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where = '('.$where.')';
-			}
-
-			$sqlParts['where'][] = $where;
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
 		}
 
 		// time_from
@@ -491,6 +443,70 @@ class CEvent extends CApiService {
 	}
 
 	/**
+	 * Returns SQL condition for tag filters.
+	 *
+	 * @param array $tags
+	 * @param int   $evaltype
+	 * @param bool  $is_events
+	 *
+	 * @return array
+	 */
+	public static function getTagsWhereCondition(array $tags, $evaltype, $is_events = true) {
+		$alias = $is_events ? 'et' : 'pt';
+		$parent_alias = $is_events ? 'e' : 'p';
+		$table = $is_events ? 'event_tag' : 'problem_tag';
+		$values_by_tag = [];
+
+		foreach ($tags as $tag) {
+			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
+			$value = array_key_exists('value', $tag) ? $tag['value'] : '';
+
+			if (!array_key_exists($tag['tag'], $values_by_tag) || is_array($values_by_tag[$tag['tag']])) {
+				if ($operator == TAG_OPERATOR_EQUAL) {
+					$values_by_tag[$tag['tag']][] = $alias.'.value='.zbx_dbstr($value);
+				}
+				elseif ($value !== '') {
+					$value = str_replace('!', '!!', $value);
+					$value = str_replace('%', '!%', $value);
+					$value = str_replace('_', '!_', $value);
+					$value = '%'.mb_strtoupper($value).'%';
+
+					$values_by_tag[$tag['tag']][] = 'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+				}
+				// ($value === '') - all other conditions can be omitted
+				else {
+					$values_by_tag[$tag['tag']] = false;
+				}
+			}
+		}
+
+		$sql_where = [];
+
+		foreach ($values_by_tag as $tag => $values) {
+			if (!is_array($values) || count($values) == 0) {
+				$values = '';
+			}
+			elseif (count($values) == 1) {
+				$values = ' AND '.$values[0];
+			}
+			else {
+				$values = $values ? ' AND ('.implode(' OR ', $values).')' : '';
+			}
+
+			$sql_where[] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM '.$table.' '.$alias.
+				' WHERE '.$parent_alias.'.eventid='.$alias.'.eventid'.
+					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
+			')';
+		}
+
+		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);
+
+		return (count($values_by_tag) > 1 && $evaltype == TAG_EVAL_TYPE_OR) ? '('.$sql_where.')' : $sql_where;
+	}
+
+	/**
 	 * Validates the input parameters for the get() method.
 	 *
 	 * @throws APIException     if the input is invalid
@@ -518,7 +534,7 @@ class CEvent extends CApiService {
 		}
 
 		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_OR]
+			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 		]);
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
