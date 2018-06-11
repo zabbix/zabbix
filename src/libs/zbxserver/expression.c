@@ -4140,8 +4140,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'", token.token.r - token.token.l + 1,
-					*data + token.token.l);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'",
+					(int)(token.token.r - token.token.l + 1), *data + token.token.l);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
