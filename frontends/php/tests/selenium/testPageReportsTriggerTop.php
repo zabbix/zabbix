@@ -38,13 +38,11 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		// Check closed filter
-		$this->zbxTestClickWait('filter-mode');
-		$this->zbxTestAssertNotVisibleId('filter-space');
+		$this->zbxTestClickWait('filter-trigger');
 		$this->zbxTestAssertNotVisibleId('groupids_');
 
 		// Check opened filter
-		$this->zbxTestClickWait('filter-mode');
-		$this->zbxTestAssertVisibleId('filter-space');
+		$this->zbxTestClickWait('filter-trigger');
 		$this->zbxTestAssertVisibleId('groupids_');
 
 		// Ckeck empty trigger list
