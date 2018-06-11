@@ -52,12 +52,16 @@ $widget->setControls((new CTag('nav', true, $form))
 // filter
 if (!$data['templateid']) {
 	$widget->addItem(
-		(new CFilter('web.screenconf.filter.state'))
-			->addColumn((new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			))
+		(new CFilter())
+			->setProfile($data['profileIdx'])
+			->setActiveTab($data['active_tab'])
+			->addFilterTab(_('Filter'), [
+				(new CFormList())->addRow(_('Name'),
+					(new CTextBox('filter_name', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+				)
+			])
 	);
 }
 
