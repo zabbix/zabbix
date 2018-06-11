@@ -1977,10 +1977,9 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 
 	foreach ($data['actions'] as $action) {
 		$esc_step = '';
-		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT
-				&& $action['p_eventid'] == 0
-				&& $action['acknowledgeid'] == 0
-		) {
+
+		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['p_eventid'] == 0
+				&& $action['acknowledgeid'] == 0) {
 			/*
 			 * Escalation step should be displayed, only if alert is caused by problem event.
 			 * Escalation step should not be displayed, if alert is caused by resolve event, or by problem update.
