@@ -1194,7 +1194,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
 								" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
-								psk_owner->first, psk_owner->second, host->host);
+								(char *)psk_owner->first, (char *)psk_owner->second,
+								host->host);
 					}
 				}
 
@@ -1234,7 +1235,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
 							" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
-							psk_owner->first, psk_owner->second, host->host);
+							(char *)psk_owner->first, (char *)psk_owner->second,
+							host->host);
 				}
 			}
 
