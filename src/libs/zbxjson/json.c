@@ -46,6 +46,10 @@ const char	*zbx_json_strerror(void)
 #else
 #	define zbx_set_json_strerror __zbx_zbx_set_json_strerror
 #endif
+
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__((__format__(__printf__, 1, 2)))
+#endif
 static void	__zbx_zbx_set_json_strerror(const char *fmt, ...)
 {
 	va_list	args;
