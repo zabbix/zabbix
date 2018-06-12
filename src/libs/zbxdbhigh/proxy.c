@@ -2538,6 +2538,7 @@ static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
 static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv)
 {
 	const char	*__function_name = "log_client_timediff";
+
 	char		tmp[32];
 	zbx_timespec_t	client_timediff;
 	int		sec, ns;
@@ -2555,10 +2556,15 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 			ns = atoi(tmp);
 			client_timediff.ns = ts_recv->ns - ns;
 
-			if (client_timediff.ns < 0)
+			if (client_timediff.sec > 0 && client_timediff.ns < 0)
 			{
 				client_timediff.sec--;
 				client_timediff.ns += 1000000000;
+			}
+			else if (client_timediff.sec < 0 && client_timediff.ns > 0)
+			{
+				client_timediff.sec++;
+				client_timediff.ns -= 1000000000;
 			}
 
 			zabbix_log(level, "%s(): timestamp from json %d seconds and %d nanosecond, "
@@ -2567,7 +2573,6 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 		}
 		else
 		{
-			client_timediff.ns = 0;
 			zabbix_log(level, "%s(): timestamp from json %d seconds, "
 				"delta time from json %d seconds", __function_name, sec, client_timediff.sec);
 		}
