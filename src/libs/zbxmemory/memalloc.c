@@ -283,13 +283,15 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 		{
 			if (NULL == chunk)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
+				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked " ZBX_FS_UI64 " skip_min "
+						ZBX_FS_UI64 " skip_max " ZBX_FS_UI64,
 						counter, size, skip_min, skip_max);
 			}
 			else if (counter >= 100)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u"
-						" size %u", counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked " ZBX_FS_UI64 " skip_min "
+						ZBX_FS_UI64 " skip_max " ZBX_FS_UI64 " size " ZBX_FS_UI64, counter,
+						size, skip_min, skip_max, CHUNK_SIZE(chunk));
 			}
 		}
 	}
@@ -765,19 +767,22 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 		if (counter > 0)
 		{
 			total_free += counter;
-			zabbix_log(LOG_LEVEL_DEBUG, "free chunks of size %2s %3d bytes: %8d",
+			zabbix_log(LOG_LEVEL_DEBUG, "free chunks of size %2s %3d bytes: " ZBX_FS_UI64,
 					index == MEM_BUCKET_COUNT - 1 ? ">=" : "",
 					MEM_MIN_BUCKET_SIZE + 8 * index, counter);
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "min chunk size: %10u bytes", min_size);
-	zabbix_log(LOG_LEVEL_DEBUG, "max chunk size: %10u bytes", max_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "min chunk size: " ZBX_FS_UI64 " bytes", min_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "max chunk size: " ZBX_FS_UI64 " bytes", max_size);
 
 	total = (info->total_size - info->used_size - info->free_size) / (2 * MEM_SIZE_FIELD) + 1;
-	zabbix_log(LOG_LEVEL_DEBUG, "memory of total size %u bytes fragmented into %d chunks", info->total_size, total);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d free chunks", info->free_size, total_free);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d used chunks", info->used_size, total - total_free);
+	zabbix_log(LOG_LEVEL_DEBUG, "memory of total size " ZBX_FS_UI64 " bytes fragmented into " ZBX_FS_UI64 " chunks",
+			info->total_size, total);
+	zabbix_log(LOG_LEVEL_DEBUG, "of those, " ZBX_FS_UI64 " bytes are in " ZBX_FS_UI64 " free chunks",
+			info->free_size, total_free);
+	zabbix_log(LOG_LEVEL_DEBUG, "of those, " ZBX_FS_UI64 " bytes are in " ZBX_FS_UI64 " used chunks",
+			info->used_size, total - total_free);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "================================");
 }
