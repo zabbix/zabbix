@@ -77,7 +77,9 @@ class CControllerMediatypeList extends CController {
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
-			'filter' => $filter
+			'filter' => $filter,
+			'profileIdx' => 'web.media_types.filter',
+			'active_tab' => CProfile::get('web.media_types.filter.active', 1)
 		];
 
 		// get media types

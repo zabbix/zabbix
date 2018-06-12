@@ -80,7 +80,7 @@ extern char		*CONFIG_SOURCE_IP;
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_DAY
 #define ZBX_XML_DATETIME		26
 
-static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 
@@ -4822,7 +4822,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
  ******************************************************************************/
 void	zbx_vmware_lock(void)
 {
-	zbx_mutex_lock(&vmware_lock);
+	zbx_mutex_lock(vmware_lock);
 }
 
 /******************************************************************************
@@ -4834,7 +4834,7 @@ void	zbx_vmware_lock(void)
  ******************************************************************************/
 void	zbx_vmware_unlock(void)
 {
-	zbx_mutex_unlock(&vmware_lock);
+	zbx_mutex_unlock(vmware_lock);
 }
 
 /******************************************************************************

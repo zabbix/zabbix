@@ -467,12 +467,12 @@ void	zbx_vcmock_free_dc_history(void *ptr)
  * mock functions
  */
 
-static ZBX_MUTEX	*vc_mutex = NULL;
+static zbx_mutex_t	*vc_mutex = NULL;
 zbx_mem_info_t		*vc_meminfo = NULL;
 
 static size_t		vcmock_mem = ZBX_MEBIBYTE * 1024;
 
-int	__wrap_zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
+int	__wrap_zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
 {
 	vc_mutex = mutex;
 	ZBX_UNUSED(name);
@@ -481,7 +481,7 @@ int	__wrap_zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, char **error)
 	return SUCCEED;
 }
 
-void	__wrap_zbx_mutex_destroy(ZBX_MUTEX *mutex)
+void	__wrap_zbx_mutex_destroy(zbx_mutex_t *mutex)
 {
 	zbx_mock_assert_ptr_eq("Attempting to destroy unknown mutex", vc_mutex, mutex);
 }

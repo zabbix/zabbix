@@ -52,7 +52,6 @@ if ($this->data['graphid']) {
 	$content_control->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid',
 		'elid' => $this->data['graphid']])
 	);
-	$content_control->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
 }
 
 $content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
@@ -63,7 +62,10 @@ $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
 	->setControls(new CList([$controls, $content_control]));
 
-$filterForm = (new CFilter('web.charts.filter.state'))->addNavigator();
+$filterForm = (new CFilter())
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
@@ -74,20 +76,18 @@ if (!empty($this->data['graphid'])) {
 			'resourcetype' => SCREEN_RESOURCE_HISTORY,
 			'action' => HISTORY_VALUES,
 			'graphid' => $data['graphid'],
-			'profileIdx' => 'web.graphs',
-			'profileIdx2' => $data['graphid'],
-			'updateProfile' => false,
-			'period' => $data['period'],
-			'stime' => $data['stime'],
-			'isNow' => $data['isNow']
+			'profileIdx' => $data['timeline']['profileIdx'],
+			'profileIdx2' => $data['timeline']['profileIdx2'],
+			'from' => $data['timeline']['from'],
+			'to' => $data['timeline']['to']
 		]);
 	}
 	else {
 		$screen = CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_CHART,
 			'graphid' => $this->data['graphid'],
-			'profileIdx' => 'web.graphs',
-			'profileIdx2' => $this->data['graphid']
+			'profileIdx' => $data['timeline']['profileIdx'],
+			'profileIdx2' => $data['timeline']['profileIdx2']
 		]);
 	}
 
@@ -97,17 +97,11 @@ if (!empty($this->data['graphid'])) {
 
 	$chartsWidget->addItem($chartTable);
 
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen->timeline,
-		'profileIdx' => $screen->profileIdx,
-		'profileIdx2' => $screen->profileIdx2
-	]);
+	CScreenBuilder::insertScreenStandardJs($screen->timeline);
 }
 else {
 	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen->timeline
-	]);
+	CScreenBuilder::insertScreenStandardJs($screen->timeline);
 
 	$chartsWidget->addItem(new CTableInfo());
 }

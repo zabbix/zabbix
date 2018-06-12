@@ -1727,7 +1727,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
 	item->snmp_oid_orig = NULL;
-	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+	if (SUCCEED == ret && (ITEM_TYPE_SNMPv1 == item_prototype->type || ITEM_TYPE_SNMPv2c == item_prototype->type ||
+			ITEM_TYPE_SNMPv3 == item_prototype->type))
+	{
+		ret = substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, err, sizeof(err));
+	}
 	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
 
 	item->username = zbx_strdup(NULL, item_prototype->username);
@@ -4118,6 +4122,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->applicationid = 0;
 		application->application_prototypeid = application_prototype->application_prototypeid;
 		application->application_discoveryid = 0;
+		application->ts_delete = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
 		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
