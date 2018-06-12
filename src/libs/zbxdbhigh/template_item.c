@@ -129,6 +129,16 @@ zbx_itemapp_t;
 ZBX_VECTOR_DECL(itemapp, zbx_itemapp_t);
 ZBX_VECTOR_IMPL(itemapp, zbx_itemapp_t);
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	parent_itemid;
+}
+zbx_proto_t;
+
+ZBX_VECTOR_DECL(proto, zbx_proto_t);
+ZBX_VECTOR_IMPL(proto, zbx_proto_t);
+
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
@@ -1044,24 +1054,17 @@ out:
  ******************************************************************************/
 static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 {
-	typedef struct
-	{
-		zbx_uint64_t	itemid;
-		zbx_uint64_t	parent_itemid;
-	}
-	zbx_proto_t;
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
-	zbx_vector_ptr_t	prototypes;
-	zbx_proto_t		*proto;
+	zbx_vector_proto_t	prototypes;
+	zbx_proto_t		*proto, proto_t;
 	int			i;
 	zbx_db_insert_t		db_insert;
 
-	zbx_vector_ptr_create(&prototypes);
+	zbx_vector_proto_create(&prototypes);
 	zbx_vector_uint64_create(&itemids);
 
 	for (i = 0; i < items->values_num; i++)
@@ -1094,12 +1097,10 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		proto = (zbx_proto_t *)zbx_malloc(NULL, sizeof(zbx_proto_t));
+		ZBX_STR2UINT64(proto_t.itemid, row[0]);
+		ZBX_STR2UINT64(proto_t.parent_itemid, row[1]);
 
-		ZBX_STR2UINT64(proto->itemid, row[0]);
-		ZBX_STR2UINT64(proto->parent_itemid, row[1]);
-
-		zbx_vector_ptr_append(&prototypes, proto);
+		zbx_vector_proto_append(&prototypes, proto_t);
 	}
 	DBfree_result(result);
 
@@ -1111,7 +1112,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 
 	for (i = 0; i < prototypes.values_num; i++)
 	{
-		proto = (zbx_proto_t *)prototypes.values[i];
+		proto = &prototypes.values[i];
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), proto->itemid, proto->parent_itemid);
 	}
@@ -1124,8 +1125,7 @@ out:
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zbx_vector_ptr_clear_ext(&prototypes, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&prototypes);
+	zbx_vector_proto_destroy(&prototypes);
 }
 
 /******************************************************************************
