@@ -137,6 +137,14 @@ class CWidgetFormProblems extends CWidgetForm {
 		}
 		$this->fields[] = $field_unacknowledged;
 
+		// show timeline
+		$field_show_timeline = (new CWidgetFieldCheckBox('show_timeline', _('Show timeline')));
+
+		if (array_key_exists('show_timeline', $this->data)) {
+			$field_show_timeline->setValue($this->data['show_timeline']);
+		}
+		$this->fields[] = $field_show_timeline;
+
 		// sort entries by
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',

@@ -317,6 +317,22 @@ if ($js_scripts) {
 	$output['body'] .= get_js(implode("\n", $js_scripts));
 }
 
+$jquery_event_change = 'var sort_triggers = jQuery("#sort_triggers");'.
+	'setStatusTimeline(sort_triggers, false);'.
+	'function setStatusTimeline(sort_triggers, force) {'.
+		'var box_disabled = true, sort = sort_triggers.val(),'.
+		'checkbox = jQuery("#show_timeline[type='."'checkbox'".']");'.
+		'if (sort == '.SCREEN_SORT_TRIGGERS_TIME_ASC.' || sort == '.SCREEN_SORT_TRIGGERS_TIME_DESC.')'.
+			'{box_disabled = false;}'.
+		'checkbox.prop("disabled", box_disabled);'.
+		'if (force) {checkbox.prop("checked", !box_disabled);}'.
+	'};'.
+	'sort_triggers.change(function(){'.
+		'var sort_triggers = jQuery(this);'.
+		'setStatusTimeline(sort_triggers, true);'.
+	'});';
+$output['body'] .= get_js($jquery_event_change, true);
+
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

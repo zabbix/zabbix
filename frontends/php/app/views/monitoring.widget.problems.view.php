@@ -33,7 +33,7 @@ $url_details = (new CUrl('tr_events.php'))
 	->setArgument('eventid', '')
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
-$show_timeline = ($data['sortfield'] === 'clock');
+$show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
 $header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
