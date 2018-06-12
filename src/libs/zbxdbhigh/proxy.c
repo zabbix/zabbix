@@ -2540,7 +2540,7 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	const char	*__function_name = "log_client_timediff";
 	char		tmp[32];
 	zbx_timespec_t	client_timediff;
-	int		sec, ns = 0;
+	int		sec, ns;
 
 	if (SUCCEED != zabbix_check_log_level(level))
 		return;
