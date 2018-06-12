@@ -647,8 +647,8 @@ static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *
 		gitem->type = atoi(row[8]);
 		gitem->flags = (unsigned char)atoi(row[9]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%d] itemid:" ZBX_FS_UI64 " key:'%s'",
-				__function_name, *gitems_num, gitem->itemid, gitem->key);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() [" ZBX_FS_SIZE_T "] itemid:" ZBX_FS_UI64 " key:'%s'",
+				__function_name, (zbx_fs_size_t)*gitems_num, gitem->itemid, gitem->key);
 
 		(*gitems_num)++;
 	}
