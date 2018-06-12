@@ -2525,18 +2525,19 @@ static void	zbx_agent_values_clean(zbx_agent_value_t *values, size_t values_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_client_timediff                                              *
+ * Function: log_client_timediff                                              *
  *                                                                            *
  * Purpose: calculates difference between server and client (proxy, active    *
- *          agent or sender) time                                             *
+ *          agent or sender) time and log it                                  *
  *                                                                            *
- * Parameters: jp      - [IN] JSON with clock, [ns] fields                    *
+ * Parameters: level   - [IN] log level                                       *
+ *             jp      - [IN] JSON with clock, [ns] fields                    *
  *             ts_recv - [IN] the connection timestamp                        *
  *                                                                            *
  ******************************************************************************/
-static void	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv)
+static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_timespec_t *ts_recv)
 {
-	const char	*__function_name = "get_client_timediff";
+	const char	*__function_name = "log_client_timediff";
 	char		tmp[32];
 	zbx_timespec_t	client_timediff;
 	int		sec, ns = 0;
@@ -2557,14 +2558,14 @@ static void	get_client_timediff(struct zbx_json_parse *jp, const zbx_timespec_t 
 				client_timediff.ns += 1000000000;
 			}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds and %d nanosecond, "
+			zabbix_log(level, "%s(): timestamp from json %d seconds and %d nanosecond, "
 					"delta time from json %d seconds and %d nanosecond",
 					__function_name, sec, ns, client_timediff.sec, client_timediff.ns);
 		}
 		else
 		{
 			client_timediff.ns = 0;
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): timestamp from json %d seconds, "
+			zabbix_log(level, "%s(): timestamp from json %d seconds, "
 				"delta time from json %d seconds", __function_name, sec, client_timediff.sec);
 		}
 	}
@@ -3062,7 +3063,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		get_client_timediff(jp, ts);
+		log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 
 	sec = zbx_time();
 
@@ -3396,7 +3397,7 @@ int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		get_client_timediff(jp, ts);
+		log_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3550,7 +3551,7 @@ int	process_auto_registration(struct zbx_json_parse *jp, zbx_uint64_t proxy_host
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		get_client_timediff(jp, ts);
+		log_client_timediff(jp, ts);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
@@ -3798,7 +3799,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		get_client_timediff(jp, ts);
+		log_client_timediff(jp, ts);
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HOST_AVAILABILITY, &jp_data))
 	{
