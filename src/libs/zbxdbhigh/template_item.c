@@ -99,20 +99,23 @@ typedef struct
 }
 zbx_lld_rule_condition_t;
 
+ZBX_VECTOR_DECL(lld_rule_condition, zbx_lld_rule_condition_t);
+ZBX_VECTOR_IMPL(lld_rule_condition, zbx_lld_rule_condition_t);
+
 /* lld rule */
 typedef struct
 {
 	/* discovery rule source id */
-	zbx_uint64_t		templateid;
+	zbx_uint64_t			templateid;
 	/* discovery rule source conditions */
-	zbx_vector_ptr_t	conditions;
+	zbx_vector_lld_rule_condition_t	conditions;
 
 	/* discovery rule destination id */
-	zbx_uint64_t		itemid;
+	zbx_uint64_t			itemid;
 	/* the starting id to be used for destination condition ids */
-	zbx_uint64_t		conditionid;
+	zbx_uint64_t			conditionid;
 	/* discovery rule destination condition ids */
-	zbx_vector_uint64_t	conditionids;
+	zbx_vector_uint64_t		conditionids;
 }
 zbx_lld_rule_map_t;
 
@@ -315,7 +318,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 {
 	zbx_template_item_t		*item;
 	zbx_lld_rule_map_t		*rule;
-	zbx_lld_rule_condition_t	*condition;
+	zbx_lld_rule_condition_t	condition;
 	int				i, index;
 	zbx_vector_uint64_t		itemids;
 	DB_RESULT			result;
@@ -340,7 +343,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		rule->templateid = item->templateid;
 		rule->conditionid = 0;
 		zbx_vector_uint64_create(&rule->conditionids);
-		zbx_vector_ptr_create(&rule->conditions);
+		zbx_vector_lld_rule_condition_create(&rule->conditions);
 
 		zbx_vector_ptr_append(rules, rule);
 
@@ -372,14 +375,12 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 				rule = (zbx_lld_rule_map_t *)rules->values[index];
 
-				condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
+				ZBX_STR2UINT64(condition.item_conditionid, row[0]);
+				ZBX_STR2UCHAR(condition.op, row[2]);
+				condition.macro = zbx_strdup(NULL, row[3]);
+				condition.value = zbx_strdup(NULL, row[4]);
 
-				ZBX_STR2UINT64(condition->item_conditionid, row[0]);
-				ZBX_STR2UCHAR(condition->op, row[2]);
-				condition->macro = zbx_strdup(NULL, row[3]);
-				condition->value = zbx_strdup(NULL, row[4]);
-
-				zbx_vector_ptr_append(&rule->conditions, condition);
+				zbx_vector_lld_rule_condition_append(&rule->conditions, condition);
 			}
 			else
 			{
@@ -502,7 +503,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
 			char				srcid[64], dstid[64], *ptr;
 			size_t				pos = 0, len;
 
-			zbx_lld_rule_condition_t	*condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			zbx_lld_rule_condition_t	*condition = &rule->conditions.values[j];
 
 			if (j < rule->conditionids.values_num)
 				id = rule->conditionids.values[j];
@@ -872,7 +873,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 			for (j = 0; j < rule->conditions.values_num; j++)
 			{
-				condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+				condition = &rule->conditions.values[j];
 
 				zbx_db_insert_add_values(&db_insert, rule->conditionid++, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
@@ -896,7 +897,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		/* update intersecting rule conditions */
 		for (j = 0; j < index; j++)
 		{
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			condition = &rule->conditions.values[j];
 
 			macro_esc = DBdyn_escape_string(condition->macro);
 			value_esc = DBdyn_escape_string(condition->value);
@@ -919,7 +920,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		/* insert new rule conditions */
 		for (j = index; j < rule->conditions.values_num; j++)
 		{
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			condition = &rule->conditions.values[j];
 
 			zbx_db_insert_add_values(&db_insert, rule->conditionid++, rule->itemid,
 					(int)condition->op, condition->macro, condition->value);
@@ -1192,7 +1193,6 @@ static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
 {
 	zbx_free(condition->macro);
 	zbx_free(condition->value);
-	zbx_free(condition);
 }
 
 /******************************************************************************
@@ -1206,8 +1206,8 @@ static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
  ******************************************************************************/
 static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
-	zbx_vector_ptr_clear_ext(&rule->conditions, (zbx_clean_func_t)free_lld_rule_condition);
-	zbx_vector_ptr_destroy(&rule->conditions);
+	zbx_vector_lld_rule_condition_clear_type(&rule->conditions, free_lld_rule_condition);
+	zbx_vector_lld_rule_condition_destroy(&rule->conditions);
 
 	zbx_vector_uint64_destroy(&rule->conditionids);
 
