@@ -143,6 +143,9 @@ class CWidgetFormProblems extends CWidgetForm {
 		if (array_key_exists('show_timeline', $this->data)) {
 			$field_show_timeline->setValue($this->data['show_timeline']);
 		}
+		elseif (count($this->data) === 0) {
+			$field_show_timeline->setValue(1);
+		}
 		$this->fields[] = $field_show_timeline;
 
 		// sort entries by
