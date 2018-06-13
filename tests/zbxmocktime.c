@@ -26,9 +26,7 @@
 #define ZBX_MOCK_FORMAT_TIME		"%02d:%02d:%02d"
 #define ZBX_MOCK_FORMAT_DATETIME	ZBX_MOCK_FORMAT_DATE " " ZBX_MOCK_FORMAT_TIME
 #define ZBX_MOCK_FORMAT_NS		".%09d"
-#define ZBX_MOCK_FORMAT_TZ		"%c%02d:%02d"
-
-#define ZBX_MOCK_TZ_MAX		7
+#define ZBX_MOCK_FORMAT_TZ		" %c%02d:%02d"
 
 #define ZBX_MOCK_TIME_DATE	0x0001
 #define ZBX_MOCK_TIME_TIME	0x0002
@@ -79,37 +77,25 @@ static const char	*ts_get_component_end(const char *text)
 static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int *day, const char **pnext)
 {
 	const char	*year_end, *month_end, *day_end;
-	int		value_year, value_month, value_day;
 
 	year_end = ts_get_component_end(text);
 	if (year_end - text != 4 || '-' != *year_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	month_end = ts_get_component_end(year_end + 1);
-	if (2 > month_end - year_end || 3 < month_end - year_end || '-' != *month_end)
+	if (month_end == year_end || '-' != *month_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	day_end = ts_get_component_end(month_end + 1);
 
-	if (2 > day_end - month_end || 3 < day_end - month_end)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
-
-	value_year = atoi(text);
-	if (1970 > value_year || 2038 < value_year)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
-
-	value_month = atoi(year_end + 1);
-	if (12 < value_month)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
-
-	value_day = atoi(month_end + 1);
-	if (value_day > zbx_day_in_month(value_year, value_month))
+	if (day_end == month_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = day_end;
-	*year = value_year;
-	*month = value_month;
-	*day = value_day;
+
+	*year = atoi(text);
+	*month = atoi(year_end + 1);
+	*day = atoi(month_end + 1);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -135,8 +121,7 @@ static zbx_mock_error_t	ts_get_date(const char *text, int *year, int *month, int
  ******************************************************************************/
 static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, int *seconds, const char **pnext)
 {
-	const char	*hours_end, *minutes_end, *seconds_end;
-	int		value_hours, value_minutes, value_seconds;
+	const char	*hours_end, *minutes_end, *seconds_send;
 
 	hours_end = ts_get_component_end(text);
 	if (hours_end == text || ':' != *hours_end)
@@ -146,27 +131,16 @@ static zbx_mock_error_t	ts_get_time(const char *text, int *hours, int *minutes, 
 	if (minutes_end - hours_end != 3 || ':' != *minutes_end)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	seconds_end = ts_get_component_end(minutes_end + 1);
+	seconds_send = ts_get_component_end(minutes_end + 1);
 
-	if (seconds_end - minutes_end != 3)
+	if (seconds_send - minutes_end != 3)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
-	value_hours = atoi(text);
-	if (24 <= value_hours)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
+	*pnext = seconds_send;
 
-	value_minutes = atoi(hours_end + 1);
-	if (60 <= value_minutes)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
-
-	value_seconds = atoi(minutes_end + 1);
-	if (60 <= value_seconds)
-		return ZBX_MOCK_NOT_A_TIMESTAMP;
-
-	*pnext = seconds_end;
-	*hours = value_hours;
-	*minutes = value_minutes;
-	*seconds = value_seconds;
+	*hours = atoi(text);
+	*minutes = atoi(hours_end + 1);
+	*seconds = atoi(minutes_end + 1);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -193,7 +167,7 @@ static zbx_mock_error_t	ts_get_ns(const char *text, int *ns, const char **pnext)
 	int		pad;
 
 	ns_end = ts_get_component_end(text + 1);
-	if (ns_end == text + 1 || 10 < ns_end - text)
+	if (ns_end == text + 1)
 		return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 	*pnext = ns_end;
@@ -275,6 +249,7 @@ static int	is_leap_year(int year)
  * Parameters: timestamp - [IN] the number of seconds since Epoch             *
  *             local     - [OUT] broken-down time representation              *
  *             tz_offset - [OUT] timezone offset in seconds                   *
+ *             tz_sec - [IN] timezone offset in seconds                       *
  *                                                                            *
  * Return value: ZBX_MOCK_SUCCESS - the time was converted successfully       *
  *               ZBX_MOCK_INTERNAL_ERROR - invalid timestamp was specified    *
@@ -304,38 +279,6 @@ static zbx_mock_error_t	zbx_time_to_localtime(time_t timestamp, struct tm *local
 
 	return ZBX_MOCK_SUCCESS;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_tz_format                                                    *
- *                                                                            *
- * Purpose: formats timezone to +hh:mm format                                 *
- *                                                                            *
- * Parameters: buffer - [OUT] the output buffer                               *
- *             size   - [IN] the output buffer size                           *
- *             tz_sec - [IN] the timezone offset in seconds                   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_tz_format(char *buffer, size_t size, int tz_sec)
-{
-	int	tz_hour, tz_min;
-	char	tz_sign;
-
-	if (0 > tz_sec)
-	{
-		tz_sec = -tz_sec;
-		tz_sign = '-';
-	}
-	else
-		tz_sign = '+';
-
-	tz_hour = tz_sec / 60;
-	tz_min = tz_hour % 60;
-	tz_hour /= 60;
-
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_TZ, tz_sign, tz_hour, tz_min);
-}
-
 
 typedef enum
 {
@@ -368,10 +311,9 @@ zbx_mock_time_parser_state_t;
  ******************************************************************************/
 zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts)
 {
-	int				sec, ns, tz, components = 0;
+	int				err, sec, ns, tz, components = 0;
 	const char			*ptr, *pnext;
 	struct tm			tm;
-	zbx_mock_error_t		err;
 	zbx_mock_time_parser_state_t	state = ZBX_TOKEN_START;
 
 	for (ptr = strtime; '\0' != *ptr;)
@@ -385,7 +327,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			if (ZBX_MOCK_SUCCESS != (err = ts_get_ns(ptr, &ns, &ptr)))
-				return err;
+				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			components |= ZBX_MOCK_TIME_NS;
 			state = ZBX_TOKEN_COMPONENT;
@@ -425,7 +367,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			if (ZBX_MOCK_SUCCESS != (err = ts_get_tz(ptr, &tz, &ptr)))
-				return err;
+				return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 			components |= ZBX_MOCK_TIME_TZ;
 			continue;
@@ -482,7 +424,7 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 			tm.tm_sec = 0;
 		}
 
-		if (0 >  (sec = timegm(&tm)))
+		if (-1 == (sec = timegm(&tm)))
 			return ZBX_MOCK_NOT_A_TIMESTAMP;
 
 		if (0 != (components & ZBX_MOCK_TIME_TZ))
@@ -522,8 +464,8 @@ zbx_mock_error_t	zbx_strtime_to_timespec(const char *strtime, zbx_timespec_t *ts
 zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size)
 {
 	struct tm		tm;
-	int			tz_sec;
-	char			tz_buf[ZBX_MOCK_TZ_MAX];
+	int			tz_hour, tz_min, tz_sec;
+	char			tz_sign;
 	zbx_mock_error_t	err;
 
 	/* max timestamp length minus nanosecond component */
@@ -533,11 +475,21 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(timestamp, &tm, &tz_sec)))
 		return err;
 
-	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
+	if (0 > tz_sec)
+	{
+		tz_sec = -tz_sec;
+		tz_sign = '-';
+	}
+	else
+		tz_sign = '+';
 
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME " %s",
+	tz_hour = tz_sec / 60;
+	tz_min = tz_hour % 60;
+	tz_hour /= 60;
+
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_TZ,
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_buf);
+			tm.tm_hour, tm.tm_min, tm.tm_sec, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }
@@ -564,8 +516,8 @@ zbx_mock_error_t	zbx_time_to_strtime(time_t timestamp, char *buffer, size_t size
 zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer, size_t size)
 {
 	struct tm		tm;
-	int			tz_sec;
-	char			tz_buf[ZBX_MOCK_TZ_MAX + 1];
+	int			tz_hour, tz_min, tz_sec;
+	char			tz_sign;
 	zbx_mock_error_t	err;
 
 	if (size < ZBX_MOCK_TIMESTAMP_MAX_LEN)
@@ -574,11 +526,21 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer,
 	if (ZBX_MOCK_SUCCESS != (err = zbx_time_to_localtime(ts->sec, &tm, &tz_sec)))
 		return err;
 
-	zbx_tz_format(tz_buf, sizeof(tz_buf), tz_sec);
+	if (0 > tz_sec)
+	{
+		tz_sec = -tz_sec;
+		tz_sign = '-';
+	}
+	else
+		tz_sign = '+';
 
-	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS " %s",
+	tz_hour = tz_sec / 60;
+	tz_min = tz_hour % 60;
+	tz_hour /= 60;
+
+	zbx_snprintf(buffer, size, ZBX_MOCK_FORMAT_DATETIME ZBX_MOCK_FORMAT_NS ZBX_MOCK_FORMAT_TZ,
 			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_buf);
+			tm.tm_hour, tm.tm_min, tm.tm_sec, ts->ns, tz_sign, tz_hour, tz_min);
 
 	return ZBX_MOCK_SUCCESS;
 }

@@ -1324,14 +1324,12 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,a.host_metadata"
-				" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
-				" where h.proxy_hostid=" ZBX_FS_UI64
+				"select host"
+				" from hosts"
+				" where proxy_hostid=" ZBX_FS_UI64
 					" and",
 				proxy_hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
 				(const char **)hosts.values, hosts.values_num);
 
 		result = DBselect("%s", sql);
@@ -1342,16 +1340,12 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 			{
 				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
-				if (0 != strcmp(autoreg_host->host, row[0]))
-					continue;
-
-				if (SUCCEED == DBis_null(row[1]) || 0 != strcmp(autoreg_host->host_metadata, row[1]))
+				if (0 == strcmp(autoreg_host->host, row[0]))
+				{
+					zbx_vector_ptr_remove(autoreg_hosts, i);
+					autoreg_host_free(autoreg_host);
 					break;
-
-				zbx_vector_ptr_remove(autoreg_hosts, i);
-				autoreg_host_free(autoreg_host);
-
-				break;
+				}
 			}
 
 		}
@@ -1369,7 +1363,9 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select autoreg_hostid,host"
 				" from autoreg_host"
-				" where");
+				" where proxy_hostid%s"
+					" and",
+				DBsql_id_cmp(proxy_hostid));
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
 				(const char **)hosts.values, hosts.values_num);
 
@@ -1463,11 +1459,9 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 					" set listen_ip='%s',"
 						"listen_dns='%s',"
 						"listen_port=%hu,"
-						"host_metadata='%s',"
-						"proxy_hostid=%s"
+						"host_metadata='%s'"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, DBsql_id_ins(proxy_hostid),
-				autoreg_host->autoreg_hostid);
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);

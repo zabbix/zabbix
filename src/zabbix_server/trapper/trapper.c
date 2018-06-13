@@ -372,7 +372,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	int			ret = FAIL, request_type = ZBX_GET_QUEUE_UNKNOWN, now, i, limit;
 	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN], limit_str[MAX_STRING_LEN];
 	zbx_user_t		user;
-	zbx_vector_queue_item_t	queue;
+	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
@@ -416,7 +416,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	}
 
 	now = time(NULL);
-	zbx_vector_queue_item_create(&queue);
+	zbx_vector_ptr_create(&queue);
 	DCget_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -430,7 +430,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			/* gather queue stats by item type */
 			for (i = 0; i < queue.values_num; i++)
 			{
-				zbx_queue_item_t	*item = &queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->type;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
@@ -455,7 +455,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			/* gather queue stats by proxy hostid */
 			for (i = 0; i < queue.values_num; i++)
 			{
-				zbx_queue_item_t	*item = &queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 				zbx_uint64_t		id = item->proxy_hostid;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
@@ -474,14 +474,14 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 			for (i = 0; i < queue.values_num && i < limit; i++)
 			{
-				zbx_queue_item_t	*item = &queue.values[i];
+				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
 
 				zbx_json_addobject(&json, NULL);
 				zbx_json_adduint64(&json, "itemid", item->itemid);
@@ -499,7 +499,8 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
-	zbx_vector_queue_item_destroy(&queue);
+	DCfree_item_queue(&queue);
+	zbx_vector_ptr_destroy(&queue);
 
 	zbx_json_free(&json);
 

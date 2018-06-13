@@ -90,9 +90,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
 	AGENT_REQUEST		request;
-	zbx_vector_regexp_t	regexps;
+	zbx_vector_ptr_t	regexps;
 
-	zbx_vector_regexp_create(&regexps);
+	zbx_vector_ptr_create(&regexps);
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
@@ -215,7 +215,7 @@ next:
 	zbx_free(items);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_regexp_destroy(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	zbx_preprocessor_flush();
 

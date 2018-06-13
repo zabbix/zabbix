@@ -534,7 +534,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay time picker.
 				case 'clndr':
-					getCalendarByID(dialog.dialogueid.toString()).clndr.clndrhide();
+					CLNDR[dialog.dialogueid].clndr.clndrhide();
 					break;
 
 				// Close overlay message.

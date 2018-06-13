@@ -32,7 +32,6 @@
 #include "cfg.h"
 #include "zbxtasks.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
@@ -91,7 +90,6 @@ extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
-ZBX_VECTOR_IMPL(queue_item, zbx_queue_item_t);
 
 /******************************************************************************
  *                                                                            *
@@ -9172,6 +9170,23 @@ char	*DCexpression_expand_user_macros(const char *expression, char **error)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCfree_item_queue                                                *
+ *                                                                            *
+ * Purpose: frees the item queue data vector created by DCget_item_queue()    *
+ *                                                                            *
+ * Parameters: queue - [IN] the item queue data vector to free                *
+ *                                                                            *
+ ******************************************************************************/
+void	DCfree_item_queue(zbx_vector_ptr_t *queue)
+{
+	int	i;
+
+	for (i = 0; i < queue->values_num; i++)
+		zbx_free(queue->values[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCget_item_queue                                                 *
  *                                                                            *
  * Purpose: retrieves vector of delayed items                                 *
@@ -9184,12 +9199,12 @@ char	*DCexpression_expand_user_macros(const char *expression, char **error)
  * Return value: the number of delayed items                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_queue(zbx_vector_queue_item_t *queue, int from, int to)
+int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
 	int			now, nitems = 0, data_expected_from, delay;
-	zbx_queue_item_t	queue_item;
+	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
 
@@ -9251,12 +9266,13 @@ int	DCget_item_queue(zbx_vector_queue_item_t *queue, int from, int to)
 
 		if (NULL != queue)
 		{
-			queue_item.itemid = dc_item->itemid;
-			queue_item.type = dc_item->type;
-			queue_item.nextcheck = dc_item->nextcheck;
-			queue_item.proxy_hostid = dc_host->proxy_hostid;
+			queue_item = (zbx_queue_item_t *)zbx_malloc(NULL, sizeof(zbx_queue_item_t));
+			queue_item->itemid = dc_item->itemid;
+			queue_item->type = dc_item->type;
+			queue_item->nextcheck = dc_item->nextcheck;
+			queue_item->proxy_hostid = dc_host->proxy_hostid;
 
-			zbx_vector_queue_item_append(queue, queue_item);
+			zbx_vector_ptr_append(queue, queue_item);
 		}
 		nitems++;
 	}
@@ -9743,7 +9759,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	ZBX_DC_EXPRESSION	*expression;
@@ -9760,18 +9776,19 @@ void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * c
 			for (i = 0; i < regexp->expressionids.values_num; i++)
 			{
 				zbx_uint64_t		expressionid = regexp->expressionids.values[i];
-				zbx_expression_t	rxp;
+				zbx_expression_t	*rxp;
 
 				if (NULL == (expression = (ZBX_DC_EXPRESSION *)zbx_hashset_search(&config->expressions, &expressionid)))
 					continue;
 
-				rxp.name = zbx_strdup(NULL, regexp->name);
-				rxp.expression = zbx_strdup(NULL, expression->expression);
-				rxp.exp_delimiter = expression->delimiter;
-				rxp.case_sensitive = expression->case_sensitive;
-				rxp.expression_type = expression->type;
+				rxp = (zbx_expression_t *)zbx_malloc(NULL, sizeof(zbx_expression_t));
+				rxp->name = zbx_strdup(NULL, regexp->name);
+				rxp->expression = zbx_strdup(NULL, expression->expression);
+				rxp->exp_delimiter = expression->delimiter;
+				rxp->case_sensitive = expression->case_sensitive;
+				rxp->expression_type = expression->type;
 
-				zbx_vector_regexp_append(expressions, rxp);
+				zbx_vector_ptr_append(expressions, rxp);
 			}
 		}
 	}
@@ -9792,7 +9809,7 @@ void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * c
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_name(zbx_vector_regexp_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
 }

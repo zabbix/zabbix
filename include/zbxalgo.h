@@ -272,8 +272,6 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 #define ZBX_VECTOR_DECL(__id, __type)										\
 														\
-typedef void (*zbx_clean_ ## __id ## _func_t)(__type *data);							\
-														\
 typedef struct													\
 {														\
 	__type			*values;									\
@@ -314,9 +312,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 									zbx_compare_func_t compare_func);	\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
-void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);					\
-void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_clean_ ## __id ## _func_t clean_func);
-
+void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 #define ZBX_PTR_VECTOR_DECL(__id, __type)									\
 														\
@@ -350,7 +346,7 @@ unsigned int	zbx_isqrt32(unsigned int value);
 #define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
 
 int	evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_str_t *unknown_msgs);
+		zbx_vector_ptr_t *unknown_msgs);
 
 /* forecasting */
 

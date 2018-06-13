@@ -24,7 +24,6 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
-#include "../zbxalgo/vectorimpl.h"
 
 #define ZBX_MODULE_FUNC_INIT			"zbx_module_init"
 #define ZBX_MODULE_FUNC_API_VERSION		"zbx_module_api_version"
@@ -34,10 +33,7 @@
 #define ZBX_MODULE_FUNC_UNINIT			"zbx_module_uninit"
 #define ZBX_MODULE_FUNC_HISTORY_WRITE_CBS	"zbx_module_history_write_cbs"
 
-ZBX_VECTOR_DECL(module, zbx_module_t);
-ZBX_VECTOR_IMPL(module, zbx_module_t);
-
-static zbx_vector_module_t	modules;
+static zbx_vector_ptr_t	modules;
 
 zbx_history_float_cb_t		*history_float_cbs = NULL;
 zbx_history_integer_cb_t	*history_integer_cbs = NULL;
@@ -86,13 +82,14 @@ static int	zbx_register_module_items(ZBX_METRIC *metrics, char *error, size_t ma
  ******************************************************************************/
 static zbx_module_t	*zbx_register_module(void *lib, char *name)
 {
-	zbx_module_t	module;
+	zbx_module_t	*module;
 
-	module.lib = lib;
-	module.name = zbx_strdup(NULL, name);
-	zbx_vector_module_append(&modules, module);
+	module = (zbx_module_t *)zbx_malloc(NULL, sizeof(zbx_module_t));
+	module->lib = lib;
+	module->name = zbx_strdup(NULL, name);
+	zbx_vector_ptr_append(&modules, module);
 
-	return &modules.values[modules.values_num - 1];
+	return module;
 }
 
 /******************************************************************************
@@ -249,7 +246,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	}
 
 	module_tmp.lib = lib;
-	if (FAIL != zbx_vector_module_search(&modules, module_tmp, zbx_module_compare_func))
+	if (FAIL != zbx_vector_ptr_search(&modules, &module_tmp, zbx_module_compare_func))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already beed loaded", name);
 		return SUCCEED;
@@ -344,7 +341,7 @@ int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbo
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_module_create(&modules);
+	zbx_vector_ptr_create(&modules);
 
 	if (NULL == *file_names)
 		goto out;
@@ -361,12 +358,12 @@ int	zbx_load_modules(const char *path, char **file_names, int timeout, int verbo
 		int	i = 0;
 
 		/* if execution reached this point at least one module was loaded successfully */
-		buffer = zbx_strdcat(NULL, modules.values[i++].name);
+		buffer = zbx_strdcat(NULL, ((zbx_module_t *)modules.values[i++])->name);
 
 		while (i < modules.values_num)
 		{
 			buffer = zbx_strdcat(buffer, ", ");
-			buffer = zbx_strdcat(buffer, modules.values[i++].name);
+			buffer = zbx_strdcat(buffer, ((zbx_module_t *)modules.values[i++])->name);
 		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "loaded modules: %s", buffer);
@@ -385,8 +382,9 @@ out:
  * Purpose: unload module and free allocated resources                        *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_unload_module(zbx_module_t	*module)
+static void	zbx_unload_module(void *data)
 {
+	zbx_module_t	*module = (zbx_module_t *)data;
 	int		(*func_uninit)(void);
 
 	if (NULL == (func_uninit = (int (*)(void))dlsym(module->lib, ZBX_MODULE_FUNC_UNINIT)))
@@ -399,6 +397,7 @@ static void	zbx_unload_module(zbx_module_t	*module)
 
 	dlclose(module->lib);
 	zbx_free(module->name);
+	zbx_free(module);
 }
 
 /******************************************************************************
@@ -421,8 +420,8 @@ void	zbx_unload_modules(void)
 	zbx_free(history_text_cbs);
 	zbx_free(history_log_cbs);
 
-	zbx_vector_module_clear_type(&modules, zbx_unload_module);
-	zbx_vector_module_destroy(&modules);
+	zbx_vector_ptr_clear_ext(&modules, zbx_unload_module);
+	zbx_vector_ptr_destroy(&modules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

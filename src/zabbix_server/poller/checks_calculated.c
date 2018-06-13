@@ -168,7 +168,7 @@ out:
 }
 
 static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t max_error_len,
-		zbx_vector_str_t *unknown_msgs)
+		zbx_vector_ptr_t *unknown_msgs)
 {
 	const char	*__function_name = "calcitem_evaluate_expression";
 	function_t	*f = NULL;
@@ -250,7 +250,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 					"Cannot evaluate function \"%s(%s)\": item \"%s:%s\" not supported.",
 					f->func, f->params, f->host, f->key);
 
-			zbx_vector_str_append(unknown_msgs, unknown_msg);
+			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
 
@@ -272,7 +272,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 						f->func, f->params);
 			}
 
-			zbx_vector_str_append(unknown_msgs, unknown_msg);
+			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
 
@@ -321,7 +321,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	int			ret;
 	char			error[MAX_STRING_LEN];
 	double			value;
-	zbx_vector_str_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
+	zbx_vector_ptr_t	unknown_msgs;		/* pointers to messages about origins of 'unknown' values */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __function_name,
 			dc_item->key_orig, dc_item->params);
@@ -336,7 +336,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	/* Assumption: most often there will be no NOTSUPPORTED items and function errors. */
 	/* Therefore initialize error messages vector but do not reserve any space. */
-	zbx_vector_str_create(&unknown_msgs);
+	zbx_vector_ptr_create(&unknown_msgs);
 
 	if (SUCCEED != (ret = calcitem_evaluate_expression(&exp, error, sizeof(error), &unknown_msgs)))
 	{
@@ -364,8 +364,8 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	SET_DBL_RESULT(result, value);
 clean:
-	zbx_vector_str_clear_ext(&unknown_msgs, zbx_ptr_free);
-	zbx_vector_str_destroy(&unknown_msgs);
+	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&unknown_msgs);
 clean1:
 	free_expression(&exp);
 

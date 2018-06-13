@@ -3753,7 +3753,6 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->applicationid = 0;
 		application->application_prototypeid = application_prototype->application_prototypeid;
 		application->application_discoveryid = 0;
-		application->ts_delete = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
 		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);

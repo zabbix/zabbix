@@ -166,6 +166,7 @@ void	__zbx_mock_assert_ptr_ne(const char *file, int line, const char *prefix_msg
 	_FAIL(file, line, prefix_msg, "Did not expect value \"0x%p\"", returned_value);
 }
 
+
 void	__zbx_mock_assert_timespec_eq(const char *file, int line, const char *prefix_msg,
 		const zbx_timespec_t *expected_value, const zbx_timespec_t *returned_value)
 {

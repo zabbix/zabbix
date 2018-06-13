@@ -239,12 +239,12 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 
 	char			*arg1 = NULL;
 	int			ret = FAIL;
-	zbx_vector_regexp_t	regexps;
+	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_regexp_create(&regexps);
+	zbx_vector_ptr_create(&regexps);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -285,7 +285,7 @@ out:
 	zbx_free(arg1);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_regexp_destroy(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -460,7 +460,7 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	}
 }
 
-static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_regexp_t *regexps)
+static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
 {
 	int	res;
 
@@ -525,13 +525,13 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 	double				arg2_dbl;
 	zbx_uint64_t			arg2_ui64, arg2_2_ui64;
 	zbx_value_type_t		arg1_type;
-	zbx_vector_regexp_t		regexps;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_regexp_create(&regexps);
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
@@ -774,7 +774,7 @@ out:
 	zbx_free(arg3);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_regexp_destroy(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1785,7 +1785,7 @@ out:
 #define ZBX_FUNC_REGEXP		2
 #define ZBX_FUNC_IREGEXP	3
 
-static int	evaluate_STR_one(int func, zbx_vector_regexp_t *regexps, const char *value, const char *arg1)
+static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *value, const char *arg1)
 {
 	switch (func)
 	{
@@ -1811,12 +1811,12 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	char				*arg1 = NULL;
 	int				arg2 = 1, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0, nparams;
 	zbx_value_type_t		arg2_type = ZBX_VALUE_NVALUES;
-	zbx_vector_regexp_t		regexps;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_regexp_create(&regexps);
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
@@ -1906,7 +1906,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	ret = SUCCEED;
 out:
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_regexp_destroy(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 

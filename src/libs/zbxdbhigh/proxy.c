@@ -30,7 +30,6 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "../zbxcrypto/tls_tcp_active.h"
-#include "../zbxalgo/vectorimpl.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -112,15 +111,6 @@ static const char	*availability_tag_available[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_AV
 static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
 					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
 					ZBX_PROTO_TAG_JMX_ERROR};
-typedef struct
-{
-	const ZBX_TABLE		*table;
-	zbx_vector_uint64_t	ids;
-}
-table_ids_t;
-
-ZBX_VECTOR_DECL(table_ids, table_ids_t);
-ZBX_VECTOR_IMPL(table_ids, table_ids_t);
 
 /******************************************************************************
  *                                                                            *
@@ -1524,6 +1514,13 @@ out:
  ******************************************************************************/
 void	process_proxyconfig(struct zbx_json_parse *jp_data)
 {
+	typedef struct
+	{
+		const ZBX_TABLE		*table;
+		zbx_vector_uint64_t	ids;
+	}
+	table_ids_t;
+
 	const char		*__function_name = "process_proxyconfig";
 	char			buf[ZBX_TABLENAME_LEN_MAX];
 	const char		*p = NULL;
@@ -1531,13 +1528,13 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	char			*error = NULL;
 	int			i, ret = SUCCEED;
 
-	table_ids_t		*table_ids, table_ids_t;
-	zbx_vector_table_ids_t	tables;
+	table_ids_t		*table_ids;
+	zbx_vector_ptr_t	tables;
 	const ZBX_TABLE		*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_table_ids_create(&tables);
+	zbx_vector_ptr_create(&tables);
 
 	DBbegin();
 
@@ -1558,10 +1555,12 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			break;
 		}
 
-		table_ids_t.table = table;
-		zbx_vector_uint64_create(&table_ids_t.ids);
-		ret = process_proxyconfig_table(table, &jp_obj, &table_ids_t.ids, &error);
-		zbx_vector_table_ids_append(&tables, table_ids_t);
+		table_ids = (table_ids_t *)zbx_malloc(NULL, sizeof(table_ids_t));
+		table_ids->table = table;
+		zbx_vector_uint64_create(&table_ids->ids);
+		zbx_vector_ptr_append(&tables, table_ids);
+
+		ret = process_proxyconfig_table(table, &jp_obj, &table_ids->ids, &error);
 	}
 
 	if (SUCCEED == ret)
@@ -1575,7 +1574,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 		for (i = tables.values_num - 1; 0 <= i; i--)
 		{
-			table_ids = &tables.values[i];
+			table_ids = (table_ids_t *)tables.values[i];
 
 			if (0 == table_ids->ids.values_num)
 				continue;
@@ -1600,11 +1599,12 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	for (i = 0; i < tables.values_num; i++)
 	{
-		table_ids = &tables.values[i];
+		table_ids = (table_ids_t *)tables.values[i];
 
 		zbx_vector_uint64_destroy(&table_ids->ids);
+		zbx_free(table_ids);
 	}
-	zbx_vector_table_ids_destroy(&tables);
+	zbx_vector_ptr_destroy(&tables);
 
 	DBend(ret);
 

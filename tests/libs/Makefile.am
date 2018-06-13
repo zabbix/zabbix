@@ -1,5 +1,4 @@
 SUBDIRS = \
-	zbxcommon \
 	zbxconf \
 	zbxdbcache \
 	zbxdbhigh \

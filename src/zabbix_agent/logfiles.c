@@ -1405,10 +1405,10 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
 static void	pick_logfile(const char *directory, const char *filename, int mtime, const regex_t *re,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
-	char		*logfile_candidate;
+	char		*logfile_candidate = NULL;
 	zbx_stat_t	file_buf;
 
-	logfile_candidate = zbx_dsprintf(NULL, "%s%s", directory, filename);
+	logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, filename);
 
 	if (0 == zbx_stat(logfile_candidate, &file_buf))
 	{
@@ -1692,9 +1692,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			/* do not make logrt[] and logrt.count[] items NOTSUPPORTED if there are no matching log */
 			/* files or they are not accessible (can happen during a rotation), just log the problem */
 #ifdef _WINDOWS
-			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", filename_regexp,
-					directory);
-
+			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
+					"access rights", filename_regexp, directory);
 			ret = ZBX_NO_FILE_ERROR;
 #else
 			if (0 != access(directory, X_OK))
@@ -1794,7 +1793,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 }
 
 static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_regexp_t *regexps, const char *pattern,
+		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		const char *server, unsigned short port, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
@@ -2126,7 +2125,7 @@ out:
  ******************************************************************************/
 static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_regexp_t *regexps, const char *pattern,
+		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		const char *server, unsigned short port, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
@@ -2954,7 +2953,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
-		zbx_vector_regexp_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
 		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
 		int rotation_type)
@@ -2973,25 +2972,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (SUCCEED != (res = make_logfile_list(flags, filename, *mtime, &logfiles, &logfiles_alloc, &logfiles_num,
 			use_ino, err_msg)))
 	{
-		if (ZBX_NO_FILE_ERROR == res)
+		if (ZBX_NO_FILE_ERROR == res && 1 == *skip_old_data)
 		{
-			if (1 == *skip_old_data)
-			{
-				*skip_old_data = 0;
-
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0",
-						__function_name);
-			}
-
-			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == *logfiles_num_old)
-			{
-				/* Both the old and the new log file lists are empty. That means the agent has not */
-				/* seen any log files for this logrt[] item since started. If log files appear later */
-				/* then analyze them from start, do not apply the 'lastlogsize' received from server */
-				/* anymore. */
-
-				*lastlogsize = 0;
-			}
+			*skip_old_data = 0;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __function_name);
 		}
 
 		/* file was not accessible for a log[] or log.count[] item or an error occurred */

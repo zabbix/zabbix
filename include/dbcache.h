@@ -24,7 +24,6 @@
 #include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
-#include "zbxregexp.h"
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -499,8 +498,6 @@ typedef struct
 }
 zbx_queue_item_t;
 
-ZBX_VECTOR_DECL(queue_item, zbx_queue_item_t);
-
 typedef union
 {
 	zbx_uint64_t	ui64;
@@ -675,7 +672,8 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timesp
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
-int	DCget_item_queue(zbx_vector_queue_item_t *queue, int from, int to);
+void	DCfree_item_queue(zbx_vector_ptr_t *queue);
+int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid);
 zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);
@@ -689,8 +687,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
 		zbx_vector_ptr_t *required_performance);
 
-void	DCget_expressions_by_names(zbx_vector_regexp_t *expressions, const char * const *names, int names_num);
-void	DCget_expressions_by_name(zbx_vector_regexp_t *expressions, const char *name);
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
+void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 

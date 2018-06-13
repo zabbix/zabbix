@@ -94,19 +94,21 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  *                                                                            *
  * Function: discover_service                                                 *
  *                                                                            *
- * Purpose: check if service is available                                     *
+ * Purpose: check if service is available and update database                 *
  *                                                                            *
  * Parameters: service type, ip address, port number                          *
  *                                                                            *
- * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
- *                                                                            *
  ******************************************************************************/
-static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **value, size_t *value_alloc)
+static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value, size_t *value_alloc)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
+	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	const char	*service = NULL;
 	AGENT_RESULT 	result;
+	DC_ITEM		item;
+	ZBX_FPING_HOST	host;
+	size_t		value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -162,11 +164,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 	if (SUCCEED == ret)
 	{
-		char		**pvalue;
-		size_t		value_offset = 0;
-		ZBX_FPING_HOST	host;
-		DC_ITEM		item;
-		char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
+		char	**pvalue;
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -338,7 +336,9 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		const char *dns, int now)
 {
 	const char	*__function_name = "process_check";
-	const char	*start;
+	int		port, first, last;
+	char		*start, *comma, *last_port;
+	int		status;
 	char		*value = NULL;
 	size_t		value_alloc = 128;
 
@@ -348,9 +348,6 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 	for (start = dcheck->ports; '\0' != *start;)
 	{
-		char	*comma, *last_port;
-		int	port, first, last;
-
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
 
@@ -366,16 +363,14 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 		for (port = first; port <= last; port++)
 		{
-			int	service_status;
-
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
 
-			service_status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
+			status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
 					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 
 			/* update host status */
-			if (-1 == *host_status || DOBJECT_STATUS_UP == service_status)
-				*host_status = service_status;
+			if (-1 == *host_status || DOBJECT_STATUS_UP == status)
+				*host_status = status;
 
 			DBbegin();
 
@@ -390,13 +385,13 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				discovery_update_service(drule, dcheck->dcheckid, dhost, ip, dns, port, service_status,
-						value, now);
+				discovery_update_service(drule, dcheck->dcheckid, dhost, ip, dns, port, status, value,
+						now);
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 			{
-				proxy_update_service(drule->druleid, dcheck->dcheckid, ip, dns, port, service_status,
-						value, now);
+				proxy_update_service(drule->druleid, dcheck->dcheckid, ip, dns, port, status, value,
+						now);
 			}
 
 			DBcommit();

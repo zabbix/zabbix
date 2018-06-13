@@ -1,18 +1,8 @@
 Changes for 4.0.0alpha8
 
 New features:
-..F....... [ZBXNEXT-4312] reworked date picker; implemented keyboard interaction (miks)
-..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
-...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
-.......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
-...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
-........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
-.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
-A.F.I..... [ZBXNEXT-4540] fixed problems filter with same tags not being joined with OR condition (Ivo, Sasha)
-..F....... [ZBXNEXT-4576] unified dashboard widget content margins (Andzs, ashubin)
-.......PS. [ZBX-12965] - fixed scheduled check calculation during daylight saving changes (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha7
@@ -333,23 +323,6 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
-
---------------------------------------------------------------------------------
-Changes for 3.4.11rc1
-
-New features:
-
-Bug fixes:
-...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
-.......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
-...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
-........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
-.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
-
---------------------------------------------------------------------------------
-Changes for 3.4.10
-
-3.4.10rc1 was released as 3.4.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.10rc1
@@ -1592,23 +1565,6 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
-
---------------------------------------------------------------------------------
-Changes for 3.0.19rc1
-
-New features:
-
-Bug fixes:
-...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
-...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
-........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)
-.......PS. [ZBX-12990] improved "vmware.hv.datastore.size" through usage the performance counters (MVekslers)
-.......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
-
---------------------------------------------------------------------------------
-Changes for 3.0.18
-
-3.0.18rc1 was released as 3.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.18rc1
@@ -3540,18 +3496,6 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
-
---------------------------------------------------------------------------------
-Changes for 2.2.23rc1
-
-New features:
-
-Bug fixes:
-
---------------------------------------------------------------------------------
-Changes for 2.2.22
-
-2.2.22rc1 was released as 2.2.22 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.22rc1
