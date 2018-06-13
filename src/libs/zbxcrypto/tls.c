@@ -64,14 +64,14 @@
 #ifdef _WINDOWS
 #include "mutexs.h"
 
-static ZBX_MUTEX	*crypto_mutexes = NULL;
+static zbx_mutex_t	*crypto_mutexes = NULL;
 
 static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 {
 	if (0 != (mode & CRYPTO_LOCK))
-		__zbx_mutex_lock(file, line, crypto_mutexes + n);
+		__zbx_mutex_lock(file, line, *(crypto_mutexes + n));
 	else
-		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
+		__zbx_mutex_unlock(file, line, *(crypto_mutexes + n));
 }
 
 static void	zbx_openssl_thread_setup(void)
@@ -82,7 +82,7 @@ static void	zbx_openssl_thread_setup(void)
 
 	num_locks = CRYPTO_num_locks();
 
-	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(ZBX_MUTEX))))
+	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(zbx_mutex_t))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
 		exit(EXIT_FAILURE);
