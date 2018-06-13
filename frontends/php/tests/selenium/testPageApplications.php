@@ -116,7 +116,7 @@ class testPageApplications extends CWebTest {
 			// Check disabled creation button of application
 			$this->zbxTestAssertElementText("//button[@id='form']", 'Create application (select host first)');
 			$this->zbxTestAssertAttribute("//button[@id='form']",'disabled','true');
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@class='object-group']");
+			$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		}
 
 		if ($data['group'] != 'all') {
