@@ -240,12 +240,6 @@ $icon-widget-btn: (
 	}
 }
 
-.icon {
-	.center {
-		background: url(../img/icon-sprite.svg) no-repeat -172px -799px !important;
-	}
-}
-
 .action-menu {
 
 	.action-menu-item-disabled {
@@ -1061,7 +1055,78 @@ td.inactive-bg {
 	.btn-back-map {
 
 		.btn-back-map-icon {
-			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+			background-position: -85px -725px;
+		}
+	}
+}
+
+// TIME SELECTION
+.ui-tabs-nav {
+	.btn-time,
+	.filter-trigger {
+		&:hover {
+			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&:focus {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: lighten($btn-bg-color, 10%);
+		}
+	}
+
+	.ui-state-focus {
+		.btn-time,
+		.filter-trigger {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: lighten($btn-bg-color, 10%);
+		}
+
+		&.ui-tabs-active {
+			.btn-time,
+			.filter-trigger {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				background-color: $ui-hover-color;
+				border-color: $ui-hover-color;
+			}
+		}
+	}
+}
+
+.btn-time-left {
+	background-position: -244px -657px;
+
+	&:disabled {
+		background-position: -244px -657px;
+	}
+}
+
+.btn-time-right {
+	background-position: -242px -623px;
+
+	&:disabled {
+		background-position: -242px -623px;
+	}
+}
+
+.btn-time-right,
+.btn-time-left {
+	&:hover,
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		background-color: lighten($btn-bg-color, 10%);
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				@include border-radius(2px);
+			}
 		}
 	}
 }

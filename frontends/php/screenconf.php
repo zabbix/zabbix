@@ -464,6 +464,11 @@ else {
 			}
 			unset($screen);
 		}
+
+		$data += [
+			'profileIdx' => 'web.screenconf.filter',
+			'active_tab' => CProfile::get('web.screenconf.filter.active', 1)
+		];
 	}
 	order_result($data['screens'], $sortField, $sortOrder);
 

@@ -44,7 +44,6 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestClickButtonText('Apply');
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_2'));
 		$this->zbxTestAssertNotVisibleId('filter_age_state');
-		$this->zbxTestAssertElementPresentId('scrollbar_cntr');
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
 			'Minimum trigger severity', 'Host inventory', 'Tags', 'Show hosts in maintenance',
 			'Show unacknowledged only',

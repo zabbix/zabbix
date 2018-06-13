@@ -879,6 +879,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	if (SUCCEED != zbx_locks_create(&error))
+	{
+		zbx_error("cannot create locks: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log:%s", error);
@@ -1152,30 +1159,13 @@ void	zbx_on_exit(void)
 
 	if (NULL != threads)
 	{
-		int		i;
-		sigset_t	set;
-
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
-		sigemptyset(&set);
-		sigaddset(&set, SIGCHLD);
-		sigprocmask(SIG_BLOCK, &set, NULL);
-
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-			{
-				kill(threads[i], SIGTERM);
-				threads[i] = ZBX_THREAD_HANDLE_NULL;
-			}
-		}
-
+		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
 		zbx_free(threads);
 	}
-
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
 	free_metrics();
-
-	zbx_sleep(2);	/* wait for all child processes to exit */
-
 #ifdef HAVE_OPENIPMI
 	zbx_ipc_service_free_env();
 #endif

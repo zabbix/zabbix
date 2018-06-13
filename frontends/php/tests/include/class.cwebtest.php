@@ -401,6 +401,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		));
 	}
 
+	/**
+	 * If 'Filter' tab is closed, then open it
+	 */
+
+	public function zbxTestExpandFilterTab() {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"))->isDisplayed();
+		if (!$element) {
+			$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
+		}
+	}
+
 	public function zbxTestInputType($id, $str) {
 		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
 	}
