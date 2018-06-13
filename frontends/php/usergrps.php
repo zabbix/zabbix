@@ -454,7 +454,9 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config
+		'config' => $config,
+		'profileIdx' => 'web.usergroup.filter',
+		'active_tab' => CProfile::get('web.usergroup.filter.active', 1)
 	];
 
 	$data['usergroups'] = API::UserGroup()->get([

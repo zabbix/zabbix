@@ -1,10 +1,14 @@
 Changes for 4.0.0alpha8
 
 New features:
+..F.I..... [ZBXNEXT-4044] changed default values of 'Display OK triggers for' and 'On status change triggers blink for' (viktors)
+..F....... [ZBXNEXT-4361] implemented new time range selector for graphs (Andzs, ashubin, gcalenko, Sasha)
+...GI..PS. [ZBXNEXT-4577] improved performance of Zabbix server by replacing semaphores to pthread mutexes and read-write locks (vso, wiper)
 ..F....... [ZBXNEXT-4312] reworked date picker; implemented keyboard interaction (miks)
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+........S. [ZBX-11434] added error messages when creation of LLD SNMP items fails due to SNMP OID field (Sergejs)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
@@ -340,6 +344,7 @@ Changes for 3.4.11rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14447] reverted ZBX-13788 fix because of broken server-proxy compatibility between minor versions (wiper)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
@@ -1599,6 +1604,7 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14447] reverted ZBX-13788 fix because of broken server-proxy compatibility between minor versions (wiper)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)
 ........S. [ZBX-14423] fixed use of initialized variable during application discovery (vso)

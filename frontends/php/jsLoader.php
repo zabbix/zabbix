@@ -90,17 +90,11 @@ $availableJScripts = [
 
 $tranStrings = [
 	'gtlc.js' => [
-		'S_ALL_S' => _('All'),
-		'S_ZOOM' => _('Zoom'),
-		'S_FIXED_SMALL' => _('fixed'),
-		'S_DYNAMIC_SMALL' => _('dynamic'),
-		'S_NOW_SMALL' => _('now'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'S_DATE_FORMAT' => DATE_TIME_FORMAT
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
