@@ -29,6 +29,7 @@
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
 #include "zbxserver.h"
+#include "ipmi.h"
 
 /******************************************************************************
  *                                                                            *
