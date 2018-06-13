@@ -167,7 +167,7 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			s = zbx_strdup(NULL, "unknown error");
 	}
 
-	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", zbx_errno, s);
+	zabbix_log(LOG_LEVEL_ERR, "[Z%04d] %s", (int)zbx_errno, s);
 
 	zbx_free(s);
 }
