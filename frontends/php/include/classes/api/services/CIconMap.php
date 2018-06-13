@@ -326,7 +326,11 @@ class CIconMap extends CApiService {
 			if (array_key_exists('mappings', $iconmap)) {
 				foreach ($iconmap['mappings'] as $mapping) {
 					if ($mapping['expression'][0] === '@') {
-						$names[mb_substr($mapping['expression'], 1)] = true;
+						/*
+						 * substr() performs differently on PHP < 7. Prior to PHP 7 version, FALSE was returned if
+						 * string is equal to start characters long. As of PHP 7, an empty string will be returned.
+						 */
+						$names[isset($mapping['expression'][1]) ? substr($mapping['expression'], 1) : ''] = true;
 					}
 				}
 			}
