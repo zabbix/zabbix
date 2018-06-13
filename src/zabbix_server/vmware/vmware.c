@@ -3871,7 +3871,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -4241,7 +4241,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		if (ZBX_VMWARE_PERF_INTERVAL_UNKNOWN == entity->refresh)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "skipping performance entity with zero refresh rate "
-					"type:%s id:%d", entity->type, entity->id);
+					"type:%s id:%s", entity->type, entity->id);
 			continue;
 		}
 
@@ -4587,7 +4587,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 	pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_search(&service->entities, &entity);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, pentity);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity:%p", __function_name, (void *)pentity);
 
 	return pentity;
 }
