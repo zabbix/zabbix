@@ -2397,8 +2397,8 @@ class CConfigurationImport {
 	 */
 	protected function getItemsOrder($master_key_identifier) {
 		$entities = $this->getFormattedItems();
-		$data_provider = API::Item();
-		return $this->getEntitiesOrder($master_key_identifier, $entities, $data_provider);
+
+		return $this->getEntitiesOrder($master_key_identifier, $entities);
 	}
 
 	/**
@@ -2412,14 +2412,13 @@ class CConfigurationImport {
 	 */
 	protected function getDiscoveryRulesItemsOrder($master_key_identifier) {
 		$discovery_rules = $this->getFormattedDiscoveryRules();
-		$data_povider = API::ItemPrototype();
 		$entities_order = [];
 
 		foreach ($discovery_rules as $host_key => $items) {
 			foreach ($items as $item) {
 				if ($item['item_prototypes']) {
 					$item_prototypes = [$host_key => $item['item_prototypes']];
-					$item_prototypes = $this->getEntitiesOrder($master_key_identifier, $item_prototypes, $data_povider);
+					$item_prototypes = $this->getEntitiesOrder($master_key_identifier, $item_prototypes, true);
 					$entities_order[$host_key][$item['key_']] = $item_prototypes[$host_key];
 				}
 			}
@@ -2434,15 +2433,15 @@ class CConfigurationImport {
 	 * Returns associative array where key is entity index in source array grouped by host key and value is entity
 	 * dependency level.
 	 *
-	 * @param string               $master_key_identifier   String containing master key name to identify item master.
-	 * @param array                $host_entities           Associative array of host key and host items.
-	 * @param CItem|CItemPrototype $data_provider           Service to get master items not found in supplied input.
+	 * @param string $master_key_identifier  String containing master key name to identify item master.
+	 * @param array  $host_entities          Associative array of host key and host items.
+	 * @param bool   $get_prototypes         Option to get also master item prototypes not found in supplied input.
 	 *
 	 * @throws Exception if data is invalid.
 	 *
 	 * @return array
 	 */
-	protected function getEntitiesOrder($master_key_identifier, array $host_entities, $data_provider) {
+	protected function getEntitiesOrder($master_key_identifier, array $host_entities, $get_prototypes = false) {
 		$find_keys = [];
 		$find_hosts = [];
 		$resolved_masters_cache = [];
@@ -2499,7 +2498,7 @@ class CConfigurationImport {
 
 			$resolved_entities = API::Item()->get($options + ['webitems' => true]);
 
-			if ($data_provider instanceof CItemPrototype) {
+			if ($get_prototypes) {
 				$resolved_entities += API::ItemPrototype()->get($options);
 			}
 
