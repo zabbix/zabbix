@@ -71,7 +71,7 @@ class testPageReportsAudit extends CWebTest {
 
 		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
-
+		$this->zbxTestExpandFilterTab();
 		$this->zbxTestAssertElementPresentId('alias');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
 		$this->zbxTestAssertElementPresentId('btn1');
@@ -171,6 +171,7 @@ class testPageReportsAudit extends CWebTest {
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
+		$this->zbxTestExpandFilterTab();
 		$this->zbxTestInputType('alias', '');
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);

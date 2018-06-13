@@ -171,8 +171,7 @@ $icon-btn: (
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -295px,
 	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -329px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px,
-	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -439px
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -43px -403px
 );
 
 @each $icon-btn, $bgimage in $icon-btn {
@@ -257,12 +256,6 @@ $icon-widget-btn: (
 
 	&::before {
 		background-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
-	}
-}
-
-.icon {
-	.center {
-		background: url(../img/icon-sprite.svg) no-repeat -325px -799px !important;
 	}
 }
 
@@ -1099,7 +1092,111 @@ td.inactive-bg {
 
 	.btn-back-map {
 		.btn-back-map-icon {
-			background: url(../img/icon-sprite.svg) no-repeat -85px -725px;
+			background-position: -85px -725px;
+		}
+	}
+}
+
+// TIME SELECTION
+.ui-tabs-nav {
+	.btn-time {
+		&:after {
+			background-position: -246px -583px;
+		}
+	}
+
+	.filter-trigger {
+		&:after {
+			background-position: -246px -547px;
+		}
+	}
+
+	.btn-time,
+	.filter-trigger {
+		&:hover {
+			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&:focus {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: darken($btn-bg-color, 10%);
+		}
+	}
+
+	.ui-state-focus {
+		.btn-time,
+		.filter-trigger {
+			@include box-shadow(0 0 0 2px rgba($blue, 1));
+			background-color: darken($btn-bg-color, 10%);
+		}
+
+		&.ui-tabs-active {
+			.btn-time,
+			.filter-trigger {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				background-color: $ui-hover-color;
+			}
+		}
+	}
+
+	.ui-tabs-active {
+		.btn-time {
+			&:after {
+				background-position: -87px -583px;
+			}
+		}
+
+		.filter-trigger {
+			&:after {
+				background-position: -87px -547px;
+			}
+		}
+	}
+}
+
+.btn-time-left {
+	background-position: -397px -657px;
+
+	&:hover,
+	&:focus {
+		background-position: -245px -658px;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		background-color: darken($btn-bg-color, 10%);
+	}
+
+	&:disabled {
+		background-position: -397px -657px;
+	}
+}
+
+.btn-time-right {
+	background-position: -395px -623px;
+
+	&:hover,
+	&:focus {
+		background-position: -243px -624px;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		background-color: darken($btn-bg-color, 10%);
+	}
+
+	&:disabled {
+		background-position: -395px -623px;
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				@include box-shadow(0 0 0 2px rgba($blue, 1));
+				@include border-radius(2px);
+			}
 		}
 	}
 }
