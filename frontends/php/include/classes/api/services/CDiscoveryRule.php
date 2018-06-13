@@ -1334,17 +1334,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$src_itemid_to_key = [];
 			$unresolved_master_itemids = [];
 
-			// Gather all master item IDs.
+			// Gather all master item IDs and check if master item IDs already belong to item prototypes.
 			foreach ($item_prototypes as $itemid => $item_prototype) {
-				if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+				if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT
+						&& !array_key_exists($item_prototype['master_itemid'], $item_prototypes)) {
 					$unresolved_master_itemids[$item_prototype['master_itemid']] = true;
-				}
-			}
-
-			// Check if master item IDs already belong to these prototypes.
-			foreach (array_keys($unresolved_master_itemids) as $master_itemid) {
-				if (array_key_exists($master_itemid, $item_prototypes)) {
-					unset($unresolved_master_itemids[$master_itemid]);
 				}
 			}
 
