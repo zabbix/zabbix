@@ -1281,7 +1281,7 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 				(size_t)*logfiles_alloc * sizeof(struct st_logfile));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
-				__function_name, *logfiles, *logfiles_alloc);
+				__function_name, (void *)*logfiles, *logfiles_alloc);
 	}
 
 	/************************************************************************************************/
