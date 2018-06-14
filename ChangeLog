@@ -8,6 +8,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+..F....... [ZBX-13701] fixed hintbox multiplication on page refresh (miks)
 .D........ [ZBX-14398] improved "Server" parameter description in Zabbix agent configuration file (vso)
 ..F....... [ZBX-14344] fixed host groups, hosts and applications not being taken into account when filtering problems by problem name in Monitoring->Problems view (agriscenko)
 ........S. [ZBX-11434] added error messages when creation of LLD SNMP items fails due to SNMP OID field (Sergejs)
