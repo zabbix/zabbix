@@ -267,14 +267,14 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 		for (i = 16; i >= 2; i--)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "+0x%02x(%%ebp) = ebp + %2d = %08x = %10u = %11d%s",
+			zabbix_log(LOG_LEVEL_CRIT, "+0x%02x(%%ebp) = ebp + %2u = %08x = %10u = %11d%s",
 					i * ZBX_PTR_SIZE, i * ZBX_PTR_SIZE,
 					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) + i * ZBX_PTR_SIZE),
 					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) + i * ZBX_PTR_SIZE),
-					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) + i * ZBX_PTR_SIZE),
+					*(int *)((void *)ZBX_GET_REG(uctx, REG_EBP) + i * ZBX_PTR_SIZE),
 					i == 2 ? " <--- call arguments" : "");
 		}
-		zabbix_log(LOG_LEVEL_CRIT, "+0x%02x(%%ebp) = ebp + %2d = %08x%28s<--- return address",
+		zabbix_log(LOG_LEVEL_CRIT, "+0x%02x(%%ebp) = ebp + %2u = %08x%28s<--- return address",
 					ZBX_PTR_SIZE, ZBX_PTR_SIZE,
 					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) + ZBX_PTR_SIZE), "");
 		zabbix_log(LOG_LEVEL_CRIT, "     (%%ebp) = ebp      = %08x%28s<--- saved ebp value",
@@ -282,11 +282,11 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 		for (i = 1; i <= 16; i++)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "-0x%02x(%%ebp) = ebp - %2d = %08x = %10u = %11d%s",
+			zabbix_log(LOG_LEVEL_CRIT, "-0x%02x(%%ebp) = ebp - %2u = %08x = %10u = %11d%s",
 					i * ZBX_PTR_SIZE, i * ZBX_PTR_SIZE,
 					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) - i * ZBX_PTR_SIZE),
 					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) - i * ZBX_PTR_SIZE),
-					*(unsigned int *)((void *)ZBX_GET_REG(uctx, REG_EBP) - i * ZBX_PTR_SIZE),
+					*(int *)((void *)ZBX_GET_REG(uctx, REG_EBP) - i * ZBX_PTR_SIZE),
 					i == 1 ? " <--- local variables" : "");
 		}
 #endif	/* REG_EBP */
