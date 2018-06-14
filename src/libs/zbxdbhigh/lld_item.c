@@ -1106,7 +1106,7 @@ static int	lld_item_dependencies_count(const zbx_uint64_t itemid, const zbx_vect
 			continue;
 
 		/* check the limit of dependent items */
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE != dep->item_flags &&
+		if (0 == (dep->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) &&
 				ZBX_DEPENDENT_ITEM_MAX_COUNT <= ++(*dependencies_num))
 		{
 			goto out;
@@ -1153,14 +1153,15 @@ out:
  *                                                                            *
  * Purpose: check the limits of dependent items                               *
  *                                                                            *
- * Parameters: item_prototype   - [IN] item prototype to be checked for limit *
+ * Parameters: item             - [IN] discovered item                        *
+ *             item_prototype   - [IN] item prototype to be checked for limit *
  *             dependencies     - [IN] item dependencies                      *
  *                                                                            *
  * Returns: SUCCEED - the check was successful                                *
  *          FAIL    - the limit of dependencies is exceeded                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_item_dependencies_check(const zbx_lld_item_prototype_t *item_prototype,
+static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld_item_prototype_t *item_prototype,
 		const zbx_vector_ptr_t *dependencies)
 {
 	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
@@ -1175,11 +1176,9 @@ static int	lld_item_dependencies_check(const zbx_lld_item_prototype_t *item_prot
 		if (item_prototype->itemid == dependence->itemid)
 			break;
 	}
+
 	if (NULL == dependence || i == dependencies->values_num)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		goto out;
-	}
+		return SUCCEED;
 
 	/* find the top dependency that doesn't have a master item id */
 	while(NULL == top_dependence)
@@ -1214,6 +1213,11 @@ static int	lld_item_dependencies_check(const zbx_lld_item_prototype_t *item_prot
 			&depth_level);
 
 	zbx_vector_uint64_destroy(&processed_itemids);
+	if (SUCCEED == ret)
+	{
+		lld_item_dependence_add(dependencies, item_prototype->itemid, item->master_itemid,
+				ZBX_FLAG_DISCOVERY_CREATED);
+	}
 out:
 	return ret;
 }
@@ -1545,12 +1549,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 			item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-			if (SUCCEED == lld_item_dependencies_check(item_prototype, item_dependencies))
-			{
-				lld_item_dependence_add(item_dependencies, item_prototype->itemid, item->master_itemid,
-						ZBX_FLAG_DISCOVERY_CREATED);
-			}
-			else
+			if (SUCCEED != lld_item_dependencies_check(item, item_prototype, item_dependencies))
 			{
 				*error = zbx_strdcatf(*error,
 						"Cannot create %s item: maximum dependent items count reached.\n",
