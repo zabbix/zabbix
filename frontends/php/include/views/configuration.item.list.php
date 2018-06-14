@@ -38,9 +38,7 @@ $widget = (new CWidget())
 	);
 
 if (!empty($this->data['hostid'])) {
-	$breadcrumb = get_header_host_table('items', $this->data['hostid']);
-	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
-	$widget->addItem($breadcrumb);
+	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 $widget->addItem($this->data['flicker']);
 

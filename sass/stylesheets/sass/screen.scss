@@ -638,6 +638,7 @@ article {
 	position: relative;
 	top: 0;
 	z-index: 3;
+	margin-bottom: 0;
 
 	& > li:first-child {
 		float: left;
@@ -645,10 +646,15 @@ article {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+
+		& > span {
+			display: inline; // FF overflow: ellipsis fix
+			padding: 4px 7px;
+		}
 	}
 
 	& + .filter-space {
-		margin-top: -33px;
+		margin-top: -28px;
 	}
 }
 

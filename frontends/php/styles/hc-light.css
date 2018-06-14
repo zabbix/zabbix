@@ -466,15 +466,19 @@ article, main {
   max-width: calc(100% - 100px);
   position: relative;
   top: 0;
-  z-index: 3; }
+  z-index: 3;
+  margin-bottom: 0; }
   .filter-breadcrumb > li:first-child {
     float: left;
     max-width: 256px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
+    .filter-breadcrumb > li:first-child > span {
+      display: inline;
+      padding: 4px 7px; }
   .filter-breadcrumb + .filter-space {
-    margin-top: -33px; }
+    margin-top: -28px; }
 
 footer {
   position: absolute;

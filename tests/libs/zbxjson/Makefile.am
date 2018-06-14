@@ -28,7 +28,7 @@ zbx_json_path_open_SOURCES = \
 	zbx_json_path_open.c \
 	../../zbxmocktest.h
 
-zbx_json_path_open_LDADD = $(JSON_LIBS) @SERVER_LIBS@
+zbx_json_path_open_LDADD = $(JSON_LIBS)
 
 if SERVER
 zbx_json_path_open_LDADD += @SERVER_LIBS@

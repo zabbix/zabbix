@@ -290,7 +290,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$list = (new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'));
@@ -531,6 +534,7 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
 			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
 			'/',

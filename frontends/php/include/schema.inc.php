@@ -2623,13 +2623,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '30m',
+				'default' => '5m',
 			],
 			'blink_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '30m',
+				'default' => '2m',
 			],
 			'problem_unack_color' => [
 				'null' => false,
