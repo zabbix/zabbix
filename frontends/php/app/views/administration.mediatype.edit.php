@@ -132,13 +132,14 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 
 // Create password field.
 if ($data['passwd'] !== '') {
+	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
-		(new CButton('chPass_btn', _('Change password')))
-			->onClick('this.style.display="none"; $("passwd").show().focus();'),
+		(new CButton('chPass_btn', _('Change password'))),
 		(new CPassBox('passwd', $data['passwd']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
+			->setAttribute('disabled', 'disabled')
 	];
 }
 else {
@@ -157,7 +158,7 @@ $mediatype_formlist
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] !== ''),
+	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] === ''),
 		$passwd_field
 	)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [

@@ -28,36 +28,37 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
-	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,		null,				null],
-	'httptestid' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
-	'http_item_type' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
-	'name' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
-	'ymin_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
-	'ymax_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
-	'ymin_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
-	'ymax_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
-	'legend' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'showworkperiod' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'showtriggers' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'graphtype' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'yaxismin' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
-	'yaxismax' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
-	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
-	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
-	'outer' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'onlyHeight' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
-	'widget_view' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null]
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,				null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,				null],
+	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'httptestid' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	null,				null],
+	'http_item_type' =>	[T_ZBX_INT,			O_OPT, null,		null,				null],
+	'name' =>			[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'width' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
+	'height' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
+	'ymin_type' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1,2'),		null],
+	'ymax_type' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1,2'),		null],
+	'ymin_itemid' =>	[T_ZBX_INT,			O_OPT, null,		DB_ID,				null],
+	'ymax_itemid' =>	[T_ZBX_INT,			O_OPT, null,		DB_ID,				null],
+	'legend' =>			[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'showworkperiod' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'showtriggers' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'graphtype' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'yaxismin' =>		[T_ZBX_DBL,			O_OPT, null,		null,				null],
+	'yaxismax' =>		[T_ZBX_DBL,			O_OPT, null,		null,				null],
+	'percent_left' =>	[T_ZBX_DBL,			O_OPT, null,		BETWEEN(0, 100),	null],
+	'percent_right' =>	[T_ZBX_DBL,			O_OPT, null,		BETWEEN(0, 100),	null],
+	'outer' =>			[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'items' =>			[T_ZBX_STR,			O_OPT, null,		null,				null],
+	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
+
 $graph_items = [];
 
 if ($httptestid = getRequest('httptestid', false)) {
@@ -135,24 +136,19 @@ else {
 /*
  * Display
  */
-$profileIdx = getRequest('profileIdx', 'web.httptest');
-$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
-
-$timeline = calculateTime([
-	'profileIdx' => $profileIdx,
-	'profileIdx2' => $profileIdx2,
-	'updateProfile' => false,
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+$timeline = getTimeSelectorPeriod([
+	'profileIdx' => getRequest('profileIdx', 'web.httpdetails.filter'),
+	'profileIdx2' => getRequest('httptestid', getRequest('profileIdx2')),
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ]);
 
-CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
+CProfile::update($timeline['profileIdx'].'.httptestid', $timeline['profileIdx2'], PROFILE_TYPE_ID);
 
 $graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
 $graph->setHeader($name);
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 $graph->setWidth(getRequest('width', 900));
 $graph->setHeight(getRequest('height', 200));
 $graph->showLegend(getRequest('legend', 1));
@@ -179,7 +175,7 @@ foreach ($graph_items as $graph_item) {
 
 if (getRequest('onlyHeight', '0') === '1') {
 	$graph->drawDimensions();
-	$height = $graph->getHeight();
+	$height = $graph->getHeight() + 1;
 
 	if (getRequest('widget_view') === '1') {
 		$height = $height - CLineGraphDraw::DEFAULT_TOP_BOTTOM_PADDING;

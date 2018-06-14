@@ -50,25 +50,24 @@ $widget = (new CWidget())
 	]));
 
 // filter
-$filter = (new CFilter('web.hosts.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
-			->addRow(
-				_('Name'),
+			->addRow(_('Name'),
 				(new CTextBox('filter_host', $data['filter']['host']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			)
-			->addRow(
-				_('Monitored by'),
+			->addRow(_('Monitored by'),
 				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
 					->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
 					->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
 					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 					->setModern(true)
 			)
-			->addRow(
-				_('Proxy'),
+			->addRow(_('Proxy'),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',
@@ -84,23 +83,18 @@ $filter = (new CFilter('web.hosts.filter.state'))
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				'filter_proxyids_row'
-			)
-	)
-	->addColumn(
+			),
 		(new CFormList())
-			->addRow(
-				_('DNS'),
+			->addRow(_('DNS'),
 				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(
-				_('IP'),
+			->addRow(_('IP'),
 				(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(
-				_('Port'),
+			->addRow(_('Port'),
 				(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-	);
+	]);
 
 $widget->addItem($filter);
 

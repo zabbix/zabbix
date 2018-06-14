@@ -1190,7 +1190,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -2116,7 +2116,7 @@ class testFormItem extends CWebTest {
 	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
@@ -2337,7 +2337,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
@@ -2357,7 +2357,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
@@ -2377,7 +2377,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');

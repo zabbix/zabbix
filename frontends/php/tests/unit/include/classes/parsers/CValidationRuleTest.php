@@ -134,9 +134,9 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'le' => '10'
 				]
 			],
-			['time', '',
+			['range_time', '',
 				[
-					'time' => true
+					'range_time' => true
 				]
 			],
 			['array_id', '',

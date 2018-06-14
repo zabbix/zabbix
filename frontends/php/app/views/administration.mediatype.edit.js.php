@@ -179,5 +179,13 @@
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
+
+		$('#chPass_btn').on('click', function() {
+			$(this).hide();
+			$('#passwd')
+				.show()
+				.removeAttr('disabled')
+				.focus();
+		});
 	});
 </script>
