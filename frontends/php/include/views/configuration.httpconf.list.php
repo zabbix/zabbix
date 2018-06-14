@@ -53,14 +53,13 @@ $widget = (new CWidget())
 			),
 		(new CTag('nav', true, ($this->data['pageFilter']->hostid > 0)
 			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
-					->setArgument('form', 'create')
-					->setArgument('groupid', $this->data['pageFilter']->groupid)
-					->setArgument('hostid', $this->data['pageFilter']->hostid)
-					->getUrl()
-				)
+				->setArgument('form', 'create')
+				->setArgument('groupid', $data['pageFilter']->groupid)
+				->setArgument('hostid', $data['pageFilter']->hostid)
+				->getUrl()
+			)
 			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
 if (!empty($this->data['hostid'])) {
