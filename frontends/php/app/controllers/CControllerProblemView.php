@@ -52,7 +52,7 @@ class CControllerProblemView extends CController {
 			'filter_age_state' =>		'in 1',
 			'filter_age' =>				'int32',
 			'filter_inventory' =>		'array',
-			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND.','.TAG_EVAL_TYPE_OR,
+			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>			'array',
 			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
 			'filter_maintenance' =>		'in 1',
@@ -61,12 +61,11 @@ class CControllerProblemView extends CController {
 			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'filter_highlight_row' =>	'in 1',
-			'period' =>					'ge '.ZBX_MIN_PERIOD.'|le '.ZBX_MAX_PERIOD,
-			'stime' =>					'time',
-			'isNow' =>					'in 0,1'
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if ($ret && $this->hasInput('filter_inventory')) {
 			foreach ($this->getInput('filter_inventory') as $filter_inventory) {
@@ -105,15 +104,25 @@ class CControllerProblemView extends CController {
 	protected function doAction() {
 		$sortField = $this->getInput('sort', CProfile::get('web.problem.sort', 'clock'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.problem.sortorder', ZBX_SORT_DOWN));
+		$active_tab = CProfile::get('web.problem.filter.active', 1);
 
 		CProfile::update('web.problem.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.problem.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
 		if (hasRequest('filter_set')) {
-			CProfile::update('web.problem.filter.show', $this->getInput('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM),
-				PROFILE_TYPE_INT
-			);
+			$show_db_type = CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM);
+			$show_type = $this->getInput('filter_show', TRIGGERS_OPTION_RECENT_PROBLEM);
+
+			if ($show_db_type != $show_type) {
+				CProfile::update('web.problem.filter.show', $show_type, PROFILE_TYPE_INT);
+
+				if ($show_type == TRIGGERS_OPTION_ALL && $active_tab == 1) {
+					$active_tab = 2;
+					CProfile::update('web.problem.filter.active', $active_tab, PROFILE_TYPE_INT);
+				}
+			}
+
 			CProfile::updateArray('web.problem.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
 			);
@@ -143,7 +152,7 @@ class CControllerProblemView extends CController {
 			CProfile::updateArray('web.problem.filter.inventory.field', $filter_inventory['fields'], PROFILE_TYPE_STR);
 			CProfile::updateArray('web.problem.filter.inventory.value', $filter_inventory['values'], PROFILE_TYPE_STR);
 
-			CProfile::update('web.problem.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND),
+			CProfile::update('web.problem.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 				PROFILE_TYPE_INT
 			);
 
@@ -295,7 +304,7 @@ class CControllerProblemView extends CController {
 				'age' => CProfile::get('web.problem.filter.age', 14),
 				'inventories' => $inventories,
 				'inventory' => $filter_inventory,
-				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND),
+				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 				'tags' => $filter_tags,
 				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
 				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
@@ -307,16 +316,23 @@ class CControllerProblemView extends CController {
 			],
 			'config' => [
 				'event_ack_enable' => $config['event_ack_enable']
-			]
+			],
+			'active_tab' => $active_tab
 		];
 
 		if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-			$data['profileIdx'] = 'web.problem.timeline';
-			$data['profileIdx2'] = 0;
-			$data['period'] = $this->hasInput('period') ? $this->getInput('period') : null;
-			$data['stime'] = $this->hasInput('stime') ? $this->getInput('stime') : null;
-			$data['isNow'] = $this->hasInput('isNow') ? $this->getInput('isNow') : null;
-			$data['updateProfile'] = ($data['period'] !== null || $data['stime'] !== null || $data['isNow'] !== null);
+			$timeselector_options = [
+				'profileIdx' => 'web.problem.filter',
+				'profileIdx2' => 0,
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			];
+			updateTimeSelectorPeriod($timeselector_options);
+
+			$data += $timeselector_options;
+		}
+		else {
+			$data['profileIdx'] = 'web.problem.filter';
 		}
 
 		$response = new CControllerResponseData($data);

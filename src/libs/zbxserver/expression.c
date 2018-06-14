@@ -2567,6 +2567,23 @@ static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_al
 	(*replace_to)[replace_to_len + 2] = '\0';
 }
 
+static const char	*zbx_dobject_status2str(int st)
+{
+	switch (st)
+	{
+		case DOBJECT_STATUS_UP:
+			return "UP";
+		case DOBJECT_STATUS_DOWN:
+			return "DOWN";
+		case DOBJECT_STATUS_DISCOVER:
+			return "DISCOVERED";
+		case DOBJECT_STATUS_LOST:
+			return "LOST";
+		default:
+			return "UNKNOWN";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: substitute_simple_macros                                         *
@@ -3214,7 +3231,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							"h.status")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								DOBJECT_STATUS_UP == atoi(replace_to) ? "UP" : "DOWN");
+								zbx_dobject_status2str(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_UPTIME))
@@ -3251,7 +3268,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							"s.status")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								DOBJECT_STATUS_UP == atoi(replace_to) ? "UP" : "DOWN");
+								zbx_dobject_status2str(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_UPTIME))
