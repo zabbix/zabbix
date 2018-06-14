@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Zabbix | Monitoring - Problems</title>
-		<link rel="stylesheet" href="stylesheets/screen.css">
-		<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
-		<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
-		<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
-		<link rel="icon" href="/favicon.ico">
-        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
-        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
-        <meta name="msapplication-TileColor" content="#d40000">
-        <style type="text/css">.status-na-bg { background-color: #97AAB3 }.status-info-bg { background-color: #7499FF }.status-warning-bg { background-color: #FFC859 }.status-average-bg { background-color: #FFA059 }.status-high-bg { background-color: #E97659 }.status-disaster-bg { background-color: #E45959 }.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg { background-color: #97AAB3 }.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg { background-color: #7499FF }.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg { background-color: #FFC859 }.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg { background-color: #FFA059 }.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg { background-color: #E97659 }.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg { background-color: #E45959 }
-
-			.problem-unack-fg {color: #EE0000;}.problem-ack-fg {color: #FF3333;}.ok-unack-fg {color: #00DD00;}.ok-ack-fg {color: #00EE00;}
-		</style>
-	</head>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Problems - Compact view</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
 <body lang="en" screen_capture_injected="true">
 	<output class="msg-bad-global" id="msg-bad-global"></output>
 	<header>
@@ -41,14 +51,15 @@
 				</nav>
 				<ul class="top-nav-icons">
 					<li>
-						<form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="hidden" id="sid" name="sid" value="7999abf544be51a6"><input type="hidden" id="form_refresh" name="form_refresh" value="1"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form>
+						<form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form>
 					</li>
 					<li>
 						<ul role="navigation" aria-label="User menu">
-							<li style="padding-left: 0"><a class="top-nav-zbbshare" title="Zabbix Share" href="#">Share</a></li>
-							<li><a class="top-nav-help" title="Help" href="#">&nbsp;</a></li>
-							<li><a class="top-nav-profile" title="Admin (Zabbix Administrator)" href="#">&nbsp;</a></li>
-							<li><a class="top-nav-signout" title="Sign out" href="#">&nbsp;</a></li>
+							<li style="padding-left:0"><a class="top-nav-support" target="_blank" title="Zabbix Technical Support" href="">Support</a></li>
+							<li><a class="top-nav-zbbshare" target="_blank" title="Zabbix Share" href="">Share</a></li>
+							<li><a class="top-nav-help" target="_blank" title="Help" href="">&nbsp;</a></li>
+							<li><a class="top-nav-profile" title="Admin (Zabbix Administrator)" href="">&nbsp;</a></li>
+							<li><a class="top-nav-signout" title="Sign out">&nbsp;</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -98,7 +109,7 @@
 					<li><a tabindex="0" href="#">Scripts</a></li>
 					<li><a tabindex="0" href="#">Queue</a></li>
 				</ul>
-				<div class="server-name">ZBXNEXT-4151</div>
+				<div class="server-name">ZABBIX SERVER NAME</div>
 			</nav>
 		</div>
 	</header>
@@ -111,16 +122,20 @@
 				<nav aria-label="Content controls">
 					<form method="get" action="zabbix.php" accept-charset="utf-8">
 						<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="page" name="page" value="1">
-						<ul>
-							<li><button type="button" data-url="zabbix.php?action=problem.view.csv&amp;page=1">Export to CSV</button></li>
-							<li><button type="button" data-url="zabbix.php?action=problem.view&amp;page=1&amp;filter_show=2&amp;filter_groupids%5B0%5D=5&amp;filter_groupids%5B1%5D=7&amp;filter_groupids%5B2%5D=2&amp;filter_groupids%5B3%5D=17&amp;filter_groupids%5B4%5D=1&amp;filter_groupids%5B5%5D=12&amp;filter_groupids%5B6%5D=13&amp;filter_groupids%5B7%5D=8&amp;filter_groupids%5B8%5D=9&amp;filter_groupids%5B9%5D=10&amp;filter_groupids%5B10%5D=11&amp;filter_groupids%5B11%5D=14&amp;filter_groupids%5B12%5D=6&amp;filter_groupids%5B13%5D=4&amp;filter_groupids%5B14%5D=15&amp;filter_groupids%5B15%5D=16&amp;filter_application=&amp;filter_name=&amp;filter_severity=0&amp;filter_inventory%5B0%5D%5Bfield%5D=type&amp;filter_inventory%5B0%5D%5Bvalue%5D=&amp;filter_evaltype=0&amp;filter_tags%5B0%5D%5Btag%5D=&amp;filter_tags%5B0%5D%5Boperator%5D=0&amp;filter_tags%5B0%5D%5Bvalue%5D=&amp;filter_show_tags=3&amp;filter_maintenance=1&amp;filter_set=1&amp;hour=15&amp;minute=01&amp;fullscreen=1" title="Fullscreen" class="btn-max"> </button></li>
-						</ul>
+						<ul><li><button type="button" data-url="zabbix.php?action=problem.view.csv&amp;page=1">Export to CSV</button></li><li><button type="button" data-url="zabbix.php?action=problem.view&amp;page=1&amp;from=2016-05-27+16%3A43%3A17&amp;to=2018-05-28+16%3A43%3A16&amp;filter_show=2&amp;filter_groupids%5B0%5D=4&amp;filter_application=&amp;filter_name=&amp;filter_severity=0&amp;filter_inventory%5B0%5D%5Bfield%5D=type&amp;filter_inventory%5B0%5D%5Bvalue%5D=&amp;filter_evaltype=0&amp;filter_tags%5B0%5D%5Btag%5D=&amp;filter_tags%5B0%5D%5Boperator%5D=0&amp;filter_tags%5B0%5D%5Bvalue%5D=&amp;filter_show_tags=3&amp;filter_maintenance=1&amp;filter_compact_view=1&amp;filter_set=1&amp;fullscreen=1" title="Fullscreen" class="btn-max">&nbsp;</button></li></ul>
 					</form>
 				</nav>
 			</div>
 		</div>
-		<div aria-label="Filter">
-			<div class="filter-btn-container"><button type="button" class="filter-trigger filter-active" id="filter-mode">Filter<span id="filter-arrow" class="arrow-up"></span></button></div>
+		<div class="filter-space ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible">
+			<ul class="filter-btn-container ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+				<li>
+					<div><button type="button" class="btn-time-left"></button><button type="button" class="btn-time-out">Zoom out</button><button type="button" class="btn-time-right"></button></div>
+				</li>
+				<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tab_1" aria-labelledby="ui-id-1" aria-selected="false"><a class="btn-time ui-tabs-anchor" href="#tab_1" role="presentation" tabindex="-1" id="ui-id-1">Last 7 days</a></li>
+				<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tab_2" aria-labelledby="ui-id-2" aria-selected="true"><a class="filter-trigger ui-tabs-anchor" href="#tab_2" role="presentation" tabindex="-1" id="ui-id-2">Filter</a></li>
+			</ul>
+			<form method="GET">
 			<div class="filter-container" id="filter-space" style="">
 				<form method="get" action="zabbix.php" accept-charset="utf-8" name="zbx_filter" id="id">
 					<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="page" name="page" value="1">
@@ -131,9 +146,7 @@
 									<li>
 										<div class="table-forms-td-left"><label>Show</label></div>
 										<div class="table-forms-td-right">
-											<ul id="filter_show" class="radio-segmented">
-												<li><input type="radio" id="filter_show_0" name="filter_show" value="1"><label for="filter_show_0">Recent problems</label></li><li><input type="radio" id="filter_show_1" name="filter_show" value="3"><label for="filter_show_1">Problems</label></li><li><input type="radio" id="filter_show_2" name="filter_show" value="2" checked="checked"><label for="filter_show_2">History</label></li>
-											</ul>
+											<ul id="filter_show" class="radio-segmented"><li><input type="radio" id="filter_show_0" name="filter_show" value="1"><label for="filter_show_0">Recent problems</label></li><li><input type="radio" id="filter_show_1" name="filter_show" value="3"><label for="filter_show_1">Problems</label></li><li><input type="radio" id="filter_show_2" name="filter_show" value="2" checked="checked"><label for="filter_show_2">History</label></li></ul>
 										</div>
 									</li>
 									<li>
@@ -142,13 +155,11 @@
 											<div class="multiselect-wrapper">
 												<div class="multiselect" id="filter_groupids_" style="width: 300px;">
 													<div class="selected">
-														<ul class="multiselect-list">
-															<li data-id="5" class=""><span class="subfilter-enabled"><span>Discovered hosts</span><span class="subfilter-disable-btn"></span></span></li>
-														</ul>
+														<ul class="multiselect-list"><li data-id="4"><span class="subfilter-enabled"><span>Zabbix servers</span><span class="subfilter-disable-btn"></span></span></li></ul>
 													</div>
 													<input class="input" type="text" placeholder="type here to search">
 													<div class="available" style="display: none;"></div>
-													<input type="hidden" name="filter_groupids[]" value="5" data-name="Discovered hosts" data-prefix="">
+													<input type="hidden" name="filter_groupids[]" value="4" data-name="Zabbix servers" data-prefix="">
 												</div>
 												<div class="multiselect-button"><button type="button" class="btn-grey">Select</button></div>
 											</div>
@@ -174,7 +185,7 @@
 										<div class="table-forms-td-right">
 											<input type="text" id="filter_application" name="filter_application" value="" maxlength="255" style="width: 300px;">
 											<div class="form-input-margin"></div>
-											<button style="margin-left: -4px;" type="button" id="filter_application_select" name="filter_application_select" class="btn-grey">Select</button>
+											<button type="button" id="filter_application_select" name="filter_application_select" class="btn-grey">Select</button>
 										</div>
 									</li>
 									<li>
@@ -212,7 +223,7 @@
 									<li style="display: none;">
 										<div class="table-forms-td-left"><label for="filter_age_state">Age less than</label></div>
 										<div class="table-forms-td-right">
-											<input type="checkbox" id="filter_age_state" name="filter_age_state" value="1" class="checkbox-radio" <label for="filter_age_state"><span></span></label>
+											<input type="checkbox" id="filter_age_state" name="filter_age_state" value="1" class="checkbox-radio" onclick="javascript: this.checked ? $(&quot;filter_age&quot;).enable() : $(&quot;filter_age&quot;).disable()"><label for="filter_age_state"><span></span></label>
 											<div class="form-input-margin"></div>
 											<input type="text" id="filter_age" name="filter_age" value="14" maxlength="3" style="text-align: right;width: 75px;" onchange="validateNumericBox(this, false, false);" disabled="disabled">
 											<div class="form-input-margin"></div>
@@ -320,17 +331,13 @@
 												<tbody>
 													<tr>
 														<td colspan="4">
-															<ul id="filter_evaltype" class="radio-segmented">
-																<li><input type="radio" id="filter_evaltype_0" name="filter_evaltype" value="0" checked="checked"><label for="filter_evaltype_0">AND</label></li><li><input type="radio" id="filter_evaltype_1" name="filter_evaltype" value="1"><label for="filter_evaltype_1">OR</label></li>
-															</ul>
+															<ul id="filter_evaltype" class="radio-segmented"><li><input type="radio" id="filter_evaltype_0" name="filter_evaltype" value="0" checked="checked"><label for="filter_evaltype_0">AND</label></li><li><input type="radio" id="filter_evaltype_1" name="filter_evaltype" value="1"><label for="filter_evaltype_1">OR</label></li></ul>
 														</td>
 													</tr>
 													<tr class="form_row">
 														<td><input type="text" id="filter_tags_0_tag" name="filter_tags[0][tag]" value="" maxlength="255" placeholder="tag" style="width: 150px;"></td>
 														<td>
-															<ul id="filter_tags_0_operator" class="radio-segmented">
-																<li><input type="radio" id="filter_tags_0_operator_0" name="filter_tags[0][operator]" value="0" checked="checked"><label for="filter_tags_0_operator_0">Like</label></li><li><input type="radio" id="filter_tags_0_operator_1" name="filter_tags[0][operator]" value="1"><label for="filter_tags_0_operator_1">Equal</label></li>
-															</ul>
+															<ul id="filter_tags_0_operator" class="radio-segmented"><li><input type="radio" id="filter_tags_0_operator_0" name="filter_tags[0][operator]" value="0" checked="checked"><label for="filter_tags_0_operator_0">Like</label></li><li><input type="radio" id="filter_tags_0_operator_1" name="filter_tags[0][operator]" value="1"><label for="filter_tags_0_operator_1">Equal</label></li></ul>
 														</td>
 														<td><input type="text" id="filter_tags_0_value" name="filter_tags[0][value]" value="" maxlength="255" placeholder="value" style="width: 150px;"></td>
 														<td class="nowrap"><button type="button" id="filter_tags_0_remove" name="filter_tags[0][remove]" class="btn-link element-table-remove">Remove</button></td>
@@ -345,42 +352,29 @@
 									<li>
 										<div class="table-forms-td-left"><label>Show tags</label></div>
 										<div class="table-forms-td-right">
-											<ul id="filter_show_tags" class="radio-segmented">
-												<li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3"><label for="filter_show_tags_0">None</label></li><li><input type="radio" id="filter_show_tags_1" name="filter_show_tags" value="1"><label for="filter_show_tags_1">1</label></li><li><input type="radio" id="filter_show_tags_2" name="filter_show_tags" value="2"><label for="filter_show_tags_2">2</label></li><li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3" checked="checked"><label for="filter_show_tags_3">3</label></li>
-											</ul>
+											<ul id="filter_show_tags" class="radio-segmented"><li><input type="radio" id="filter_show_tags_0" name="filter_show_tags" value="0"><label for="filter_show_tags_0">None</label></li><li><input type="radio" id="filter_show_tags_1" name="filter_show_tags" value="1"><label for="filter_show_tags_1">1</label></li><li><input type="radio" id="filter_show_tags_2" name="filter_show_tags" value="2"><label for="filter_show_tags_2">2</label></li><li><input type="radio" id="filter_show_tags_3" name="filter_show_tags" value="3" checked="checked"><label for="filter_show_tags_3">3</label></li></ul>
 										</div>
 									</li>
 									<li>
 										<div class="table-forms-td-left"><label for="filter_maintenance">Show hosts in maintenance</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_maintenance" name="filter_maintenance" value="1" class="checkbox-radio" checked="checked">
-												<label for="filter_maintenance"><span></span></label>
-												<div class="table-forms-second-column">
-													<label for="filter_unacknowledged" class="second-column-label">Show unacknowledged only</label>
-													<input type="checkbox" id="filter_compact_view" name="filter_unacknowledged" value="1" class="checkbox-radio" checked="checked">
-													<label for="filter_unacknowledged"><span></span></label>
-												</div>
-											</div>
+										<div class="table-forms-td-right">
+											<input type="checkbox" id="filter_maintenance" name="filter_maintenance" value="1" class="checkbox-radio" checked="checked"><label for="filter_maintenance"><span></span></label>
+											<div class="table-forms-second-column"><label for="filter_unacknowledged" class="second-column-label">Show unacknowledged only</label><input type="checkbox" id="filter_unacknowledged" name="filter_unacknowledged" value="1" class="checkbox-radio"><label for="filter_unacknowledged"><span></span></label></div>
+										</div>
+									</li>
+									<li>
+										<div class="table-forms-td-left"><label for="filter_compact_view">Compact view</label></div>
+										<div class="table-forms-td-right">
+											<input type="checkbox" id="filter_compact_view" name="filter_compact_view" value="1" class="checkbox-radio" checked="checked"><label for="filter_compact_view"><span></span></label>
+											<div class="table-forms-second-column"><label for="filter_show_timeline" class="second-column-label">Show timeline</label><input type="checkbox" id="filter_show_timeline" name="filter_show_timeline" value="1" class="checkbox-radio" disabled="disabled"><label for="filter_show_timeline"><span></span></label></div>
+										</div>
 									</li>
 									<li>
 										<div class="table-forms-td-left"><label for="filter_details">Show details</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_details" name="filter_details" value="1" class="checkbox-radio">
-												<label for="filter_details"><span></span></label>
-												<div class="table-forms-second-column">
-													<label for="filter_compact_view" class="second-column-label">Compact view</label>
-													<input type="checkbox" id="filter_compact_view" name="filter_compact_view" value="1" class="checkbox-radio" checked="checked" disabled="disabled">
-													<label for="filter_compact_view"><span></span></label>
-												</div>
-											</div>
-									<li>
-										<div class="table-forms-td-left"><label for="filter_show_timeline">Show timeline</label></div>
-											<div class="table-forms-td-right"><input type="checkbox" id="filter_show_timeline" name="filter_show_timeline" value="1" class="checkbox-radio" disabled="disabled">
-												<label for="filter_show_timeline"><span></span></label>
-												<div class="filter-highlight-row-cb table-forms-second-column">
-													<label for="filter_highlight_row" class="second-column-label">Highlight whole row</label>
-													<input type="checkbox" id="filter_highlight_row" name="filter_highlight_row" value="1" class="checkbox-radio" checked="checked">
-													<label for="filter_highlight_row"><span></span></label>
-												</div>
-											</div>
+										<div class="table-forms-td-right">
+											<input type="checkbox" id="filter_details" name="filter_details" value="1" class="checkbox-radio" disabled="disabled"><label for="filter_details"><span></span></label>
+											<div class="filter-highlight-row-cb table-forms-second-column"><label for="filter_highlight_row" class="second-column-label">Highlight whole row</label><input type="checkbox" id="filter_highlight_row" name="filter_highlight_row" value="1" class="checkbox-radio"><label for="filter_highlight_row"><span></span></label></div>
+										</div>
 									</li>
 								</ul>
 							</div>
@@ -1184,7 +1178,7 @@
 			</form>
 		</div>
 	</main>
-	<footer role="contentinfo">Zabbix 4.0.0alpha6. © 2001–2018, <a class="grey link-alt" href="#">Zabbix SIA</a></footer>
+<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
 	<div id="zbx_messages" class="overlay-dialogue notif ui-draggable" style="right: 0px; top: 126px; display: none;">
 		<button title="Clear" class="overlay-close-btn"></button>
 		<div class="dashbrd-widget-head cursor-move">

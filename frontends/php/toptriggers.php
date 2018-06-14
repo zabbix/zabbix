@@ -208,6 +208,11 @@ $data['hosts'] = API::Host()->get([
 
 $data['scripts'] = API::Script()->getScriptsByHosts($trigger_hostids);
 
+$data += [
+	'profileIdx' => 'web.toptriggers.filter',
+	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
+];
+
 // render view
 $historyView = new CView('reports.toptriggers', $data);
 $historyView->render();

@@ -71,32 +71,30 @@ $widget = (new CWidget())
 	])));
 
 // filter
-$filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
-
-$column = new CFormList();
-
-// application
-$column->addRow(_('Application'), [
-	(new CTextBox('application', $data['filter']['application']))
-		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('application_name', _('Select')))
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",'.
-			CJs::encodeJson([
-				'srctbl' => 'applications',
-				'srcfld1' => 'name',
-				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'application',
-				'real_hosts' => '1',
-				'with_applications' => '1'
-			]).', null, this);'
-		)
-]);
-
-$filter->addColumn($column);
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+	->addFilterTab(_('Filter'), [
+		(new CFormList())->addRow(_('Application'), [
+			(new CTextBox('application', $data['filter']['application']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('autofocus', 'autofocus'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('application_name', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson([
+						'srctbl' => 'applications',
+						'srcfld1' => 'name',
+						'dstfrm' => 'zbx_filter',
+						'dstfld1' => 'application',
+						'real_hosts' => '1',
+						'with_applications' => '1'
+					]).', null, this);'
+				)
+		])
+	]);
 
 $widget->addItem($filter);
 

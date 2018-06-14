@@ -34,10 +34,18 @@ class CNewValidator {
 	 */
 	private $validationRuleParser;
 
+	/**
+	 * Parser for range date/time.
+	 *
+	 * @var CRangeTimeParser
+	 */
+	private $range_time_parser;
+
 	public function __construct(array $input, array $rules) {
 		$this->input = $input;
 		$this->rules = $rules;
 		$this->validationRuleParser = new CValidationRule();
+		$this->range_time_parser = null;
 
 		$this->validate();
 	}
@@ -244,24 +252,24 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'string' => true
+				 * 'range_time' => true
 				 */
-				case 'string':
-					if (array_key_exists($field, $this->input) && !is_string($this->input[$field])) {
+				case 'range_time':
+					if (array_key_exists($field, $this->input) && !$this->isRangeTime($this->input[$field])) {
 						$this->addError($fatal,
-							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a character string is expected'))
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
 						);
 						return false;
 					}
 					break;
 
 				/*
-				 * 'time' => true
+				 * 'string' => true
 				 */
-				case 'time':
-					if (array_key_exists($field, $this->input) && !$this->is_time($this->input[$field])) {
+				case 'string':
+					if (array_key_exists($field, $this->input) && !is_string($this->input[$field])) {
 						$this->addError($fatal,
-							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time is expected'))
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a character string is expected'))
 						);
 						return false;
 					}
@@ -414,22 +422,12 @@ class CNewValidator {
 		return 31;
 	}
 
-	private function is_time($value) {
-		// YYYYMMDDhhmmss
-
-		if (!is_string($value) || strlen($value) != 14 || !ctype_digit($value)) {
-			return false;
+	private function isRangeTime($value) {
+		if ($this->range_time_parser === null) {
+			$this->range_time_parser = new CRangeTimeParser();
 		}
 
-		$Y = (int) substr($value, 0, 4);
-		$M = (int) substr($value, 4, 2);
-		$D = (int) substr($value, 6, 2);
-		$h = (int) substr($value, 8, 2);
-		$m = (int) substr($value, 10, 2);
-		$s = (int) substr($value, 12, 2);
-
-		return ($Y >= 1990 && $M >= 1 && $M <= 12 && $D >= 1 && $D <= $this->getDaysInMonth($Y, $M)
-			&& $h >= 0 && $h <= 23 && $m >= 0 && $m <= 59 && $s >= 0 && $s <= 59);
+		return is_string($value) && $this->range_time_parser->parse($value) == CParser::PARSE_SUCCESS;
 	}
 
 	/**
