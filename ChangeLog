@@ -8,7 +8,6 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
-.......PS. [ZBX-12957] removed time adjustment of received packets from agent for server and proxy (MVekslers)
 ...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
 A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
 ..F....... [ZBX-13701] fixed hintbox multiplication on page refresh (miks)
