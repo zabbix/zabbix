@@ -23,6 +23,7 @@ class CWidgetField {
 	const FLAG_ACKNOWLEDGES = 0x01;
 	const FLAG_NOT_EMPTY = 0x02;
 	const FLAG_LABEL_ASTERISK = 0x04;
+	const FLAG_DISABLED = 0x08;
 
 	protected	$name;
 	protected	$label;

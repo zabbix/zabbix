@@ -44,7 +44,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$config = select_config();
 
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
-		$show_timeline = ($sortfield === 'clock') ? $fields['show_timeline'] : 0;
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
@@ -57,7 +56,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
 			'unacknowledged' => $fields['unacknowledged'],
-			'show_timeline' => $show_timeline
+			'show_timeline' => ($sortfield === 'clock') ? $fields['show_timeline'] : 0
 		], $config);
 
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);

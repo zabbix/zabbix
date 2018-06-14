@@ -46,6 +46,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 		continue;
 	}
 	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
+	$disabled = ($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -62,7 +63,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldCheckBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			new CVar($field->getName(), '0'),
-			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
+			(new CCheckBox($field->getName()))
+				->setChecked((bool) $field->getValue())
+				->setEnabled(!$disabled)
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
@@ -316,22 +319,6 @@ foreach ($jq_templates as $id => $jq_template) {
 if ($js_scripts) {
 	$output['body'] .= get_js(implode("\n", $js_scripts));
 }
-
-$jquery_event_change = 'var sort_triggers = jQuery("#sort_triggers");'.
-	'setStatusTimeline(sort_triggers, false);'.
-	'function setStatusTimeline(sort_triggers, force) {'.
-		'var box_disabled = true, sort = sort_triggers.val(),'.
-		'checkbox = jQuery("#show_timeline[type='."'checkbox'".']");'.
-		'if (sort == '.SCREEN_SORT_TRIGGERS_TIME_ASC.' || sort == '.SCREEN_SORT_TRIGGERS_TIME_DESC.')'.
-			'{box_disabled = false;}'.
-		'checkbox.prop("disabled", box_disabled);'.
-		'if (force) {checkbox.prop("checked", !box_disabled);}'.
-	'};'.
-	'sort_triggers.change(function(){'.
-		'var sort_triggers = jQuery(this);'.
-		'setStatusTimeline(sort_triggers, true);'.
-	'});';
-$output['body'] .= get_js($jquery_event_change, true);
 
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();

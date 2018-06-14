@@ -146,7 +146,11 @@ class CWidgetFormProblems extends CWidgetForm {
 		elseif (count($this->data) === 0) {
 			$field_show_timeline->setValue(1);
 		}
-		$this->fields[] = $field_show_timeline;
+
+		$enabled_show_timeline = [
+			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+			SCREEN_SORT_TRIGGERS_TIME_ASC => true
+		];
 
 		// sort entries by
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
@@ -158,11 +162,21 @@ class CWidgetFormProblems extends CWidgetForm {
 			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
-		]))->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
+		]))
+			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
+			->setAction('jQuery(":checkbox[name=show_timeline]").prop("disabled", !'.
+				CJs::encodeJson($enabled_show_timeline).'[this.value])'
+			);
 
 		if (array_key_exists('sort_triggers', $this->data)) {
 			$field_sort->setValue($this->data['sort_triggers']);
 		}
+
+		if (!array_key_exists($field_sort->getValue(), $enabled_show_timeline)) {
+			$field_show_timeline->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+
+		$this->fields[] = $field_show_timeline;
 		$this->fields[] = $field_sort;
 
 		// show lines
