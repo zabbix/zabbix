@@ -920,4 +920,4 @@ calendar.prototype = {
 		this.clndr_days.setAttribute('class', 'calendar-date');
 		table.appendChild(this.clndr_days);
 	}
-}
+};

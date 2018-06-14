@@ -305,7 +305,6 @@ sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 sass/img_source/icons-sprite.ai -text
-sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text

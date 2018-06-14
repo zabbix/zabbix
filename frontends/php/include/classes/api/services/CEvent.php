@@ -376,7 +376,7 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags']);
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
 		}
 
 		// time_from

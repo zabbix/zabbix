@@ -29,24 +29,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
-	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
-	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
-	'name' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null],
-	'graphtype' =>		[T_ZBX_INT, O_OPT, null,	IN('2,3'),			null],
-	'graph3d' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
-	'legend' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
-	'items' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
-	'widget_view' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null]
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,				null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,				null],
+	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,	null,				null],
+	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,	null,				null],
+	'name' =>			[T_ZBX_STR,			O_OPT, null,	null,				null],
+	'width' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(20, 65535),	null],
+	'height' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(0, 65535),	null],
+	'graphtype' =>		[T_ZBX_INT,			O_OPT, null,	IN('2,3'),			null],
+	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),			null],
+	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
+	'items' =>			[T_ZBX_STR,			O_OPT, null,	null,				null],
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $items = getRequest('items', []);
 CArrayHelper::sort($items, ['sortorder']);
@@ -89,19 +88,17 @@ foreach ($items as $item) {
 /*
  * Display
  */
-$timeline = calculateTime([
-	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+$timeline = getTimeSelectorPeriod([
+	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ]);
 
 $graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
 $graph->setHeader(getRequest('name', ''));
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 
 if (!empty($_REQUEST['graph3d'])) {
 	$graph->switchPie3D();

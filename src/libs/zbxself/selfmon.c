@@ -80,10 +80,10 @@ zbx_selfmon_collector_t;
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
 
-#	define LOCK_SM		zbx_mutex_lock(&sm_lock)
-#	define UNLOCK_SM	zbx_mutex_unlock(&sm_lock)
+#	define LOCK_SM		zbx_mutex_lock(sm_lock)
+#	define UNLOCK_SM	zbx_mutex_unlock(sm_lock)
 
-static ZBX_MUTEX	sm_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	sm_lock = ZBX_MUTEX_NULL;
 #endif
 
 extern char	*CONFIG_FILE;
