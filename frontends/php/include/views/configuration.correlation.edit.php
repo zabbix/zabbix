@@ -160,9 +160,18 @@ switch ($data['new_condition']['type']) {
 }
 
 // Create operator combobox separately, since they depend on condition type.
-$condition_operators_combobox = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
-foreach (getOperatorsByCorrConditionType($data['new_condition']['type']) as $operator) {
-	$condition_operators_combobox->addItem($operator, corrConditionOperatorToString($operator));
+$condition_operators_list = getOperatorsByCorrConditionType($data['new_condition']['type']);
+if (count($condition_operators_list) === 1) {
+	$condition_operators_input = (new CTextBox('new_condition[operator]',
+			condition_operator2str(CONDITION_OPERATOR_EQUAL), true
+		))->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH);
+}
+else {
+	$condition_operators_input = false;
+	$condition_operators_combobox = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
+	foreach (getOperatorsByCorrConditionType($data['new_condition']['type']) as $operator) {
+		$condition_operators_combobox->addItem($operator, corrConditionOperatorToString($operator));
+	}
 }
 
 $correlation_tab
@@ -178,7 +187,7 @@ $correlation_tab
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$condition2,
 						$condition2 === null ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition_operators_combobox,
+						$condition_operators_input ? $condition_operators_input : $condition_operators_combobox,
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$condition
 					])
