@@ -1292,35 +1292,89 @@ static int	DBpatch_3050117(void)
 
 static int	DBpatch_3050118(void)
 {
-	int	ret;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	ret = DBexecute("update events set severity="
-			"(select priority from triggers where triggerid=objectid) "
-				"where source=0 and object=0 and value=1");
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > ret)
-		return FAIL;
+	result = DBselect(
+			"select e.eventid,t.priority"
+			" from events e"
+			" left join triggers t"
+				" on e.objectid=t.triggerid"
+			" where e.source=0"
+				" and e.object=0"
+				" and e.value=1"
+				" and t.priority is not null"
+			);
 
-	return SUCCEED;
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set severity=%s where eventid=%s;\n",
+				row[1], row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_free(sql);
+
+	return ret;
 }
 
 static int	DBpatch_3050119(void)
 {
-	int	ret;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	ret = DBexecute("update problem set severity="
-			"(select priority from triggers where triggerid=objectid) where source=0 and object=0");
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (ZBX_DB_OK > ret)
-		return FAIL;
+	result = DBselect(
+			"select p.eventid,t.priority"
+			" from problem p"
+			" left join triggers t"
+				" on p.objectid=t.triggerid"
+			" where p.source=0"
+				" and p.object=0"
+				" and t.priority is not null"
+			);
 
-	return SUCCEED;
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set severity=%s where eventid=%s;\n",
+				row[1], row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_free(sql);
+
+	return ret;
 }
 
 static int	DBpatch_3050120(void)
