@@ -1321,13 +1321,12 @@ static int	DBpatch_3050118(void)
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
-	DBfree_result(result);
-
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
+	DBfree_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1363,13 +1362,13 @@ static int	DBpatch_3050119(void)
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
-	DBfree_result(result);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
+	DBfree_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1417,7 +1416,6 @@ static int	DBpatch_3050120(void)
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
-	DBfree_result(result);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1425,6 +1423,7 @@ static int	DBpatch_3050120(void)
 		ret = FAIL;
 out:
 	zbx_hashset_destroy(&eventids);
+	DBfree_result(result);
 	zbx_free(sql);
 
 	return ret;
