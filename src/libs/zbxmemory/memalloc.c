@@ -629,8 +629,8 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	(*info)->free_size = (*info)->total_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T,
-			(char *)(*info)->lo_bound + MEM_SIZE_FIELD,
-			(char *)(*info)->hi_bound - MEM_SIZE_FIELD,
+			(void *)((char *)(*info)->lo_bound + MEM_SIZE_FIELD),
+			(void *)((char *)(*info)->hi_bound - MEM_SIZE_FIELD),
 			(zbx_fs_size_t)(*info)->total_size);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
