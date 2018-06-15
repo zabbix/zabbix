@@ -46,7 +46,7 @@ typedef struct
 	/* callback function to copy data after shared memory reallocation */
 	zbx_shm_copy_func_t	copy_func;
 
-	ZBX_MUTEX		lock;
+	zbx_mutex_t		lock;
 }
 zbx_dshm_t;
 
@@ -61,7 +61,7 @@ typedef struct
 }
 zbx_dshm_ref_t;
 
-int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, ZBX_MUTEX_NAME mutex,
+int	zbx_dshm_create(zbx_dshm_t *shm, size_t shm_size, zbx_mutex_name_t mutex,
 		zbx_shm_copy_func_t copy_func, char **errmsg);
 
 int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg);
