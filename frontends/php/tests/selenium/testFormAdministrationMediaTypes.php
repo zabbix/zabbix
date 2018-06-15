@@ -516,6 +516,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Jabber',
+					'passwd' => 'Secret password',
 					'name' => 'Jabber with custom concurrent sessions and default options',
 					'sessions' => 'Custom',
 					'maxsessions' => 0
@@ -549,6 +550,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'name' => 'Ez Texting media type',
 					'type' => 'Ez Texting',
 					'username' => 'test',
+					'passwd' => 'Secret password',
 					'sessions' => 'Custom',
 					'maxsessions' => 10,
 					'attempts' => 5,
