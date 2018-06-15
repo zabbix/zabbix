@@ -349,6 +349,12 @@ src/zabbix_server/taskmanager/Makefile.am -text
 src/zabbix_server/taskmanager/proxy_tasks.c -text
 src/zabbix_server/taskmanager/taskmanager.c -text
 src/zabbix_server/taskmanager/taskmanager.h -text
+templates/net/template_net_arista_SNMPv2_EN.xml -text svneol=unset#application/xml
+templates/server/template_server_dell_idrac_SNMPv2_EN.xml -text svneol=unset#application/xml
+templates/server/template_server_hp_ilo_SNMPv2_EN.xml -text svneol=unset#application/xml
+templates/server/template_server_ibm_imm_SNMPv1_EN.xml -text svneol=unset#application/xml
+templates/server/template_server_ibm_imm_SNMPv2_EN.xml -text svneol=unset#application/xml
+templates/server/template_server_supermicro_aten_SNMPv2_EN.xml -text svneol=unset#application/xml
 tests/libs/zbxcommon/calculate_item_nextcheck.yaml -text
 tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml -text
