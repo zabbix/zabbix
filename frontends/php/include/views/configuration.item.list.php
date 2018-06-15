@@ -81,23 +81,22 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
-foreach ($this->data['items'] as $item) {
+foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-	if (array_key_exists($item['itemid'], $this->data['parent_templates'])) {
-		$root_template = end($this->data['parent_templates'][$item['itemid']]);
-		$root_template = reset($root_template);
+	if (array_key_exists($item['itemid'], $data['parent_templates'])) {
+		$parent_template = end($data['parent_templates'][$item['itemid']]);
 
-		if ($root_template['editable']) {
-			$description[] = (new CLink(CHtml::encode($root_template['name']),
-				'?hostid='.$root_template['hostid'].'&filter_set=1'
+		if ($parent_template['editable']) {
+			$description[] = (new CLink(CHtml::encode($parent_template['name']),
+				'?hostid='.$parent_template['templateid'].'&filter_set=1'
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$description[] = (new CSpan($root_template['accessible']
-				? CHtml::encode($root_template['name'])
+			$description[] = (new CSpan($parent_template['accessible']
+				? CHtml::encode($parent_template['name'])
 				: _('Inaccessible template')
 			))->addClass(ZBX_STYLE_GREY);
 		}

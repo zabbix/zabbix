@@ -1419,23 +1419,22 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	if ($item) {
-		$parent_templates = getItemsParentTemplates([$item]);
+		$parent_templates = getItemParentTemplates([$item]);
 
 		if (array_key_exists($item['itemid'], $parent_templates)) {
-			foreach ($parent_templates[$item['itemid']] as $templates) {
-				foreach ($templates as $templateid => $template) {
-					if ($template['editable']) {
-						$data['templates'][] = new CLink(CHtml::encode($template['name']),
-							'items.php?form=update&itemid='.$templateid
-						);
-					}
-					else {
-						$data['templates'][] = (new CSpan($template['accessible']
-							? CHtml::encode($template['name'])
-							: _('Inaccessible template')
-						))->addClass(ZBX_STYLE_GREY);
-					}
+			foreach ($parent_templates[$item['itemid']] as $template) {
+				if ($template['editable']) {
+					$data['templates'][] = new CLink(CHtml::encode($template['name']),
+						'items.php?form=update&itemid='.$template['itemid']
+					);
 				}
+				else {
+					$data['templates'][] = (new CSpan($template['accessible']
+						? CHtml::encode($template['name'])
+						: _('Inaccessible template')
+					))->addClass(ZBX_STYLE_GREY);
+				}
+
 				$data['templates'][] = '&nbsp;&rArr;&nbsp;';
 			}
 			$data['templates'] = array_reverse($data['templates']);
@@ -1832,7 +1831,7 @@ else {
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
 		// Get parent templates.
-		$data['parent_templates'] = getItemsParentTemplates($data['items']);
+		$data['parent_templates'] = getItemParentTemplates($data['items']);
 
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
@@ -2008,13 +2007,11 @@ else {
 	}
 
 	foreach ($data['parent_templates'] as $templates) {
-		$root_template = end($templates);
-		$root_template = reset($root_template);
+		$parent_template = end($templates);
 
-		if ($root_template['accessible']) {
-			$hostids[] = $root_template['hostid'];
+		if ($parent_template['accessible']) {
+			$hostids[] = $parent_template['templateid'];
 		}
-
 	}
 
 	$data['writable_templates'] = [];

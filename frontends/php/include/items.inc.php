@@ -782,82 +782,101 @@ function get_realhost_by_itemid($itemid) {
 	return get_host_by_itemid($itemid);
 }
 
-function getItemsParentTemplates(array $items) {
+/**
+ * Get parent templates for each given item.
+ *
+ * @param array $items                 An array of items.
+ * @param array $items[]['itemid']     ID of item.
+ * @param array $items[]['templateid'] ID of parent template item.
+ *
+ * @return array
+ */
+function getItemParentTemplates(array $items) {
+	$parent_itemids = [];
 	$parent_templates = [];
-	$templates_hostids = [];
+	$child_to_parent = [];
 
 	foreach ($items as $item) {
 		if ($item['templateid']) {
-			$parent_templates[$item['itemid']][] = [
-				$item['templateid'] => []
-			];
+			$parent_itemids[] = $item['templateid'];
+			$parent_templates[$item['itemid']] = [];
+			$child_to_parent[$item['itemid']] = $item['templateid'];
 		}
 	}
 
-	$db_items = $items;
+	if (!$parent_itemids) {
+		return [];
+	}
 
-	while ($db_items) {
-		$db_itemids = zbx_objectValues($db_items, 'templateid');
+	$hostids = [];
+	$templateids = [];
 
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'templateid'],
-			'selectHosts' => ['hostid', 'name'],
-			'itemids' => $db_itemids,
+	while ($parent_itemids) {
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'templateid'],
+			'itemids' => $parent_itemids,
 			'preservekeys' => true
 		]);
 
-		foreach ($parent_templates as &$list) {
-			foreach ($list as &$templates) {
-				foreach ($templates as $templateid => &$template) {
-					if (in_array($templateid, $db_itemids)) {
-						if (array_key_exists($templateid, $db_items)) {
-							$template = reset($db_items[$templateid]['hosts']);
-							$template['accessible'] = true;
-
-							$templates_hostids[] = $template['hostid'];
-
-							if ($db_items[$templateid]['templateid']) {
-								$list[] = [
-									$db_items[$templateid]['templateid'] => []
-								];
-							}
-						}
-						else {
-							$template['accessible'] = false;
-						}
-					}
+		$parent_itemids = [];
+		foreach ($items as $item) {
+			if (!array_key_exists($item['itemid'], $child_to_parent)) {
+				if ($item['templateid'] && !in_array($item['templateid'], $child_to_parent)) {
+					$parent_itemids[] = $item['templateid'];
 				}
-				unset($template);
+
+				$child_to_parent[$item['itemid']] = $item['templateid'];
 			}
-			unset($templates);
+
+			$hostids[$item['itemid']] = $item['hostid'];
+			$templateids[$item['hostid']] = $item['hostid'];
 		}
-		unset($list);
 	}
 
-	$editable_templates = $templates_hostids
+	$accessible_templates = $templateids
+		? API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $templateids,
+			'preservekeys' => true
+		])
+		: [];
+
+	$editable_templates = $accessible_templates
 		? API::Template()->get([
 			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($templates_hostids)),
+			'templateids' => array_keys($accessible_templates),
 			'editable' => true,
 			'preservekeys' => true
 		])
 		: [];
 
-	foreach ($parent_templates as &$list) {
-		foreach ($list as &$templates) {
-			foreach ($templates as &$template) {
-				if ($template['accessible'] && array_key_exists($template['hostid'], $editable_templates)) {
-					$template['editable'] = true;
+	foreach ($parent_templates as $itemid => &$templates) {
+		if (array_key_exists($itemid, $child_to_parent)) {
+			$parent_itemid = $child_to_parent[$itemid];
+
+			while ($parent_itemid) {
+				if (array_key_exists($parent_itemid, $hostids)) {
+					$templateid = $hostids[$parent_itemid];
+					$templates[] = [
+						'templateid' => $templateid,
+						'name' => $accessible_templates[$templateid]['name'],
+						'itemid' => $parent_itemid,
+						'accessible' => true,
+						'editable' => array_key_exists($templateid, $editable_templates) ? true : false
+					];
+					$parent_itemid = $child_to_parent[$parent_itemid];
 				}
 				else {
-					$template['editable'] = false;
+					$templates[] = [
+						'accessible' => false,
+						'editable' => false
+					];
+					$parent_itemid = null;
 				}
 			}
-			unset($template);
 		}
-		unset($templates);
 	}
-	unset($list);
+	unset($templates);
 
 	return $parent_templates;
 }
