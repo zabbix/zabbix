@@ -66,10 +66,12 @@ $maintenance_period_table = (new CTable())
 	->setId('maintenance_periods')
 	->setAriaRequired();
 
-foreach ($this->data['timeperiods'] as $id => $timeperiod) {
+foreach ($data['timeperiods'] as $id => $timeperiod) {
 	$maintenance_period_table->addRow([
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
-		shedule2str($timeperiod),
+		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
+			? $timeperiod['start_date']
+			: shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol(
 			new CHorList([
@@ -115,19 +117,19 @@ $maintenancePeriodFormList->addRow(
 	(new CLabel(_('Periods'), $maintenance_period_table->getId()))->setAsteriskMark(), $periodsDiv
 );
 
-if (isset($_REQUEST['new_timeperiod'])) {
-	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
-		$saveLabel = _('Update');
+if ($data['new_timeperiod']) {
+	if (is_array($data['new_timeperiod']) && array_key_exists('id', $data['new_timeperiod'])) {
+		$save_label = _('Update');
 	}
 	else {
-		$saveLabel = _('Add');
+		$save_label = _('Add');
 	}
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
 		(new CDiv([
-			get_timeperiod_form(),
+			getTimeperiodForm($data),
 			new CHorList([
-				(new CSimpleButton($saveLabel))
+				(new CSimpleButton($save_label))
 					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "add_timeperiod", "1");')
 					->addClass(ZBX_STYLE_BTN_LINK),
 				(new CSimpleButton(_('Cancel')))

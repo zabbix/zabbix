@@ -1855,13 +1855,19 @@ function getTriggerFormData(array $data) {
 
 	return $data;
 }
-
-function get_timeperiod_form() {
+/**
+ * Get "Maintenance period" form.
+ *
+ * @param array        $data                  Current maintenance period data.
+ * @param string|array $data[new_timeperiod]  Data of new time period in array or string type indicator that form has
+ *                                            been opened with default data.
+ *
+ * @return CFormList
+ */
+function getTimeperiodForm(array $data) {
 	$form = new CFormList();
 
-	// init new_timeperiod variable
-	$new_timeperiod = getRequest('new_timeperiod', []);
-	$new = is_array($new_timeperiod);
+	$new_timeperiod = $data['new_timeperiod'];
 
 	if (is_array($new_timeperiod)) {
 		if (isset($new_timeperiod['id'])) {
@@ -2185,23 +2191,22 @@ function get_timeperiod_form() {
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-		if (isset($_REQUEST['add_timeperiod'])) {
-			$date = [
-				'y' => getRequest('new_timeperiod_start_date_year'),
-				'm' => getRequest('new_timeperiod_start_date_month'),
-				'd' => getRequest('new_timeperiod_start_date_day'),
-				'h' => getRequest('new_timeperiod_start_date_hour'),
-				'i' => getRequest('new_timeperiod_start_date_minute')
-			];
+		if (array_key_exists('add_timeperiod', $data) && $data['add_timeperiod']) {
+			$range_time_parser = new CRangeTimeParser();
+
+			$range_time_parser->parse($data['new_timeperiod_start_date']);
+			$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
 		}
 		else {
-			$date = zbxDateToTime($new_timeperiod['start_date']
-				? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
+			if (!$new_timeperiod['start_date']) {
+				$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
+			}
 		}
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_timeperiod_start_date', $date)))->setId('new_timeperiod_start_date')
+			(new CDiv(createDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date'])))
+				->setId('new_timeperiod_start_date')
 		);
 	}
 
