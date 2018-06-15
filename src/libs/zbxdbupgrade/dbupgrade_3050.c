@@ -1306,12 +1306,11 @@ static int	DBpatch_3050118(void)
 	result = DBselect(
 			"select e.eventid,t.priority"
 			" from events e"
-			" left join triggers t"
+			" inner join triggers t"
 				" on e.objectid=t.triggerid"
 			" where e.source=0"
 				" and e.object=0"
 				" and e.value=1"
-				" and t.priority is not null"
 			);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1350,11 +1349,10 @@ static int	DBpatch_3050119(void)
 	result = DBselect(
 			"select p.eventid,t.priority"
 			" from problem p"
-			" left join triggers t"
+			" inner join triggers t"
 				" on p.objectid=t.triggerid"
 			" where p.source=0"
 				" and p.object=0"
-				" and t.priority is not null"
 			);
 
 	while (NULL != (row = DBfetch(result)))
