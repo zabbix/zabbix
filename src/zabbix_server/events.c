@@ -1621,7 +1621,7 @@ void	zbx_export_events(void)
 	zbx_event_recovery_t	*recovery;
 	DB_EVENT		*event;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:" ZBX_FS_SIZE_T, __function_name, events_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	if (0 == events_num)
 		goto exit;
@@ -2352,7 +2352,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		zbx_vector_ptr_destroy(&internal_ok_events);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:" ZBX_FS_SIZE_T, __function_name, processed_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, (int)processed_num);
 
 	return processed_num;
 }
