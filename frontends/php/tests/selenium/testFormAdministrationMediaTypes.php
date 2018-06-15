@@ -577,6 +577,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		elseif ($data['type'] == 'Ez Texting') {
 			$this->zbxTestInputType('eztext_username', $data['username']);
 		}
+
+		if (array_key_exists('passwd', $data)){
+			$this->zbxTestInputType('passwd', $data['passwd']);
+		}
+
 		$this->zbxTestTabSwitch('Options');
 
 		if (array_key_exists('attempts', $data)){
