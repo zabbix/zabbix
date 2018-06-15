@@ -170,11 +170,10 @@ if (count($condition_operators_list) > 1) {
 	}
 }
 else {
-	$operator = reset($condition_operators_list);
-
-	$condition_operator = [new CVar('new_condition[operator]', $operator),
-	(new CTextBox('', corrConditionOperatorToString($operator), true))->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-];
+	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
+		(new CTextBox('', corrConditionOperatorToString($condition_operators_list[0]), true))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+	];
 }
 
 $correlation_tab
