@@ -2332,6 +2332,7 @@ $icon-widget-btn: (
 		&:focus,
 		&:hover {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			cursor: pointer;
 		}
 	}
 
