@@ -1294,7 +1294,7 @@ static int	DBpatch_3050118(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	int		ret;
+	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -1337,7 +1337,7 @@ static int	DBpatch_3050119(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	int		ret;
+	int		ret = SUCCEED;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
