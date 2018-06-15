@@ -1613,6 +1613,7 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11861] fixed filter by trigger not being reset when accessing Events from a global search result (agriscenko)
 ...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
 A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
 .D........ [ZBX-14398] improved "Server" parameter description in Zabbix agent configuration file (vso)
