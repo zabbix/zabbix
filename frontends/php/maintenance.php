@@ -42,18 +42,12 @@ $fields = [
 	'mname' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
 	'maintenance_type' =>					[T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'description' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'active_since' =>						[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'active_till' =>						[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'active_since_day' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_since_month' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_since_year' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_since_hour' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_since_minute' =>				[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_till_day' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_till_month' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_till_year' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_till_hour' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'active_till_minute' =>					[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
+	'active_since' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
+												'isset({add}) || isset({update})'
+											],
+	'active_till' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
+												'isset({add}) || isset({update})'
+											],
 	'new_timeperiod_start_date_day' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
 	'new_timeperiod_start_date_month' =>	[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
 	'new_timeperiod_start_date_year' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
@@ -134,62 +128,27 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	$result = true;
+	$range_time_parser = new CRangeTimeParser();
 
-	if (!validateDateTime($_REQUEST['active_since_year'],
-			$_REQUEST['active_since_month'],
-			$_REQUEST['active_since_day'],
-			$_REQUEST['active_since_hour'],
-			$_REQUEST['active_since_minute'])) {
-		info(_s('Invalid date "%s".', _('Active since')));
-		$result = false;
-	}
-	if (!validateDateInterval($_REQUEST['active_since_year'],
-			$_REQUEST['active_since_month'],
-			$_REQUEST['active_since_day'])) {
-		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
-		$result = false;
-	}
-	if (!validateDateTime($_REQUEST['active_till_year'],
-				$_REQUEST['active_till_month'],
-				$_REQUEST['active_till_day'],
-				$_REQUEST['active_till_hour'],
-				$_REQUEST['active_till_minute'])) {
-		info(_s('Invalid date "%s".', _('Active till')));
-		$result = false;
-	}
-	if (!validateDateInterval($_REQUEST['active_till_year'], $_REQUEST['active_till_month'], $_REQUEST['active_till_day'])) {
+	$range_time_parser->parse(getRequest('active_since'));
+	$active_since_date = $range_time_parser->getDateTime(true);
+
+	$range_time_parser->parse(getRequest('active_till'));
+	$active_till_date = $range_time_parser->getDateTime(false);
+
+	if (!validateDateInterval($active_till_date->format('Y'), $active_till_date->format('m'),
+			$active_till_date->format('d'))) {
 		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 		$result = false;
 	}
 
 	if ($result) {
-		if (isset($_REQUEST['active_since'])) {
-			$activeSince = mktime(
-				$_REQUEST['active_since_hour'],
-				$_REQUEST['active_since_minute'],
-				0,
-				$_REQUEST['active_since_month'],
-				$_REQUEST['active_since_day'],
-				$_REQUEST['active_since_year']
-			);
-		}
-		if (isset($_REQUEST['active_till'])) {
-			$activeTill = mktime(
-				$_REQUEST['active_till_hour'],
-				$_REQUEST['active_till_minute'],
-				0,
-				$_REQUEST['active_till_month'],
-				$_REQUEST['active_till_day'],
-				$_REQUEST['active_till_year']
-			);
-		}
-
 		$maintenance = [
 			'name' => $_REQUEST['mname'],
 			'maintenance_type' => $_REQUEST['maintenance_type'],
 			'description' => $_REQUEST['description'],
-			'active_since' => $activeSince,
-			'active_till' => $activeTill,
+			'active_since' => $active_since_date->getTimestamp(),
+			'active_till' => $active_till_date->getTimestamp(),
 			'timeperiods' => getRequest('timeperiods', []),
 			'hostids' => getRequest('hostids', []),
 			'groupids' => getRequest('groupids', [])
@@ -396,8 +355,8 @@ if (!empty($data['form'])) {
 		$dbMaintenance = reset($dbMaintenance);
 		$data['mname'] = $dbMaintenance['name'];
 		$data['maintenance_type'] = $dbMaintenance['maintenance_type'];
-		$data['active_since'] = $dbMaintenance['active_since'];
-		$data['active_till'] = $dbMaintenance['active_till'];
+		$data['active_since'] = date(ZBX_DATE_TIME, $dbMaintenance['active_since']);
+		$data['active_till'] = date(ZBX_DATE_TIME, $dbMaintenance['active_till']);
 		$data['description'] = $dbMaintenance['description'];
 
 		// time periods
@@ -421,28 +380,21 @@ if (!empty($data['form'])) {
 	else {
 		$data['mname'] = getRequest('mname', '');
 		$data['maintenance_type'] = getRequest('maintenance_type', 0);
-		if (isset($_REQUEST['active_since'])) {
-			$data['active_since'] = mktime($_REQUEST['active_since_hour'],
-					$_REQUEST['active_since_minute'],
-					0,
-					$_REQUEST['active_since_month'],
-					$_REQUEST['active_since_day'],
-					$_REQUEST['active_since_year']);
+
+		if (hasRequest('active_since')) {
+			$data['active_since'] = getRequest('active_since');
 		}
 		else {
-			$data['active_since'] = strtotime('today');
+			$data['active_since'] = date(ZBX_DATE_TIME, strtotime('today'));
 		}
-		if (isset($_REQUEST['active_till'])) {
-			$data['active_till'] = mktime($_REQUEST['active_till_hour'],
-					$_REQUEST['active_till_minute'],
-					0,
-					$_REQUEST['active_till_month'],
-					$_REQUEST['active_till_day'],
-					$_REQUEST['active_till_year']);
+
+		if (hasRequest('active_till')) {
+			$data['active_till'] = getRequest('active_till');
 		}
 		else {
-			$data['active_till'] = strtotime('tomorrow');
+			$data['active_till'] = date(ZBX_DATE_TIME, strtotime('tomorrow'));
 		}
+
 		$data['description'] = getRequest('description', '');
 		$data['timeperiods'] = getRequest('timeperiods', []);
 

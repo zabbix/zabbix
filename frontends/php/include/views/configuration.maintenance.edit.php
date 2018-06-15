@@ -47,54 +47,10 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 			->setModern(true)
-	);
-
-// active since
-if (isset($_REQUEST['active_since'])) {
-	$fromYear = getRequest('active_since_year');
-	$fromMonth = getRequest('active_since_month');
-	$fromDay = getRequest('active_since_day');
-	$fromHours = getRequest('active_since_hour');
-	$fromMinutes = getRequest('active_since_minute');
-	$fromDate = [
-		'y' => $fromYear,
-		'm' => $fromMonth,
-		'd' => $fromDay,
-		'h' => $fromHours,
-		'i' => $fromMinutes
-	];
-	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
-}
-else {
-	$fromDate = zbxDateToTime($this->data['active_since']);
-	$activeSince = $this->data['active_since'];
-}
-$maintenanceForm->addVar('active_since', $activeSince);
-
-// active till
-if (isset($_REQUEST['active_till'])) {
-	$toYear = getRequest('active_till_year');
-	$toMonth = getRequest('active_till_month');
-	$toDay = getRequest('active_till_day');
-	$toHours = getRequest('active_till_hour');
-	$toMinutes = getRequest('active_till_minute');
-	$toDate = [
-		'y' => $toYear,
-		'm' => $toMonth,
-		'd' => $toDay,
-		'h' => $toHours,
-		'i' => $toMinutes,
-	];
-	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
-}
-else {
-	$toDate = zbxDateToTime($this->data['active_till']);
-	$activeTill = $this->data['active_till'];
-}
-$maintenanceForm->addVar('active_till', $activeTill);
-
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate));
+	)
+	->addRow(_('Active since'), createDateSelector('active_since', $data['active_since']))
+	->addRow(_('Active till'), createDateSelector('active_till', $data['active_till']));
+;
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
