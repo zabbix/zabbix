@@ -156,9 +156,9 @@ class CWidgetFormProblems extends CWidgetForm {
 			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
 			->setAction(
 				'jQuery(":checkbox[name=show_timeline]")'.
-				'.filter(":disabled").prop("checked", true).end()'.
-				'.prop("disabled", !'.CJs::encodeJson($enabled_show_timeline).'[this.value])'.
-				'.filter(":disabled").prop("checked", false)'
+					'.filter(":disabled").prop("checked", true).end()'.
+					'.prop("disabled", !'.CJs::encodeJson($enabled_show_timeline).'[this.value])'.
+					'.filter(":disabled").prop("checked", false)'
 			);
 
 		if (array_key_exists('sort_triggers', $this->data)) {
