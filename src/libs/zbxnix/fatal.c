@@ -252,15 +252,13 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #ifdef	HAVE_SYS_UCONTEXT_H
 
 #ifdef	ZBX_GET_PC
-		zabbix_log(LOG_LEVEL_CRIT, "Program counter: %p", (void *)(ZBX_GET_PC(uctx)));
+		zabbix_log(LOG_LEVEL_CRIT, "Program counter: %p", ZBX_GET_PC(uctx));
 		zabbix_log(LOG_LEVEL_CRIT, "=== Registers: ===");
 
 		for (i = 0; i < NGREG; i++)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16llx = %20llu = %20lld", get_register_name(i),
-					(unsigned long long)(ZBX_GET_REG(uctx, i)),
-					(unsigned long long)(ZBX_GET_REG(uctx, i)),
-					(long long)(ZBX_GET_REG(uctx, i)));
+			zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", get_register_name(i),
+					ZBX_GET_REG(uctx, i), ZBX_GET_REG(uctx, i), ZBX_GET_REG(uctx, i));
 		}
 #ifdef	REG_EBP	/* dump a bit of stack frame for i386 */
 		zabbix_log(LOG_LEVEL_CRIT, "=== Stack frame: ===");
