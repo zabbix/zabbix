@@ -8,6 +8,12 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+..F....... [ZBX-13283] removed info label in Trigger severities and Users administration pages (miks)
+...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
+A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
+..F....... [ZBX-13701] fixed hintbox multiplication on page refresh (miks)
+.D........ [ZBX-14398] improved "Server" parameter description in Zabbix agent configuration file (vso)
+..F....... [ZBX-14344] fixed host groups, hosts and applications not being taken into account when filtering problems by problem name in Monitoring->Problems view (agriscenko)
 ........S. [ZBX-11434] added error messages when creation of LLD SNMP items fails due to SNMP OID field (Sergejs)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
@@ -344,6 +350,9 @@ Changes for 3.4.11rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
+A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
+.D........ [ZBX-14398] improved "Server" parameter description in Zabbix agent configuration file (vso)
 .......PS. [ZBX-14447] reverted ZBX-13788 fix because of broken server-proxy compatibility between minor versions (wiper)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 .......PS. [ZBX-13765] fixed discovered host status update if it was down and a service was discovered on that host (Andris)
@@ -1604,6 +1613,10 @@ Changes for 3.0.19rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-11861] fixed filter by trigger not being reset when accessing Events from a global search result (agriscenko)
+...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
+A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
+.D........ [ZBX-14398] improved "Server" parameter description in Zabbix agent configuration file (vso)
 .......PS. [ZBX-14447] reverted ZBX-13788 fix because of broken server-proxy compatibility between minor versions (wiper)
 ...G...... [ZBX-12250] fixed logrt[] item to analyze log file from start if no log files match and no log files were seen before (Andris)
 ...G...... [ZBX-12070] fixed "proc.num" and "proc.mem" items calculation of values when zabbix_agentd called in test mode (Sergejs)

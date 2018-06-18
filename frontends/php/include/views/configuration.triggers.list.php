@@ -85,9 +85,7 @@ $widget = (new CWidget())
 	]));
 
 if ($this->data['hostid']) {
-	$breadcrumb = get_header_host_table('triggers', $this->data['hostid']);
-	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
-	$widget->addItem($breadcrumb);
+	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 }
 
 $widget->addItem($filter);
