@@ -454,6 +454,14 @@ ul.top-nav-icons {
 	}
 }
 
+.filter-breadcrumb {
+	a {
+		&:focus {
+			margin-bottom: -1px;
+		}
+	}
+}
+
 .server-name {
 	color: $link-main-subnav-color;
 }
