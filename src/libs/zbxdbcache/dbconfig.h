@@ -42,10 +42,10 @@ typedef struct
 	unsigned char		state;
 	unsigned char		locked;
 	unsigned char		status;
-	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines */
-	unsigned char		recovery_mode;		/* TRIGGER_RECOVERY_MODE_* defines  */
-	unsigned char		correlation_mode;	/* ZBX_TRIGGER_CORRELATION_* defines */
-	unsigned char		timer;			/* trigger has time functions */
+	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
+	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
+	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
+	unsigned char		timer;			/* see ZBX_TRIGGER_TIMER_* defines       */
 
 	zbx_vector_ptr_t	tags;
 }

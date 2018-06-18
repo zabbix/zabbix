@@ -1514,7 +1514,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 
 	/* piggyback timer trigger processing */
-	zbx_dc_get_timer_triggers(&trigger_info, &trigger_order, locked_triggerids, time(NULL));
+	zbx_dc_get_timer_triggers(&trigger_info, &trigger_order, locked_triggerids, time(NULL), ZBX_HC_SYNC_MAX / 2);
 
 	if (0 == trigger_order.values_num)
 		goto clean_triggers;

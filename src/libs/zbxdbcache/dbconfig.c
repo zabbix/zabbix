@@ -58,9 +58,9 @@ static int	sync_in_progress = 0;
 #define TRIGGER_FUNCTIONAL_FALSE	1
 
 /* trigger contains time functions and is also scheduled by timer queue */
-#define TRIGGER_TIMER_UNKNOWN		0
-#define TRIGGER_TIMER_NONE		1
-#define TRIGGER_TIMER_QUEUE		2
+#define ZBX_TRIGGER_TIMER_UNKNOWN	0
+#define ZBX_TRIGGER_TIMER_NONE		1
+#define ZBX_TRIGGER_TIMER_QUEUE		2
 
 /* item priority in poller queue */
 #define ZBX_QUEUE_PRIORITY_HIGH		0
@@ -4445,7 +4445,7 @@ static void	dc_trigger_update_cache(void)
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
 		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
-		trigger->timer = TRIGGER_TIMER_UNKNOWN;
+		trigger->timer = ZBX_TRIGGER_TIMER_UNKNOWN;
 	}
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
@@ -4484,10 +4484,10 @@ static void	dc_trigger_update_cache(void)
 		}
 
 		if (SUCCEED == DCin_maintenance_without_data_collection(host, item))
-			trigger->timer = TRIGGER_TIMER_NONE;
+			trigger->timer = ZBX_TRIGGER_TIMER_NONE;
 
-		if (TRIGGER_TIMER_UNKNOWN == trigger->timer && 1 == function->timer)
-			trigger->timer = TRIGGER_TIMER_QUEUE;
+		if (ZBX_TRIGGER_TIMER_UNKNOWN == trigger->timer && 1 == function->timer)
+			trigger->timer = ZBX_TRIGGER_TIMER_QUEUE;
 	}
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
@@ -4536,7 +4536,7 @@ static void	dc_trigger_update_cache(void)
 		if (TRIGGER_FUNCTIONAL_FALSE == trigger->functional)
 			continue;
 
-		if (TRIGGER_TIMER_QUEUE != trigger->timer)
+		if (ZBX_TRIGGER_TIMER_QUEUE != trigger->timer)
 			continue;
 
 		trigger->nextcheck = dc_timer_calculate_nextcheck(now, trigger->triggerid);
@@ -6986,11 +6986,11 @@ static int	DCconfig_find_active_time_function(const char *expression)
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		zbx_vector_uint64_t *locked_triggerids, int now)
+		zbx_vector_uint64_t *locked_triggerids, int now, int limit)
 {
 	WRLOCK_CACHE;
 
-	while (SUCCEED != zbx_binary_heap_empty(&config->timer_queue))
+	while (SUCCEED != zbx_binary_heap_empty(&config->timer_queue) && 0 != limit)
 	{
 		zbx_binary_heap_elem_t	*elem;
 		ZBX_DC_TRIGGER		*dc_trigger;
@@ -7015,6 +7015,8 @@ void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *tr
 
 			if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
 				trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+
+			limit--;
 		}
 
 		dc_trigger->nextcheck = dc_timer_calculate_nextcheck(now, dc_trigger->triggerid);
