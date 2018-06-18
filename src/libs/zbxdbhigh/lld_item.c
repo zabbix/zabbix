@@ -1023,6 +1023,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 		zbx_vector_uint64_clear(check_ids);
 
 		result = DBselect("%s", sql);
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_item_dependence_t	*dependence = NULL;
@@ -1181,7 +1182,7 @@ static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld
 		return SUCCEED;
 
 	/* find the top dependency that doesn't have a master item id */
-	while(NULL == top_dependence)
+	while (NULL == top_dependence)
 	{
 		for (i = 0; i < dependencies->values_num; i++)
 		{
@@ -1213,6 +1214,7 @@ static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld
 			&depth_level);
 
 	zbx_vector_uint64_destroy(&processed_itemids);
+
 	if (SUCCEED == ret)
 	{
 		lld_item_dependence_add(dependencies, item_prototype->itemid, item->master_itemid,
