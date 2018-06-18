@@ -341,20 +341,11 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		char	*source;
-		size_t	sz_source;
-
-		sz_source = strlen(vc_value.value.log->source) + 1;
-		source = zbx_malloc(NULL, sz_source);
-
-		zbx_snprintf(source, sz_source, "%s", vc_value.value.log->source);
-		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source, arg1, ZBX_CASE_SENSITIVE))
+		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		zbx_history_record_clear(&vc_value, item->value_type);
-
-		zbx_free(source);
 
 		ret = SUCCEED;
 	}
