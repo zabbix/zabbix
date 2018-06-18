@@ -192,7 +192,7 @@ function inheritTagFilters($groupid, $name) {
  * Get sub-groups of selected host groups.
  *
  * @param array $groupids
- * @param array $ms_groups  [OUT] the list of groups for multiselect
+ * @param array $ms_groups [OUT] the list of groups for multiselect
  *
  * @return array
  */
