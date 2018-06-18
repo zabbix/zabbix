@@ -8,6 +8,7 @@ New features:
 ..F....PS. [ZBXNEXT-2365] added additional auto-registration operations and re-running of auto-registration actions if host metadata is modified (ashubin, vso)
 
 Bug fixes:
+.......PS. [ZBX-14388] fixed log message about full history cache (Sergejs)
 ..F....... [ZBX-13283] removed info label in Trigger severities and Users administration pages (miks)
 ...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
 A.F....... [ZBX-13355] fixed media type a required password field successfully passing validation while being empty and prevented auto-filling stored passwords by browser (Ivo)
