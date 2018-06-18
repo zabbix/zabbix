@@ -1612,8 +1612,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.19rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-11861] fixed filter by trigger not being reset when accessing Events from a global search result (agriscenko)
 ...G...... [ZBX-6046] fixed the functions 'net.if.*' for Solaris with empty 64 bits counters (MVekslers)
