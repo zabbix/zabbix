@@ -46,11 +46,8 @@ if ($data['limited']) {
 	$triggersForm
 		->addVar('recovery_mode', $data['recovery_mode'])
 		->addVar('type', $data['type'])
-		->addVar('correlation_mode', $data['correlation_mode']);
-
-	if ($data['config']['event_ack_enable']) {
-		$triggersForm->addVar('manual_close', $data['manual_close']);
-	}
+		->addVar('correlation_mode', $data['correlation_mode'])
+		->addVar('manual_close', $data['manual_close']);
 }
 
 // create form list
@@ -520,13 +517,11 @@ $triggersFormList->addRow(_('Tags'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 
-if ($data['config']['event_ack_enable']) {
-	$triggersFormList->addRow(_('Allow manual close'),
-		(new CCheckBox('manual_close'))
-			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-			->setEnabled(!$data['limited'])
-	);
-}
+$triggersFormList->addRow(_('Allow manual close'),
+	(new CCheckBox('manual_close'))
+		->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+		->setEnabled(!$data['limited'])
+);
 
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {

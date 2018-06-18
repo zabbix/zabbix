@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha8');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050110);
+define('ZABBIX_DB_VERSION',		3050120);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -602,7 +602,7 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledged: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Updated problem: {EVENT.NAME}');
 define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {TRIGGER.NAME}');
 
@@ -614,14 +614,14 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 );
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
-		"{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} with the following message:\n".
-		"{ACK.MESSAGE}\n\n".
-		"Current problem status is {EVENT.STATUS}"
+		"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+		"{EVENT.UPDATE.MESSAGE}\n\n".
+		"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
 );
 define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {TRIGGER.NAME}\n".
-		"Host: {HOST.NAME}\nSeverity: {TRIGGER.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
+		"Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 define('ACTION_DEFAULT_MSG_RECOVERY', "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-		"Problem name: {TRIGGER.NAME}\nHost: {HOST.NAME}\nSeverity: {TRIGGER.SEVERITY}\n\n".
+		"Problem name: {TRIGGER.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\n".
 		"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 
 define('ACTION_STATUS_ENABLED',		0);
@@ -859,17 +859,22 @@ define('HTTPTEST_VERIFY_PEER_ON',	1);
 define('HTTPTEST_VERIFY_HOST_OFF',	0);
 define('HTTPTEST_VERIFY_HOST_ON',	1);
 
-define('EVENT_ACK_DISABLED',	'0');
-define('EVENT_ACK_ENABLED',		'1');
-
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
 
 define('ZBX_ACKNOWLEDGE_SELECTED',	0);
 define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
 
-define('ZBX_ACKNOWLEDGE_ACTION_NONE',			0x00);
-define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
+define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
+define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
+define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
+define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
+define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
+
+define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
+define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
+define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',		2);
+define('ZBX_EVENT_HISTORY_ALERT',				3);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
@@ -1202,6 +1207,9 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
+// Maximum width for popups in Actions column for problems.
+define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
+
 // dashboard widgets
 define('WIDGET_ACTION_LOG',		'actionlog');
 define('WIDGET_CLOCK',			'clock');
@@ -1437,6 +1445,20 @@ define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
+define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
+define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
+define('ZBX_STYLE_ACTION_ICON_MSGS', 'icon-action-msgs');
+define('ZBX_STYLE_ACTION_ICON_SEV_UP', 'icon-action-severity-up');
+define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
+define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
+define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
+define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
+define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
+define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
+define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
+define('ZBX_STYLE_ACTIONS_NUM_YELLOW', 'icon-actions-number-yellow');
+define('ZBX_STYLE_ACTIONS_NUM_RED', 'icon-actions-number-red');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
