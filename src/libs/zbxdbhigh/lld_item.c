@@ -1163,7 +1163,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld_item_prototype_t *item_prototype,
-		const zbx_vector_ptr_t *dependencies)
+		zbx_vector_ptr_t *dependencies)
 {
 	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
 	int 			ret = FAIL, i, dependence_num = 0;
