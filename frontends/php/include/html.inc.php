@@ -1038,7 +1038,6 @@ function getTriggerStatusCss($config)
  *
  * @return array
  */
-
 function getApplicationTemplateList(array $templates) {
 	CArrayHelper::sort($templates, ['name']);
 

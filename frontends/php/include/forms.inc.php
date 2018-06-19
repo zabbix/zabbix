@@ -1090,6 +1090,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	// item
 	if (array_key_exists('itemid', $item)) {
 		$data['item'] = $item;
+		$plain_item = $item;
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 
@@ -1154,10 +1155,10 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// plain item
 					else {
-						$parent_templates = getItemParentTemplates([$item]);
+						$parent_templates = getItemParentTemplates([$plain_item]);
 
-						if (array_key_exists($item['itemid'], $parent_templates)) {
-							$data['templates'] = getItemTemplateList($parent_templates[$item['itemid']]);
+						if (array_key_exists($plain_item['itemid'], $parent_templates)) {
+							$data['templates'] = getItemTemplateList($parent_templates[$plain_item['itemid']]);
 						}
 
 						break;
