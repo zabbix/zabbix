@@ -1010,7 +1010,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 		}
 
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,master_itemid,flags from items where ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,master_itemid,flags from items where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
 				NEXT_CHECK_BY_ITEM_IDS == check_type ? "itemid" : "master_itemid",
 				check_ids->values, check_ids->values_num);
