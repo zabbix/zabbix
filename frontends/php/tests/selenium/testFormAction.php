@@ -1606,10 +1606,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTextPresent('Default message');
 			$this->zbxTestAssertVisibleId('ack_longdata');
 			$this->zbxTestAssertAttribute("//textarea[@id='ack_longdata']", 'rows', 7);
-			$ack_longdata_val = '{USER.FULLNAME} acknowledged problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}'.
-						' with the following message:'.
+			$ack_longdata_val = '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.'.
 						' {EVENT.UPDATE.MESSAGE}'.
-						' Current problem status is {EVENT.STATUS}';
+						' Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.';
 			$this->zbxTestAssertElementText('//textarea[@id="ack_longdata"]', $ack_longdata_val);
 		}
 		elseif ($eventsource == 'Triggers') {
