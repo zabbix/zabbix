@@ -158,7 +158,8 @@ $mediatype_formlist
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Password'), 'passwd'))->setAsteriskMark($data['passwd'] === ''),
+	->addRow((new CLabel(_('Password'), 'passwd'))
+		->setAsteriskMark($data['type'] == MEDIA_TYPE_JABBER || $data['type'] == MEDIA_TYPE_EZ_TEXTING),
 		$passwd_field
 	)
 	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [

@@ -49,15 +49,16 @@ class testPageReportsActionLog extends CWebTest {
 	* @dataProvider allAuditActions
 	*/
 	public function testPageReportsActionLog_CheckValues($auditactions) {
-		// from: 2012-02-20 09:00:00
-		// to: 2014-02-19 09:00:00
-		$this->zbxTestLogin('auditacts.php?from=2012-02-20+09%3A00%3A00&to=2014-02-19+09%3A00%3A00');
+		$time = $auditactions['clock'];
+		$today = date("Y-m-d H:i:s", $time);
+
+		$this->zbxTestLogin('auditacts.php?'.http_build_query([
+			'from' => date('Y-m-d H:i:s', $time - 3600),
+			'to' => date('Y-m-d H:i:s', $time + 3600)
+		]));
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
-
-		$time = $auditactions['clock'];
-		$today = date("Y-m-d H:i:s", $time);
 
 		$status = '';
 		$type = '';

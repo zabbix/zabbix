@@ -340,6 +340,7 @@ function add_elementNames(&$selements) {
 		? API::Trigger()->get([
 			'output' => ['description', 'expression', 'priority'],
 			'selectHosts' => ['name'],
+			'selectLastEvent' => ['severity'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		])
@@ -382,7 +383,9 @@ function add_elementNames(&$selements) {
 						$trigger = $triggers[$element['triggerid']];
 						$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
 						$element['elementExpressionTrigger'] = $trigger['expression'];
-						$element['priority'] = $trigger['priority'];
+						$element['priority'] = array_key_exists('severity', $trigger['lastEvent'])
+								? $trigger['lastEvent']['severity']
+								: $trigger['priority'];
 					}
 					else {
 						unset($selement['elements'][$enum]);
@@ -797,7 +800,7 @@ function getImagesInfo($selement) {
  *
  * @param array $sysmap
  * @param int   $options
- * @param int   $options['severity_min'] Minimum trigger severity, default value is maximal (Disaster)
+ * @param int   $options['severity_min'] Minimum severity, default value is maximal (Disaster)
  *
  * @return array
  */
@@ -805,9 +808,6 @@ function getSelementsInfo($sysmap, array $options = []) {
 	if (!isset($options['severity_min'])) {
 		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}
-
-	$config = select_config();
-	$showUnacknowledged = $config['event_ack_enable'] ? $sysmap['show_unack'] : EXTACK_OPTION_ALL;
 
 	$triggerIdToSelementIds = [];
 	$subSysmapTriggerIdToSelementIds = [];
@@ -821,7 +821,6 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'output' => API_OUTPUT_EXTEND
 		]);
 		$iconMap = reset($iconMap);
-
 	}
 	$hostsToGetInventories = [];
 
@@ -971,7 +970,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['maintenance_status', 'maintenanceid'],
-			'selectLastEvent' => ['acknowledged'],
+			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => ['state' => null],
 			'nopermissions' => true,
@@ -1002,7 +1001,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 	if (!empty($subSysmapTriggerIdToSelementIds)) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
-			'selectLastEvent' => ['acknowledged'],
+			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => ['state' => null],
 			'skipDependent' => true,
@@ -1044,7 +1043,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
-			'selectLastEvent' => ['acknowledged'],
+			'selectLastEvent' => ['acknowledged', 'severity'],
 			'hostids' => array_keys($monitored_hostids),
 			'filter' => ['state' => null],
 			'monitored' => true,
@@ -1071,6 +1070,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 			$subSysmapTriggerIdToSelementIds
 		);
 	}
+
+	$config = select_config();
 
 	$info = [];
 	foreach ($selements as $selementId => $selement) {
@@ -1132,7 +1133,10 @@ function getSelementsInfo($sysmap, array $options = []) {
 		$critical_triggerid = 0;
 
 		foreach ($selement['triggers'] as $trigger) {
-			if ($options['severity_min'] <= $trigger['priority']) {
+			$trigger_severity = array_key_exists('severity', $trigger['lastEvent'])
+					? $trigger['lastEvent']['severity']
+					: $trigger['priority'];
+			if ($options['severity_min'] <= $trigger_severity) {
 				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
 					$i['trigger_disabled']++;
 				}
@@ -1145,8 +1149,8 @@ function getSelementsInfo($sysmap, array $options = []) {
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
-						if ($i['priority'] < $trigger['priority']) {
-							$i['priority'] = $trigger['priority'];
+						if ($i['priority'] < $trigger_severity) {
+							$i['priority'] = $trigger_severity;
 							$critical_triggerid = $trigger['triggerid'];
 						}
 
@@ -1160,7 +1164,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 					}
 
 					$i['latelyChanged'] |=
-						((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
+							((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 				}
 			}
 		}
@@ -1197,11 +1201,11 @@ function getSelementsInfo($sysmap, array $options = []) {
 
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
-				$info[$selementId] = getMapsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getMapsInfo($selement, $i, $sysmap['show_unack']);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				$info[$selementId] = getHostGroupsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getHostGroupsInfo($selement, $i, $sysmap['show_unack']);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
@@ -1210,7 +1214,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 					$i['maintenance_title'] = $mnt['name'];
 				}
 
-				$info[$selementId] = getHostsInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getHostsInfo($selement, $i, $sysmap['show_unack']);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$info[$selementId]['iconid'] = getIconByMapping($iconMap,
 						$hostInventories[$selement['elements'][0]['hostid']]
@@ -1229,7 +1233,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 					}
 				}
 
-				$info[$selementId] = getTriggersInfo($selement, $i, $showUnacknowledged);
+				$info[$selementId] = getTriggersInfo($selement, $i, $sysmap['show_unack']);
 				$info[$selementId]['triggerid'] = $critical_triggerid;
 				break;
 
@@ -2134,7 +2138,7 @@ function getMapHighligts($map, $map_info) {
 		$highlights[$id] = [
 			'st' =>  $st_color,
 			'hl' => $hl_color,
-			'ack' => ($hl_color !== null && isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable'])
+			'ack' => ($hl_color !== null && array_key_exists('ack', $elementInfo) && $elementInfo['ack'])
 		];
 	}
 
@@ -2166,6 +2170,7 @@ function getMapLinktriggerInfo($sysmap, $options) {
 	return API::Trigger()->get([
 		'output' => ['status', 'value', 'priority'],
 		'min_severity' => $options['severity_min'],
+		'selectLastEvent' => ['severity'],
 		'preservekeys' => true,
 		'triggerids' => $triggerids
 	]);
