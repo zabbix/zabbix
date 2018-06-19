@@ -1026,3 +1026,73 @@ function getTriggerStatusCss($config)
 
 	return $css;
 }
+
+/**
+ * Returns a list of application templates.
+ *
+ * @param array  $templates               An array of templates.
+ * @param string $templates['templateid'] ID of a template.
+ * @param string $templates['name']       Visible name of the template.
+ * @param bool   $templates['accessible'] Whether current user is permitted to access the template.
+ * @param bool   $templates['editable']   Whether current user is permitted to edit the template.
+ *
+ * @return array
+ */
+
+function getApplicationTemplateList(array $templates) {
+	CArrayHelper::sort($templates, ['name']);
+
+	$list = [];
+	foreach ($templates as $template) {
+		if ($template['editable']) {
+			$list[] = (new CLink(
+				CHtml::encode($template['name']), 'applications.php?hostid='.$template['templateid'])
+			)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$list[] = (new CSpan($template['accessible']
+				? CHtml::encode($template['name'])
+				: _('Inaccessible template')
+			))->addClass(ZBX_STYLE_GREY);
+		}
+		$list[] = ', ';
+	}
+	array_pop($list);
+
+	return $list;
+}
+
+/**
+ * Returns a list of item templates.
+ *
+ * @param array  $templates               An array of templates.
+ * @param string $templates['templateid'] ID of a template.
+ * @param string $templates['name']       Visible name of the template.
+ * @param bool   $templates['accessible'] Whether current user is permitted to access the template.
+ * @param bool   $templates['editable']   Whether current user is permitted to edit the template.
+ *
+ * @return array
+ */
+function getItemTemplateList(array $templates) {
+	$list = [];
+
+	foreach ($templates as $template) {
+		if ($template['editable']) {
+			$list[] = new CLink(CHtml::encode($template['name']),
+				'items.php?form=update&itemid='.$template['itemid']
+			);
+		}
+		else {
+			$list[] = (new CSpan($template['accessible']
+				? CHtml::encode($template['name'])
+				: _('Inaccessible template')
+			))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$list[] = '&nbsp;&rArr;&nbsp;';
+	}
+
+	return $list;
+}

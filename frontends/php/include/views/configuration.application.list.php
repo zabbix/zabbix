@@ -74,27 +74,7 @@ foreach ($data['applications'] as $application) {
 	// inherited app, display the template list
 	if ($application['templateids']
 			&& array_key_exists($application['applicationid'], $data['parent_templates'])) {
-		$name = [];
-		$parent_templates = $data['parent_templates'][$application['applicationid']];
-		CArrayHelper::sort($parent_templates, ['name']);
-
-		foreach ($parent_templates as $template) {
-			if ($template['editable']) {
-				$name[] = (new CLink(
-					CHtml::encode($template['name']), 'applications.php?hostid='.$template['templateid'])
-				)
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$name[] = (new CSpan($template['accessible']
-					? CHtml::encode($template['name'])
-					: _('Inaccessible template')
-				))->addClass(ZBX_STYLE_GREY);
-			}
-			$name[] = ', ';
-		}
-		array_pop($name);
+		$name = getApplicationTemplateList($data['parent_templates'][$application['applicationid']]);
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
 	}

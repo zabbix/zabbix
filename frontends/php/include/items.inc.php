@@ -785,9 +785,9 @@ function get_realhost_by_itemid($itemid) {
 /**
  * Get parent templates for each given item.
  *
- * @param array $items                 An array of items.
- * @param array $items[]['itemid']     ID of item.
- * @param array $items[]['templateid'] ID of parent template item.
+ * @param array  $items                 An array of items.
+ * @param string $items[]['itemid']     ID of an item.
+ * @param string $items[]['templateid'] ID of parent template item.
  *
  * @return array
  */

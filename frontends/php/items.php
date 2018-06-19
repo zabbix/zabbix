@@ -1419,30 +1419,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
-	if ($item) {
-		$parent_templates = getItemParentTemplates([$item]);
-
-		if (array_key_exists($item['itemid'], $parent_templates)) {
-			foreach ($parent_templates[$item['itemid']] as $template) {
-				if ($template['editable']) {
-					$data['templates'][] = new CLink(CHtml::encode($template['name']),
-						'items.php?form=update&itemid='.$template['itemid']
-					);
-				}
-				else {
-					$data['templates'][] = (new CSpan($template['accessible']
-						? CHtml::encode($template['name'])
-						: _('Inaccessible template')
-					))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$data['templates'][] = '&nbsp;&rArr;&nbsp;';
-			}
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
-		}
-	}
-
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]

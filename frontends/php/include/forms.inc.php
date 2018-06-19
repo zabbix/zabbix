@@ -1154,7 +1154,13 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// plain item
 					else {
-						// moved to controller
+						$parent_templates = getItemParentTemplates([$item]);
+
+						if (array_key_exists($item['itemid'], $parent_templates)) {
+							$data['templates'] = getItemTemplateList($parent_templates[$item['itemid']]);
+						}
+
+						break;
 					}
 				}
 				$itemid = $item['templateid'];
