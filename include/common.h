@@ -1477,5 +1477,7 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 
+char	*zbx_create_token(zbx_uint64_t seed);
+
 #endif
 

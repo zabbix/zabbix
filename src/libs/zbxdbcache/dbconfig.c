@@ -94,6 +94,24 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_strdup                                                        *
+ *                                                                            *
+ * Purpose: copies string into configuration cache shared memory              *
+ *                                                                            *
+ ******************************************************************************/
+char	*dc_strdup(const char *source)
+{
+	char	*dst;
+	size_t	len;
+
+	len = strlen(source) + 1;
+	dst = (char *)__config_mem_malloc_func(NULL, len);
+	memcpy(dst, source, len);
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_item_processed_by_server                                      *
  *                                                                            *
  * Parameters: type - [IN] item type [ITEM_TYPE_* flag]                       *
@@ -5355,6 +5373,24 @@ static int	__config_psk_compare(const void *d1, const void *d2)
 }
 #endif
 
+static zbx_hash_t	__config_data_session_hash(const void *data)
+{
+	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
+	zbx_hash_t			hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&session->hostid);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(session->token, strlen(session->token), hash);
+}
+
+static int	__config_data_session_compare(const void *d1, const void *d2)
+{
+	const zbx_data_session_t	*s1 = (const zbx_data_session_t *)d1;
+	const zbx_data_session_t	*s2 = (const zbx_data_session_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
+	return strcmp(s1->token, s2->token);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: init_configuration_cache                                         *
@@ -5383,6 +5419,7 @@ int	init_configuration_cache(char **error)
 
 	config = (ZBX_DC_CONFIG *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
+
 	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
@@ -5501,6 +5538,8 @@ int	init_configuration_cache(char **error)
 					__config_mem_realloc_func,
 					__config_mem_free_func);
 
+	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
+
 	config->config = NULL;
 
 	config->status = (ZBX_DC_STATUS *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_STATUS));
@@ -5510,6 +5549,18 @@ int	init_configuration_cache(char **error)
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
 	config->proxy_lastaccess_ts = time(NULL);
+
+	/* create data session token for proxies */
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	{
+		char	*token;
+
+		token = zbx_create_token(0);
+		config->session_token = dc_strdup(token);
+		zbx_free(token);
+	}
+	else
+		config->session_token = NULL;
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -11413,3 +11464,99 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 		zbx_vector_uint64_pair_sort(lastaccess, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_session_token                                         *
+ *                                                                            *
+ * Purpose: returns session token                                             *
+ *                                                                            *
+ * Return value: The session token (NULL for server).                         *
+ *                                                                            *
+ * Comments: The session token is generated during configuration cache        *
+ *           initialization and is not changed later. Therefore no locking    *
+ *           is required.                                                     *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_dc_get_session_token()
+{
+	return config->session_token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_data_session                                          *
+ *                                                                            *
+ * Purpose: returns data session                                              *
+ *                                                                            *
+ * Parameter: hostid - [IN] the host (proxy) identifier                       *
+ *            token  - [IN] the session token                                 *
+ *                                                                            *
+ * Return value: The data session.                                            *
+ *                                                                            *
+ * Comments: A new session is created if none found.                          *
+ *           The last_valueid property of the returned session object can be  *
+ *           updated directly without locking cache because only one data     *
+ *           session is updated at the same time and after retrieving the     *
+ *           session object will not be deleted for 24 hours.                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_data_session_t	*zbx_dc_get_data_session(zbx_uint64_t hostid, const char *token)
+{
+	zbx_data_session_t	*session, session_local;
+	int			now;
+
+	now = time(NULL);
+	session_local.hostid = hostid;
+	session_local.token = token;
+
+	RDLOCK_CACHE;
+	session = (zbx_data_session_t *)zbx_hashset_search(&config->data_sessions, &session_local);
+	UNLOCK_CACHE;
+
+	if (NULL == session)
+	{
+		WRLOCK_CACHE;
+		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
+				sizeof(session_local));
+		session->token = dc_strdup(token);
+		UNLOCK_CACHE;
+
+		session->last_valueid = 0;
+	}
+
+	session->lastaccess = now;
+
+	return session;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_cleanup_data_sessions                                     *
+ *                                                                            *
+ * Purpose: removes data sessions not accessed for 24 hours                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_cleanup_data_sessions()
+{
+	zbx_data_session_t	*session;
+	zbx_hashset_iter_t	iter;
+	int			now;
+
+	now = time(NULL);
+
+	WRLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->data_sessions, &iter);
+	while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (session->lastaccess + SEC_PER_DAY >= now)
+		{
+			__config_mem_free_func(session->token);
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+

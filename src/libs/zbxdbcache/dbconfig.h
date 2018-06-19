@@ -636,6 +636,8 @@ typedef struct
 	int			sync_ts;
 	int			item_sync_ts;
 
+	char			*session_token;
+
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		numitems;
@@ -688,6 +690,7 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
+	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_vector_uint64_t	locked_lld_ruleids;	/* for keeping track of lld rules being processed */

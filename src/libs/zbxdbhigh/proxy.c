@@ -2008,7 +2008,7 @@ static void	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid, zbx
 
 	typedef struct
 	{
-		zbx_uint64_t	itemid;
+		zbx_uint64_t	id;
 		zbx_uint64_t	lastlogsize;
 		size_t		psource;
 		size_t		pvalue;
@@ -2095,7 +2095,7 @@ try_again:
 
 		hd = &data[data_num++];
 
-		hd->itemid = *lastid;
+		hd->id = *lastid;
 		hd->clock = atoi(row[2]);
 		hd->ns = atoi(row[3]);
 		hd->timestamp = atoi(row[4]);
@@ -2150,6 +2150,7 @@ try_again:
 			zbx_json_addarray(j, ZBX_PROTO_TAG_HISTORY_DATA);
 
 		zbx_json_addobject(j, NULL);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_ID, hd->id);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, dc_items[i].itemid);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
@@ -2189,8 +2190,8 @@ try_again:
 		if (ZBX_DATA_JSON_RECORD_LIMIT < j->buffer_offset)
 		{
 			/* rollback lastid and id to the last added itemid */
-			*lastid = hd->itemid;
-			*id = hd->itemid;
+			*lastid = hd->id;
+			*id = hd->id;
 
 			*more = ZBX_PROXY_DATA_MORE;
 			break;
@@ -2673,6 +2674,12 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
 		av->logeventid = atoi(tmp);
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_ID, &tmp, &tmp_alloc) ||
+			SUCCEED != is_uint64(tmp, &av->id))
+	{
+		av->id = 0;
+	}
 
 	zbx_free(tmp);
 
@@ -3666,7 +3673,9 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: parses history data array and process the data                    *
  *                                                                            *
- * Parameters: jp_data         - [IN] JSON with history data array            *
+ * Parameters: proxy           - [IN] the proxy                               *
+ *             jp_data         - [IN] JSON with history data array            *
+ *             token           - [IN] the data session token                  *
  *             client_timediff - [IN/OUT] time difference between sending and *
  *                                        receiving parties (nanoseconds may  *
  *                                        be autoincremented to ensure unique *
@@ -3681,7 +3690,7 @@ int	zbx_get_protocol_version(struct zbx_json_parse *jp)
  *           protocol introduced in Zabbix v3.3.                              *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data,
+static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_parse *jp_data, const char *token,
 		zbx_timespec_t *client_timediff, char **info)
 {
 	const char		*__function_name = "process_proxy_history_data_33";
@@ -3693,8 +3702,11 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
 	DC_ITEM			*items;
 	char			*error = NULL;
+	zbx_data_session_t	*session;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	session = zbx_dc_get_data_session(proxy->hostid, token);
 
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
@@ -3711,6 +3723,13 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 			if (SUCCEED != errcodes[i])
 				continue;
 
+			if (0 != values[i].id && values[i].id <= session->last_valueid)
+			{
+				DCconfig_clean_items(&items[i], &errcodes[i], 1);
+				errcodes[i] = FAIL;
+				continue;
+			}
+
 			if (SUCCEED != proxy_item_validator(&items[i], NULL, (void *)&proxy->hostid, &error))
 			{
 				if (NULL != error)
@@ -3725,9 +3744,9 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 		}
 
 		processed_num += process_history_data(items, values, errcodes, values_num);
-		DCconfig_clean_items(items, errcodes, values_num);
 
 		total_num += read_num;
+		session->last_valueid = values[values_num - 1].id;
 
 		DCconfig_clean_items(items, errcodes, values_num);
 		zbx_agent_values_clean(values, values_num);
@@ -3843,10 +3862,16 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
 	{
 		zbx_timespec_t	client_timediff_copy = client_timediff;
+		char		*token = NULL;
+		size_t		token_size = 0;
+
+		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);
 
 		/* use modifiable copy of client_timediff to allow unique clock,ns value timestamps */
-		process_proxy_history_data_33(proxy, &jp_data, &client_timediff_copy, &error_step);
+		process_proxy_history_data_33(proxy, &jp_data, token, &client_timediff_copy, &error_step);
 		zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+
+		zbx_free(token);
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))

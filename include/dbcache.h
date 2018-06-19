@@ -755,6 +755,7 @@ typedef struct
 	char		*value;	/* NULL in case of meta record (see "meta" field below) */
 	char		*source;
 	zbx_uint64_t	lastlogsize;
+	zbx_uint64_t	id;
 	int		mtime;
 	int		timestamp;
 	int		severity;
@@ -781,5 +782,18 @@ zbx_trigger_dep_t;
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_uint64_t *proxy_hostids);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	last_valueid;
+	char		*token;
+	int		lastaccess;
+}
+zbx_data_session_t;
+
+const char	*zbx_dc_get_session_token();
+zbx_data_session_t	*zbx_dc_get_data_session(zbx_uint64_t hostid, const char *token);
+void	zbx_dc_cleanup_data_sessions();
 
 #endif
