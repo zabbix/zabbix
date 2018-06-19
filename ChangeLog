@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+.......PS. [ZBX-12957] removed time adjustment of received packets for server and proxy (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha8
