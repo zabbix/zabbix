@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxtasks.h"
+#include "zbxregexp.h"
 
 extern unsigned char	program_type;
 
@@ -1234,6 +1235,48 @@ static int	DBpatch_3050110(void)
 	return DBset_default("config", &field);
 }
 
+static int	DBpatch_3050111(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	char			*sql = NULL, *parameter = NULL, *parameter_esc;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select functionid,parameter from functions where name='logsource'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		parameter = zbx_strdup(parameter, row[1]);
+
+		zbx_regexp_escape(&parameter);
+		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update functions set parameter='%s' where functionid=%s;\n", parameter_esc, row[0]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1347,5 +1390,6 @@ DBPATCH_ADD(3050107, 0, 1)
 DBPATCH_ADD(3050108, 0, 1)
 DBPATCH_ADD(3050109, 0, 1)
 DBPATCH_ADD(3050110, 0, 1)
+DBPATCH_ADD(3050111, 0, 1)
 
 DBPATCH_END()
