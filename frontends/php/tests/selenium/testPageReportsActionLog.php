@@ -77,7 +77,7 @@ class testPageReportsActionLog extends CWebTest {
 			$status = 'Executed';
 		}
 
-		$sql = 'SELECT mt.description FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alerttype=0';
+		$sql = 'SELECT mt.description FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alertid='.zbx_dbstr($auditactions['alertid']);
 		$type = DBfetch(DBselect($sql));
 
 		if ($auditactions['status'] == 1) {
