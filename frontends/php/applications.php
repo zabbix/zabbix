@@ -247,7 +247,7 @@ else {
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
-		$data['root_templates'] = getApplicationsRootTemplates($data['applications']);
+		$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
