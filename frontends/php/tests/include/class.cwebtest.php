@@ -159,7 +159,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
 			self::$cookie = [
-				'name' => 'zbx_sessionid',
+				'name' => ZBX_SESSION_NAME,
 				'value' => $sessionid,
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
@@ -399,6 +399,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
 			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']"
 		));
+	}
+
+	/**
+	 * If 'Filter' tab is closed, then open it
+	 */
+
+	public function zbxTestExpandFilterTab() {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"))->isDisplayed();
+		if (!$element) {
+			$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
+		}
 	}
 
 	public function zbxTestInputType($id, $str) {
@@ -827,7 +839,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if (self::$shared_browser !== null) {
 			try {
 				if (self::$cookie !== null) {
-					$session_id = self::$shared_browser->manage()->getCookieNamed('zbx_sessionid');
+					$session_id = self::$shared_browser->manage()->getCookieNamed(ZBX_SESSION_NAME);
 
 					if ($session_id === null || !array_key_exists('value', $session_id)
 							|| $session_id['value'] !== self::$cookie['value']) {

@@ -198,13 +198,13 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'object-group')]");
 		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 
 		$this->zbxTestClickXpathWait("//button[@class='btn-kiosk']");
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementNotPresentXpath("//ul[@class='object-group']");
+		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 		$this->zbxTestCheckFatalErrors();
 
@@ -212,7 +212,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementPresentXpath("//ul[@class='object-group']");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'object-group')]");
 		$this->zbxTestCheckFatalErrors();
 	}
 }

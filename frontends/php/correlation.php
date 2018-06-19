@@ -482,7 +482,9 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config
+		'config' => $config,
+		'profileIdx' => 'web.correlation.filter',
+		'active_tab' => CProfile::get('web.correlation.filter.active', 1)
 	];
 
 	$data['correlations'] = API::Correlation()->get([

@@ -22,6 +22,24 @@
 class CTestDbHelper {
 
 	/**
+	 * Returns comma-delimited list of the fields.
+	 *
+	 * @param string $table_name
+	 * @param array  $exlude_fields
+	 */
+	public static function getTableFields($table_name, array $exlude_fields = []) {
+		$field_names = [];
+
+		foreach (DB::getSchema($table_name)['fields'] as $field_name => $field) {
+			if (!in_array($field_name, $exlude_fields, true)) {
+				$field_names[] = $field_name;
+			}
+		}
+
+		return implode(', ', $field_names);
+	}
+
+	/**
 	 * Add host groups to user group with these rights.
 	 *
 	 * @param string $usergroup_name
@@ -31,14 +49,14 @@ class CTestDbHelper {
 	 */
 	public static function setHostGroupPermissions($usergroup_name, $hostgroup_name, $permission, $subgroups = false) {
 		$usergroup = DB::find('usrgrp', ['name' => $usergroup_name]);
-		$hostgroups = DB::find('groups', ['name' => $hostgroup_name]);
+		$hostgroups = DB::find('hstgrp', ['name' => $hostgroup_name]);
 
 		if ($usergroup && $hostgroups) {
 			$usergroup = $usergroup[0];
 
 			if ($subgroups) {
 				$hostgroups = array_merge($hostgroups, DBfetchArray(DBselect(
-					'SELECT * FROM groups WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
+					'SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($hostgroups[0]['name'].'/%')
 				)));
 			}
 

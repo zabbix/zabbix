@@ -25,9 +25,9 @@
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
 static void	get_swapinfo(double *total, double *fr)
 {
-	register int cnt, i, page_size;
+	int	cnt, i, page_size;
 /* Support for >2Gb */
-/*	register int t, f;*/
+/*	int t, f;*/
 	double	t, f;
 	struct swaptable *swt;
 	struct swapent *ste;

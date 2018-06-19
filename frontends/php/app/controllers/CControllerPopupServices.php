@@ -144,6 +144,8 @@ class CControllerPopupServices extends CController {
 			$data['db_cservices'] = $child_services;
 		}
 
+		$data['user']['debug_mode'] = $this->getDebugMode();
+
 		$this->setResponse(new CControllerResponseData($data));
 	}
 }

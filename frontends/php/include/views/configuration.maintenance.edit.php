@@ -93,8 +93,8 @@ else {
 }
 $maintenanceForm->addVar('active_till', $activeTill);
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till'));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since'));
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate));
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -192,19 +192,15 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow(new CLabel(_('Hosts in maintenance'), 'hosts[]'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true
-			],
+			'object_name' => 'hosts',
 			'data' => $data['hosts_ms'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $maintenanceForm->getName(),
 					'dstfld1' => 'hostids_',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -212,19 +208,15 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow(new CLabel(_('Groups in maintenance'), 'groups[]'),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
+			'object_name' => 'hostGroup',
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $maintenanceForm->getName(),
 					'dstfld1' => 'groupids_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

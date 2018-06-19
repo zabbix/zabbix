@@ -130,9 +130,13 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	events[events_num].value = value;
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 	events[events_num].flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	events[events_num].severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
+		if (TRIGGER_VALUE_PROBLEM == value)
+			events[events_num].severity = trigger_priority;
+
 		events[events_num].trigger.triggerid = objectid;
 		events[events_num].trigger.description = zbx_strdup(NULL, trigger_description);
 		events[events_num].trigger.expression = zbx_strdup(NULL, trigger_expression);
@@ -256,7 +260,7 @@ static int	save_events(void)
 	}
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
-			"name", NULL);
+			"name", "severity", NULL);
 
 	eventid = DBget_maxid_num("events", num);
 
@@ -272,7 +276,7 @@ static int	save_events(void)
 
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
 				events[i].objectid, events[i].clock, events[i].ns, events[i].value,
-				ZBX_NULL2EMPTY_STR(events[i].name));
+				ZBX_NULL2EMPTY_STR(events[i].name), events[i].severity);
 
 		num++;
 
@@ -372,14 +376,15 @@ static void	save_problems(void)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-				"name", NULL);
+				"name", "severity", NULL);
 
 		for (j = 0; j < problems.values_num; j++)
 		{
 			const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
 			zbx_db_insert_add_values(&db_insert, event->eventid, event->source, event->object,
-					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name));
+					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
+					event->severity);
 		}
 
 		zbx_db_insert_execute(&db_insert);
@@ -540,7 +545,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hg.groupid"
-				" from groups g,hosts_groups hg,items i,functions f"
+				" from hstgrp g,hosts_groups hg,items i,functions f"
 				" where f.triggerid=" ZBX_FS_UI64
 				" and i.itemid=f.itemid"
 				" and hg.hostid=i.hostid"
@@ -1667,7 +1672,7 @@ void	zbx_export_events(void)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select distinct g.name"
-					" from groups g, hosts_groups hg"
+					" from hstgrp g, hosts_groups hg"
 					" where g.groupid=hg.groupid"
 						" and");
 
@@ -2065,19 +2070,20 @@ static int	event_check_dependency(const DB_EVENT *event, const zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: match_tags                                                       *
+ * Function: match_tag                                                        *
  *                                                                            *
- * Purpose: match two tag vectors                                             *
+ * Purpose: checks if the two tag sets have matching tag                      *
  *                                                                            *
- * Parameters: tags1 - [IN] the first tag vector                              *
+ * Parameters: name  - [IN] the name of tag to match                          *
+ *             tags1 - [IN] the first tag vector                              *
  *             tags2 - [IN] the second tag vector                             *
  *                                                                            *
- * Return value: SUCCEED - at least one tag/value from the first vector       *
- *                         matches tag/value from the second vector.          *
+ * Return value: SUCCEED - both tag sets contains a tag with the specified    *
+ *                         name and the same value                            *
  *               FAIL    - otherwise.                                         *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags(const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tags2)
+static int	match_tag(const char *name, const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tags2)
 {
 	int		i, j;
 	zbx_tag_t	*tag1, *tag2;
@@ -2086,11 +2092,14 @@ static int	match_tags(const zbx_vector_ptr_t *tags1, const zbx_vector_ptr_t *tag
 	{
 		tag1 = (zbx_tag_t *)tags1->values[i];
 
+		if (0 != strcmp(tag1->tag, name))
+			continue;
+
 		for (j = 0; j < tags2->values_num; j++)
 		{
 			tag2 = (zbx_tag_t *)tags2->values[j];
 
-			if (0 == strcmp(tag1->tag, tag2->tag) && 0 == strcmp(tag1->value, tag2->value))
+			if (0 == strcmp(tag2->tag, name) && 0 == strcmp(tag1->value, tag2->value))
 				return SUCCEED;
 		}
 	}
@@ -2229,7 +2238,8 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
 
 				if (problem->triggerid == event->objectid)
 				{
-					if (SUCCEED == match_tags(&problem->tags, &event->tags))
+					if (SUCCEED == match_tag(event->trigger.correlation_tag,
+							&problem->tags, &event->tags))
 					{
 						recover_event(problem->eventid, EVENT_SOURCE_TRIGGERS,
 								EVENT_OBJECT_TRIGGER, event->objectid);

@@ -35,15 +35,14 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
-			'groupid' =>			'db groups.groupid',
+			'groupid' =>			'db hstgrp.groupid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
-			'period' =>				'int32',
-			'stime' =>				'time',
-			'isNow' =>				'in 0,1'
+			'from' =>				'range_time',
+			'to' =>					'range_time'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -105,39 +104,28 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$dashboard = $this->dashboard;
 			unset($dashboard['widgets']);
 
+			$timeselector_options = [
+				'profileIdx' => 'web.dashbrd.filter',
+				'profileIdx2' => $this->dashboard['dashboardid'],
+				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+				'to' => $this->hasInput('to') ? $this->getInput('to') : null
+			];
+			updateTimeSelectorPeriod($timeselector_options);
+
 			$data = [
 				'dashboard' => $dashboard,
 				'fullscreen' => $fullscreen,
 				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeline' => self::showTimeline($this->dashboard['widgets']),
+				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
+				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
+				'timeline' => getTimeSelectorPeriod($timeselector_options)
 			];
-
-			$options = [
-				'profileIdx' => 'web.dashbrd',
-				'profileIdx2' => $this->dashboard['dashboardid']
-			];
-
-			$data['timeline'] = calculateTime([
-				'profileIdx' => $options['profileIdx'],
-				'profileIdx2' => $options['profileIdx2'],
-				'updateProfile' => true,
-				'period' => $this->hasInput('period') ? $this->getInput('period') : null,
-				'stime' => $this->hasInput('stime') ? $this->getInput('stime') : null,
-				'isNow' => $this->hasInput('isNow') ? $this->getInput('isNow') : null
-			]);
 
 			$data['timeControlData'] = [
-				'loadScroll' => 1,
 				'mainObject' => 1,
-				'onDashboard' => 1,
-				'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1, $options['profileIdx2']),
-				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-				'profile' => [
-					'idx' => $options['profileIdx'],
-					'idx2' => $options['profileIdx2']
-				]
+				'onDashboard' => 1
 			];
 
 			if (self::hasDynamicWidgets($data['grid_widgets'])) {
@@ -185,7 +173,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		$error = null;
 
 		if ($this->hasInput('new')) {
-			$dashboard = $this->getNewDashboard();
+			$dashboard = self::getNewDashboard();
 		}
 		elseif ($this->hasInput('source_dashboardid')) {
 			// Clone dashboard and show as new.
@@ -198,7 +186,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			]);
 
 			if ($dashboards) {
-				$dashboard = $this->getNewDashboard();
+				$dashboard = self::getNewDashboard();
 				$dashboard['name'] = $dashboards[0]['name'];
 				$dashboard['widgets'] = $this->unsetInaccessibleFields($dashboards[0]['widgets']);
 				$dashboard['sharing'] = [
@@ -239,7 +227,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 				if ($dashboards) {
 					$this->prepareEditableFlag($dashboards);
 					$dashboard = array_shift($dashboards);
-					$dashboard['owner'] = $this->getOwnerData($dashboard['userid']);
+					$dashboard['owner'] = self::getOwnerData($dashboard['userid']);
 
 					CProfile::update('web.dashbrd.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
@@ -395,24 +383,24 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return array
 	 */
-	private function getNewDashboard() {
+	public static function getNewDashboard() {
 		return [
 			'dashboardid' => 0,
 			'name' => _('New dashboard'),
 			'editable' => true,
 			'widgets' => [],
-			'owner' => $this->getOwnerData(CWebUser::$data['userid'])
+			'owner' => self::getOwnerData(CWebUser::$data['userid'])
 		];
 	}
 
 	/**
-	 * Get owner datails.
+	 * Get owner details.
 	 *
 	 * @param string $userid
 	 *
 	 * @return array
 	 */
-	private function getOwnerData($userid) {
+	public static function getOwnerData($userid) {
 		$owner = ['id' => $userid, 'name' => _('Inaccessible user')];
 
 		$users = API::User()->get([
@@ -521,7 +509,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	/**
-	 * Checks, if any of widgets needs timeline.
+	 * Checks, if any of widgets needs time selector.
 	 *
 	 * @param array $widgets
 	 *
@@ -529,7 +517,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 *
 	 * @return bool
 	 */
-	private static function showTimeline($widgets) {
+	private static function showTimeSelector(array $widgets) {
 		foreach ($widgets as $widget) {
 			if (CWidgetConfig::usesTimeline($widget['type'])) {
 				return true;

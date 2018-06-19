@@ -1190,7 +1190,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of items');
@@ -1257,7 +1257,7 @@ class testFormItem extends CWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
@@ -1283,7 +1283,7 @@ class testFormItem extends CWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -2116,7 +2116,7 @@ class testFormItem extends CWebTest {
 	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
@@ -2172,7 +2172,7 @@ class testFormItem extends CWebTest {
 		}
 
 		if (array_key_exists('master_item',$data))	{
-			$this->zbxTestClickWait('button');
+			$this->zbxTestClickButtonMultiselect('master_itemid');
 			$this->zbxTestLaunchOverlayDialog('Items');
 			$this->zbxTestClickLinkTextWait($data['master_item']);
 		}
@@ -2337,7 +2337,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
@@ -2357,7 +2357,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
@@ -2377,7 +2377,7 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
 		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');
@@ -2620,6 +2620,20 @@ class testFormItem extends CWebTest {
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Change per second']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item with preprocessing rule with user macro',
+					'key' => 'item-user-macro',
+					'preprocessing' => [
+						['type' => 'Regular expression', 'params' => '{$DELIM}(.*)', 'output' => '\1'],
+						['type' => 'Trim', 'params' => '{$DELIM}'],
+						['type' => 'XML XPath', 'params' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSON Path', 'params' => '$.data[\'{$KEY}\']'],
+						['type' => 'Custom multiplier', 'params' => '{$VALUE}']
 					]
 				]
 			]

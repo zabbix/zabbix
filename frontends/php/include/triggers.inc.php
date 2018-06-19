@@ -19,9 +19,36 @@
 **/
 
 /**
- * Get trigger severity status css style.
+ * Get trigger severity full line height css style name.
  *
- * @param  int         $severity trigger severity
+ * @param  int         $severity Trigger severity.
+ *
+ * @return string|null
+ */
+function getSeverityFlhStyle($severity) {
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_FLH_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_FLH_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_FLH_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_FLH_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_FLH_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_FLH_NA_BG;
+		default:
+			return null;
+	}
+}
+
+/**
+ * Get trigger severity status css style name.
+ *
+ * @param  int         $severity Trigger severity.
+ *
  * @return string|null
  */
 function getSeverityStatusStyle($severity) {
@@ -69,8 +96,8 @@ function getSeverityStyle($severity, $type = true) {
 /**
  * Get trigger severity name by given state and configuration.
  *
- * @param int   $severity trigger severity
- * @param array $config   array containing configuration parameters containing severity names
+ * @param int   $severity Trigger severity.
+ * @param array $config   Array with configuration parameters containing severity names.
  *
  * @return string
  */
@@ -128,11 +155,11 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int         $severity     trigger severity
- * @param array|null  $config       array of configuration parameters to get trigger severity name; can be omitted
- *                                  if $text is not null
- * @param string|null $text         trigger severity name
- * @param bool        $force_normal  true to return 'normal' class, false to return corresponding severity class
+ * @param int         $severity     Trigger, Event or Problem severity.
+ * @param array|null  $config       Array of configuration parameters to get trigger severity name; can be omitted
+ *                                  if $text is not null.
+ * @param string|null $text         Trigger severity name.
+ * @param bool        $force_normal True to return 'normal' class, false to return corresponding severity class.
  *
  * @return CCol
  */
@@ -144,9 +171,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 	if ($force_normal) {
 		return new CCol($text);
 	}
-	else {
-		return (new CCol($text))->addClass(getSeverityStyle($severity));
-	}
+
+	return (new CCol($text))->addClass(getSeverityStyle($severity));
 }
 
 /**
@@ -211,9 +237,8 @@ function trigger_value2str($value = null) {
 	elseif (isset($triggerValues[$value])) {
 		return $triggerValues[$value];
 	}
-	else {
-		return _('Unknown');
-	}
+
+	return _('Unknown');
 }
 
 function getParentHostsByTriggers($triggers) {
@@ -892,9 +917,6 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	$desc = null;
 	$acknowledge = [];
 
-	// for how long triggers should blink on status change (set by user in administration->general)
-	$config = select_config();
-
 	if ($trigger) {
 		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
@@ -902,28 +924,26 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			if ($config['event_ack_enable']) {
-				$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
+			$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
 
-				if ($event) {
-					$event = reset($event);
+			if ($event) {
+				$event = reset($event);
 
-					if ($screenid !== null) {
-						$acknowledge = [
-							'eventid' => $event['eventid'],
-							'backurl' => $pageFile.'?screenid='.$screenid
-						];
-					}
-					else {
-						$acknowledge = [
-							'eventid' => $event['eventid'],
-							'backurl' => $pageFile
-						];
-					}
+				if ($screenid !== null) {
+					$acknowledge = [
+						'eventid' => $event['eventid'],
+						'backurl' => $pageFile.'?screenid='.$screenid
+					];
+				}
+				else {
+					$acknowledge = [
+						'eventid' => $event['eventid'],
+						'backurl' => $pageFile
+					];
+				}
 
-					if ($event['acknowledged'] == 1) {
-						$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-					}
+				if ($event['acknowledged'] == 1) {
+					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 				}
 			}
 		}
@@ -942,7 +962,8 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	}
 
 	if ($trigger) {
-		// blinking
+		// Calculate for how long triggers should blink on status change (set by user in administration->general).
+		$config = select_config();
 		$config['blink_period'] = timeUnitToSeconds($config['blink_period']);
 		$duration = time() - $trigger['lastchange'];
 
@@ -1130,6 +1151,13 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 	return API::Trigger()->get($options);
 }
 
+/**
+ * Make trigger info block.
+ *
+ * @param array $trigger			Trigger described in info block.
+ *
+ * @return object
+ */
 function make_trigger_details($trigger) {
 	$hostNames = [];
 
@@ -1194,12 +1222,10 @@ function make_trigger_details($trigger) {
 			: '')
 		]);
 
-	if ($config['event_ack_enable']) {
-		$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-			? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
-		]);
-	}
+	$table->addRow([_('Allow manual close'), ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
+		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)
+		: (new CCol(_('No')))->addClass(ZBX_STYLE_RED)
+	]);
 
 	$table->addRow([_('Enabled'), ($trigger['status'] == TRIGGER_STATUS_ENABLED)
 		? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN)

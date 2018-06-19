@@ -28,7 +28,7 @@ class CControllerWebView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'fullscreen' =>	'in 0,1',
-			'groupid' =>	'db groups.groupid',
+			'groupid' =>	'db hstgrp.groupid',
 			'hostid' =>		'db hosts.hostid',
 			'sort' =>		'in hostname,name',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,

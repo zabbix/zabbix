@@ -173,7 +173,7 @@ function get_icon($type, $params = []) {
 						->setArgument('fullscreen', null)
 						->setArgument('kioskmode', null);
 
-					$icon = (new CRedirectButton(' ', $url->getUrl()))
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Normal view'))
 						->addClass(ZBX_STYLE_BTN_MIN)
 						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
@@ -183,7 +183,7 @@ function get_icon($type, $params = []) {
 						->setArgument('fullscreen', '1')
 						->setArgument('kioskmode', '1');
 
-					$icon = (new CRedirectButton(' ', $url->getUrl()))
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Kiosk mode'))
 						->addClass(ZBX_STYLE_BTN_KIOSK);
 				}
@@ -193,7 +193,7 @@ function get_icon($type, $params = []) {
 					->setArgument('fullscreen', '1')
 					->setArgument('kioskmode', null);
 
-				$icon = (new CRedirectButton(' ', $url->getUrl()))
+				$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 					->setTitle(_('Fullscreen'))
 					->addClass(ZBX_STYLE_BTN_MAX);
 			}
@@ -208,12 +208,6 @@ function get_icon($type, $params = []) {
 		case 'overviewhelp':
 			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_INFO);
-
-		case 'reset':
-			return (new CRedirectButton(SPACE, null))
-				->addClass(ZBX_STYLE_BTN_RESET)
-				->setTitle(_('Reset'))
-				->onClick('timeControl.objectReset();');
 	}
 }
 
@@ -296,7 +290,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$list = (new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'));
@@ -537,6 +534,7 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
 			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
 			'/',
@@ -756,16 +754,11 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  *
  * @param string      $name
  * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
- * @param string|null $relatedCalendar name of the calendar which must be closed when this calendar opens
  *
  * @return array
  */
-function createDateSelector($name, $date, $relatedCalendar = null) {
-	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
-		'_calendar"].clndr.clndrshow(pos.top, pos.left, this);';
-	if ($relatedCalendar) {
-		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
-	}
+function createDateSelector($name, $date) {
+	$onClick = 'dateSelectorOnClick(event, this, "'.$name.'_calendar");';
 
 	if (is_array($date)) {
 		$y = $date['y'];
@@ -840,8 +833,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
  *
  * @return CDiv
  */
-function makePageFooter($with_version = true)
-{
+function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, [
 		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
@@ -860,8 +852,7 @@ function makePageFooter($with_version = true)
  *
  * @return CComboBox
  */
-function makeAdministrationGeneralMenu($selected)
-{
+function makeAdministrationGeneralMenu($selected) {
 	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -878,30 +869,58 @@ function makeAdministrationGeneralMenu($selected)
 }
 
 /**
- * Renders an icon list
+ * Renders an icon list.
  *
- * @param array $info_icons  The list of information icons
+ * @param array $info_icons  The list of information icons.
  *
- * @return CSpan
+ * @return CDiv|string
  */
-function makeInformationList($info_icons)
-{
+function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
 }
 
 /**
- * Renders an information icon like green [i] with message
+ * Renders an information icon like green [i] with message.
  *
  * @param string $message
  *
  * @return CSpan
  */
-function makeInformationIcon($message)
-{
+function makeInformationIcon($message) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message);
+}
+
+/**
+ * Renders an action icon.
+ *
+ * @param array  $icon_data
+ * @param string $icon_data[icon]  Icon style.
+ * @param array  $icon_data[hint]  Hintbox content (optional).
+ * @param int    $icon_data[num]   Number displayed over the icon (optional).
+ *
+ * @return CSpan
+ */
+function makeActionIcon(array $icon_data) {
+	$icon = (new CSpan())->addClass($icon_data['icon']);
+
+	if (array_key_exists('num', $icon_data)) {
+		if ($icon_data['num'] > 99) {
+			$icon_data['num'] = '99+';
+		}
+		$icon->setAttribute('data-count', $icon_data['num']);
+	}
+
+	if (array_key_exists('hint', $icon_data)) {
+		$icon->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+	}
+	elseif (array_key_exists('title', $icon_data)) {
+		$icon->setTitle($icon_data['title']);
+	}
+
+	return $icon;
 }
 
 /**
@@ -911,8 +930,7 @@ function makeInformationIcon($message)
  *
  * @return CSpan
  */
-function makeErrorIcon($error)
-{
+function makeErrorIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
@@ -926,8 +944,7 @@ function makeErrorIcon($error)
  *
  * @return CSpan
  */
-function makeUnknownIcon($error)
-{
+function makeUnknownIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
@@ -941,8 +958,7 @@ function makeUnknownIcon($error)
  *
  * @return CSpan
  */
-function makeWarningIcon($error)
-{
+function makeWarningIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
@@ -954,8 +970,7 @@ function makeWarningIcon($error)
  *
  * @return CButton
  */
-function makeDebugButton()
-{
+function makeDebugButton() {
 	return (new CDiv(
 		(new CLink(_('Debug'), '#debug'))
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
@@ -981,22 +996,8 @@ function makeDebugButton()
  *
  * @return string
  */
-function getTriggerSeverityCss($config)
-{
+function getTriggerSeverityCss($config) {
 	$css = '';
-
-	$severity_statuses = [
-		ZBX_STYLE_STATUS_NA_BG => $config['severity_color_0'],
-		ZBX_STYLE_STATUS_INFO_BG => $config['severity_color_1'],
-		ZBX_STYLE_STATUS_WARNING_BG => $config['severity_color_2'],
-		ZBX_STYLE_STATUS_AVERAGE_BG => $config['severity_color_3'],
-		ZBX_STYLE_STATUS_HIGH_BG => $config['severity_color_4'],
-		ZBX_STYLE_STATUS_DISASTER_BG => $config['severity_color_5']
-	];
-
-	foreach ($severity_statuses as $class => $color) {
-		$css .= '.'.$class.' { background-color: #'.$color.' }'."\n";
-	}
 
 	$severities = [
 		ZBX_STYLE_NA_BG => $config['severity_color_0'],
@@ -1008,7 +1009,8 @@ function getTriggerSeverityCss($config)
 	];
 
 	foreach ($severities as $class => $color) {
-		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before { background-color: #'.$color.' }'."\n";
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before, .flh-'.$class.
+			', .status-'.$class.' { background-color: #'.$color.' }'."\n";
 	}
 
 	return $css;
@@ -1026,8 +1028,7 @@ function getTriggerSeverityCss($config)
  *
  * @return string
  */
-function getTriggerStatusCss($config)
-{
+function getTriggerStatusCss($config) {
 	$css = '';
 
 	if ($config['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {

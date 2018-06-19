@@ -73,19 +73,17 @@ $hostList
 	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
-			'objectName' => 'hostGroup',
+			'object_name' => 'hostGroup',
 			'disabled' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-			'objectOptions' => ['editable' => true],
+			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
-			'addNew' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $frmHost->getName(),
 					'dstfld1' => 'groups_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))
@@ -541,7 +539,7 @@ $tmplList = new CFormList();
 
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$ignoredTemplates = [];
+	$disableids = [];
 
 	$linkedTemplateTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
@@ -579,7 +577,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'conditions_'.$template['templateid']);
 
-		$ignoredTemplates[$template['templateid']] = $template['name'];
+		$disableids[] = $template['templateid'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
@@ -589,12 +587,11 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 
 	// create new linked template table
-	$newTemplateTable = (new CTable())
+	$new_template_table = (new CTable())
 		->addRow([
 			(new CMultiSelect([
 				'name' => 'add_templates[]',
-				'objectName' => 'templates',
-				'ignored' => $ignoredTemplates,
+				'object_name' => 'templates',
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'templates',
@@ -602,8 +599,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'srcfld2' => 'host',
 						'dstfrm' => $frmHost->getName(),
 						'dstfld1' => 'add_templates_',
-						'templated_hosts' => '1',
-						'multiselect' => '1'
+						'disableids' => $disableids
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -615,7 +611,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		]);
 
 	$tmplList->addRow(_('Link new templates'),
-		(new CDiv($newTemplateTable))
+		(new CDiv($new_template_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
