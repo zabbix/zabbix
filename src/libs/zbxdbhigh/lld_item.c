@@ -1538,13 +1538,13 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 			item = (zbx_lld_item_t *)items->values[i];
 
 			if (0 != item->itemid || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-				return;
+				continue;
 
 			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
-				return;
+				continue;
 			}
 
 			item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
