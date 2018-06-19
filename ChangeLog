@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha9
 
 New features:
+..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
 
