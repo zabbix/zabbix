@@ -1601,7 +1601,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertVisibleId('ack_shortdata');
 			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'maxlength', 255);
 			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'size', 20);
-			$this->zbxTestAssertElementValue('ack_shortdata', 'Acknowledged: {TRIGGER.NAME}');
+			$this->zbxTestAssertElementValue('ack_shortdata', 'Updated problem: {EVENT.NAME}');
 
 			$this->zbxTestTextPresent('Default message');
 			$this->zbxTestAssertVisibleId('ack_longdata');
