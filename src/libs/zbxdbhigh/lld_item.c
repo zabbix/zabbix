@@ -1450,7 +1450,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 
 	/* check duplicated keys in DB */
-
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
@@ -1528,8 +1527,23 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	zbx_vector_str_destroy(&keys);
 	zbx_vector_uint64_destroy(&itemids);
 
-	/* check limit of dependent items in the dependency tree */
+	/* check for broken dependent items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
 
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED)) {
+			for (j = 0; j < item->dependent_items.values_num; j++)
+			{
+				zbx_lld_item_t	*dependent;
+
+				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
+				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			}
+		}
+	}
+
+	/* check limit of dependent items in the dependency tree */
 	if (0 != item_dependencies->values_num)
 	{
 		for (i = 0; i < items->values_num; i++)
@@ -2971,7 +2985,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		{
 			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
 					&db_insert_idiscovery);
-
 		}
 		else
 		{
