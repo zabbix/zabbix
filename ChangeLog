@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-14420] fixed link to Problems screen in map element's context menu (miks)
 .......PS. [ZBX-12957] removed time adjustment of received packets for server and proxy (MVekslers)
 
 --------------------------------------------------------------------------------

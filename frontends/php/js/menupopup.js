@@ -212,7 +212,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param array  options['gotos']['showGraphs']     Display "Graphs" link enabled or disabled.
  * @param array  options['gotos']['screens']        Link to host screen page with url parameters ("name" => "value").
  * @param array  options['gotos']['showScreens']    Display "Screens" link enabled or disabled.
- * @param array  options['gotos']['triggerStatus']  Link to trigger status page with url parameters ("name" => "value").
+ * @param array  options['gotos']['triggerStatus']  Link to "Problems" page with url parameters ("name" => "value").
  * @param array  options['gotos']['showTriggers']   Display "Problems" link enabled or disabled.
  * @param array  options['gotos']['submap']         Link to submap page with url parameters ("name" => "value").
  * @param array  options['gotos']['events']         Link to events page with url parameters ("name" => "value").
