@@ -533,15 +533,22 @@ output {
   background-color: #2b2b2b;
   border-collapse: separate;
   border: 1px solid #303030; }
-  .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td {
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: black; }
-    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .ok-ack-fg, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .ok-ack-fg, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .ok-ack-fg, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .ok-ack-fg, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .ok-ack-fg, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td a, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .ok-ack-fg {
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td a, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .problem-unack-fg, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .problem-ack-fg, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .ok-unack-fg, .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .ok-ack-fg {
       color: black;
       border-bottom-color: rgba(0, 0, 0, 0.5); }
-    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td .icon-wzrd-action, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td .icon-wzrd-action, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td .icon-wzrd-action, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td .icon-wzrd-action, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td .icon-wzrd-action, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td .icon-wzrd-action {
-      background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px; }
-    .list-table.compact-view tr.flh-na-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-info-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-warning-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-average-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-high-bg:not(.row-selected):not(:hover) td button:focus, .list-table.compact-view tr.flh-disaster-bg:not(.row-selected):not(:hover) td button:focus {
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wzrd-action {
+      background-position: -165px -624px; }
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #2b2b2b; }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wzrd-action {
+    background-color: transparent; }
   .list-table.compact-view .link-action {
     color: #f2f2f2; }
     .list-table.compact-view .link-action.red {
@@ -552,20 +559,32 @@ output {
       color: #e99003; }
     .list-table.compact-view .link-action.green {
       color: #59db8f; }
-    .list-table.compact-view .link-action:hover {
-      color: #4796c4; }
-    .list-table.compact-view .link-action:focus {
+    .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
       color: #4796c4; }
   .list-table.compact-view td {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     border-bottom: none;
     box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
-    color: #f2f2f2; }
+    color: #f2f2f2;
+    height: 22px;
+    line-height: 1;
+    vertical-align: middle; }
+    .list-table.compact-view td [class*='icon-'] {
+      vertical-align: middle; }
+      .list-table.compact-view td [class*='icon-']:after {
+        margin: 0;
+        line-height: 14px; }
+      .list-table.compact-view td [class*='icon-']:last-of-type {
+        margin-right: 0; }
+    .list-table.compact-view td .rel-container span {
+      margin: 0; }
     .list-table.compact-view td .tag {
-      max-width: 40px;
-      margin: -2px 3px 0 0;
-      padding: 2px 3px; }
+      display: inline-block;
+      line-height: 16px;
+      margin-right: 3px;
+      padding: 0 3px;
+      max-width: 40px; }
       @media screen and (min-width: 1200px) {
         .list-table.compact-view td .tag {
           max-width: 71px; } }
@@ -575,13 +594,12 @@ output {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
-    .list-table.compact-view td .rel-container {
-      display: inline; }
     .list-table.compact-view td .icon-wzrd-action {
-      margin: 2px 0 0 2px;
+      background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
       height: 12px;
       min-height: 12px;
-      background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px; }
+      margin: 0;
+      position: relative; }
   .list-table thead th {
     color: #737373;
     height: 100%;
@@ -638,13 +656,7 @@ output {
       -webkit-transition: background-color 0.2s ease-out;
       -moz-transition: background-color 0.2s ease-out;
       transition: background-color 0.2s ease-out; }
-      .list-table thead th a:hover {
-        text-decoration: none;
-        background-color: #383838; }
-      .list-table thead th a:focus {
-        text-decoration: none;
-        background-color: #383838; }
-      .list-table thead th a:active {
+      .list-table thead th a:hover, .list-table thead th a:focus, .list-table thead th a:active {
         text-decoration: none;
         background-color: #383838; }
   .list-table tbody tr:hover {
@@ -668,7 +680,9 @@ output {
   .list-table td {
     padding: 6px 5px;
     position: relative;
-    border-bottom: 1px solid #383838; }
+    border-bottom: 1px solid #383838;
+    line-height: 18px;
+    vertical-align: top; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -4009,6 +4023,111 @@ svg {
 :placeholder-shown {
   color: #9d9d9d; }
 
+.icon-action-command,
+.icon-action-close,
+.icon-action-msg,
+.icon-action-msgs,
+.icon-action-severity-up,
+.icon-action-severity-down,
+.icon-action-severity-changed,
+.icon-action-message,
+.icon-action-ack,
+.icon-problem-generated,
+.icon-problem-recovery,
+.icon-actions-number-gray,
+.icon-actions-number-yellow,
+.icon-actions-number-red {
+  display: inline-block;
+  position: relative;
+  height: 18px;
+  width: 18px;
+  margin: 0 5px 0 0;
+  top: 0;
+  bottom: 0;
+  vertical-align: bottom; }
+  .icon-action-command::before,
+  .icon-action-close::before,
+  .icon-action-msg::before,
+  .icon-action-msgs::before,
+  .icon-action-severity-up::before,
+  .icon-action-severity-down::before,
+  .icon-action-severity-changed::before,
+  .icon-action-message::before,
+  .icon-action-ack::before,
+  .icon-problem-generated::before,
+  .icon-problem-recovery::before,
+  .icon-actions-number-gray::before,
+  .icon-actions-number-yellow::before,
+  .icon-actions-number-red::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    background-image: url(../img/icon-sprite.svg);
+    background-repeat: no-repeat; }
+
+[data-count][class*='icon-']::after {
+  position: absolute;
+  content: attr(data-count);
+  text-align: center;
+  margin-top: -2px;
+  font-size: 9px;
+  letter-spacing: -0.25px;
+  width: 18px; }
+
+.icon-action-command::before {
+  background-position: -249px -245px; }
+
+.icon-action-close::before {
+  background-position: -224px -245px; }
+
+.icon-action-msg::before {
+  background-position: -299px -245px; }
+
+.icon-action-severity-up::before {
+  background-position: -349px -245px; }
+
+.icon-action-severity-down::before {
+  background-position: -375px -245px; }
+
+.icon-action-severity-changed::before {
+  background-position: -399px -245px; }
+
+.icon-action-message::before {
+  background-position: -199px -245px; }
+
+.icon-action-ack::before {
+  background-position: -323px -245px; }
+
+.icon-problem-generated::before {
+  background-position: -449px -245px; }
+
+.icon-problem-recovery::before {
+  background-position: -424px -245px; }
+
+.icon-action-msgs[data-count]::after {
+  color: #2b2b2b; }
+.icon-action-msgs::before {
+  background-position: -474px -245px; }
+
+.icon-actions-number-gray[data-count]::after {
+  color: #f2f2f2; }
+.icon-actions-number-gray::before {
+  background-position: -499px -245px; }
+
+.icon-actions-number-yellow[data-count]::after {
+  color: #f2f2f2; }
+.icon-actions-number-yellow::before {
+  background-position: -549px -245px; }
+
+.icon-actions-number-red[data-count]::after {
+  color: #f2f2f2; }
+.icon-actions-number-red::before {
+  background-position: -524px -245px; }
+
 .list-table thead th {
   border-color: #404040; }
 
@@ -4018,7 +4137,7 @@ svg {
 
 .list-table.compact-view tr:hover td.na-bg, .list-table.compact-view tr:hover td.normal-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg, .list-table.compact-view tr:hover td.info-bg, .list-table.compact-view tr:hover td.warning-bg, .list-table.compact-view tr:hover td.average-bg, .list-table.compact-view tr:hover td.high-bg, .list-table.compact-view tr:hover td.disaster-bg {
   color: black; }
-.list-table.compact-view tr.flh-na-bg td, .list-table.compact-view tr.flh-info-bg td, .list-table.compact-view tr.flh-warning-bg td, .list-table.compact-view tr.flh-average-bg td, .list-table.compact-view tr.flh-high-bg td, .list-table.compact-view tr.flh-disaster-bg td {
+.list-table.compact-view tr[class*='flh-'] td {
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
 .list-table.compact-view td.na-bg, .list-table.compact-view td.normal-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
   color: black;
@@ -4034,3 +4153,15 @@ svg {
 
 .time-quick li a:focus {
   color: #fff; }
+
+.icon-action-msgs[data-count]::after {
+  color: #f2f2f2; }
+
+.icon-action-severity-up::before {
+  background-position: -624px -245px; }
+
+.icon-action-severity-down::before {
+  background-position: -649px -245px; }
+
+.icon-actions-number-gray[data-count]::after {
+  color: #f2f2f2; }

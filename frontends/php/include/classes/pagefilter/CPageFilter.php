@@ -709,7 +709,7 @@ class CPageFilter {
 	/**
 	 * Initialize minimum trigger severities.
 	 *
-	 * @param string $severityMin			minimum trigger severity
+	 * @param string $severityMin			minimum severity
 	 * @param array  $options				array of options
 	 * @param int    $options['default']	default severity
 	 * @param string $options['mapId']		ID of a map
