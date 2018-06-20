@@ -1235,12 +1235,47 @@ static int	DBpatch_3050110(void)
 	return DBset_default("config", &field);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: add_anchors                                                      *
+ *                                                                            *
+ * Comments: auxiliary function for DBpatch_3050111()                         *
+ *                                                                            *
+ ******************************************************************************/
+
+static void	add_anchors(const char *src, char *dst)
+{
+	char	*d = dst;
+	int	quoted = 0;
+
+	if ('"' == *src)
+	{
+		quoted = 1;
+		*d++ = *src++;
+	}
+
+	*d++ = '^';			/* start anchor */
+
+	for(; '\0' != *src; src++)
+	{
+		if (1 == quoted && '"' == *src && '\0' == src[1])
+			*d++ = '$';	/* end anchor if parameter is quoted */
+
+		*d++ = *src;
+	}
+
+	if (0 == quoted)
+		*d++ = '$';		/* end anchor */
+
+	*d = '\0';
+}
+
 static int	DBpatch_3050111(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
 	int			ret = FAIL;
-	char			*sql = NULL, *parameter = NULL, *parameter_esc;
+	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1249,13 +1284,21 @@ static int	DBpatch_3050111(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		parameter = zbx_strdup(parameter, row[1]);
+		parameter = zbx_strdup(NULL, row[1]);
 
 		zbx_regexp_escape(&parameter);
 		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
 
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 2);
+		add_anchors(parameter_esc, parameter_esc_anchored);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update functions set parameter='%s' where functionid=%s;\n", parameter_esc, row[0]);
+				"update functions set parameter='%s' where functionid=%s;\n",
+				parameter_esc_anchored, row[0]);
+
+		zbx_free(parameter);
+		zbx_free(parameter_esc);
+		zbx_free(parameter_esc_anchored);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
