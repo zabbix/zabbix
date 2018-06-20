@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha8');
+define('ZABBIX_VERSION',		'4.0.0alpha9');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050101);
+define('ZABBIX_DB_VERSION',		3050120);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -30,12 +30,16 @@ define('ZABBIX_COPYRIGHT_TO',	'2018');
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
+define('ZBX_SESSION_NAME', 'zbx_sessionid'); // Session cookie name for Zabbix front-end.
+
 define('ZBX_MIN_PERIOD',		60); // 1 minute
-define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
-define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
+define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
+define('ZBX_PERIOD_DEFAULT_TO',		'now');
+define('ZBX_DATE_TIME',			'Y-m-d H:i:s');// Time selector date and time presentation format.
 
 // the maximum period to display history data for the latest data and item overview pages in seconds
 // by default set to 86400 seconds (24 hours)
@@ -136,6 +140,7 @@ define('ZBX_DROPDOWN_FIRST_ALL',	1);
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
+define('T_ZBX_RANGE_TIME',	3);
 define('T_ZBX_CLR',			5);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
@@ -599,7 +604,7 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Acknowledged: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Updated problem: {EVENT.NAME}');
 define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {TRIGGER.NAME}');
 
@@ -611,14 +616,14 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
 );
 define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
-		"{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME} with the following message:\n".
-		"{ACK.MESSAGE}\n\n".
-		"Current problem status is {EVENT.STATUS}"
+		"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
+		"{EVENT.UPDATE.MESSAGE}\n\n".
+		"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
 );
 define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {TRIGGER.NAME}\n".
-		"Host: {HOST.NAME}\nSeverity: {TRIGGER.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
+		"Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 define('ACTION_DEFAULT_MSG_RECOVERY', "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-		"Problem name: {TRIGGER.NAME}\nHost: {HOST.NAME}\nSeverity: {TRIGGER.SEVERITY}\n\n".
+		"Problem name: {TRIGGER.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\n".
 		"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 
 define('ACTION_STATUS_ENABLED',		0);
@@ -706,7 +711,6 @@ define('SCREEN_MODE_JS',		3);
 define('SCREEN_SIMPLE_ITEM',	0);
 define('SCREEN_DYNAMIC_ITEM',	1);
 
-define('SCREEN_REFRESH_TIMEOUT',		30);
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 
 define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
@@ -857,17 +861,22 @@ define('HTTPTEST_VERIFY_PEER_ON',	1);
 define('HTTPTEST_VERIFY_HOST_OFF',	0);
 define('HTTPTEST_VERIFY_HOST_ON',	1);
 
-define('EVENT_ACK_DISABLED',	'0');
-define('EVENT_ACK_ENABLED',		'1');
-
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
 
 define('ZBX_ACKNOWLEDGE_SELECTED',	0);
 define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
 
-define('ZBX_ACKNOWLEDGE_ACTION_NONE',			0x00);
-define('ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM',	0x01);
+define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
+define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
+define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
+define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
+define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
+
+define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
+define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
+define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',		2);
+define('ZBX_EVENT_HISTORY_ALERT',				3);
 
 define('ZBX_TM_TASK_CLOSE_PROBLEM', 1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',	4);
@@ -889,8 +898,8 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 
 // Problem and event tag constants.
-define('TAG_EVAL_TYPE_AND',		0);
-define('TAG_EVAL_TYPE_OR',		1);
+define('TAG_EVAL_TYPE_AND_OR',	0);
+define('TAG_EVAL_TYPE_OR',		2);
 define('TAG_OPERATOR_LIKE',		0);
 define('TAG_OPERATOR_EQUAL',	1);
 
@@ -1200,6 +1209,9 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
+// Maximum width for popups in Actions column for problems.
+define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
+
 // dashboard widgets
 define('WIDGET_ACTION_LOG',		'actionlog');
 define('WIDGET_CLOCK',			'clock');
@@ -1346,8 +1358,11 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
-define('ZBX_STYLE_BTN_RESET', 'btn-reset');
 define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
+define('ZBX_STYLE_BTN_TIME', 'btn-time');
+define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
+define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
+define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
@@ -1395,7 +1410,12 @@ define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
-define('ZBX_STYLE_FILTER_ACTIVE', 'filter-active');
+define('ZBX_STYLE_TIME_INPUT', 'time-input');
+define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
+define('ZBX_STYLE_TIME_QUICK', 'time-quick');
+define('ZBX_STYLE_TIME_QUICK_RANGE', 'time-quick-range');
+define('ZBX_STYLE_TIME_SELECTION_CONTAINER', 'time-selection-container');
+define('ZBX_STYLE_FILTER_BREADCRUMB', 'filter-breadcrumb');
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
@@ -1427,6 +1447,20 @@ define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
+define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
+define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
+define('ZBX_STYLE_ACTION_ICON_MSGS', 'icon-action-msgs');
+define('ZBX_STYLE_ACTION_ICON_SEV_UP', 'icon-action-severity-up');
+define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down');
+define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
+define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
+define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
+define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
+define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
+define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
+define('ZBX_STYLE_ACTIONS_NUM_YELLOW', 'icon-actions-number-yellow');
+define('ZBX_STYLE_ACTIONS_NUM_RED', 'icon-actions-number-red');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');

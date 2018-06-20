@@ -39,9 +39,10 @@
 
 static int	sync_in_progress = 0;
 
-#define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
-#define START_SYNC	LOCK_CACHE; sync_in_progress = 1
+#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
+#define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
+#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
+#define START_SYNC	WRLOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
 #define ZBX_LOC_NOWHERE	0
@@ -83,7 +84,7 @@ static int	sync_in_progress = 0;
 typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
 static ZBX_DC_CONFIG	*config = NULL;
-static ZBX_MUTEX	config_lock = ZBX_MUTEX_NULL;
+static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
 static zbx_mem_info_t	*config_mem;
 
 extern unsigned char	program_type;
@@ -297,10 +298,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
-		int flags, int now)
+static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now)
 {
-	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
@@ -311,9 +310,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
-
-	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-		now -= proxy->timediff;
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -371,9 +367,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	}
 
 	item->schedulable = 1;
-
-	if (NULL != proxy)
-		item->nextcheck += proxy->timediff + 1;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -1364,7 +1357,6 @@ done:
 
 			if (0 == found)
 			{
-				proxy->timediff = 0;
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
@@ -2756,7 +2748,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, host, item->state, flags, now);
+				DCitem_nextcheck_update(item, item->state, flags, now);
 		}
 		else
 		{
@@ -5371,7 +5363,7 @@ int	init_configuration_cache(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __function_name, CONFIG_CONF_CACHE_SIZE);
 
-	if (SUCCEED != (ret = zbx_mutex_create(&config_lock, ZBX_MUTEX_CONFIG, error)))
+	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
 
 	if (SUCCEED != (ret = zbx_mem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
@@ -5533,13 +5525,13 @@ void	free_configuration_cache(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	config = NULL;
 
 	UNLOCK_CACHE;
 
-	zbx_mutex_destroy(&config_lock);
+	zbx_rwlock_destroy(&config_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -5660,7 +5652,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 	int			ret = FAIL;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 	{
@@ -5725,7 +5717,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 		return FAIL;
 	}
 #endif
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
 	{
@@ -5827,7 +5819,7 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 	ZBX_DC_PSK		psk_i_local;
 	size_t			psk_len = 0;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
@@ -6182,7 +6174,7 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
 }
 
-static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger)
+static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
 {
 	int	i;
 
@@ -6221,8 +6213,8 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger)
 
 		for (i = 0; i < src_trigger->tags.values_num; i++)
 		{
-			zbx_dc_trigger_tag_t	*dc_trigger_tag = (zbx_dc_trigger_tag_t *)src_trigger->tags.values[i];
-			zbx_tag_t		*tag;
+			const zbx_dc_trigger_tag_t	*dc_trigger_tag = (const zbx_dc_trigger_tag_t *)src_trigger->tags.values[i];
+			zbx_tag_t			*tag;
 
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, dc_trigger_tag->tag);
@@ -6275,7 +6267,7 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
@@ -6314,7 +6306,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
@@ -6412,7 +6404,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 	zbx_hashset_clear(items);
 	*timestamp = config->item_sync_ts;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->preprocitems, &iter);
 	while (NULL != (dc_preprocitem = (const ZBX_DC_PREPROCITEM *)zbx_hashset_iter_next(&iter)))
@@ -6477,7 +6469,7 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
@@ -6498,14 +6490,14 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num)
 {
-	size_t		i;
-	ZBX_DC_TRIGGER	*dc_trigger;
+	size_t			i;
+	const ZBX_DC_TRIGGER	*dc_trigger;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerids[i])))
+		if (NULL == (dc_trigger = (const ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerids[i])))
 		{
 			errcode[i] = FAIL;
 			continue;
@@ -6538,7 +6530,7 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
@@ -6634,7 +6626,7 @@ int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hc_item_t		*history_item;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
@@ -6694,7 +6686,7 @@ void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zb
 	if (0 == triggerids_in->values_num)
 		return;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < triggerids_in->values_num; i++)
 	{
@@ -6723,7 +6715,7 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 	int		i;
 	ZBX_DC_TRIGGER	*dc_trigger;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < triggerids->values_num; i++)
 	{
@@ -6749,7 +6741,7 @@ void	DCconfig_unlock_all_triggers(void)
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hashset_iter_t	iter;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 
@@ -6775,7 +6767,7 @@ int	DCconfig_lock_lld_rule(zbx_uint64_t lld_ruleid)
 {
 	int	ret = FAIL;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (FAIL == zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 	{
@@ -6801,7 +6793,7 @@ void	DCconfig_unlock_lld_rule(zbx_uint64_t lld_ruleid)
 {
 	int	i;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (FAIL != (i = zbx_vector_uint64_search(&config->locked_lld_ruleids, lld_ruleid,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -6828,10 +6820,10 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_TRIGGER		*dc_trigger;
+	const ZBX_DC_TRIGGER	*dc_trigger;
 	DC_TRIGGER		*trigger;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < itemids_num; i++)
 	{
@@ -6943,7 +6935,7 @@ int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t 
 	ZBX_DC_TRIGGER		*dc_trigger;
 	DC_TRIGGER		*trigger;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	start = zbx_vector_ptr_nearestindex(&config->time_triggers[process_num - 1], &start_triggerid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -7008,7 +7000,7 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 {
 	ZBX_DC_INTERFACE	*dc_interface;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (NULL != (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)) &&
 			SNMP_BULK_ENABLED == dc_interface->bulk)
@@ -7026,9 +7018,9 @@ void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp
 static int	DCconfig_get_suggested_snmp_vars_nolock(zbx_uint64_t interfaceid, int *bulk)
 {
 	int			num;
-	ZBX_DC_INTERFACE	*dc_interface;
+	const ZBX_DC_INTERFACE	*dc_interface;
 
-	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
+	dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
 
 	if (NULL != bulk)
 		*bulk = (NULL == dc_interface ? SNMP_BULK_DISABLED : dc_interface->bulk);
@@ -7061,7 +7053,7 @@ int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
 {
 	int	ret;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	ret = DCconfig_get_suggested_snmp_vars_nolock(interfaceid, bulk);
 
@@ -7072,14 +7064,15 @@ int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
 
 static int	dc_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
 {
-	int			res = FAIL;
-	const ZBX_DC_INTERFACE	*dc_interface;
-	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
+	int				res = FAIL;
+	const ZBX_DC_INTERFACE		*dc_interface;
+	const ZBX_DC_INTERFACE_HT	*interface_ht;
+	ZBX_DC_INTERFACE_HT		interface_ht_local;
 
 	interface_ht_local.hostid = hostid;
 	interface_ht_local.type = type;
 
-	if (NULL != (interface_ht = (ZBX_DC_INTERFACE_HT *)zbx_hashset_search(&config->interfaces_ht, &interface_ht_local)))
+	if (NULL != (interface_ht = (const ZBX_DC_INTERFACE_HT *)zbx_hashset_search(&config->interfaces_ht, &interface_ht_local)))
 	{
 		dc_interface = interface_ht->interface_ptr;
 		DCget_interface(interface, dc_interface);
@@ -7106,7 +7099,7 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 {
 	int	res;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	res = dc_get_interface_by_type(interface, hostid, type);
 
@@ -7131,20 +7124,23 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uint64_t itemid)
 {
 	int			res = FAIL, i;
-	ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_INTERFACE	*dc_interface;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (0 != itemid)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 			goto unlock;
 
 		if (0 != dc_item->interfaceid)
 		{
-			if (NULL == (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid)))
+			if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces,
+					&dc_item->interfaceid)))
+			{
 				goto unlock;
+			}
 
 			DCget_interface(interface, dc_interface);
 			res = SUCCEED;
@@ -7223,7 +7219,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 
 	queue = &config->queues[poller_type];
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	nextcheck = dc_config_get_queue_nextcheck(queue);
 
@@ -7241,7 +7237,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -7326,7 +7322,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 			max_items = 1;
 	}
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -7458,7 +7454,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 	queue = &config->queues[ZBX_POLLER_TYPE_IPMI];
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	while (num < items_num && FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -7535,16 +7531,17 @@ int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **inte
 {
 	const char		*__function_name = "DCconfig_get_snmp_interfaceids_by_addr";
 
-	int			count = 0, i;
-	ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr, dc_interface_snmpaddr_local;
+	int				count = 0, i;
+	const ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr;
+	ZBX_DC_INTERFACE_ADDR		dc_interface_snmpaddr_local;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __function_name, addr);
 
 	dc_interface_snmpaddr_local.addr = addr;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
-	if (NULL == (dc_interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(&config->interface_snmpaddrs, &dc_interface_snmpaddr_local)))
+	if (NULL == (dc_interface_snmpaddr = (const ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(&config->interface_snmpaddrs, &dc_interface_snmpaddr_local)))
 		goto unlock;
 
 	*interfaceids = (zbx_uint64_t *)zbx_malloc(*interfaceids, dc_interface_snmpaddr->interfaceids.values_num * sizeof(zbx_uint64_t));
@@ -7574,29 +7571,29 @@ unlock:
  ******************************************************************************/
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
-	const char		*__function_name = "DCconfig_get_snmp_items_by_interface";
+	const char			*__function_name = "DCconfig_get_snmp_items_by_interface";
 
-	size_t			items_num = 0, items_alloc = 8;
-	int			i;
-	ZBX_DC_ITEM		*dc_item;
-	ZBX_DC_INTERFACE_ITEM	*dc_interface_snmpitem;
-	ZBX_DC_INTERFACE	*dc_interface;
-	ZBX_DC_HOST		*dc_host;
+	size_t				items_num = 0, items_alloc = 8;
+	int				i;
+	const ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_INTERFACE_ITEM	*dc_interface_snmpitem;
+	const ZBX_DC_INTERFACE		*dc_interface;
+	const ZBX_DC_HOST		*dc_host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64, __function_name, interfaceid);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
-	if (NULL == (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)))
+	if (NULL == (dc_interface = (const ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)))
 		goto unlock;
 
-	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
+	if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_interface->hostid)))
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
 		goto unlock;
 
-	if (NULL == (dc_interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(&config->interface_snmpitems, &interfaceid)))
+	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(&config->interface_snmpitems, &interfaceid)))
 		goto unlock;
 
 	*items = (DC_ITEM *)zbx_malloc(*items, items_alloc * sizeof(DC_ITEM));
@@ -7688,7 +7685,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
 		const int *errcodes, size_t num)
 {
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
 
@@ -7698,7 +7695,7 @@ void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, c
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
 {
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_requeue_items(itemids, states, lastclocks, errcodes, num);
 	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
@@ -7728,7 +7725,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < itemids_num; i++)
 	{
@@ -8096,7 +8093,7 @@ int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_tim
 	if (0 == in->errors_from && HOST_AVAILABLE_TRUE == in->available)
 		goto out;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
@@ -8158,7 +8155,7 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_t
 	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
 		goto out;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
@@ -8242,7 +8239,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < availabilities->values_num; i++)
 	{
@@ -8356,9 +8353,9 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 	int				ret = SUCCEED;
 	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
-	if (NULL != (trigdep = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
+	if (NULL != (trigdep = (const ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps, &triggerid)))
 		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0, NULL, NULL);
 
 	UNLOCK_CACHE;
@@ -8459,7 +8456,7 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 	if (0 == trigger_diff->values_num)
 		return;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
@@ -8501,7 +8498,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < hostids_num; i++)
 	{
@@ -8562,9 +8559,9 @@ void	*DCconfig_get_stats(int request)
 	}
 }
 
-static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
+static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 {
-	ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST		*host;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
 	dst_proxy->hostid = src_proxy->hostid;
@@ -8576,7 +8573,7 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, ZBX_DC_PROXY *src_proxy)
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
 
-	if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
+	if (NULL != (host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &src_proxy->hostid)))
 	{
 		strscpy(dst_proxy->host, host->host);
 		strscpy(dst_proxy->proxy_address, src_proxy->proxy_address);
@@ -8667,7 +8664,7 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
 
 	queue = &config->pqueue;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	while (num < max_hosts && FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -8716,7 +8713,7 @@ int	DCconfig_get_proxypoller_nextcheck(void)
 
 	queue = &config->pqueue;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (FAIL == zbx_binary_heap_empty(queue))
 	{
@@ -8750,7 +8747,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)) &&
 			NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
@@ -8792,84 +8789,13 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_proxy_timediff                                      *
- *                                                                            *
- * Purpose: set rounded time difference between server clock and proxy clock  *
- *                                                                            *
- * Comments: When we calculate "nextcheck" for items on proxied hosts, we     *
- *           take the time difference between server and proxy into account.  *
- *                                                                            *
- *           For instance, suppose an item was processed on the proxy at 10   *
- *           seconds and there is a time difference between server and proxy  *
- *           of -2 seconds (that is, proxy's time is 2 seconds in front). In  *
- *           the server's database, we will store the timestamp of 8 seconds. *
- *           However, when we calculate "nextcheck" on the server side, we    *
- *           should calculate it from 10 seconds. Otherwise, if we calculate  *
- *           it from 8 seconds, we will probably get those 10 seconds as the  *
- *           "nextcheck". Finally, after calculating "nextcheck", we should   *
- *           utilize the time difference again to get Zabbix server's time.   *
- *                                                                            *
- *           Now, suppose we have a non-integer time difference, say, of -1.5 *
- *           seconds. Suppose also that one item on the proxy was checked at  *
- *           4.7 seconds, whereas a second item was checked at 5.2 seconds,   *
- *           which corresponds to server times of 3.2 and 3.7 seconds. Since  *
- *           "nextcheck" calculation only uses the integer part, server will  *
- *           use 3 seconds as the basis, before using the time difference.    *
- *           However, it is very likely that the first item was scheduled for *
- *           4 seconds on the proxy and the second item for 5 seconds, so in  *
- *           order to be precise we would need to store time differences for  *
- *           each individual item. That would lead to a significant increase  *
- *           in memory consumption, which we rather avoid. For this reason    *
- *           we only store a single time difference between server and proxy, *
- *           and use it for all items. However, the way time difference is    *
- *           used is different before and after "nextcheck" calculation.      *
- *                                                                            *
- *           Consider the example above. Server uses 3 seconds as the basis,  *
- *           and subtracts a unified difference of -2 (rounded down) to both  *
- *           items, yielding 5. It then calculates "nextcheck" for these two  *
- *           items, yielding 4 and 5 (assuming a one-minute delay). It then   *
- *           adds a unified difference of -1 (rounded up), to get Zabbix      *
- *           server's time of 3 and 4.                                        *
- *                                                                            *
- *           This has the effect that items will get into the delayed item    *
- *           queue at most one second later, but this is feasible: in proxy   *
- *           to server communication there is a communication latency, which  *
- *           also has the effect of putting items into the delayed item queue *
- *           a bit later, and we do not account for that anyway.              *
- *                                                                            *
- *           As described above, we subtract a rounded down difference before *
- *           "nextcheck" calculation and a rounded up difference after. Since *
- *           we have a 1/10^9 chance of hitting an integer "timediff" value,  *
- *           which would yield the same value rounded down and rounded up, in *
- *           the proxy structure we only store the difference rounded down to *
- *           save space. This is achieved by discarding the "ns" part of the  *
- *           "timediff" structure. We then assume that the rounded down value *
- *           and the rounded up values are different.                         *
- *                                                                            *
- *           Calculations of "nextchecks" themselves are done in functions    *
- *           DCget_reachable_nextcheck() and DCsync_items() functions.        *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff)
-{
-	ZBX_DC_PROXY	*dc_proxy;
-
-	LOCK_CACHE;
-
-	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		dc_proxy->timediff = timediff->sec;
-
-	UNLOCK_CACHE;
-}
-
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
 	int			i, j;
-	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
-	ZBX_DC_HTMPL		*htmpl;
+	const ZBX_DC_HMACRO_HM	*hmacro_hm;
+	ZBX_DC_HMACRO_HM	hmacro_hm_local;
+	const ZBX_DC_HTMPL	*htmpl;
 	zbx_vector_uint64_t	templateids;
 
 	if (0 == host_num)
@@ -8881,11 +8807,11 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 	{
 		hmacro_hm_local.hostid = hostids[i];
 
-		if (NULL != (hmacro_hm = (ZBX_DC_HMACRO_HM *)zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local)))
+		if (NULL != (hmacro_hm = (const ZBX_DC_HMACRO_HM *)zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local)))
 		{
 			for (j = 0; j < hmacro_hm->hmacros.values_num; j++)
 			{
-				ZBX_DC_HMACRO	*hmacro = (ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
+				const ZBX_DC_HMACRO	*hmacro = (const ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
 
 				if (0 == strcmp(hmacro->macro, macro))
 				{
@@ -8908,7 +8834,7 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 
 	for (i = 0; i < host_num; i++)
 	{
-		if (NULL != (htmpl = (ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
+		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
 		{
 			for (j = 0; j < htmpl->templateids.values_num; j++)
 				zbx_vector_uint64_append(&templateids, htmpl->templateids.values[j]);
@@ -8926,16 +8852,17 @@ static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const c
 
 static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
 {
-	int		i;
-	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
+	int			i;
+	const ZBX_DC_GMACRO_M	*gmacro_m;
+	ZBX_DC_GMACRO_M		gmacro_m_local;
 
 	gmacro_m_local.macro = macro;
 
-	if (NULL != (gmacro_m = (ZBX_DC_GMACRO_M *)zbx_hashset_search(&config->gmacros_m, &gmacro_m_local)))
+	if (NULL != (gmacro_m = (const ZBX_DC_GMACRO_M *)zbx_hashset_search(&config->gmacros_m, &gmacro_m_local)))
 	{
 		for (i = 0; i < gmacro_m->gmacros.values_num; i++)
 		{
-			ZBX_DC_GMACRO	*gmacro = (ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
+			const ZBX_DC_GMACRO	*gmacro = (const ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
 
 			if (0 == strcmp(gmacro->macro, macro))
 			{
@@ -8998,7 +8925,7 @@ void	DCget_user_macro(const zbx_uint64_t *hostids, int hostids_num, const char *
 	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
 		goto out;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	dc_get_user_macro(hostids, hostids_num, name, context, replace_to);
 
@@ -9159,7 +9086,7 @@ char	*DCexpression_expand_user_macros(const char *expression, char **error)
 {
 	char	*expression_ex;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	expression_ex = dc_expression_expand_user_macros(expression, error);
 
@@ -9208,11 +9135,11 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
-	while (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
 	{
 		const ZBX_DC_HOST	*dc_host;
 
@@ -9222,7 +9149,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
 
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
@@ -9565,7 +9492,7 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9597,7 +9524,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9624,7 +9551,7 @@ zbx_uint64_t	DCget_trigger_count(void)
 {
 	zbx_uint64_t	count;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9646,7 +9573,7 @@ zbx_uint64_t	DCget_host_count(void)
 {
 	zbx_uint64_t	nhosts;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9668,7 +9595,7 @@ double	DCget_required_performance(void)
 {
 	double	nvps;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9709,7 +9636,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 	const ZBX_DC_PROXY	*dc_proxy;
 	const ZBX_DC_HOST	*dc_proxy_host;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9762,23 +9689,24 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
-	ZBX_DC_EXPRESSION	*expression;
-	ZBX_DC_REGEXP		*regexp, search_regexp;
+	const ZBX_DC_EXPRESSION	*expression;
+	const ZBX_DC_REGEXP	*regexp;
+	ZBX_DC_REGEXP		search_regexp;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (iname = 0; iname < names_num; iname++)
 	{
 		search_regexp.name = names[iname];
 
-		if (NULL != (regexp = (ZBX_DC_REGEXP *)zbx_hashset_search(&config->regexps, &search_regexp)))
+		if (NULL != (regexp = (const ZBX_DC_REGEXP *)zbx_hashset_search(&config->regexps, &search_regexp)))
 		{
 			for (i = 0; i < regexp->expressionids.values_num; i++)
 			{
 				zbx_uint64_t		expressionid = regexp->expressionids.values[i];
 				zbx_expression_t	*rxp;
 
-				if (NULL == (expression = (ZBX_DC_EXPRESSION *)zbx_hashset_search(&config->expressions, &expressionid)))
+				if (NULL == (expression = (const ZBX_DC_EXPRESSION *)zbx_hashset_search(&config->expressions, &expressionid)))
 					continue;
 
 				rxp = (zbx_expression_t *)zbx_malloc(NULL, sizeof(zbx_expression_t));
@@ -9828,19 +9756,19 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
  ******************************************************************************/
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
-	ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_HOST	*dc_host;
-	int		ret = FAIL;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	int			ret = FAIL;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
-	if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+	if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 		goto unlock;
 
 	if (ITEM_STATUS_ACTIVE != dc_item->status)
 		goto unlock;
 
-	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+	if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
@@ -9871,16 +9799,16 @@ unlock:
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids)
 {
-	ZBX_DC_FUNCTION	*function;
-	ZBX_DC_ITEM	*item;
-	int		i;
+	const ZBX_DC_FUNCTION	*function;
+	const ZBX_DC_ITEM	*item;
+	int			i;
 
 	for (i = 0; i < functionids_num; i++)
 	{
-		if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		if (NULL == (function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
 				continue;
 
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+		if (NULL != (item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
 			zbx_vector_uint64_append(hostids, item->hostid);
 	}
 
@@ -9904,7 +9832,7 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	zbx_dc_get_hostids_by_functionids(functionids->values, functionids->values_num, hostids);
 
@@ -9926,21 +9854,21 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
  ******************************************************************************/
 static void	dc_get_hosts_by_functionids(const zbx_uint64_t *functionids, int functionids_num, zbx_hashset_t *hosts)
 {
-	ZBX_DC_FUNCTION	*dc_function;
-	ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_HOST	*dc_host;
-	DC_HOST		host;
-	int		i;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+	DC_HOST			host;
+	int			i;
 
 	for (i = 0; i < functionids_num; i++)
 	{
-		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
 			continue;
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
+		if (NULL == (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
 			continue;
 
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 			continue;
 
 		DCget_host(&host, dc_host);
@@ -9964,7 +9892,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	dc_get_hosts_by_functionids(functionids->values, functionids->values_num, hosts);
 
@@ -9989,7 +9917,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
  ******************************************************************************/
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 {
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
 	{
@@ -10074,7 +10002,7 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 
@@ -10169,19 +10097,19 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 {
 	const char		*__function_name = "DCget_hosts_availability";
-	ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 	zbx_hashset_iter_t	iter;
 	zbx_host_availability_t	*ha = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	*ts = time(NULL);
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 
-	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (host = (const ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
 		if (config->availability_diff_ts <= host->availability_ts && host->availability_ts < *ts)
 		{
@@ -10230,7 +10158,7 @@ void	DCtouch_hosts_availability(const zbx_vector_uint64_t *hostids)
 
 	now = time(NULL);
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
@@ -10454,16 +10382,16 @@ static void	prepare_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, zbx_hashset_t *uniq_conditions, unsigned char opflags)
 {
 	const char			*__function_name = "zbx_dc_get_actions_eval";
-	zbx_dc_action_t			*dc_action;
+	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->actions, &iter);
 
-	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_action = (const zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (0 != (opflags & dc_action->opflags))
 			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
@@ -10598,7 +10526,7 @@ static void	dc_corr_condition_copy(const zbx_dc_corr_condition_t *dc_condition, 
  * Return value: The cloned correlation operation.                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_corr_operation_t	*zbx_dc_corr_operation_dup(zbx_dc_corr_operation_t *dc_operation)
+static zbx_corr_operation_t	*zbx_dc_corr_operation_dup(const zbx_dc_corr_operation_t *dc_operation)
 {
 	zbx_corr_operation_t	*operation;
 
@@ -10741,14 +10669,14 @@ void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules)
  ******************************************************************************/
 void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 {
-	int			i;
-	zbx_hashset_iter_t	iter;
-	zbx_dc_correlation_t	*dc_correlation;
-	zbx_dc_corr_condition_t	*dc_condition;
-	zbx_correlation_t	*correlation;
-	zbx_corr_condition_t	*condition, condition_local;
+	int				i;
+	zbx_hashset_iter_t		iter;
+	const zbx_dc_correlation_t	*dc_correlation;
+	const zbx_dc_corr_condition_t	*dc_condition;
+	zbx_correlation_t		*correlation;
+	zbx_corr_condition_t		*condition, condition_local;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	/* The correlation rules are refreshed only if the sync timestamp   */
 	/* does not match current configuration cache sync timestamp. This  */
@@ -10762,7 +10690,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 	zbx_dc_correlation_rules_clean(rules);
 
 	zbx_hashset_iter_reset(&config->correlations, &iter);
-	while (NULL != (dc_correlation = (zbx_dc_correlation_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_correlation = (const zbx_dc_correlation_t *)zbx_hashset_iter_next(&iter)))
 	{
 		correlation = (zbx_correlation_t *)zbx_malloc(NULL, sizeof(zbx_correlation_t));
 		correlation->correlationid = dc_correlation->correlationid;
@@ -10774,7 +10702,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 		for (i = 0; i < dc_correlation->conditions.values_num; i++)
 		{
-			dc_condition = (zbx_dc_corr_condition_t *)dc_correlation->conditions.values[i];
+			dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[i];
 			condition_local.corr_conditionid = dc_condition->corr_conditionid;
 			condition = (zbx_corr_condition_t *)zbx_hashset_insert(&rules->conditions, &condition_local, sizeof(condition_local));
 			dc_corr_condition_copy(dc_condition, condition);
@@ -10784,7 +10712,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 		for (i = 0; i < dc_correlation->operations.values_num; i++)
 		{
 			zbx_vector_ptr_append(&correlation->operations,
-					zbx_dc_corr_operation_dup((zbx_dc_corr_operation_t *)dc_correlation->operations.values[i]));
+					zbx_dc_corr_operation_dup((const zbx_dc_corr_operation_t *)dc_correlation->operations.values[i]));
 		}
 
 		zbx_vector_ptr_append(&rules->correlations, correlation);
@@ -10865,7 +10793,7 @@ void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zb
 {
 	int	i;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < groupids_num; i++)
 		dc_get_nested_hostgroupids(groupids[i], nested_groupids);
@@ -10891,7 +10819,7 @@ void	zbx_dc_get_nested_hostgroupids_by_names(char **names, int names_num, zbx_ve
 {
 	int	i, index;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < names_num; i++)
 	{
@@ -10931,11 +10859,11 @@ void	zbx_dc_get_nested_hostgroupids_by_names(char **names, int names_num, zbx_ve
  ******************************************************************************/
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error)
 {
-	int		ret = FAIL;
-	ZBX_DC_HOST	*dc_host;
-	ZBX_DC_PROXY	*dc_proxy;
+	int			ret = FAIL;
+	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_PROXY	*dc_proxy;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(name)))
 	{
@@ -10949,7 +10877,7 @@ int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **er
 		goto out;
 	}
 
-	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
+	if (NULL == (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
 	{
 		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
 		goto out;
@@ -10983,7 +10911,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -11007,7 +10935,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
 	}
 
 	UNLOCK_CACHE;
@@ -11035,17 +10963,17 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
  ******************************************************************************/
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n)
 {
-	ZBX_DC_HOST	*host;
-	int		i, ret = FAIL;
+	const ZBX_DC_HOST	*host;
+	int			i, ret = FAIL;
 
 	if (0 == hostid)
 		return FAIL;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	/* find host entry in 'config->hosts' hashset */
 
-	if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+	if (NULL == (host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
 
 	/* allocate memory for results */
@@ -11057,7 +10985,7 @@ int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, 
 
 	for (i = 0; i < *n; i++)
 	{
-		const ZBX_DC_INTERFACE	*src = (ZBX_DC_INTERFACE *)host->interfaces_v.values[i];
+		const ZBX_DC_INTERFACE	*src = (const ZBX_DC_INTERFACE *)host->interfaces_v.values[i];
 		DC_INTERFACE2		*dst = *interfaces + i;
 
 		dst->interfaceid = src->interfaceid;
@@ -11095,7 +11023,7 @@ void	DCconfig_items_apply_changes(const zbx_vector_ptr_t *item_diff)
 	if (0 == item_diff->values_num)
 		return;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < item_diff->values_num; i++)
 	{
@@ -11135,7 +11063,7 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
 	ZBX_DC_HOST_INVENTORY	*host_inventory = NULL;
 	int			i;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
@@ -11168,21 +11096,21 @@ void	DCconfig_update_inventory_values(const zbx_vector_ptr_t *inventory_values)
  ******************************************************************************/
 int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx)
 {
-	ZBX_DC_ITEM		*dc_item;
-	ZBX_DC_HOST_INVENTORY	*dc_inventory;
-	int			ret = FAIL;
+	const ZBX_DC_ITEM		*dc_item;
+	const ZBX_DC_HOST_INVENTORY	*dc_inventory;
+	int				ret = FAIL;
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 	{
-		if (NULL != (dc_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid)) &&
+		if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories_auto, &dc_item->hostid)) &&
 				NULL != dc_inventory->values[value_idx])
 		{
 			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
 			ret = SUCCEED;
 		}
-		else if (NULL != (dc_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &dc_item->hostid)))
+		else if (NULL != (dc_inventory = (const ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories, &dc_item->hostid)))
 		{
 			*replace_to = zbx_strdup(*replace_to, dc_inventory->values[value_idx]);
 			ret = SUCCEED;
@@ -11226,7 +11154,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 	zbx_vector_uint64_create(&masterids);
 	zbx_vector_uint64_reserve(&masterids, 64);
 
-	LOCK_CACHE;
+	RDLOCK_CACHE;
 
 	for (i = 0; i < triggerids->values_num; i++)
 	{
@@ -11282,7 +11210,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 	ZBX_DC_HOST	*dc_host;
 	zbx_uint64_t	proxy_hostid;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	for (i = 0; i < itemids->values_num; i++)
 	{
@@ -11326,7 +11254,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 {
 	ZBX_DC_PROXY	*proxy;
 
-	LOCK_CACHE;
+	WRLOCK_CACHE;
 
 	if (diff->lastaccess < config->proxy_lastaccess_ts)
 		diff->lastaccess = config->proxy_lastaccess_ts;
@@ -11383,7 +11311,7 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 	{
 		zbx_hashset_iter_t	iter;
 
-		LOCK_CACHE;
+		WRLOCK_CACHE;
 
 		zbx_hashset_iter_reset(&config->proxies, &iter);
 

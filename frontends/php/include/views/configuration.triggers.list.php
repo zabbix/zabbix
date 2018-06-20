@@ -28,8 +28,10 @@ else {
 	$create_button = new CSubmit('form', _('Create trigger'));
 }
 
-$filter = (new CFilter('web.triggers.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Severity'),
 				new CSeverity([
@@ -50,7 +52,7 @@ $filter = (new CFilter('web.triggers.filter.state'))
 					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 					->setModern(true)
 			)
-	);
+	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
