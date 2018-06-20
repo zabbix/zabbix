@@ -546,7 +546,6 @@ FIELD		|configid	|t_id		|	|NOT NULL	|0
 FIELD		|refresh_unsupported|t_varchar(32)|'10m'	|NOT NULL	|ZBX_PROXY
 FIELD		|work_period	|t_varchar(255)	|'1-5,09:00-18:00'|NOT NULL|0
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
-FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
@@ -572,8 +571,8 @@ FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_NODATA
-FIELD		|ok_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
-FIELD		|blink_period	|t_varchar(32)	|'30m'	|NOT NULL	|ZBX_NODATA
+FIELD		|ok_period	|t_varchar(32)	|'5m'	|NOT NULL	|ZBX_NODATA
+FIELD		|blink_period	|t_varchar(32)	|'2m'	|NOT NULL	|ZBX_NODATA
 FIELD		|problem_unack_color|t_varchar(6)|'CC0000'|NOT NULL	|ZBX_NODATA
 FIELD		|problem_ack_color|t_varchar(6)	|'CC0000'|NOT NULL	|ZBX_NODATA
 FIELD		|ok_unack_color	|t_varchar(6)	|'009900'|NOT NULL	|ZBX_NODATA
@@ -1072,6 +1071,7 @@ FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
@@ -1098,6 +1098,8 @@ FIELD		|eventid	|t_id		|	|NOT NULL	|0			|2|events
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|old_severity	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|new_severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|eventid
 INDEX		|3		|clock
@@ -1140,7 +1142,8 @@ FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
-INDEX		|1		|proxy_hostid,host
+INDEX		|1		|host
+INDEX		|2		|proxy_hostid
 
 TABLE|proxy_autoreg_host|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
@@ -1403,6 +1406,8 @@ FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
 INDEX		|3		|r_eventid
@@ -1620,4 +1625,4 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050101	|3050101
+ROW		|3050120	|3050120

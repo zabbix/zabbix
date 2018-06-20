@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Time selection - expanded</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
+<body>
+	<header>
+		<div>
+			<div class="top-nav-container" id="mmenu">
+				<a class="header-logo" href="">
+					<div class="logo"></div>
+				</a>
+				<nav aria-label="Main navigation">
+					<ul class="top-nav">
+						<li class="selected" id="view"><a onclick="javascript: MMenu.mouseOver('view');" onkeyup="javascript: MMenu.keyUp('view', event);" tabindex="0" role="button" href="javascript:void(0)">Monitoring</a></li>
+						<li id="cm" class=""><a onclick="javascript: MMenu.mouseOver('cm');" onkeyup="javascript: MMenu.keyUp('cm', event);" tabindex="0" role="button" href="javascript:void(0)">Inventory</a></li>
+						<li id="reports" class=""><a onclick="javascript: MMenu.mouseOver('reports');" onkeyup="javascript: MMenu.keyUp('reports', event);" tabindex="0" role="button" href="javascript:void(0)">Reports</a></li>
+						<li id="config" class=""><a onclick="javascript: MMenu.mouseOver('config');" onkeyup="javascript: MMenu.keyUp('config', event);" tabindex="0" role="button" href="javascript:void(0)">Configuration</a></li>
+						<li id="admin" class=""><a onclick="javascript: MMenu.mouseOver('admin');" onkeyup="javascript: MMenu.keyUp('admin', event);" tabindex="0" role="button" href="javascript:void(0)">Administration</a></li>
+					</ul>
+				</nav>
+				<ul class="top-nav-icons">
+					<li>
+						<form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form>
+					</li>
+					<li>
+						<ul role="navigation" aria-label="User menu">
+							<li style="padding-left:0"><a class="top-nav-support" target="_blank" title="Zabbix Technical Support" href="">Support</a></li>
+							<li><a class="top-nav-zbbshare" target="_blank" title="Zabbix Share" href="">Share</a></li>
+							<li><a class="top-nav-help" target="_blank" title="Help" href="">&nbsp;</a></li>
+							<li><a class="top-nav-profile" title="Admin (Zabbix Administrator)" href="">&nbsp;</a></li>
+							<li><a class="top-nav-signout" title="Sign out" onclick="javascript: return redirect('index.php?reconnect=1&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="javascript:void(0)">&nbsp;</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<nav aria-label="Sub navigation" class="top-subnav-container" onmouseover="javascript: MMenu.submenu_mouseOver();" onmouseout="javascript: MMenu.mouseOut();">
+				<ul class="top-subnav" id="sub_view" style="display: block;">
+					<li><a tabindex="0" href="">Dashboard</a></li>
+					<li><a tabindex="0" class="selected" href="">Problems</a></li>
+					<li><a tabindex="0" href="">Overview</a></li>
+					<li><a tabindex="0" href="">Web</a></li>
+					<li><a tabindex="0" href="">Latest data</a></li>
+					<li><a tabindex="0" href="">Graphs</a></li>
+					<li><a tabindex="0" href="">Screens</a></li>
+					<li><a tabindex="0" href="">Maps</a></li>
+					<li><a tabindex="0" href="">Discovery</a></li>
+					<li><a tabindex="0" href="">Services</a></li>
+				</ul>
+				<div class="server-name">ZABBIX SERVER NAME</div>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<div class="header-title table">
+			<div class="cell">
+				<h1 id="page-title-general">Problems</h1>
+			</div>
+			<div class="cell nowrap">
+				<nav aria-label="Content controls">
+					<form method="get" action="zabbix.php" accept-charset="utf-8">
+						<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="fullscreen" name="fullscreen" value="1"><input type="hidden" id="page" name="page" value="1">
+						<ul><li><button type="button" data-url="zabbix.php?action=problem.view.csv&amp;page=1">Export to CSV</button></li><li><button type="button" data-url="zabbix.php?action=problem.view&amp;page=1&amp;filter_show=2&amp;filter_groupids%5B0%5D=4&amp;filter_application=&amp;filter_name=&amp;filter_severity=0&amp;filter_inventory%5B0%5D%5Bfield%5D=type&amp;filter_inventory%5B0%5D%5Bvalue%5D=&amp;filter_evaltype=0&amp;filter_tags%5B0%5D%5Btag%5D=&amp;filter_tags%5B0%5D%5Boperator%5D=0&amp;filter_tags%5B0%5D%5Bvalue%5D=&amp;filter_show_tags=3&amp;filter_maintenance=1&amp;filter_set=1" title="Normal view" class="btn-min">&nbsp;</button></li></ul>
+					</form>
+				</nav>
+			</div>
+		</div>
+		<div class="filter-space ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible" id="filter_5b0d5e0da3713" data-profile-idx="web.problem.filter" data-profile-idx2="0" style="" aria-label="Filter">
+			<ul class="filter-btn-container ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+				<li>
+					<div><button type="button" class="btn-time-left" disabled="disabled"></button><button type="button" class="btn-time-out" disabled="disabled">Zoom out</button><button type="button" class="btn-time-right" disabled="disabled"></button></div>
+				</li><li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tab_1" aria-labelledby="ui-id-1" aria-selected="true"><a class="btn-time ui-tabs-anchor" href="#tab_1" role="presentation" tabindex="-1" id="ui-id-1">Last 7 days</a></li><li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tab_2" aria-labelledby="ui-id-2" aria-selected="false"><a class="filter-trigger ui-tabs-anchor" href="#tab_2" role="presentation" tabindex="-1" id="ui-id-2">Filter</a></li></ul>
+			<form method="get" action="zabbix.php" accept-charset="utf-8" name="zbx_filter" id="id">
+				<input type="hidden" name="action" value="problem.view"><input type="hidden" name="fullscreen" value="1"><input type="hidden" name="page" value="1">
+				<div class="filter-container time-selection-container ui-tabs-panel ui-widget-content ui-corner-bottom" id="tab_1" style="" aria-labelledby="ui-id-1" role="tabpanel" aria-expanded="true" aria-hidden="false">
+					<div class="time-input">
+						<ul><li><label for="from">From</label></li><li><input type="text" id="from" name="from" value="now-7d" maxlength="255"></li><li><button type="button" id="from_calendar" name="from_calendar" class="icon-cal"></button></li></ul>
+						<ul data-error-for="from" class="time-input-error" style=""><li class="red">Maximum time period to display is 731 days.</li></ul>
+						<ul><li><label for="to">To</label></li><li><input type="text" id="to" name="to" value="now" maxlength="255"></li><li><button type="button" id="to_calendar" name="to_calendar" class="icon-cal"></button></li></ul>
+						<ul data-error-for="to" class="time-input-error" style="display: none"><li class="red"></li></ul>
+						<ul><li><button type="button" id="apply" name="apply">Apply</button></li></ul>
+					</div>
+					<div class="time-quick-range">
+						<div class="cell">
+							<ul class="time-quick">
+								<li><a data-from="now-2d" data-to="now" data-label="Last 2 days" role="button" href="javascript:void(0)">Last 2 days</a></li>
+								<li><a data-from="now-7d" data-to="now" data-label="Last 7 days" class="selected" role="button" href="javascript:void(0)">Last 7 days</a></li>
+								<li><a data-from="now-30d" data-to="now" data-label="Last 30 days" role="button" href="javascript:void(0)">Last 30 days</a></li>
+								<li><a data-from="now-3M" data-to="now" data-label="Last 3 months" role="button" href="javascript:void(0)">Last 3 months</a></li>
+								<li><a data-from="now-6M" data-to="now" data-label="Last 6 months" role="button" href="javascript:void(0)">Last 6 months</a></li>
+								<li><a data-from="now-1y" data-to="now" data-label="Last 1 year" role="button" href="javascript:void(0)">Last 1 year</a></li>
+								<li><a data-from="now-2y" data-to="now" data-label="Last 2 years" role="button" href="javascript:void(0)">Last 2 years</a></li>
+							</ul>
+						</div>
+						<div class="cell">
+							<ul class="time-quick">
+								<li><a data-from="now-1d/d" data-to="now-1d/d" data-label="Yesterday" role="button" href="javascript:void(0)">Yesterday</a></li>
+								<li><a data-from="now-2d/d" data-to="now-2d/d" data-label="Day before yesterday" role="button" href="javascript:void(0)">Day before yesterday</a></li>
+								<li><a data-from="now-1w/d" data-to="now-1w/d" data-label="This day last week" role="button" href="javascript:void(0)">This day last week</a></li>
+								<li><a data-from="now-1w/w" data-to="now-1w/w" data-label="Previous week" role="button" href="javascript:void(0)">Previous week</a></li>
+								<li><a data-from="now-1M/M" data-to="now-1M/M" data-label="Previous month" role="button" href="javascript:void(0)">Previous month</a></li>
+								<li><a data-from="now-1y/y" data-to="now-1y/y" data-label="Previous year" role="button" href="javascript:void(0)">Previous year</a></li>
+							</ul>
+						</div>
+						<div class="cell">
+							<ul class="time-quick">
+								<li><a data-from="now/d" data-to="now/d" data-label="Today" role="button" href="javascript:void(0)">Today</a></li>
+								<li><a data-from="now/d" data-to="now" data-label="Today so far" role="button" href="javascript:void(0)">Today so far</a></li>
+								<li><a data-from="now/w" data-to="now/w" data-label="This week" role="button" href="javascript:void(0)">This week</a></li>
+								<li><a data-from="now/w" data-to="now" data-label="This week so far" role="button" href="javascript:void(0)">This week so far</a></li>
+								<li><a data-from="now/M" data-to="now/M" data-label="This month" role="button" href="javascript:void(0)">This month</a></li>
+								<li><a data-from="now/M" data-to="now" data-label="This month so far" role="button" href="javascript:void(0)">This month so far</a></li>
+								<li><a data-from="now/y" data-to="now/y" data-label="This year" role="button" href="javascript:void(0)">This year</a></li>
+								<li><a data-from="now/y" data-to="now" data-label="This year so far" role="button" href="javascript:void(0)">This year so far</a></li>
+							</ul>
+						</div>
+						<div class="cell">
+							<ul class="time-quick">
+								<li><a data-from="now-5m" data-to="now" data-label="Last 5 minutes" role="button" href="javascript:void(0)">Last 5 minutes</a></li>
+								<li><a data-from="now-15m" data-to="now" data-label="Last 15 minutes" role="button" href="javascript:void(0)">Last 15 minutes</a></li>
+								<li><a data-from="now-30m" data-to="now" data-label="Last 30 minutes" role="button" href="javascript:void(0)">Last 30 minutes</a></li>
+								<li><a data-from="now-1h" data-to="now" data-label="Last 1 hour" role="button" href="javascript:void(0)">Last 1 hour</a></li>
+								<li><a data-from="now-3h" data-to="now" data-label="Last 3 hours" role="button" href="javascript:void(0)">Last 3 hours</a></li>
+								<li><a data-from="now-6h" data-to="now" data-label="Last 6 hours" role="button" href="javascript:void(0)">Last 6 hours</a></li>
+								<li><a data-from="now-12h" data-to="now" data-label="Last 12 hours" role="button" href="javascript:void(0)">Last 12 hours</a></li>
+								<li><a data-from="now-24h" data-to="now" data-label="Last 1 day" role="button" href="javascript:void(0)">Last 1 day</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</form>
+	<div class="flickerfreescreen" data-timestamp="1526287690" id="flickerfreescreen_problem">
+		<form method="get" action="zabbix.php" accept-charset="utf-8" name="problem">
+			<input type="hidden" id="backurl" name="backurl" value="zabbix.php?action=problem.view&amp;uncheck=1">
+			<table class="list-table" id="t5af94d4ac7b08237549034">
+				<thead>
+					<tr>
+						<th class="cell-width"><a href="">Time</a></th>
+						<th class="cell-width"><input type="checkbox" id="all_eventids" name="all_eventids" value="1" class="checkbox-radio" onclick="checkAll('problem', 'all_eventids', 'eventids');"><label for="all_eventids"><span></span></label></th>
+						<th><a href="">Severity</a></th>
+						<th class="cell-width">Recovery time</th>
+						<th>Status</th>
+						<th>Info</th>
+						<th><a href="">Host<span class="arrow-up"></span></a></th>
+						<th><a href="">Problem</a></th>
+						<th>Duration</th>
+						<th>Ack</th>
+						<th>Actions</th>
+						<th>Tags</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:08</a></td>
+						<td><input type="checkbox" id="eventids_91" name="eventids[91]" value="91" class="checkbox-radio"><label for="eventids_91"><span></span></label></td>
+						<td>Not classified</td>
+						<td class="nowrap right"><a href="">2018-04-10 09:51:55</a></td>
+						<td><span class="ok-ack-fg">RESOLVED</span></td>
+						<td>
+							<div class="rel-container">
+								<span class="icon-info status-green" data-hintbox="1" data-hintbox-static="1"></span>
+							</div>
+						</td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger60</a></td>
+						<td>5m 3d 17h</td>
+						<td>
+							<a data-hintbox="1" class="link-alt green" href="">Yes</a>
+							&nbsp;<sup>3</sup>
+						</td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td>
+							<span class="tag" data-hintbox="1" data-hintbox-static="1">Tag 1: value 1</span>
+							<span class="tag" data-hintbox="1" data-hintbox-static="1">Tag 2: value 2</span>
+							<span class="tag" data-hintbox="1" data-hintbox-static="1">Tag 3: value 3</span>
+							<span class="rel-container">
+								<button type="button" class="icon-wzrd-action" data-hintbox="1" data-hintbox-style="max-width: 500px" data-hintbox-static="1"></button>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:07</a></td>
+						<td><input type="checkbox" id="eventids_90" name="eventids[90]" value="90" class="checkbox-radio"><label for="eventids_90"><span></span></label></td>
+						<td class="info-bg">Information</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger55</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:06</a></td>
+						<td><input type="checkbox" id="eventids_89" name="eventids[89]" value="89" class="checkbox-radio"><label for="eventids_89"><span></span></label></td>
+						<td class="warning-bg">Warning</td>
+						<td></td>
+						<td><span class="problem-ack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger50</a></td>
+						<td>6m 7d 19h</td>
+						<td>
+							<a data-hintbox="1" class="link-alt green" href="">Yes</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr class="row-selected">
+						<td class="nowrap right"><a href="">2017-11-07 15:40:05</a></td>
+						<td><input type="checkbox" id="eventids_88" name="eventids[88]" value="88" class="checkbox-radio" checked><label for="eventids_88"><span></span></label></td>
+						<td class="average-bg">Average</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger45</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:04</a></td>
+						<td><input type="checkbox" id="eventids_87" name="eventids[87]" value="87" class="checkbox-radio"><label for="eventids_87"><span></span></label></td>
+						<td class="high-bg">High</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger40</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:03</a></td>
+						<td><input type="checkbox" id="eventids_86" name="eventids[86]" value="86" class="checkbox-radio"><label for="eventids_86"><span></span></label></td>
+						<td class="disaster-bg">Disaster</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger35</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:02</a></td>
+						<td><input type="checkbox" id="eventids_85" name="eventids[85]" value="85" class="checkbox-radio"><label for="eventids_85"><span></span></label></td>
+						<td class="high-bg">High</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger30</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:01</a></td>
+						<td><input type="checkbox" id="eventids_84" name="eventids[84]" value="84" class="checkbox-radio"><label for="eventids_84"><span></span></label></td>
+						<td>Average</td>
+						<td class="nowrap right"><a href="">2018-05-02 09:45:35</a></td>
+						<td><span class="ok-ack-fg">RESOLVED</span></td>
+						<td>
+							<div class="rel-container">
+								<span class="icon-info status-green" data-hintbox="1" data-hintbox-static="1"></span>
+							</div>
+						</td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger25</a></td>
+						<td>5m 25d 17h</td>
+						<td>
+							<a data-hintbox="1" class="link-alt green" href="">Yes</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:40:00</a></td>
+						<td><input type="checkbox" id="eventids_83" name="eventids[83]" value="83" class="checkbox-radio"><label for="eventids_83"><span></span></label></td>
+						<td class="warning-bg">Warning</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger20</a></td>
+						<td>6m 7d 19h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:39:59</a></td>
+						<td><input type="checkbox" id="eventids_82" name="eventids[82]" value="82" class="checkbox-radio"><label for="eventids_82"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2018-04-21 09:20:29</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >ValueItemTrigger15</a></td>
+						<td>5m 14d 16h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 15:39:58</a></td>
+						<td><input type="checkbox" id="eventids_81" name="eventids[81]" value="81" class="checkbox-radio"><label for="eventids_81"><span></span></label></td>
+						<td>Not classified</td>
+						<td class="nowrap right"><a href="">2018-05-02 09:44:20</a></td>
+						<td><span class="ok-ack-fg">RESOLVED</span></td>
+						<td>
+							<div class="rel-container">
+								<span class="icon-info status-green" data-hintbox="1" data-hintbox-static="1"></span>
+							</div>
+						</td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td>
+							<span class="icon-depend-down cursor-pointer" data-hintbox="1" data-hintbox-static="1"></span>
+							<a class="link-action" >ValueItemTrigger10</a>
+						</td>
+						<td>5m 25d 17h</td>
+						<td>
+							<a data-hintbox="1" class="link-alt green" href="">Yes</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-11-07 11:45:00</a></td>
+						<td><input type="checkbox" id="eventids_79" name="eventids[79]" value="79" class="checkbox-radio"><label for="eventids_79"><span></span></label></td>
+						<td class="average-bg">Average</td>
+						<td></td>
+						<td><span class="problem-unack-fg">PROBLEM</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix agent on Zabbix server is unreachable for 5 minutes</a></td>
+						<td>6m 7d 23h</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-10-17 10:51:00</a></td>
+						<td><input type="checkbox" id="eventids_58" name="eventids[58]" value="58" class="checkbox-radio"><label for="eventids_58"><span></span></label></td>
+						<td>Average</td>
+						<td class="nowrap right"><a href="">2017-10-30 16:31:09</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix agent on Zabbix server is unreachable for 5 minutes</a></td>
+						<td>13d 6h 40m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-10-13 07:34:04</a></td>
+						<td><input type="checkbox" id="eventids_55" name="eventids[55]" value="55" class="checkbox-radio"><label for="eventids_55"><span></span></label></td>
+						<td>Average</td>
+						<td class="nowrap right"><a href="">2017-10-13 07:34:05</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix agent on Zabbix server is unreachable for 5 minutes</a></td>
+						<td>1s</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-10-13 06:01:40</a></td>
+						<td><input type="checkbox" id="eventids_53" name="eventids[53]" value="53" class="checkbox-radio"><label for="eventids_53"><span></span></label></td>
+						<td>Average</td>
+						<td class="nowrap right"><a href="">2017-10-13 06:01:40</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix agent on Zabbix server is unreachable for 5 minutes</a></td>
+						<td>0</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-10-11 08:58:33</a></td>
+						<td><input type="checkbox" id="eventids_51" name="eventids[51]" value="51" class="checkbox-radio"><label for="eventids_51"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-10-11 09:08:33</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix server has just been restarted</a></td>
+						<td>10m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-10-09 14:18:33</a></td>
+						<td><input type="checkbox" id="eventids_47" name="eventids[47]" value="47" class="checkbox-radio"><label for="eventids_47"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-10-09 14:28:33</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix server has just been restarted</a></td>
+						<td>10m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-09-28 06:26:07</a></td>
+						<td><input type="checkbox" id="eventids_43" name="eventids[43]" value="43" class="checkbox-radio"><label for="eventids_43"><span></span></label></td>
+						<td>Average</td>
+						<td class="nowrap right"><a href="">2017-09-28 06:46:29</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix agent on Zabbix server is unreachable for 5 minutes</a></td>
+						<td>20m 22s</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-09-27 09:28:32</a></td>
+						<td><input type="checkbox" id="eventids_40" name="eventids[40]" value="40" class="checkbox-radio"><label for="eventids_40"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-09-27 10:28:32</a></td>
+						<td><span class="ok-ack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Host information was changed on Zabbix server</a></td>
+						<td>1h</td>
+						<td>
+							<a data-hintbox="1" class="link-alt green" href="">Yes</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-09-27 09:18:33</a></td>
+						<td><input type="checkbox" id="eventids_39" name="eventids[39]" value="39" class="checkbox-radio"><label for="eventids_39"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-09-27 09:28:33</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix server has just been restarted</a></td>
+						<td>10m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td class="nowrap">
+							<a class="link-action red" data-hintbox="1" data-hintbox-static="1" role="button" href="javascript:void(0)">Failures</a>
+							&nbsp;<sup>1</sup>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-09-25 14:18:33</a></td>
+						<td><input type="checkbox" id="eventids_33" name="eventids[33]" value="33" class="checkbox-radio"><label for="eventids_33"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-09-25 14:58:33</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix server has just been restarted</a></td>
+						<td>40m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="nowrap right"><a href="">2017-08-31 09:18:33</a></td>
+						<td><input type="checkbox" id="eventids_29" name="eventids[29]" value="29" class="checkbox-radio"><label for="eventids_29"><span></span></label></td>
+						<td>Information</td>
+						<td class="nowrap right"><a href="">2017-08-31 09:28:33</a></td>
+						<td><span class="ok-unack-fg">RESOLVED</span></td>
+						<td></td>
+						<td><a class="link-action">Zabbix server</a></td>
+						<td><a class="link-action" >Zabbix server has just been restarted</a></td>
+						<td>10m</td>
+						<td><a class="link-alt red" href="">No</a></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="table-paging">
+				<div class="paging-btn-container">
+					<div class="table-stats">Displaying 22 of 22 found</div>
+				</div>
+			</div>
+			<div id="action_buttons" class="action-buttons"><span id="selected_count" class="selected-item-count">1 selected</span><button type="submit" name="action" value="acknowledge.edit" class="btn-alt">Bulk acknowledge</button></div>
+		</form>
+	</div>
+</main>
+<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
+</body>
+</html>

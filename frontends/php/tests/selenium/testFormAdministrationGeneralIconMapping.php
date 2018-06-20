@@ -452,6 +452,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($update_icon, 'iconmap_name');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_name'));
@@ -549,6 +550,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	public function testFormAdministrationGeneralIconMapping_Update($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($data['old_name'], 'iconmap_name');
+		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
@@ -727,6 +729,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestLogin('adm.iconmapping.php');
 		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
 		$this->zbxTestClickWait('clone');
+		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestInputType('iconmap_name', $data['new_name']);
 		if (array_key_exists('mappings', $data)) {
@@ -959,7 +962,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	}
 
 	private function checkFormFields($data) {
-		$this->zbxTestDoubleClickLinkText($data['name'], 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestAssertElementValue('iconmap_name', $data['name']);
 		$this->zbxTestAssertElementValue('iconmap_mappings_0_expression', $data['mappings'][0]['expression']);
 		$this->zbxTestDropdownAssertSelected('iconmap[mappings][0][inventory_link]', $data['inventory']);
