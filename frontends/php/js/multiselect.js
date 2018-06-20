@@ -976,6 +976,7 @@ jQuery(function($) {
 				.find('input[type="text"]')
 				.attr({
 					placeholder: options.labels['type here to search'],
+					'aria-label': options.labels['type here to search'],
 					readonly: false
 				});
 		}
@@ -984,6 +985,7 @@ jQuery(function($) {
 				.find('input[type="text"]')
 				.attr({
 					placeholder: '',
+					'aria-label': '',
 					readonly: true
 				});
 		}
