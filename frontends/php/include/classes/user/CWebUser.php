@@ -76,7 +76,7 @@ class CWebUser {
 			}
 
 			// remove guest session after successful login
-			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie('zbx_sessionid')));
+			$result &= DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie(ZBX_SESSION_NAME)));
 
 			if ($result) {
 				self::setSessionCookie(self::$data['sessionid']);
@@ -97,7 +97,7 @@ class CWebUser {
 		self::$data['sessionid'] = self::getSessionCookie();
 		self::$data = API::User()->logout([]);
 		CSession::destroy();
-		zbx_unsetcookie('zbx_sessionid');
+		zbx_unsetcookie(ZBX_SESSION_NAME);
 	}
 
 	public static function checkAuthentication($sessionId) {
@@ -148,16 +148,16 @@ class CWebUser {
 	public static function setSessionCookie($sessionId) {
 		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
 
-		zbx_setcookie('zbx_sessionid', $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
+		zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
 	}
 
 	/**
-	 * Retrieves current session ID from zbx_sessionid cookie.
+	 * Retrieves current session ID from cookie named as defined in ZBX_SESSION_NAME.
 	 *
 	 * @return string
 	 */
 	public static function getSessionCookie() {
-		return get_cookie('zbx_sessionid');
+		return get_cookie(ZBX_SESSION_NAME);
 	}
 
 	public static function setDefault() {

@@ -158,7 +158,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Problem'),
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
-		->addRow(_('Minimum trigger severity'),
+		->addRow(_('Minimum severity'),
 			new CComboBox('filter_severity', $data['filter']['severity'], null, $data['filter']['severities'])
 		);
 
@@ -267,14 +267,12 @@ if ($data['action'] == 'problem.view') {
 		)
 		->addRow(_('Show hosts in maintenance'), [
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
-			$data['config']['event_ack_enable']
-				? (new CDiv([
-					(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
-						->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-					(new CCheckBox('filter_unacknowledged'))
-						->setChecked($data['filter']['unacknowledged'] == 1)
-				]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
-				: null
+			(new CDiv([
+				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
+					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+				(new CCheckBox('filter_unacknowledged'))
+					->setChecked($data['filter']['unacknowledged'] == 1)
+			]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
 		->addRow(_('Compact view'), [
 			(new CCheckBox('filter_compact_view'))->setChecked($data['filter']['compact_view'] == 1),

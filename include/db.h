@@ -309,6 +309,7 @@ typedef struct
 	int			value;
 	int			acknowledged;
 	int			ns;
+	int			severity;
 
 	zbx_vector_ptr_t	tags;
 
@@ -450,6 +451,9 @@ typedef struct
 	zbx_uint64_t	userid;
 	char		*message;
 	int		clock;
+	int		action;
+	int		old_severity;
+	int		new_severity;
 }
 DB_ACKNOWLEDGE;
 
