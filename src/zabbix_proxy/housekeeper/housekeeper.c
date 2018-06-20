@@ -22,6 +22,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "dbcache.h"
 
 #include "housekeeper.h"
 

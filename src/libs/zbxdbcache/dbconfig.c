@@ -11506,6 +11506,9 @@ zbx_data_session_t	*zbx_dc_get_data_session(zbx_uint64_t hostid, const char *tok
 	zbx_data_session_t	*session, session_local;
 	int			now;
 
+	if (NULL == token)
+		return NULL;
+
 	now = time(NULL);
 	session_local.hostid = hostid;
 	session_local.token = token;
@@ -11552,7 +11555,7 @@ void	zbx_dc_cleanup_data_sessions()
 	{
 		if (session->lastaccess + SEC_PER_DAY >= now)
 		{
-			__config_mem_free_func(session->token);
+			__config_mem_free_func((char *)session->token);
 			zbx_hashset_iter_remove(&iter);
 		}
 	}
