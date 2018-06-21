@@ -1482,5 +1482,8 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 
+#define ZBX_MAINTENANCE_INACTIVE	0
+#define ZBX_MAINTENANCE_ACTIVE		1
+
 #endif
 

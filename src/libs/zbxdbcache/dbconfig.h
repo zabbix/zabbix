@@ -632,6 +632,7 @@ typedef struct
 	zbx_uint64_t		maintenanceid;
 	unsigned char		type;
 	unsigned char		tags_evaltype;
+	unsigned char		state;
 	int			active_since;
 	int			active_until;
 	zbx_vector_uint64_t	groupids;
