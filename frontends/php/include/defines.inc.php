@@ -609,7 +609,7 @@ define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {TRIGGER.NAME}');
 
 define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
-define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP:{DISCOVERY.DEVICE.IPADDRESS}\n".
+define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}\n".
 		"Device DNS: {DISCOVERY.DEVICE.DNS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\n".
 		"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\n".
 		"Device service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\n".
