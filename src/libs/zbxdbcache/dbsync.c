@@ -3723,3 +3723,90 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_host_group_hosts                              *
+ *                                                                            *
+ * Purpose: compares hosts_groups table with cached configuration data        *
+ *                                                                            *
+ * Parameter: cache - [IN] the configuration cache                            *
+ *            sync  - [OUT] the changeset                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_hashset_iter_t	iter, iter_hosts;
+	zbx_dc_hostgroup_t	*group;
+	zbx_hashset_t		groups;
+	zbx_uint64_t		*phostid;
+	zbx_uint64_pair_t	gh_local, *gh;
+	char			groupid_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1];
+	char			*del_row[2] = {groupid_s, hostid_s};
+
+	if (NULL == (result = DBselect(
+			"select hg.groupid,hg.hostid"
+			" from hosts_groups hg,hosts h"
+			" where hg.hostid=h.hostid"
+			" and h.status in (%d,%d)"
+			" and h.flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&groups, 100, ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC, ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC);
+
+	/* index all group->host links */
+	zbx_hashset_iter_reset(&dbsync_env.cache->hostgroups, &iter);
+	while (NULL != (group = (zbx_dc_hostgroup_t *)zbx_hashset_iter_next(&iter)))
+	{
+		gh_local.first = group->groupid;
+
+		zbx_hashset_iter_reset(&group->hostids, &iter_hosts);
+		while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter_hosts)))
+		{
+			gh_local.second = *phostid;
+			zbx_hashset_insert(&groups, &gh_local, sizeof(gh_local));
+		}
+	}
+
+	/* add new rows, remove existing rows from index */
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(gh_local.first, dbrow[0]);
+		ZBX_STR2UINT64(gh_local.second, dbrow[1]);
+
+		if (NULL == (gh = (zbx_uint64_pair_t *)zbx_hashset_search(&groups, &gh_local)))
+			dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_ADD, dbrow);
+		else
+			zbx_hashset_remove_direct(&groups, gh);
+	}
+
+	/* add removed rows */
+	zbx_hashset_iter_reset(&groups, &iter);
+	while (NULL != (gh = (zbx_uint64_pair_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_snprintf(groupid_s, sizeof(groupid_s), ZBX_FS_UI64, gh->first);
+		zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, gh->second);
+		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
+	}
+
+	DBfree_result(result);
+	zbx_hashset_destroy(&groups);
+
+	return SUCCEED;
+}

@@ -926,6 +926,29 @@ static void	DCdump_correlations(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
+static void	DCdump_host_group_hosts(zbx_dc_hostgroup_t *group)
+{
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_uint64_t	index;
+	zbx_uint64_t		*phostid;
+
+	zbx_vector_uint64_create(&index);
+	zbx_hashset_iter_reset(&group->hostids, &iter);
+
+	while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append_ptr(&index, phostid);
+
+	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  hosts:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
 static void	DCdump_host_groups(ZBX_DC_CONFIG *config)
 {
 	const char		*__function_name = "DCdump_host_groups";
@@ -949,6 +972,9 @@ static void	DCdump_host_groups(ZBX_DC_CONFIG *config)
 	{
 		group = (zbx_dc_hostgroup_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "groupid:" ZBX_FS_UI64 " name:'%s'", group->groupid, group->name);
+
+		if (0 != group->hostids.num_data)
+			DCdump_host_group_hosts(group);
 	}
 
 	zbx_vector_ptr_destroy(&index);

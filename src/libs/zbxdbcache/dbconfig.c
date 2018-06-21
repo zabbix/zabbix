@@ -4107,6 +4107,10 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 		{
 			group->flags = ZBX_DC_HOSTGROUP_FLAGS_NONE;
 			zbx_vector_ptr_append(&config->hostgroups_name, group);
+
+			zbx_hashset_create_ext(&group->hostids, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
 		}
 
 		DCstrpool_replace(found, &group->name, row[1]);
@@ -4126,6 +4130,7 @@ static void	DCsync_hostgroups(zbx_dbsync_t *sync)
 			zbx_vector_uint64_destroy(&group->nested_groupids);
 
 		zbx_strpool_release(group->name);
+		zbx_hashset_destroy(&group->hostids);
 		zbx_hashset_remove_direct(&config->hostgroups, group);
 	}
 
@@ -4760,6 +4765,68 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_hostgroup_hosts                                           *
+ *                                                                            *
+ * Purpose: Updates group hosts in configuration cache                        *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - groupid                                                      *
+ *           1 - hostid                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
+{
+	const char		*__function_name = "DCsync_hostgroup_hosts";
+
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+
+	zbx_dc_hostgroup_t	*group = NULL;
+
+	int			ret;
+	zbx_uint64_t		_groupid = 0, groupid, hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		if (_groupid != groupid || 0 == _groupid)
+		{
+			_groupid = groupid;
+			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
+				continue;
+		}
+
+		ZBX_STR2UINT64(hostid, row[1]);
+		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
+	}
+
+	/* remove deleted group hostids from cache */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
+			continue;
+
+		ZBX_STR2UINT64(hostid, row[1]);
+		zbx_hashset_remove(&group->hostids, &hostid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_trigger_update_topology                                       *
  *                                                                            *
  * Purpose: updates trigger topology after trigger dependency changes         *
@@ -4942,7 +5009,7 @@ void	DCsync_configuration(unsigned char mode)
 				action_condition_sync, trigger_tag_sync, correlation_sync, corr_condition_sync,
 				corr_operation_sync, hgroups_sync, itempp_sync, maintenance_sync,
 				maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
-				maintenance_host_sync;
+				maintenance_host_sync, hgroup_host_sync;
 	zbx_uint64_t		update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4976,6 +5043,7 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&corr_condition_sync, mode);
 	zbx_dbsync_init(&corr_operation_sync, mode);
 	zbx_dbsync_init(&hgroups_sync, mode);
+	zbx_dbsync_init(&hgroup_host_sync, mode);
 	zbx_dbsync_init(&itempp_sync, mode);
 
 	zbx_dbsync_init(&maintenance_sync, mode);
@@ -5039,6 +5107,13 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	hisec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_host_groups(&hgroups_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_host_group_hosts(&hgroup_host_sync))
+		goto out;
+	hgroups_sec = zbx_time() - sec;
+
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_hosts(&hosts_sync);
@@ -5047,6 +5122,11 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_host_inventory(&hi_sync);
 	hisec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_hostgroups(&hgroups_sync);
+	DCsync_hostgroup_hosts(&hgroup_host_sync);
+	hgroups_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
@@ -5150,11 +5230,6 @@ void	DCsync_configuration(unsigned char mode)
 	corr_operation_sec = zbx_time() - sec;
 
 	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_host_groups(&hgroups_sync))
-		goto out;
-	hgroups_sec = zbx_time() - sec;
-
-	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_maintenances(&maintenance_sync))
 		goto out;
 	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
@@ -5211,11 +5286,6 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on correlation rules, must be after DCsync_correlations() */
 	DCsync_corr_operations(&corr_operation_sync);
 	corr_operation_sec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_hostgroups(&hgroups_sync);
-	hgroups_sec2 = zbx_time() - sec;
-
 
 	sec = zbx_time();
 	DCsync_maintenances(&maintenance_sync);
@@ -5505,6 +5575,7 @@ out:
 	zbx_dbsync_clear(&maintenance_tag_sync);
 	zbx_dbsync_clear(&maintenance_group_sync);
 	zbx_dbsync_clear(&maintenance_host_sync);
+	zbx_dbsync_clear(&hgroup_host_sync);
 
 	zbx_dbsync_free_env();
 

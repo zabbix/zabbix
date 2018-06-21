@@ -613,6 +613,7 @@ typedef struct
 	const char		*name;
 
 	zbx_vector_uint64_t	nested_groupids;
+	zbx_hashset_t		hostids;
 	unsigned char		flags;
 }
 zbx_dc_hostgroup_t;
