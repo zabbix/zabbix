@@ -1429,6 +1429,85 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3050121(void)
+{
+	const ZBX_TABLE table =
+		{"event_suppress",	"eventid",	0,
+			{
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050122(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_1", "suppress_until", 0);
+}
+
+static int	DBpatch_3050123(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 1, &field);
+}
+
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 2, &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	const ZBX_TABLE table =
+		{"maintenance_tag",	"maintenancetagid",	0,
+			{
+				{"maintenancetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
+}
+
+static int	DBpatch_3050127(void)
+{
+	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_tag", 1, &field);
+}
+
+static int	DBpatch_3050128(void)
+{
+	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_3050129(void)
+{
+	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("maintenances", &field);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1552,5 +1631,14 @@ DBPATCH_ADD(3050117, 0, 1)
 DBPATCH_ADD(3050118, 0, 1)
 DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
+DBPATCH_ADD(3050121, 0, 1)
+DBPATCH_ADD(3050122, 0, 1)
+DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
+DBPATCH_ADD(3050129, 0, 1)
 
 DBPATCH_END()
