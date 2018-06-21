@@ -3790,7 +3790,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		{
 			UNLOCK_CACHE;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
+			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
 			sleep(1);
 
 			LOCK_CACHE;
