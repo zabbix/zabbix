@@ -351,12 +351,16 @@ ActionProcessor.prototype = {
 					this.actionToggle(action.value, !this.checkConditions(action.cond));
 					break;
 				case 'enable':
+					jQuery(action.value)
+						.prop('disabled', !this.checkConditions(action.cond))
+						.closest('.input-color-picker')
+						.toggleClass('disabled', !this.checkConditions(action.cond));
+					break;
 				case 'disable':
 					jQuery(action.value)
-						// Invert result of checkConditions when action is 'enable'.
-						.prop('disabled', (this.checkConditions(action.cond) ^ (action.action == 'enable')))
+						.prop('disabled', this.checkConditions(action.cond))
 						.closest('.input-color-picker')
-						.toggleClass('disabled', (this.checkConditions(action.cond) ^ (action.action == 'enable')));
+						.toggleClass('disabled', this.checkConditions(action.cond));
 					break;
 			}
 		}
