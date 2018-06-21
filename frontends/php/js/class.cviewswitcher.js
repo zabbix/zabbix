@@ -353,9 +353,10 @@ ActionProcessor.prototype = {
 				case 'enable':
 				case 'disable':
 					jQuery(action.value)
-						.prop('disabled', !(this.checkConditions(action.cond) && action.action == 'enable'))
+						// invert result of checkConditions when action is 'enable'
+						.prop('disabled', (this.checkConditions(action.cond) ^ (action.action == 'enable')))
 						.closest('.input-color-picker')
-						.toggleClass('disabled', !(this.checkConditions(action.cond) && action.action == 'enable'));
+						.toggleClass('disabled', (this.checkConditions(action.cond) ^ (action.action == 'enable')));
 					break;
 			}
 		}
