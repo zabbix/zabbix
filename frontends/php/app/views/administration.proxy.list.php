@@ -31,20 +31,24 @@ $widget = (new CWidget())
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter('web.proxies.filter.state'))
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			),
+			(new CFormList())->addRow(_('Mode'),
+				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					->addValue(_('Any'), -1)
+					->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
+					->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+					->setModern(true)
+			)
+		])
 		->addVar('action', 'proxy.list')
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
-		->addColumn((new CFormList())->addRow(_('Mode'),
-			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-				->addValue(_('Any'), -1)
-				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
-				->setModern(true)
-		))
 	);
 
 // create form

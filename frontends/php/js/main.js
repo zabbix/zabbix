@@ -455,28 +455,32 @@ var hintBox = {
 
 	/**
 	 * Initialize hint box event handlers.
-	 * Event 'remove' is triggered on widget update by updateWidgetContent() and widget remove by deleteWidget().
+	 *
+	 * Event 'remove' is triggered on:
+	 * - content update using flickerfreeScreen.refreshHtml()
+	 * - widget update by updateWidgetContent()
+	 * - widget remove by deleteWidget().
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
 			var target = jQuery(this);
 
 			switch (e.type) {
-				case 'mouseenter' :
+				case 'mouseenter':
 					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
 						target.data('hintbox-style')
 					);
 					break;
 
-				case 'mouseleave' :
+				case 'mouseleave':
 					hintBox.hideHint(e, this);
 					break;
 
-				case 'remove' :
+				case 'remove':
 					hintBox.deleteHint(this);
 					break;
 
-				case 'keydown' :
+				case 'keydown':
 					if (e.which == 13 && target.data('hintbox-static') == 1) {
 						var offset = target.offset(),
 							w = jQuery(window);
@@ -492,7 +496,7 @@ var hintBox = {
 
 					break;
 
-				case 'click' :
+				case 'click':
 					if (target.data('hintbox-static') == 1) {
 						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
 							target.data('hintbox-style')

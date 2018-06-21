@@ -58,7 +58,6 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable'],
 				'severity_name_0' => $config['severity_name_0'],
 				'severity_name_1' => $config['severity_name_1'],
 				'severity_name_2' => $config['severity_name_2'],

@@ -41,16 +41,16 @@ static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
 static zbx_mem_info_t	*trend_mem = NULL;
 
-#define	LOCK_CACHE	zbx_mutex_lock(&cache_lock)
-#define	UNLOCK_CACHE	zbx_mutex_unlock(&cache_lock)
-#define	LOCK_TRENDS	zbx_mutex_lock(&trends_lock)
-#define	UNLOCK_TRENDS	zbx_mutex_unlock(&trends_lock)
-#define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
-#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
+#define	LOCK_CACHE	zbx_mutex_lock(cache_lock)
+#define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)
+#define	LOCK_TRENDS	zbx_mutex_lock(trends_lock)
+#define	UNLOCK_TRENDS	zbx_mutex_unlock(trends_lock)
+#define	LOCK_CACHE_IDS		zbx_mutex_lock(cache_ids_lock)
+#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(cache_ids_lock)
 
-static ZBX_MUTEX	cache_lock = ZBX_MUTEX_NULL;
-static ZBX_MUTEX	trends_lock = ZBX_MUTEX_NULL;
-static ZBX_MUTEX	cache_ids_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	cache_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
@@ -3790,7 +3790,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		{
 			UNLOCK_CACHE;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
+			zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
 			sleep(1);
 
 			LOCK_CACHE;
