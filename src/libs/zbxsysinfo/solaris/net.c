@@ -32,7 +32,7 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 
 	if (NULL == (kc = kstat_open()))
 	{
-		*error = zbx_dsprintf(*error, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s", zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -61,19 +61,19 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 
 	if (NULL == kp)
 	{
-		*error = zbx_dsprintf(*error, "Cannot look up interface \"%s\" in kernel statistics facility", name);
+		*error = zbx_dsprintf(NULL, "Cannot look up interface \"%s\" in kernel statistics facility", name);
 		goto clean;
 	}
 
 	if (-1 == kstat_read(kc, kp, 0))
 	{
-		*error = zbx_dsprintf(*error, "Cannot read from kernel statistics facility: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot read from kernel statistics facility: %s", zbx_strerror(errno));
 		goto clean;
 	}
 
 	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot look up data in kernel statistics facility: %s",
+		*error = zbx_dsprintf(NULL, "Cannot look up data in kernel statistics facility: %s",
 				zbx_strerror(errno));
 		goto clean;
 	}
@@ -90,177 +90,186 @@ clean:
 static int	NET_IF_IN_BYTES(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "rbytes64", &value, &error) ||
-			SUCCEED == get_kstat_named_field(if_name, "rbytes", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "rbytes64", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if (0 == value && SUCCEED != get_kstat_named_field(if_name, "rbytes", &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_IN_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ipackets64", &value, &error) ||
-			SUCCEED == get_kstat_named_field(if_name, "ipackets", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "ipackets64", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if (0 == value && SUCCEED != get_kstat_named_field(if_name, "ipackets", &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_IN_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "ierrors", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_OUT_BYTES(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "obytes64", &value, &error) ||
-			SUCCEED == get_kstat_named_field(if_name, "obytes", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "obytes64", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if (0 == value && SUCCEED != get_kstat_named_field(if_name, "obytes", &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_OUT_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "opackets64", &value, &error) ||
-			SUCCEED == get_kstat_named_field(if_name, "opackets", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "opackets64", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if (0 == value && SUCCEED != get_kstat_named_field(if_name, "opackets", &value, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "oerrors", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "oerrors", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
-	char		*error = NULL;
+	char		*error;
 
-	if ((SUCCEED == get_kstat_named_field(if_name, "rbytes64", &value_in, &error) &&
-			SUCCEED == get_kstat_named_field(if_name, "obytes64", &value_out, &error)) ||
-			(SUCCEED == get_kstat_named_field(if_name, "rbytes", &value_in, &error) &&
-			SUCCEED == get_kstat_named_field(if_name, "obytes", &value_out, &error)))
+	if (SUCCEED != get_kstat_named_field(if_name, "rbytes64", &value_in, &error)
+			|| SUCCEED != get_kstat_named_field(if_name, "obytes64", &value_out, &error))
 	{
-		SET_UI64_RESULT(result, value_in + value_out);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if ((0 == value_in && SUCCEED != get_kstat_named_field(if_name, "rbytes", &value_in, &error)) ||
+			(0 == value_out && SUCCEED != get_kstat_named_field(if_name, "obytes", &value_out, &error)))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
-	char		*error = NULL;
+	char		*error;
 
-	if ((SUCCEED == get_kstat_named_field(if_name, "ipackets64", &value_in, &error) &&
-			SUCCEED == get_kstat_named_field(if_name, "opackets64", &value_out, &error)) ||
-			(SUCCEED == get_kstat_named_field(if_name, "ipackets", &value_in, &error) &&
-			SUCCEED == get_kstat_named_field(if_name, "opackets", &value_out, &error)))
+	if (SUCCEED != get_kstat_named_field(if_name, "ipackets64", &value_in, &error)
+			|| SUCCEED != get_kstat_named_field(if_name, "opackets64", &value_out, &error))
 	{
-		SET_UI64_RESULT(result, value_in + value_out);
-		zbx_free(error);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+	else if ((0 == value_in && SUCCEED != get_kstat_named_field(if_name, "ipackets", &value_in, &error)) ||
+			(0 == value_out && SUCCEED != get_kstat_named_field(if_name, "opackets", &value_out, &error)))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
-	char		*error = NULL;
+	char		*error;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &value_in, &error) &&
-			SUCCEED == get_kstat_named_field(if_name, "oerrors", &value_out, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "ierrors", &value_in, &error) ||
+			SUCCEED != get_kstat_named_field(if_name, "oerrors", &value_out, &error))
 	{
-		SET_UI64_RESULT(result, value_in + value_out);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
-	char		*if_name, *error = NULL;
+	char		*if_name, *error;
 
 	if (1 < request->nparam)
 	{
@@ -276,16 +285,15 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &value, &error))
+	if (SUCCEED != get_kstat_named_field(if_name, "collisions", &value, &error))
 	{
-		SET_UI64_RESULT(result, value);
-
-		return SYSINFO_RET_OK;
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
 	}
 
-	SET_MSG_RESULT(result, error);
+	SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -405,7 +413,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		ret = NET_IF_OUT_BYTES(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_OUT_PACKETS(if_name, result);
@@ -440,7 +448,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		ret = NET_IF_TOTAL_BYTES(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_TOTAL_PACKETS(if_name, result);
