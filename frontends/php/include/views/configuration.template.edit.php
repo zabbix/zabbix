@@ -19,9 +19,11 @@
 **/
 
 
-$widget = (new CWidget())
-	->setTitle(_('Templates'))
-	->addItem(get_header_host_table('', $data['templateid']));
+$widget = (new CWidget())->setTitle(_('Templates'));
+
+if (!($data['form'] === 'clone' || $data['form'] === 'full_clone')) {
+	$widget->addItem(get_header_host_table('', $data['templateid']));
+}
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
