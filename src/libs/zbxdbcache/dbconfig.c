@@ -4355,6 +4355,409 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_maintenances                                              *
+ *                                                                            *
+ * Purpose: Updates maintenances in configuration cache                       *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenanceid                                                *
+ *           1 - maintenance_type                                             *
+ *           2 - active_since                                                 *
+ *           3 - active_till                                                  *
+ *           4 - tags_evaltype                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_maintenances(zbx_dbsync_t *sync)
+{
+	const char		*__function_name = "DCsync_maintenances";
+
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	zbx_uint64_t		maintenanceid;
+	zbx_dc_maintenance_t	*maintenance;
+	int			found, ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(maintenanceid, row[0]);
+
+		maintenance = (zbx_dc_maintenance_t *)DCfind_id(&config->maintenances, maintenanceid,
+				sizeof(zbx_dc_maintenance_t), &found);
+
+		if (0 == found)
+		{
+			zbx_vector_uint64_create_ext(&maintenance->groupids, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_uint64_create_ext(&maintenance->hostids, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&maintenance->tags, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+			zbx_vector_ptr_create_ext(&maintenance->periods, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+		}
+
+		ZBX_STR2UCHAR(maintenance->type, row[1]);
+		ZBX_STR2UCHAR(maintenance->tags_evaltype, row[4]);
+		maintenance->active_since = atoi(row[2]);
+		maintenance->active_until = atoi(row[3]);
+	}
+
+	/* remove deleted maintenances */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances, &rowid)))
+			continue;
+
+		zbx_vector_uint64_destroy(&maintenance->groupids);
+		zbx_vector_uint64_destroy(&maintenance->hostids);
+		zbx_vector_ptr_destroy(&maintenance->tags);
+		zbx_vector_ptr_destroy(&maintenance->periods);
+
+		zbx_hashset_remove_direct(&config->maintenances, maintenance);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_maintenance_tags                                          *
+ *                                                                            *
+ * Purpose: Updates maintenance tags in configuration cache                   *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenancetagid                                             *
+ *           1 - maintenanceid                                                *
+ *           2 - operator                                                     *
+ *           3 - tag                                                          *
+ *           4 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
+{
+	const char			*__function_name = "DCsync_maintenance_tags";
+
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	zbx_uint64_t			maintenancetagid, maintenanceid;
+	zbx_dc_maintenance_tag_t	*maintenance_tag;
+	zbx_dc_maintenance_t		*maintenance;
+	int				found, ret, index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(maintenanceid, row[1]);
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceid)))
+		{
+			continue;
+		}
+
+		ZBX_STR2UINT64(maintenancetagid, row[0]);
+		maintenance_tag = (zbx_dc_maintenance_tag_t *)DCfind_id(&config->maintenance_tags, maintenancetagid,
+				sizeof(zbx_dc_maintenance_tag_t), &found);
+
+		maintenance_tag->maintenanceid = maintenanceid;
+		ZBX_STR2UCHAR(maintenance_tag->operator, row[2]);
+		DCstrpool_replace(found, &maintenance_tag->tag, row[3]);
+		DCstrpool_replace(found, &maintenance_tag->value, row[4]);
+
+		if (0 == found)
+			zbx_vector_ptr_append(&maintenance->tags, maintenance_tag);
+	}
+
+	/* remove deleted maintenance tags */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (maintenance_tag = (zbx_dc_maintenance_tag_t *)zbx_hashset_search(&config->maintenance_tags,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenance_tag->maintenanceid)))
+		{
+			index = zbx_vector_ptr_search(&maintenance->tags, &maintenance_tag->maintenancetagid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+			if (FAIL != index)
+				zbx_vector_ptr_remove_noorder(&maintenance->tags, index);
+		}
+
+		zbx_strpool_release(maintenance_tag->tag);
+		zbx_strpool_release(maintenance_tag->value);
+
+		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_maintenance_periods                                       *
+ *                                                                            *
+ * Purpose: Updates maintenance period in configuration cache                 *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - timeperiodid                                                 *
+ *           1 - timeperiod_type                                              *
+ *           2 - every                                                        *
+ *           3 - month                                                        *
+ *           4 - dayofweek                                                    *
+ *           5 - day                                                          *
+ *           6 - start_time                                                   *
+ *           7 - period                                                       *
+ *           8 - start_date                                                   *
+ *           9 - maintenanceid                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
+{
+	const char			*__function_name = "DCsync_maintenance_periods";
+
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	zbx_uint64_t			periodid, maintenanceid;
+	zbx_dc_maintenance_period_t	*period;
+	zbx_dc_maintenance_t		*maintenance;
+	int				found, ret, index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(maintenanceid, row[9]);
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceid)))
+		{
+			continue;
+		}
+
+		ZBX_STR2UINT64(periodid, row[0]);
+		period = (zbx_dc_maintenance_period_t *)DCfind_id(&config->maintenance_periods, periodid,
+				sizeof(zbx_dc_maintenance_period_t), &found);
+
+		period->maintenanceid = maintenanceid;
+		ZBX_STR2UCHAR(period->type, row[1]);
+		period->every = atoi(row[2]);
+		period->month = atoi(row[3]);
+		period->dayofweek = atoi(row[4]);
+		period->day = atoi(row[5]);
+		period->start_time = atoi(row[6]);
+		period->period = atoi(row[7]);
+		period->start_date = atoi(row[8]);
+
+		if (0 == found)
+			zbx_vector_ptr_append(&maintenance->periods, period);
+	}
+
+	/* remove deleted maintenance tags */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (period = (zbx_dc_maintenance_period_t *)zbx_hashset_search(&config->maintenance_periods,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&period->maintenanceid)))
+		{
+			index = zbx_vector_ptr_search(&maintenance->periods, &period->timeperiodid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+			if (FAIL != index)
+				zbx_vector_ptr_remove_noorder(&maintenance->periods, index);
+		}
+
+		zbx_hashset_remove_direct(&config->maintenance_periods, period);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_maintenance_groups                                        *
+ *                                                                            *
+ * Purpose: Updates maintenance groups in configuration cache                 *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenanceid                                                *
+ *           1 - groupid                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
+{
+	const char		*__function_name = "DCsync_maintenance_groups";
+
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+
+	zbx_dc_maintenance_t	*maintenance = NULL;
+
+	int			index, ret;
+	zbx_uint64_t		_maintenanceid = 0, maintenanceid, groupid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(maintenanceid, row[0]);
+
+		if (_maintenanceid != maintenanceid || 0 == _maintenanceid)
+		{
+			_maintenanceid = maintenanceid;
+			if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+					&maintenanceid)))
+			{
+				continue;
+			}
+		}
+
+		ZBX_STR2UINT64(groupid, row[1]);
+
+		zbx_vector_uint64_append(&maintenance->groupids, groupid);
+	}
+
+	/* remove deleted maintenance groupids from cache */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		ZBX_STR2UINT64(maintenanceid, row[0]);
+
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceid)))
+		{
+			continue;
+		}
+		ZBX_STR2UINT64(groupid, row[1]);
+
+		if (FAIL == (index = zbx_vector_uint64_search(&maintenance->groupids, groupid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			continue;
+		}
+
+		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_maintenance_hosts                                         *
+ *                                                                            *
+ * Purpose: Updates maintenance hosts in configuration cache                  *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenanceid                                                *
+ *           1 - hostid                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
+{
+	const char		*__function_name = "DCsync_maintenance_hosts";
+
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+
+	zbx_dc_maintenance_t	*maintenance = NULL;
+
+	int			index, ret;
+	zbx_uint64_t		_maintenanceid = 0, maintenanceid, hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(maintenanceid, row[0]);
+
+		if (_maintenanceid != maintenanceid || 0 == _maintenanceid)
+		{
+			_maintenanceid = maintenanceid;
+			if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+					&maintenanceid)))
+			{
+				continue;
+			}
+		}
+
+		ZBX_STR2UINT64(hostid, row[1]);
+
+		zbx_vector_uint64_append(&maintenance->hostids, hostid);
+	}
+
+	/* remove deleted maintenance hostids from cache */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		ZBX_STR2UINT64(maintenanceid, row[0]);
+
+		if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceid)))
+		{
+			continue;
+		}
+		ZBX_STR2UINT64(hostid, row[1]);
+
+		if (FAIL == (index = zbx_vector_uint64_search(&maintenance->hostids, hostid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			continue;
+		}
+
+		zbx_vector_uint64_remove_noorder(&maintenance->hostids, index);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_trigger_update_topology                                       *
  *                                                                            *
  * Purpose: updates trigger topology after trigger dependency changes         *
@@ -4530,12 +4933,14 @@ void	DCsync_configuration(unsigned char mode)
 				action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, correlation_sec,
 				correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 				corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
-				update_sec;
+				update_sec, maintenance_sec, maintenance_sec2;
 
 	zbx_dbsync_t		config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync,
 				items_sync, triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
 				action_condition_sync, trigger_tag_sync, correlation_sync, corr_condition_sync,
-				corr_operation_sync, hgroups_sync, itempp_sync;
+				corr_operation_sync, hgroups_sync, itempp_sync, maintenance_sync,
+				maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
+				maintenance_host_sync;
 	zbx_uint64_t		update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -4570,6 +4975,12 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_init(&corr_operation_sync, mode);
 	zbx_dbsync_init(&hgroups_sync, mode);
 	zbx_dbsync_init(&itempp_sync, mode);
+
+	zbx_dbsync_init(&maintenance_sync, mode);
+	zbx_dbsync_init(&maintenance_period_sync, mode);
+	zbx_dbsync_init(&maintenance_tag_sync, mode);
+	zbx_dbsync_init(&maintenance_group_sync, mode);
+	zbx_dbsync_init(&maintenance_host_sync, mode);
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
@@ -4741,6 +5152,19 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	hgroups_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_maintenances(&maintenance_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_periods(&maintenance_period_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_groups(&maintenance_group_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
+		goto out;
+	maintenance_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4789,6 +5213,15 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_hostgroups(&hgroups_sync);
 	hgroups_sec2 = zbx_time() - sec;
+
+
+	sec = zbx_time();
+	DCsync_maintenances(&maintenance_sync);
+	DCsync_maintenance_tags(&maintenance_tag_sync);
+	DCsync_maintenance_groups(&maintenance_group_sync);
+	DCsync_maintenance_hosts(&maintenance_host_sync);
+	DCsync_maintenance_periods(&maintenance_period_sync);
+	maintenance_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 
@@ -4839,11 +5272,11 @@ void	DCsync_configuration(unsigned char mode)
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
 				action_sec + action_op_sec + action_condition_sec + trigger_tag_sec + correlation_sec +
-				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec;
+				corr_condition_sec + corr_operation_sec + hgroups_sec + itempp_sec + maintenance_sec;
 		total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
-				itempp_sec2 + update_sec;
+				itempp_sec2 + maintenance_sec2 + update_sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 				__function_name, csec, csec2, config_sync.add_num, config_sync.update_num,
@@ -4909,6 +5342,9 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
 				__function_name, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
 				itempp_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+				__function_name, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
+				maintenance_sync.update_num, maintenance_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __function_name, update_sec);
 
@@ -5011,6 +5447,13 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item procs : %d (%d slots)", __function_name,
 				config->preprocops.num_data, config->preprocops.num_slots);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: %d (%d slots)", __function_name,
+				config->maintenances.num_data, config->maintenances.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint tags : %d (%d slots)", __function_name,
+				config->maintenance_tags.num_data, config->maintenance_tags.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maint time : %d (%d slots)", __function_name,
+				config->maintenance_periods.num_data, config->maintenance_periods.num_slots);
+
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
@@ -5055,6 +5498,11 @@ out:
 	zbx_dbsync_clear(&corr_operation_sync);
 	zbx_dbsync_clear(&hgroups_sync);
 	zbx_dbsync_clear(&itempp_sync);
+	zbx_dbsync_clear(&maintenance_sync);
+	zbx_dbsync_clear(&maintenance_period_sync);
+	zbx_dbsync_clear(&maintenance_tag_sync);
+	zbx_dbsync_clear(&maintenance_group_sync);
+	zbx_dbsync_clear(&maintenance_host_sync);
 
 	zbx_dbsync_free_env();
 
@@ -5426,6 +5874,10 @@ int	init_configuration_cache(char **error)
 			__config_mem_free_func);
 
 	CREATE_HASHSET(config->preprocops, 0);
+
+	CREATE_HASHSET(config->maintenances, 0);
+	CREATE_HASHSET(config->maintenance_periods, 0);
+	CREATE_HASHSET(config->maintenance_tags, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);

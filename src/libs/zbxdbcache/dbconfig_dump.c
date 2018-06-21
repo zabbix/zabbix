@@ -976,6 +976,142 @@ static void	DCdump_host_group_index(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
+static void	DCdump_maintenance_groups(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_uint64_t	index;
+
+	zbx_vector_uint64_create(&index);
+
+	zbx_vector_uint64_append_array(&index, maintenance->groupids.values, maintenance->groupids.values_num);
+	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  groups:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    groupid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
+static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_uint64_t	index;
+
+	zbx_vector_uint64_create(&index);
+
+	zbx_vector_uint64_append_array(&index, maintenance->hostids.values, maintenance->hostids.values_num);
+	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  hosts:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
+static int	maintenance_tag_compare(const void *v1, const void *v2)
+{
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)v1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)v2;
+	int				ret;
+
+	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))
+		return ret;
+
+	if (0 != (ret = (strcmp(tag1->value, tag2->value))))
+		return ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(tag1->operator, tag2->operator);
+
+	return 0;
+}
+
+static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zbx_vector_ptr_create(&index);
+
+	zbx_vector_ptr_append_array(&index, maintenance->tags.values, maintenance->tags.values_num);
+	zbx_vector_ptr_sort(&index, maintenance_tag_compare);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_tag_t	*tag = (zbx_dc_maintenance_tag_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    maintenancetagid:" ZBX_FS_UI64 " operator:%u tag:'%s' value:'%s'",
+				tag->maintenancetagid, tag->operator, tag->tag, tag->value);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+}
+
+static void	DCdump_maintenance_periods(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zbx_vector_ptr_create(&index);
+
+	zbx_vector_ptr_append_array(&index, maintenance->periods.values, maintenance->periods.values_num);
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  periods:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_period_t	*period = (zbx_dc_maintenance_period_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    timeperiodid:" ZBX_FS_UI64 " type:%u every:%d month:%d dayofweek:%d"
+				" day:%d start_time:%d period:%d start_date:%d",
+				period->timeperiodid, period->type, period->every, period->month, period->dayofweek,
+				period->day, period->start_time, period->period, period->start_date);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+}
+
+static void	DCdump_maintenances(ZBX_DC_CONFIG *config)
+{
+	const char		*__function_name = "DCdump_maintenances";
+
+	zbx_dc_maintenance_t	*maintenance;
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, maintenance);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "maintenanceid:" ZBX_FS_UI64 " type:%u tag_evaltype:%u active_since:%d"
+				" active_until:%d", maintenance->maintenanceid, maintenance->type,
+				maintenance->tags_evaltype, maintenance->active_since, maintenance->active_until);
+
+		DCdump_maintenance_groups(maintenance);
+		DCdump_maintenance_hosts(maintenance);
+		DCdump_maintenance_tags(maintenance);
+		DCdump_maintenance_periods(maintenance);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+}
+
 void	DCdump_configuration(ZBX_DC_CONFIG *config)
 {
 	DCdump_config(config);
@@ -997,4 +1133,5 @@ void	DCdump_configuration(ZBX_DC_CONFIG *config)
 	DCdump_correlations(config);
 	DCdump_host_groups(config);
 	DCdump_host_group_index(config);
+	DCdump_maintenances(config);
 }

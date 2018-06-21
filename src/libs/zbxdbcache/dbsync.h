@@ -141,6 +141,10 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync);
-
+int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

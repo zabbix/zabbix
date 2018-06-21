@@ -629,6 +629,45 @@ zbx_dc_preproc_op_t;
 
 typedef struct
 {
+	zbx_uint64_t		maintenanceid;
+	unsigned char		type;
+	unsigned char		tags_evaltype;
+	int			active_since;
+	int			active_until;
+	zbx_vector_uint64_t	groupids;
+	zbx_vector_uint64_t	hostids;
+	zbx_vector_ptr_t	tags;
+	zbx_vector_ptr_t	periods;
+}
+zbx_dc_maintenance_t;
+
+typedef struct
+{
+	zbx_uint64_t	maintenancetagid;
+	zbx_uint64_t	maintenanceid;
+	unsigned char	operator;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_maintenance_tag_t;
+
+typedef struct
+{
+	zbx_uint64_t	timeperiodid;
+	zbx_uint64_t	maintenanceid;
+	unsigned char	type;
+	int		every;
+	int		month;
+	int		dayofweek;
+	int		day;
+	int		start_time;
+	int		period;
+	int		start_date;
+}
+zbx_dc_maintenance_period_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -683,6 +722,9 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 	zbx_hashset_t		preprocops;
+	zbx_hashset_t		maintenances;
+	zbx_hashset_t		maintenance_periods;
+	zbx_hashset_t		maintenance_tags;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
