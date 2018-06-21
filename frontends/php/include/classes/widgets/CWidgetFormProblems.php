@@ -167,8 +167,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		$this->fields[] = $field_sort;
 
 		// show timeline
-		$field_show_timeline = (new CWidgetFieldCheckBox('show_timeline', _('Show timeline')));
-		$field_show_timeline->setDefault(1);
+		$field_show_timeline = (new CWidgetFieldCheckBox('show_timeline', _('Show timeline')))->setDefault(1);
 
 		if (array_key_exists('show_timeline', $this->data)) {
 			$field_show_timeline->setValue($this->data['show_timeline']);
