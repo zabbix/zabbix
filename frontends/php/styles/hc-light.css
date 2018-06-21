@@ -463,20 +463,23 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  max-width: calc(100% - 100px);
   position: relative;
   top: 0;
   z-index: 3;
   margin-bottom: 0; }
   .filter-breadcrumb > li:first-child {
     float: left;
-    max-width: 256px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap; }
     .filter-breadcrumb > li:first-child > span {
-      display: inline;
+      display: inline-block;
+      line-height: 1;
       padding: 4px 7px; }
+      .filter-breadcrumb > li:first-child > span a {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: top; }
   .filter-breadcrumb + .filter-space {
     margin-top: -28px; }
 
@@ -1594,7 +1597,8 @@ button {
   .ui-tabs-nav .filter-trigger:hover {
     color: #fff;
     background-color: #484848;
-    border-color: #484848; }
+    border-color: #484848;
+    cursor: pointer; }
 .ui-tabs-nav .btn-time {
   padding: 0 34px 0 10px; }
   .ui-tabs-nav .btn-time:after {
@@ -4317,6 +4321,9 @@ ul.top-nav-icons a:focus {
   -webkit-transition: box-shadow 0.2s ease-out;
   -moz-transition: box-shadow 0.2s ease-out;
   transition: box-shadow 0.2s ease-out; }
+
+.filter-breadcrumb a:focus {
+  margin-bottom: -1px; }
 
 .server-name {
   color: rgba(255, 255, 255, 0.8); }
