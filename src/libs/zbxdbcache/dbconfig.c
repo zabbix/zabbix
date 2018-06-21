@@ -4400,7 +4400,8 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 		if (0 == found)
 		{
-			maintenance->state = ZBX_MAINTENANCE_INACTIVE;
+			maintenance->state = ZBX_MAINTENANCE_IDLE;
+			maintenance->started_until = 0;
 
 			zbx_vector_uint64_create_ext(&maintenance->groupids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);

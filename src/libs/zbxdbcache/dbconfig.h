@@ -636,6 +636,7 @@ typedef struct
 	unsigned char		state;
 	int			active_since;
 	int			active_until;
+	int			started_until;
 	zbx_vector_uint64_t	groupids;
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_ptr_t	tags;
