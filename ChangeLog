@@ -363,6 +363,7 @@ Bug fixes:
 Changes for 3.4.11
 
 New features:
+A.F....... [ZBX-1357] added and enabled Norwegian translation to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated English (United States), French, Hebrew, Japanese, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 --------------------------------------------------------------------------------
