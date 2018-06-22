@@ -4401,7 +4401,8 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			maintenance->state = ZBX_MAINTENANCE_IDLE;
-			maintenance->started_until = 0;
+			maintenance->running_since = 0;
+			maintenance->running_until = 0;
 
 			zbx_vector_uint64_create_ext(&maintenance->groupids, __config_mem_malloc_func,
 					__config_mem_realloc_func, __config_mem_free_func);
@@ -4634,13 +4635,14 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-
+	zbx_vector_ptr_t	maintenances;
 	zbx_dc_maintenance_t	*maintenance = NULL;
-
-	int			index, ret;
+	int			index, ret, i;
 	zbx_uint64_t		_maintenanceid = 0, maintenanceid, groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&maintenances);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4658,6 +4660,7 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 			{
 				continue;
 			}
+			zbx_vector_ptr_append(&maintenances, maintenance);
 		}
 
 		ZBX_STR2UINT64(groupid, row[1]);
@@ -4684,7 +4687,19 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		}
 
 		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
+		zbx_vector_ptr_append(&maintenances, maintenance);
 	}
+
+	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < maintenances.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+		zbx_vector_uint64_sort(&maintenance->groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	zbx_vector_ptr_destroy(&maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4709,13 +4724,14 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-
+	zbx_vector_ptr_t	maintenances;
 	zbx_dc_maintenance_t	*maintenance = NULL;
-
-	int			index, ret;
+	int			index, ret, i;
 	zbx_uint64_t		_maintenanceid = 0, maintenanceid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&maintenances);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4760,6 +4776,17 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 		zbx_vector_uint64_remove_noorder(&maintenance->hostids, index);
 	}
+
+	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < maintenances.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+		zbx_vector_uint64_sort(&maintenance->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	zbx_vector_ptr_destroy(&maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -11858,3 +11885,216 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 		zbx_vector_uint64_pair_sort(lastaccess, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_calculate_maintenance_period                                  *
+ *                                                                            *
+ * Purpose: calculates start time for the specified maintenance period        *
+ *                                                                            *
+ * Parameter: period        - [IN] the maintenance period                     *
+ *            active_since  - [IN] the maintenance activation start time      *
+ *            start_date    - [IN] the period starting timestamp based on     *
+ *                                 current time                               *
+ *            running_since - [IN] the actual period starting timestamp       *
+ *                                                                            *
+ * Return value: SUCCEED - a valid period was found                           *
+ *               FAIL    - period started before maintenance activation time  *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_period_t *period, time_t active_since,
+		time_t start_date, time_t *running_since)
+{
+	int		day, wday, week;
+	struct tm	*tm;
+
+	if (TIMEPERIOD_TYPE_ONETIME == period->type)
+	{
+		*running_since = period->start_date;
+		return SUCCEED;
+	}
+
+	switch (period->type)
+	{
+		case TIMEPERIOD_TYPE_DAILY:
+			if (start_date < active_since)
+				return FAIL;
+
+			tm = localtime(&active_since);
+			active_since = active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN
+					+ tm->tm_sec);
+
+			day = (start_date - active_since) / SEC_PER_DAY;
+			start_date -= SEC_PER_DAY * (day % period->every);
+			break;
+		case TIMEPERIOD_TYPE_WEEKLY:
+			if (start_date < active_since)
+				return FAIL;
+
+			tm = localtime(&active_since);
+			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+			active_since = active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR +
+					tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+
+			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			{
+				/* check for every x week(s) */
+				week = (start_date - active_since) / SEC_PER_WEEK;
+				if (0 != week % period->every)
+					continue;
+
+				/* check for day of the week */
+				tm = localtime(&start_date);
+				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+				if (0 == (period->dayofweek & (1 << wday)))
+					continue;
+
+				break;
+			}
+			break;
+		case TIMEPERIOD_TYPE_MONTHLY:
+			for (; start_date >= active_since; start_date -= SEC_PER_DAY)
+			{
+				/* check for month */
+				tm = localtime(&start_date);
+				if (0 == (period->month & (1 << tm->tm_mon)))
+					continue;
+
+				if (0 != period->day)
+				{
+					/* check for day of the month */
+					if (period->day != tm->tm_mday)
+						continue;
+				}
+				else
+				{
+					/* check for day of the week */
+					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
+					if (0 == (period->dayofweek & (1 << wday)))
+						continue;
+
+					/* check for number of day (first, second, third, fourth or last) */
+					day = (tm->tm_mday - 1) / 7 + 1;
+					if (5 == period->every && 4 == day)
+					{
+						if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
+								tm->tm_mon + 1))
+						{
+							continue;
+						}
+					}
+					else if (period->every != day)
+						continue;
+				}
+
+				if (start_date < active_since)
+					return FAIL;
+
+				break;
+			}
+			break;
+		default:
+			return FAIL;
+	}
+
+	*running_since = start_date;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_update_maintenances                                       *
+ *                                                                            *
+ * Purpose: update maintenance state depending on maintenance periods         *
+ *                                                                            *
+ * Comments: This function calculates if any maintenance period is running    *
+ *           and based on that sets current maintenance state - running/idle  *
+ *           and period start/end time.                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_maintenances()
+{
+	const char			*__function_name = "zbx_dc_update_maintenances";
+
+	zbx_dc_maintenance_t		*maintenance;
+	zbx_dc_maintenance_period_t	*period;
+	zbx_hashset_iter_t		iter;
+	int				i, started_num = 0, running_num = 0, stopped_num = 0, seconds, ret;
+	unsigned char			state;
+	struct tm			*tm;
+	time_t				now, period_start, running_since, running_until;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	now = time(NULL);
+	tm = localtime(&now);
+	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
+
+	WRLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	{
+		state = ZBX_MAINTENANCE_IDLE;
+		running_since = 0;
+		running_until = 0;
+
+		if (now >= maintenance->active_since && now < maintenance->active_until)
+		{
+			for (i = 0; i < maintenance->periods.values_num; i++)
+			{
+				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
+
+				period_start = now - seconds + period->start_time;
+				if (seconds < period->start_time)
+					period_start -= SEC_PER_DAY;
+
+				ret = dc_calculate_maintenance_period(period, maintenance->active_since,
+						period_start, &period_start);
+
+				if (SUCCEED == ret && (period_start > now || now >= period_start + period->period))
+					ret = FAIL;
+
+				if (SUCCEED == ret)
+				{
+					state = ZBX_MAINTENANCE_RUNNING;
+					if (period_start + period->period > running_until)
+					{
+						running_since = period_start;
+						running_until = period_start + period->period;
+					}
+				}
+			}
+		}
+
+		if (state == ZBX_MAINTENANCE_RUNNING)
+		{
+			if (ZBX_MAINTENANCE_IDLE == maintenance->state)
+			{
+				maintenance->running_since = running_since;
+				maintenance->state = ZBX_MAINTENANCE_RUNNING;
+				started_num++;
+			}
+
+			maintenance->running_until = running_until;
+			running_num++;
+		}
+		else
+		{
+			if (ZBX_MAINTENANCE_RUNNING == maintenance->state)
+			{
+				maintenance->running_since = 0;
+				maintenance->running_until = 0;
+				maintenance->state = ZBX_MAINTENANCE_IDLE;
+				stopped_num++;
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d", __function_name,
+			started_num, stopped_num, running_num);
+}
+

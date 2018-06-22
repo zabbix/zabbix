@@ -1126,6 +1126,8 @@ static void	DCdump_maintenances(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "maintenanceid:" ZBX_FS_UI64 " type:%u tag_evaltype:%u active_since:%d"
 				" active_until:%d", maintenance->maintenanceid, maintenance->type,
 				maintenance->tags_evaltype, maintenance->active_since, maintenance->active_until);
+		zabbix_log(LOG_LEVEL_TRACE, "  state:%u running_since:%d running_until:%d",
+				maintenance->state, maintenance->running_since, maintenance->running_until);
 
 		DCdump_maintenance_groups(maintenance);
 		DCdump_maintenance_hosts(maintenance);

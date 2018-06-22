@@ -32,7 +32,7 @@
 
 #include "timer.h"
 
-#define TIMER_DELAY	30
+#define TIMER_DELAY	1
 
 #define ZBX_TRIGGERS_MAX	1000
 
@@ -638,6 +638,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		total_sec = 0.0, total_sec_maint = 0.0,
 		old_total_sec = 0.0, old_total_sec_maint = 0.0;
 	time_t	last_stat_time;
+	time_t	maintenance_time;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -657,8 +658,24 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	if (SUCCEED == zbx_is_export_enabled())
 		zbx_problems_export_init("timer", process_num);
 
+	maintenance_time = time(NULL) - SEC_PER_MIN;
+
 	for (;;)
 	{
+		now = time(NULL);
+
+		if (1 == process_num)
+		{
+			if (now - maintenance_time >= SEC_PER_MIN)
+			{
+				zbx_dc_update_maintenances();
+				maintenance_time = now;
+			}
+		}
+
+		zbx_sleep_loop(TIMER_DELAY);
+
+#ifdef OLD
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
@@ -779,6 +796,7 @@ next:
 		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
 #else
 		;
+#endif
 #endif
 	}
 
