@@ -360,6 +360,12 @@ Bug fixes:
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
 
 --------------------------------------------------------------------------------
+Changes for 3.4.11
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), French, Hebrew, Japanese, Portuguese (Brazil), Russian, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.4.11rc1
 
 Bug fixes:
