@@ -83,7 +83,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_groupids
 		);
 
@@ -111,7 +111,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_hostids
 		);
 
@@ -140,7 +140,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field_name))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_itemsids
 		);
 

@@ -67,7 +67,8 @@ $filter = (new CFilter())
 					->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
 					->setModern(true)
 			)
-			->addRow(_('Proxy'),
+			->addRow(
+				(new CLabel(_('Proxy'), 'filter_proxyids__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',
