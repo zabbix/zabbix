@@ -1,9 +1,12 @@
 Changes for 4.0.0alpha9
 
 New features:
+..F....... [ZBXNEXT-4367] added screen reader features for multiselect (ashubin)
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-13779] fixed redirect button link in multiple places (miks)
+..F....... [ZBXNEXT-4361] fixed selected breadcrumbs item style; fixed active time range tabs hover cursor style (Andzs, ashubin)
 ..F....... [ZBX-14420] fixed link to Problems screen in map element's context menu (miks)
 .......PS. [ZBX-12957] removed time adjustment of received packets for server and proxy (MVekslers)
 
