@@ -781,5 +781,25 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_uint64_t *proxy_hostids);
 
+/* maintenance data */
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	maintenanceid;
+	int		maintenance_from;
+	unsigned char	maintenance_type;
+	unsigned char	maintenance_status;
+
+	unsigned int	flags;
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID		0x0001
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM	0x0002
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE	0x0003
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS	0x0004
+}
+zbx_host_maintenance_diff_t;
+
 void	zbx_dc_update_maintenances();
+void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates);
+
 #endif

@@ -622,7 +622,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
-				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress"
+				",tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,"
+				"maintenanceid"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -633,7 +634,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 37, NULL);
+	dbsync_prepare(sync, 38, NULL);
 #else
 	if (NULL == (result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
@@ -642,7 +643,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
 				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept,"
-				"proxy_address,auto_compress"
+				"proxy_address,auto_compress,maintenanceid"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -653,7 +654,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 33, NULL);
+	dbsync_prepare(sync, 34, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)

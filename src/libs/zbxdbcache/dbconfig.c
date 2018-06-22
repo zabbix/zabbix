@@ -1261,6 +1261,7 @@ done:
 
 		if (0 == found)
 		{
+			ZBX_DBROW2UINT64(host->maintenanceid, row[33 + ZBX_HOST_TLS_OFFSET]);
 			host->maintenance_status = (unsigned char)atoi(row[7]);
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
@@ -4635,14 +4636,11 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	zbx_vector_ptr_t	maintenances;
 	zbx_dc_maintenance_t	*maintenance = NULL;
-	int			index, ret, i;
+	int			index, ret;
 	zbx_uint64_t		_maintenanceid = 0, maintenanceid, groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_ptr_create(&maintenances);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4660,7 +4658,6 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 			{
 				continue;
 			}
-			zbx_vector_ptr_append(&maintenances, maintenance);
 		}
 
 		ZBX_STR2UINT64(groupid, row[1]);
@@ -4687,19 +4684,7 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		}
 
 		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
-		zbx_vector_ptr_append(&maintenances, maintenance);
 	}
-
-	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < maintenances.values_num; i++)
-	{
-		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
-		zbx_vector_uint64_sort(&maintenance->groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-
-	zbx_vector_ptr_destroy(&maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -11890,7 +11875,7 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
  *                                                                            *
  * Function: dc_calculate_maintenance_period                                  *
  *                                                                            *
- * Purpose: calculates start time for the specified maintenance period        *
+ * Purpose: calculate start time for the specified maintenance period         *
  *                                                                            *
  * Parameter: period        - [IN] the maintenance period                     *
  *            active_since  - [IN] the maintenance activation start time      *
@@ -12097,4 +12082,240 @@ void	zbx_dc_update_maintenances()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d", __function_name,
 			started_num, stopped_num, running_num);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_get_active_maintenances                                       *
+ *                                                                            *
+ * Purpose: get active maintenances                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_active_maintenances(zbx_vector_ptr_t *maintenances)
+{
+	zbx_dc_maintenance_t	*maintenance;
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_MAINTENANCE_RUNNING == maintenance->state)
+			zbx_vector_ptr_append(maintenances, maintenance);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_match_host                                        *
+ *                                                                            *
+ * Purpose: check if the host must be processed by the specified maintenance  *
+ *                                                                            *
+ * Parameters: maintenance - [IN] the maintenance                             *
+ *             hostid      - [IN] identifier of the host to check             *
+ *                                                                            *
+ * Return value: SUCCEED - the host must be processed by the maintenance      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_match_host(const zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
+{
+	int	ret = FAIL;
+
+	if (FAIL != zbx_vector_uint64_bsearch(&maintenance->hostids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		return SUCCEED;
+
+	if (0 != maintenance->groupids.values_num)
+	{
+		int			i;
+		zbx_dc_hostgroup_t	*group;
+		zbx_vector_uint64_t	groupids;
+
+		zbx_vector_uint64_create(&groupids);
+
+		for (i = 0; i < maintenance->groupids.values_num; i++)
+			dc_get_nested_hostgroupids(maintenance->groupids.values[i], &groupids);
+
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (i = 0; i < groupids.values_num; i++)
+		{
+			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups,
+					&groupids.values[i])))
+			{
+				continue;
+			}
+
+			if (NULL != zbx_hashset_search(&group->hostids, &hostid))
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+
+		zbx_vector_uint64_destroy(&groupids);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_get_host_maintenance_updates                                  *
+ *                                                                            *
+ * Purpose: gets maintenance updates for all hosts                            *
+ *                                                                            *
+ * Parameters: maintenances - [IN] the running maintenances                   *
+ *             updates      - [OUT] updates to be applied                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_host_maintenance_updates(const zbx_vector_ptr_t *maintenances, zbx_vector_ptr_t *updates)
+{
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_HOST			*host;
+	const zbx_dc_maintenance_t	*maintenance;
+	int				i, maintenance_from;
+	unsigned char			maintenance_status, maintenance_type;
+	zbx_uint64_t			maintenanceid;
+	zbx_host_maintenance_diff_t	*diff;
+	unsigned int			flags;
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		maintenance_status = HOST_MAINTENANCE_STATUS_OFF;
+		maintenance_type = MAINTENANCE_TYPE_NORMAL;
+		maintenanceid = 0;
+		maintenance_from = 0;
+		flags = 0;
+
+		for (i = 0; i < maintenances->values_num; i++)
+		{
+			maintenance = (const zbx_dc_maintenance_t *)maintenances->values[i];
+
+			if (SUCCEED == dc_maintenance_match_host(maintenance, host->hostid))
+			{
+				if (0 == maintenanceid ||
+						(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
+								MAINTENANCE_TYPE_NODATA == maintenance->type))
+				{
+					maintenance_status = HOST_MAINTENANCE_STATUS_ON;
+					maintenance_type = maintenance->type;
+					maintenanceid = maintenance->maintenanceid;
+					maintenance_from = maintenance->running_since;
+				}
+			}
+		}
+
+
+		if (maintenanceid != host->maintenanceid)
+			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID;
+
+		if (maintenance_status != host->maintenance_status)
+			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS;
+
+		if (maintenance_from != host->maintenance_from)
+			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM;
+
+		if (maintenance_type != host->maintenance_type)
+			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE;
+
+		if (0 != flags)
+		{
+			diff = (zbx_host_maintenance_diff_t *)zbx_malloc(0, sizeof(zbx_host_maintenance_diff_t));
+			diff->flags = flags;
+			diff->hostid = host->hostid;
+			diff->maintenanceid = maintenanceid;
+			diff->maintenance_status = maintenance_status;
+			diff->maintenance_from = maintenance_from;
+			diff->maintenance_type = maintenance_type;
+			zbx_vector_ptr_append(updates, diff);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_flush_host_maintenance_updates                                *
+ *                                                                            *
+ * Purpose: flush host maintenance updates to configuration cache             *
+ *                                                                            *
+ * Parameters: updates - [IN] the updates to flush                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
+{
+	int				i;
+	zbx_host_maintenance_diff_t	*diff;
+	ZBX_DC_HOST			*host;
+
+	for (i = 0; i < updates->values_num;)
+	{
+		diff = (zbx_host_maintenance_diff_t *)updates->values[i];
+
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &diff->hostid)))
+		{
+			zbx_free(diff);
+			zbx_vector_ptr_remove(updates, i);
+			continue;
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID))
+			host->maintenanceid = diff->maintenanceid;
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE))
+			host->maintenance_type = diff->maintenance_type;
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
+			host->maintenance_status = diff->maintenance_status;
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
+			host->maintenance_from = diff->maintenance_from;
+
+		i++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_update_host_maintenances                                  *
+ *                                                                            *
+ * Purpose: update host maintenance status in configuration cache based       *
+ *          on running maintenances                                           *
+ *                                                                            *
+ * Parameters: updates - [OUT] updates that were made in configuration cache  *
+ *             and must be applied to database                                *
+ *                                                                            *
+ * Comments: This function must be called after zbx_dc_update_maintenances()  *
+ *           function has updated maintenance state in configuration cache.   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
+{
+	const char		*__function_name = "zbx_dc_update_host_maintenances";
+	zbx_vector_ptr_t	maintenances;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&maintenances);
+	zbx_vector_ptr_reserve(&maintenances, 100);
+
+	RDLOCK_CACHE;
+
+	dc_get_active_maintenances(&maintenances);
+	dc_get_host_maintenance_updates(&maintenances, updates);
+
+	UNLOCK_CACHE;
+
+	zbx_vector_ptr_destroy(&maintenances);
+
+	if (0 != updates->values_num)
+	{
+		WRLOCK_CACHE;
+		dc_flush_host_maintenance_updates(updates);
+		UNLOCK_CACHE;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() updates:%d", __function_name, updates->values_num);
+}
+
 

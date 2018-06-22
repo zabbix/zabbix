@@ -280,6 +280,8 @@ typedef struct
 							/* above store cumulative statistics for all hosts monitored */
 							/* by a particular proxy. */
 							/* NOTE: On disabled hosts all items are counted as disabled. */
+	zbx_uint64_t	maintenanceid;
+
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
