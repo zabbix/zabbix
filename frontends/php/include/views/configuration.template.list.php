@@ -35,8 +35,7 @@ $widget = (new CWidget())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(new CRedirectButton(_('Create template'),
-				(new CUrl())
-					->removeArgument('templateid')
+				(new CUrl('templates.php'))
 					->setArgument('groupid', $data['pageFilter']->groupid)
 					->setArgument('form', 'create')
 					->getUrl()

@@ -24,7 +24,7 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create item prototype'),
-				(new CUrl())
+				(new CUrl('disc_prototypes.php'))
 					->setArgument('form', 'create')
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl()
