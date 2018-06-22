@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-22 20:29+0300\n"
-"PO-Revision-Date: 2018-01-24 09:13+0300\n"
+"PO-Revision-Date: 2018-03-02 08:14+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1516777991.000000\n"
+"X-POOTLE-MTIME: 1519971275.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -121,8 +121,8 @@ msgstr[1] "%1$s דקות"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s מתוך רכיב %2$s נמצא במצב תקלה"
+msgstr[1] "%1$s מתוך %2$s רכיבים נמצאים במצב תקלה"
 
 #: jsLoader.php:206
 #, c-format
@@ -134,15 +134,15 @@ msgstr ""
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "תקלה %1$s"
+msgstr[1] "%1$s תקלות"
 
 #: include/classes/helpers/CMapHelper.php:250
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "תקלה %1$s בסך הכול"
+msgstr[1] "%1$s תקלות בסך הכול"
 
 #: include/actions.inc.php:2222
 #, c-format
@@ -199,7 +199,7 @@ msgstr "(0 - אינסוף)"
 
 #: include/views/configuration.action.edit.php:606
 msgid "(0 - use action default)"
-msgstr "(0 - שימוש בבררת המחדל של הפעולה)"
+msgstr "(0 - שימוש בבררת המחדל של המשימה)"
 
 #: include/views/configuration.hostgroups.list.php:30
 msgid "(Only super admins can create groups)"
@@ -258,7 +258,7 @@ msgstr "<ידני>"
 
 #: app/views/administration.script.edit.php:39
 msgid "<sub-menu/sub-menu/...>script"
-msgstr ""
+msgstr "<תת־תפריט/תת־תפריט/...>סקריפט"
 
 #: include/views/configuration.host.discovery.edit.php:438
 #: include/views/configuration.item.edit.php:564
@@ -340,7 +340,7 @@ msgstr "אירועי תקלה מוכרים"
 #: adm.triggerdisplayoptions.php:41
 #: include/views/administration.general.trigger.options.edit.php:71
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "אירועים מוכרים שנפתרו"
 
 #: app/views/administration.mediatype.edit.php:101
 #: app/views/dashboard.sharing.edit.php:24
@@ -413,7 +413,7 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:287
 #: include/views/monitoring.sysmap.edit.php:323 services.php:367
 msgid "Action"
-msgstr "פעולה"
+msgstr "משימה"
 
 #: include/classes/api/services/CAction.php:2734
 #: include/classes/api/services/CAction.php:2753
@@ -421,7 +421,7 @@ msgstr "פעולה"
 #: include/classes/api/services/CAction.php:2965
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr "הפעולה „%1$s” כבר קיימת."
+msgstr "המשימה „%1$s” כבר קיימת."
 
 #: include/classes/api/services/CAction.php:2802
 #: include/classes/api/services/CAction.php:3005
@@ -431,34 +431,34 @@ msgstr "למשימה „%1$s” לא הוגדרו פעולות."
 
 #: actionconf.php:233
 msgid "Action added"
-msgstr "נוספה פעולה"
+msgstr "נוספה משימה"
 
 #: actionconf.php:257
 msgid "Action deleted"
-msgstr "הפעולה נמחקה"
+msgstr "המשימה נמחקה"
 
 #: actionconf.php:502
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] "הפעולה נוטרלה"
-msgstr[1] "הפעולות נוטרלו"
+msgstr[0] "המשימה הושבתה"
+msgstr[1] "המשימות הושבתו"
 
 #: actionconf.php:501
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] "הפעולה הופעלה"
-msgstr[1] "הפעולות הופעלו"
+msgstr[0] "המשימה הופעלה"
+msgstr[1] "המשימות הופעלו"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:181
 #: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:164
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
-msgstr "רישום פעילות"
+msgstr "רישום משימות"
 
 #: actionconf.php:224
 msgid "Action updated"
-msgstr "הפעולה עודכנה"
+msgstr "המשימה עודכנה"
 
 #: app/views/monitoring.dashboard.view.php:90
 #: app/views/monitoring.dashboard.view.php:93
@@ -1009,7 +1009,7 @@ msgstr "אפריל"
 
 #: include/classes/html/CButtonQMessage.php:46
 msgid "Are you sure you want perform this action?"
-msgstr "אכן לבצע את הפעולה הזו?"
+msgstr "לבצע את המשימה הזו?"
 
 #: include/views/js/administration.general.macros.edit.js.php:42
 msgid "Are you sure you want to delete"
@@ -1082,11 +1082,11 @@ msgstr "יש לבחור במארח או בקבוצה אחת או יותר."
 
 #: include/views/configuration.maintenance.edit.php:190
 msgid "At least one host or host group must be selected."
-msgstr ""
+msgstr "יש לבחור לפחות במארח אחד או בקבוצת מארחים אחת."
 
 #: include/views/configuration.host.edit.php:101
 msgid "At least one interface must exist."
-msgstr ""
+msgstr "חייב להיות לפחות מנשק אחד."
 
 #: include/classes/api/services/CMaintenance.php:363
 #: include/classes/api/services/CMaintenance.php:368
@@ -1101,11 +1101,11 @@ msgstr "נדרשת תמיכה באחד לפחות מתוך MySQL,‏ PostgreSQL,
 
 #: include/views/configuration.action.edit.php:1262
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "חייבת להיות לפחות פעולה אחת."
 
 #: include/views/configuration.action.edit.php:1266
 msgid "At least one operation or recovery operation must exist."
-msgstr ""
+msgstr "חייבת להיות לפחות פעולה או פעולת שיקום אחת."
 
 #: include/views/configuration.action.edit.php:1861
 msgid "At least one operation, recovery operation or update operation must exist."
@@ -1123,7 +1123,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1501
 #: include/views/configuration.action.edit.php:2256
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "יש לבחור לפחות במשתמש אחד או בקבוצת מארחים אחת."
 
 #: app/views/administration.mediatype.edit.php:213
 msgid "Attempt interval"
@@ -1512,7 +1512,7 @@ msgstr "ביטול"
 #: include/classes/api/services/CMap.php:1468
 #, c-format
 msgid "Cannot add \"%1$s\" element of the map \"%2$s\" due to circular reference."
-msgstr ""
+msgstr "לא ניתן להוסיף רכיב „%1$s” של המפה „%2$s” עקב הפניה מעגלית."
 
 #: include/classes/api/services/CHttpTest.php:710
 #, c-format
@@ -1534,11 +1534,11 @@ msgstr "לא ניתן להוסיף את הפריט „%1$s” שאינו מספ�
 
 #: actionconf.php:234
 msgid "Cannot add action"
-msgstr "לא ניתן להוסיף פעולה"
+msgstr "לא ניתן להוסיף משימה"
 
 #: actionconf.php:319
 msgid "Cannot add action condition"
-msgstr "לא ניתן להוסיף תנאי לפעולה"
+msgstr "לא ניתן להוסיף תנאי למשימה"
 
 #: applications.php:114
 msgid "Cannot add application"
@@ -1701,7 +1701,7 @@ msgstr "לא ניתן להוסיף תרחיש רשת"
 
 #: jsLoader.php:109
 msgid "Cannot add widgets in kiosk mode"
-msgstr ""
+msgstr "לא ניתן להוסיף וידג׳טים במצב קיוסק"
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -1840,7 +1840,7 @@ msgstr "לא ניתן למחוק את המשתמש הפנימי של Zabbix בש
 
 #: actionconf.php:257
 msgid "Cannot delete action"
-msgstr "לא ניתן למחוק את הפעולה"
+msgstr "לא ניתן למחוק את המשימה"
 
 #: applications.php:133 applications.php:145
 msgid "Cannot delete application"
@@ -1982,11 +1982,11 @@ msgstr[1] "לא ניתן למחוק סקריפטים"
 #: include/classes/api/services/CScript.php:564
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "לא ניתן למחוק את הסקריפטים. בסקריפט „%1$s” נעשה שימוש במשימה של הפעילות „%2$s”."
+msgstr "לא ניתן למחוק את הסקריפטים. בסקריפט „%1$s” נעשה שימוש במשימת הפעולה „%2$s”."
 
 #: actionconf.php:524
 msgid "Cannot delete selected actions"
-msgstr "לא ניתן למחוק את הפעולות הנבחרות"
+msgstr "לא ניתן למחוק את המשימות הנבחרות"
 
 #: correlation.php:374
 msgid "Cannot delete selected correlations"
@@ -2073,8 +2073,8 @@ msgstr "לא ניתן למחוק תרחיש רשת"
 #: actionconf.php:513
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] "לא ניתן לנטרל פעולה"
-msgstr[1] "לא ניתן לנטרל פעולות"
+msgstr[0] "לא ניתן להשבית משימה"
+msgstr[1] "לא ניתן להשבית משימות"
 
 #: correlation.php:361
 msgid "Cannot disable correlation"
@@ -2136,8 +2136,8 @@ msgstr "לא ניתן להציג יותר מפריט אחד מהסוג „תרש
 #: actionconf.php:512
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] "לא ניתן להפעיל פעולה"
-msgstr[1] "לא ניתן להפעיל פעולות"
+msgstr[0] "לא ניתן להפעיל משימה"
+msgstr[1] "לא ניתן להפעיל משימות"
 
 #: correlation.php:360
 msgid "Cannot enable correlation"
@@ -2479,7 +2479,7 @@ msgstr ""
 #: include/classes/api/services/CAction.php:2769
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
-msgstr "לא ניתן להגדיר את „%1$s“ עבור הפעולה „%2$s“."
+msgstr "לא ניתן להגדיר את „%1$s” עבור המשימה „%2$s”."
 
 #: include/classes/api/services/CGraphGeneral.php:487
 #, c-format
@@ -2592,7 +2592,7 @@ msgstr "לא ניתן לנתק את ההקפצה „%s”, קיימים פריט
 #: include/classes/api/services/CAction.php:2913
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr "לא ניתן לעדכן את „%1$s“ עבור הפעולה „%2$s“."
+msgstr "לא ניתן לעדכן את „%1$s” עבור המשימה „%2$s”."
 
 #: include/classes/api/services/CGraphGeneral.php:621
 #, c-format
@@ -2676,7 +2676,7 @@ msgstr "לא ניתן לעדכן תרחיש רשת בתבנית „%1$s”:‏ %
 
 #: actionconf.php:225
 msgid "Cannot update action"
-msgstr "לא ניתן לעדכן פעולה"
+msgstr "לא ניתן לעדכן משימה"
 
 #: applications.php:106
 msgid "Cannot update application"
@@ -3262,7 +3262,7 @@ msgstr "תנאי"
 #: include/classes/api/services/CAction.php:2610
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr "לא נעשה שימוש בתנאי „%2$s” בנוסחה „%3$s” עבור הפעולה „%1$s”."
+msgstr "לא נעשה שימוש בתנאי „%2$s” בנוסחה „%3$s” עבור המשימה „%1$s”."
 
 #: include/classes/api/services/CCorrelation.php:1259
 #, c-format
@@ -3277,7 +3277,7 @@ msgstr "לא נעשה שימוש בתנאי „%2$s” בנוסחה „%3$s” �
 #: include/classes/api/services/CAction.php:2609
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr "התנאי „%2$s” בו נעשה שימוש בנוסחה „%3$s” עבור הפעולה „%1$s” אינו מוגדר."
+msgstr "התנאי „%2$s” בו נעשה שימוש בנוסחה „%3$s” עבור המשימה „%1$s” אינו מוגדר."
 
 #: include/classes/api/services/CCorrelation.php:1247
 #, c-format
@@ -3330,7 +3330,7 @@ msgstr "הגדרת Zabbix"
 
 #: actionconf.php:27
 msgid "Configuration of actions"
-msgstr "הגדרת פעולות"
+msgstr "הגדרת משימות"
 
 #: applications.php:27
 msgid "Configuration of applications"
@@ -3737,7 +3737,7 @@ msgstr "ספירת החלפות ההקשר. מחזירה מספר שלם וחי�
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:575
 msgid "Count of directory entries, recursively. Returns integer"
-msgstr ""
+msgstr "ספירת רשומות תיקיות באופן רקורסיבי. מחזירה מספר שלם"
 
 #: include/classes/items/CHelpItems.php:383
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
@@ -3749,7 +3749,7 @@ msgstr "מספר השורות שתואמות בקובץ היומן שבמעקב.
 
 #: include/views/configuration.action.list.php:38
 msgid "Create action"
-msgstr "יצירת פעולה"
+msgstr "יצירת משימה"
 
 #: include/views/configuration.application.list.php:42
 msgid "Create application"
@@ -4452,7 +4452,7 @@ msgstr "למחוק את היישום?"
 
 #: include/views/configuration.action.edit.php:2360
 msgid "Delete current action?"
-msgstr "למחוק את הפעולה הנוכחית?"
+msgstr "למחוק את המשימה הנוכחית?"
 
 #: include/views/configuration.correlation.edit.php:269
 msgid "Delete current correlation?"
@@ -4536,7 +4536,7 @@ msgstr "למחוק סקריפט?"
 
 #: include/views/configuration.action.list.php:135
 msgid "Delete selected actions?"
-msgstr "למחוק את הפעולות הנבחרות?"
+msgstr "למחוק את המשימות הנבחרות?"
 
 #: include/views/configuration.application.list.php:146
 msgid "Delete selected applications?"
@@ -4941,7 +4941,7 @@ msgstr "להשבית את המארחים שמנוטרים על ידי המתוו
 
 #: include/views/configuration.action.list.php:134
 msgid "Disable selected actions?"
-msgstr "להשבית את הפעולות הנבחרות?"
+msgstr "להשבית את המשימות הנבחרות?"
 
 #: include/views/configuration.application.list.php:145
 msgid "Disable selected applications?"
@@ -5031,7 +5031,7 @@ msgstr "התקן שהתגלה"
 
 #: include/forms.inc.php:485
 msgid "Discovered items"
-msgstr ""
+msgstr "פריטים שהתגלו"
 
 #: include/forms.inc.php:482 include/forms.inc.php:873 include/menu.inc.php:98
 #: include/menu.inc.php:224 include/views/configuration.action.list.php:33
@@ -5476,7 +5476,7 @@ msgstr "קובץ מפתח SSL ריק עבור תרחיש הרשת „%1$s”."
 #: include/classes/validators/CActionCondValidator.php:190
 #: include/classes/validators/CActionCondValidator.php:197
 msgid "Empty action condition."
-msgstr "תנאי פעולה ריק."
+msgstr "תנאי משימה ריק."
 
 #: include/classes/api/services/CItemPrototype.php:318
 #, c-format
@@ -5494,7 +5494,7 @@ msgstr "מזהה היחס ריק."
 #: include/classes/api/services/CAction.php:2657
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
-msgstr "מזהה נוסחה ריק לתנאי מסנן עבור הפעולה „%1$s”."
+msgstr "מזהה נוסחה ריק לתנאי מסנן עבור המשימה „%1$s”."
 
 #: include/classes/api/services/CDiscoveryRule.php:1112
 #, c-format
@@ -5646,7 +5646,7 @@ msgstr "הפעלת סדר וניקיון פנימיים"
 
 #: include/views/configuration.action.list.php:133
 msgid "Enable selected actions?"
-msgstr "להפעיל את הפעולות הנבחרות?"
+msgstr "להפעיל את המשימות הנבחרות?"
 
 #: include/views/configuration.application.list.php:144
 msgid "Enable selected applications?"
@@ -5750,7 +5750,7 @@ msgstr "אנגלית (en_US)"
 #: app/views/monitoring.problem.view.js.php:22
 #: app/views/monitoring.problem.view.php:236
 msgid "Equal"
-msgstr ""
+msgstr "שווה"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -5786,7 +5786,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "מזהה אירוע של רשומת היומן האחרונה שתואמת לביטוי רגולרי T, אז N שונה מ־1,‏ 0 - אחרת"
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "אירוע הוכר"
 
@@ -6907,11 +6906,11 @@ msgstr "גבוהה"
 
 #: include/classes/core/ZBase.php:262
 msgid "High-contrast dark"
-msgstr ""
+msgstr "כהה בניגודיות גבוהה"
 
 #: include/classes/core/ZBase.php:261
 msgid "High-contrast light"
-msgstr ""
+msgstr "בהיר בניגודיות גבוהה"
 
 #: app/views/monitoring.problem.view.php:291
 msgid "Highlight whole row"
@@ -7785,56 +7784,56 @@ msgstr "SLA מקובל שגוי עבור השירות „%1$s”."
 
 #: include/classes/api/services/CAction.php:3074
 msgid "Incorrect acknowledgement action operationid."
-msgstr "מזהה משימת פעולת הכרה שגוי."
+msgstr "מזהה הפעולה של משימת ההכרה שגוי."
 
 #: include/classes/validators/CActionCondValidator.php:136
 msgid "Incorrect action condition discovery check."
-msgstr "בדיקת גילוי תנאי פעולה שגוי."
+msgstr "בדיקת גילוי תנאי משימה שגויה."
 
 #: include/classes/api/services/CAction.php:3150
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "בדיקת גילוי תנאי פעולה שגוי. בדיקת גילוי אינה קיימת או שאין לך גישה אליה."
+msgstr "בדיקת גילוי תנאי משימה שגויה. בדיקת הגילוי אינה קיימת או שאין לך גישה אליה."
 
 #: include/classes/validators/CActionCondValidator.php:109
 msgid "Incorrect action condition discovery object."
-msgstr "פריט גילוי תנאי פעולה שגוי."
+msgstr "פריט גילוי תנאי משימה שגוי."
 
 #: include/classes/api/services/CAction.php:3147
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "כלל גילוי תנאי פעולה שגוי. כלל הגילוי לא קיים או שאין לך גישה אליו."
+msgstr "כלל גילוי תנאי משימה שגוי. כלל הגילוי לא קיים או שאין לך גישה אליו."
 
 #: include/classes/validators/CActionCondValidator.php:154
 msgid "Incorrect action condition discovery status."
-msgstr "מצב גילוי תנאי פעולה שגוי."
+msgstr "מצב גילוי תנאי משימה שגוי."
 
 #: include/classes/validators/CActionCondValidator.php:178
 msgid "Incorrect action condition event type."
-msgstr "סוג אירוע תנאי פעולה שגוי."
+msgstr "סוג אירוע תנאי משימה שגוי."
 
 #: include/classes/api/services/CAction.php:3135
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "קבוצת מארחים תנאי פעולה שגויה. קבוצת המארחים לא קיימת או שאין לך גישה אליה."
+msgstr "קבוצת מארחים תנאי משימה שגויה. קבוצת המארחים לא קיימת או שאין לך גישה אליה."
 
 #: include/classes/api/services/CAction.php:3138
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "מארח תנאי פעולה שגוי. המארח לא קיים או שאין לך גישה אליו."
+msgstr "מארח תנאי משימה שגוי. המארח לא קיים או שאין לך גישה אליו."
 
 #: include/classes/validators/CActionCondValidator.php:145
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
-msgstr "פתחת תנאי הפעולה שגויה „%1$s”."
+msgstr "פתחת תנאי המשימה שגויה „%1$s”."
 
 #: include/classes/api/services/CAction.php:3153
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "מתווך תנאי פעולה שגוי. המתווך לא קיים או שאין לך גישה אליו."
+msgstr "מתווך תנאי משימה שגוי. המתווך לא קיים או שאין לך גישה אליו."
 
 #: include/classes/api/services/CAction.php:3141
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "תבנית תנאי פעולה שגויה. התבנית לא קיימת או שאין לך גישה אליה."
+msgstr "תבנית תנאי משימה שגויה. התבנית לא קיימת או שאין לך גישה אליה."
 
 #: include/classes/validators/CActionCondValidator.php:169
 msgid "Incorrect action condition trigger severity."
-msgstr "חומרת הקפצה תנאי פעולה שגויה."
+msgstr "חומרת הקפצה תנאי משימה שגויה."
 
 #: include/classes/api/services/CAction.php:3144
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
@@ -8045,7 +8044,7 @@ msgstr "מזהה כלל גילוי שגוי לאבטיפוס מארח „%1$s”
 #: include/classes/api/services/CEvent.php:540
 #: include/classes/api/services/CProblem.php:379
 msgid "Incorrect evaltype value."
-msgstr ""
+msgstr "ערך evaltype שגוי."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
@@ -8981,12 +8980,12 @@ msgstr "הצגה שגויה של הקפצות תקינות: %1$s."
 #: include/classes/validators/CEmailValidator.php:39
 #, c-format
 msgid "Invalid email address \"%1$s\"."
-msgstr ""
+msgstr "כתובת דוא״ל שגויה „%1$s”."
 
 #: include/classes/api/services/CUser.php:614
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "כתובת דוא״ל שגויה עבור סוג המדיה עם המזהה „%1$s”."
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
@@ -9375,7 +9374,7 @@ msgstr "אבטיפוס הפריט „%1$s” כבר קיים תחת „%2$s”, 
 #: include/classes/api/services/CItemGeneral.php:1064
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
-msgstr ""
+msgstr "אבטיפוס הפריט „%1$s” כבר קיים תחת „%2$s”, מקושר לכלל אחר."
 
 #: include/classes/api/services/CItemPrototype.php:36
 #, c-format
@@ -9646,7 +9645,7 @@ msgstr "מילת מפתח"
 
 #: include/html.inc.php:187
 msgid "Kiosk mode"
-msgstr ""
+msgstr "מצב קיוסק"
 
 #: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
@@ -9891,7 +9890,7 @@ msgstr "האורך של הערך T (העדכני ביותר) בתווים שונ
 #: app/views/monitoring.problem.view.js.php:21
 #: app/views/monitoring.problem.view.php:235
 msgid "Like"
-msgstr ""
+msgstr "כמו"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:51
 msgid "Limit for search and filter results"
@@ -10509,7 +10508,7 @@ msgstr[1] "תקופת הזמן המרבית להצגה היא %1$s ימים."
 #: include/classes/api/services/CUser.php:621
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "חרגת מהאורך הכללי המרבי המותר לכתובת דוא״ל עבור סוג המדיה עם המזהה „%1$s”."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:331
 msgid "Maximum value for period T is < N"
@@ -10789,7 +10788,7 @@ msgstr "יום שני"
 
 #: include/views/configuration.host.list.php:62
 msgid "Monitored by"
-msgstr ""
+msgstr "מנוטר על ידי"
 
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.massupdate.php:174
@@ -10856,7 +10855,7 @@ msgstr "השתקה"
 
 #: app/views/popup.triggerexpr.php:150
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/discovery.inc.php:53
 #: include/views/js/configuration.discovery.edit.js.php:190
@@ -12243,29 +12242,29 @@ msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
 #: actionconf.php:404 correlation.php:317
 #, c-format
 msgid "Operation \"%s\" already exists."
-msgstr "הפעילות „%s“ כבר קיימת."
+msgstr "הפעולה „%s“ כבר קיימת."
 
 #: include/validate.inc.php:316
 msgid "Operation cannot be performed due to unauthorized request."
-msgstr "לא ניתן לבצע את הפעילות עקב בקשה בלתי מורשית."
+msgstr "לא ניתן לבצע את הפעולה עקב בקשה בלתי מורשית."
 
 #: include/views/configuration.action.edit.php:1216
 msgid "Operation condition"
-msgstr "תנאי הפעילות"
+msgstr "תנאי הפעולה"
 
 #: include/views/configuration.action.edit.php:1237
 #: include/views/configuration.action.edit.php:1834
 #: include/views/configuration.action.edit.php:2319
 msgid "Operation details"
-msgstr "פרטי הפעילות"
+msgstr "פרטי הפעולה"
 
 #: include/classes/api/services/CAction.php:1851
 msgid "Operation has no group to operate."
-msgstr "להפעלה אין קבוצה לביצוע."
+msgstr "לפעולה אין קבוצה לביצוע."
 
 #: include/classes/api/services/CAction.php:1863
 msgid "Operation has no template to operate."
-msgstr "לפעילות אין תבנית לפעולה."
+msgstr "לפעולה אין תבנית לפעילות."
 
 #: include/views/configuration.action.edit.php:613
 #: include/views/configuration.action.edit.php:625
@@ -12273,7 +12272,7 @@ msgstr "לפעילות אין תבנית לפעולה."
 #: include/views/configuration.action.edit.php:1391
 #: include/views/configuration.action.edit.php:1957
 msgid "Operation type"
-msgstr "סוג הפעילות"
+msgstr "סוג הפעולה"
 
 #: include/views/configuration.action.edit.php:565
 #: include/views/configuration.action.edit.php:1260
@@ -12285,7 +12284,7 @@ msgstr "סוג הפעילות"
 #: include/views/configuration.correlation.edit.php:257
 #: include/views/configuration.correlation.list.php:62
 msgid "Operations"
-msgstr "פעילויות"
+msgstr "פעולות"
 
 #: include/hosts.inc.php:62
 msgid "Operator"
@@ -12750,7 +12749,7 @@ msgstr "הדבקה ללא קישורים חיצוניים"
 
 #: actionconf.php:93 include/views/configuration.action.edit.php:424
 msgid "Pause operations while in maintenance"
-msgstr "השהיית פעילויות בזמן עבודות תחזוקה"
+msgstr "השהיית פעולות בזמן עבודות תחזוקה"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -13176,7 +13175,7 @@ msgstr "המתווך „%1$s” עבור המארח „%2$s” לא קיים."
 #: include/classes/api/services/CProxy.php:482
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "הפעולה „%2$s” משתמשת במתווך „%1$s”."
 
 #: include/classes/api/services/CProxy.php:439
 #, c-format
@@ -13195,7 +13194,7 @@ msgstr "נוסף מתווך"
 
 #: app/views/administration.proxy.edit.php:75
 msgid "Proxy address"
-msgstr ""
+msgstr "כתובת מתווך"
 
 #: app/controllers/CControllerProxyDelete.php:62
 msgid "Proxy deleted"
@@ -13381,7 +13380,7 @@ msgstr "שגיאה בתחביר ביטוי השחזור."
 
 #: include/views/configuration.action.edit.php:1856
 msgid "Recovery operations"
-msgstr "פעילויות שחזור"
+msgstr "פעולות שחזור"
 
 #: app/views/monitoring.widget.problems.view.php:55
 #: include/classes/screens/CScreenEvents.php:32
@@ -13421,7 +13420,7 @@ msgstr "רענון פריטים בלתי נתמכים „%1$s”."
 
 #: include/forms.inc.php:701
 msgid "Regular"
-msgstr ""
+msgstr "רגיל"
 
 #: include/audit.inc.php:46 include/items.inc.php:1524
 #: include/views/configuration.host.discovery.edit.php:616
@@ -13479,7 +13478,7 @@ msgstr "ביטויים רגולריים"
 
 #: include/forms.inc.php:486
 msgid "Regular items"
-msgstr ""
+msgstr "פריטים רגילים"
 
 #: include/views/general.login.php:59
 msgid "Remember me for 30 days"
@@ -13616,7 +13615,7 @@ msgstr "הסרת מארח"
 
 #: include/views/configuration.host.massupdate.php:138
 msgid "Remove host groups"
-msgstr ""
+msgstr "הסרת קבוצת מארחים"
 
 #: jsLoader.php:199
 #, c-format
@@ -15158,11 +15157,11 @@ msgstr "קודים של מצב"
 
 #: include/classes/helpers/CMapHelper.php:222
 msgid "Status disabled"
-msgstr ""
+msgstr "מצב מושבת"
 
 #: include/classes/helpers/CMapHelper.php:218
 msgid "Status maintenance"
-msgstr ""
+msgstr "מצב תחזוקה"
 
 #: app/controllers/CControllerDiscoveryView.php:89
 #: app/views/monitoring.discovery.view.php:26
@@ -15171,7 +15170,7 @@ msgstr "מצב הגילוי"
 
 #: include/classes/helpers/CMapHelper.php:214
 msgid "Status ok"
-msgstr ""
+msgstr "מצב תקין"
 
 #: include/maps.inc.php:48
 msgid "Status only"
@@ -15179,7 +15178,7 @@ msgstr "מצב בלבד"
 
 #: include/classes/helpers/CMapHelper.php:210
 msgid "Status problem"
-msgstr ""
+msgstr "מצב תקלה"
 
 #: include/actions.inc.php:1979
 #: include/classes/screens/CScreenHttpTestDetails.php:82
@@ -16477,7 +16476,7 @@ msgstr "אירועים מסוג בעיה שלא קיבלו הכרה"
 #: adm.triggerdisplayoptions.php:38
 #: include/views/administration.general.trigger.options.edit.php:61
 msgid "Unacknowledged RESOLVED events"
-msgstr ""
+msgstr "אירועים שנפתרו ואינם מוכרים"
 
 #: include/classes/widgets/CWidgetFormProblemHosts.php:90
 #: include/classes/widgets/CWidgetFormProblemsBySv.php:90
@@ -16856,7 +16855,7 @@ msgstr "שימוש בבקשות קבוצתיות"
 #: adm.triggerdisplayoptions.php:30
 #: include/views/administration.general.trigger.options.edit.php:37
 msgid "Use custom event status colors"
-msgstr ""
+msgstr "שימוש בצבעים מותאמים אישית לציון מצב אירוע"
 
 #: app/views/popup.media.php:73
 #: include/views/administration.users.edit.php:248
@@ -17514,7 +17513,7 @@ msgstr "וייטנאמית (vi_VN)"
 #: include/views/monitoring.charts.php:43
 #: include/views/monitoring.history.php:79
 msgid "View as"
-msgstr ""
+msgstr "הצגה בתור"
 
 #: include/classes/mvc/CView.php:158
 msgid "View is not rendered."
@@ -17916,11 +17915,11 @@ msgstr "אין לך אפשרות להחליף מארחים בבחירה הנוכ
 
 #: include/views/js/configuration.action.edit.js.php:357
 msgid "You did not specify host for operation."
-msgstr "לא ציינת מארח לפעילות."
+msgstr "לא ציינת מארח לפעולה."
 
 #: include/views/js/configuration.action.edit.js.php:325
 msgid "You did not specify host group for operation."
-msgstr "לא ציינת קבוצת מארחים לפעילות."
+msgstr "לא ציינת קבוצת מארחים לפעולה."
 
 #: include/classes/api/services/CAction.php:1835
 #, c-format
@@ -17955,7 +17954,7 @@ msgstr "לא ציינת יעדים עבור סקריפט גלובלי של מש�
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
 msgid "You do not have permission to perform this operation."
-msgstr "אין לך הרשאה לבצע פעילות זו."
+msgstr "אין לך הרשאה לבצע פעולה זו."
 
 #: include/classes/api/services/CUser.php:260
 msgid "You do not have permissions to create users."

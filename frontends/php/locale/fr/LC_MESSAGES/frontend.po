@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-22 20:29+0300\n"
-"PO-Revision-Date: 2018-01-19 12:35+0300\n"
-"Last-Translator: Tchris78 <c.triomphe@axelit.fr>\n"
+"PO-Revision-Date: 2018-05-24 13:14+0300\n"
+"Last-Translator: Christophe <ctr@pmspos.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1516358148.000000\n"
+"X-POOTLE-MTIME: 1527160481.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -122,8 +122,8 @@ msgstr[1] "%1$s minutes"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s de %2$s élément en défaut"
+msgstr[1] "%1$s de %2$s éléments en défaut"
 
 #: jsLoader.php:206
 #, c-format
@@ -135,15 +135,15 @@ msgstr ""
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problème"
+msgstr[1] "%1$s problèmes"
 
 #: include/classes/helpers/CMapHelper.php:250
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problème au total"
+msgstr[1] "%1$s problèmes au total"
 
 #: include/actions.inc.php:2222
 #, c-format
@@ -259,7 +259,7 @@ msgstr "<manuel>"
 
 #: app/views/administration.script.edit.php:39
 msgid "<sub-menu/sub-menu/...>script"
-msgstr ""
+msgstr "<sous-menu/sous-menu/...>script"
 
 #: include/views/configuration.host.discovery.edit.php:438
 #: include/views/configuration.item.edit.php:564
@@ -341,7 +341,7 @@ msgstr "Événements PROBLÈME acquittés"
 #: adm.triggerdisplayoptions.php:41
 #: include/views/administration.general.trigger.options.edit.php:71
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Evénements acquitté et résolu"
 
 #: app/views/administration.mediatype.edit.php:101
 #: app/views/dashboard.sharing.edit.php:24
@@ -1083,11 +1083,11 @@ msgstr "Au moins un hôte ou un groupe doit être sélectionné."
 
 #: include/views/configuration.maintenance.edit.php:190
 msgid "At least one host or host group must be selected."
-msgstr ""
+msgstr "Au moins un hôte ou un groupe d'hôtes doivent être sélectionné."
 
 #: include/views/configuration.host.edit.php:101
 msgid "At least one interface must exist."
-msgstr ""
+msgstr "Au moins une interface doit exister."
 
 #: include/classes/api/services/CMaintenance.php:363
 #: include/classes/api/services/CMaintenance.php:368
@@ -1102,11 +1102,11 @@ msgstr "Au moins l'une parmi MySQL, PostgreSQL, Oracle et IBM DB2 doit être sup
 
 #: include/views/configuration.action.edit.php:1262
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Au moins une opération doit exister."
 
 #: include/views/configuration.action.edit.php:1266
 msgid "At least one operation or recovery operation must exist."
-msgstr ""
+msgstr "Au moins une opération ou une opération de récupération doivent exister."
 
 #: include/views/configuration.action.edit.php:1861
 msgid "At least one operation, recovery operation or update operation must exist."
@@ -1124,7 +1124,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1501
 #: include/views/configuration.action.edit.php:2256
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Au moins un utilisateur ou un groupe d'utilisateurs doivent être sélectionné."
 
 #: app/views/administration.mediatype.edit.php:213
 msgid "Attempt interval"
@@ -1513,7 +1513,7 @@ msgstr "Annuler"
 #: include/classes/api/services/CMap.php:1468
 #, c-format
 msgid "Cannot add \"%1$s\" element of the map \"%2$s\" due to circular reference."
-msgstr ""
+msgstr "Impossible d'ajouter l'élément \"%1$s\" de la carte \"%2$s\" en raison d'une référence circulaire."
 
 #: include/classes/api/services/CHttpTest.php:710
 #, c-format
@@ -1702,7 +1702,7 @@ msgstr "Impossible d'ajouter le scénario web"
 
 #: jsLoader.php:109
 msgid "Cannot add widgets in kiosk mode"
-msgstr ""
+msgstr "Impossible d'ajouter des widgets en mode kiosque"
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -3739,7 +3739,7 @@ msgstr "Nombre de bascules de contexte. Retourne un entier"
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:575
 msgid "Count of directory entries, recursively. Returns integer"
-msgstr ""
+msgstr "Nombre d'entrées de répertoire, récursif. Renvoie un entier"
 
 #: include/classes/items/CHelpItems.php:383
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
@@ -5033,7 +5033,7 @@ msgstr "Equipement découvert"
 
 #: include/forms.inc.php:485
 msgid "Discovered items"
-msgstr ""
+msgstr "Eléments découvert"
 
 #: include/forms.inc.php:482 include/forms.inc.php:873 include/menu.inc.php:98
 #: include/menu.inc.php:224 include/views/configuration.action.list.php:33
@@ -5752,7 +5752,7 @@ msgstr "Anglais (en_US)"
 #: app/views/monitoring.problem.view.js.php:22
 #: app/views/monitoring.problem.view.php:236
 msgid "Equal"
-msgstr ""
+msgstr "Egal"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -5788,7 +5788,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "L'ID événement de la dernière entrée de journal correspond à l'expression rationnelle T alors N n'est PAS 1, 0 - autrement"
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Événement acquitté"
 
@@ -6909,11 +6908,11 @@ msgstr "Haut"
 
 #: include/classes/core/ZBase.php:262
 msgid "High-contrast dark"
-msgstr ""
+msgstr "Noir à contraste élevé"
 
 #: include/classes/core/ZBase.php:261
 msgid "High-contrast light"
-msgstr ""
+msgstr "Clair à contraste élevé"
 
 #: app/views/monitoring.problem.view.php:291
 msgid "Highlight whole row"
@@ -8047,7 +8046,7 @@ msgstr "ID de règle de découverte incorrect pour le prototype d'hôte \"%1$s\"
 #: include/classes/api/services/CEvent.php:540
 #: include/classes/api/services/CProblem.php:379
 msgid "Incorrect evaltype value."
-msgstr ""
+msgstr "Valeur evaltype incorrecte."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
@@ -8983,12 +8982,12 @@ msgstr "Affichage invalide des déclencheurs OK : %1$s."
 #: include/classes/validators/CEmailValidator.php:39
 #, c-format
 msgid "Invalid email address \"%1$s\"."
-msgstr ""
+msgstr "Adresse de courrier électronique non valide \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:614
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "Adresse e-mail incorrecte pour le type de media avec l'ID \"%1$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
@@ -9377,7 +9376,7 @@ msgstr "Le prototype d'élément \"%1$s\" existe déjà sur \"%2$s\", hérité d
 #: include/classes/api/services/CItemGeneral.php:1064
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
-msgstr ""
+msgstr "Le prototype d’élément \"%1$s\" existe déjà sur \"%2$s\", lié à une autre règle."
 
 #: include/classes/api/services/CItemPrototype.php:36
 #, c-format
@@ -9648,7 +9647,7 @@ msgstr "Mot-clé"
 
 #: include/html.inc.php:187
 msgid "Kiosk mode"
-msgstr ""
+msgstr "Mode kiosque"
 
 #: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
@@ -9893,7 +9892,7 @@ msgstr "La longueur de la dernière (plus récente) valeur T, en caractères, n'
 #: app/views/monitoring.problem.view.js.php:21
 #: app/views/monitoring.problem.view.php:235
 msgid "Like"
-msgstr ""
+msgstr "Comme"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:51
 msgid "Limit for search and filter results"
@@ -10511,7 +10510,7 @@ msgstr[1] "La période maximale à afficher est %1$s jours."
 #: include/classes/api/services/CUser.php:621
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "Longueur totale maximale de l'adresse e-mail dépassée pour le type de media avec l'ID \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:331
 msgid "Maximum value for period T is < N"
@@ -10791,7 +10790,7 @@ msgstr "Lundi"
 
 #: include/views/configuration.host.list.php:62
 msgid "Monitored by"
-msgstr ""
+msgstr "Surveillé par"
 
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.massupdate.php:174
@@ -10858,7 +10857,7 @@ msgstr "Sourdine"
 
 #: app/views/popup.triggerexpr.php:150
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/discovery.inc.php:53
 #: include/views/js/configuration.discovery.edit.js.php:190
@@ -13178,7 +13177,7 @@ msgstr "Le proxy \"%1$s\" pour l'hôte \"%2$s\" n'existe pas."
 #: include/classes/api/services/CProxy.php:482
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Le proxy \"%1$s\" est utilisé par l'action \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:439
 #, c-format
@@ -13197,7 +13196,7 @@ msgstr "Proxy ajouté"
 
 #: app/views/administration.proxy.edit.php:75
 msgid "Proxy address"
-msgstr ""
+msgstr "Adresse du proxy"
 
 #: app/controllers/CControllerProxyDelete.php:62
 msgid "Proxy deleted"
@@ -13423,7 +13422,7 @@ msgstr "Rafraîchir les éléments non supportés \"%1$s\"."
 
 #: include/forms.inc.php:701
 msgid "Regular"
-msgstr ""
+msgstr "Normal"
 
 #: include/audit.inc.php:46 include/items.inc.php:1524
 #: include/views/configuration.host.discovery.edit.php:616
@@ -13481,7 +13480,7 @@ msgstr "Expressions rationnelles"
 
 #: include/forms.inc.php:486
 msgid "Regular items"
-msgstr ""
+msgstr "Eléments normaux"
 
 #: include/views/general.login.php:59
 msgid "Remember me for 30 days"
@@ -13618,7 +13617,7 @@ msgstr "Supprimer l'hôte"
 
 #: include/views/configuration.host.massupdate.php:138
 msgid "Remove host groups"
-msgstr ""
+msgstr "Supprimer les groupes d’hôte"
 
 #: jsLoader.php:199
 #, c-format
@@ -15160,11 +15159,11 @@ msgstr "Codes d'état"
 
 #: include/classes/helpers/CMapHelper.php:222
 msgid "Status disabled"
-msgstr ""
+msgstr "Statut désactivé"
 
 #: include/classes/helpers/CMapHelper.php:218
 msgid "Status maintenance"
-msgstr ""
+msgstr "Statut maintenance"
 
 #: app/controllers/CControllerDiscoveryView.php:89
 #: app/views/monitoring.discovery.view.php:26
@@ -15173,7 +15172,7 @@ msgstr "État de la découverte"
 
 #: include/classes/helpers/CMapHelper.php:214
 msgid "Status ok"
-msgstr ""
+msgstr "Statut ok"
 
 #: include/maps.inc.php:48
 msgid "Status only"
@@ -15181,7 +15180,7 @@ msgstr "État seulement"
 
 #: include/classes/helpers/CMapHelper.php:210
 msgid "Status problem"
-msgstr ""
+msgstr "Statut problème"
 
 #: include/actions.inc.php:1979
 #: include/classes/screens/CScreenHttpTestDetails.php:82
@@ -16479,7 +16478,7 @@ msgstr "Événements PROBLÈME non acquittés"
 #: adm.triggerdisplayoptions.php:38
 #: include/views/administration.general.trigger.options.edit.php:61
 msgid "Unacknowledged RESOLVED events"
-msgstr ""
+msgstr "Evénements RÉSOLUS non acquitté"
 
 #: include/classes/widgets/CWidgetFormProblemHosts.php:90
 #: include/classes/widgets/CWidgetFormProblemsBySv.php:90
@@ -16858,7 +16857,7 @@ msgstr "Utiliser les requêtes de masse"
 #: adm.triggerdisplayoptions.php:30
 #: include/views/administration.general.trigger.options.edit.php:37
 msgid "Use custom event status colors"
-msgstr ""
+msgstr "Utiliser les couleurs d'état d'événement personnalisées"
 
 #: app/views/popup.media.php:73
 #: include/views/administration.users.edit.php:248
@@ -17516,7 +17515,7 @@ msgstr "Vietnamien (vi_VN)"
 #: include/views/monitoring.charts.php:43
 #: include/views/monitoring.history.php:79
 msgid "View as"
-msgstr ""
+msgstr "Afficher comme"
 
 #: include/classes/mvc/CView.php:158
 msgid "View is not rendered."

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-22 20:29+0300\n"
-"PO-Revision-Date: 2017-08-23 15:16+0300\n"
+"PO-Revision-Date: 2018-05-23 12:31+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1503494160.000000\n"
+"X-POOTLE-MTIME: 1527071484.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -122,8 +122,8 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s de %2$s elemento em estado de incidente"
+msgstr[1] "%1$s de %2$s elementos em estado de incidente"
 
 #: jsLoader.php:206
 #, c-format
@@ -135,15 +135,15 @@ msgstr ""
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s incidente"
+msgstr[1] "%1$s incidentes"
 
 #: include/classes/helpers/CMapHelper.php:250
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s incidente no total"
+msgstr[1] "%1$s incidentes no total"
 
 #: include/actions.inc.php:2222
 #, c-format
@@ -259,7 +259,7 @@ msgstr "<manual>"
 
 #: app/views/administration.script.edit.php:39
 msgid "<sub-menu/sub-menu/...>script"
-msgstr ""
+msgstr "<sub-menu/sub-menu/...>script"
 
 #: include/views/configuration.host.discovery.edit.php:438
 #: include/views/configuration.item.edit.php:564
@@ -341,7 +341,7 @@ msgstr "Eventos de INCIDENTE reconhecidos"
 #: adm.triggerdisplayoptions.php:41
 #: include/views/administration.general.trigger.options.edit.php:71
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Eventos confirmados RESOLVIDOS"
 
 #: app/views/administration.mediatype.edit.php:101
 #: app/views/dashboard.sharing.edit.php:24
@@ -1084,11 +1084,11 @@ msgstr "No mínimo um host ou grupo deve ser selecionado."
 
 #: include/views/configuration.maintenance.edit.php:190
 msgid "At least one host or host group must be selected."
-msgstr ""
+msgstr "Ao menos um host ou grupo de host precisa ser selecionado."
 
 #: include/views/configuration.host.edit.php:101
 msgid "At least one interface must exist."
-msgstr ""
+msgstr "Ao menos uma interface deve existir."
 
 #: include/classes/api/services/CMaintenance.php:363
 #: include/classes/api/services/CMaintenance.php:368
@@ -1103,11 +1103,11 @@ msgstr "No mínimo um banco de dados deverá ser suportado (MySQL, PostgreSQL, O
 
 #: include/views/configuration.action.edit.php:1262
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Ao menos uma operação deve existir."
 
 #: include/views/configuration.action.edit.php:1266
 msgid "At least one operation or recovery operation must exist."
-msgstr ""
+msgstr "Ao menos uma operação ou recuperação deve existir."
 
 #: include/views/configuration.action.edit.php:1861
 msgid "At least one operation, recovery operation or update operation must exist."
@@ -1125,7 +1125,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:1501
 #: include/views/configuration.action.edit.php:2256
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Ao menos um usuário ou grupo de usuários deve ser selecionado."
 
 #: app/views/administration.mediatype.edit.php:213
 msgid "Attempt interval"
@@ -1514,7 +1514,7 @@ msgstr "Cancelar"
 #: include/classes/api/services/CMap.php:1468
 #, c-format
 msgid "Cannot add \"%1$s\" element of the map \"%2$s\" due to circular reference."
-msgstr ""
+msgstr "Não é possível adicionar o elemento \"%1$s\" ao mapa \"%2$s\" devido à referência circular."
 
 #: include/classes/api/services/CHttpTest.php:710
 #, c-format
@@ -1703,7 +1703,7 @@ msgstr "Não foi possível adicionar a apresentação de telas"
 
 #: jsLoader.php:109
 msgid "Cannot add widgets in kiosk mode"
-msgstr ""
+msgstr "Não é possível adicionar widgets no modo de quiosque"
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -2196,7 +2196,7 @@ msgstr "Não foi possível executar o script"
 
 #: jsLoader.php:174
 msgid "Cannot expand macros."
-msgstr ""
+msgstr "Não foi possível expandir as macros."
 
 #: include/classes/import/importers/CMapImporter.php:262
 #, c-format
@@ -3739,7 +3739,7 @@ msgstr "Número de trocas de contexto. Retorna: número inteiro"
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:575
 msgid "Count of directory entries, recursively. Returns integer"
-msgstr ""
+msgstr "Contagem recursiva de entradas de diretório. Retorna inteiro"
 
 #: include/classes/items/CHelpItems.php:383
 msgid "Count of matched lines in log file monitoring with log rotation support. Returns integer"
@@ -4353,7 +4353,7 @@ msgstr "Modo padrão do inventário em novos hosts"
 
 #: include/views/configuration.action.edit.php:2290
 msgid "Default media type"
-msgstr ""
+msgstr "Tipo de mídia padrão"
 
 #: include/views/configuration.action.edit.php:419
 #: include/views/configuration.action.edit.php:777
@@ -4896,7 +4896,7 @@ msgstr "Dimensão (cols x linhas)"
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:579
 msgid "Directory size (in bytes). Returns integer"
-msgstr ""
+msgstr "Tamanho do diretório (em bytes). Retorna inteiro"
 
 #: app/views/administration.mediatype.list.php:152
 #: include/views/administration.auditlogs.list.php:50
@@ -5034,7 +5034,7 @@ msgstr "Dispositivo descoberto"
 
 #: include/forms.inc.php:485
 msgid "Discovered items"
-msgstr ""
+msgstr "Itens descobertos"
 
 #: include/forms.inc.php:482 include/forms.inc.php:873 include/menu.inc.php:98
 #: include/menu.inc.php:224 include/views/configuration.action.list.php:33
@@ -5425,13 +5425,13 @@ msgstr "Valor real"
 #: include/classes/helpers/CElasticsearchHelper.php:194
 #, c-format
 msgid "Elasticsearch error: %1$s."
-msgstr ""
+msgstr "Erro no elasticsearch: %1$s."
 
 #: include/classes/api/managers/CHistoryManager.php:813
 #: include/classes/api/managers/CHistoryManager.php:822
 #, c-format
 msgid "Elasticsearch url is not set for type: %1$s."
-msgstr ""
+msgstr "A url do elasticsearch não foi definida para o tipo: %1$s."
 
 #: include/views/monitoring.sysmap.edit.php:226
 msgid "Element"
@@ -5755,7 +5755,7 @@ msgstr "Inglês (en_US)"
 #: app/views/monitoring.problem.view.js.php:22
 #: app/views/monitoring.problem.view.php:236
 msgid "Equal"
-msgstr ""
+msgstr "Igual"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -5791,7 +5791,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "O ID de evento da última entrada do log corresponde à expressão regular T, então N NÃO É 1, 0 - outro caso"
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Evento reconhecido"
 
@@ -5906,7 +5905,7 @@ msgstr "Expandir"
 
 #: include/views/monitoring.sysmap.constructor.php:46
 msgid "Expand macros"
-msgstr ""
+msgstr "Expandir macros"
 
 #: include/views/monitoring.sysmap.edit.php:134
 msgid "Expand single problem"
@@ -6912,11 +6911,11 @@ msgstr "Alta"
 
 #: include/classes/core/ZBase.php:262
 msgid "High-contrast dark"
-msgstr ""
+msgstr "Escuro em alto contraste"
 
 #: include/classes/core/ZBase.php:261
 msgid "High-contrast light"
-msgstr ""
+msgstr "Claro em alto contraste"
 
 #: app/views/monitoring.problem.view.php:291
 msgid "Highlight whole row"
@@ -8050,7 +8049,7 @@ msgstr "Foi informado um ID de autobusca inválido para o protótipo de host \"%
 #: include/classes/api/services/CEvent.php:540
 #: include/classes/api/services/CProblem.php:379
 msgid "Incorrect evaltype value."
-msgstr ""
+msgstr "Tipo de validação com valor incorreto."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
@@ -8230,7 +8229,7 @@ msgstr "Foi informado o ID de protótipo de item \"%1$s\" e ele é inválido par
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
 #: include/triggers.inc.php:1376
 msgid "Incorrect item value type"
-msgstr ""
+msgstr "Tipo incorreto para o item"
 
 #: include/classes/validators/CFunctionValidator.php:299
 #, c-format
@@ -8969,7 +8968,7 @@ msgstr "Modificação inválida no piscar ou status da trigger: %1$s."
 #: include/profiles.inc.php:103
 #, c-format
 msgid "Invalid data storage period for services: %1$s."
-msgstr ""
+msgstr "Período de armazenamento incorreto para serviços: %1$s."
 
 #: maintenance.php:143 maintenance.php:157 services.php:182 services.php:196
 #, c-format
@@ -8988,12 +8987,12 @@ msgstr "Apresentação inválida do OK das triggers: %1$s."
 #: include/classes/validators/CEmailValidator.php:39
 #, c-format
 msgid "Invalid email address \"%1$s\"."
-msgstr ""
+msgstr "Endereço de e-mail inválido: \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:614
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "Endereço de e-mail inválido para o tipo de mídia com o ID \"%1$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:315
 msgid "Invalid fifth parameter."
@@ -9384,7 +9383,7 @@ msgstr "O protótipo de item \"%1$s\" já existe em \"%2$s\", foi herdado de out
 #: include/classes/api/services/CItemGeneral.php:1064
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", linked to another rule."
-msgstr ""
+msgstr "O protótipo de item \"%1$s\" já existe em \"%2$s\", ligado à outra regra."
 
 #: include/classes/api/services/CItemPrototype.php:36
 #, c-format
@@ -9655,7 +9654,7 @@ msgstr "Palavra-chave"
 
 #: include/html.inc.php:187
 msgid "Kiosk mode"
-msgstr ""
+msgstr "Modo de quiosque"
 
 #: include/locales.inc.php:69
 msgid "Korean (ko_KR)"
@@ -9900,7 +9899,7 @@ msgstr "Comprimento em caracteres do último (mais recente) valor de T NÃO É N
 #: app/views/monitoring.problem.view.js.php:21
 #: app/views/monitoring.problem.view.php:235
 msgid "Like"
-msgstr ""
+msgstr "Parecido"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:51
 msgid "Limit for search and filter results"
@@ -10518,7 +10517,7 @@ msgstr[1] "O período máximo a ser exibido é de %1$s dias."
 #: include/classes/api/services/CUser.php:621
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr ""
+msgstr "O tamanho máximo do endereço de e-mail foi excedito para o tipo de mídia com o ID \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:331
 msgid "Maximum value for period T is < N"
@@ -10798,7 +10797,7 @@ msgstr "Segunda-feira"
 
 #: include/views/configuration.host.list.php:62
 msgid "Monitored by"
-msgstr ""
+msgstr "Monitorado por"
 
 #: include/views/configuration.host.edit.php:278
 #: include/views/configuration.host.massupdate.php:174
@@ -10865,7 +10864,7 @@ msgstr "Sem som"
 
 #: app/views/popup.triggerexpr.php:150
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/discovery.inc.php:53
 #: include/views/js/configuration.discovery.edit.js.php:190
@@ -11824,7 +11823,7 @@ msgstr "Notificações"
 #: include/actions.inc.php:816 include/actions.inc.php:1131
 #: include/actions.inc.php:1132
 msgid "Notify all involved"
-msgstr ""
+msgstr "Notificar todos os involvidos"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -12013,7 +12012,7 @@ msgstr "Numérico (fracionário)"
 
 #: include/triggers.inc.php:1822
 msgid "Numeric (integer)"
-msgstr ""
+msgstr "Numérico (inteiro)"
 
 #: include/forms.inc.php:357 include/items.inc.php:127
 #: include/views/configuration.item.edit.php:675
@@ -12225,7 +12224,7 @@ msgstr "Apenas usuários com perfil de Super Admin podem excluir mapeamentos de 
 
 #: include/classes/api/services/CDashboard.php:459
 msgid "Only super admins can set dashboard owner."
-msgstr ""
+msgstr "Apenas super administradores podem definir um proprietario de dashboard."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Only super admins can update correlations."
@@ -13166,7 +13165,7 @@ msgstr "Propriedades"
 #: include/classes/screens/CScreenUrl.php:62 include/events.inc.php:415
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
-msgstr ""
+msgstr "A url fornecida \"%1$s\" é inválida."
 
 #: app/controllers/CControllerPopupGeneric.php:112
 #: app/views/administration.proxy.edit.php:24
@@ -13189,7 +13188,7 @@ msgstr "O proxy \"%1$s\" para o host \"%2$s\" não existe."
 #: include/classes/api/services/CProxy.php:482
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "O proxy \"%1$s\" é utilizado pela ação \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:439
 #, c-format
@@ -13208,7 +13207,7 @@ msgstr "Proxy adicionado"
 
 #: app/views/administration.proxy.edit.php:75
 msgid "Proxy address"
-msgstr ""
+msgstr "Endereço do proxy"
 
 #: app/controllers/CControllerProxyDelete.php:62
 msgid "Proxy deleted"
@@ -13403,7 +13402,7 @@ msgstr "Operações de recuperação"
 #: include/classes/screens/CScreenProblem.php:1019 include/events.inc.php:246
 #: include/events.inc.php:445
 msgid "Recovery time"
-msgstr "Tempo para recuperação"
+msgstr "Hora da recuperação"
 
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:452
@@ -13417,11 +13416,11 @@ msgstr "Atualizar"
 #: include/classes/widgets/CWidgetForm.php:53 include/html.inc.php:206
 #: jsLoader.php:234
 msgid "Refresh interval"
-msgstr ""
+msgstr "Intervalo de atualização"
 
 #: jsLoader.php:235
 msgid "Refresh interval multiplier"
-msgstr ""
+msgstr "Multiplicador do intervalo de atualização"
 
 #: adm.other.php:30 include/views/administration.general.other.edit.php:48
 msgid "Refresh unsupported items"
@@ -13434,7 +13433,7 @@ msgstr "Atualizar itens não suportados: %1$s."
 
 #: include/forms.inc.php:701
 msgid "Regular"
-msgstr ""
+msgstr "Comum"
 
 #: include/audit.inc.php:46 include/items.inc.php:1524
 #: include/views/configuration.host.discovery.edit.php:616
@@ -13492,7 +13491,7 @@ msgstr "Expressões regulares"
 
 #: include/forms.inc.php:486
 msgid "Regular items"
-msgstr ""
+msgstr "Itens normais"
 
 #: include/views/general.login.php:59
 msgid "Remember me for 30 days"
@@ -13629,7 +13628,7 @@ msgstr "Remover servidor"
 
 #: include/views/configuration.host.massupdate.php:138
 msgid "Remove host groups"
-msgstr ""
+msgstr "Remover grupos de host"
 
 #: jsLoader.php:199
 #, c-format
@@ -14367,7 +14366,7 @@ msgstr "Padrão de busca está vazio"
 #: include/forms.inc.php:2122 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "Second"
-msgstr ""
+msgstr "Segundo"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -15171,11 +15170,11 @@ msgstr "Códigos de status"
 
 #: include/classes/helpers/CMapHelper.php:222
 msgid "Status disabled"
-msgstr ""
+msgstr "Status desativado"
 
 #: include/classes/helpers/CMapHelper.php:218
 msgid "Status maintenance"
-msgstr ""
+msgstr "Status de manutenção"
 
 #: app/controllers/CControllerDiscoveryView.php:89
 #: app/views/monitoring.discovery.view.php:26
@@ -15184,7 +15183,7 @@ msgstr "Status das regras de autobusca"
 
 #: include/classes/helpers/CMapHelper.php:214
 msgid "Status ok"
-msgstr ""
+msgstr "Status ok"
 
 #: include/maps.inc.php:48
 msgid "Status only"
@@ -15192,7 +15191,7 @@ msgstr "Somente status"
 
 #: include/classes/helpers/CMapHelper.php:210
 msgid "Status problem"
-msgstr ""
+msgstr "Status de incidente"
 
 #: include/actions.inc.php:1979
 #: include/classes/screens/CScreenHttpTestDetails.php:82
@@ -15349,7 +15348,7 @@ msgstr "Padrão do sistema"
 
 #: include/func.inc.php:1868
 msgid "System error occurred. Please contact Zabbix administrator."
-msgstr ""
+msgstr "Ocorreu um erro no sistema. Por favor contate o administrador Zabbix."
 
 #: include/classes/core/CJsonRpc.php:213
 msgid "System error."
@@ -15966,7 +15965,7 @@ msgstr "Total"
 #: include/classes/debug/CProfiler.php:153
 #, c-format
 msgid "Total Elasticsearch time: %1$s"
-msgstr ""
+msgstr "Tempo total no Elasticsearch: %1$s"
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -16491,7 +16490,7 @@ msgstr "Eventos com status INCIDENTE e não reconhecidos"
 #: adm.triggerdisplayoptions.php:38
 #: include/views/administration.general.trigger.options.edit.php:61
 msgid "Unacknowledged RESOLVED events"
-msgstr ""
+msgstr "Eventos não reconhecidos e RESOLVIDOS"
 
 #: include/classes/widgets/CWidgetFormProblemHosts.php:90
 #: include/classes/widgets/CWidgetFormProblemsBySv.php:90
@@ -16870,7 +16869,7 @@ msgstr "Usar requisições em lote"
 #: adm.triggerdisplayoptions.php:30
 #: include/views/administration.general.trigger.options.edit.php:37
 msgid "Use custom event status colors"
-msgstr ""
+msgstr "Utilizar cor personalizada de status de evento"
 
 #: app/views/popup.media.php:73
 #: include/views/administration.users.edit.php:248
@@ -17146,7 +17145,7 @@ msgstr "Usuário"
 
 #: app/views/administration.mediatype.edit.php:89
 msgid "Username and password"
-msgstr ""
+msgstr "Usuário e senha"
 
 #: app/controllers/CControllerPopupGeneric.php:176
 #: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:269
@@ -17500,7 +17499,7 @@ msgstr "Variáveis"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:459
 msgid "Various information about specific process(es). Returns float"
-msgstr ""
+msgstr "Várias informações sobre processo(s) específico(s). Retorna ponto flutuante"
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -17532,7 +17531,7 @@ msgstr "Vietnamita (vi_VN)"
 #: include/views/monitoring.charts.php:43
 #: include/views/monitoring.history.php:79
 msgid "View as"
-msgstr ""
+msgstr "Ver como"
 
 #: include/classes/mvc/CView.php:158
 msgid "View is not rendered."
@@ -17802,7 +17801,7 @@ msgstr "Campos errados para a trigger."
 #: include/classes/api/services/CTriggerGeneral.php:522
 #: include/classes/api/services/CTriggerGeneral.php:675
 msgid "Wrong value for url field."
-msgstr ""
+msgstr "Valor errado para o campo URL."
 
 #: include/views/js/monitoring.sysmaps.js.php:244
 #: include/views/js/monitoring.sysmaps.js.php:377
@@ -17997,7 +17996,7 @@ msgstr "Você precisa de permissão para executar esta ação!"
 
 #: include/classes/db/DB.php:136
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
-msgstr ""
+msgstr "Seu banco de dados não está funcionando corretamente. Aguarde alguns minutos e tente novamente esta ação. Se o problema persistir, por favor contacte um administrador do sistema. O problema pode ser causado por uma transação demorada em execução ou por bloqueio em nível de linha realizado por seu sistema gerenciador de banco de dados."
 
 #: index.php:28
 msgid "ZABBIX"
@@ -18362,7 +18361,7 @@ msgstr ""
 
 #: include/classes/helpers/CElasticsearchHelper.php:86
 msgid "cannot perform Scroll API request, data could be truncated"
-msgstr ""
+msgstr "não foi possível executar a solicitação de rolagem de API, os dados podem estar truncados"
 
 #: include/classes/parsers/CConditionFormula.php:219
 #, c-format
@@ -18457,7 +18456,7 @@ msgstr "a expressão está vazia"
 
 #: include/classes/helpers/CElasticsearchHelper.php:184
 msgid "failed to parse JSON"
-msgstr ""
+msgstr "falha ao analisar o JSON"
 
 #: include/classes/api/services/CItemGeneral.php:1305
 msgid "first parameter is expected"
@@ -19008,7 +19007,7 @@ msgstr "informe aqui o argumento para pesquisa"
 
 #: include/classes/validators/CApiInputValidator.php:1181
 msgid "unacceptible URL"
-msgstr ""
+msgstr "URL inaceitável"
 
 #: include/classes/parsers/CItemKey.php:172
 msgid "unexpected end of key"
