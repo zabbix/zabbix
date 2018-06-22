@@ -997,6 +997,13 @@ output {
           background-color: #4d4d4d;
           opacity: 1;
           filter: alpha(opacity=100); }
+  .multiselect div[aria-live] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1; }
 
 .multiselect-button, .multiselect {
   display: inline-block;
