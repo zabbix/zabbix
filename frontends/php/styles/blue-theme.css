@@ -48,26 +48,21 @@ a:link {
   -webkit-transition: color 0.2s ease-out;
   -moz-transition: color 0.2s ease-out;
   transition: color 0.2s ease-out; }
-
 a:visited {
   color: #0275b8;
   text-decoration: none; }
-
 a:hover {
   outline: 0;
   color: #0275b8;
   border-bottom: 1px solid rgba(2, 117, 184, 0.5); }
-
 a:focus {
   color: #0275b8;
   outline: none;
   border-bottom: 2px solid rgba(2, 117, 184, 0.5); }
-
 a:active {
   outline: 0;
   color: #0275b8;
   border-bottom: 1px solid rgba(2, 117, 184, 0.5); }
-
 a img {
   border: none;
   vertical-align: top; }
@@ -1163,7 +1158,6 @@ output {
 .list-check-radio li, .list-hor-check-radio li {
   display: block;
   padding: .3em 0; }
-
 .list-check-radio label, .list-hor-check-radio label {
   padding: 0 0 0 18px;
   display: inline-block;
@@ -1272,7 +1266,6 @@ label.form-label-asterisk:before {
 
 label input[type="checkbox"] {
   margin-right: 3px; }
-
 label input[type="radio"] {
   margin-right: 3px; }
 
@@ -1527,7 +1520,7 @@ button {
     box-shadow: 0 0 0 0px !important; }
   .btn-link[disabled] {
     background-color: transparent; }
-    [disabled].btn-link:hover {
+    .btn-link[disabled]:hover {
       background-color: transparent; }
 
 .btn-search {
@@ -2239,7 +2232,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: scale(1.05); }
   100% {
     transform: scale(1); } }
-
 @-moz-keyframes zoom-in-out {
   0% {
     transform: scale(1); }
@@ -2247,7 +2239,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: scale(1.05); }
   100% {
     transform: scale(1); } }
-
 @-o-keyframes zoom-in-out {
   0% {
     transform: scale(1); }
@@ -2255,7 +2246,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: scale(1.05); }
   100% {
     transform: scale(1); } }
-
 @keyframes zoom-in-out {
   0% {
     transform: scale(1); }
@@ -2263,7 +2253,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: scale(1.05); }
   100% {
     transform: scale(1); } }
-
 @keyframes zoom-in-out {
   0% {
     transform: scale(1); }
@@ -2271,7 +2260,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transform: scale(1.05); }
   100% {
     transform: scale(1); } }
-
 .new-widget {
   -webkit-animation: zoom-in-out .2s linear;
   -moz-animation: zoom-in-out .2s linear;
@@ -2377,29 +2365,22 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .ui-inner-handles .ui-resizable-n {
   top: 0; }
-
 .ui-inner-handles .ui-resizable-ne {
   top: -4px;
   right: -4px; }
-
 .ui-inner-handles .ui-resizable-nw {
   top: -4px;
   left: -4px; }
-
 .ui-inner-handles .ui-resizable-e {
   right: 0; }
-
 .ui-inner-handles .ui-resizable-s {
   bottom: 0; }
-
 .ui-inner-handles .ui-resizable-se {
   bottom: -4px;
   right: -4px; }
-
 .ui-inner-handles .ui-resizable-sw {
   bottom: -4px;
   left: -4px; }
-
 .ui-inner-handles .ui-resizable-w {
   left: 0; }
 
@@ -3605,7 +3586,6 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     -moz-transform: rotate(360deg);
     -ms-transform: rotate(360deg);
     transform: rotate(360deg); } }
-
 .browser-logo-chrome {
   background: url(../img/browser-sprite.png) no-repeat 0 0; }
 
@@ -3651,10 +3631,8 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 
 .available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-
 .available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #ebebeb; }
-
 .available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #ccd5d9;
   border: 1px solid #bdc9ce; }
@@ -3771,37 +3749,31 @@ svg {
   .navtree .problems {
     margin-left: 10px;
     left: -15px; } }
-
 @keyframes fadein {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
-
 @-moz-keyframes fadein {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
-
 @-webkit-keyframes fadein {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
-
 @-ms-keyframes fadein {
-  .navtree from {
+  from {
     opacity: 0; }
-  .navtree to {
+  to {
     opacity: 1; } }
-
 @-o-keyframes fadein {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
-
 .navtree .tree {
   width: 100%;
   height: 100%; }
