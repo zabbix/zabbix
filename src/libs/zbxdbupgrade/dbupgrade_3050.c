@@ -1508,6 +1508,101 @@ static int	DBpatch_3050129(void)
 	return DBadd_field("maintenances", &field);
 }
 
+static int	DBpatch_3050130(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update profiles"
+			" set idx='web.problem.filter.show_suppressed'"
+			" where idx='web.problem.filter.maintenance'");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050131(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update profiles"
+			" set idx='web.overview.filter.show_suppressed'"
+			" where idx='web.overview.filter.show_maintenance'");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_3050132(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update widget_field"
+			" set name='show_suppressed'"
+			" where name='maintenance'"
+				" and exists (select null"
+					" from widget"
+					" where widget.widgetid=widget_field.widgetid"
+						" and widget.type in ('problems','problemhosts','problemsbysv'))");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050133(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			NULL);
+
+	/* type : 'problem' - WIDGET_PROBLEMS */
+	result = DBselect("select w.widgetid"
+			" from widget w"
+			" where w.type in ('problems','problemhosts','problemsbysv')"
+				" and not exists (select null"
+					" from widget_field wf"
+					" where w.widgetid=wf.widgetid"
+						" and wf.name='show_suppressed')");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_suppressed", 1);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+
 #endif
 
 DBPATCH_START(3050)
@@ -1640,5 +1735,9 @@ DBPATCH_ADD(3050126, 0, 1)
 DBPATCH_ADD(3050127, 0, 1)
 DBPATCH_ADD(3050128, 0, 1)
 DBPATCH_ADD(3050129, 0, 1)
+DBPATCH_ADD(3050130, 0, 1)
+DBPATCH_ADD(3050131, 0, 1)
+DBPATCH_ADD(3050132, 0, 1)
+DBPATCH_ADD(3050133, 0, 1)
 
 DBPATCH_END()
