@@ -53,8 +53,8 @@
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression);
 
-int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
-		char **error);
+int	evaluate_function(char *value, DC_ITEM *item, const char *function, const char *parameters,
+		const zbx_timespec_t *ts, char **error);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
@@ -85,5 +85,6 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen);
 int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
+int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
 #endif

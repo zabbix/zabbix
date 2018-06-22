@@ -41,10 +41,6 @@ $form_list->addRow(_('Name'),
 
 // widget specific fields
 foreach ($data['dialogue']['fields'] as $field) {
-	if (!$data['config']['event_ack_enable'] && ($field->getFlags() & CWidgetField::FLAG_ACKNOWLEDGES)) {
-		$form->addVar($field->getName(), $field->getValue());
-		continue;
-	}
 	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
 
 	if ($field instanceof CWidgetFieldComboBox) {

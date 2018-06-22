@@ -121,7 +121,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter-space');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 
 		switch ($result) {
 			case TEST_GOOD:

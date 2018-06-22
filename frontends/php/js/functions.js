@@ -516,6 +516,7 @@ function getOverlayDialogueId() {
  * @param {object} params.content                           Window content.
  * @param {object} params.controls                          Window controls.
  * @param {array}  params.buttons                           Window buttons.
+ * @param {string} params.debug                             Debug HTML displayed in modal window.
  * @param {string} params.buttons[]['title']                Text on the button.
  * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
  *                                                          on click.
@@ -664,7 +665,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 					.attr('aria-labeledby', headerid)
 				.end()
 		)
-		.append(overlay_dialogue_footer);
+		.append(overlay_dialogue_footer)
+		.append(typeof params.debug !== 'undefined' ? params.debug : null);
 
 	if (overlay_bg !== null) {
 		jQuery(overlay_bg).on('remove', function(event) {
@@ -867,25 +869,6 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 		return json;
 	};
 })(jQuery);
-
-function makeErrorMessageBox(errors, elementId) {
-	var div = jQuery('<div>').addClass('msg-bad').attr('id', elementId);
-	var details = jQuery('<div>').addClass('msg-details'),
-		ul = jQuery('<ul>');
-
-	errors.each(function (error) {
-		// split long messages
-		var msg = '';
-		error.match(/[\s\S]{1,120}/g).each(function (error_part) {
-			msg = msg + jQuery.escapeHtml(error_part) + "\n";
-		});
-		ul.append(jQuery('<li>').append(msg));
-	});
-	details.append(ul);
-	div.append(details);
-
-	return div;
-}
 
 /**
  * Parse url string to object. Hash starting part of URL will be removed.

@@ -93,8 +93,8 @@ else {
 }
 $maintenanceForm->addVar('active_till', $activeTill);
 
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate, 'active_till'));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate, 'active_since'));
+$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate));
+$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate));
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

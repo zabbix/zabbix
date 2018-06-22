@@ -191,14 +191,14 @@ $map_tab
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Append icon label to form list.
+// Append map element label to form list.
 unset($data['labelTypes'][MAP_LABEL_TYPE_CUSTOM]);
-$map_tab->addRow(_('Icon label type'),
+$map_tab->addRow(_('Map element label type'),
 	new CComboBox('label_type', $data['sysmap']['label_type'], null, $data['labelTypes'])
 );
 
-// Append icon label location to form list.
-$map_tab->addRow(_('Icon label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
+// Append map element label location to form list.
+$map_tab->addRow(_('Map element label location'), new CComboBox('label_location', $data['sysmap']['label_location'], null,
 	[
 		0 => _('Bottom'),
 		1 => _('Left'),
@@ -207,17 +207,16 @@ $map_tab->addRow(_('Icon label location'), new CComboBox('label_location', $data
 	]
 ));
 
-if ($data['config']['event_ack_enable']) {
-	// Append show unack to form list.
-	$map_tab->addRow(_('Problem display'),
-		new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
-			EXTACK_OPTION_ALL => _('All'),
-			EXTACK_OPTION_BOTH => _('Separated'),
-			EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-		])
-	);
-}
-$map_tab->addRow(_('Minimum trigger severity'),
+// Append show unack to form list.
+$map_tab->addRow(_('Problem display'),
+	new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
+		EXTACK_OPTION_ALL => _('All'),
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
+	])
+);
+
+$map_tab->addRow(_('Minimum severity'),
 	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
 );
 

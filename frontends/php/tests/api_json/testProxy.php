@@ -70,6 +70,11 @@ class testProxy extends CZabbixTest {
 				'proxy' => ['99000', '99004'],
 				'expected_error' => 'Host "API Host monitored with proxy" is monitored with proxy "Api active proxy with host".'
 			],
+			// Check if proxy used in discovery rule.
+			[
+				'proxy' => ['99006'],
+				'expected_error' => 'Proxy "Api active proxy for discovery" is used by discovery rule "API discovery rule for delete with proxy".'
+			],
 			// Successfully delete proxy.
 			[
 				'proxy' => ['99000'],
@@ -90,7 +95,7 @@ class testProxy extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['proxyids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from hosts where hostid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($id)));
 			}
 		}
 	}

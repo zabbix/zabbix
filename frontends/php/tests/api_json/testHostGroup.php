@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
- * @backup groups
+ * @backup hstgrp
  */
 class testHostGroup extends CZabbixTest {
 
@@ -127,7 +127,7 @@ class testHostGroup extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from groups where groupid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroup[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
@@ -290,7 +290,7 @@ class testHostGroup extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from groups where groupid='.zbx_dbstr($id));
+				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $hostgroups[$key]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
@@ -299,7 +299,7 @@ class testHostGroup extends CZabbixTest {
 		else {
 			foreach ($hostgroups as $hostgroup) {
 				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
-					$this->assertEquals(0, DBcount('SELECT * FROM groups WHERE name='.zbx_dbstr($hostgroup['name'])));
+					$this->assertEquals(0, DBcount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
 				}
 			}
 		}
@@ -408,7 +408,7 @@ class testHostGroup extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from groups where groupid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from hstgrp where groupid='.zbx_dbstr($id)));
 			}
 		}
 	}
