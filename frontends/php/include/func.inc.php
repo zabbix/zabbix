@@ -1271,15 +1271,17 @@ function zbx_toHash($value, $field = null) {
  * key.
  *
  * E.g:
- * zbx_toObject(array(1, 2), 'hostid')  // returns array(array('hostid' => 1), array('hostid' => 2))
- * zbx_toObject(3, 'hostid')            // returns array(array('hostid' => 3))
+ * zbx_toObject(array(1, 2), 'hostid')            // returns array(array('hostid' => 1), array('hostid' => 2))
+ * zbx_toObject(3, 'hostid')                      // returns array(array('hostid' => 3))
+ * zbx_toObject(array('a' => 1), 'hostid', true)  // returns array('a' => array('hostid' => 1))
  *
  * @param $value
  * @param $field
+ * @param $preserve_keys
  *
  * @return array
  */
-function zbx_toObject($value, $field) {
+function zbx_toObject($value, $field, $preserve_keys = false) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1290,10 +1292,14 @@ function zbx_toObject($value, $field) {
 		$result = [[$field => $value]];
 	}
 	elseif (!isset($value[$field])) {
-		foreach ($value as $val) {
+		foreach ($value as $key => $val) {
 			if (!is_array($val)) {
-				$result[] = [$field => $val];
+				$result[$key] = [$field => $val];
 			}
+		}
+
+		if (!$preserve_keys) {
+			$result = array_values($result);
 		}
 	}
 
@@ -2112,14 +2118,14 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {

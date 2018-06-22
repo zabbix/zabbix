@@ -129,11 +129,29 @@ function _n($string1, $string2) {
 }
 
 /**
+ * Translates the string with respect to the given context.
+ * If no translation is found, the original string will be used.
+ *
+ * Example: _x('Message', 'context');
+ * returns: 'Message'
+ *
+ * @param string $message		string to translate
+ * @param string $context		context of the string
+ *
+ * @return string
+ */
+function _x($message, $context) {
+	return ($context == '')
+		? _($message)
+		: pgettext($context, $message);
+}
+
+/**
  * Translates the string with respect to the given context and replaces placeholders with supplied arguments.
  * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  * Parameter placeholders must be defined as %1$s, %2$s etc.
  *
- * Example: _x('Message for arg1 "%1$s" and arg2 "%2$s"', 'context', 'arg1Value', 'arg2Value');
+ * Example: _xs('Message for arg1 "%1$s" and arg2 "%2$s"', 'context', 'arg1Value', 'arg2Value');
  * returns: 'Message for arg1 "arg1Value" and arg2 "arg2Value"'
  *
  * @param string $message		string to translate
@@ -143,7 +161,7 @@ function _n($string1, $string2) {
  *
  * @return string
  */
-function _x($message, $context) {
+function _xs($message, $context) {
 	$arguments = array_slice(func_get_args(), 2);
 
 	return ($context == '')
