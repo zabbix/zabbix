@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-22 20:29+0300\n"
-"PO-Revision-Date: 2018-02-04 15:22+0300\n"
+"PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1517750550.000000\n"
+"X-POOTLE-MTIME: 1510338737.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -5790,7 +5790,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "Son kayıt girişinin olay ID'si T düzenli ifadesiyle eşleşirse N, 1 DEĞİL'dir, diğer durumlarda 0'dır."
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Olay onaylandı"
 

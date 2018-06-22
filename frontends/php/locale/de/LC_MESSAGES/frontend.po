@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-22 20:29+0300\n"
-"PO-Revision-Date: 2018-02-27 10:14+0300\n"
-"Last-Translator: Kubiakm <mk.naumburg@gmail.com>\n"
+"PO-Revision-Date: 2018-01-01 00:47+0300\n"
+"Last-Translator: Daniel <mail@dlaube.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1519719280.000000\n"
+"X-POOTLE-MTIME: 1514760475.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -5804,7 +5804,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "Ereignis-ID des letzten auf regulären Ausdruck T passenden Protokolleintrags, dann N NICHT 1, sonst 0"
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Ereignis bestätigt"
 

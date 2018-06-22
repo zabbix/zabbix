@@ -5853,7 +5853,6 @@ msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0
 msgstr "ID udalosti posledného log záznamu vybraného regulárnym výrazom T, potom N NOT 1, 0 - inak"
 
 #: include/actions.inc.php:57
-#, fuzzy
 msgid "Event acknowledged"
 msgstr "Udalosť potvrdená"
 
