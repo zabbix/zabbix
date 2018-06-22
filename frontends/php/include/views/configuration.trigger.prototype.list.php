@@ -24,7 +24,7 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create trigger prototype'),
-				(new CUrl())
+				(new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->setArgument('form', 'create')
 			))
