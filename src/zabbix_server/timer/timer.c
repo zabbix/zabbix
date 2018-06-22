@@ -28,7 +28,6 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "export.h"
 
 #include "timer.h"
 
@@ -576,9 +575,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (SUCCEED == zbx_is_export_enabled())
-		zbx_problems_export_init("timer", process_num);
 
 	for (;;)
 	{
