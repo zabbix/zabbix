@@ -64,9 +64,9 @@ class CLink extends CTag {
 		}
 
 		if ($this->use_sid) {
-			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+			if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
-				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
+				$url .= 'sid='.substr($_COOKIE[ZBX_SESSION_NAME], 16, 16);
 			}
 			$confirm_script = ($this->confirm_message !== '')
 				? 'Confirm('.CHtml::encode(CJs::encodeJson($this->confirm_message)).') && '

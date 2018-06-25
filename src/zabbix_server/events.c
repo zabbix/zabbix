@@ -130,9 +130,13 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	events[events_num].value = value;
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 	events[events_num].flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	events[events_num].severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
+		if (TRIGGER_VALUE_PROBLEM == value)
+			events[events_num].severity = trigger_priority;
+
 		events[events_num].trigger.triggerid = objectid;
 		events[events_num].trigger.description = zbx_strdup(NULL, trigger_description);
 		events[events_num].trigger.expression = zbx_strdup(NULL, trigger_expression);
@@ -256,7 +260,7 @@ static int	save_events(void)
 	}
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
-			"name", NULL);
+			"name", "severity", NULL);
 
 	eventid = DBget_maxid_num("events", num);
 
@@ -272,7 +276,7 @@ static int	save_events(void)
 
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
 				events[i].objectid, events[i].clock, events[i].ns, events[i].value,
-				ZBX_NULL2EMPTY_STR(events[i].name));
+				ZBX_NULL2EMPTY_STR(events[i].name), events[i].severity);
 
 		num++;
 
@@ -372,14 +376,15 @@ static void	save_problems(void)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-				"name", NULL);
+				"name", "severity", NULL);
 
 		for (j = 0; j < problems.values_num; j++)
 		{
 			const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
 			zbx_db_insert_add_values(&db_insert, event->eventid, event->source, event->object,
-					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name));
+					event->objectid, event->clock, event->ns, ZBX_NULL2EMPTY_STR(event->name),
+					event->severity);
 		}
 
 		zbx_db_insert_execute(&db_insert);
