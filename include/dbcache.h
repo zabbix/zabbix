@@ -809,10 +809,9 @@ typedef struct
 }
 zbx_event_suppress_query_t;
 
-void	zbx_dc_update_maintenances();
+void	zbx_dc_update_maintenances(zbx_uint64_t *update_revision, int *modified_num, int *stopped_num);
 void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates);
-void	zbx_dc_set_maintenance_update_time(int now);
-int	zbx_dc_get_maintenance_update_time();
-void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries);
+void	zbx_dc_get_maintenance_update_stats(zbx_uint64_t *update_revision, int *modified_num, int *stopped_num);
+void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t maintenance_revision);
 
 #endif

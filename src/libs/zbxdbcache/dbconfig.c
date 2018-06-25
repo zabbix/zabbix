@@ -92,6 +92,8 @@ extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
+static void	dc_hostgroup_cache_nested_groupids(zbx_dc_hostgroup_t *parent_group);
+
 /******************************************************************************
  *                                                                            *
  * Function: is_item_processed_by_server                                      *
@@ -4419,6 +4421,7 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(maintenance->tags_evaltype, row[4]);
 		maintenance->active_since = atoi(row[2]);
 		maintenance->active_until = atoi(row[3]);
+		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	/* remove deleted maintenances */
@@ -4434,6 +4437,7 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 		zbx_vector_ptr_destroy(&maintenance->periods);
 
 		zbx_hashset_remove_direct(&config->maintenances, maintenance);
+		config->maintenance_revision++;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4513,6 +4517,7 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&maintenance->tags, maintenance_tag);
 
 		zbx_vector_ptr_append(&maintenances, maintenance);
+		config->maintenance_revision++;
 	}
 
 	/* remove deleted maintenance tags */
@@ -4541,6 +4546,7 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
 
 		zbx_vector_ptr_append(&maintenances, maintenance);
+		config->maintenance_revision++;
 	}
 
 	/* sort maintenance tags */
@@ -4552,6 +4558,7 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 	{
 		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
 		zbx_vector_ptr_sort(&maintenance->tags, dc_compare_maintenance_tags);
+		maintenance->revision = config->maintenance_revision;
 	}
 
 	zbx_vector_ptr_destroy(&maintenances);
@@ -4621,6 +4628,8 @@ static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 		period->period = atoi(row[7]);
 		period->start_date = atoi(row[8]);
 
+		maintenance->revision = ++config->maintenance_revision;
+
 		if (0 == found)
 			zbx_vector_ptr_append(&maintenance->periods, period);
 	}
@@ -4646,6 +4655,7 @@ static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 		}
 
 		zbx_hashset_remove_direct(&config->maintenance_periods, period);
+		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4698,6 +4708,7 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(groupid, row[1]);
 
 		zbx_vector_uint64_append(&maintenance->groupids, groupid);
+		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	/* remove deleted maintenance groupids from cache */
@@ -4719,6 +4730,7 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		}
 
 		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
+		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4774,6 +4786,8 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hostid, row[1]);
 
 		zbx_vector_uint64_append(&maintenance->hostids, hostid);
+		zbx_vector_ptr_append(&maintenances, maintenance);
+		config->maintenance_revision++;
 	}
 
 	/* remove deleted maintenance hostids from cache */
@@ -4795,6 +4809,8 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 		}
 
 		zbx_vector_uint64_remove_noorder(&maintenance->hostids, index);
+		zbx_vector_ptr_append(&maintenances, maintenance);
+		config->maintenance_revision++;
 	}
 
 	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -4804,6 +4820,7 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	{
 		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
 		zbx_vector_uint64_sort(&maintenance->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		maintenance->revision = config->maintenance_revision;
 	}
 
 	zbx_vector_ptr_destroy(&maintenances);
@@ -5028,6 +5045,47 @@ static void	dc_hostgroups_update_cache(void)
 			zbx_vector_uint64_destroy(&group->nested_groupids);
 		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_precache_nested_groups                            *
+ *                                                                            *
+ * Purpose: precaches nested groups for groups used in maintenances           *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_maintenance_precache_nested_groups(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_maintenance_t	*maintenance;
+	zbx_vector_uint64_t	groupids;
+	int			i;
+	zbx_dc_hostgroup_t	*group;
+
+	if (0 == config->maintenances.num_data)
+		return;
+
+	zbx_vector_uint64_create(&groupids);
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_uint64_append_array(&groupids, maintenance->groupids.values,
+				maintenance->groupids.values_num);
+	}
+
+	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < groupids.values_num; i++)
+	{
+		if (NULL != (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups,
+				&groupids.values[i])))
+		{
+			dc_hostgroup_cache_nested_groupids(group);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&groupids);
 }
 
 /******************************************************************************
@@ -5372,6 +5430,9 @@ void	DCsync_configuration(unsigned char mode)
 	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOST_GROUPS;
 
+	if (0 != maintenance_group_sync.add_num + maintenance_group_sync.update_num + maintenance_group_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS;
+
 	/* update trigger topology if trigger dependency was changed */
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY))
 		dc_trigger_update_topology();
@@ -5385,6 +5446,10 @@ void	DCsync_configuration(unsigned char mode)
 
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_HOST_GROUPS))
 		dc_hostgroups_update_cache();
+
+	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
+		dc_maintenance_precache_nested_groups();
+
 
 	update_sec = zbx_time() - sec;
 
@@ -6073,7 +6138,10 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
-	config->maintenance_update_ts = 0;
+	config->maintenance_revision = 0;
+	config->maintenance_update_revision = 0;
+	config->maintenance_modified_num = 0;
+	config->maintenance_stopped_num = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
@@ -11301,6 +11369,42 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_hostgroup_cache_nested_groupids                               *
+ *                                                                            *
+ * Purpose: cache nested group identifiers                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_hostgroup_cache_nested_groupids(zbx_dc_hostgroup_t *parent_group)
+{
+	zbx_dc_hostgroup_t	*group;
+
+	if (0 == (parent_group->flags & ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS))
+	{
+		int	index, len;
+
+		zbx_vector_uint64_create_ext(&parent_group->nested_groupids, __config_mem_malloc_func,
+				__config_mem_realloc_func, __config_mem_free_func);
+
+		index = zbx_vector_ptr_bsearch(&config->hostgroups_name, parent_group, dc_compare_hgroups);
+		len = strlen(parent_group->name);
+
+		while (++index < config->hostgroups_name.values_num)
+		{
+			group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
+
+			if (0 != strncmp(group->name, parent_group->name, len))
+				break;
+
+			if ('\0' == group->name[len] || '/' == group->name[len])
+				zbx_vector_uint64_append(&parent_group->nested_groupids, group->groupid);
+		}
+
+		parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_get_nested_hostgroupids                                       *
  *                                                                            *
  * Purpose: gets nested group ids for the specified host group                *
@@ -11312,7 +11416,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
  ******************************************************************************/
 static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids)
 {
-	zbx_dc_hostgroup_t	*parent_group, *group;
+	zbx_dc_hostgroup_t	*parent_group;
 
 	zbx_vector_uint64_append(nested_groupids, groupid);
 
@@ -11323,32 +11427,13 @@ static void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t
 
 	if (NULL != (parent_group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
 	{
-		if (0 == (parent_group->flags & ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS))
+		dc_hostgroup_cache_nested_groupids(parent_group);
+
+		if (0 != parent_group->nested_groupids.values_num)
 		{
-			int	index, len;
-
-			zbx_vector_uint64_create_ext(&parent_group->nested_groupids, __config_mem_malloc_func,
-					__config_mem_realloc_func, __config_mem_free_func);
-
-			index = zbx_vector_ptr_bsearch(&config->hostgroups_name, parent_group, dc_compare_hgroups);
-			len = strlen(parent_group->name);
-
-			while (++index < config->hostgroups_name.values_num)
-			{
-				group = (zbx_dc_hostgroup_t *)config->hostgroups_name.values[index];
-
-				if (0 != strncmp(group->name, parent_group->name, len))
-					break;
-
-				if ('\0' == group->name[len] || '/' == group->name[len])
-					zbx_vector_uint64_append(&parent_group->nested_groupids, group->groupid);
-			}
-
-			parent_group->flags |= ZBX_DC_HOSTGROUP_FLAGS_NESTED_GROUPIDS;
+			zbx_vector_uint64_append_array(nested_groupids, parent_group->nested_groupids.values,
+					parent_group->nested_groupids.values_num);
 		}
-
-		zbx_vector_uint64_append_array(nested_groupids, parent_group->nested_groupids.values,
-				parent_group->nested_groupids.values_num);
 	}
 }
 
@@ -12029,19 +12114,30 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_period_t *pe
  *                                                                            *
  * Purpose: update maintenance state depending on maintenance periods         *
  *                                                                            *
+ * Parameters: pupdate_revision - [OUT] maintenance revision for this update  *
+ *                                      (optional, can be NULL)               *
+ *             pmodified_num    - [OUT] the number of maintenances modified   *
+ *                                      since last maintenance update.        *
+ *                                      Note that started/stopped maintenances*
+ *                                      also counts as modified.              *
+ *                                      (ignored if pupdate_revision is null) *
+ *             pstopped_num     - [OUT] the number of stopped maintenances    *
+ *                                      (ignored if pupdate_revision is null) *
+ *                                                                            *
  * Comments: This function calculates if any maintenance period is running    *
  *           and based on that sets current maintenance state - running/idle  *
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_maintenances()
+void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_num, int *pstopped_num)
 {
 	const char			*__function_name = "zbx_dc_update_maintenances";
 
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, started_num = 0, running_num = 0, stopped_num = 0, seconds, ret;
+	int				i, running_num = 0, seconds, ret, started_num = 0, modified_num = 0,
+			stopped_num = 0;
 	unsigned char			state;
 	struct tm			*tm;
 	time_t				now, period_start, running_since, running_until;
@@ -12098,7 +12194,11 @@ void	zbx_dc_update_maintenances()
 				started_num++;
 			}
 
-			maintenance->running_until = running_until;
+			if (maintenance->running_until != running_until)
+			{
+				maintenance->running_until = running_until;
+				maintenance->revision = ++config->maintenance_revision;
+			}
 			running_num++;
 		}
 		else
@@ -12108,15 +12208,31 @@ void	zbx_dc_update_maintenances()
 				maintenance->running_since = 0;
 				maintenance->running_until = 0;
 				maintenance->state = ZBX_MAINTENANCE_IDLE;
+				maintenance->revision = ++config->maintenance_revision;
 				stopped_num++;
 			}
 		}
+
+		if (maintenance->revision > config->maintenance_update_revision)
+			modified_num++;
+	}
+
+	if (NULL != pupdate_revision)
+	{
+		*pupdate_revision = config->maintenance_revision;
+		*pmodified_num = modified_num;
+		*pstopped_num = stopped_num;
+
+		config->maintenance_update_revision = *pupdate_revision;
+		config->maintenance_modified_num = modified_num;
+		config->maintenance_stopped_num = stopped_num;
 	}
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d", __function_name,
-			started_num, stopped_num, running_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d modified:%d", __function_name,
+			started_num, stopped_num, running_num, modified_num);
+
 }
 
 /******************************************************************************
@@ -12126,7 +12242,7 @@ void	zbx_dc_update_maintenances()
  * Purpose: get active maintenances                                           *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_active_maintenances(zbx_vector_ptr_t *maintenances)
+static void	dc_get_active_maintenances(zbx_uint64_t revision, zbx_vector_ptr_t *maintenances)
 {
 	zbx_dc_maintenance_t	*maintenance;
 	zbx_hashset_iter_t	iter;
@@ -12134,7 +12250,7 @@ static void	dc_get_active_maintenances(zbx_vector_ptr_t *maintenances)
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
 	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_MAINTENANCE_RUNNING == maintenance->state)
+		if (ZBX_MAINTENANCE_RUNNING == maintenance->state && maintenance->revision > revision)
 			zbx_vector_ptr_append(maintenances, maintenance);
 	}
 }
@@ -12318,8 +12434,9 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
  * Purpose: update host maintenance status in configuration cache based       *
  *          on running maintenances                                           *
  *                                                                            *
- * Parameters: updates - [OUT] updates that were made in configuration cache  *
- *             and must be applied to database                                *
+ * Parameters: updates          - [OUT] updates that were made in             *
+ *                                configuration cache and must be applied     *
+ *                                to database                                 *
  *                                                                            *
  * Comments: This function must be called after zbx_dc_update_maintenances()  *
  *           function has updated maintenance state in configuration cache.   *
@@ -12337,7 +12454,7 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 
 	RDLOCK_CACHE;
 
-	dc_get_active_maintenances(&maintenances);
+	dc_get_active_maintenances(0, &maintenances);
 	dc_get_host_maintenance_updates(&maintenances, updates);
 
 	UNLOCK_CACHE;
@@ -12356,34 +12473,25 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_set_maintenance_update_time                               *
- *                                                                            *
- * Purpose: set maintenance update timestamp                                  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_set_maintenance_update_time(int now)
-{
-	WRLOCK_CACHE;
-	config->maintenance_update_ts = now;
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_dc_get_maintenance_update_time                               *
  *                                                                            *
  * Purpose: get maintenance update timestamp                                  *
  *                                                                            *
+ * Parameters: update_revision - [OUT] revision of the last maintenance update*
+ *             modified_num    - [OUT] the number of maintenances modified    *
+ *                                     since last maintenance update.         *
+ *                                     Note that started/stopped maintenances *
+ *                                     also counts as modified.               *
+ *             stopped_num     - [OUT] the number of stopped maintenances     *
+ *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_maintenance_update_time()
+void	zbx_dc_get_maintenance_update_stats(zbx_uint64_t *update_revision, int *modified_num, int *stopped_num)
 {
-	int	ts;
-
 	RDLOCK_CACHE;
-	ts = config->maintenance_update_ts;
+	*update_revision = config->maintenance_update_revision;
+	*modified_num = config->maintenance_modified_num;
+	*stopped_num = config->maintenance_stopped_num;
 	UNLOCK_CACHE;
-
-	return ts;
 }
 
 /******************************************************************************
@@ -12610,7 +12718,7 @@ static int	dc_compare_tags(const void *d1, const void *d2)
  * Purpose: get active maintenances for each event                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries)
+void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t maintenance_revision)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
 	zbx_vector_ptr_t		maintenances;
@@ -12639,7 +12747,7 @@ void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries)
 
 	RDLOCK_CACHE;
 
-	dc_get_active_maintenances(&maintenances);
+	dc_get_active_maintenances(maintenance_revision, &maintenances);
 
 	if (0 == maintenances.values_num)
 		goto unlock;
