@@ -327,11 +327,13 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filterForm = (new CFilter('web.latest.filter.state'))
+$filterForm = (new CFilter())
+	->setProfile('web.latest.filter')
+	->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'),
+	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
@@ -346,7 +348,7 @@ $filterColumn1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'),
+	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
@@ -385,9 +387,7 @@ $filterColumn2 = (new CFormList())
 	)
 	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 
-$filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+$filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
 
 $widget->addItem($filterForm);
 // End of Filter

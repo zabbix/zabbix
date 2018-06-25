@@ -24,7 +24,9 @@ require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = (new CFilter($filter['filterid']))
+$filterForm = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
 	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
@@ -40,15 +42,13 @@ $column1 = (new CFormList())
 	);
 
 // ack status
-if ($config['event_ack_enable']) {
-	$column1->addRow(_('Acknowledge status'),
-		new CComboBox('ack_status', $filter['ackStatus'], null, [
-			ZBX_ACK_STS_ANY => _('Any'),
-			ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
-			ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-		])
-	);
-}
+$column1->addRow(_('Acknowledge status'),
+	new CComboBox('ack_status', $filter['ackStatus'], null, [
+		ZBX_ACK_STS_ANY => _('Any'),
+		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
+		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
+	])
+);
 
 // min severity
 $severityNames = [];
@@ -142,7 +142,6 @@ $column2->addRow(_('Show hosts in maintenance'),
 	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
 );
 
-$filterForm->addColumn($column1);
-$filterForm->addColumn($column2);
+$filterForm->addFilterTab(_('Filter'), [$column1, $column2]);
 
 return $filterForm;

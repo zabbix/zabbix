@@ -80,9 +80,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// ack status
-	if ($config['event_ack_enable'] == EVENT_ACK_ENABLED) {
-		CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
-	}
+	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
 
 	// update host inventory filter
 	$inventoryFields = [];
@@ -130,27 +128,29 @@ $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTI
 /*
  * Display
  */
-$data = [
-	'fullscreen' => (bool) getRequest('fullscreen', false),
-	'type' => $type,
-	'view_style' => $viewStyle,
-	'config' => $config
-];
-
-$data['pageFilter'] = new CPageFilter([
+$page_filter = new CPageFilter([
 	'groups' => [
-		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
+		($type == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	],
 	'hosts' => [
 		'monitored_hosts' => true,
-		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
+		($type == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
 	],
 	'hostid' => getRequest('hostid'),
 	'groupid' => getRequest('groupid')
 ]);
 
-$data['groupid'] = $data['pageFilter']->groupid;
-$data['hostid'] = $data['pageFilter']->hostid;
+$data = [
+	'fullscreen' => (bool) getRequest('fullscreen', false),
+	'type' => $type,
+	'view_style' => $viewStyle,
+	'config' => $config,
+	'pageFilter' => $page_filter,
+	'groupid' => $page_filter->groupid,
+	'hostid' => $page_filter->hostid,
+	'profileIdx' => 'web.overview.filter',
+	'active_tab' => CProfile::get('web.overview.filter.active', 1)
+];
 
 // fetch trigger data
 if ($type == SHOW_TRIGGERS) {

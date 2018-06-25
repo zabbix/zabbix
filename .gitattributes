@@ -38,6 +38,7 @@ frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
+frontends/php/locale/nb/LC_MESSAGES/frontend.po -text
 frontends/php/tests/images/image.png -text svneol=unset#image/png
 include/zbxhistory.h -text
 include/zbxipcservice.h -text
@@ -305,7 +306,6 @@ sass/favicon.ico -text svneol=unset#image/x-icon
 sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 sass/img_source/icons-sprite.ai -text
-sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxalgo/queue.c -text

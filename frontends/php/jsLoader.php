@@ -90,17 +90,11 @@ $availableJScripts = [
 
 $tranStrings = [
 	'gtlc.js' => [
-		'S_ALL_S' => _('All'),
-		'S_ZOOM' => _('Zoom'),
-		'S_FIXED_SMALL' => _('fixed'),
-		'S_DYNAMIC_SMALL' => _('dynamic'),
-		'S_NOW_SMALL' => _('now'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'S_DATE_FORMAT' => DATE_TIME_FORMAT
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
@@ -200,7 +194,16 @@ $tranStrings = [
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
-		'Select' => _('Select')
+		'Select' => _('Select'),
+		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
+		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
+		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
+		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
+		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
+		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),

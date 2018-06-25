@@ -619,7 +619,9 @@ else {
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'config' => $config
+		'config' => $config,
+		'profileIdx' => 'web.triggers.filter',
+		'active_tab' => CProfile::get('web.triggers.filter.active', 1)
 	];
 
 	$data['pageFilter'] = new CPageFilter([
