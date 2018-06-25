@@ -685,20 +685,17 @@ class CScreenProblem extends CScreenBase {
 
 		$data = self::makeData($data, $this->data['filter']);
 
-		$original_severity = [];
-
 		if ($data['triggers']) {
 			$triggerids = array_keys($data['triggers']);
 
 			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'priority'],
+				'output' => [],
 				'selectDependencies' => ['triggerid'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
 			]);
 
 			foreach ($data['triggers'] as $triggerid => &$trigger) {
-				$original_severity[$triggerid] = $trigger['priority'];
 				$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
 					? $db_triggers[$triggerid]['dependencies']
 					: [];
