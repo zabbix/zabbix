@@ -389,14 +389,9 @@ class CScreenProblem extends CScreenBase {
 				];
 				break;
 
-			case 'priority':
-				foreach ($data['problems'] as &$problem) {
-					$problem['priority'] = $data['triggers'][$problem['objectid']]['priority'];
-				}
-				unset($problem);
-
+			case 'severity':
 				$sort_fields = [
-					['field' => 'priority', 'order' => $sortorder],
+					['field' => 'severity', 'order' => $sortorder],
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				];
@@ -789,7 +784,7 @@ class CScreenProblem extends CScreenBase {
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
 						$header_check_box,
-						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'],
+						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 							$link
 						)->addStyle('width: 120px;'),
 						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
@@ -811,7 +806,7 @@ class CScreenProblem extends CScreenBase {
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
 						$header_check_box,
-						make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder'],
+						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 							$link
 						),
 						(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
