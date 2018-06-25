@@ -131,6 +131,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 	events[events_num].flags = ZBX_FLAGS_DB_EVENT_CREATE;
 	events[events_num].severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	events[events_num].suppressed = EVENT_SUPPRESSED_FALSE;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -1746,6 +1747,7 @@ exit:
 static void	save_event_suppress_data()
 {
 	zbx_vector_ptr_t		event_queries;
+	zbx_vector_ptr_t		event_refs;
 	zbx_event_suppress_query_t	*query;
 	int				j, k;
 	size_t				i;
@@ -1753,6 +1755,7 @@ static void	save_event_suppress_data()
 	/* prepare query data  */
 
 	zbx_vector_ptr_create(&event_queries);
+	zbx_vector_ptr_create(&event_refs);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -1778,6 +1781,7 @@ static void	save_event_suppress_data()
 		zbx_vector_uint64_pair_create(&query->maintenances);
 
 		zbx_vector_ptr_append(&event_queries, query);
+		zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
 
@@ -1801,6 +1805,9 @@ static void	save_event_suppress_data()
 							query->maintenances.values[j].first,
 							(int)query->maintenances.values[j].second);
 				}
+
+				((DB_EVENT *)event_refs.values[k])->suppressed = (0 == query->maintenances.values_num ?
+						EVENT_SUPPRESSED_FALSE : EVENT_SUPPRESSED_TRUE);
 			}
 
 			zbx_db_insert_execute(&db_insert);
@@ -1809,6 +1816,7 @@ static void	save_event_suppress_data()
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
 
+	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_ptr_destroy(&event_queries);
 }
 

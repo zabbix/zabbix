@@ -198,6 +198,8 @@ struct	_DC_TRIGGER;
 #define ITEM_PREPROC_PARAMS_LEN		255
 
 #define EVENT_NAME_LEN			2048
+#define EVENT_SUPPRESSED_FALSE		0
+#define EVENT_SUPPRESSED_TRUE		1
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
@@ -310,6 +312,7 @@ typedef struct
 	int			acknowledged;
 	int			ns;
 	int			severity;
+	unsigned char		suppressed;
 
 	zbx_vector_ptr_t	tags;
 
