@@ -362,6 +362,14 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_REGEXP		8
 #define CONDITION_OPERATOR_NOT_REGEXP		9
 
+/* maintenance tag operators */
+#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
+#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
+
+/* maintenance tag evaluation types */
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
+
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
 /* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */

@@ -12395,10 +12395,16 @@ int	zbx_dc_get_maintenance_update_time()
  ******************************************************************************/
 static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, const zbx_tag_t *tag)
 {
-	if (CONDITION_OPERATOR_LIKE == mt->operator)
-		return (NULL != strstr(tag->value, mt->value) ? SUCCEED : FAIL);
-
-	return (0 == strcmp(tag->value, mt->value) ? SUCCEED : FAIL);
+	switch (mt->operator)
+	{
+		case ZBX_MAINTENANCE_TAG_OPERATOR_LIKE:
+			return (NULL != strstr(tag->value, mt->value) ? SUCCEED : FAIL);
+		case ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL:
+			return (0 == strcmp(tag->value, mt->value) ? SUCCEED : FAIL);
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
 }
 
 /******************************************************************************
@@ -12560,11 +12566,21 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
  ******************************************************************************/
 static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
 {
-	if (0 == maintenance->tags.values_num)
-		return SUCCEED;
+	switch (maintenance->tags_evaltype)
+	{
+		case ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR:
+			/* break; is not missing here */
+		case ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR:
+			if (0 == maintenance->tags.values_num)
+				return SUCCEED;
 
-	if (0 == tags->values_num)
-		return FAIL;
+			if (0 == tags->values_num)
+				return FAIL;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
 
 	if (CONDITION_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
 		return dc_maintenance_match_tags_andor(maintenance, tags);
