@@ -679,6 +679,7 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
+	int			maintenance_update_ts;
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */

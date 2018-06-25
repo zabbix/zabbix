@@ -1432,7 +1432,7 @@ out:
 static int	DBpatch_3050121(void)
 {
 	const ZBX_TABLE table =
-		{"event_suppress",	"eventid",	0,
+		{"event_suppress",	"eventid,maintenanceid",	0,
 			{
 				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},

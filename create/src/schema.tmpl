@@ -1624,7 +1624,7 @@ TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 
-TABLE|event_suppress|eventid|0
+TABLE|event_suppress|eventid,maintenanceid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0

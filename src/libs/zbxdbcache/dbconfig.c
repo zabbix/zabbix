@@ -4441,6 +4441,21 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_compare_maintenance_tags                                      *
+ *                                                                            *
+ * Purpose: compare maintenance tags by tag name for sorting                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
+{
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)d1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)d2;
+
+	return strcmp(tag1->tag, tag2->tag);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_maintenance_tags                                          *
  *                                                                            *
  * Purpose: Updates maintenance tags in configuration cache                   *
@@ -4465,9 +4480,12 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_uint64_t			maintenancetagid, maintenanceid;
 	zbx_dc_maintenance_tag_t	*maintenance_tag;
 	zbx_dc_maintenance_t		*maintenance;
-	int				found, ret, index;
+	zbx_vector_ptr_t		maintenances;
+	int				found, ret, index, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&maintenances);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4493,6 +4511,8 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 		if (0 == found)
 			zbx_vector_ptr_append(&maintenance->tags, maintenance_tag);
+
+		zbx_vector_ptr_append(&maintenances, maintenance);
 	}
 
 	/* remove deleted maintenance tags */
@@ -4519,7 +4539,22 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 		zbx_strpool_release(maintenance_tag->value);
 
 		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
+
+		zbx_vector_ptr_append(&maintenances, maintenance);
 	}
+
+	/* sort maintenance tags */
+
+	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&maintenances, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < maintenances.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+		zbx_vector_ptr_sort(&maintenance->tags, dc_compare_maintenance_tags);
+	}
+
+	zbx_vector_ptr_destroy(&maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -6038,6 +6073,7 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
+	config->maintenance_update_ts = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
@@ -12318,4 +12354,325 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() updates:%d", __function_name, updates->values_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_set_maintenance_update_time                               *
+ *                                                                            *
+ * Purpose: set maintenance update timestamp                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_set_maintenance_update_time(int now)
+{
+	WRLOCK_CACHE;
+	config->maintenance_update_ts = now;
+	UNLOCK_CACHE;
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_maintenance_update_time                               *
+ *                                                                            *
+ * Purpose: get maintenance update timestamp                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_maintenance_update_time()
+{
+	int	ts;
+
+	RDLOCK_CACHE;
+	ts = config->maintenance_update_ts;
+	UNLOCK_CACHE;
+
+	return ts;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_tag_match                                         *
+ *                                                                            *
+ * Purpose: perform maintenance tag comparison using maintenance tag operator *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, const zbx_tag_t *tag)
+{
+	if (CONDITION_OPERATOR_LIKE == mt->operator)
+		return (NULL != strstr(tag->value, mt->value) ? SUCCEED : FAIL);
+
+	return (0 == strcmp(tag->value, mt->value) ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_match_tag_range                                   *
+ *                                                                            *
+ * Purpose: matches tags with [*mt_pos] maintenance tag name                  *
+ *                                                                            *
+ * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
+ *             etags    - [IN] the event tags, sorted by tag names            *
+ *             mt_pos   - [IN/OUT] the next maintenance tag index             *
+ *             et_pos   - [IN/OUT] the next event tag index                   *
+ *                                                                            *
+ * Return value: SUCCEED - found matching tag                                 *
+ *               FAIL    - no matching tags found                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_ptr_t *etags,
+		int *mt_pos, int *et_pos)
+{
+	const zbx_dc_maintenance_tag_t	*mtag;
+	const zbx_tag_t			*etag;
+	const char			*name;
+	int				i, j, ret, mt_start, mt_end, et_start, et_end;
+
+	mt_start = *mt_pos;
+	et_start = *et_pos;
+
+	mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[mt_start];
+	name = mtag->tag;
+
+	/* find last maintenance tag with the same name */
+
+	for (i = mt_start + 1; i < mtags->values_num; i++)
+	{
+		mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[i];
+		if (0 != strcmp(mtag->tag, name))
+			break;
+	}
+	mt_end = i - 1;
+	*mt_pos = i;
+
+	/* find first event tag with the same name */
+
+	for (i = et_start; i < etags->values_num; i++)
+	{
+		etag = (const zbx_tag_t *)etags->values[i];
+		if (0 < (ret = strcmp(etag->tag, name)))
+		{
+			*et_pos = i;
+			return FAIL;
+		}
+
+		if (0 == ret)
+			break;
+	}
+
+	if (i == etags->values_num)
+	{
+		*et_pos = i;
+		return FAIL;
+	}
+
+	et_start = i++;
+
+	/* find last event tag with the same name */
+
+	for (; i < etags->values_num; i++)
+	{
+		etag = (const zbx_tag_t *)etags->values[i];
+		if (0 != strcmp(etag->tag, name))
+			break;
+	}
+
+	et_end = i - 1;
+	*et_pos = i;
+
+	/* cross-compare maintenance and event tags within the found ranges */
+
+	for (i = mt_start; i <= mt_end; i++)
+	{
+		mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[i];
+
+		for (j = et_start; j <= et_end; j++)
+		{
+			etag = (const zbx_tag_t *)etags->values[j];
+			if (SUCCEED == dc_maintenance_tag_value_match(mtag, etag))
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_match_tags_or                                     *
+ *                                                                            *
+ * Purpose: matches maintenance and event tags using OR eval type             *
+ *                                                                            *
+ * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
+ *             etags    - [IN] the event tags, sorted by tag names            *
+ *                                                                            *
+ * Return value: SUCCEED - event tags matches maintenance                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+{
+	int	mt_pos = 0, et_pos = 0;
+
+	while (mt_pos < maintenance->tags.values_num && et_pos < tags->values_num)
+	{
+		if (SUCCEED == dc_maintenance_match_tag_range(&maintenance->tags, tags, &mt_pos, &et_pos))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_match_tags_andor                                  *
+ *                                                                            *
+ * Purpose: matches maintenance and event tags using AND/OR eval type         *
+ *                                                                            *
+ * Parameters: mtags    - [IN] the maintenance tags, sorted by tag names      *
+ *             etags    - [IN] the event tags, sorted by tag names            *
+ *                                                                            *
+ * Return value: SUCCEED - event tags matches maintenance                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+{
+	int	mt_pos = 0, et_pos = 0;
+
+	while (mt_pos < maintenance->tags.values_num && et_pos < tags->values_num)
+	{
+		if (FAIL == dc_maintenance_match_tag_range(&maintenance->tags, tags, &mt_pos, &et_pos))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_maintenance_match_tags                                        *
+ *                                                                            *
+ * Purpose: check if the tags must be processed by the specified maintenance  *
+ *                                                                            *
+ * Parameters: maintenance - [IN] the maintenance                             *
+ *             tags        - [IN] the tags to check                           *
+ *                                                                            *
+ * Return value: SUCCEED - the tags must be processed by the maintenance      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+{
+	if (0 == maintenance->tags.values_num)
+		return SUCCEED;
+
+	if (0 == tags->values_num)
+		return FAIL;
+
+	if (CONDITION_EVAL_TYPE_AND_OR == maintenance->tags_evaltype)
+		return dc_maintenance_match_tags_andor(maintenance, tags);
+	else
+		return dc_maintenance_match_tags_or(maintenance, tags);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_compare_tags                                                  *
+ *                                                                            *
+ * Purpose: compare maintenance tags by tag name for sorting                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_tags(const void *d1, const void *d2)
+{
+	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
+	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
+
+	return strcmp(tag1->tag, tag2->tag);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_event_maintenances                                    *
+ *                                                                            *
+ * Purpose: get active maintenances for each event                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries)
+{
+	const char			*__function_name = "zbx_dc_get_event_maintenances";
+	zbx_vector_ptr_t		maintenances;
+	int				i, j, k;
+	zbx_dc_maintenance_t		*maintenance;
+	zbx_event_suppress_query_t	*query;
+	ZBX_DC_ITEM			*item;
+	ZBX_DC_FUNCTION			*function;
+	zbx_vector_uint64_t		hostids;
+	zbx_uint64_pair_t		pair;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&maintenances);
+	zbx_vector_ptr_reserve(&maintenances, 100);
+	zbx_vector_uint64_create(&hostids);
+
+	/* pre-sort query tags for quicker tag matching */
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		if (0 != query->tags.values_num)
+			zbx_vector_ptr_sort(&query->tags, dc_compare_tags);
+	}
+
+	RDLOCK_CACHE;
+
+	dc_get_active_maintenances(&maintenances);
+
+	if (0 == maintenances.values_num)
+		goto unlock;
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+
+		for (j = 0; j < query->functionids.values_num; j++)
+		{
+			if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+					&query->functionids.values[j])))
+			{
+				continue;
+			}
+
+			if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+				continue;
+
+			zbx_vector_uint64_append(&hostids, item->hostid);
+		}
+
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (j = 0; j < maintenances.values_num; j++)
+		{
+			maintenance = (zbx_dc_maintenance_t *)maintenances.values[j];
+
+			for (k = 0; k < hostids.values_num; k++)
+			{
+				if (SUCCEED == dc_maintenance_match_host(maintenance, hostids.values[k]) &&
+						SUCCEED == dc_maintenance_match_tags(maintenance, &query->tags))
+				{
+					pair.first = maintenance->maintenanceid;
+					pair.second = maintenance->running_until;
+					zbx_vector_uint64_pair_append(&query->maintenances, pair);
+					break;
+				}
+			}
+		}
+
+		zbx_vector_uint64_clear(&hostids);
+	}
+unlock:
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_ptr_destroy(&maintenances);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}

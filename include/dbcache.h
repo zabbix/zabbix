@@ -799,7 +799,20 @@ typedef struct
 }
 zbx_host_maintenance_diff_t;
 
+/* event maintenance query data, used to get event maintenances from cache */
+typedef struct
+{
+	zbx_uint64_t			eventid;		/* [IN] eventid */
+	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
+	zbx_vector_ptr_t		tags;			/* [IN] event tags */
+	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenances for the event */
+}
+zbx_event_suppress_query_t;
+
 void	zbx_dc_update_maintenances();
 void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates);
+void	zbx_dc_set_maintenance_update_time(int now);
+int	zbx_dc_get_maintenance_update_time();
+void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries);
 
 #endif
