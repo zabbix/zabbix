@@ -1737,6 +1737,83 @@ exit:
 
 /******************************************************************************
  *                                                                            *
+ * Function: save_event_suppress_data                                         *
+ *                                                                            *
+ * Purpose: retrieve running maintenances for each event and saves it in      *
+ *          event_suppress table                                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	save_event_suppress_data()
+{
+	zbx_vector_ptr_t		event_queries;
+	zbx_event_suppress_query_t	*query;
+	int				j, k;
+	size_t				i;
+
+	/* prepare query data  */
+
+	zbx_vector_ptr_create(&event_queries);
+
+	for (i = 0; i < events_num; i++)
+	{
+		if (0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
+			continue;
+
+		if (EVENT_SOURCE_TRIGGERS != events[i].source)
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != events[i].value)
+			continue;
+
+		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
+		query->eventid = events[i].eventid;
+
+		zbx_vector_uint64_create(&query->functionids);
+		get_functionids(&query->functionids, events[i].trigger.expression);
+		get_functionids(&query->functionids, events[i].trigger.recovery_expression);
+
+		zbx_vector_ptr_create(&query->tags);
+		zbx_vector_ptr_append_array(&query->tags, events[i].tags.values, events[i].tags.values_num);
+
+		zbx_vector_uint64_pair_create(&query->maintenances);
+
+		zbx_vector_ptr_append(&event_queries, query);
+	}
+
+
+	if (0 != event_queries.values_num)
+	{
+		/* get maintenance data and save it in database */
+		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, 0))
+		{
+			zbx_db_insert_t	db_insert;
+
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
+					"suppress_until", NULL);
+
+			for (k = 0; k < event_queries.values_num; k++)
+			{
+				query = (zbx_event_suppress_query_t *)event_queries.values[k];
+
+				for (j = 0; j < query->maintenances.values_num; j++)
+				{
+					zbx_db_insert_add_values(&db_insert, query->eventid,
+							query->maintenances.values[j].first,
+							(int)query->maintenances.values[j].second);
+				}
+			}
+
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
+		}
+		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
+	}
+
+	zbx_vector_ptr_destroy(&event_queries);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: flush_events                                                     *
  *                                                                            *
  * Purpose: flushes local event cache to database                             *
@@ -1752,6 +1829,7 @@ static int	flush_events(void)
 	ret = save_events();
 	save_problems();
 	save_event_recovery();
+	save_event_suppress_data();
 
 	zbx_vector_uint64_pair_create(&closed_events);
 

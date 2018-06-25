@@ -12717,12 +12717,14 @@ static int	dc_compare_tags(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: get active maintenances for each event                            *
  *                                                                            *
+ * Return value: SUCCEED - at least one matching maintenance was found        *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t maintenance_revision)
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t maintenance_revision)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
 	zbx_vector_ptr_t		maintenances;
-	int				i, j, k;
+	int				i, j, k, ret = FAIL;
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_event_suppress_query_t	*query;
 	ZBX_DC_ITEM			*item;
@@ -12785,6 +12787,7 @@ void	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t
 					pair.first = maintenance->maintenanceid;
 					pair.second = maintenance->running_until;
 					zbx_vector_uint64_pair_append(&query->maintenances, pair);
+					ret = SUCCEED;
 					break;
 				}
 			}
@@ -12799,4 +12802,22 @@ unlock:
 	zbx_vector_ptr_destroy(&maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_event_suppress_query_free                                    *
+ *                                                                            *
+ * Purpose: free event suppress query structure                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
+{
+	zbx_vector_uint64_destroy(&query->functionids);
+	zbx_vector_uint64_pair_destroy(&query->maintenances);
+	zbx_vector_ptr_clear_ext(&query->tags, (zbx_clean_func_t)zbx_free_tag);
+	zbx_vector_ptr_destroy(&query->tags);
+	zbx_free(query);
 }

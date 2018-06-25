@@ -145,22 +145,6 @@ zbx_event_suppress_data_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_event_suppress_query_free                                    *
- *                                                                            *
- * Purpose: free event suppress query structure                               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
-{
-	zbx_vector_uint64_destroy(&query->functionids);
-	zbx_vector_uint64_pair_destroy(&query->maintenances);
-	zbx_vector_ptr_clear_ext(&query->tags, (zbx_clean_func_t)zbx_free_tag);
-	zbx_vector_ptr_destroy(&query->tags);
-	zbx_free(query);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_event_suppress_data_free                                     *
  *                                                                            *
  * Purpose: free event suppress data structure                                *
@@ -463,6 +447,8 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 		zbx_dc_get_event_maintenances(&event_queries, revision);
 
+		/* generate event suppress changeset */
+
 		for (i = 0; i < event_queries.values_num; i++)
 		{
 			query = (zbx_event_suppress_query_t *)event_queries.values[i];
@@ -507,6 +493,8 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 						(int)query->maintenances.values[k].second);
 			}
 		}
+
+		/* flush event suppress changeset */
 
 		if (0 != inserts.values_num || 0 != updates.values_num)
 		{
