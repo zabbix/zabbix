@@ -5051,7 +5051,7 @@ static void	dc_hostgroups_update_cache(void)
  *                                                                            *
  * Function: dc_maintenance_precache_nested_groups                            *
  *                                                                            *
- * Purpose: precaches nested groups for groups used in maintenances           *
+ * Purpose: pre-caches nested groups for groups used in running maintenances  *
  *                                                                            *
  ******************************************************************************/
 static void	dc_maintenance_precache_nested_groups(void)
@@ -5069,6 +5069,9 @@ static void	dc_maintenance_precache_nested_groups(void)
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
 	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
+		if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
+			continue;
+
 		zbx_vector_uint64_append_array(&groupids, maintenance->groupids.values,
 				maintenance->groupids.values_num);
 	}
@@ -12192,6 +12195,18 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 				maintenance->running_since = running_since;
 				maintenance->state = ZBX_MAINTENANCE_RUNNING;
 				started_num++;
+
+				/* pre-cache nested host groups */
+				for (i = 0; i < maintenance->groupids.values_num; i++)
+				{
+					zbx_dc_hostgroup_t	*group;
+
+					if (NULL != (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(
+							&config->hostgroups, &maintenance->groupids.values[i])))
+					{
+						dc_hostgroup_cache_nested_groupids(group);
+					}
+				}
 			}
 
 			if (maintenance->running_until != running_until)
@@ -12242,7 +12257,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
  * Purpose: get active maintenances                                           *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_active_maintenances(zbx_uint64_t revision, zbx_vector_ptr_t *maintenances)
+static void	dc_get_running_maintenances(zbx_uint64_t revision, zbx_vector_ptr_t *maintenances)
 {
 	zbx_dc_maintenance_t	*maintenance;
 	zbx_hashset_iter_t	iter;
@@ -12454,7 +12469,7 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 
 	RDLOCK_CACHE;
 
-	dc_get_active_maintenances(0, &maintenances);
+	dc_get_running_maintenances(0, &maintenances);
 	dc_get_host_maintenance_updates(&maintenances, updates);
 
 	UNLOCK_CACHE;
@@ -12715,7 +12730,8 @@ static int	dc_compare_tags(const void *d1, const void *d2)
  *                                                                            *
  * Function: zbx_dc_get_event_maintenances                                    *
  *                                                                            *
- * Purpose: get active maintenances for each event                            *
+ * Purpose: get running maintenances for each event modified after            *
+ *          maintenance_revision revision                                     *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
@@ -12749,7 +12765,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t 
 
 	RDLOCK_CACHE;
 
-	dc_get_active_maintenances(maintenance_revision, &maintenances);
+	dc_get_running_maintenances(maintenance_revision, &maintenances);
 
 	if (0 == maintenances.values_num)
 		goto unlock;

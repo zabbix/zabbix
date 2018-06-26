@@ -38,6 +38,31 @@ extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern int		CONFIG_TIMER_FORKS;
 
+/* trigger -> functions cache */
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	functionids;
+}
+zbx_trigger_functions_t;
+
+/* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
+typedef struct
+{
+	zbx_uint64_t			triggerid;
+	zbx_vector_uint64_pair_t	maintenances;
+}
+zbx_event_suppress_data_t;
+
+/* event suppress data */
+typedef struct
+{
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	maintenanceid;
+	int		suppress_until;
+}
+zbx_event_suppress_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: db_update_host_maintenances                                      *
@@ -59,7 +84,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 
 		for (i = 0; i < updates->values_num; i++)
 		{
-			char delim = ' ';
+			char	delim = ' ';
 
 			diff = (const zbx_host_maintenance_diff_t *)updates->values[i];
 
@@ -69,11 +94,14 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 			{
 				if (0 != diff->maintenanceid)
 				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=" ZBX_FS_UI64,
-						delim, diff->maintenanceid);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid="
+							ZBX_FS_UI64, delim, diff->maintenanceid);
 				}
 				else
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null", delim);
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null",
+							delim);
+				}
 
 				delim = ',';
 			}
@@ -124,24 +152,10 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
  ******************************************************************************/
 static void	db_remove_expired_event_suppress_data(int now)
 {
+	DBbegin();
 	DBexecute("delete from event_suppress where suppress_until<%d", now);
+	DBcommit();
 }
-
-/* trigger -> functions cache */
-typedef struct
-{
-	zbx_uint64_t		triggerid;
-	zbx_vector_uint64_t	functionids;
-}
-zbx_trigger_functions_t;
-
-/* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
-typedef struct
-{
-	zbx_uint64_t			triggerid;
-	zbx_vector_uint64_pair_t	maintenances;
-}
-zbx_event_suppress_data_t;
 
 /******************************************************************************
  *                                                                            *
@@ -160,7 +174,7 @@ void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
  *                                                                            *
  * Function: db_get_query_events                                              *
  *                                                                            *
- * Purpose: get open problems from database and prepare maintenance queries,  *
+ * Purpose: get open problems from database and prepare event query, event    *
  *          data structures                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -201,7 +215,7 @@ static void	db_get_query_events(int process_num, zbx_vector_ptr_t *event_queries
  *                                                                            *
  * Function: db_get_query_functions                                           *
  *                                                                            *
- * Purpose: get query event functionids from database                         *
+ * Purpose: get event query functionids from database                         *
  *                                                                            *
  ******************************************************************************/
 static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_vector_ptr_t *event_data)
@@ -221,6 +235,8 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_hashset_create(&triggers, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* cache functionids by triggerids */
 
 	for (i = 0; i < event_data->values_num; i++)
 	{
@@ -257,6 +273,8 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
 	}
 	DBfree_result(result);
 
+	/*  copy functionids to event queries */
+
 	for (i = 0; i < event_queries->values_num; i++)
 	{
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
@@ -281,7 +299,7 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
  *                                                                            *
  * Function: db_get_query_tags                                                *
  *                                                                            *
- * Purpose: get query event tags from database                                *
+ * Purpose: get event query tags from database                                *
  *                                                                            *
  ******************************************************************************/
 static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
@@ -335,7 +353,7 @@ static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
  *                                                                            *
  * Function: db_get_suppress_data                                             *
  *                                                                            *
- * Purpose: get query event maintenance information from database             *
+ * Purpose: get event query maintenance information from database             *
  *                                                                            *
  ******************************************************************************/
 static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vector_ptr_t *event_data)
@@ -388,20 +406,19 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vect
 	zbx_vector_uint64_destroy(&eventids);
 }
 
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	maintenanceid;
-	int		suppress_until;
-}
-zbx_dc_event_suppress_t;
-
+/******************************************************************************
+ *                                                                            *
+ * Function: add_event_suppress_record                                        *
+ *                                                                            *
+ * Purpose: add event suppress record to records to be inserted/updated       *
+ *                                                                            *
+ ******************************************************************************/
 static void	add_event_suppress_record(zbx_vector_ptr_t *records, zbx_uint64_t eventid, zbx_uint64_t maintenanceid,
 		int suppress_until)
 {
-	zbx_dc_event_suppress_t	*record;
+	zbx_event_suppress_t	*record;
 
-	record = (zbx_dc_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_dc_event_suppress_t));
+	record = (zbx_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_t));
 	record->eventid = eventid;
 	record->maintenanceid = maintenanceid;
 	record->suppress_until = suppress_until;
@@ -427,7 +444,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 	zbx_event_suppress_data_t	*data;
 	int				i, j, k;
 	zbx_vector_ptr_t		inserts, updates;
-	zbx_dc_event_suppress_t		*record;
+	zbx_event_suppress_t		*record;
 
 	*suppressed_num = 0;
 
@@ -510,7 +527,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				for (i = 0; i < inserts.values_num; i++)
 				{
-					record = (zbx_dc_event_suppress_t *)inserts.values[i];
+					record = (zbx_event_suppress_t *)inserts.values[i];
 					zbx_db_insert_add_values(&db_insert, record->eventid, record->maintenanceid,
 							record->suppress_until);
 					(*suppressed_num)++;
@@ -518,7 +535,6 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				ret = zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
-				zbx_vector_ptr_clear_ext(&inserts, zbx_ptr_free);
 			}
 
 			if (FAIL != ret && 0 != updates.values_num)
@@ -530,7 +546,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				for (i = 0; i < updates.values_num; i++)
 				{
-					record = (zbx_dc_event_suppress_t *)updates.values[i];
+					record = (zbx_event_suppress_t *)updates.values[i];
 
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"update event_suppress"
@@ -552,10 +568,12 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 				}
 
 				zbx_free(sql);
-				zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
-			}
 
+			}
 			DBcommit();
+
+			zbx_vector_ptr_clear_ext(&inserts, zbx_ptr_free);
+			zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
 		}
 
 		zbx_vector_ptr_destroy(&updates);
@@ -569,12 +587,11 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 	zbx_vector_ptr_destroy(&event_queries);
 }
 
-
 /******************************************************************************
  *                                                                            *
- * Function: main_timer_loop                                                  *
+ * Function: timer_thread                                                     *
  *                                                                            *
- * Purpose: periodically processes host maintenance                           *
+ * Purpose: periodically processes maintenance                                *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)

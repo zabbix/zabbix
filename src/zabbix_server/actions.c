@@ -386,36 +386,12 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_IN:
-				result = DBselect(
-						"select count(*)"
-						" from hosts h,items i,functions f,triggers t"
-						" where h.hostid=i.hostid"
-							" and h.maintenance_status=%d"
-							" and i.itemid=f.itemid"
-							" and f.triggerid=t.triggerid"
-							" and t.triggerid=" ZBX_FS_UI64,
-						HOST_MAINTENANCE_STATUS_ON,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+				if (EVENT_SUPPRESSED_TRUE == event->suppressed)
 					ret = SUCCEED;
-				DBfree_result(result);
 				break;
 			case CONDITION_OPERATOR_NOT_IN:
-				result = DBselect(
-						"select count(*)"
-						" from hosts h,items i,functions f,triggers t"
-						" where h.hostid=i.hostid"
-							" and h.maintenance_status=%d"
-							" and i.itemid=f.itemid"
-							" and f.triggerid=t.triggerid"
-							" and t.triggerid=" ZBX_FS_UI64,
-						HOST_MAINTENANCE_STATUS_OFF,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+				if (EVENT_SUPPRESSED_FALSE == event->suppressed)
 					ret = SUCCEED;
-				DBfree_result(result);
 				break;
 			default:
 				ret = NOTSUPPORTED;

@@ -1813,6 +1813,13 @@ static void	save_event_suppress_data()
 			zbx_db_insert_execute(&db_insert);
 			zbx_db_insert_clean(&db_insert);
 		}
+
+		for (k = 0; k < event_queries.values_num; k++)
+		{
+			query = (zbx_event_suppress_query_t *)event_queries.values[k];
+			/* reset tags vector to avoid double freeing copied tag name/value pointers */
+			zbx_vector_ptr_clear(&query->tags);
+		}
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
 
