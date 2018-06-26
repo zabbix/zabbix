@@ -12346,30 +12346,35 @@ static void	dc_get_host_maintenance_updates(const zbx_vector_ptr_t *maintenances
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
+		if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
+			continue;
+
 		maintenance_status = HOST_MAINTENANCE_STATUS_OFF;
 		maintenance_type = MAINTENANCE_TYPE_NORMAL;
 		maintenanceid = 0;
 		maintenance_from = 0;
 		flags = 0;
 
-		for (i = 0; i < maintenances->values_num; i++)
+		if (HOST_STATUS_MONITORED == host->status)
 		{
-			maintenance = (const zbx_dc_maintenance_t *)maintenances->values[i];
-
-			if (SUCCEED == dc_maintenance_match_host(maintenance, host->hostid))
+			for (i = 0; i < maintenances->values_num; i++)
 			{
-				if (0 == maintenanceid ||
-						(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
-								MAINTENANCE_TYPE_NODATA == maintenance->type))
+				maintenance = (const zbx_dc_maintenance_t *)maintenances->values[i];
+
+				if (SUCCEED == dc_maintenance_match_host(maintenance, host->hostid))
 				{
-					maintenance_status = HOST_MAINTENANCE_STATUS_ON;
-					maintenance_type = maintenance->type;
-					maintenanceid = maintenance->maintenanceid;
-					maintenance_from = maintenance->running_since;
+					if (0 == maintenanceid ||
+							(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
+							MAINTENANCE_TYPE_NODATA == maintenance->type))
+					{
+						maintenance_status = HOST_MAINTENANCE_STATUS_ON;
+						maintenance_type = maintenance->type;
+						maintenanceid = maintenance->maintenanceid;
+						maintenance_from = maintenance->running_since;
+					}
 				}
 			}
 		}
-
 
 		if (maintenanceid != host->maintenanceid)
 			flags |= ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID;
