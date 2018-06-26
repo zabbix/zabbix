@@ -12417,6 +12417,8 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
 	zbx_host_maintenance_diff_t	*diff;
 	ZBX_DC_HOST			*host;
 
+	WRLOCK_CACHE;
+
 	for (i = 0; i < updates->values_num;)
 	{
 		diff = (zbx_host_maintenance_diff_t *)updates->values[i];
@@ -12442,6 +12444,8 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
 
 		i++;
 	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -12472,6 +12476,9 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 	RDLOCK_CACHE;
 
 	dc_get_running_maintenances(0, &maintenances);
+
+	/* host maintenance update must be performed even without running maintenances */
+	/* to reset host maintenances status for stopped maintenances                  */
 	dc_get_host_maintenance_updates(&maintenances, updates);
 
 	UNLOCK_CACHE;
@@ -12479,20 +12486,16 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 	zbx_vector_ptr_destroy(&maintenances);
 
 	if (0 != updates->values_num)
-	{
-		WRLOCK_CACHE;
 		dc_flush_host_maintenance_updates(updates);
-		UNLOCK_CACHE;
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() updates:%d", __function_name, updates->values_num);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_maintenance_update_time                               *
+ * Function: zbx_dc_get_maintenance_update_stats                              *
  *                                                                            *
- * Purpose: get maintenance update timestamp                                  *
+ * Purpose: get maintenance update statistics                                 *
  *                                                                            *
  * Parameters: update_revision - [OUT] revision of the last maintenance update*
  *             modified_num    - [OUT] the number of maintenances modified    *
@@ -12555,13 +12558,17 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 	const char			*name;
 	int				i, j, ret, mt_start, mt_end, et_start, et_end;
 
+	/* get the maintenance tag name */
+	mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[*mt_pos];
+	name = mtag->tag;
+
+	/* find maintenance and event tag ranges matching the first maintenance tag name */
+	/* (maintenance tag range [mt_start,mt_end], event tag range [et_start,et_end])  */
+
 	mt_start = *mt_pos;
 	et_start = *et_pos;
 
-	mtag = (const zbx_dc_maintenance_tag_t *)mtags->values[mt_start];
-	name = mtag->tag;
-
-	/* find last maintenance tag with the same name */
+	/* find last maintenance tag with the required name */
 
 	for (i = mt_start + 1; i < mtags->values_num; i++)
 	{
@@ -12572,7 +12579,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 	mt_end = i - 1;
 	*mt_pos = i;
 
-	/* find first event tag with the same name */
+	/* find first event tag with the required name */
 
 	for (i = et_start; i < etags->values_num; i++)
 	{
@@ -12595,7 +12602,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
 
 	et_start = i++;
 
-	/* find last event tag with the same name */
+	/* find last event tag with the required name */
 
 	for (; i < etags->values_num; i++)
 	{
@@ -12756,7 +12763,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t 
 	zbx_vector_ptr_reserve(&maintenances, 100);
 	zbx_vector_uint64_create(&hostids);
 
-	/* pre-sort query tags for quicker tag matching */
+	/* event tags must be sorted by name to perform maintenance tag matching */
 
 	for (i = 0; i < event_queries->values_num; i++)
 	{
@@ -12776,6 +12783,8 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t 
 	{
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 
+		/* find hostids of items used in event trigger expressions */
+
 		for (j = 0; j < query->functionids.values_num; j++)
 		{
 			if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
@@ -12793,6 +12802,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t 
 		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		/* find matching maintenances */
 		for (j = 0; j < maintenances.values_num; j++)
 		{
 			maintenance = (zbx_dc_maintenance_t *)maintenances.values[j];
