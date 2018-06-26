@@ -1287,7 +1287,7 @@ static int	DBpatch_3050111(void)
 
 		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource()"
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to support regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
