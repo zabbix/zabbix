@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
 ..F....... [ZBX-11989] fixed condition operators for event correlation rules (vasilijs)
 ..F....... [ZBX-13779] fixed redirect button link in multiple places (miks)
 ..F....... [ZBXNEXT-4361] fixed selected breadcrumbs item style; fixed active time range tabs hover cursor style (Andzs, ashubin)
@@ -367,6 +368,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.11
@@ -1642,6 +1644,7 @@ Changes for 3.0.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.19
