@@ -1537,7 +1537,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 			item = (zbx_lld_item_t *)items->values[i];
 
-			if (0 != item->itemid || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			if (0 == item->master_itemid || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 				continue;
 
 			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
@@ -1565,7 +1565,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED)) {
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
 			for (j = 0; j < item->dependent_items.values_num; j++)
 			{
 				zbx_lld_item_t	*dependent;
