@@ -42,6 +42,7 @@ $form_list->addRow(_('Name'),
 // widget specific fields
 foreach ($data['dialogue']['fields'] as $field) {
 	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
+	$disabled = ($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -58,7 +59,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldCheckBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			new CVar($field->getName(), '0'),
-			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
+			(new CCheckBox($field->getName()))
+				->setChecked((bool) $field->getValue())
+				->setEnabled(!$disabled)
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
