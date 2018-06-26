@@ -22,6 +22,7 @@
 #include "dbupgrade.h"
 #include "zbxtasks.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -1276,12 +1277,29 @@ static int	DBpatch_3050111(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		parameter = zbx_strdup(NULL, row[1]);
+		size_t	regexp_esc_param_len;
 
+		parameter = zbx_strdup(NULL, row[1]);
 		zbx_regexp_escape(&parameter);
+
+		/* Strings converted to regexp has to start with ^ and end with $. */
+		regexp_esc_param_len = strlen(parameter) + 2;
+
+		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource()"
+					" (functionid: %s) to support regexp during database upgrade. The converted"
+					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
+					" Allowed length is %d characters.",
+					row[1], row[0], regexp_esc_param_len, FUNCTION_PARAM_LEN);
+
+			zbx_free(parameter);
+			continue;
+		}
+
 		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
 
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 2);
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, regexp_esc_param_len);
 		DBpatch_3050111_add_anchors(parameter_esc, parameter_esc_anchored);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
