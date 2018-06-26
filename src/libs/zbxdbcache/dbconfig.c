@@ -12355,23 +12355,20 @@ static void	dc_get_host_maintenance_updates(const zbx_vector_ptr_t *maintenances
 		maintenance_from = 0;
 		flags = 0;
 
-		if (HOST_STATUS_MONITORED == host->status)
+		for (i = 0; i < maintenances->values_num; i++)
 		{
-			for (i = 0; i < maintenances->values_num; i++)
-			{
-				maintenance = (const zbx_dc_maintenance_t *)maintenances->values[i];
+			maintenance = (const zbx_dc_maintenance_t *)maintenances->values[i];
 
-				if (SUCCEED == dc_maintenance_match_host(maintenance, host->hostid))
+			if (SUCCEED == dc_maintenance_match_host(maintenance, host->hostid))
+			{
+				if (0 == maintenanceid ||
+						(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
+						MAINTENANCE_TYPE_NODATA == maintenance->type))
 				{
-					if (0 == maintenanceid ||
-							(MAINTENANCE_TYPE_NORMAL == maintenance_type &&
-							MAINTENANCE_TYPE_NODATA == maintenance->type))
-					{
-						maintenance_status = HOST_MAINTENANCE_STATUS_ON;
-						maintenance_type = maintenance->type;
-						maintenanceid = maintenance->maintenanceid;
-						maintenance_from = maintenance->running_since;
-					}
+					maintenance_status = HOST_MAINTENANCE_STATUS_ON;
+					maintenance_type = maintenance->type;
+					maintenanceid = maintenance->maintenanceid;
+					maintenance_from = maintenance->running_since;
 				}
 			}
 		}
