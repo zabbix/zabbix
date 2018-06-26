@@ -12140,7 +12140,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
 	int				i, running_num = 0, seconds, ret, started_num = 0, modified_num = 0,
-			stopped_num = 0;
+					stopped_num = 0;
 	unsigned char			state;
 	struct tm			*tm;
 	time_t				now, period_start, running_since, running_until;
@@ -12162,6 +12162,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 
 		if (now >= maintenance->active_since && now < maintenance->active_until)
 		{
+			/* find the longest running maintenance period */
 			for (i = 0; i < maintenance->periods.values_num; i++)
 			{
 				period = (zbx_dc_maintenance_period_t *)maintenance->periods.values[i];
@@ -12173,10 +12174,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 				ret = dc_calculate_maintenance_period(period, maintenance->active_since,
 						period_start, &period_start);
 
-				if (SUCCEED == ret && (period_start > now || now >= period_start + period->period))
-					ret = FAIL;
-
-				if (SUCCEED == ret)
+				if (SUCCEED == ret && period_start <= now && now < period_start + period->period)
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
 					if (period_start + period->period > running_until)
@@ -12247,7 +12245,6 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d modified:%d", __function_name,
 			started_num, stopped_num, running_num, modified_num);
-
 }
 
 /******************************************************************************

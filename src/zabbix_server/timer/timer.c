@@ -65,6 +65,53 @@ zbx_event_suppress_t;
 
 /******************************************************************************
  *                                                                            *
+ * Function: log_host_maintenance_update                                      *
+ *                                                                            *
+ * Purpose: log host maintenance changes                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
+{
+	char	*msg = NULL;
+	size_t	msg_alloc = 0, msg_offset = 0;
+	int	maintenance_off = 0;
+
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
+	{
+		if (HOST_MAINTENANCE_STATUS_ON == diff->maintenance_status)
+		{
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "putting host (" ZBX_FS_UI64 ") into",
+					diff->hostid);
+		}
+		else
+		{
+			maintenance_off = 1;
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "taking host (" ZBX_FS_UI64 ") out of",
+				diff->hostid);
+		}
+	}
+	else
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "changing host (" ZBX_FS_UI64 ")", diff->hostid);
+
+	zbx_strcpy_alloc(&msg, &msg_alloc, &msg_offset, " maintenance");
+
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID) && 0 != diff->maintenanceid)
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "(" ZBX_FS_UI64 ")", diff->maintenanceid);
+
+
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE) && 0 == maintenance_off)
+	{
+		const char	*desription[] = {"with data collection", "without data collection"};
+
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", desription[diff->maintenance_type]);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+	zbx_free(msg);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: db_update_host_maintenances                                      *
  *                                                                            *
  * Purpose: update host maintenance properties in database                    *
@@ -132,6 +179,8 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				break;
 
+			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+				log_host_maintenance_update(diff);
 		}
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
