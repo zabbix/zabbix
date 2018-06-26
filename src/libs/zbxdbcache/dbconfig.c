@@ -298,10 +298,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
-		int flags, int now)
+static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now)
 {
-	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
@@ -312,9 +310,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
-
-	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-		now -= proxy->timediff;
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -372,9 +367,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	}
 
 	item->schedulable = 1;
-
-	if (NULL != proxy)
-		item->nextcheck += proxy->timediff + 1;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -1365,7 +1357,6 @@ done:
 
 			if (0 == found)
 			{
-				proxy->timediff = 0;
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
@@ -2757,7 +2748,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, host, item->state, flags, now);
+				DCitem_nextcheck_update(item, item->state, flags, now);
 		}
 		else
 		{
@@ -7246,7 +7237,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -8796,78 +8787,6 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_proxy_timediff                                      *
- *                                                                            *
- * Purpose: set rounded time difference between server clock and proxy clock  *
- *                                                                            *
- * Comments: When we calculate "nextcheck" for items on proxied hosts, we     *
- *           take the time difference between server and proxy into account.  *
- *                                                                            *
- *           For instance, suppose an item was processed on the proxy at 10   *
- *           seconds and there is a time difference between server and proxy  *
- *           of -2 seconds (that is, proxy's time is 2 seconds in front). In  *
- *           the server's database, we will store the timestamp of 8 seconds. *
- *           However, when we calculate "nextcheck" on the server side, we    *
- *           should calculate it from 10 seconds. Otherwise, if we calculate  *
- *           it from 8 seconds, we will probably get those 10 seconds as the  *
- *           "nextcheck". Finally, after calculating "nextcheck", we should   *
- *           utilize the time difference again to get Zabbix server's time.   *
- *                                                                            *
- *           Now, suppose we have a non-integer time difference, say, of -1.5 *
- *           seconds. Suppose also that one item on the proxy was checked at  *
- *           4.7 seconds, whereas a second item was checked at 5.2 seconds,   *
- *           which corresponds to server times of 3.2 and 3.7 seconds. Since  *
- *           "nextcheck" calculation only uses the integer part, server will  *
- *           use 3 seconds as the basis, before using the time difference.    *
- *           However, it is very likely that the first item was scheduled for *
- *           4 seconds on the proxy and the second item for 5 seconds, so in  *
- *           order to be precise we would need to store time differences for  *
- *           each individual item. That would lead to a significant increase  *
- *           in memory consumption, which we rather avoid. For this reason    *
- *           we only store a single time difference between server and proxy, *
- *           and use it for all items. However, the way time difference is    *
- *           used is different before and after "nextcheck" calculation.      *
- *                                                                            *
- *           Consider the example above. Server uses 3 seconds as the basis,  *
- *           and subtracts a unified difference of -2 (rounded down) to both  *
- *           items, yielding 5. It then calculates "nextcheck" for these two  *
- *           items, yielding 4 and 5 (assuming a one-minute delay). It then   *
- *           adds a unified difference of -1 (rounded up), to get Zabbix      *
- *           server's time of 3 and 4.                                        *
- *                                                                            *
- *           This has the effect that items will get into the delayed item    *
- *           queue at most one second later, but this is feasible: in proxy   *
- *           to server communication there is a communication latency, which  *
- *           also has the effect of putting items into the delayed item queue *
- *           a bit later, and we do not account for that anyway.              *
- *                                                                            *
- *           As described above, we subtract a rounded down difference before *
- *           "nextcheck" calculation and a rounded up difference after. Since *
- *           we have a 1/10^9 chance of hitting an integer "timediff" value,  *
- *           which would yield the same value rounded down and rounded up, in *
- *           the proxy structure we only store the difference rounded down to *
- *           save space. This is achieved by discarding the "ns" part of the  *
- *           "timediff" structure. We then assume that the rounded down value *
- *           and the rounded up values are different.                         *
- *                                                                            *
- *           Calculations of "nextchecks" themselves are done in functions    *
- *           DCget_reachable_nextcheck() and DCsync_items() functions.        *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff)
-{
-	ZBX_DC_PROXY	*dc_proxy;
-
-	WRLOCK_CACHE;
-
-	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		dc_proxy->timediff = timediff->sec;
-
-	UNLOCK_CACHE;
 }
 
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
@@ -11016,7 +10935,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
 	}
 
 	UNLOCK_CACHE;

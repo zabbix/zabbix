@@ -194,7 +194,16 @@ $tranStrings = [
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
-		'Select' => _('Select')
+		'Select' => _('Select'),
+		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
+		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
+		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
+		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
+		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
+		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),

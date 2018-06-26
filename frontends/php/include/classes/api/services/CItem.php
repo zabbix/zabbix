@@ -1284,6 +1284,8 @@ class CItem extends CItemGeneral {
 			foreach ($result as &$item) {
 				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
+				$no_value = in_array($item['value_type'],
+						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]) ? '' : '0';
 
 				if (isset($requestedOutput['lastclock'])) {
 					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
@@ -1292,10 +1294,10 @@ class CItem extends CItemGeneral {
 					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
 				}
 				if (isset($requestedOutput['lastvalue'])) {
-					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : '0';
+					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : $no_value;
 				}
 				if (isset($requestedOutput['prevvalue'])) {
-					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : '0';
+					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : $no_value;
 				}
 			}
 			unset($item);
