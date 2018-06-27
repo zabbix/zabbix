@@ -93,7 +93,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/db.inc.php';
 
 		// page specific includes
-		require_once $this->getRootDir().'/include/acknow.inc.php';
 		require_once $this->getRootDir().'/include/actions.inc.php';
 		require_once $this->getRootDir().'/include/discovery.inc.php';
 		require_once $this->getRootDir().'/include/draw.inc.php';
@@ -425,6 +424,13 @@ class ZBase {
 		// Controller returned fatal error
 		else if ($response instanceof CControllerResponseFatal) {
 			header('Content-Type: text/html; charset=UTF-8');
+
+			global $ZBX_MESSAGES;
+			$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
+			foreach ($messages as $message) {
+				$response->addMessage($message['message']);
+			}
+
 			$response->addMessage('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {

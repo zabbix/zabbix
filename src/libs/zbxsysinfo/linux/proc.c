@@ -521,7 +521,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
-		if (0 == strcmp(entries->d_name, "self"))
+		if (0 == atoi(entries->d_name))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
@@ -788,7 +788,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
-		if (0 == strcmp(entries->d_name, "self"))
+		if (0 == atoi(entries->d_name))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);

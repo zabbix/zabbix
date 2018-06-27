@@ -4051,4 +4051,75 @@ out:
     mode: ZBX_VC_MODE_LOWMEM
     hits: 0
     misses: 0
+---
+# TC29
+# Test that value in a middle of second interval is returned.
+test case: Get 1 item value when cache working in low memory mode
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - &row12
+      value: value 1.2
+      ts: 2017-01-10 10:00:01.200000000 +00:00
+    - &row15
+      value: value 1.5
+      ts: 2017-01-10 10:00:01.500000000 +00:00
+    - &row17
+      value: value 1.7
+      ts: 2017-01-10 10:00:01.700000000 +00:00
+    - &row22
+      value: value 2.2
+      ts: 2017-01-10 10:00:02.200000000 +00:00
+    - &row25
+      value: value 2.5
+      ts: 2017-01-10 10:00:02.500000000 +00:00
+    - &row27
+      value: value 2.7
+      ts: 2017-01-10 10:00:02.700000000 +00:00
+    - &row32
+      value: value 3.2
+      ts: 2017-01-10 10:00:03.200000000 +00:00
+    - &row35
+      value: value 3.5
+      ts: 2017-01-10 10:00:03.500000000 +00:00
+    - &row37
+      value: value 3.7
+      ts: 2017-01-10 10:00:03.700000000 +00:00
+    - &row42
+      value: value 4.2
+      ts: 2017-01-10 10:00:04.200000000 +00:00
+    - &row45
+      value: value 4.5
+      ts: 2017-01-10 10:00:04.500000000 +00:00
+    - &row47
+      value: value 4.7
+      ts: 2017-01-10 10:00:04.700000000 +00:00
+    - &row52
+      value: value 5.2
+      ts: 2017-01-10 10:00:05.200000000 +00:00
+    - &row55
+      value: value 5.5
+      ts: 2017-01-10 10:00:05.500000000 +00:00
+    - &row57
+      value: value 5.7
+      ts: 2017-01-10 10:00:05.700000000 +00:00
+  test:
+    cache mode: ZBX_VC_MODE_LOWMEM
+    time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 1
+    end: 2017-01-10 10:00:05.600000000 +00:00
+out:
+  values:
+  - *row55
+  cache:
+    items:
+    - itemid: 1
+    mode: ZBX_VC_MODE_LOWMEM
+    hits: 0
+    misses: 1
 ...

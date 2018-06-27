@@ -21,9 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$filterForm = (new CFilter('web.toptriggers.filter.state'))
-	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
-	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
+$filterForm = new CFilter();
 
 // severities
 $severity_columns = [0 => [], 1 => []];
@@ -35,7 +33,7 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 }
 
 $filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'),
+	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
@@ -50,7 +48,7 @@ $filterColumn1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'),
+	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
@@ -106,8 +104,11 @@ $filterColumn2 = (new CFormList())
 	]);
 
 $filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
+	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
+	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 // table
 $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);

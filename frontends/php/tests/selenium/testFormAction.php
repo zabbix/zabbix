@@ -485,9 +485,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestInputTypeWait('new_condition_value', 'TEST2');
 			$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[text()='Add' and contains(@onclick, 'add_condition')]");
 
-				$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
-				$evaltype = $data['evaltype'];
-			}
+			$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
+			$evaltype = $data['evaltype'];
+		}
 
 		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
 			$this->zbxTestTextPresent('Type of calculation');
@@ -526,8 +526,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
-			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]/td[2]');
+			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
@@ -914,7 +913,7 @@ class testFormAction extends CWebTest {
 				$def_longdata_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
 					' Problem name: {TRIGGER.NAME}'.
 					' Host: {HOST.NAME}'.
-					' Severity: {TRIGGER.SEVERITY}'.
+					' Severity: {EVENT.SEVERITY}'.
 					' Original problem ID: {EVENT.ID}'.
 					' {TRIGGER.URL}';
 					break;
@@ -1217,7 +1216,7 @@ class testFormAction extends CWebTest {
 						$new_operation_opmessage_message_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
 							' Problem name: {TRIGGER.NAME}'.
 							' Host: {HOST.NAME}'.
-							' Severity: {TRIGGER.SEVERITY}'.
+							' Severity: {EVENT.SEVERITY}'.
 							' Original problem ID: {EVENT.ID}'.
 							' {TRIGGER.URL}';
 							break;
@@ -1560,7 +1559,7 @@ class testFormAction extends CWebTest {
 					$r_longdata_val = 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}'.
 						' Problem name: {TRIGGER.NAME}'.
 						' Host: {HOST.NAME}'.
-						' Severity: {TRIGGER.SEVERITY}'.
+						' Severity: {EVENT.SEVERITY}'.
 						' Original problem ID: {EVENT.ID}'.
 						' {TRIGGER.URL}';
 						break;
@@ -1580,7 +1579,7 @@ class testFormAction extends CWebTest {
 		}
 
 		if (array_key_exists('acknowledge_msg', $data)) {
-			$this->zbxTestTabSwitch('Acknowledgement operations');
+			$this->zbxTestTabSwitch('Update operations');
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('ack_shortdata'));
 			$acknowledge_msg = $data['acknowledge_msg'];
 		}
@@ -1592,7 +1591,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementPresentId('tab_acknowledgeTab');
 		}
 		else {
-			$this->zbxTestTextNotPresent('Acknowledgement operations');
+			$this->zbxTestTextNotPresent('Update operations');
 			$this->zbxTestAssertElementNotPresentId('tab_acknowledgeTab');
 		}
 
@@ -1601,15 +1600,14 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertVisibleId('ack_shortdata');
 			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'maxlength', 255);
 			$this->zbxTestAssertAttribute("//input[@id='ack_shortdata']", 'size', 20);
-			$this->zbxTestAssertElementValue('ack_shortdata', 'Acknowledged: {TRIGGER.NAME}');
+			$this->zbxTestAssertElementValue('ack_shortdata', 'Updated problem: {EVENT.NAME}');
 
 			$this->zbxTestTextPresent('Default message');
 			$this->zbxTestAssertVisibleId('ack_longdata');
 			$this->zbxTestAssertAttribute("//textarea[@id='ack_longdata']", 'rows', 7);
-			$ack_longdata_val = '{USER.FULLNAME} acknowledged problem at {ACK.DATE} {ACK.TIME}'.
-						' with the following message:'.
-						' {ACK.MESSAGE}'.
-						' Current problem status is {EVENT.STATUS}';
+			$ack_longdata_val = '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.'.
+						' {EVENT.UPDATE.MESSAGE}'.
+						' Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.';
 			$this->zbxTestAssertElementText('//textarea[@id="ack_longdata"]', $ack_longdata_val);
 		}
 		elseif ($eventsource == 'Triggers') {

@@ -202,7 +202,7 @@ class testFormGraph extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Graphs']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Graphs']");
 
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');

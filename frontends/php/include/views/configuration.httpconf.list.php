@@ -19,8 +19,10 @@
 **/
 
 
-$filter = (new CFilter('web.httpconf.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Status'),
 				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
@@ -29,8 +31,7 @@ $filter = (new CFilter('web.httpconf.filter.state'))
 					->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 					->setModern(true)
 			)
-	)
-	->addNavigator();
+	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
@@ -51,15 +52,14 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, ($this->data['pageFilter']->hostid > 0)
-			? new CRedirectButton(_('Create web scenario'), (new CUrl())
-					->setArgument('form', 'create')
-					->setArgument('groupid', $this->data['pageFilter']->groupid)
-					->setArgument('hostid', $this->data['pageFilter']->hostid)
-					->getUrl()
-				)
+			? new CRedirectButton(_('Create web scenario'), (new CUrl('httpconf.php'))
+				->setArgument('form', 'create')
+				->setArgument('groupid', $data['pageFilter']->groupid)
+				->setArgument('hostid', $data['pageFilter']->hostid)
+				->getUrl()
+			)
 			: (new CButton('form', _('Create web scenario (select host first)')))->setEnabled(false)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
 if (!empty($this->data['hostid'])) {

@@ -29,22 +29,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'graphid' =>		[T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null],
-	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
-	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,		null],
-	'isNow' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),	null],
-	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
-	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
-	'width' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',	null],
-	'graph3d' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null],
-	'legend' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'widget_view' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'graphid' =>		[T_ZBX_INT,			O_MAND, P_SYS,		DB_ID,		null],
+	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,		null],
+	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,		null],
+	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,		null,		null],
+	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,		null,		null],
+	'width' =>			[T_ZBX_INT,			O_OPT, P_NZERO,	BETWEEN(20, 65535),	null],
+	'height' =>			[T_ZBX_INT,			O_OPT, P_NZERO,	'{} > 0',	null],
+	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),	null],
+	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	exit();
 }
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 /*
  * Permissions
@@ -66,18 +65,16 @@ else {
 /*
  * Display
  */
-$timeline = calculateTime([
-	'profileIdx' => getRequest('profileIdx', 'web.screens'),
+$timeline = getTimeSelectorPeriod([
+	'profileIdx' => getRequest('profileIdx'),
 	'profileIdx2' => getRequest('profileIdx2'),
-	'updateProfile' => (getRequest('updateProfile', '0') === '1'),
-	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'isNow' => getRequest('isNow')
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
 ]);
 
 $graph = new CPieGraphDraw($dbGraph['graphtype']);
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+$graph->setPeriod($timeline['to_ts'] - $timeline['from_ts']);
+$graph->setSTime($timeline['from_ts']);
 
 $width = getRequest('width', 0);
 if ($width <= 0) {
