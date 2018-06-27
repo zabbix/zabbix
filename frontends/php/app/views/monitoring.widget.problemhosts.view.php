@@ -78,46 +78,9 @@ foreach ($data['groups'] as $group) {
 	 */
 	if ($data['filter']['ext_ack'] != EXTACK_OPTION_ALL) {
 		if ($group['hosts_problematic_unack_list']) {
-			// Set trigger severities as table header, ordered starting from highest severity.
-			$header = [_('Host')];
-
-			foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-				if (in_array($severity, $data['filter']['severities'])) {
-					$header[] = getSeverityName($severity, $data['config']);
-				}
-			}
-
-			$table_inf = (new CTableInfo())->setHeader($header);
-
-			$popup_rows = 0;
-
-			foreach ($group['hosts_problematic_unack_list'] as $hostid => $host_name) {
-				$host = $data['hosts_data'][$hostid];
-				$url_host->setArgument('filter_hostids', [$hostid]);
-				$row = new CRow(
-					(new CCol(
-						new CLink($host['host'], $url_host->getUrl())
-					))->addClass(ZBX_STYLE_NOWRAP)
-				);
-
-				foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-					if (in_array($severity, $data['filter']['severities'])) {
-						$row->addItem(
-							($host['severities'][$severity] != 0)
-								? (new CCol($host['severities'][$severity]))->addClass(getSeverityStyle($severity))
-								: ''
-						);
-					}
-				}
-
-				$table_inf->addRow($row);
-
-				if (++$popup_rows == ZBX_WIDGET_ROWS) {
-					break;
-				}
-			}
-
-			$last_unack_count = (new CLinkAction($group['hosts_problematic_unack_count']))->setHint($table_inf);
+			$last_unack_count = (new CLinkAction($group['hosts_problematic_unack_count']))->setHint(
+				makeProblemHostsHintBox($group['hosts_problematic_unack_list'], $data, $url_host)
+			);
 		}
 		else {
 			$last_unack_count = null;
@@ -129,46 +92,9 @@ foreach ($data['groups'] as $group) {
 	 * problems for each host, grouped per problem severity.
 	 */
 	if ($data['filter']['ext_ack'] != EXTACK_OPTION_UNACK && $group['hosts_problematic_count'] != 0) {
-		// Set trigger severities as table header, ordered starting from highest severity.
-		$header = [_('Host')];
-
-		foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-			if (in_array($severity, $data['filter']['severities'])) {
-				$header[] = getSeverityName($severity, $data['config']);
-			}
-		}
-
-		$table_inf = (new CTableInfo())->setHeader($header);
-
-		$popup_rows = 0;
-
-		foreach ($group['hosts_problematic_list'] as $hostid => $host_name) {
-			$host_data = $data['hosts_data'][$hostid];
-			$url_host->setArgument('filter_hostids', [$hostid]);
-			$row = new CRow(
-				(new CCol(
-					new CLink($host_data['host'], $url_host->getUrl())
-				))->addClass(ZBX_STYLE_NOWRAP)
-			);
-
-			foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
-				if (in_array($severity, $data['filter']['severities'])) {
-					$row->addItem(
-						($host_data['severities'][$severity] != 0)
-							? (new CCol($host_data['severities'][$severity]))->addClass(getSeverityStyle($severity))
-							: ''
-					);
-				}
-			}
-
-			$table_inf->addRow($row);
-
-			if (++$popup_rows == ZBX_WIDGET_ROWS) {
-				break;
-			}
-		}
-
-		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))->setHint($table_inf);
+		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))->setHint(
+			makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host)
+		);
 	}
 
 	// Add 'With problems' column with ext_ack specific content.
