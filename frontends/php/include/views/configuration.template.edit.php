@@ -21,7 +21,7 @@
 
 $widget = (new CWidget())->setTitle(_('Templates'));
 
-if (!($data['form'] === 'clone' || $data['form'] === 'full_clone')) {
+if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 	$widget->addItem(get_header_host_table('', $data['templateid']));
 }
 
