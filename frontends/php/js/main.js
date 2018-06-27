@@ -746,7 +746,7 @@ function set_color(color) {
 	color = color.toString().trim().toUpperCase();
 
 	if (curr_lbl) {
-		var background = /[0-9A-F]{6}/g.test(color) ? '#' + color : '';
+		var background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
 
 		curr_lbl.style.color = background;
 		curr_lbl.style.background = background;
