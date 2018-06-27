@@ -83,10 +83,7 @@ typedef struct
 {
 	char	*name;
 	char	*uuid;
-
-	zbx_uint64_t	capacity;
-	zbx_uint64_t	free_space;
-	zbx_uint64_t	uncommitted;
+	char	*id;
 }
 zbx_vmware_datastore_t;
 
@@ -206,6 +203,9 @@ typedef struct
 	zbx_uint64_t		eventlog_last_key;
 }
 zbx_vmware_service_t;
+
+#define ZBX_VMWARE_PERF_INTERVAL_UNKNOWN	0
+#define ZBX_VMWARE_PERF_INTERVAL_NONE		-1
 
 /* the vmware collector data */
 typedef struct

@@ -72,6 +72,7 @@ abstract class CGraphDraw {
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
 		$this->graphtheme = getUserGraphTheme();
+		$this->shiftY = 0;
 	}
 
 	/**
@@ -210,10 +211,6 @@ abstract class CGraphDraw {
 		);
 	}
 
-	public function period2str($period) {
-		return ' ('.zbx_date2age(0, $period).')';
-	}
-
 	public function drawHeader() {
 		if (!$this->draw_header) {
 			return;
@@ -227,17 +224,13 @@ abstract class CGraphDraw {
 			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
 		}
 
-		if ($this->period) {
-			$str .= $this->period2str($this->period);
-		}
-
 		// calculate largest font size that can fit graph header
 		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
 		for ($fontsize = static::DEFAULT_HEADER_LABEL_FONT_SIZE; $fontsize > 7; $fontsize--) {
 			$dims = imageTextSize($fontsize, 0, $str);
 			$x = $this->fullSizeX / 2 - ($dims['width'] / 2);
 
-			// most important information must be displayed, period can be out of the graph
+			// Most important information must be displayed.
 			if ($x < 2) {
 				$x = 2;
 			}

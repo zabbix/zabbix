@@ -270,7 +270,9 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$form = (new CFilter('web.items.filter.state'))
+	$filter = (new CFilter())
+		->setProfile('web.items.filter')
+		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)
 		->addVar('subfilter_apps', $subfilter_apps)
 		->addVar('subfilter_types', $subfilter_types)
@@ -330,7 +332,7 @@ function getItemFilterForm(&$items) {
 		]), ['groupid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow(_('Host group'),
+	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupid',
 			'object_name' => 'hostGroup',
@@ -340,7 +342,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
+					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_groupid',
 					'editable' => true
 				]
@@ -376,7 +378,7 @@ function getItemFilterForm(&$items) {
 		]), ['hostid' => 'id'])
 		: [];
 
-	$filterColumn1->addRow(_('Host'),
+	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostid',
 			'object_name' => 'hosts',
@@ -386,7 +388,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => [
 					'srctbl' => 'host_templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => $form->getName(),
+					'dstfrm' => $filter->getName(),
 					'dstfld1' => 'filter_hostid',
 					'editable' => true,
 					'templated_hosts' => true
@@ -418,7 +420,7 @@ function getItemFilterForm(&$items) {
 					CJs::encodeJson([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
+						'dstfrm' => $filter->getName(),
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
@@ -484,11 +486,6 @@ function getItemFilterForm(&$items) {
 			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
 		])
 	);
-
-	$form->addColumn($filterColumn1);
-	$form->addColumn($filterColumn2);
-	$form->addColumn($filterColumn3);
-	$form->addColumn($filterColumn4);
 
 	// subfilters
 	$table_subfilter = (new CTableInfo())
@@ -892,9 +889,11 @@ function getItemFilterForm(&$items) {
 		$table_subfilter->addRow([$interval_output]);
 	}
 
-	$form->setFooter($table_subfilter);
+	$filter->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2, $filterColumn3, $filterColumn4],
+		$table_subfilter
+	);
 
-	return $form;
+	return $filter;
 }
 
 /**

@@ -42,7 +42,6 @@ $fields = [
 	'max_in_table'				=> [T_ZBX_INT, O_OPT, null, BETWEEN(1, 99999), 'isset({update})',
 		_('Max count of elements to show inside table cell')
 	],
-	'event_ack_enable'			=> [T_ZBX_INT, O_OPT, null, IN('1'), null, _('Enable event acknowledgement')],
 	'server_check_interval'		=> [T_ZBX_INT, O_OPT, null, IN(SERVER_CHECK_INTERVAL), null,
 		_('Show warning if Zabbix server is down')
 	],
@@ -63,7 +62,6 @@ if (hasRequest('update')) {
 		'dropdown_first_remember' => getRequest('dropdown_first_remember', 0),
 		'search_limit' => getRequest('search_limit'),
 		'max_in_table' => getRequest('max_in_table'),
-		'event_ack_enable' => getRequest('event_ack_enable', 0),
 		'server_check_interval' => getRequest('server_check_interval', 0)
 	]);
 	$result = DBend($result);
@@ -83,7 +81,6 @@ if (hasRequest('form_refresh')) {
 		'dropdown_first_remember' => getRequest('dropdown_first_remember', 0),
 		'search_limit' => getRequest('search_limit', $config['search_limit']),
 		'max_in_table' => getRequest('max_in_table', $config['max_in_table']),
-		'event_ack_enable' => getRequest('event_ack_enable', 0),
 		'server_check_interval' => getRequest('server_check_interval', 0)
 	];
 }
@@ -94,7 +91,6 @@ else {
 		'dropdown_first_remember' => $config['dropdown_first_remember'],
 		'search_limit' => $config['search_limit'],
 		'max_in_table' => $config['max_in_table'],
-		'event_ack_enable' => $config['event_ack_enable'],
 		'server_check_interval' => $config['server_check_interval']
 	];
 }
