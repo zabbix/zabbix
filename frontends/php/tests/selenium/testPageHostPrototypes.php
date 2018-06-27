@@ -25,47 +25,29 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
  */
 class testPageHostPrototypes extends CWebTest {
 
-	private function selectHostPrototype($data) {
-		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name='" . $data['item'] . "'"));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=" . $discoveryid['itemid']);
-		foreach ($data['host_list'] as $host) {
-			$host_name = $host['host'];
-			if ($host_name === 'all') {
-				$this->zbxTestCheckboxSelect('all_hosts');
-			} else {
-				$result = DBselect('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_name));
-				while ($row = DBfetch($result)) {
-					$this->zbxTestCheckboxSelect('group_hostid_' . $row['hostid']);
-				}
-			}
-		}
-	}
-
 	public static function getSelectedData() {
 		return [
 			[
 				[
 					'item' => 'Discovery rule 1',
-					'host_list' => [
-						['host' => 'Host prototype {#1}']
+					'hosts' => [
+						'Host prototype {#1}'
 					]
 				]
 			],
 			[
 				[
 					'item' => 'Discovery rule 2',
-					'host_list' => [
-						['host' => 'all']
-					]
+					'hosts' => 'all'
 				]
 			],
 			[
 				[
 					'item' => 'Discovery rule 3',
-					'host_list' => [
-						['host' => 'Host prototype {#7}'],
-						['host' => 'Host prototype {#9}'],
-						['host' => 'Host prototype {#10}']
+					'hosts' => [
+						'Host prototype {#7}',
+						'host' => 'Host prototype {#9}',
+						'host' => 'Host prototype {#10}'
 					]
 				]
 			]
@@ -73,82 +55,95 @@ class testPageHostPrototypes extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getSelectedData
+	 * Select specified hosts from host prototype page.
+	 *
+	 * @param array $data	test case data from data provider
 	 */
-	public function testPageHostPrototypes_DisableSelected($data) {
+	private function selectHostPrototype($data) {
+		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+
+		if ($data['hosts'] === 'all') {
+			$this->zbxTestCheckboxSelect('all_hosts');
+			return;
+		}
+
+		foreach ($data['hosts'] as $host) {
+			$result = DBselect('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
+			while ($row = DBfetch($result)) {
+				$this->zbxTestCheckboxSelect('group_hostid_'.$row['hostid']);
+			}
+		}
+	}
+
+	/**
+	 * Check specific page action.
+	 * Actions are defined by buttons pressed on page.
+	 *
+	 * @param array  $data		test case data from data provider
+	 * @param string $action	button text (action to be executed)
+	 * @param int    $status	host status to be checked in DB
+	 */
+	protected function checkPageAction($data, $action, $status = null) {
 		$this->selectHostPrototype($data);
-		$this->zbxTestClickButtonText('Create disabled');
+
+		// Click on button with required action.
+		$this->zbxTestClickButtonText($action);
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
-		// Check the results in DB, that selected host prototype disabled.
-		foreach ($data['host_list'] as $host) {
-			$host_name = $host['host'];
-			if ($host_name === 'all') {
-				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
-				foreach ($result as $hostid) {
-					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_MONITORED.' AND hostid='.zbx_dbstr($hostid['hostid'])));
-				}
-			}
-			else {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_MONITORED.' AND host='.zbx_dbstr($host_name)));
-			}
+		// Create query part for status (if any).
+		$status_criteria = ($status !== null) ? (' AND status='.$status) : '';
+
+		// Check the results in DB.
+		if ($data['hosts'] === 'all') {
+			$sql = 'SELECT NULL'.
+						' FROM hosts'.
+						' WHERE hostid IN ('.
+							'SELECT hostid'.
+							' FROM host_discovery'.
+							' WHERE parent_itemid IN ('.
+								'SELECT itemid'.
+								' FROM items'.
+								' WHERE name='.zbx_dbstr($data['item']).
+							')'.
+						')';
 		}
+		else {
+			$names = [];
+			foreach ($data['hosts'] as $host) {
+				$names[] = zbx_dbstr($host);
+			}
+
+			$sql = 'SELECT NULL'.
+					' FROM hosts'.
+					' WHERE host IN ('.implode(',', $names).')';
+		}
+
+		$this->assertEquals(0, DBcount($sql.$status_criteria));
+	}
+
+	/**
+	 * @dataProvider getSelectedData
+	 */
+	public function testPageHostPrototypes_DisableSelected($data) {
+		$this->checkPageAction($data, 'Create disabled', HOST_STATUS_MONITORED);
 	}
 
 	/**
 	 * @dataProvider getSelectedData
 	 */
 	public function testPageHostPrototypes_EnableSelected($data) {
-		$this->selectHostPrototype($data);
-		$this->zbxTestClickButtonText('Create enabled');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
-		$this->zbxTestCheckFatalErrors();
-
-		// Check the results in DB, that selected host prototype enabled.
-		foreach ($data['host_list'] as $host) {
-			$host_name = $host['host'];
-			if ($host_name === 'all') {
-				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
-				foreach ($result as $hostid) {
-					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED.' AND hostid='.zbx_dbstr($hostid['hostid'])));
-				}
-			}
-			else {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED.' AND host='.zbx_dbstr($host_name)));
-			}
-		}
+		$this->checkPageAction($data, 'Create enabled', HOST_STATUS_NOT_MONITORED);
 	}
 
 	/**
 	 * @dataProvider getSelectedData
 	 */
 	public function testPageHostPrototypes_DeleteSelected($data) {
-		$this->selectHostPrototype($data);
-		$this->zbxTestClickButtonText('Delete');
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
-		$this->zbxTestCheckFatalErrors();
-
-		// Check the results in DB, that selected host prototype deleted.
-		foreach ($data['host_list'] as $host) {
-			$host_name = $host['host'];
-			if ($host_name === 'all') {
-				$result = DBdata('SELECT hostid FROM host_discovery WHERE parent_itemid IN (SELECT itemid FROM items WHERE name='.zbx_dbstr($data['item']).')', false);
-				foreach ($result as $hostid) {
-					$hostid = $hostid[0];
-					$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($hostid['hostid'])));
-				}
-			}
-			else {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($host_name)));
-			}
-		}
+		$this->checkPageAction($data, 'Delete');
 	}
 }
