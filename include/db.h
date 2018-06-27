@@ -766,20 +766,4 @@ typedef struct
 }
 zbx_proxy_diff_t;
 
-
-/* event suppress data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	maintenanceid;
-	int		suppress_until;
-}
-zbx_event_suppress_t;
-
-void	zbx_db_add_event_suppress_record(zbx_vector_ptr_t *records, zbx_uint64_t eventid, zbx_uint64_t maintenanceid,
-		int suppress_until);
-int	zbx_db_insert_event_suppress_records(zbx_vector_ptr_t *records);
-
-
-
 #endif

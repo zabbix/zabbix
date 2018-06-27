@@ -1790,9 +1790,10 @@ static void	save_event_suppress_data()
 		/* get maintenance data and save it in database */
 		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, 0))
 		{
-			zbx_vector_ptr_t	records;
+			zbx_db_insert_t	db_insert;
 
-			zbx_vector_ptr_create(&records);
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
+					"suppress_until", NULL);
 
 			for (k = 0; k < event_queries.values_num; k++)
 			{
@@ -1800,16 +1801,17 @@ static void	save_event_suppress_data()
 
 				for (j = 0; j < query->maintenances.values_num; j++)
 				{
-					zbx_db_add_event_suppress_record(&records, query->eventid,
+					zbx_db_insert_add_values(&db_insert, query->eventid,
 							query->maintenances.values[j].first,
 							(int)query->maintenances.values[j].second);
 				}
+
+				((DB_EVENT *)event_refs.values[k])->suppressed = (0 == query->maintenances.values_num ?
+						EVENT_SUPPRESSED_FALSE : EVENT_SUPPRESSED_TRUE);
 			}
 
-			zbx_db_insert_event_suppress_records(&records);
-
-			zbx_vector_ptr_clear_ext(&records, zbx_ptr_free);
-			zbx_vector_ptr_destroy(&records);
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
 		}
 
 		for (k = 0; k < event_queries.values_num; k++)
