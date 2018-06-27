@@ -893,7 +893,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'size', 20);
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Problem: {TRIGGER.NAME}');
+				$this->zbxTestAssertElementValue('def_shortdata', 'Problem: {EVENT.NAME}');
 				break;
 			case 'Discovery':
 				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
@@ -911,7 +911,7 @@ class testFormAction extends CWebTest {
 		switch ($eventsource) {
 			case 'Triggers':
 				$def_longdata_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-					' Problem name: {TRIGGER.NAME}'.
+					' Problem name: {EVENT.NAME}'.
 					' Host: {HOST.NAME}'.
 					' Severity: {EVENT.SEVERITY}'.
 					' Original problem ID: {EVENT.ID}'.
@@ -1195,7 +1195,7 @@ class testFormAction extends CWebTest {
 				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opmessage_subject\']', 'size', 20);
 				switch ($eventsource) {
 					case 'Triggers':
-						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Problem: {TRIGGER.NAME}');
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Problem: {EVENT.NAME}');
 						break;
 					case 'Discovery':
 						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
@@ -1214,7 +1214,7 @@ class testFormAction extends CWebTest {
 				switch ($eventsource) {
 					case 'Triggers':
 						$new_operation_opmessage_message_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-							' Problem name: {TRIGGER.NAME}'.
+							' Problem name: {EVENT.NAME}'.
 							' Host: {HOST.NAME}'.
 							' Severity: {EVENT.SEVERITY}'.
 							' Original problem ID: {EVENT.ID}'.
@@ -1544,7 +1544,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'size', 20);
 			switch ($eventsource) {
 				case 'Triggers':
-					$this->zbxTestAssertElementValue('r_shortdata', 'Resolved: {TRIGGER.NAME}');
+					$this->zbxTestAssertElementValue('r_shortdata', 'Resolved: {EVENT.NAME}');
 					break;
 				case 'Internal':
 					$this->zbxTestAssertElementValue('r_shortdata', '');
@@ -1557,7 +1557,7 @@ class testFormAction extends CWebTest {
 			switch ($eventsource) {
 				case 'Triggers':
 					$r_longdata_val = 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}'.
-						' Problem name: {TRIGGER.NAME}'.
+						' Problem name: {EVENT.NAME}'.
 						' Host: {HOST.NAME}'.
 						' Severity: {EVENT.SEVERITY}'.
 						' Original problem ID: {EVENT.ID}'.
