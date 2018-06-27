@@ -919,7 +919,7 @@ class testFormAction extends CWebTest {
 					break;
 			case 'Discovery':
 				$def_longdata_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-					' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
+					' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
 					' Device DNS: {DISCOVERY.DEVICE.DNS}'.
 					' Device status: {DISCOVERY.DEVICE.STATUS}'.
 					' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
@@ -1222,7 +1222,7 @@ class testFormAction extends CWebTest {
 							break;
 					case 'Discovery':
 						$new_operation_opmessage_message_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-							' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
+							' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
 							' Device DNS: {DISCOVERY.DEVICE.DNS}'.
 							' Device status: {DISCOVERY.DEVICE.STATUS}'.
 							' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
