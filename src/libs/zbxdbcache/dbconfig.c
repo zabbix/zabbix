@@ -12269,6 +12269,31 @@ static void	dc_get_running_maintenances(zbx_uint64_t revision, zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_get_maintenances_by_ids                                       *
+ *                                                                            *
+ * Purpose: get maintenances by identifiers                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_get_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *maintenances)
+{
+	zbx_dc_maintenance_t	*maintenance;
+	int			i;
+
+
+	for (i = 0; i < maintenanceids->values_num; i++)
+	{
+		if (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
+				&maintenanceids->values[i])))
+		{
+			zbx_vector_ptr_append(maintenances, maintenance);
+		}
+
+	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_maintenance_match_host                                        *
  *                                                                            *
  * Purpose: check if the host must be processed by the specified maintenance  *
@@ -12452,7 +12477,9 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
  * Purpose: update host maintenance status in configuration cache based       *
  *          on running maintenances                                           *
  *                                                                            *
- * Parameters: updates          - [OUT] updates that were made in             *
+ * Parameters: maintenanceids   - [IN] identifiers of the maintenances to     *
+ *                                process                                     *
+ *             updates          - [OUT] updates that were made in             *
  *                                configuration cache and must be applied     *
  *                                to database                                 *
  *                                                                            *
@@ -12460,7 +12487,7 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
  *           function has updated maintenance state in configuration cache.   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
+void	zbx_dc_update_host_maintenances(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
 {
 	const char		*__function_name = "zbx_dc_update_host_maintenances";
 	zbx_vector_ptr_t	maintenances;
@@ -12472,7 +12499,7 @@ void	zbx_dc_update_host_maintenances(zbx_vector_ptr_t *updates)
 
 	RDLOCK_CACHE;
 
-	dc_get_running_maintenances(0, &maintenances);
+	dc_get_maintenances_by_ids(maintenanceids, &maintenances);
 
 	/* host maintenance update must be performed even without running maintenances */
 	/* to reset host maintenances status for stopped maintenances                  */
@@ -12742,7 +12769,7 @@ static int	dc_compare_tags(const void *d1, const void *d2)
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t maintenance_revision)
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids)
 {
 	const char			*__function_name = "zbx_dc_get_event_maintenances";
 	zbx_vector_ptr_t		maintenances;
@@ -12771,7 +12798,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, zbx_uint64_t 
 
 	RDLOCK_CACHE;
 
-	dc_get_running_maintenances(maintenance_revision, &maintenances);
+	dc_get_maintenances_by_ids(maintenanceids, &maintenances);
 
 	if (0 == maintenances.values_num)
 		goto unlock;
@@ -12845,4 +12872,36 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
 	zbx_vector_ptr_clear_ext(&query->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&query->tags);
 	zbx_free(query);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_running_maintenanceids                                *
+ *                                                                            *
+ * Purpose: get identifiers of the running maintenances                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t *maintenanceids)
+{
+	int			i;
+	zbx_dc_maintenance_t	*maintenance;
+	zbx_vector_ptr_t	maintenances;
+
+	zbx_vector_ptr_create(&maintenances);
+	zbx_vector_ptr_reserve(&maintenances, 100);
+
+
+	RDLOCK_CACHE;
+
+	dc_get_running_maintenances(revision, &maintenances);
+
+	for (i = 0; i < maintenances.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+		zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_ptr_destroy(&maintenances);
 }

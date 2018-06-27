@@ -29,6 +29,7 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "export.h"
+#include "db.h"
 
 #include "timer.h"
 
@@ -53,15 +54,6 @@ typedef struct
 	zbx_vector_uint64_pair_t	maintenances;
 }
 zbx_event_suppress_data_t;
-
-/* event suppress data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	maintenanceid;
-	int		suppress_until;
-}
-zbx_event_suppress_t;
 
 /******************************************************************************
  *                                                                            *
@@ -124,70 +116,66 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	do
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < updates->values_num; i++)
 	{
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		char	delim = ' ';
 
-		for (i = 0; i < updates->values_num; i++)
+		diff = (const zbx_host_maintenance_diff_t *)updates->values[i];
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID))
 		{
-			char	delim = ' ';
-
-			diff = (const zbx_host_maintenance_diff_t *)updates->values[i];
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
-
-			if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID))
+			if (0 != diff->maintenanceid)
 			{
-				if (0 != diff->maintenanceid)
-				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid="
-							ZBX_FS_UI64, delim, diff->maintenanceid);
-				}
-				else
-				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null",
-							delim);
-				}
-
-				delim = ',';
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid="
+						ZBX_FS_UI64, delim, diff->maintenanceid);
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null",
+						delim);
 			}
 
-			if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_type=%u",
-						delim, diff->maintenance_type);
-				delim = ',';
-			}
-
-			if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_status=%u",
-						delim, diff->maintenance_status);
-				delim = ',';
-			}
-
-			if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_from=%d",
-						delim, diff->maintenance_from);
-			}
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n",
-					diff->hostid);
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				break;
-
-			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-				log_host_maintenance_update(diff);
+			delim = ',';
 		}
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_type=%u",
+					delim, diff->maintenance_type);
+			delim = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_status=%u",
+					delim, diff->maintenance_status);
+			delim = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_from=%d",
+					delim, diff->maintenance_from);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n",
+				diff->hostid);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			break;
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			log_host_maintenance_update(diff);
 	}
-	while (ZBX_DB_DOWN == DBcommit());
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
 
 	zbx_free(sql);
 }
@@ -457,25 +445,6 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vect
 
 /******************************************************************************
  *                                                                            *
- * Function: add_event_suppress_record                                        *
- *                                                                            *
- * Purpose: add event suppress record to records to be inserted/updated       *
- *                                                                            *
- ******************************************************************************/
-static void	add_event_suppress_record(zbx_vector_ptr_t *records, zbx_uint64_t eventid, zbx_uint64_t maintenanceid,
-		int suppress_until)
-{
-	zbx_event_suppress_t	*record;
-
-	record = (zbx_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_t));
-	record->eventid = eventid;
-	record->maintenanceid = maintenanceid;
-	record->suppress_until = suppress_until;
-	zbx_vector_ptr_append(records, record);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: db_update_event_suppress_data                                    *
  *                                                                            *
  * Purpose: create/update event suppress data to reflect latest maintenance   *
@@ -493,7 +462,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 	zbx_event_suppress_data_t	*data;
 	int				i, j, k;
 	zbx_vector_ptr_t		inserts, updates;
-	zbx_event_suppress_t		*record;
+	zbx_vector_uint64_t		maintenanceids;
 
 	*suppressed_num = 0;
 
@@ -504,16 +473,28 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 	if (0 != event_queries.values_num)
 	{
+		zbx_db_insert_t	db_insert;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
 		zbx_vector_ptr_create(&inserts);
 		zbx_vector_ptr_create(&updates);
+		zbx_vector_uint64_create(&maintenanceids);
 
 		db_get_query_functions(&event_queries, &event_data);
 		db_get_query_tags(&event_queries);
 		db_get_suppress_data(&event_queries, &event_data);
 
-		zbx_dc_get_event_maintenances(&event_queries, revision);
+		DBbegin();
 
-		/* generate event suppress changeset */
+		zbx_dc_get_running_maintenanceids(0, &maintenanceids);
+		zbx_db_lock_maintenanceids(&maintenanceids);
+
+		zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
+
+		zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
+				"suppress_until", NULL);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_queries.values_num; i++)
 		{
@@ -535,7 +516,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 				{
-					add_event_suppress_record(&inserts, query->eventid,
+					zbx_db_insert_add_values(&db_insert, query->eventid,
 							query->maintenances.values[k].first,
 							(int)query->maintenances.values[k].second);
 					k++;
@@ -544,9 +525,16 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				if (data->maintenances.values[j].second != query->maintenances.values[k].second)
 				{
-					add_event_suppress_record(&updates, query->eventid,
-							query->maintenances.values[k].first,
-							(int)query->maintenances.values[k].second);
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"update event_suppress"
+							" set suppress_until=%d"
+							" where eventid=" ZBX_FS_UI64
+								" and maintenanceid=" ZBX_FS_UI64 ";\n",
+								(int)query->maintenances.values[k].second,
+								query->eventid, query->maintenances.values[k].first);
+
+					if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+						goto cleanup;
 				}
 				j++;
 				k++;
@@ -554,77 +542,26 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 			for (;k < query->maintenances.values_num; k++)
 			{
-				add_event_suppress_record(&inserts, query->eventid,
+				zbx_db_insert_add_values(&db_insert, query->eventid,
 						query->maintenances.values[k].first,
 						(int)query->maintenances.values[k].second);
 			}
 		}
 
-		/* flush event suppress changeset */
-
-		if (0 != inserts.values_num || 0 != updates.values_num)
+		if (FAIL != zbx_db_insert_execute(&db_insert))
 		{
-			zbx_db_insert_t	db_insert;
-			int		ret = SUCCEED;
+			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-			DBbegin();
-
-			if (0 != inserts.values_num)
-			{
-				zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
-						"suppress_until", NULL);
-
-				for (i = 0; i < inserts.values_num; i++)
-				{
-					record = (zbx_event_suppress_t *)inserts.values[i];
-					zbx_db_insert_add_values(&db_insert, record->eventid, record->maintenanceid,
-							record->suppress_until);
-					(*suppressed_num)++;
-				}
-
-				ret = zbx_db_insert_execute(&db_insert);
-				zbx_db_insert_clean(&db_insert);
-			}
-
-			if (FAIL != ret && 0 != updates.values_num)
-			{
-				char	*sql = NULL;
-				size_t	sql_alloc = 0, sql_offset = 0;
-
-				DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-				for (i = 0; i < updates.values_num; i++)
-				{
-					record = (zbx_event_suppress_t *)updates.values[i];
-
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"update event_suppress"
-							" set suppress_until=%d"
-							" where eventid=" ZBX_FS_UI64
-								" and maintenanceid=" ZBX_FS_UI64 ";\n",
-							record->suppress_until, record->eventid, record->maintenanceid);
-
-					if (FAIL == (ret  = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-						break;
-				}
-
-				if (FAIL != ret)
-				{
-					DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-					if (16 < sql_offset)
-						DBexecute("%s", sql);
-				}
-
-				zbx_free(sql);
-
-			}
-			DBcommit();
-
-			zbx_vector_ptr_clear_ext(&inserts, zbx_ptr_free);
-			zbx_vector_ptr_clear_ext(&updates, zbx_ptr_free);
+			if (16 < sql_offset)
+				DBexecute("%s", sql);
 		}
+cleanup:
+		DBcommit();
 
+		zbx_db_insert_clean(&db_insert);
+		zbx_free(sql);
+
+		zbx_vector_uint64_destroy(&maintenanceids);
 		zbx_vector_ptr_destroy(&updates);
 		zbx_vector_ptr_destroy(&inserts);
 
@@ -634,6 +571,42 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 	zbx_vector_ptr_destroy(&event_data);
 	zbx_vector_ptr_destroy(&event_queries);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_update_host_maintenances                                      *
+ *                                                                            *
+ * Purpose: update host maintenance parameters in cache and database          *
+ *                                                                            *
+ ******************************************************************************/
+static int	update_host_maintenances()
+{
+	zbx_vector_uint64_t	maintenanceids;
+	zbx_vector_ptr_t	updates;
+	int			hosts_num;
+
+	zbx_vector_uint64_create(&maintenanceids);
+	zbx_vector_ptr_create(&updates);
+	zbx_vector_ptr_reserve(&updates, 100);
+
+	DBbegin();
+
+	zbx_dc_get_running_maintenanceids(0, &maintenanceids);
+	zbx_db_lock_maintenanceids(&maintenanceids);
+
+	zbx_dc_update_host_maintenances(&maintenanceids, &updates);
+
+	if (0 != (hosts_num = updates.values_num))
+		db_update_host_maintenances(&updates);
+
+	DBcommit();
+
+	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
+	zbx_vector_ptr_destroy(&updates);
+	zbx_vector_uint64_destroy(&maintenanceids);
+
+	return hosts_num;
 }
 
 /******************************************************************************
@@ -661,6 +634,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == zbx_is_export_enabled())
@@ -676,7 +650,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		{
 			if (sec - maintenance_time >= ZBX_TIMER_DELAY)
 			{
-				zbx_vector_ptr_t	updates;
 
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
@@ -684,20 +657,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				zbx_dc_update_maintenances(&update_revision, &modified_num, &stopped_num);
 
 				if (0 != modified_num)
-				{
-					zbx_vector_ptr_create(&updates);
-					zbx_vector_ptr_reserve(&updates, 100);
-
-					zbx_dc_update_host_maintenances(&updates);
-					hosts_num = updates.values_num;
-
-					if (0 != updates.values_num)
-					{
-						db_update_host_maintenances(&updates);
-						zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
-					}
-					zbx_vector_ptr_destroy(&updates);
-				}
+					hosts_num = update_host_maintenances();
 
 				db_remove_expired_event_suppress_data((int)sec);
 
@@ -758,4 +718,5 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
 #endif
 	}
+
 }
