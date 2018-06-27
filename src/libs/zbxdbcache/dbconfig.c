@@ -4866,9 +4866,9 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		if (_groupid != groupid || 0 == _groupid)
 		{
-			_groupid = groupid;
 			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
 				continue;
+			_groupid = groupid;
 		}
 
 		ZBX_STR2UINT64(hostid, row[1]);
