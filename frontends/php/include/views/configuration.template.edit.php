@@ -84,7 +84,7 @@ $templateList = (new CFormList('hostlist'))
 	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Groups'), 'groups[]'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
 			'object_name' => 'hostGroup',
@@ -408,7 +408,7 @@ $newTemplateTable = (new CTable())
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
-$tmplList->addRow(_('Link new templates'),
+$tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
 	(new CDiv($newTemplateTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
