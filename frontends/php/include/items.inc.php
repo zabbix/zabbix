@@ -844,12 +844,13 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		'preservekeys' => true
 	]);
 
-	$db_triggers = API::Trigger()->get([
+	$db_triggers = getTriggersWithActualSeverity([
 		'output' => ['triggerid', 'priority', 'value'],
 		'selectItems' => ['itemid'],
 		'groupids' => $groupids ? $groupids : null,
 		'applicationids' => $applicationids,
-		'monitored' => true
+		'monitored' => true,
+		'preservekeys' => true
 	]);
 
 	foreach ($db_triggers as $db_trigger) {
