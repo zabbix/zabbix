@@ -743,20 +743,20 @@ function create_color_picker() {
 }
 
 function set_color(color) {
-	var background = color;
+	color = color.toString().trim().toUpperCase();
 
 	if (curr_lbl) {
-		if (color.trim() !== '') {
-			background = '#' + color;
-		}
+		var background = /[0-9A-F]{6}/g.test(color) ? '#' + color : '';
 
 		curr_lbl.style.color = background;
 		curr_lbl.style.background = background;
 		curr_lbl.title = background;
 	}
+
 	if (curr_txt) {
-		curr_txt.value = color.toString().toUpperCase();
+		curr_txt.value = color;
 	}
+
 	hide_color_picker();
 }
 
