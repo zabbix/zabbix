@@ -1166,7 +1166,7 @@ static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld
 		zbx_vector_ptr_t *dependencies)
 {
 	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
-	int 			ret = FAIL, i, dependence_num = 0;
+	int 			ret = FAIL, i, dependence_num = 0, item_in_deps = FAIL;
 	unsigned char		depth_level = 0;
 	zbx_vector_uint64_t	processed_itemids;
 
@@ -1187,6 +1187,9 @@ static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld
 		for (i = 0; i < dependencies->values_num; i++)
 		{
 			tmp_dep = (zbx_item_dependence_t *)dependencies->values[i];
+
+			if (item->itemid == tmp_dep->itemid)
+				item_in_deps = SUCCEED;
 
 			if (dependence->master_itemid == tmp_dep->itemid)
 			{
@@ -1215,11 +1218,12 @@ static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld
 
 	zbx_vector_uint64_destroy(&processed_itemids);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == ret && SUCCEED != item_in_deps)
 	{
 		lld_item_dependence_add(dependencies, item_prototype->itemid, item->master_itemid,
 				ZBX_FLAG_DISCOVERY_CREATED);
 	}
+
 out:
 	return ret;
 }
@@ -1537,8 +1541,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 			item = (zbx_lld_item_t *)items->values[i];
 
-			if (0 == item->master_itemid || 0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED)
+					|| (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE)))
+			{
 				continue;
+			}
 
 			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
