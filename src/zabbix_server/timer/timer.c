@@ -54,15 +54,6 @@ typedef struct
 }
 zbx_event_suppress_data_t;
 
-/* event suppress data */
-typedef struct
-{
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	maintenanceid;
-	int		suppress_until;
-}
-zbx_event_suppress_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: log_host_maintenance_update                                      *
@@ -457,25 +448,6 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vect
 
 /******************************************************************************
  *                                                                            *
- * Function: add_event_suppress_record                                        *
- *                                                                            *
- * Purpose: add event suppress record to records to be inserted/updated       *
- *                                                                            *
- ******************************************************************************/
-static void	add_event_suppress_record(zbx_vector_ptr_t *records, zbx_uint64_t eventid, zbx_uint64_t maintenanceid,
-		int suppress_until)
-{
-	zbx_event_suppress_t	*record;
-
-	record = (zbx_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_t));
-	record->eventid = eventid;
-	record->maintenanceid = maintenanceid;
-	record->suppress_until = suppress_until;
-	zbx_vector_ptr_append(records, record);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: db_update_event_suppress_data                                    *
  *                                                                            *
  * Purpose: create/update event suppress data to reflect latest maintenance   *
@@ -535,7 +507,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 				{
-					add_event_suppress_record(&inserts, query->eventid,
+					zbx_db_add_event_suppress_record(&inserts, query->eventid,
 							query->maintenances.values[k].first,
 							(int)query->maintenances.values[k].second);
 					k++;
@@ -544,7 +516,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				if (data->maintenances.values[j].second != query->maintenances.values[k].second)
 				{
-					add_event_suppress_record(&updates, query->eventid,
+					zbx_db_add_event_suppress_record(&updates, query->eventid,
 							query->maintenances.values[k].first,
 							(int)query->maintenances.values[k].second);
 				}
@@ -554,7 +526,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 			for (;k < query->maintenances.values_num; k++)
 			{
-				add_event_suppress_record(&inserts, query->eventid,
+				zbx_db_add_event_suppress_record(&inserts, query->eventid,
 						query->maintenances.values[k].first,
 						(int)query->maintenances.values[k].second);
 			}
@@ -564,26 +536,14 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 		if (0 != inserts.values_num || 0 != updates.values_num)
 		{
-			zbx_db_insert_t	db_insert;
-			int		ret = SUCCEED;
+			int	ret = SUCCEED;
 
 			DBbegin();
 
 			if (0 != inserts.values_num)
 			{
-				zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
-						"suppress_until", NULL);
-
-				for (i = 0; i < inserts.values_num; i++)
-				{
-					record = (zbx_event_suppress_t *)inserts.values[i];
-					zbx_db_insert_add_values(&db_insert, record->eventid, record->maintenanceid,
-							record->suppress_until);
-					(*suppressed_num)++;
-				}
-
-				ret = zbx_db_insert_execute(&db_insert);
-				zbx_db_insert_clean(&db_insert);
+				ret = zbx_db_insert_event_suppress_records(&inserts);
+				(*suppressed_num) += inserts.values_num;
 			}
 
 			if (FAIL != ret && 0 != updates.values_num)
