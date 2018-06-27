@@ -485,9 +485,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestInputTypeWait('new_condition_value', 'TEST2');
 			$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[text()='Add' and contains(@onclick, 'add_condition')]");
 
-				$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
-				$evaltype = $data['evaltype'];
-			}
+			$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
+			$evaltype = $data['evaltype'];
+		}
 
 		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
 			$this->zbxTestTextPresent('Type of calculation');
@@ -526,8 +526,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
-			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]/td[2]');
+			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
