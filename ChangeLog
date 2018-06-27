@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F.I..... [ZBX-13647] fixed action defines (vasilijs)
 A......... [ZBX-12115] changed API returned lastvalue and prevvalue for text based items with no values (miks)
 A......... [ZBX-14409] fixed icon mapping expression validation (miks)
 ..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
