@@ -33,7 +33,7 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 }
 
 $filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'),
+	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
@@ -48,7 +48,7 @@ $filterColumn1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'),
+	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',

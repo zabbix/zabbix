@@ -634,7 +634,6 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	max-width: calc(100% - 100px);
 	position: relative;
 	top: 0;
 	z-index: 3;
@@ -642,14 +641,20 @@ article {
 
 	& > li:first-child {
 		float: left;
-		max-width: 256px;
-		overflow: hidden;
-		text-overflow: ellipsis;
 		white-space: nowrap;
 
 		& > span {
-			display: inline; // FF overflow: ellipsis fix
+			display: inline-block;
+			line-height: 1;
 			padding: 4px 7px;
+
+			a {
+				display: inline-block;
+				max-width: 200px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				vertical-align: top;
+			}
 		}
 	}
 
@@ -1501,6 +1506,15 @@ output {
 				}
 			}
 		}
+	}
+
+	div[aria-live] {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: -1;
 	}
 }
 
@@ -2361,6 +2375,7 @@ $icon-widget-btn: (
 		&:focus,
 		&:hover {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			cursor: pointer;
 		}
 	}
 
