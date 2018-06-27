@@ -812,6 +812,7 @@ class CConfigurationImport {
 				}
 			}
 			unset($entity);
+
 			$entityids = $entity_service->create($entities)['itemids'];
 			$entityid = reset($entityids);
 
@@ -963,6 +964,7 @@ class CConfigurationImport {
 
 		$xml_item_key = 'master_item';
 		$order_tree = $this->getDiscoveryRulesItemsOrder($xml_item_key);
+
 		// process prototypes
 		$prototypes_to_update = [];
 		$prototypes_to_create = [];
@@ -984,6 +986,7 @@ class CConfigurationImport {
 
 				// prototypes
 				$item_prototypes = $item['item_prototypes'] ? $order_tree[$host][$item_key] : [];
+
 				foreach ($item_prototypes as $index => $level) {
 					$prototype = $item['item_prototypes'][$index];
 					$prototype['hostid'] = $hostId;
@@ -1149,10 +1152,12 @@ class CConfigurationImport {
 		}
 
 		if ($prototypes_to_create) {
+			ksort($prototypes_to_create);
 			$this->createEntitiesWithDependency($xml_item_key, $prototypes_to_create, API::ItemPrototype());
 		}
 
 		if ($prototypes_to_update) {
+			ksort($prototypes_to_update);
 			$this->updateEntitiesWithDependency($xml_item_key, $prototypes_to_update, API::ItemPrototype());
 		}
 
@@ -2547,10 +2552,9 @@ class CConfigurationImport {
 					];
 					$resolved_entities = API::Item()->get($options + ['webitems' => true]);
 
-					if ($data_provider instanceof CItemPrototype) {
+					if ($get_prototypes) {
 						$resolved_entities += API::ItemPrototype()->get($options);
 					}
-
 				}
 				else {
 					break;
