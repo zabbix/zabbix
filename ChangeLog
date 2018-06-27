@@ -7,6 +7,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-13718] fixed selection of cached checkboxes in checkbox range library (miks)
+..F....... [ZBX-13647] fixed action defines (vasilijs)
 A......... [ZBX-12115] changed API returned lastvalue and prevvalue for text based items with no values (miks)
 A......... [ZBX-14409] fixed icon mapping expression validation (miks)
 ..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
