@@ -340,7 +340,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		headers_slist = curl_slist_append(headers_slist, line);
 
-		if(0 == strncmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")))
+		if (FAIL == found && 0 == strncmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")))
 			found = SUCCEED;
 
 		zbx_free(line);
