@@ -167,8 +167,8 @@ function getActionsBySysmap($sysmap, array $options = []) {
 				}
 
 				$gotos['triggerStatus'] = [
-					'hostid' => $hostId,
-					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+					'filter_hostids' => [$hostId],
+					'filter_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
 				$gotos['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED
 						&& array_key_exists($hostId, $monitored_triggers_hosts));
@@ -214,9 +214,8 @@ function getActionsBySysmap($sysmap, array $options = []) {
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$gotos['triggerStatus'] = [
-					'groupid' => $elem['elements'][0]['groupid'],
-					'hostid' => 0,
-					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+					'filter_groupids' => [$elem['elements'][0]['groupid']],
+					'filter_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
 
 				// always show active trigger link for host group map elements
