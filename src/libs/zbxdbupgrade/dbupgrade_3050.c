@@ -32,8 +32,6 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char program_type;
-
 static int	DBpatch_3050000(void)
 {
 	const ZBX_FIELD	field = {"proxy_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -1282,7 +1280,7 @@ static int	DBpatch_3050111(void)
 		parameter = zbx_strdup(NULL, row[1]);
 		zbx_regexp_escape(&parameter);
 
-		/* Strings converted to regexp has to start with ^ and end with $. */
+		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
 		regexp_esc_param_len = strlen(parameter) + 2;
 
 		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
