@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
 ..F.I..... [ZBX-14359] changed problem name macro in default action subject and message from TRIGGER.NAME to EVENT.NAME (agriscenko)
 ..F....... [ZBX-13718] fixed selection of cached checkboxes in checkbox range library (miks)
 ..F....... [ZBX-13647] fixed action defines (vasilijs)
@@ -373,6 +374,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
 ..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
 
 --------------------------------------------------------------------------------
@@ -1649,6 +1651,7 @@ Changes for 3.0.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
 ..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
 
 --------------------------------------------------------------------------------
