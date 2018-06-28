@@ -1429,6 +1429,22 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3050121(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update profiles set value_str='severity' where idx='web.problem.sort' and value_str='priority'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1552,5 +1568,6 @@ DBPATCH_ADD(3050117, 0, 1)
 DBPATCH_ADD(3050118, 0, 1)
 DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
+DBPATCH_ADD(3050121, 0, 1)
 
 DBPATCH_END()

@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F.I..... [ZBX-14525] fixed sorting by severity in Monitoring->Problems and Problems widget (Sasha)
 ..F....... [ZBX-12580] reworked problem hosts widget to source data from problems and take changed severity into account (miks)
 .......PS. [ZBX-14537] fixed HTTP agent application/json Content-Type not being set by default when using custom headers (vso)
 ..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
