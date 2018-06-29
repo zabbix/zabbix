@@ -666,7 +666,6 @@ typedef struct
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
-	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
