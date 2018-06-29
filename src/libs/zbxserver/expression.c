@@ -225,12 +225,11 @@ static char	*get_expanded_expression(const char *expression)
 {
 	char	*expression_ex;
 
-	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression, NULL)))
+	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression)))
 		zbx_remove_whitespace(expression_ex);
 
 	return expression_ex;
 }
-
 
 /******************************************************************************
  *                                                                            *
