@@ -2197,7 +2197,7 @@ function getTimeperiodForm(array $data) {
 			$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
 		}
 		else {
-			if (!$new_timeperiod['start_date']) {
+			if ($new_timeperiod['start_date'] == 0) {
 				$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
 			}
 		}

@@ -385,6 +385,10 @@ if (!empty($data['form'])) {
 		]);
 	}
 	else {
+		if (getRequest('new_timeperiod', []) != 1 && getRequest('new_timeperiod', [])) {
+			$data['new_timeperiod']['start_date'] = getRequest('new_timeperiod_start_date');
+		}
+
 		$data['mname'] = getRequest('mname', '');
 		$data['maintenance_type'] = getRequest('maintenance_type', 0);
 
