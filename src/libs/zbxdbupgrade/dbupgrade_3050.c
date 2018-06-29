@@ -1509,7 +1509,7 @@ static int	DBpatch_3050122(void)
 		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
 
 		parameter_esc_anchored = (char *)zbx_malloc(NULL, regexp_esc_param_len + 1);
-		DBpatch_3050111_add_anchors(parameter_esc, parameter_esc_anchored);
+		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
