@@ -5503,7 +5503,6 @@ int	init_configuration_cache(char **error)
 			__config_mem_free_func);
 
 	CREATE_HASHSET(config->preprocops, 0);
-	CREATE_HASHSET(config->timer_triggers, 20);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -6933,7 +6932,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 				zbx_vector_ptr_append(trigger_order, trigger);
 			}
 
-			/* copy latest change timestamp and error message */
+			/* copy latest change timestamp */
 
 			if (trigger->timespec.sec < timespecs[i].sec ||
 					(trigger->timespec.sec == timespecs[i].sec &&
@@ -6945,8 +6944,6 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -6982,11 +6979,11 @@ static int	DCconfig_find_active_time_function(const char *expression)
  * Parameters: trigger_info      - [IN/OUT] triggers                          *
  *             trigger_order     - [IN/OUT] triggers in processing order      *
  *             locked_triggerids - [IN/OUT] locked trigger ids                *
- *             now               - [IN] current time                          *
+ *             ts                - [IN] current timestamp                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		zbx_vector_uint64_t *locked_triggerids, int now, int limit)
+		zbx_vector_uint64_t *locked_triggerids, const zbx_timespec_t *ts, int limit)
 {
 	WRLOCK_CACHE;
 
@@ -6999,7 +6996,7 @@ void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *tr
 		elem = zbx_binary_heap_find_min(&config->timer_queue);
 		dc_trigger = (ZBX_DC_TRIGGER *)elem->data;
 
-		if (dc_trigger->nextcheck > now)
+		if (dc_trigger->nextcheck > ts->sec)
 			break;
 
 		/* locked triggers are already being processed by other processes, we can skip them */
@@ -7009,6 +7006,8 @@ void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *tr
 
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
 			DCget_trigger(trigger, dc_trigger);
+			trigger->timespec = *ts;
+
 			zbx_vector_ptr_append(trigger_order, trigger);
 			zbx_vector_uint64_append(locked_triggerids, dc_trigger->triggerid);
 			dc_trigger->locked = 1;
@@ -7019,7 +7018,7 @@ void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *tr
 			limit--;
 		}
 
-		dc_trigger->nextcheck = dc_timer_calculate_nextcheck(now, dc_trigger->triggerid);
+		dc_trigger->nextcheck = dc_timer_calculate_nextcheck(ts->sec, dc_trigger->triggerid);
 		zbx_binary_heap_update_direct(&config->timer_queue, elem);
 	}
 

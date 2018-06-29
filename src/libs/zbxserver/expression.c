@@ -4475,8 +4475,21 @@ static void	func_clean(void *ptr)
 	zbx_free(func->error);
 }
 
-static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
-		zbx_hashset_t *ifuncs, zbx_vector_ptr_t *triggers)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_populate_function_items                                      *
+ *                                                                            *
+ * Purpose: prepare hashset of functions to evaluate                          *
+ *                                                                            *
+ * Parameters: functionids - [IN] function identifiers                        *
+ *             funcs       - [OUT] functions indexed by itemid, name,         *
+ *                                 parameter, timestamp                       *
+ *             ifuncs      - [OUT] function index by functionid               *
+ *             trigger     - [IN] vector of triggers, sorted by triggerid     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
+		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "zbx_populate_function_items";
 
@@ -4793,7 +4806,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *                                                                            *
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
- * Parameters: triggers - array of DC_TRIGGER structures                      *
+ * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ *                             triggerids                                     *
  *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
  *                            items and failed functions                      *
  *                                                                            *
@@ -4845,7 +4859,8 @@ empty:
  *                                                                            *
  * Purpose: evaluate trigger expressions                                      *
  *                                                                            *
- * Parameters: triggers - [IN] array of DC_TRIGGER structures                 *
+ * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ *                             triggerids                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *

@@ -781,6 +781,6 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_uint64_t *proxy_hostids);
 
 void	zbx_dc_get_timer_triggers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		zbx_vector_uint64_t *locked_triggerids, int now, int limit);
+		zbx_vector_uint64_t *locked_triggerids, const zbx_timespec_t *ts, int limit);
 
 #endif
