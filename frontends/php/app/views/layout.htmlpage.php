@@ -131,7 +131,8 @@ function local_generateFooter($fullscreen) {
 			'debug_mode' => CWebUser::$data['debug_mode']
 		]
 	]);
-	echo '</main>'.$pageFooter->getOutput();
+	echo '</main>'."\n";
+	echo $pageFooter->getOutput();
 }
 
 function local_showMessage() {
