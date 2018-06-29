@@ -59,8 +59,7 @@ static int	sync_in_progress = 0;
 
 /* trigger contains time functions and is also scheduled by timer queue */
 #define ZBX_TRIGGER_TIMER_UNKNOWN	0
-#define ZBX_TRIGGER_TIMER_NONE		1
-#define ZBX_TRIGGER_TIMER_QUEUE		2
+#define ZBX_TRIGGER_TIMER_QUEUE		1
 
 /* item priority in poller queue */
 #define ZBX_QUEUE_PRIORITY_HIGH		0
@@ -4480,10 +4479,7 @@ static void	dc_trigger_update_cache(void)
 			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 		}
 
-		if (SUCCEED == DCin_maintenance_without_data_collection(host, item))
-			trigger->timer = ZBX_TRIGGER_TIMER_NONE;
-
-		if (ZBX_TRIGGER_TIMER_UNKNOWN == trigger->timer && 1 == function->timer)
+		if (1 == function->timer)
 			trigger->timer = ZBX_TRIGGER_TIMER_QUEUE;
 	}
 
@@ -6938,6 +6934,8 @@ static int	DCconfig_find_active_time_function(const char *expression)
 {
 	zbx_uint64_t		functionid;
 	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_ITEM	*dc_item;
 
 	while (SUCCEED == get_N_functionid(expression, 1, &functionid, &expression))
 	{
@@ -6945,7 +6943,16 @@ static int	DCconfig_find_active_time_function(const char *expression)
 			continue;
 
 		if (1 == dc_function->timer)
-			return SUCCEED;
+		{
+			if (NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
+				continue;
+
+			if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+				continue;
+
+			if (SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
+				return SUCCEED;
+		}
 	}
 
 	return FAIL;
@@ -6976,14 +6983,32 @@ void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_ve
 		if (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
 				&triggerids->values[i])))
 		{
-			DC_TRIGGER	*trigger, trigger_local = {.triggerid = dc_trigger->triggerid};
+			DC_TRIGGER	*trigger, trigger_local;
+			unsigned char	flags;
 
+			if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
+			{
+				flags = ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+			}
+			else
+			{
+				if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode)
+					continue;
+
+				if (TRIGGER_VALUE_PROBLEM != dc_trigger->value)
+					continue;
+
+				if (SUCCEED != DCconfig_find_active_time_function(dc_trigger->recovery_expression))
+					continue;
+
+				flags = 0;
+			}
+
+			trigger_local.triggerid = dc_trigger->triggerid;
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
 			DCget_trigger(trigger, dc_trigger);
 			trigger->timespec = *ts;
-
-			if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
-				trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+			trigger->flags = flags;
 
 			zbx_vector_ptr_append(trigger_order, trigger);
 		}
