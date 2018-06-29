@@ -3912,23 +3912,26 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 	size_t	lpp_offset, lpp_len;
 
 	/* try to validate function name */
-	if (SUCCEED != function_parse_name(expr, par_l))
-		return FAIL;
-
-	/* now we know the position of '(', try to find ')' */
-	if (SUCCEED != function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
+	if (SUCCEED == function_parse_name(expr, par_l))
 	{
+		/* now we know the position of '(', try to find ')' */
+		if (SUCCEED == function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
+			return SUCCEED;
+
 		if (*par_l > *par_r && NULL != error)
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
-				"Check expression part starting from %.*s",
+				"Check expression part starting from: %.*s",
 				*par_l, expr, lpp_len, expr + lpp_offset);
-		}
 
-		return FAIL;
+			return FAIL;
+		}
 	}
 
-	return SUCCEED;
+	if (NULL != error)
+		zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -3975,6 +3978,8 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 		*par_r += *func_pos;
 		return SUCCEED;
 	}
+
+	zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
 
 	return FAIL;
 }
