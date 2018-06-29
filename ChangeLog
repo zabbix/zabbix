@@ -381,6 +381,7 @@ New features:
 
 Bug fixes:
 A......... [ZBX-13732] fixed status change for linked template items through parent template if host assigned (agriscenko)
+..F....... [ZBX-14432] removed redundant code and improved performance in event details screen (miks)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
 ........S. [ZBX-14500] fixed crash when reporting unknown triggers and using $1-$9 macros at the same time (vso)
 ..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
@@ -1660,6 +1661,7 @@ Changes for 3.0.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14432] removed redundant code in event details screen (miks)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
 ..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
 ..F....... [ZBX-14402] fixed internal item parameter that does not match documentation (vasilijs)
