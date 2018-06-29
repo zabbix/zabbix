@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha9
 
 New features:
+........S. [ZBXNEXT-1701] added support of regular expressions and global regular expressions to "logsource()" trigger function (viktors)
 ........S. [ZBXNEXT-4586] added support of macros {ITEM.VALUE} and {ITEM.LASTVALUE} to trigger URL (vasilijs, viktors)
 ..F....... [ZBXNEXT-4049] added checkbox to hide timeline when problems sort by time (vasilijs)
 ..F....... [ZBXNEXT-4367] added screen reader features for multiselect (ashubin)
