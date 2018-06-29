@@ -2204,7 +2204,9 @@ function getTimeperiodForm(array $data) {
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date'], ZBX_DATE_TIME)))
+			(new CDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date']))
+				->setDateFormat(ZBX_DATE_TIME)
+				->setAriaRequired()
 		);
 	}
 

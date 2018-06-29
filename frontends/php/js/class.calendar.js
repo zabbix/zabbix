@@ -488,12 +488,23 @@ calendar.prototype = {
 						}
 					}
 					else {
+						// If time is not set, set it to 00:00:00.
 						this.sdt.setHours(0);
 						this.sdt.setMinutes(0);
 						this.sdt.setSeconds(0);
 					}
 				}
+				else {
+					// IF date is empty field, reset time as well.
+					this.sdt.setHours(0);
+					this.sdt.setMinutes(0);
+					this.sdt.setSeconds(0);
+				}
 			}
+		}
+
+		if (!result) {
+			return false;
 		}
 
 		if (!is_null(this.clndr_utime_field)) {

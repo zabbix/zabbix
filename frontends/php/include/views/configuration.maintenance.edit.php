@@ -49,8 +49,16 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->setModern(true)
 	)
 	// Show date and time in shorter format without seconds.
-	->addRow(_('Active since'), createDateSelector('active_since', $data['active_since'], ZBX_DATE_TIME))
-	->addRow(_('Active till'), createDateSelector('active_till', $data['active_till'], ZBX_DATE_TIME));
+	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
+		(new CDateSelector('active_since', $data['active_since']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
+		(new CDateSelector('active_till', $data['active_till']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setAriaRequired()
+	);
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
