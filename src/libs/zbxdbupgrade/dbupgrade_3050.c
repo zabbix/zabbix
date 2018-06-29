@@ -1234,7 +1234,218 @@ static int	DBpatch_3050110(void)
 	return DBset_default("config", &field);
 }
 
-static void	DBpatch_3050111_add_anchors(const char *src, char *dst)
+static int	DBpatch_3050111(void)
+{
+	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("events", &field);
+}
+
+static int	DBpatch_3050112(void)
+{
+	const ZBX_FIELD	field = {"acknowledged", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3050113(void)
+{
+	const ZBX_FIELD	field = {"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3050114(void)
+{
+	const ZBX_FIELD	field = {"old_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3050115(void)
+{
+	const ZBX_FIELD	field = {"new_severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_3050116(void)
+{
+	return DBdrop_field("config", "event_ack_enable");
+}
+
+static int	DBpatch_3050117(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update problem set acknowledged="
+			"(select acknowledged from events where events.eventid=problem.eventid)");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050118(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select e.eventid,t.priority"
+			" from events e"
+			" inner join triggers t"
+				" on e.objectid=t.triggerid"
+			" where e.source=0"
+				" and e.object=0"
+				" and e.value=1"
+			);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update events set severity=%s where eventid=%s;\n",
+				row[1], row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3050119(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select p.eventid,t.priority"
+			" from problem p"
+			" inner join triggers t"
+				" on p.objectid=t.triggerid"
+			" where p.source=0"
+				" and p.object=0"
+			);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update problem set severity=%s where eventid=%s;\n",
+				row[1], row[0]);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3050120(void)
+{
+	int		ret = SUCCEED, action;
+	zbx_uint64_t	ackid, eventid;
+	zbx_hashset_t	eventids;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql;
+	size_t		sql_alloc = 4096, sql_offset = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+	zbx_hashset_create(&eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select acknowledgeid,eventid,action from acknowledges order by clock");
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(ackid, row[0]);
+		ZBX_STR2UINT64(eventid, row[1]);
+		action = atoi(row[2]);
+
+		/* 0x04 - ZBX_ACKNOWLEDGE_ACTION_COMMENT */
+		action |= 0x04;
+
+		if (NULL == zbx_hashset_search(&eventids, &eventid))
+		{
+			zbx_hashset_insert(&eventids, &eventid, sizeof(eventid));
+			/* 0x02 - ZBX_ACKNOWLEDGE_ACTION_ACKNOWLEDGE */
+			action |= 0x02;
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update acknowledges set action=%d where acknowledgeid=" ZBX_FS_UI64 ";\n",
+				action, ackid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_hashset_destroy(&eventids);
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3050121(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update profiles set value_str='severity' where idx='web.problem.sort' and value_str='priority'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
 	char	*d = dst;
 	int	quoted = 0;
@@ -1261,7 +1472,7 @@ static void	DBpatch_3050111_add_anchors(const char *src, char *dst)
 	*d = '\0';
 }
 
-static int	DBpatch_3050111(void)
+static int	DBpatch_3050122(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -1442,5 +1653,16 @@ DBPATCH_ADD(3050108, 0, 1)
 DBPATCH_ADD(3050109, 0, 1)
 DBPATCH_ADD(3050110, 0, 1)
 DBPATCH_ADD(3050111, 0, 1)
+DBPATCH_ADD(3050112, 0, 1)
+DBPATCH_ADD(3050113, 0, 1)
+DBPATCH_ADD(3050114, 0, 1)
+DBPATCH_ADD(3050115, 0, 1)
+DBPATCH_ADD(3050116, 0, 1)
+DBPATCH_ADD(3050117, 0, 1)
+DBPATCH_ADD(3050118, 0, 1)
+DBPATCH_ADD(3050119, 0, 1)
+DBPATCH_ADD(3050120, 0, 1)
+DBPATCH_ADD(3050121, 0, 1)
+DBPATCH_ADD(3050122, 0, 1)
 
 DBPATCH_END()

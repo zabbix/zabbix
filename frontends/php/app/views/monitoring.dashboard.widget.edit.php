@@ -41,11 +41,8 @@ $form_list->addRow(_('Name'),
 
 // widget specific fields
 foreach ($data['dialogue']['fields'] as $field) {
-	if (!$data['config']['event_ack_enable'] && ($field->getFlags() & CWidgetField::FLAG_ACKNOWLEDGES)) {
-		$form->addVar($field->getName(), $field->getValue());
-		continue;
-	}
 	$aria_required = ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
+	$disabled = ($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 	if ($field instanceof CWidgetFieldComboBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
@@ -62,7 +59,9 @@ foreach ($data['dialogue']['fields'] as $field) {
 	elseif ($field instanceof CWidgetFieldCheckBox) {
 		$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required), [
 			new CVar($field->getName(), '0'),
-			(new CCheckBox($field->getName()))->setChecked((bool) $field->getValue())
+			(new CCheckBox($field->getName()))
+				->setChecked((bool) $field->getValue())
+				->setEnabled(!$disabled)
 		]);
 	}
 	elseif ($field instanceof CWidgetFieldGroup) {
@@ -87,7 +86,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_groupids
 		);
 
@@ -115,7 +114,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field->getName().'[]'))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_hostids
 		);
 
@@ -144,7 +143,7 @@ foreach ($data['dialogue']['fields'] as $field) {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($aria_required);
 
-		$form_list->addRow((new CLabel($field->getLabel(), $field_name))->setAsteriskMark($aria_required),
+		$form_list->addRow((new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark($aria_required),
 			$field_itemsids
 		);
 

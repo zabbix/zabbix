@@ -82,7 +82,7 @@ if ($slideshow_ownerid !== '') {
 
 // Append multiselect to slide show tab.
 $slideshow_tab->addRow(
-	(new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+	(new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(),
 	(new CMultiSelect($multiselect_data))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

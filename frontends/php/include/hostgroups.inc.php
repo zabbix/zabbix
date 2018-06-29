@@ -230,3 +230,61 @@ function getSubGroups(array $groupids, array &$ms_groups = null) {
 
 	return $groupids;
 }
+
+/*
+ * Creates a hintbox suitable for Problem hosts widget.
+ *
+ * @param array  $hosts                                                   Array of problematic hosts.
+ * @param array  $data                                                    Array of host data, filter settings and
+ *                                                                        severity configuration.
+ * @param array  $data['config']                                          Severities configuration array.
+ * @param array  $data['filter']['severities']                            Array of severities.
+ * @param string $data['hosts_data'][<hostid>]['host']                    Host name.
+ * @param int    $data['hosts_data'][<hostid>]['severities'][<severity>]  Severity count.
+ * @param CUrl   $url                                                     URL that leads to problems view having hostid
+ *                                                                        in its filter.
+ *
+ * @return CTableInfo
+ */
+function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
+	// Set trigger severities as table header, ordered starting from highest severity.
+	$header = [_('Host')];
+
+	foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
+		if (in_array($severity, $data['filter']['severities'])) {
+			$header[] = getSeverityName($severity, $data['config']);
+		}
+	}
+
+	$table_inf = (new CTableInfo())->setHeader($header);
+
+	$popup_rows = 0;
+
+	foreach ($hosts as $hostid => $host_name) {
+		$host_data = $data['hosts_data'][$hostid];
+		$url->setArgument('filter_hostids', [$hostid]);
+		$row = new CRow(
+			(new CCol(
+				new CLink($host_data['host'], $url->getUrl())
+			))->addClass(ZBX_STYLE_NOWRAP)
+		);
+
+		foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
+			if (in_array($severity, $data['filter']['severities'])) {
+				$row->addItem(
+					($host_data['severities'][$severity] != 0)
+						? (new CCol($host_data['severities'][$severity]))->addClass(getSeverityStyle($severity))
+						: ''
+				);
+			}
+		}
+
+		$table_inf->addRow($row);
+
+		if (++$popup_rows == ZBX_WIDGET_ROWS) {
+			break;
+		}
+	}
+
+	return $table_inf;
+}

@@ -123,7 +123,7 @@ function getFontComboBox($name) {
 							MAP_LABEL_LOC_TOP => _('Top')
 						])
 					)
-					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
+					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
 							'object_name' => 'hostGroup',
@@ -132,7 +132,7 @@ function getFontComboBox($name) {
 							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
-					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
+					->addRow((new CLabel(_('Host'), 'elementNameHost_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
 							'object_name' => 'hosts',
@@ -152,7 +152,7 @@ function getFontComboBox($name) {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					], 'triggerListRow')
-					->addRow(_('New triggers'),
+					->addRow((new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
 						(new CDiv([
 							new CVar('elementExpressionTrigger', ''),
 							(new CMultiSelect([
