@@ -34,8 +34,6 @@ void	zbx_mock_test_entry(void **state)
 	const int 		max_error_len = MAX_STRING_LEN;
 	char 			error_text[MAX_STRING_LEN];
 
-	*error_text = '\0';
-
 	ZBX_UNUSED(state);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("param", &param_handle)) ||
