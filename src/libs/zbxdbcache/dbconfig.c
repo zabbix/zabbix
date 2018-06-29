@@ -9039,7 +9039,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  * Comments: The returned expression must be freed by the caller.             *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expression_expand_user_macros(const char *expression, char **error)
+static char	*dc_expression_expand_user_macros(const char *expression)
 {
 	zbx_vector_uint64_t	functionids, hostids;
 	char			*out;
@@ -9055,7 +9055,7 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
 
 	if (NULL != strstr(out, "{$"))
 	{
-		*error = zbx_strdup(*error, "cannot evaluate expression: invalid macro value");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate expression: invalid macro value");
 		zbx_free(out);
 	}
 
@@ -9072,7 +9072,6 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
  * Purpose: expand user macros in trigger expression                          *
  *                                                                            *
  * Parameters: expression - [IN] the expression to expand                     *
- *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: The expanded expression or NULL in the case of error.        *
  *               If NULL is returned the error message is set.                *
@@ -9082,13 +9081,13 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
  *           dc_expression_expand_user_macros() function for external usage.  *
  *                                                                            *
  ******************************************************************************/
-char	*DCexpression_expand_user_macros(const char *expression, char **error)
+char	*DCexpression_expand_user_macros(const char *expression)
 {
 	char	*expression_ex;
 
 	RDLOCK_CACHE;
 
-	expression_ex = dc_expression_expand_user_macros(expression, error);
+	expression_ex = dc_expression_expand_user_macros(expression);
 
 	UNLOCK_CACHE;
 
