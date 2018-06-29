@@ -380,6 +380,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-13732] fixed status change for linked template items through parent template if host assigned (agriscenko)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
 ........S. [ZBX-14500] fixed crash when reporting unknown triggers and using $1-$9 macros at the same time (vso)
 ..F....... [ZBX-12104] added limit ZBX_HISTORY_PERIOD for {ITEM.VALUE} macro resolving in trigger name (gcalenko)
