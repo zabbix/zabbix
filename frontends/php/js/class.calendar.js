@@ -33,7 +33,7 @@ function getCalendarByID(clndr_id) {
 	return ret;
 }
 
-function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
+function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid, date_time_format) {
 	if (typeof id === 'undefined' || id === null) {
 		id = 'c' + CLNDR.length;
 	}
@@ -43,7 +43,7 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 	}
 
 	var clndr = new Object;
-	clndr.clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
+	clndr.clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid, date_time_format);
 	CLNDR.push(clndr);
 
 	return clndr;
@@ -93,8 +93,9 @@ calendar.prototype = {
 	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
+	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 
-	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid) {
+	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid, date_time_format) {
 		this.id = id;
 		this.timeobjects = new Array();
 		if (!(this.status = this.checkOuterObj(timeobjects))) {
@@ -118,6 +119,10 @@ calendar.prototype = {
 		}
 		else {
 			this.setSDateFromOuterObj();
+		}
+
+		if (typeof date_time_format !== 'undefined') {
+			this.date_time_format = date_time_format;
 		}
 
 		this.cdt.setTime(this.sdt.getTime());
@@ -430,99 +435,71 @@ calendar.prototype = {
 				}
 			}
 		}
+
 		return true;
 	},
 
 	setSDateFromOuterObj: function() {
-		switch (this.timeobjects.length) {
-			case 1:
-				var val = null;
-				var result = false;
+		var val = null,
+			result = false;
 
-				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
-					val = this.timeobjects[0].value;
-				}
-				else {
-					val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
+		if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
+			val = this.timeobjects[0].value;
+		}
+		else {
+			val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
+		}
+
+		// Allow unix timestamp 0 (year 1970).
+		if (jQuery(this.timeobjects[0]).attr('data-timestamp') >= 0) {
+			this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
+		}
+		else {
+			if (is_string(val)) {
+				var datetime = val.split(' '),
+					date = datetime[0].split('-');
+					time = new Array();
+
+				if (datetime.length > 1) {
+					var time = datetime[1].split(':');
 				}
 
-				// allow unix timestamp 0 (year 1970)
-				if (jQuery(this.timeobjects[0]).attr('data-timestamp') >= 0) {
-					this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
-				}
-				else {
-					if (is_string(val)) {
-						var datetime = val.split(' ');
-						var date = datetime[0].split('.');
-						var time = new Array();
+				if (date.length == 3) {
+					result = this.setSDateDMY(date[2], date[1], date[0]);
 
-						if (datetime.length > 1) {
-							var time = datetime[1].split(':');
+					if (!result) {
+						return false;
+					}
+
+					// Set time to calendar, so time doesn't change when selecting different date.
+					if (time.length == 2 || time.length == 3) {
+						if (time[0] > -1 && time[0] < 24) {
+							this.sdt.setHours(time[0]);
 						}
-						if (date.length == 3) {
-							result = this.setSDateDMY(date[0], date[1], date[2]);
-							if (time.length == 2) {
-								if (time[0] > -1 && time[0] < 24) {
-									this.sdt.setHours(time[0]);
-								}
-								if (time[1] > -1 && time[1] < 60) {
-									this.sdt.setMinutes(time[1]);
-								}
+
+						if (time[1] > -1 && time[1] < 60) {
+							this.sdt.setMinutes(time[1]);
+						}
+
+						if (time.length == 3) {
+							if (time[1] > -1 && time[2] < 60) {
+								this.sdt.setSeconds(time[2]);
 							}
 						}
 					}
-				}
-
-				if (!result) {
-					return false;
-				}
-				break;
-			case 3:
-			case 5:
-				var val = new Array();
-				var result = true;
-
-				for (var i = 0; i < this.timeobjects.length; i++) {
-					if ('undefined' !== this.timeobjects[i] && !empty(this.timeobjects[i])) {
-						if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
-							val[i] = this.timeobjects[i].value;
-						}
-						else {
-							val[i] = (IE) ? this.timeobjects[i].innerText : this.timeobjects[i].textContent;
-						}
-					}
 					else {
-						result = false;
-					}
-				}
-
-				if (result) {
-					result = this.setSDateDMY(val[0], val[1], val[2]);
-					if (val.length > 4) {
-						val[3] = parseInt(val[3], 10);
-						val[4] = parseInt(val[4], 10);
-						if (val[3] > -1 && val[3] < 24) {
-							this.sdt.setHours(val[3]);
-							result = true;
-						}
-						if (val[4] > -1 && val[4] < 60) {
-							this.sdt.setMinutes(val[4]);
-							result = true;
-						}
+						this.sdt.setHours(0);
+						this.sdt.setMinutes(0);
 						this.sdt.setSeconds(0);
 					}
 				}
-				if (!result) {
-					return false;
-				}
-				break;
-			default:
-				return false;
+			}
 		}
 
 		if (!is_null(this.clndr_utime_field)) {
 			this.clndr_utime_field.value = this.sdt.getZBXDate();
 		}
+
 		return true;
 	},
 
@@ -538,43 +515,18 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		switch (this.timeobjects.length) {
-			case 1:
-				// uses default format
-				var date = this.sdt.format();
+		var date = this.sdt.format(this.date_time_format);
 
-				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
-					this.timeobjects[0].value = date;
-				}
-				else {
-					if (IE) {
-						this.timeobjects[0].innerText =  date;
-					}
-					else {
-						this.timeobjects[0].textContent = date;
-					}
-				}
-				break;
-
-			case 3:
-			case 5:
-				// custom date format for input fields
-				var date = this.sdt.format('d m Y H i').split(' ');
-
-				for (var i = 0; i < this.timeobjects.length; i++) {
-					if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
-						this.timeobjects[i].value = date[i];
-					}
-					else {
-						if (IE) {
-							this.timeobjects[i].innerText = date[i];
-						}
-						else {
-							this.timeobjects[i].textContent = date[i];
-						}
-					}
-				}
-				break;
+		if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
+			this.timeobjects[0].value = date;
+		}
+		else {
+			if (IE) {
+				this.timeobjects[0].innerText =  date;
+			}
+			else {
+				this.timeobjects[0].textContent = date;
+			}
 		}
 
 		if (!is_null(this.clndr_utime_field)) {

@@ -752,12 +752,13 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 /**
  * Create array with all inputs required for date selection and calendar.
  *
- * @param string $name  Field name.
- * @param string $date  Absolue (Y-m-d H:i:s) or relative time (now+1d, now/M ...).
+ * @param string $name              Field name.
+ * @param string $date              Absolute (Y-m-d H:i:s) or relative time (now+1d, now/M ...).
+ * @param string $date_time_format  Format in which to return date and time (optional). Default is Y-m-d H:i:s.
  *
  * @return array
  */
-function createDateSelector($name, $date) {
+function createDateSelector($name, $date, $date_time_format = ZBX_FULL_DATE_TIME) {
 	$fields = [
 		(new CTextBox($name, $date))->setId($name),
 		(new CButton($name.'_calendar'))
@@ -766,7 +767,7 @@ function createDateSelector($name, $date) {
 	];
 
 	// Calendar toggle visibility handlers initialization.
-	zbx_add_post_js('create_calendar(null, "'.$name.'", "'.$name.'_calendar", null);');
+	zbx_add_post_js('create_calendar(null, "'.$name.'", "'.$name.'_calendar", null, null, "'.$date_time_format.'");');
 
 	return $fields;
 }
@@ -779,8 +780,7 @@ function createDateSelector($name, $date) {
  *
  * @return CDiv
  */
-function makePageFooter($with_version = true)
-{
+function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, [
 		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',

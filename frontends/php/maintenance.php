@@ -43,10 +43,10 @@ $fields = [
 	'maintenance_type' =>					[T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'description' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'active_since' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
-												'isset({add}) || isset({update})'
+												'isset({add}) || isset({update})', _('Active since')
 											],
 	'active_till' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
-												'isset({add}) || isset({update})'
+												'isset({add}) || isset({update})', _('Active till')
 											],
 	'new_timeperiod_start_date' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null],
 	'new_timeperiod' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'],
@@ -261,11 +261,10 @@ elseif (hasRequest('add_timeperiod') && hasRequest('new_timeperiod')) {
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
 		$range_time_parser = new CRangeTimeParser();
-		$range_time_parser->parse(getRequest('new_timeperiod_start_date'));
-		$new_timeperiod_start_date = $range_time_parser->getDateTime(false);
+		$range_time_parser->parse($new_timeperiod['start_date']);
+		$start_date = $range_time_parser->getDateTime(false);
 
-		if (!validateDateInterval($new_timeperiod_start_date->format('Y'), $new_timeperiod_start_date->format('m'),
-				$new_timeperiod_start_date->format('d'))) {
+		if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('d'))) {
 			error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
 			$result = false;
 		}

@@ -48,9 +48,9 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 			->setModern(true)
 	)
-	->addRow(_('Active since'), createDateSelector('active_since', $data['active_since']))
-	->addRow(_('Active till'), createDateSelector('active_till', $data['active_till']));
-;
+	// Show date and time in shorter format without seconds.
+	->addRow(_('Active since'), createDateSelector('active_since', $data['active_since'], ZBX_DATE_TIME))
+	->addRow(_('Active till'), createDateSelector('active_till', $data['active_till'], ZBX_DATE_TIME));
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

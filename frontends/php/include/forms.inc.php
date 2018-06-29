@@ -2187,7 +2187,6 @@ function getTimeperiodForm(array $data) {
 			->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day'], 'new_timeperiod_day_tmp'))
 			->addItem(new CVar('new_timeperiod[hour]', $new_timeperiod['hour'], 'new_timeperiod_hour_tmp'))
 			->addItem(new CVar('new_timeperiod[minute]', $new_timeperiod['minute'], 'new_timeperiod_minute_tmp'))
-			->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']))
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
@@ -2205,8 +2204,7 @@ function getTimeperiodForm(array $data) {
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date'])))
-				->setId('new_timeperiod_start_date')
+			(new CDiv(createDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date'], ZBX_DATE_TIME)))
 		);
 	}
 
