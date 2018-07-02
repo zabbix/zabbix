@@ -390,13 +390,8 @@ class CScreenProblem extends CScreenBase {
 				break;
 
 			case 'priority':
-				foreach ($data['problems'] as &$problem) {
-					$problem['priority'] = $data['triggers'][$problem['objectid']]['priority'];
-				}
-				unset($problem);
-
 				$sort_fields = [
-					['field' => 'priority', 'order' => $sortorder],
+					['field' => 'severity', 'order' => $sortorder],
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 				];

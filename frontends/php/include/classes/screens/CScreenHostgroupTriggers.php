@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../blocks.inc.php';
 
-class CScreenHostgroupTriggers extends CScreenBase {
+class CScreenHostgroupTriggers extends CScreenHostTriggers {
 
 	/**
 	 * Process screen.
@@ -137,7 +137,7 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
 
-		list($table, $info) = make_latest_issues($params, $this->pageFile.'?screenid='.$this->screenid);
+		list($table, $info) = $this->getProblemsListTable($params, $this->pageFile.'?screenid='.$this->screenid);
 
 		$footer = (new CList())
 			->addItem($info)
