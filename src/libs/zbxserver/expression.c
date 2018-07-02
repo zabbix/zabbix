@@ -225,12 +225,11 @@ static char	*get_expanded_expression(const char *expression)
 {
 	char	*expression_ex;
 
-	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression, NULL)))
+	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression)))
 		zbx_remove_whitespace(expression_ex);
 
 	return expression_ex;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -3852,6 +3851,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				{
+					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value);
 				}
 			}
 		}

@@ -955,8 +955,8 @@ class CHelpItems {
 					'description' => _('Returns information associated with Zabbix Java gateway. Valid params are: ping, version.')
 				],
 				[
-					'key' => 'zabbix[process,<type>,<num>,<state>]',
-					'description' => _('Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.')
+					'key' => 'zabbix[process,<type>,<mode>,<state>]',
+					'description' => _('Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage.')
 				],
 				[
 					'key' => 'zabbix[proxy,<name>,<param>]',
