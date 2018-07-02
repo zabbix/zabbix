@@ -327,26 +327,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in event description.
-	 *
-	 * @static
-	 *
-	 * @param array $event
-	 *
-	 * @return string
-	 */
-	public static function resolveEventDescription(array $event) {
-		self::init();
-
-		$events = self::$macrosResolver->resolveTriggerNames([$event['triggerid'] => $event], [
-			'references_only' => false,
-			'events' => true
-		]);
-
-		return $events[$event['triggerid']]['description'];
-	}
-
-	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
 	 * @static
