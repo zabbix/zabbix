@@ -6973,8 +6973,8 @@ static int	DCconfig_find_active_time_function(const char *expression)
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts)
 {
-	int			i;
-	ZBX_DC_TRIGGER		*dc_trigger;
+	int		i;
+	ZBX_DC_TRIGGER	*dc_trigger;
 
 	RDLOCK_CACHE;
 

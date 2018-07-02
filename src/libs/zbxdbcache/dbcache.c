@@ -2732,9 +2732,9 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 
 int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 {
-	int				history_num, next_sync = 0, txn_error;
-	time_t				sync_start, now;
-	zbx_vector_ptr_t		history_items;
+	int			history_num, next_sync = 0;
+	time_t			sync_start, now;
+	zbx_vector_ptr_t	history_items;
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
@@ -2762,7 +2762,7 @@ int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 			DCmass_proxy_add_history(history, history_num);
 			DCmass_proxy_update_items(history, history_num);
 		}
-		while (ZBX_DB_DOWN == (txn_error = DBcommit()));
+		while (ZBX_DB_DOWN == DBcommit());
 
 		LOCK_CACHE;
 
