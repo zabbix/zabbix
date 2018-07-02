@@ -1480,7 +1480,6 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
-	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1519,6 +1518,8 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 	if (0 != timer_triggerids->values_num)
 	{
+		zbx_timespec_t	ts;
+
 		zbx_timespec(&ts);
 		zbx_dc_get_timer_triggers_by_triggerids(&trigger_info, &trigger_order, timer_triggerids, &ts);
 	}
