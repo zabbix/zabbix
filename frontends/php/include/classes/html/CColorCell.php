@@ -28,6 +28,7 @@ class CColorCell extends CDiv {
 			$this->setName($name);
 			$this->setId(zbx_formatDomId($name));
 		}
-		$this->setAttribute('style', 'background: #'.$color);
+
+		$this->setAttribute('style', preg_match('/[0-9A-F]{6}/i', $color) ? 'background: #'.$color : null);
 	}
 }

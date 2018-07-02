@@ -8,6 +8,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-13381] fixed invisible color picker selector, fixed wrong color preview, extended color pallette (Andzs, ashubin)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
 ........S. [ZBX-14500] fixed crash when reporting unknown triggers and using $1-$9 macros at the same time (vso)
 ..F.I..... [ZBX-14525] fixed sorting by severity in Monitoring->Problems and Problems widget (Sasha)
