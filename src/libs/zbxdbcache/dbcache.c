@@ -2808,7 +2808,7 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 					txn_error;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
-	zbx_vector_ptr_t		history_items, trigger_diff;
+	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
 
 	if (NULL == history_float && NULL != history_float_cbs)
@@ -2841,6 +2841,8 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
 
+	zbx_vector_ptr_create(&inventory_values);
+	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
 
@@ -2881,11 +2883,6 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 
 		if (0 != history_num)
 		{
-			zbx_vector_ptr_t	item_diff, inventory_values;
-
-			zbx_vector_ptr_create(&inventory_values);
-			zbx_vector_ptr_create(&item_diff);
-
 			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
@@ -2932,9 +2929,7 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 			zbx_clean_events();
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
-			zbx_vector_ptr_destroy(&inventory_values);
 			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
-			zbx_vector_ptr_destroy(&item_diff);
 		}
 
 		if (FAIL != ret)
@@ -3061,6 +3056,8 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
 
 	zbx_vector_ptr_destroy(&history_items);
+	zbx_vector_ptr_destroy(&inventory_values);
+	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
 
