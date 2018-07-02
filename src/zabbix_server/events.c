@@ -1550,6 +1550,18 @@ void	zbx_uninitialize_events(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_reset_event_recovery                                         *
+ *                                                                            *
+ * Purpose: reset event_recovery data                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_reset_event_recovery(void)
+{
+	zbx_hashset_clear(&event_recovery);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_clean_events                                                 *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
@@ -1577,7 +1589,7 @@ void	zbx_clean_events(void)
 
 	events_num = 0;
 
-	zbx_hashset_clear(&event_recovery);
+	zbx_reset_event_recovery();
 }
 
 /******************************************************************************

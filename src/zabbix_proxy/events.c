@@ -81,6 +81,11 @@ void	zbx_clean_events(void)
 	THIS_SHOULD_NEVER_HAPPEN;
 }
 
+void	zbx_reset_event_recovery(void)
+{
+	THIS_SHOULD_NEVER_HAPPEN;
+}
+
 void	zbx_export_events(void)
 {
 	THIS_SHOULD_NEVER_HAPPEN;

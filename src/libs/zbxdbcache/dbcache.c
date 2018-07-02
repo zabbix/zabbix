@@ -2918,6 +2918,8 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 
 					if (ZBX_DB_OK == (txn_error = DBcommit()))
 						DCupdate_trends(&trends_diff);
+					else
+						zbx_reset_event_recovery();
 
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
