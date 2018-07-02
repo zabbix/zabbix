@@ -675,11 +675,10 @@ class CMacrosResolverGeneral {
 	 * @param array $macros[<functionid>][<macro>]  an array of the tokens
 	 * @param array $triggers
 	 * @param array $macro_values
-	 * @param bool  $events			resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $triggers, array $macro_values, $events) {
+	protected function getItemMacros(array $macros, array $triggers, array $macro_values) {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -697,11 +696,6 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $macro => $tokens) {
 				switch ($macro) {
 					case 'ITEM.VALUE':
-						if ($events) {
-							$trigger = $triggers[$function['triggerid']];
-							$value = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
-							break;
-						}
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':

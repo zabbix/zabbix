@@ -207,8 +207,7 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveTriggerNames($triggers, [
-			'references_only' => $references_only,
-			'events' => false
+			'references_only' => $references_only
 		]);
 	}
 
