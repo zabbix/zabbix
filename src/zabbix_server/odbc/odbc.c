@@ -473,7 +473,8 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		/* force len to integer value for DB2 compatibility */
 		do
 		{
-			rc = SQLGetData(query_result->hstmt, i + 1, query_result->c_types[i], buffer, MAX_STRING_LEN, &len);
+			rc = SQLGetData(query_result->hstmt, i + 1, query_result->c_types[i], buffer, MAX_STRING_LEN,
+					&len);
 
 			if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
@@ -484,7 +485,7 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 			if (SQL_NULL_DATA == (int)len)
 				break;
 
-			buffer[(int)len] = '\0';
+			buffer[sizeof(buffer) - 1] = '\0';
 
 			zbx_strcpy_alloc(&query_result->row[i], &alloc, &offset, buffer);
 		}
