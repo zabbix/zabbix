@@ -2876,6 +2876,8 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 			if (history_num != history_items.values_num)
 				hc_push_busy_items(&history_items);
 		}
+		else
+			history_num = 0;
 
 		UNLOCK_CACHE;
 
