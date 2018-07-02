@@ -217,7 +217,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	CURL			*easyhandle;
 	CURLcode		err;
 	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
-	int			ret = NOTSUPPORTED, timeout_seconds;
+	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
 	struct zbx_json		json;
@@ -335,15 +335,24 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if ('\0' == *item->headers)
+	headers = item->headers;
+	while (NULL != (line = zbx_http_get_header(&headers)))
+	{
+		headers_slist = curl_slist_append(headers_slist, line);
+
+		if (FAIL == found && 0 == strncmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")))
+			found = SUCCEED;
+
+		zbx_free(line);
+	}
+
+	if (FAIL == found)
 	{
 		if (ZBX_POSTTYPE_JSON == item->post_type)
-			zbx_http_add_headers(application_json, &headers_slist);
+			headers_slist = curl_slist_append(headers_slist, application_json);
 		else if (ZBX_POSTTYPE_XML == item->post_type)
-			zbx_http_add_headers(application_xml, &headers_slist);
+			headers_slist = curl_slist_append(headers_slist, application_xml);
 	}
-	else
-		zbx_http_add_headers(item->headers, &headers_slist);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 	{
