@@ -1531,10 +1531,10 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
-
+out:
 	zbx_free(timespecs);
 	zbx_free(itemids);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -2805,7 +2805,7 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, candidate_num, next_sync = 0, history_float_num,
 					history_integer_num, history_string_num, history_text_num, history_log_num,
-					txn_error, ret;
+					txn_error;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
@@ -2860,7 +2860,7 @@ int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 	do
 	{
 		DC_ITEM			*items;
-		int			*errcodes, trends_num = 0, timers_num = 0;
+		int			*errcodes, trends_num = 0, timers_num = 0, ret = SUCCEED;
 		zbx_vector_uint64_t	itemids;
 		ZBX_DC_TREND		*trends = NULL;
 
