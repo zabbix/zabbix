@@ -1447,36 +1447,45 @@ static int	DBpatch_3050121(void)
 
 static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
-	char	*d = dst;
-	int	quoted = 0, i;
-	size_t	param_pos, param_len, sep_pos;
+	char		*pout = dst;
+	size_t		pos, len, sep;
+	const char	*pin = src;
+	int		quoted = 0;
 
-	zbx_function_param_parse(src, &param_pos, &param_len, &sep_pos);
+	zbx_function_param_parse(src, &pos, &len, &sep);
 
-	/* copy what was before the parameter */
-	for (i = param_pos; 0 < i; i--)
-		*d++ = *src++;
-
-	if ('"' == *src)
+	if (0 != pos)
 	{
+		memcpy(pout, src, pos);
+		pout += pos;
+		pin += pos;
+	}
+
+	if ('"' == *pin)
+	{
+		*pout++ = *pin++;
+		len -= 2;
 		quoted = 1;
-		*d++ = *src++;
 	}
 
-	*d++ = '^';			/* start anchor */
+	*pout++ = '^';		/* start anchor */
 
-	for(; '\0' != *src; src++)
+	if (0 != len)
 	{
-		if (1 == quoted && '"' == *src && '\\' != *(src - 1))
-			*d++ = '$';	/* end anchor if parameter is quoted */
-
-		*d++ = *src;
+		memcpy(pout, pin, len);
+		pout += len;
+		pin += len;
 	}
 
-	if (0 == quoted)
-		*d++ = '$';		/* end anchor */
+	*pout++ = '$';		/* end anchor */
 
-	*d = '\0';
+	if (0 != quoted)
+	{
+		memcpy(pout, pin, sep - (pin - src));
+		pout += sep - (pin - src);
+	}
+
+	*pout++ = '\0';
 }
 
 static int	DBpatch_3050122(void)
