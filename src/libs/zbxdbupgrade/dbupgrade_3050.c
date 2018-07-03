@@ -1448,7 +1448,17 @@ static int	DBpatch_3050121(void)
 static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
 	char	*d = dst;
-	int	quoted = 0;
+	int	quoted = 0, i;
+	size_t	src_len, param_pos, param_len, sep_pos;
+
+	zbx_function_param_parse(src, &param_pos, &param_len, &sep_pos);
+
+	/* copy what was before the parameter */
+	for (i = param_pos; 0 < i; i--)
+	{
+		src_len--;
+		*d++ = *src++;
+	}
 
 	if ('"' == *src)
 	{
@@ -1460,7 +1470,7 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 
 	for(; '\0' != *src; src++)
 	{
-		if (1 == quoted && '"' == *src && '\0' == src[1])
+		if (1 == quoted && '"' == *src && '\\' != *(src - 1))
 			*d++ = '$';	/* end anchor if parameter is quoted */
 
 		*d++ = *src;
@@ -1492,7 +1502,7 @@ static int	DBpatch_3050122(void)
 		zbx_regexp_escape(&parameter);
 
 		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
-		regexp_esc_param_len = strlen(parameter) + 2;
+		regexp_esc_param_len = zbx_strlen_utf8(parameter) + 2;
 
 		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
 		{
@@ -1508,7 +1518,7 @@ static int	DBpatch_3050122(void)
 
 		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
 
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, regexp_esc_param_len + 1);
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 3);
 		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
