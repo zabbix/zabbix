@@ -130,14 +130,18 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 				(new CForm('get', $this->pageFile))
 					->addItem(
 						(new CList())
-							->addItem([_('Group'), SPACE, $groups_cb])
-							->addItem(SPACE)
-							->addItem([_('Host'), SPACE, $hosts_cb])
+							->addItem([_('Group'), '&nbsp;', $groups_cb])
+							->addItem('&nbsp;')
+							->addItem([_('Host'), '&nbsp;', $hosts_cb])
 					)
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
 
-		list($table, $info) = $this->getProblemsListTable($params, $this->pageFile.'?screenid='.$this->screenid);
+		list($table, $info) = $this->getProblemsListTable($params,
+			(new CUrl($this->pageFile))
+				->setArgument('screenid', $this->screenid)
+				->getUrl()
+		);
 
 		$footer = (new CList())
 			->addItem($info)
