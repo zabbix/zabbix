@@ -1850,7 +1850,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect("show columns from %s like '%s'",
-			table_name, field_name_esc, ZBX_SQL_LIKE_ESCAPE_CHAR);
+			table_name, field_name_esc);
 
 	zbx_free(field_name_esc);
 
