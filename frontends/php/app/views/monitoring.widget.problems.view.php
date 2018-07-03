@@ -59,7 +59,7 @@ $table = (new CTableInfo())
 		[
 			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
 			' &bullet; ',
-			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
+			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		_('Duration'),
 		_('Ack'),

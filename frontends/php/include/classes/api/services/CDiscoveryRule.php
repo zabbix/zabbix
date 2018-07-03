@@ -1312,7 +1312,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
-		$prototypes = API::ItemPrototype()->get([
+		$item_prototypes = API::ItemPrototype()->get([
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor',
@@ -1329,18 +1329,60 @@ class CDiscoveryRule extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$rs = [];
-		if ($prototypes) {
+		if ($item_prototypes) {
 			$create_order = [];
 			$src_itemid_to_key = [];
-			foreach ($prototypes as $itemid => $item) {
-				$dependency_level = 0;
-				$master_item = $item;
-				$src_itemid_to_key[$itemid] = $item['key_'];
+			$unresolved_master_itemids = [];
 
-				while ($master_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$master_item = $prototypes[$master_item['master_itemid']];
-					++$dependency_level;
+			// Gather all master item IDs and check if master item IDs already belong to item prototypes.
+			foreach ($item_prototypes as $itemid => $item_prototype) {
+				if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT
+						&& !array_key_exists($item_prototype['master_itemid'], $item_prototypes)) {
+					$unresolved_master_itemids[$item_prototype['master_itemid']] = true;
+				}
+			}
+
+			$items = [];
+
+			// It's possible that master items are non-prototype items.
+			if ($unresolved_master_itemids) {
+				$items = API::Item()->get([
+					'output' => ['itemid'],
+					'itemids' => array_keys($unresolved_master_itemids),
+					'webitems' => true,
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+					'preservekeys' => true
+				]);
+
+				foreach ($items as $item) {
+					if (array_key_exists($item['itemid'], $unresolved_master_itemids)) {
+						unset($unresolved_master_itemids[$item['itemid']]);
+					}
+				}
+
+				// If still there are IDs left, there's nothing more we can do.
+				if ($unresolved_master_itemids) {
+					reset($unresolved_master_itemids);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
+						'master_itemid', _s('Item "%1$s" does not exist or you have no access to this item',
+							key($unresolved_master_itemids)
+					)));
+				}
+			}
+
+			foreach ($item_prototypes as $itemid => $item_prototype) {
+				$dependency_level = 0;
+				$master_item_prototype = $item_prototype;
+				$src_itemid_to_key[$itemid] = $item_prototype['key_'];
+
+				while ($master_item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+					if (array_key_exists($master_item_prototype['master_itemid'], $item_prototypes)) {
+						$master_item_prototype = $item_prototypes[$master_item_prototype['master_itemid']];
+						++$dependency_level;
+					}
+					else {
+						break;
+					}
 				}
 
 				$create_order[$itemid] = $dependency_level;
@@ -1368,58 +1410,61 @@ class CDiscoveryRule extends CItemGeneral {
 					$create_items = [];
 				}
 
-				$prototype = $prototypes[$key];
-
-				if ($prototype['templateid']) {
-					$prototype = get_same_item_for_host($prototype, $dstHost['hostid']);
-
-					if (!$prototype) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
-					}
-					$itemkey_to_id[$srcItem['key_']] = $prototype['itemid'];
-					continue;
-				}
-
-				$prototype['ruleid'] = $dstDiscovery['itemid'];
-				$prototype['hostid'] = $dstDiscovery['hostid'];
+				$item_prototype = $item_prototypes[$key];
+				$item_prototype['ruleid'] = $dstDiscovery['itemid'];
+				$item_prototype['hostid'] = $dstDiscovery['hostid'];
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 					// find a matching interface
-					$interface = self::findInterfaceForItem($prototype['type'], $dstHost['interfaces']);
+					$interface = self::findInterfaceForItem($item_prototype['type'], $dstHost['interfaces']);
 					if ($interface) {
-						$prototype['interfaceid'] = $interface['interfaceid'];
+						$item_prototype['interfaceid'] = $interface['interfaceid'];
 					}
 					// no matching interface found, throw an error
 					elseif ($interface !== false) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Cannot find host interface on "%1$s" for item key "%2$s".',
 							$dstHost['name'],
-							$prototype['key_']
+							$item_prototype['key_']
 						));
 					}
 				}
 
 				// add new applications
-				$prototype['applications'] = get_same_applications_for_host(
-					zbx_objectValues($prototype['applications'], 'applicationid'),
+				$item_prototype['applications'] = get_same_applications_for_host(
+					zbx_objectValues($item_prototype['applications'], 'applicationid'),
 					$dstHost['hostid']
 				);
 
-				if (!$prototype['preprocessing']) {
-					unset($prototype['preprocessing']);
+				if (!$item_prototype['preprocessing']) {
+					unset($item_prototype['preprocessing']);
 				}
 
-				if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
-					$src_item_key = $src_itemid_to_key[$prototype['master_itemid']];
-					$prototype['master_itemid'] = $itemkey_to_id[$src_item_key];
+				if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $item_prototype['master_itemid'];
+
+					if (array_key_exists($master_itemid, $src_itemid_to_key)) {
+						$src_item_key = $src_itemid_to_key[$master_itemid];
+						$item_prototype['master_itemid'] = $itemkey_to_id[$src_item_key];
+					}
+					else {
+						// It's a non-prototype item, so look for it on destination host.
+						$dst_item = get_same_item_for_host($items[$master_itemid], $dstHost['hostid']);
+
+						if (!$dst_item) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
+						}
+
+						$item_prototype['master_itemid'] = $dst_item['itemid'];
+					}
 				}
 				else {
-					unset($prototype['master_itemid']);
+					unset($item_prototype['master_itemid']);
 				}
 
-				unset($prototype['templateid']);
-				$create_items[] = $prototype;
+				unset($item_prototype['templateid']);
+				$create_items[] = $item_prototype;
 			}
 
 			if ($create_items && !API::ItemPrototype()->create($create_items)) {
