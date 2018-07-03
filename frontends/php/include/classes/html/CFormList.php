@@ -73,7 +73,7 @@ class CFormList extends CList {
 	public function addInfo($text) {
 		$this->addItem(
 			[
-				(new CDiv(_('Info')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 				(new CDiv(
 					(new CDiv($text))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
