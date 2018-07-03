@@ -3707,6 +3707,44 @@ int	zbx_function_param_quote(char **param, int forced)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_function_getparam_dyn                                        *
+ *                                                                            *
+ * Purpose: return parameter by index (Nparam) from parameter list (params)   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      params - [IN] parameter list                                          *
+ *      Nparam - [IN] requested parameter index (from 1)                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *      NULL - requested parameter missing                                    *
+ *      otherwise - requested parameter                                       *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_getparam_dyn(const char *params, int Nparam)
+{
+	const char	*ptr;
+	size_t		sep_pos, params_len;
+	char		*out = NULL;
+	int		idx = 0;
+
+	params_len = strlen(params) + 1;
+
+	for (ptr = params; ++idx <= Nparam && ptr < params + params_len; ptr += sep_pos + 1)
+	{
+		size_t	param_pos, param_len;
+		int	quoted;
+
+		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+
+		if (idx == Nparam)
+			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+	}
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_no_function                                                  *
  *                                                                            *
  * Purpose: count calculated item (prototype) formula characters that can be  *
