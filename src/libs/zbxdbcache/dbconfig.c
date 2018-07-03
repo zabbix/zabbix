@@ -6671,9 +6671,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *           case configuration changes. On a stable configuration, it should *
  *           work without any problems.                                       *
  *                                                                            *
- *           Also see function DCconfig_get_time_based_triggers(), which      *
- *           timer processes use to lock and unlock triggers.                 *
- *                                                                            *
  * Return value: the number of items available for processing (unlocked).     *
  *                                                                            *
  ******************************************************************************/

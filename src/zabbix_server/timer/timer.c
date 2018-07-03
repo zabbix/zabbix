@@ -23,7 +23,6 @@
 #include "pid.h"
 #include "db.h"
 #include "log.h"
-#include "../events.h"
 #include "dbcache.h"
 #include "zbxserver.h"
 #include "daemon.h"
@@ -32,8 +31,6 @@
 #include "timer.h"
 
 #define TIMER_DELAY	30
-
-#define ZBX_TRIGGERS_MAX	1000
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
