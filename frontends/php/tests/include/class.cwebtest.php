@@ -269,8 +269,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 
 		foreach ($strings as $string) {
-			$elements = $this->webDriver->findElement(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
-			$this->assertFalse($elements->isDisplayed());
+			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			foreach ($elements as $element) {
+				$this->assertFalse($element->isDisplayed());
+			}
 		}
 	}
 

@@ -204,7 +204,6 @@ class testFormEventCorrelation extends CWebTest {
 					'select_tag' => 'Event tag pair',
 					'oldtag' => 'Old tag',
 					'newtag' => 'New tag',
-					'operator' => '='
 				]
 			],
 			[
@@ -316,7 +315,10 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
+
+		if (array_key_exists('operator', $data)) {
+			$this->zbxTestDropdownSelectWait('new_condition_operator', $data['operator']);
+		}
 
 		if ($data['select_tag'] === 'New event host group') {
 			$this->zbxTestClickButtonMultiselect('new_condition_groupids_');
@@ -730,7 +732,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation deleted');
-		$this->zbxTestTextNotPresent('Event correlation for delete');
+		$this->zbxTestTextNotVisibleOnPage('Event correlation for delete');
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
