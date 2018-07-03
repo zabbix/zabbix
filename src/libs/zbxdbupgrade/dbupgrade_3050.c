@@ -1449,16 +1449,13 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
 	char	*d = dst;
 	int	quoted = 0, i;
-	size_t	src_len, param_pos, param_len, sep_pos;
+	size_t	param_pos, param_len, sep_pos;
 
 	zbx_function_param_parse(src, &param_pos, &param_len, &sep_pos);
 
 	/* copy what was before the parameter */
 	for (i = param_pos; 0 < i; i--)
-	{
-		src_len--;
 		*d++ = *src++;
-	}
 
 	if ('"' == *src)
 	{
