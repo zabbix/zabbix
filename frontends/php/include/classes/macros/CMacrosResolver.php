@@ -316,7 +316,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param int    $triggers[$triggerid]['ns']			(optional)
 	 * @param array  $options
 	 * @param bool   $options['references_only']			resolve only $1-$9 macros
-	 * @param bool   $options['events']						resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields
 	 *
 	 * @return array
 	 */
@@ -409,7 +408,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Get macro value.
 			$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 			$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-			$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, $options['events']);
+			$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 
 			if ($usermacros) {
 				// Get hosts for triggers.
@@ -536,7 +535,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
