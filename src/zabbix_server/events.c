@@ -1556,6 +1556,18 @@ void	zbx_uninitialize_events(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_reset_event_recovery                                         *
+ *                                                                            *
+ * Purpose: reset event_recovery data                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_reset_event_recovery(void)
+{
+	zbx_hashset_clear(&event_recovery);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_clean_events                                                 *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
@@ -1583,7 +1595,7 @@ void	zbx_clean_events(void)
 
 	events_num = 0;
 
-	zbx_hashset_clear(&event_recovery);
+	zbx_reset_event_recovery();
 }
 
 /******************************************************************************
@@ -2394,6 +2406,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
+	if (NULL != trigger_diff && 0 != correlation_cache.num_data)
+		flush_correlation_queue(trigger_diff, triggerids_lock);
+
 	if (0 != events_num)
 	{
 		zbx_vector_ptr_create(&internal_ok_events);
@@ -2522,63 +2537,4 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 	DCconfig_clean_triggers(&trigger, &errcode, 1);
 
 	return (0 == processed_num ? FAIL : SUCCEED);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_flush_correlated_events                                      *
- *                                                                            *
- * Purpose: try flushing closing events queued by correlation operations      *
- *                                                                            *
- * Return value: The number of events left in correlation queue               *
- *                                                                            *
- * Comments: This function will try to lock corresponding triggers before     *
- *           flushing closing events. If the trigger cannot be locked the     *
- *           event will stay in the queue.                                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_flush_correlated_events(void)
-{
-	const char		*__function_name = "zbx_flush_correlated_events";
-	zbx_vector_ptr_t	trigger_diff;
-	zbx_vector_uint64_t	triggerids_lock;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __function_name, correlation_cache.num_data);
-
-	if (0 == correlation_cache.num_data)
-		goto out;
-
-	zbx_vector_ptr_create(&trigger_diff);
-	zbx_vector_uint64_create(&triggerids_lock);
-
-	flush_correlation_queue(&trigger_diff, &triggerids_lock);
-
-	if (0 != events_num)
-	{
-		DBbegin();
-
-		flush_events();
-		update_trigger_changes(&trigger_diff);
-		DCconfig_triggers_apply_changes(&trigger_diff);
-		zbx_db_save_trigger_changes(&trigger_diff);
-
-		DBcommit();
-
-		DBupdate_itservices(&trigger_diff);
-
-		if (SUCCEED == zbx_is_export_enabled())
-			zbx_export_events();
-
-		zbx_clean_events();
-	}
-
-	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-	DCconfig_unlock_triggers(&triggerids_lock);
-
-	zbx_vector_uint64_destroy(&triggerids_lock);
-	zbx_vector_ptr_destroy(&trigger_diff);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events_num:%d", __function_name, correlation_cache.num_data);
-
-	return correlation_cache.num_data;
 }

@@ -11,11 +11,12 @@ find ./ -type f -name '*.php' | sort -d -f > locale/POTFILES.in
 # keyword "_n" is Zabbix frontend plural function
 # keyword "_s" is Zabbix frontend placeholder function
 # keyword "_x" is Zabbix frontend context function
+# keyword "_xs" is Zabbix frontend context function
 xgettext --files-from=locale/POTFILES.in --from-code=UTF-8 \
 --output=locale/frontend.pot \
 --copyright-holder="Zabbix SIA" --no-wrap --sort-output \
 --add-comments="GETTEXT:" --keyword=_n:1,2 --keyword=_s \
---keyword=_x:1,2c --keyword=_xn:1,2,4c || exit 1
+--keyword=_x:1,2c --keyword=_xs:1,2c --keyword=_xn:1,2,4c || exit 1
 
 cd $directory/locale
 #--sort-by-file

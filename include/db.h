@@ -201,6 +201,8 @@ struct	_DC_TRIGGER;
 #define EVENT_SUPPRESSED_FALSE		0
 #define EVENT_SUPPRESSED_TRUE		1
 
+#define FUNCTION_PARAM_LEN		255
+
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"

@@ -485,9 +485,9 @@ class testFormAction extends CWebTest {
 			$this->zbxTestInputTypeWait('new_condition_value', 'TEST2');
 			$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[text()='Add' and contains(@onclick, 'add_condition')]");
 
-				$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
-				$evaltype = $data['evaltype'];
-			}
+			$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
+			$evaltype = $data['evaltype'];
+		}
 
 		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
 			$this->zbxTestTextPresent('Type of calculation');
@@ -526,8 +526,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
 		else {
-			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
-			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]/td[2]');
+			$this->zbxTestAssertElementNotPresentXpath('//tr[@id="conditions_0"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
@@ -894,7 +893,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'size', 20);
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Problem: {TRIGGER.NAME}');
+				$this->zbxTestAssertElementValue('def_shortdata', 'Problem: {EVENT.NAME}');
 				break;
 			case 'Discovery':
 				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
@@ -912,7 +911,7 @@ class testFormAction extends CWebTest {
 		switch ($eventsource) {
 			case 'Triggers':
 				$def_longdata_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-					' Problem name: {TRIGGER.NAME}'.
+					' Problem name: {EVENT.NAME}'.
 					' Host: {HOST.NAME}'.
 					' Severity: {EVENT.SEVERITY}'.
 					' Original problem ID: {EVENT.ID}'.
@@ -920,7 +919,7 @@ class testFormAction extends CWebTest {
 					break;
 			case 'Discovery':
 				$def_longdata_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-					' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
+					' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
 					' Device DNS: {DISCOVERY.DEVICE.DNS}'.
 					' Device status: {DISCOVERY.DEVICE.STATUS}'.
 					' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
@@ -1196,7 +1195,7 @@ class testFormAction extends CWebTest {
 				$this->zbxTestAssertAttribute('//input[@id=\'new_operation_opmessage_subject\']', 'size', 20);
 				switch ($eventsource) {
 					case 'Triggers':
-						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Problem: {TRIGGER.NAME}');
+						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Problem: {EVENT.NAME}');
 						break;
 					case 'Discovery':
 						$this->zbxTestAssertElementValue('new_operation_opmessage_subject', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
@@ -1215,7 +1214,7 @@ class testFormAction extends CWebTest {
 				switch ($eventsource) {
 					case 'Triggers':
 						$new_operation_opmessage_message_val = 'Problem started at {EVENT.TIME} on {EVENT.DATE}'.
-							' Problem name: {TRIGGER.NAME}'.
+							' Problem name: {EVENT.NAME}'.
 							' Host: {HOST.NAME}'.
 							' Severity: {EVENT.SEVERITY}'.
 							' Original problem ID: {EVENT.ID}'.
@@ -1223,7 +1222,7 @@ class testFormAction extends CWebTest {
 							break;
 					case 'Discovery':
 						$new_operation_opmessage_message_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-							' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
+							' Device IP: {DISCOVERY.DEVICE.IPADDRESS}'.
 							' Device DNS: {DISCOVERY.DEVICE.DNS}'.
 							' Device status: {DISCOVERY.DEVICE.STATUS}'.
 							' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
@@ -1545,7 +1544,7 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'size', 20);
 			switch ($eventsource) {
 				case 'Triggers':
-					$this->zbxTestAssertElementValue('r_shortdata', 'Resolved: {TRIGGER.NAME}');
+					$this->zbxTestAssertElementValue('r_shortdata', 'Resolved: {EVENT.NAME}');
 					break;
 				case 'Internal':
 					$this->zbxTestAssertElementValue('r_shortdata', '');
@@ -1558,7 +1557,7 @@ class testFormAction extends CWebTest {
 			switch ($eventsource) {
 				case 'Triggers':
 					$r_longdata_val = 'Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}'.
-						' Problem name: {TRIGGER.NAME}'.
+						' Problem name: {EVENT.NAME}'.
 						' Host: {HOST.NAME}'.
 						' Severity: {EVENT.SEVERITY}'.
 						' Original problem ID: {EVENT.ID}'.

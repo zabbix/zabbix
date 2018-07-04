@@ -356,7 +356,7 @@ class CControllerPopupGeneric extends CController {
 			'with_simple_graph_items' =>	'in 1',
 			'with_triggers' =>				'in 1',
 			'with_monitored_triggers' =>	'in 1',
-			'with_webitems' =>	            'in 1',
+			'with_webitems' =>				'in 1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',

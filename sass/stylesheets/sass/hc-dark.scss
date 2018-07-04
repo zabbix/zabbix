@@ -300,6 +300,14 @@ ul.top-nav-icons {
 	}
 }
 
+.filter-breadcrumb {
+	a {
+		&:focus {
+			margin-bottom: -1px;
+		}
+	}
+}
+
 .add-child-btn {
 	background: url(../img/icon-sprite.svg) no-repeat -359px -551px !important;
 }

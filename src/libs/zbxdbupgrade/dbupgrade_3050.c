@@ -21,6 +21,8 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxtasks.h"
+#include "zbxregexp.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -29,8 +31,6 @@ extern unsigned char	program_type;
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_3050000(void)
 {
@@ -1431,6 +1431,116 @@ out:
 
 static int	DBpatch_3050121(void)
 {
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"update profiles set value_str='severity' where idx='web.problem.sort' and value_str='priority'");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
+{
+	char	*d = dst;
+	int	quoted = 0;
+
+	if ('"' == *src)
+	{
+		quoted = 1;
+		*d++ = *src++;
+	}
+
+	*d++ = '^';			/* start anchor */
+
+	for(; '\0' != *src; src++)
+	{
+		if (1 == quoted && '"' == *src && '\0' == src[1])
+			*d++ = '$';	/* end anchor if parameter is quoted */
+
+		*d++ = *src;
+	}
+
+	if (0 == quoted)
+		*d++ = '$';		/* end anchor */
+
+	*d = '\0';
+}
+
+static int	DBpatch_3050122(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select functionid,parameter from functions where name='logsource'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		size_t	regexp_esc_param_len;
+
+		parameter = zbx_strdup(NULL, row[1]);
+		zbx_regexp_escape(&parameter);
+
+		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
+		regexp_esc_param_len = strlen(parameter) + 2;
+
+		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
+					" (functionid: %s) to regexp during database upgrade. The converted"
+					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
+					" Allowed length is %d characters.",
+					row[1], row[0], regexp_esc_param_len, FUNCTION_PARAM_LEN);
+
+			zbx_free(parameter);
+			continue;
+		}
+
+		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
+
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, regexp_esc_param_len + 1);
+		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update functions set parameter='%s' where functionid=%s;\n",
+				parameter_esc_anchored, row[0]);
+
+		zbx_free(parameter);
+		zbx_free(parameter_esc);
+		zbx_free(parameter_esc_anchored);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3050123(void)
+{
 	const ZBX_TABLE table =
 		{"event_suppress",	"event_suppressid",	0,
 			{
@@ -1446,31 +1556,31 @@ static int	DBpatch_3050121(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050122(void)
+static int	DBpatch_3050124(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_1", "eventid,maintenanceid", 1);
 }
 
-static int	DBpatch_3050123(void)
+static int	DBpatch_3050125(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_2", "suppress_until", 0);
 }
 
-static int	DBpatch_3050124(void)
+static int	DBpatch_3050126(void)
 {
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 1, &field);
 }
 
-static int	DBpatch_3050125(void)
+static int	DBpatch_3050127(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 2, &field);
 }
 
-static int	DBpatch_3050126(void)
+static int	DBpatch_3050128(void)
 {
 	const ZBX_TABLE table =
 		{"maintenance_tag",	"maintenancetagid",	0,
@@ -1488,33 +1598,33 @@ static int	DBpatch_3050126(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050127(void)
+static int	DBpatch_3050129(void)
 {
 	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050130(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("maintenance_tag", 1, &field);
 }
 
-static int	DBpatch_3050129(void)
+static int	DBpatch_3050131(void)
 {
 	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
 
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050132(void)
 {
 	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("maintenances", &field);
 }
 
-static int	DBpatch_3050131(void)
+static int	DBpatch_3050133(void)
 {
 	int		ret;
 
@@ -1531,7 +1641,7 @@ static int	DBpatch_3050131(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050132(void)
+static int	DBpatch_3050134(void)
 {
 	int		ret;
 
@@ -1549,7 +1659,7 @@ static int	DBpatch_3050132(void)
 }
 
 
-static int	DBpatch_3050133(void)
+static int	DBpatch_3050135(void)
 {
 	int		ret;
 
@@ -1570,7 +1680,7 @@ static int	DBpatch_3050133(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050134(void)
+static int	DBpatch_3050136(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1607,8 +1717,6 @@ static int	DBpatch_3050134(void)
 
 	return ret;
 }
-
-
 #endif
 
 DBPATCH_START(3050)
@@ -1746,5 +1854,7 @@ DBPATCH_ADD(3050131, 0, 1)
 DBPATCH_ADD(3050132, 0, 1)
 DBPATCH_ADD(3050133, 0, 1)
 DBPATCH_ADD(3050134, 0, 1)
+DBPATCH_ADD(3050135, 0, 1)
+DBPATCH_ADD(3050136, 0, 1)
 
 DBPATCH_END()

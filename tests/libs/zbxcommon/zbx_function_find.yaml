@@ -21,28 +21,28 @@ test case: "function name not found #1"
 in:
   param: 'test'
 out:
-  error: ''
+  error: 'Incorrect function expression: test'
   return: 'FAIL'
 ---
 test case: "function name not found #2"
 in:
   param: 'test)('
 out:
-  error: ''
+  error: 'Incorrect function expression: test)('
   return: 'FAIL'
 ---
 test case: "function name not found #3"
 in:
   param: '()test'
 out:
-  error: ''
+  error: 'Incorrect function expression: test'
   return: 'FAIL'
 ---
 test case: "function name not found #4"
 in:
   param: '!!!'
 out:
-  error: ''
+  error: 'Incorrect function expression: !!!'
   return: 'FAIL'
 ---
 test case: "function name not found #5"
@@ -50,49 +50,49 @@ in:
   param: '
 '
 out:
-  error: ''
+  error: 'Incorrect function expression:  '
   return: 'FAIL'
 ---
 test case: "function name not found #6"
 in:
   param: ''
 out:
-  error: ''
+  error: 'Incorrect function expression: '
   return: 'FAIL'
 ---
 test case: "function parameters not found #1"
 in:
   param: 'test('
 out:
-  error: "Incorrect function 'test' expression. Check expression part starting from "
+  error: "Incorrect function 'test' expression. Check expression part starting from: "
   return: 'FAIL'
 ---
 test case: "function parameters not found #2"
 in:
   param: 'test(param'
 out:
-  error: "Incorrect function 'test' expression. Check expression part starting from param"
+  error: "Incorrect function 'test' expression. Check expression part starting from: param"
   return: 'FAIL'
 ---
 test case: "function parameters not found #3"
 in:
   param: 'test(,param'
 out:
-  error: "Incorrect function 'test' expression. Check expression part starting from param"
+  error: "Incorrect function 'test' expression. Check expression part starting from: param"
   return: 'FAIL'
 ---
 test case: "function parameters not found #4"
 in:
   param: 'test(param,'
 out:
-  error: "Incorrect function 'test' expression. Check expression part starting from param,"
+  error: "Incorrect function 'test' expression. Check expression part starting from: param,"
   return: 'FAIL'
 ---
 test case: "function parameters not found #5"
 in:
   param: 'last(123,"grpsum[\"{$MYGROUP}\",\"ckey3\",last"])'
 out:
-  error: 'Incorrect function ''last'' expression. Check expression part starting from "grpsum[\"{$MYGROUP}\",\"ckey3\",last"'
+  error: 'Incorrect function ''last'' expression. Check expression part starting from: "grpsum[\"{$MYGROUP}\",\"ckey3\",last"'
   return: 'FAIL'
 ---
 test case: "successfully found function that started after a space #1"
