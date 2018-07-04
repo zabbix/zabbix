@@ -1447,14 +1447,14 @@ static int	DBpatch_3050121(void)
 
 static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
+	const char	*pin = src;
 	char		*pout = dst;
 	size_t		pos, len, sep;
-	const char	*pin = src;
 	int		quoted = 0;
 
 	zbx_function_param_parse(src, &pos, &len, &sep);
 
-	if (0 != pos)
+	if (0 != pos)		/* copy leading spaces */
 	{
 		memcpy(pout, src, pos);
 		pout += pos;
@@ -1464,7 +1464,7 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 	if ('"' == *pin)
 	{
 		*pout++ = *pin++;
-		len -= 2;
+		len -= 2;	/* length without starting and ending quotes */
 		quoted = 1;
 	}
 
@@ -1481,8 +1481,8 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 
 	if (0 != quoted)
 	{
-		memcpy(pout, pin, sep - (pin - src));
-		pout += sep - (pin - src);
+		memcpy(pout, pin, sep - (size_t)(pin - src));
+		pout += sep - (size_t)(pin - src);
 	}
 
 	*pout++ = '\0';
