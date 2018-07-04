@@ -1624,11 +1624,13 @@ TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 
-TABLE|event_suppress|eventid,maintenanceid|0
+TABLE|event_suppress|event_suppressid|0
+FIELD		|event_suppressid|t_id		|	|NOT NULL	|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
-INDEX		|1		|suppress_until
+UNIQUE		|1		|eventid,maintenanceid
+INDEX		|2		|suppress_until
 
 TABLE|maintenance_tag|maintenancetagid|ZBX_DATA
 FIELD		|maintenancetagid|t_id		|	|NOT NULL	|0
@@ -1641,4 +1643,4 @@ INDEX|1|maintenanceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050133	|3050133
+ROW		|3050134	|3050134

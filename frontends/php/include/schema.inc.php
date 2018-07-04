@@ -135,6 +135,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'tags_evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'hosts' => [
@@ -4212,12 +4218,6 @@ return [
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			],
-			'tags_evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 		],
 	],
 	'maintenances_groups' => [
@@ -7437,8 +7437,15 @@ return [
 		],
 	],
 	'event_suppress' => [
-		'key' => 'eventid',
+		'key' => 'event_suppressid',
 		'fields' => [
+			'event_suppressid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'event_suppressid',
+			],
 			'eventid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,

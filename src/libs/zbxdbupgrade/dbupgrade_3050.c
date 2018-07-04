@@ -1432,8 +1432,9 @@ out:
 static int	DBpatch_3050121(void)
 {
 	const ZBX_TABLE table =
-		{"event_suppress",	"eventid,maintenanceid",	0,
+		{"event_suppress",	"event_suppressid",	0,
 			{
+				{"event_suppressid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 				{"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1447,24 +1448,29 @@ static int	DBpatch_3050121(void)
 
 static int	DBpatch_3050122(void)
 {
-	return DBcreate_index("event_suppress", "event_suppress_1", "suppress_until", 0);
+	return DBcreate_index("event_suppress", "event_suppress_1", "eventid,maintenanceid", 1);
 }
 
 static int	DBpatch_3050123(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_2", "suppress_until", 0);
+}
+
+static int	DBpatch_3050124(void)
 {
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 1, &field);
 }
 
-static int	DBpatch_3050124(void)
+static int	DBpatch_3050125(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 2, &field);
 }
 
-static int	DBpatch_3050125(void)
+static int	DBpatch_3050126(void)
 {
 	const ZBX_TABLE table =
 		{"maintenance_tag",	"maintenancetagid",	0,
@@ -1482,33 +1488,33 @@ static int	DBpatch_3050125(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050126(void)
+static int	DBpatch_3050127(void)
 {
 	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
 }
 
-static int	DBpatch_3050127(void)
+static int	DBpatch_3050128(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("maintenance_tag", 1, &field);
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050129(void)
 {
 	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
 
-static int	DBpatch_3050129(void)
+static int	DBpatch_3050130(void)
 {
 	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("maintenances", &field);
 }
 
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050131(void)
 {
 	int		ret;
 
@@ -1525,7 +1531,7 @@ static int	DBpatch_3050130(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050131(void)
+static int	DBpatch_3050132(void)
 {
 	int		ret;
 
@@ -1543,7 +1549,7 @@ static int	DBpatch_3050131(void)
 }
 
 
-static int	DBpatch_3050132(void)
+static int	DBpatch_3050133(void)
 {
 	int		ret;
 
@@ -1564,7 +1570,7 @@ static int	DBpatch_3050132(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050133(void)
+static int	DBpatch_3050134(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1739,5 +1745,6 @@ DBPATCH_ADD(3050130, 0, 1)
 DBPATCH_ADD(3050131, 0, 1)
 DBPATCH_ADD(3050132, 0, 1)
 DBPATCH_ADD(3050133, 0, 1)
+DBPATCH_ADD(3050134, 0, 1)
 
 DBPATCH_END()
