@@ -91,7 +91,7 @@ if (!$data['screen']['templateid']) {
 	}
 
 	// Append multiselect to screen tab.
-	$screen_tab->addRow((new CLabel(_('Owner'), 'userid'))->setAsteriskMark(),
+	$screen_tab->addRow((new CLabel(_('Owner'), 'userid_ms'))->setAsteriskMark(),
 		(new CMultiSelect($multiselect_data))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()

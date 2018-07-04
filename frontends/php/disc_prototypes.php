@@ -661,9 +661,15 @@ if (isset($_REQUEST['form'])) {
 			$itemPrototype['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if (getRequest('type', $itemPrototype['type']) == ITEM_TYPE_DEPENDENT) {
-			$master_prototypes = API::ItemPrototype()->get([
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+		if ($itemPrototype['type'] == ITEM_TYPE_DEPENDENT) {
+			$master_prototypes = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'itemids' => [$itemPrototype['master_itemid']],
+				'hostids' => [$itemPrototype['hostid']],
+				'webitems' => true
+			])
+			+ API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
 				'itemids' => getRequest('master_itemid', $itemPrototype['master_itemid'])
 			]);
 
@@ -673,9 +679,14 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	elseif (getRequest('master_itemid')) {
-		$master_prototypes = API::ItemPrototype()->get([
+		$master_prototypes = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
 			'itemids' => getRequest('master_itemid'),
-			'output' => ['itemid', 'type', 'hostid', 'name', 'key_']
+			'webitems' => true
+		])
+		+ API::ItemPrototype()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'itemids' => getRequest('master_itemid')
 		]);
 
 		if ($master_prototypes) {

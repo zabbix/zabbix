@@ -28,8 +28,10 @@ else {
 	$create_button = new CSubmit('form', _('Create trigger'));
 }
 
-$filter = (new CFilter('web.triggers.filter.state'))
-	->addColumn(
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
 		(new CFormList())
 			->addRow(_('Severity'),
 				new CSeverity([
@@ -50,7 +52,7 @@ $filter = (new CFilter('web.triggers.filter.state'))
 					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 					->setModern(true)
 			)
-	);
+	]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
@@ -71,15 +73,14 @@ $widget = (new CWidget())
 				])
 			),
 		(new CTag('nav', true, ($data['hostid'] != 0)
-			? new CRedirectButton(_('Create trigger'), (new CUrl())
-					->setArgument('groupid', $data['pageFilter']->groupid)
-					->setArgument('hostid', $data['pageFilter']->hostid)
-					->setArgument('form', 'create')
-					->getUrl()
-				)
+			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
+				->setArgument('groupid', $data['pageFilter']->groupid)
+				->setArgument('hostid', $data['pageFilter']->hostid)
+				->setArgument('form', 'create')
+				->getUrl()
+			)
 			: (new CButton('form', _('Create trigger (select host first)')))->setEnabled(false)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	]));
 
 if ($this->data['hostid']) {

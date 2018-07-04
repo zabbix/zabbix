@@ -3,9 +3,6 @@ noinst_PROGRAMS = parse_cfg_file
 
 parse_cfg_file_SOURCES = \
 	parse_cfg_file.c \
-	../../../src/zabbix_server/actions.c \
-	../../../src/zabbix_server/events.c \
-	../../../src/zabbix_server/operations.c \
 	../../zbxmocktest.h
 
 parse_cfg_file_LDADD = \
@@ -67,8 +64,11 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
+	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
 parse_cfg_file_LDADD += @SERVER_LIBS@
 

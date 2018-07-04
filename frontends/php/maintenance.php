@@ -505,7 +505,9 @@ else {
 	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
-		'filter' => $filter
+		'filter' => $filter,
+		'profileIdx' => 'web.maintenance.filter',
+		'active_tab' => CProfile::get('web.maintenance.filter.active', 1)
 	];
 
 	// Get list of maintenances.

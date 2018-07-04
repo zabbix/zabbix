@@ -209,9 +209,9 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 static char	zbx_num2hex(unsigned char c)
 {
 	if (c >= 10)
-		return (char)(c + 0x57); /* a-f */
+		return (char)(c + 0x57);	/* a-f */
 	else
-		return (char)(c + 0x30); /* 0-9 */
+		return (char)(c + 0x30);	/* 0-9 */
 }
 
 static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
@@ -681,7 +681,7 @@ static const char	*zbx_json_decodenull(const char *p)
  *                                                                            *
  * Function: zbx_is_valid_json_hex                                            *
  *                                                                            *
- * Purpose: chack if a 4 character sequence is a valid hex number 0000 - FFFF *
+ * Purpose: check if a 4 character sequence is a valid hex number 0000 - FFFF *
  *                                                                            *
  * Parameters:                                                                *
  *      p - pointer to the 1st character                                      *
@@ -722,11 +722,11 @@ static unsigned int	zbx_hex2num(char c)
 	int	res;
 
 	if (c >= 'a')
-		res = c - 0x57; /* a-f */
+		res = c - 'a' + 10;	/* a-f */
 	else if (c >= 'A')
-		res = c - 0x37; /* A-F */
+		res = c - 'A' + 10;	/* A-F */
 	else
-		res = c - 0x30; /* 0-9 */
+		res = c - '0';		/* 0-9 */
 
 	return (unsigned int)res;
 }
@@ -785,7 +785,7 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 		return 1;
 	}
 
-	if ('u' == **p)		/* \u0000 - \uFFFF */
+	if ('u' == **p)		/* \u0000 - \uffff */
 	{
 		unsigned int	num;
 
@@ -798,25 +798,25 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 		num += zbx_hex2num(*(++*p));
 		++*p;
 
-		if (0x007F >= num)	/* 0000 - 007F */
+		if (0x007f >= num)	/* 0000 - 007f */
 		{
 			bytes[0] = (unsigned char)num;
 			return 1;
 		}
-		else if (0x07FF >= num)	/* 0080 - 07FF */
+		else if (0x07ff >= num)	/* 0080 - 07ff */
 		{
-			bytes[0] = (unsigned char)'\xC0' | (unsigned char)((num & 0x07C0) >> 6);
-			bytes[1] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
+			bytes[0] = (unsigned char)(0xc0 | ((num >> 6) & 0x1f));
+			bytes[1] = (unsigned char)(0x80 | (num & 0x3f));
 			return 2;
 		}
-		else if (0xD7FF >= num || 0xE000 <= num)	/* 0800 - D7FF or E000 - FFFF */
+		else if (0xd7ff >= num || 0xe000 <= num)	/* 0800 - d7ff or e000 - ffff */
 		{
-			bytes[0] = (unsigned char)'\xE0' | (unsigned char)((num & 0xF000) >> 12);
-			bytes[1] = (unsigned char)'\x80' | (unsigned char)((num & 0x0FC0) >> 6);
-			bytes[2] = (unsigned char)'\x80' | (unsigned char)(num & 0x003F);
+			bytes[0] = (unsigned char)(0xe0 | ((num >> 12) & 0x0f));
+			bytes[1] = (unsigned char)(0x80 | ((num >> 6) & 0x3f));
+			bytes[2] = (unsigned char)(0x80 | (num & 0x3f));
 			return 3;
 		}
-		else if (0xD800 <= num && num <= 0xDBFF)	/* high surrogate D800 - DBFF */
+		else if (0xd800 <= num && num <= 0xdbff)	/* high surrogate d800 - dbff */
 		{
 			unsigned int	num_lo, uc;
 
@@ -831,17 +831,17 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
 			num_lo += zbx_hex2num(*(++*p));
 			++*p;
 
-			if (num_lo < 0xDC00 || 0xDFFF < num_lo)		/* low surrogate range is DC00 - DFFF */
+			if (num_lo < 0xdc00 || 0xdfff < num_lo)		/* low surrogate range is dc00 - dfff */
 				return 0;
 
 			/* decode surrogate pair */
 
-			uc = 0x010000 + ((num & 0x03FF) << 10) + (num_lo & 0x03FF);
+			uc = 0x010000 + ((num & 0x03ff) << 10) + (num_lo & 0x03ff);
 
-			bytes[0] = (unsigned char)'\xF0' | (unsigned char)((uc & 0x1C0000) >> 18);
-			bytes[1] = (unsigned char)'\x80' | (unsigned char)((uc & 0x03F000) >> 12);
-			bytes[2] = (unsigned char)'\x80' | (unsigned char)((uc & 0x000FC0) >> 6);
-			bytes[3] = (unsigned char)'\x80' | (unsigned char)(uc & 0x00003F);
+			bytes[0] = (unsigned char)(0xf0 | ((uc >> 18) & 0x07));
+			bytes[1] = (unsigned char)(0x80 | ((uc >> 12) & 0x3f));
+			bytes[2] = (unsigned char)(0x80 | ((uc >> 6) & 0x3f));
+			bytes[3] = (unsigned char)(0x80 | (uc & 0x3f));
 			return 4;
 		}
 		/* error - low surrogate without high surrogate */
@@ -1288,56 +1288,45 @@ int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, i
 	if ('[' != *next)
 		return zbx_jsonpath_error(*pnext);
 
-	while (*(++next) == ' ')
-		;
+	SKIP_WHITESPACE_NEXT(next);
 
 	/* process array index component */
 	if (0 != isdigit(*next))
 	{
-		for (pos = 0; 0 != isdigit(next[pos]); pos++)
+		for (pos = 1; 0 != isdigit(next[pos]); pos++)
 			;
-
-		if (0 == pos)
-			return zbx_jsonpath_error(*pnext);
 
 		loc->l = next - path;
 		loc->r = loc->l + pos - 1;
 
 		next += pos;
-
-		while (*next == ' ')
-			next++;
-
-		if (']' != *next++)
-			return zbx_jsonpath_error(*pnext);
-
-		*pnext = next;
 		*type = ZBX_JSONPATH_ARRAY_INDEX;
 
-		return SUCCEED;
+		SKIP_WHITESPACE(next);
 	}
-
-	loc->l = next - path + 1;
-
-	for (quotes = *next++; quotes != *next; next++)
+	else
 	{
-		if ('\0' == *next)
+		loc->l = next - path + 1;
+
+		for (quotes = *next++; quotes != *next; next++)
+		{
+			if ('\0' == *next)
+				return zbx_jsonpath_error(*pnext);
+		}
+
+		if ((pos = next - path) == loc->l)
 			return zbx_jsonpath_error(*pnext);
+
+		loc->r = pos - 1;
+		*type = ZBX_JSONPATH_COMPONENT_BRACKET;
+
+		SKIP_WHITESPACE_NEXT(next);
 	}
-
-	if ((pos = next - path) == loc->l)
-		return zbx_jsonpath_error(*pnext);
-
-	loc->r = pos - 1;
-
-	while (*(++next) == ' ')
-		;
 
 	if (']' != *next++)
 		return zbx_jsonpath_error(*pnext);
 
 	*pnext = next;
-	*type = ZBX_JSONPATH_COMPONENT_BRACKET;
 
 	return SUCCEED;
 }
@@ -1434,3 +1423,35 @@ void	zbx_json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_path_check                                              *
+ *                                                                            *
+ * Purpose: validate json path string                                         *
+ *                                                                            *
+ * Parameters: path   - [IN] the json path                                    *
+ *             error  - [OUT] the error message buffer                        *
+ *             errlen - [IN] the size of error message buffer                 *
+ *                                                                            *
+ * Return value: SUCCEED - the json path component was parsed successfully    *
+ *               FAIL    - json path parsing error                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_path_check(const char *path, char * error, size_t errlen)
+{
+	const char	*next = NULL;
+	zbx_strloc_t	loc;
+	int		type;
+
+	do
+	{
+		if (SUCCEED != zbx_jsonpath_next(path, &next, &loc, &type))
+		{
+			zbx_snprintf(error, errlen, "json path not valid: %s", zbx_json_strerror());
+			return FAIL;
+		}
+	}
+	while ('\0' != *next);
+
+	return SUCCEED;
+}

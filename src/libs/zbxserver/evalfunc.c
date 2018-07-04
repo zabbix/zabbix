@@ -305,15 +305,19 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts)
+static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	const char		*__function_name = "evaluate_LOGSOURCE";
 
 	char			*arg1 = NULL;
 	int			ret = FAIL;
+	zbx_vector_ptr_t	regexps;
 	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&regexps);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -324,9 +328,20 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 	if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 1, &arg1))
 		goto out;
 
+	if ('@' == *arg1)
+	{
+		DCget_expressions_by_name(&regexps, arg1 + 1);
+
+		if (0 == regexps.values_num)
+		{
+			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg1 + 1);
+			goto out;
+		}
+	}
+
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		if (0 == strcmp(NULL == vc_value.value.log->source ? "" : vc_value.value.log->source, arg1))
+		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -336,9 +351,12 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
-
-	zbx_free(arg1);
 out:
+	zbx_free(arg1);
+
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -2522,7 +2540,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "logsource"))
 	{
-		ret = evaluate_LOGSOURCE(value, item, parameter, ts);
+		ret = evaluate_LOGSOURCE(value, item, parameter, ts, error);
 	}
 	else if (0 == strcmp(function, "band"))
 	{

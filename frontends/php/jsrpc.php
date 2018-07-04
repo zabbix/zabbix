@@ -18,8 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/func.inc.php';
+require_once dirname(__FILE__).'/include/defines.inc.php';
+require_once dirname(__FILE__).'/include/classes/json/CJson.php';
+require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
+require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
 $requestType = getRequest('type', PAGE_TYPE_JSON);
 if ($requestType == PAGE_TYPE_JSON) {
@@ -30,6 +33,13 @@ if ($requestType == PAGE_TYPE_JSON) {
 else {
 	$data = $_REQUEST;
 }
+
+if (is_array($data) && array_key_exists('method', $data)
+		&& in_array($data['method'], ['message.settings', 'message.get', 'zabbix.status'])) {
+	CWebUser::disableSessionExtension();
+}
+
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'RPC';
 $page['file'] = 'jsrpc.php';

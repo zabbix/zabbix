@@ -8,15 +8,6 @@ noinst_PROGRAMS = $(AGENT_tests)
 
 if AGENT
 COMMON_SRC_FILES = \
-	../../../../src/zabbix_agent/active.c ../../../../src/zabbix_agent/active.h \
-	../../../../src/zabbix_agent/stats.c \
-	../../../../src/zabbix_agent/cpustat.c \
-	../../../../src/zabbix_agent/diskdevices.c \
-	../../../../src/zabbix_agent/vmstats.c \
-	../../../../src/zabbix_agent/logfiles.c \
-	../../../../src/zabbix_agent/zbxconf.c \
-	../../../../src/zabbix_agent/listener.c \
-	../../../../src/zabbix_agent/procstat.c \
 	../../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
@@ -39,6 +30,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 

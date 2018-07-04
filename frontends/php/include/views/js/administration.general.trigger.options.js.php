@@ -7,14 +7,9 @@ $schema = DB::getSchema('config');
 		jQuery("input[name=custom_color]").on('change', function() {
 			var checked = jQuery(this).is(':checked');
 			jQuery(".input-color-picker").each(function() {
-				var field = jQuery(this);
-				if (checked) {
-					field.removeClass('<?= ZBX_STYLE_DISABLED ?>');
-				}
-				else {
-					field.addClass('<?= ZBX_STYLE_DISABLED ?>');
-				}
-				jQuery("input", field).attr('disabled', checked ? null : 'disabled');
+				var $field = jQuery(this);
+				$field.toggleClass('<?= ZBX_STYLE_DISABLED ?>', !checked);
+				jQuery("input", $field).attr('disabled', checked ? null : 'disabled');
 			});
 		});
 		jQuery("#resetDefaults").click(function() {

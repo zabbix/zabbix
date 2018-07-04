@@ -86,7 +86,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
+		<?= (new CColor('items[#{number}][color]', ''))->toString() ?>
 	</td>
 	<?php if (!$readonly): ?>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
@@ -126,6 +126,8 @@
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
 		colorPalette.incrementNextColor();
+		set_color_by_name('items_' + number + '_color', color);
+
 		<?php if (!$readonly): ?>
 			rewriteNameLinks();
 		<?php endif ?>

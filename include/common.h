@@ -721,8 +721,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
 /* acknowledgement actions (flags) */
-#define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
-#define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
+#define ZBX_PROBLEM_UPDATE_CLOSE	0x0001
+#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE	0x0002
+#define ZBX_PROBLEM_UPDATE_MESSAGE	0x0004
+#define ZBX_PROBLEM_UPDATE_SEVERITY	0x0008
+
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
+
 
 #define ZBX_USER_ONLINE_TIME	600
 
@@ -1091,6 +1096,7 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 char	*xml_escape_dyn(const char *data);
+void	xml_escape_xpath(char **data);
 
 int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
@@ -1313,6 +1319,8 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_NUMERIC	0x08000
 #define ZBX_TOKEN_JSON		0x10000
 #define ZBX_TOKEN_XML		0x20000
+#define ZBX_TOKEN_REGEXP	0x40000
+#define ZBX_TOKEN_XPATH		0x80000
 
 /* location of a substring */
 typedef struct

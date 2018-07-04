@@ -333,7 +333,7 @@ class CControllerPopupGeneric extends CController {
 			'dstfld1' =>					'string|not_empty',
 			'srctbl' =>						'string',
 			'srcfld1' =>					'string|required|in '.$this->popup_properties[$this->source_table]['allowed_src_fields'],
-			'groupid' =>					'db groups.groupid',
+			'groupid' =>					'db hstgrp.groupid',
 			'group' =>						'string',
 			'hostid' =>						'db hosts.hostid',
 			'host' =>						'string',
@@ -356,7 +356,7 @@ class CControllerPopupGeneric extends CController {
 			'with_simple_graph_items' =>	'in 1',
 			'with_triggers' =>				'in 1',
 			'with_monitored_triggers' =>	'in 1',
-			'with_webitems' =>	            'in 1',
+			'with_webitems' =>				'in 1',
 			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
@@ -1002,7 +1002,10 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' => $page_options['multiselect'],
 			'table_columns' => $this->popup_properties[$this->source_table]['table_columns'],
 			'table_records' => $records,
-			'allowed_item_types' => $this->allowed_item_types
+			'allowed_item_types' => $this->allowed_item_types,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
 		];
 
 		if ($this->source_table === 'triggers' || $this->source_table === 'trigger_prototypes') {
