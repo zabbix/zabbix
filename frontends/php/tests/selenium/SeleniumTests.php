@@ -36,6 +36,7 @@ require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDiscovery.php';
 require_once dirname(__FILE__).'/testPageDiscoveryRules.php';
+require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -135,6 +136,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageDiscoveryRules');
+		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHosts');

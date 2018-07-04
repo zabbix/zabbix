@@ -35,7 +35,7 @@ class CControllerProblemView extends CController {
 
 		$fields = [
 			'action' =>					'string',
-			'sort' =>					'in clock,host,priority,name',
+			'sort' =>					'in clock,host,severity,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
 			'fullscreen' =>				'in 0,1',
