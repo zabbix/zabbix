@@ -45,7 +45,7 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 				$params['sortorder'] = ZBX_SORT_DOWN;
 				break;
 			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
-				$params['sortfield'] = 'priority';
+				$params['sortfield'] = 'severity';
 				$params['sortorder'] = ZBX_SORT_DOWN;
 				break;
 			case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
