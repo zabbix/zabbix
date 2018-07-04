@@ -194,7 +194,7 @@ foreach ($data['groups'] as $group) {
 	];
 }
 $groupList->addRow(
-	(new CLabel(_('Groups'), 'group_links[]'))->setAsteriskMark(),
+	(new CLabel(_('Groups'), 'group_links__ms'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
@@ -324,7 +324,7 @@ else {
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]);
 
-	$tmplList->addRow(_('Link new templates'),
+	$tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
 		(new CDiv($newTemplateTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

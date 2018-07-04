@@ -1010,6 +1010,13 @@ output {
           background-color: #93a5af;
           opacity: 1;
           filter: alpha(opacity=100); }
+  .multiselect div[aria-live] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1; }
 
 .multiselect-button, .multiselect {
   display: inline-block;
@@ -3492,14 +3499,18 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px; }
+    width: 18px;
+    height: 18px;
+    border: 1px solid #acbbc2;
+    background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+    cursor: pointer; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
   .input-color-picker.disabled {
     opacity: 1; }
     .input-color-picker.disabled div {
-      background: #acbbc2 !important; }
+      background: #acbbc2 !important;
+      border: 1px solid #acbbc2; }
 
 .in-progress {
   position: relative; }
