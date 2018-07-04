@@ -320,7 +320,7 @@ class CMaintenance extends CApiService {
 			'tags' => ['type' => API_OBJECTS, 'fields' => [
 				'tag' => [
 					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED,
+					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength('maintenance_tag', 'tag')
 				],
 				'operator' => ['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])],
@@ -343,7 +343,7 @@ class CMaintenance extends CApiService {
 			// Check whether maintenance with no data collection has no problem tags.
 			if (array_key_exists('maintenance_type', $maintenance)
 					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& array_key_exists('tags', $maintenance)) {
+					&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_('Problem tags for maintenance with no data collection are not allowed.')
 				);
@@ -351,6 +351,23 @@ class CMaintenance extends CApiService {
 
 			// Keep values only for fields with defined validation rules.
 			$maintenance = array_intersect_key($maintenance, $api_input_rules);
+
+			if (array_key_exists('tags', $maintenance) && $maintenance['tags']) {
+				foreach ($maintenance['tags'] as &$tag) {
+					$tag += [
+						'operator' => TAG_OPERATOR_LIKE,
+						'value' => UNKNOWN_VALUE
+					];
+				}
+				unset($tag);
+
+				// Check whether tags are unique.
+				if (count($maintenance['tags']) != count(array_unique($maintenance['tags'], SORT_REGULAR))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Problem tag duplicates are not allowed.')
+					);
+				}
+			}
 
 			if (!CApiInputValidator::validate(
 					['type' => API_OBJECT, 'fields' => $api_input_rules], $maintenance, '', $error)) {
@@ -502,7 +519,7 @@ class CMaintenance extends CApiService {
 			'tags' => ['type' => API_OBJECTS, 'fields' => [
 				'tag' => [
 					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED,
+					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength('maintenance_tag', 'tag')
 				],
 				'operator' => ['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])],
@@ -519,7 +536,7 @@ class CMaintenance extends CApiService {
 			// Check whether maintenance with no data collection has no problem tags.
 			if (array_key_exists('maintenance_type', $maintenance)
 					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& array_key_exists('tags', $maintenance)) {
+					&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_('Problem tags for maintenance with no data collection are not allowed.')
 				);
@@ -527,6 +544,23 @@ class CMaintenance extends CApiService {
 
 			// Keep values only for fields with defined validation rules.
 			$maintenance = array_intersect_key($maintenance, $api_input_rules);
+
+			if (array_key_exists('tags', $maintenance) && $maintenance['tags']) {
+				foreach ($maintenance['tags'] as &$tag) {
+					$tag += [
+						'operator' => TAG_OPERATOR_LIKE,
+						'value' => UNKNOWN_VALUE
+					];
+				}
+				unset($tag);
+
+				// Check whether tags are unique.
+				if (count($maintenance['tags']) != count(array_unique($maintenance['tags'], SORT_REGULAR))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Problem tag duplicates are not allowed.')
+					);
+				}
+			}
 
 			if (!CApiInputValidator::validate(
 					['type' => API_OBJECT, 'fields' => $api_input_rules], $maintenance, '', $error)) {
@@ -553,13 +587,6 @@ class CMaintenance extends CApiService {
 			if (!array_key_exists($maintenance['maintenanceid'], $db_maintenances)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
-			if ($db_maintenances[$maintenance['maintenanceid']]['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& array_key_exists('tags', $maintenance)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Problem tags for maintenance with no data collection are not allowed.')
 				);
 			}
 
@@ -794,7 +821,7 @@ class CMaintenance extends CApiService {
 			}
 
 			// Collect tags to be deleted and inserted.
-			if (array_key_exists('tags', $maintenance) ) {
+			if (array_key_exists('tags', $maintenance)) {
 				$tags = $this->compareTags($maintenance['tags'],
 					$db_maintenances[$maintenance['maintenanceid']]['tags']);
 
@@ -835,24 +862,26 @@ class CMaintenance extends CApiService {
 	/**
 	 * Compare input tags with tags stored in the database.
 	 *
-	 * @param array $tags
-	 * @param array $tags['tag']
-	 * @param array $tags['operator']
-	 * @param array $tags['value']
-	 * @param array $db_tags
-	 * @param array $db_tags['tag']
-	 * @param array $db_tags['operator']
-	 * @param array $db_tags['value']
+	 * @param array  $tags
+	 * @param string $tags[]['tag']
+	 * @param int    $tags[]['operator']
+	 * @param string $tags[]['value']
+	 * @param array  $db_tags
+	 * @param string $db_tags[]['tag']
+	 * @param int    $db_tags[]['operator']
+	 * @param string $db_tags[]['value']
 	 *
 	 * @return array An array of tags to be deleted and inserted.
 	 */
 	private function compareTags(array $tags, array $db_tags) {
-		foreach ($tags as $tnum => $tag) {
-			$tag['operator'] = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
-			$tag['value'] = array_key_exists('value', $tag) ? $tag['value'] : UNKNOWN_VALUE;
+		foreach ($tags as $tnum => &$tag) {
+			$tag += [
+				'operator' => TAG_OPERATOR_LIKE,
+				'value' => UNKNOWN_VALUE
+			];
 
 			foreach ($db_tags as $dnum => $db_tag) {
-				if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] === $db_tag['operator']
+				if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
 						&& $tag['value'] === $db_tag['value']) {
 					unset($tags[$tnum]);
 					unset($db_tags[$dnum]);
@@ -860,6 +889,7 @@ class CMaintenance extends CApiService {
 				}
 			}
 		}
+		unset($tag);
 
 		return [
 			'to_delete' => $db_tags,
