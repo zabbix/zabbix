@@ -1786,9 +1786,8 @@ static void	save_event_suppress_data()
 		zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
-	if (0 != event_queries.values_num)
+	if (0 != event_queries.values_num && SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
 	{
-		zbx_dc_get_running_maintenanceids(0, &maintenanceids);
 		zbx_db_lock_maintenanceids(&maintenanceids);
 
 		/* get maintenance data and save it in database */

@@ -12880,28 +12880,35 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
  *                                                                            *
  * Purpose: get identifiers of the running maintenances                       *
  *                                                                            *
+ * Return value: SUCCEED - at least one running maintenance was found         *
+ *               FAIL    - no running maintenances were found                 *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t *maintenanceids)
+int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t *maintenanceids)
 {
-	int			i;
+	int			i, ret = FAIL;
 	zbx_dc_maintenance_t	*maintenance;
 	zbx_vector_ptr_t	maintenances;
 
 	zbx_vector_ptr_create(&maintenances);
 	zbx_vector_ptr_reserve(&maintenances, 100);
 
-
 	RDLOCK_CACHE;
 
 	dc_get_running_maintenances(revision, &maintenances);
-
-	for (i = 0; i < maintenances.values_num; i++)
+	if (0 != maintenances.values_num)
 	{
-		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
-		zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
+		for (i = 0; i < maintenances.values_num; i++)
+		{
+			maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+			zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
+		}
+		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_destroy(&maintenances);
+
+	return ret;
 }

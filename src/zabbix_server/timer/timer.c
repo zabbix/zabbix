@@ -487,9 +487,10 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 		DBbegin();
 
-		zbx_dc_get_running_maintenanceids(0, &maintenanceids);
-		zbx_db_lock_maintenanceids(&maintenanceids);
+		if (SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+			goto cleanup;
 
+		zbx_db_lock_maintenanceids(&maintenanceids);
 		zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
@@ -592,13 +593,14 @@ static int	update_host_maintenances()
 
 	DBbegin();
 
-	zbx_dc_get_running_maintenanceids(0, &maintenanceids);
-	zbx_db_lock_maintenanceids(&maintenanceids);
+	if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+	{
+		zbx_db_lock_maintenanceids(&maintenanceids);
+		zbx_dc_update_host_maintenances(&maintenanceids, &updates);
 
-	zbx_dc_update_host_maintenances(&maintenanceids, &updates);
-
-	if (0 != (hosts_num = updates.values_num))
-		db_update_host_maintenances(&updates);
+		if (0 != (hosts_num = updates.values_num))
+			db_update_host_maintenances(&updates);
+	}
 
 	DBcommit();
 
