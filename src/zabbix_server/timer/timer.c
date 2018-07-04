@@ -670,6 +670,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				if (0 != modified_num - stopped_num)
 					db_update_event_suppress_data(process_num, maintenance_revision, &events_num);
+				else
+					events_num = 0;
 
 				info_offset = 0;
 				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
