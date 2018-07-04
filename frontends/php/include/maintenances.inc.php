@@ -53,8 +53,8 @@ function shedule2str($timeperiod) {
 		$str = zbx_date2str(DATE_TIME_FORMAT, $timeperiod['start_date']);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
-		$str = _n('At %1$s:%2$s on every day',
-			'At %1$s:%2$s on every %3$s days',
+		$str = _n('At %1$s:%2$s every day',
+			'At %1$s:%2$s every %3$s days',
 			$timeperiod['hour'],
 			$timeperiod['minute'],
 			$timeperiod['every']
@@ -73,8 +73,8 @@ function shedule2str($timeperiod) {
 			}
 		}
 
-		$str = _n('At %1$s:%2$s on every %3$s of every week',
-			'At %1$s:%2$s on every %3$s of every %4$s weeks',
+		$str = _n('At %1$s:%2$s %3$s of every week',
+			'At %1$s:%2$s %3$s of every %4$s weeks',
 			$timeperiod['hour'],
 			$timeperiod['minute'],
 			$days,
@@ -108,11 +108,11 @@ function shedule2str($timeperiod) {
 
 			$every = '';
 			switch ($timeperiod['every']) {
-				case 1: $every = _('First'); break;
-				case 2: $every = _x('Second', 'adjective'); break;
-				case 3: $every = _('Third'); break;
-				case 4: $every = _('Fourth'); break;
-				case 5: $every = _('Last'); break;
+				case 1: $every = _('first'); break;
+				case 2: $every = _x('second', 'adjective'); break;
+				case 3: $every = _('third'); break;
+				case 4: $every = _('fourth'); break;
+				case 5: $every = _('last'); break;
 			}
 
 			$str = _s('At %1$s:%2$s on %3$s %4$s of every %5$s',

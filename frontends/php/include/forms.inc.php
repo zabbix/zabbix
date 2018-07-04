@@ -2118,11 +2118,11 @@ function get_timeperiod_form() {
 					(new CLabel(_('Day of week'), 'new_timeperiod_dayofweek'))->setAsteriskMark(),
 					(new CTable())
 						->addRow((new CCol(new CComboBox('new_timeperiod[every]', $new_timeperiod['every'], null, [
-								1 => _('First'),
-								2 => _x('Second', 'adjective'),
-								3 => _('Third'),
-								4 => _('Fourth'),
-								5 => _('Last')
+								1 => _('first'),
+								2 => _x('second', 'adjective'),
+								3 => _('third'),
+								4 => _('fourth'),
+								5 => _('last')
 							])))
 						)
 						->addRow(
