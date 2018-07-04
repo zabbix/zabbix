@@ -392,6 +392,7 @@ tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/parse_key
 tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
+tests/libs/zbxcommon/zbx_function_getparam_dyn
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in
