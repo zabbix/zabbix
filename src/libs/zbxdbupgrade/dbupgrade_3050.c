@@ -1485,7 +1485,7 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 		pout += sep - (size_t)(pin - src);
 	}
 
-	*pout++ = '\0';
+	*pout = '\0';
 }
 
 static int	DBpatch_3050122(void)
