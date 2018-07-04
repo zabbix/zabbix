@@ -4687,7 +4687,7 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 	unsigned char		tag;
 	zbx_dc_maintenance_t	*maintenance = NULL;
 	int			index, ret;
-	zbx_uint64_t		_maintenanceid = 0, maintenanceid, groupid;
+	zbx_uint64_t		last_maintenanceid = 0, maintenanceid, groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4699,14 +4699,14 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(maintenanceid, row[0]);
 
-		if (_maintenanceid != maintenanceid || 0 == _maintenanceid)
+		if (last_maintenanceid != maintenanceid || 0 == last_maintenanceid)
 		{
-			_maintenanceid = maintenanceid;
 			if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
 					&maintenanceid)))
 			{
 				continue;
 			}
+			last_maintenanceid = maintenanceid;
 		}
 
 		ZBX_STR2UINT64(groupid, row[1]);
@@ -4763,7 +4763,7 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	zbx_vector_ptr_t	maintenances;
 	zbx_dc_maintenance_t	*maintenance = NULL;
 	int			index, ret, i;
-	zbx_uint64_t		_maintenanceid = 0, maintenanceid, hostid;
+	zbx_uint64_t		last_maintenanceid = 0, maintenanceid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4777,14 +4777,14 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(maintenanceid, row[0]);
 
-		if (_maintenanceid != maintenanceid || 0 == _maintenanceid)
+		if (last_maintenanceid != maintenanceid || 0 == last_maintenanceid)
 		{
-			_maintenanceid = maintenanceid;
 			if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
 					&maintenanceid)))
 			{
 				continue;
 			}
+			last_maintenanceid = maintenanceid;
 		}
 
 		ZBX_STR2UINT64(hostid, row[1]);
@@ -4856,7 +4856,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 	zbx_dc_hostgroup_t	*group = NULL;
 
 	int			ret;
-	zbx_uint64_t		_groupid = 0, groupid, hostid;
+	zbx_uint64_t		last_groupid = 0, groupid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4868,11 +4868,11 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (_groupid != groupid || 0 == _groupid)
+		if (last_groupid != groupid || 0 == last_groupid)
 		{
 			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
 				continue;
-			_groupid = groupid;
+			last_groupid = groupid;
 		}
 
 		ZBX_STR2UINT64(hostid, row[1]);
