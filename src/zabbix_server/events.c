@@ -1795,8 +1795,8 @@ static void	save_event_suppress_data()
 		{
 			zbx_db_insert_t	db_insert;
 
-			zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
-					"suppress_until", NULL);
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
+					"maintenanceid", "suppress_until", NULL);
 
 			for (k = 0; k < event_queries.values_num; k++)
 			{
@@ -1804,7 +1804,7 @@ static void	save_event_suppress_data()
 
 				for (j = 0; j < query->maintenances.values_num; j++)
 				{
-					zbx_db_insert_add_values(&db_insert, query->eventid,
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
 							query->maintenances.values[j].first,
 							(int)query->maintenances.values[j].second);
 				}
@@ -1813,6 +1813,7 @@ static void	save_event_suppress_data()
 						EVENT_SUPPRESSED_FALSE : EVENT_SUPPRESSED_TRUE);
 			}
 
+			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 			zbx_db_insert_execute(&db_insert);
 			zbx_db_insert_clean(&db_insert);
 		}

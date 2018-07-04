@@ -493,7 +493,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 		zbx_db_lock_maintenanceids(&maintenanceids);
 		zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
-		zbx_db_insert_prepare(&db_insert, "event_suppress", "eventid", "maintenanceid",
+		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", NULL);
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -517,7 +517,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 				if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 				{
-					zbx_db_insert_add_values(&db_insert, query->eventid,
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
 							query->maintenances.values[k].first,
 							(int)query->maintenances.values[k].second);
 					k++;
@@ -543,12 +543,13 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 			for (;k < query->maintenances.values_num; k++)
 			{
-				zbx_db_insert_add_values(&db_insert, query->eventid,
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
 						query->maintenances.values[k].first,
 						(int)query->maintenances.values[k].second);
 			}
 		}
 
+		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		if (FAIL != zbx_db_insert_execute(&db_insert))
 		{
 			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -594,13 +595,12 @@ static int	update_host_maintenances()
 	DBbegin();
 
 	if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
-	{
 		zbx_db_lock_maintenanceids(&maintenanceids);
-		zbx_dc_update_host_maintenances(&maintenanceids, &updates);
 
-		if (0 != (hosts_num = updates.values_num))
-			db_update_host_maintenances(&updates);
-	}
+	zbx_dc_update_host_maintenances(&maintenanceids, &updates);
+
+	if (0 != (hosts_num = updates.values_num))
+		db_update_host_maintenances(&updates);
 
 	DBcommit();
 
