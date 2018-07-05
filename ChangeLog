@@ -392,6 +392,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14491] fixed link "show value mappings", which leads to no permission page (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
 ..F....... [ZBX-13641] disabled preprocessing update for discovered items (vasilijs)
 A......... [ZBX-13732] fixed status change for linked template items through parent template if host assigned (agriscenko)
@@ -1675,6 +1676,7 @@ Changes for 3.0.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14491] fixed link "show value mappings", which leads to no permission page (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
 ..F....... [ZBX-14432] removed redundant code in event details screen (miks)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
