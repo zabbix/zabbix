@@ -4542,6 +4542,8 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 			if (FAIL != index)
 				zbx_vector_ptr_remove_noorder(&maintenance->tags, index);
+
+			zbx_vector_ptr_append(&maintenances, maintenance);
 		}
 
 		zbx_strpool_release(maintenance_tag->tag);
@@ -4549,7 +4551,6 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
 
-		zbx_vector_ptr_append(&maintenances, maintenance);
 		config->maintenance_revision++;
 	}
 
@@ -4656,10 +4657,11 @@ static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 
 			if (FAIL != index)
 				zbx_vector_ptr_remove_noorder(&maintenance->periods, index);
+
+			maintenance->revision = ++config->maintenance_revision;
 		}
 
 		zbx_hashset_remove_direct(&config->maintenance_periods, period);
-		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
