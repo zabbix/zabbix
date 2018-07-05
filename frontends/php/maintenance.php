@@ -63,6 +63,8 @@ $fields = [
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'edit_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'tags_evaltype' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
+	'tags' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add_timeperiod' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -102,6 +104,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 	$dbMaintenance = API::Maintenance()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'selectTimeperiods' => API_OUTPUT_EXTEND,
+		'selectTags' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'maintenanceids' => getRequest('maintenanceid'),
 	]);
@@ -194,6 +197,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'hostids' => getRequest('hostids', []),
 			'groupids' => getRequest('groupids', [])
 		];
+
+		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
+			$maintenance += [
+				'tags_evaltype' => getRequest('tags_evaltype', TAG_EVAL_TYPE_AND_OR),
+				'tags' => getRequest('tags', [])
+			];
+
+			foreach ($maintenance['tags'] as $tnum => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($maintenance['tags'][$tnum]);
+				}
+			}
+		}
 
 		if (isset($_REQUEST['maintenanceid'])) {
 			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
@@ -417,10 +433,15 @@ if (!empty($data['form'])) {
 			'maintenanceids' => $data['maintenanceid'],
 			'editable' => true
 		]);
+
+		// tags
+		$data['tags_evaltype'] = $dbMaintenance['tags_evaltype'];
+		$data['tags'] = $dbMaintenance['tags'];
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
 		$data['mname'] = getRequest('mname', '');
-		$data['maintenance_type'] = getRequest('maintenance_type', 0);
+		$data['maintenance_type'] = getRequest('maintenance_type', MAINTENANCE_TYPE_NORMAL);
 		if (isset($_REQUEST['active_since'])) {
 			$data['active_since'] = mktime($_REQUEST['active_since_hour'],
 					$_REQUEST['active_since_minute'],
@@ -445,6 +466,8 @@ if (!empty($data['form'])) {
 		}
 		$data['description'] = getRequest('description', '');
 		$data['timeperiods'] = getRequest('timeperiods', []);
+		$data['tags_evaltype'] = getRequest('tags_evaltype', TAG_EVAL_TYPE_AND_OR);
+		$data['tags'] = getRequest('tags', []);
 
 		$hostids = getRequest('hostids', []);
 		$groupids = getRequest('groupids', []);
