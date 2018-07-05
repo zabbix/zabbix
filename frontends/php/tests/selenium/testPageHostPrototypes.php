@@ -46,8 +46,8 @@ class testPageHostPrototypes extends CWebTest {
 					'item' => 'Discovery rule 3',
 					'hosts' => [
 						'Host prototype {#7}',
-						'host' => 'Host prototype {#9}',
-						'host' => 'Host prototype {#10}'
+						'Host prototype {#9}',
+						'Host prototype {#10}'
 					]
 				]
 			]
@@ -85,11 +85,19 @@ class testPageHostPrototypes extends CWebTest {
 	 * @param int    $status	host status to be checked in DB
 	 */
 	protected function checkPageAction($data, $action, $status = null) {
-		$this->selectHostPrototype($data);
-
 		// Click on button with required action.
-		$this->zbxTestClickButtonText($action);
-		$this->zbxTestAcceptAlert();
+		if ($action === 'xpath') {
+			foreach ($data['hosts'] as $host) {
+				$id = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host)));
+				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid=".$id['hostid']."')]");
+			}
+		}
+		else {
+			$this->selectHostPrototype($data);
+			$this->zbxTestClickButtonText($action);
+			$this->zbxTestAcceptAlert();
+		}
+
 		$this->zbxTestIsElementPresent('//*[@class="msg-good"]');
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
@@ -145,5 +153,38 @@ class testPageHostPrototypes extends CWebTest {
 	 */
 	public function testPageHostPrototypes_DeleteSelected($data) {
 		$this->checkPageAction($data, 'Delete');
+	}
+
+	public static function getHostPrototypeData() {
+		return [
+			[
+				[
+					'item' => 'Discovery rule 1',
+					'hosts' => [
+						'Host prototype {#2}'
+						],
+					'status' => HOST_STATUS_NOT_MONITORED
+				]
+			],
+			[
+				[
+					'item' => 'Discovery rule 1',
+					'hosts' => [
+						'Host prototype {#3}'
+						],
+					'status' => HOST_STATUS_MONITORED
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHostPrototypeData
+	 */
+	public function testPageHostPrototypes_SingleEnableDisable($data) {
+		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
+		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+
+		$this->checkPageAction($data, 'xpath', $data['status']);
 	}
 }
