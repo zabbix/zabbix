@@ -32,7 +32,7 @@ void	zbx_mock_test_entry(void **state)
 	num = (int)zbx_mock_get_parameter_uint64("in.num");
 	param = zbx_mock_get_parameter_string("out.param");
 
-	rvalue = zbx_function_getparam_dyn(params, num);
+	rvalue = zbx_function_get_param_dyn(params, num);
 
 	if (NULL != rvalue )
 	{

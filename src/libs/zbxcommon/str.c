@@ -3707,7 +3707,7 @@ int	zbx_function_param_quote(char **param, int forced)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_function_getparam_dyn                                        *
+ * Function: zbx_function_get_param_dyn                                       *
  *                                                                            *
  * Purpose: return parameter by index (Nparam) from parameter list (params)   *
  *                                                                            *
@@ -3720,7 +3720,7 @@ int	zbx_function_param_quote(char **param, int forced)
  *      otherwise - requested parameter                                       *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_function_getparam_dyn(const char *params, int Nparam)
+char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 {
 	const char	*ptr;
 	size_t		sep_pos, params_len;

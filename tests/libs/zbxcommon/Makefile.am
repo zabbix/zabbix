@@ -4,7 +4,7 @@ SERVER_tests = \
 	parse_key \
 	replace_key_params_dyn \
 	calculate_item_nextcheck \
-	zbx_function_getparam_dyn
+	zbx_function_get_param_dyn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -134,17 +134,17 @@ calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
-zbx_function_getparam_dyn_SOURCES = \
-	zbx_function_getparam_dyn.c \
+zbx_function_get_param_dyn_SOURCES = \
+	zbx_function_get_param_dyn.c \
 	$(COMMON_SRC_FILES)
 
-zbx_function_getparam_dyn_LDADD = \
+zbx_function_get_param_dyn_LDADD = \
 	$(COMMON_LIB_FILES)
 
-zbx_function_getparam_dyn_LDADD += @SERVER_LIBS@
+zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
 
-zbx_function_getparam_dyn_LDFLAGS = @SERVER_LDFLAGS@
+zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_function_getparam_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_function_get_param_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
