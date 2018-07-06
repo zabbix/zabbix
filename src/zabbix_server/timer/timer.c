@@ -585,24 +585,34 @@ static int	update_host_maintenances()
 	zbx_vector_uint64_t	maintenanceids;
 	zbx_vector_ptr_t	updates;
 	int			hosts_num;
+	int			tnx_error;
 
 	zbx_vector_uint64_create(&maintenanceids);
 	zbx_vector_ptr_create(&updates);
 	zbx_vector_ptr_reserve(&updates, 100);
 
-	DBbegin();
+	do
+	{
+		DBbegin();
 
-	if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
-		zbx_db_lock_maintenanceids(&maintenanceids);
+		if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+			zbx_db_lock_maintenanceids(&maintenanceids);
 
-	zbx_dc_update_host_maintenances(&maintenanceids, &updates);
+		/* host maintenance update must be called even with no maintenances running */
+		/* to reset host maintenance status if necessary                            */
+		zbx_dc_get_host_maintenance_updates(&maintenanceids, &updates);
 
-	if (0 != (hosts_num = updates.values_num))
-		db_update_host_maintenances(&updates);
+		if (0 != updates.values_num)
+			db_update_host_maintenances(&updates);
 
-	DBcommit();
+		if (ZBX_DB_OK == (tnx_error = DBcommit()) && 0 != (hosts_num = updates.values_num))
+			zbx_dc_flush_host_maintenance_updates(&updates);
 
-	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_uint64_clear(&maintenanceids);
+	}
+	while (ZBX_DB_DOWN == tnx_error);
+
 	zbx_vector_ptr_destroy(&updates);
 	zbx_vector_uint64_destroy(&maintenanceids);
 

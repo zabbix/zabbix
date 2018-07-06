@@ -12500,18 +12500,18 @@ static void	dc_get_host_maintenance_updates(const zbx_vector_ptr_t *maintenances
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_flush_host_maintenance_updates                                *
+ * Function: zbx_dc_flush_host_maintenance_updates                            *
  *                                                                            *
  * Purpose: flush host maintenance updates to configuration cache             *
  *                                                                            *
  * Parameters: updates - [IN] the updates to flush                            *
  *                                                                            *
  ******************************************************************************/
-static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
+void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
 {
-	int				i;
-	zbx_host_maintenance_diff_t	*diff;
-	ZBX_DC_HOST			*host;
+	int					i;
+	const zbx_host_maintenance_diff_t	*diff;
+	ZBX_DC_HOST				*host;
 
 	WRLOCK_CACHE;
 
@@ -12520,11 +12520,7 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
 		diff = (zbx_host_maintenance_diff_t *)updates->values[i];
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &diff->hostid)))
-		{
-			zbx_free(diff);
-			zbx_vector_ptr_remove(updates, i);
 			continue;
-		}
 
 		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID))
 			host->maintenanceid = diff->maintenanceid;
@@ -12546,24 +12542,22 @@ static void	dc_flush_host_maintenance_updates(zbx_vector_ptr_t *updates)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_update_host_maintenances                                  *
+ * Function: zbx_dc_get_host_maintenance_updates                              *
  *                                                                            *
- * Purpose: update host maintenance status in configuration cache based       *
- *          on running maintenances                                           *
+ * Purpose: calculates required host maintenance updates based on specified   *
+ *          maintenances                                                      *
  *                                                                            *
  * Parameters: maintenanceids   - [IN] identifiers of the maintenances to     *
  *                                process                                     *
- *             updates          - [OUT] updates that were made in             *
- *                                configuration cache and must be applied     *
- *                                to database                                 *
+ *             updates          - [OUT] pending updates                       *
  *                                                                            *
  * Comments: This function must be called after zbx_dc_update_maintenances()  *
  *           function has updated maintenance state in configuration cache.   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_host_maintenances(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
+void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
 {
-	const char		*__function_name = "zbx_dc_update_host_maintenances";
+	const char		*__function_name = "zbx_dc_get_host_maintenance_updates";
 	zbx_vector_ptr_t	maintenances;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -12582,9 +12576,6 @@ void	zbx_dc_update_host_maintenances(const zbx_vector_uint64_t *maintenanceids, 
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_destroy(&maintenances);
-
-	if (0 != updates->values_num)
-		dc_flush_host_maintenance_updates(updates);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() updates:%d", __function_name, updates->values_num);
 }
