@@ -485,7 +485,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 
 		DBbegin();
 
-		if (SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+		if (SUCCEED != zbx_dc_get_running_maintenanceids(revision, &maintenanceids))
 			goto cleanup;
 
 		zbx_db_lock_maintenanceids(&maintenanceids);
