@@ -1678,6 +1678,7 @@ Changes for 3.0.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14491] fixed link "show value mappings", which leads to no permission page (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
 ..F....... [ZBX-14432] removed redundant code in event details screen (miks)
 ........S. [ZBX-14410] improved error message handling in zbx_function_find() (MVekslers)
