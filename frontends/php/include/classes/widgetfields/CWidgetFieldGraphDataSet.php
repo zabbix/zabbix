@@ -34,7 +34,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 7],
+			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
@@ -44,6 +44,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO])]
 		]]);
+		$this->setFlags(parent::FLAG_NOT_EMPTY);
 		$this->setDefault([]);
 	}
 
@@ -223,6 +224,17 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		}
 
 		return $this;
+	}
+
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		// At least on data set is mandatory.
+		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$this->getValue()) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Data set'), _('cannot be empty'));
+		}
+
+		return $errors;
 	}
 
 	/**
