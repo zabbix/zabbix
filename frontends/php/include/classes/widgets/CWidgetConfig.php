@@ -38,7 +38,7 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_SVG_GRAPH			=> _('Graph'),
-			WIDGET_GRAPH				=> _('Host Graph'),
+			WIDGET_GRAPH				=> _('Clasic Graph'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
