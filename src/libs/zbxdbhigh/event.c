@@ -54,7 +54,9 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			"select e.eventid,e.source,e.object,e.objectid,e.clock,e.value,e.acknowledged,e.ns,e.name,"
 				"e.severity,max(es.suppress_until)"
 			" from events e"
-			" left join event_suppress es on e.eventid=es.eventid where");
+				" left join event_suppress es"
+					" on e.eventid=es.eventid"
+			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids->values, eventids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " group by e.eventid order by e.eventid");
 
