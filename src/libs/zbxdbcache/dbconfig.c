@@ -12323,26 +12323,6 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_get_active_maintenances                                       *
- *                                                                            *
- * Purpose: get active maintenances                                           *
- *                                                                            *
- ******************************************************************************/
-static void	dc_get_running_maintenances(zbx_uint64_t revision, zbx_vector_ptr_t *maintenances)
-{
-	zbx_dc_maintenance_t	*maintenance;
-	zbx_hashset_iter_t	iter;
-
-	zbx_hashset_iter_reset(&config->maintenances, &iter);
-	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (ZBX_MAINTENANCE_RUNNING == maintenance->state && maintenance->revision > revision)
-			zbx_vector_ptr_append(maintenances, maintenance);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dc_get_maintenances_by_ids                                       *
  *                                                                            *
  * Purpose: get maintenances by identifiers                                   *
@@ -12364,7 +12344,6 @@ static void	dc_get_maintenances_by_ids(const zbx_vector_uint64_t *maintenanceids
 
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -12951,29 +12930,19 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
  ******************************************************************************/
 int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t *maintenanceids)
 {
-	int			i, ret = FAIL;
 	zbx_dc_maintenance_t	*maintenance;
-	zbx_vector_ptr_t	maintenances;
-
-	zbx_vector_ptr_create(&maintenances);
-	zbx_vector_ptr_reserve(&maintenances, 100);
+	zbx_hashset_iter_t	iter;
 
 	RDLOCK_CACHE;
 
-	dc_get_running_maintenances(revision, &maintenances);
-	if (0 != maintenances.values_num)
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (i = 0; i < maintenances.values_num; i++)
-		{
-			maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
+		if (ZBX_MAINTENANCE_RUNNING == maintenance->state && maintenance->revision > revision)
 			zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
-		}
-		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
 
-	zbx_vector_ptr_destroy(&maintenances);
-
-	return ret;
+	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
