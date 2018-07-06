@@ -21,6 +21,8 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxtasks.h"
+#include "zbxregexp.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -29,8 +31,6 @@ extern unsigned char	program_type;
  */
 
 #ifndef HAVE_SQLITE3
-
-extern unsigned char program_type;
 
 static int	DBpatch_3050000(void)
 {
@@ -1445,6 +1445,115 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
+{
+	const char	*pin = src;
+	char		*pout = dst;
+	size_t		pos, len, sep;
+	int		quoted = 0;
+
+	zbx_function_param_parse(src, &pos, &len, &sep);
+
+	if (0 != pos)		/* copy leading spaces */
+	{
+		memcpy(pout, src, pos);
+		pout += pos;
+		pin += pos;
+	}
+
+	if ('"' == *pin)
+	{
+		*pout++ = *pin++;
+		len -= 2;	/* length without starting and ending quotes */
+		quoted = 1;
+	}
+
+	*pout++ = '^';		/* start anchor */
+
+	if (0 != len)
+	{
+		memcpy(pout, pin, len);
+		pout += len;
+		pin += len;
+	}
+
+	*pout++ = '$';		/* end anchor */
+
+	if (0 != quoted)
+	{
+		memcpy(pout, pin, sep - (size_t)(pin - src));
+		pout += sep - (size_t)(pin - src);
+	}
+
+	*pout = '\0';
+}
+
+static int	DBpatch_3050122(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = FAIL;
+	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select functionid,parameter from functions where name='logsource'");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		size_t	required_len;
+
+		parameter = zbx_strdup(NULL, row[1]);
+		zbx_regexp_escape(&parameter);
+
+		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
+
+		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(parameter) + 2))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
+					" (functionid: %s) to regexp during database upgrade. The converted"
+					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
+					" Allowed length is %d characters.",
+					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
+
+			zbx_free(parameter);
+			continue;
+		}
+
+		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
+
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 3);	/* 3 for ^, $, '\0' */
+		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update functions set parameter='%s' where functionid=%s;\n",
+				parameter_esc_anchored, row[0]);
+
+		zbx_free(parameter);
+		zbx_free(parameter_esc);
+		zbx_free(parameter_esc_anchored);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1569,5 +1678,6 @@ DBPATCH_ADD(3050118, 0, 1)
 DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
+DBPATCH_ADD(3050122, 0, 1)
 
 DBPATCH_END()
