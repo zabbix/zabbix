@@ -167,7 +167,9 @@ static int	dbsync_compare_str(const char *value_raw, const char *value)
  * Parameter: sync  - [IN] the changeset                                      *
  *            rowid - [IN] the row identifier                                 *
  *            tag   - [IN] the row tag (see ZBX_DBSYNC_ROW_ defines)          *
- *            row   - [IN] the row contents (NULL for ZBX_DBSYNC_ROW_REMOVE)  *
+ *            row   - [IN] the row contents (depending on configuration cache *
+ *                         removal logic for the specific object it can be    *
+ *                         NULL when used with ZBX_DBSYNC_ROW_REMOVE tag)     *
  *                                                                            *
  ******************************************************************************/
 static void	dbsync_add_row(zbx_dbsync_t *sync, zbx_uint64_t rowid, unsigned char tag, const DB_ROW dbrow)
