@@ -22,6 +22,7 @@
 class CWidgetForm {
 
 	protected $fields;
+	protected $tabs;
 
 	/**
 	 * Widget fields array that came from AJAX request.
@@ -34,6 +35,7 @@ class CWidgetForm {
 		$this->data = CJs::decodeJson($data);
 
 		$this->fields = [];
+		$this->tabs = [];
 
 		// Refresh interval field.
 		$default_rf_rate = '';
@@ -96,10 +98,31 @@ class CWidgetForm {
 	/**
 	 * Return fields for this form.
 	 *
+	 * boolean $joined  Returns joined list of fields included in form directly and fields included in tabs.
+	 *
 	 * @return array  An array of CWidgetField.
 	 */
-	public function getFields() {
-		return $this->fields;
+	public function getFields($joined = true) {
+		$fields = $this->fields;
+
+		if ($joined) {
+			foreach ($this->tabs as $tab) {
+				foreach ($tab['fields'] as $tab_fields) {
+					$fields[] = $tab_fields;
+	}
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Return fields grouped per tabs.
+	 *
+	 * @return array  An array of tabs containing tab name and array of CWidgetField.
+	 */
+	public function getTabs($joined = true) {
+		return $this->tabs;
 	}
 
 	/**
@@ -113,6 +136,12 @@ class CWidgetForm {
 		foreach ($this->fields as $field) {
 			/* @var $field CWidgetField */
 			$data[$field->getName()] = $field->getValue();
+		}
+
+		foreach ($this->tabs as $tab) {
+			foreach ($tab['fields'] as $field) {
+				$errors = array_merge($errors, $field->validate($strict));
+			}
 		}
 
 		return $data;
@@ -133,6 +162,12 @@ class CWidgetForm {
 			$errors = array_merge($errors, $field->validate($strict));
 		}
 
+		foreach ($this->tabs as $tab) {
+			foreach ($tab['fields'] as $field) {
+				$errors = array_merge($errors, $field->validate($strict));
+			}
+		}
+
 		return $errors;
 	}
 
@@ -146,6 +181,12 @@ class CWidgetForm {
 
 		foreach ($this->fields as $field) {
 			$field->toApi($api_fields);
+		}
+
+		foreach ($this->tabs as $tab) {
+			foreach ($tab['fields'] as $field) {
+				$field->toApi($api_fields);
+			}
 		}
 
 		return $api_fields;

@@ -145,16 +145,19 @@ jQuery(function($) {
 						item.prefix = data.values[i].prefix;
 					}
 
-					jQuery('#' + data.parentId).multiSelect('addData', item);
+					$('#' + data.parentId).multiSelect('addData', item);
 				}
 			}
+		}
+		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
+			$('[name="'+data.parentId+'"]').val(data.values[0][data.object]);
 		}
 		else if (typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
 			addPopupValues(data);
 		}
 		else {
-			jQuery('#' + data.parentId).val(data.values[0].name);
+			$('#' + data.parentId).val(data.values[0].name);
 		}
 	});
 

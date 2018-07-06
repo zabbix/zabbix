@@ -924,6 +924,31 @@ define('GRAPH_TYPE_COLUMN',			7);
 define('GRAPH_TYPE_BAR_STACKED',	8);
 define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
+define('SVG_GRAPH_TYPE_LINE',		0);
+define('SVG_GRAPH_TYPE_POINTS',		1);
+define('SVG_GRAPH_TYPE_STAIRCASE',	2);
+
+define('SVG_GRAPH_MISSING_DATA_NONE',			 0);
+define('SVG_GRAPH_MISSING_DATA_CONNECTED',		 1);
+define('SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO', 2);
+
+define('SVG_GRAPH_DATA_SOURCE_AUTO',	0);
+define('SVG_GRAPH_DATA_SOURCE_HISTORY',	1);
+define('SVG_GRAPH_DATA_SOURCE_TRENDS',	2);
+
+define('SVG_GRAPH_RELATIVE_TIME',	0);
+define('SVG_GRAPH_ABSOLUTE_TIME',	1);
+
+define('SVG_GRAPH_LEGEND_SHOW', 1);
+
+define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
+
+define('SVG_GRAPH_AXIS_Y_SHOW', 1);
+define('SVG_GRAPH_AXIS_X_SHOW', 1);
+
+define('SVG_GRAPH_AXIS_UNITS_AUTO', 0);
+define('SVG_GRAPH_AXIS_UNITS_STATIC', 1);
+
 define('BR_DISTRIBUTION_MULTIPLE_PERIODS',	1);
 define('BR_DISTRIBUTION_MULTIPLE_ITEMS',	2);
 define('BR_COMPARE_VALUE_MULTIPLE_PERIODS',	3);
@@ -1220,6 +1245,7 @@ define('WIDGET_DISCOVERY',		'discovery');
 define('WIDGET_FAV_GRAPHS',		'favgraphs');
 define('WIDGET_FAV_MAPS',		'favmaps');
 define('WIDGET_FAV_SCREENS',	'favscreens');
+define('WIDGET_SVG_GRAPH',		'svggraph');
 define('WIDGET_GRAPH',			'graph');
 define('WIDGET_MAP',			'map');
 define('WIDGET_NAV_TREE',		'navtree');
@@ -1351,6 +1377,7 @@ define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
+define('ZBX_STYLE_BTN_GEAR', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
@@ -1358,6 +1385,7 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_TRASH', 'btn-widget-delete');
 define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
@@ -1387,6 +1415,7 @@ define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
 define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_COLOR_PREVIEW_BOX', 'color-preview-box');
 define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
 define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
 define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
@@ -1403,10 +1432,14 @@ define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_PATTERNSELECT', 'patternselect');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
 define('ZBX_STYLE_OK_ACK_FG', 'ok-ack-fg');
+define('ZBX_STYLE_OVERRIDES_LIST', 'overrides-list');
+define('ZBX_STYLE_OVERRIDES_LIST_ITEM', 'overrides-list-item');
+define('ZBX_STYLE_OVERRIDES_OPTIONS_LIST', 'overrides-options-list');
 define('ZBX_STYLE_PLUS_ICON', 'plus-icon');
 define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
 define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
@@ -1470,6 +1503,12 @@ define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LIST_VERTICAL_ACCORDION', 'list-vertical-accordion');
+define('ZBX_STYLE_LIST_ACCORDION_FOOT', 'list-accordion-foot');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM', 'list-accordion-item');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED', 'list-accordion-item-opened');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD', 'list-accordion-item-head');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM_BODY', 'list-accordion-item-body');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
 define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
 define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
@@ -1551,6 +1590,7 @@ define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
+define('ZBX_STYLE_TABS_LEFT_PADDING_15_PERCENTS', 'tabs-left-padding-15-percents');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
@@ -1580,6 +1620,13 @@ define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
+
+// html layout columns
+define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
+define('ZBX_STYLE_COLUMNS_1', 'columns-1');
+define('ZBX_STYLE_COLUMNS_5', 'columns-5');
+define('ZBX_STYLE_COLUMNS_6', 'columns-6');
+define('ZBX_STYLE_COLUMNS_11', 'columns-11');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

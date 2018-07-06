@@ -94,32 +94,35 @@ class CTabView extends CDiv {
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
-			if ($this->selectedTab === null) {
-				$activeTab = get_cookie('tab', 0);
-				$createEvent = '';
+			zbx_add_post_js($this->makeJavascript());
 			}
-			else {
-				$activeTab = $this->selectedTab;
-				$createEvent = 'create: function() { jQuery.cookie("tab", '.CJs::encodeJson($this->selectedTab).'); },';
-			}
-
-			$disabledTabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
-
-			zbx_add_post_js('
-				jQuery("#'.$this->id.'").tabs({
-					'.$createEvent.'
-					'.$disabledTabs.'
-					active: '.CJs::encodeJson($activeTab).',
-					activate: function(event, ui) {
-						jQuery.cookie("tab", ui.newTab.index().toString());
-					}
-				})
-				.css("visibility", "visible");'
-			);
-		}
 
 		$this->addItem($this->footer);
 
 		return parent::toString($destroy);
+					}
+
+	public function makeJavascript() {
+		if ($this->selectedTab === null) {
+			$active_tab = get_cookie('tab', 0);
+			$create_event = '';
+		}
+		else {
+			$active_tab = $this->selectedTab;
+			$create_event = 'create: function() { jQuery.cookie("tab", '.CJs::encodeJson($this->selectedTab).'); },';
+		}
+
+		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
+
+		return
+			'jQuery("#'.$this->id.'").tabs({'.
+				$create_event.
+				$disabled_tabs.
+				'active: '.CJs::encodeJson($active_tab).','.
+				'activate: function(event, ui) {'.
+					'jQuery.cookie("tab", ui.newTab.index().toString());'.
+				'}'.
+			'})'.
+			'.css("visibility", "visible");';
 	}
 }

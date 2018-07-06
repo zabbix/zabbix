@@ -18,30 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldCheckBox extends CWidgetField {
-
-	protected $caption;
-
+class CWidgetFieldDatePicker extends CWidgetField {
 	/**
-	 * Check box widget field.
+	 * Date picker widget field.
 	 *
-	 * @param string $name     Field name in form.
-	 * @param string $label    Label for the field in form.
-	 * @param string $caption  String displayed right after the check-box.
+	 * @param string $name   Field name in form.
+	 * @param string $label  Label for the field in form.
 	 */
-	public function __construct($name, $label, $caption = null) {
+	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault(0);
-		$this->caption = $caption;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setDefault('');
 	}
 
 	public function setValue($value) {
-		return parent::setValue((int) $value);
-	}
-
-	public function getCaption() {
-		return $this->caption;
+		return parent::setValue($value);
 	}
 }

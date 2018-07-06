@@ -19,6 +19,7 @@
 **/
 
 class CWidgetFieldSeverities extends CWidgetField {
+	protected $style;
 
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
@@ -29,11 +30,22 @@ class CWidgetFieldSeverities extends CWidgetField {
 		$this->setExValidationRules(
 			['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))
 		]);
+		$this->setStyle(ZBX_STYLE_LIST_CHECK_RADIO);
 	}
 
 	public function setValue($value) {
 		$this->value = (array) $value;
 
 		return $this;
+	}
+
+	public function setStyle($value) {
+		$this->style = $value;
+
+		return $this;
+	}
+
+	public function getStyle() {
+		return $this->style;
 	}
 }

@@ -1582,6 +1582,12 @@ output {
 	> .ui-tabs-nav {
 		margin: -10px -10px 10px -10px;
 	}
+
+	&.tabs-left-padding-15-percents { // TODO miks: this is ugly... should provide something better.
+		> .ui-tabs-nav {
+			padding-left: 15%;
+		}
+	}
 }
 
 .form-btns {
@@ -5413,6 +5419,110 @@ svg {
 	.navtree .problems {
 		margin-left: 10px;
 		left: -15px;
+	}
+}
+
+.overrides-list {
+	padding: 0px 35px 10px 0px;
+	width: calc(100% - 35px);
+
+	.overrides-list-item {
+		border-bottom: 1px solid $table-border-color;
+		margin-bottom: 10px;
+		display: table;
+		width: 100%;
+	}
+}
+
+.overrides-options-list {
+	white-space: normal;
+	padding: 10px 0px;
+
+	> li {
+		display: inline-block;
+		margin: 2px 7px 2px 0;
+		white-space: nowrap;
+
+		> div {
+			position: relative;
+			padding: 1px 22px 1px 1px;
+			background-color: lighten($ui-bg-selected-color, 10%);
+			border-radius: 2px;
+
+			> span {
+				color: lighten($ui-bg-selected-color, 100%);
+				padding-left: 8px;
+				line-height: 20px;
+			}
+
+			> input[type=text] {
+				border-style: none;
+				line-height: 20px;
+				min-height: 20px;
+				width: 85px;
+			}
+
+			> .remove-btn {
+				color: #ffffff;
+				right: 2px;
+				top: 3px;
+
+				&:active {
+					background-color: lighten($ui-bg-selected-color, 100%);
+				}
+			}
+		}
+	}
+}
+
+.color-preview-box {
+	height: 24px;
+	width: 24px;
+	float: left;
+	margin-right: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	font-weight: bold;
+}
+
+.list-vertical-accordion {
+	display: flex;
+	flex-direction: column;
+
+	:not(.list-accordion-item-opened) .list-accordion-item-body {
+		display: none;
+	}
+}
+
+.columns-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+
+	.columns-1,
+	.columns-5,
+	.columns-6,
+	.columns-11 {
+		-webkit-box-flex: 0;
+	}
+	.columns-1 {
+		-ms-flex: 0 0 8.333333%;
+		flex: 0 0 8.333333%;
+		max-width: 8.333333%;
+	}
+	.columns-5 {
+		-ms-flex: 0 0 41.666667%;
+		flex: 0 0 41.666667%;
+		max-width: 41.666667%;
+	}
+	.columns-6 {
+		flex: 0 0 50%;
+		max-width: 50%;
+	}
+	.columns-11 {
+		flex: 0 0 91.6666666667%;
+		max-width: 91.6666666667%;
 	}
 }
 

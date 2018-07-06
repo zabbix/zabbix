@@ -18,30 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CWidgetFieldCheckBox extends CWidgetField {
 
-	protected $caption;
+class CWidgetFieldEmbed extends CWidgetField {
+	protected $item;
 
 	/**
-	 * Check box widget field.
+	 * HTML Embed element (not a field).
 	 *
-	 * @param string $name     Field name in form.
-	 * @param string $label    Label for the field in form.
-	 * @param string $caption  String displayed right after the check-box.
+	 * This class is temporary solution to make graph preview available in widget configuration window.
+	 *
+	 * @param object $item   Item to embed.
 	 */
-	public function __construct($name, $label, $caption = null) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
-		$this->setDefault(0);
-		$this->caption = $caption;
+	public function __construct($item) {
+		//parent::__construct(null, null);
+		$this->item = $item;
 	}
 
-	public function setValue($value) {
-		return parent::setValue((int) $value);
+	public function getItem() {
+		return $this->item;
 	}
 
-	public function getCaption() {
-		return $this->caption;
+	// Since it is not a field, no need to validate input values.
+	public function validate($strict = false) {
+		return [];
 	}
 }

@@ -1059,6 +1059,8 @@ output {
   text-align: left; }
   .table-forms-container > .ui-tabs-nav, .browser-warning-container > .ui-tabs-nav {
     margin: -10px -10px 10px -10px; }
+  .table-forms-container.tabs-left-padding-15-percents > .ui-tabs-nav, .tabs-left-padding-15-percents.browser-warning-container > .ui-tabs-nav {
+    padding-left: 15%; }
 
 .form-btns button {
   margin: 10px 6px 5px 6px; }
@@ -3736,6 +3738,83 @@ svg {
   .navtree .problems {
     margin-left: 10px;
     left: -15px; } }
+.overrides-list {
+  padding: 0px 35px 10px 0px;
+  width: calc(100% - 35px); }
+  .overrides-list .overrides-list-item {
+    border-bottom: 1px solid #888;
+    margin-bottom: 10px;
+    display: table;
+    width: 100%; }
+
+.overrides-options-list {
+  white-space: normal;
+  padding: 10px 0px; }
+  .overrides-options-list > li {
+    display: inline-block;
+    margin: 2px 7px 2px 0;
+    white-space: nowrap; }
+    .overrides-options-list > li > div {
+      position: relative;
+      padding: 1px 22px 1px 1px;
+      background-color: #4d4d4d;
+      border-radius: 2px; }
+      .overrides-options-list > li > div > span {
+        color: white;
+        padding-left: 8px;
+        line-height: 20px; }
+      .overrides-options-list > li > div > input[type=text] {
+        border-style: none;
+        line-height: 20px;
+        min-height: 20px;
+        width: 85px; }
+      .overrides-options-list > li > div > .remove-btn {
+        color: #ffffff;
+        right: 2px;
+        top: 3px; }
+        .overrides-options-list > li > div > .remove-btn:active {
+          background-color: white; }
+
+.color-preview-box {
+  height: 24px;
+  width: 24px;
+  float: left;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: bold; }
+
+.list-vertical-accordion {
+  display: flex;
+  flex-direction: column; }
+  .list-vertical-accordion :not(.list-accordion-item-opened) .list-accordion-item-body {
+    display: none; }
+
+.columns-wrapper {
+  display: flex;
+  flex-wrap: wrap; }
+  .columns-wrapper .columns-1,
+  .columns-wrapper .columns-5,
+  .columns-wrapper .columns-6,
+  .columns-wrapper .columns-11 {
+    -webkit-box-flex: 0; }
+  .columns-wrapper .columns-1 {
+    -ms-flex: 0 0 8.333333%;
+    flex: 0 0 8.333333%;
+    max-width: 8.333333%; }
+  .columns-wrapper .columns-5 {
+    -ms-flex: 0 0 41.666667%;
+    flex: 0 0 41.666667%;
+    max-width: 41.666667%; }
+  .columns-wrapper .columns-6 {
+    flex: 0 0 50%;
+    max-width: 50%; }
+  .columns-wrapper .columns-11 {
+    flex: 0 0 91.6666666667%;
+    max-width: 91.6666666667%; }
+
 @keyframes fadein {
   from {
     opacity: 0; }
