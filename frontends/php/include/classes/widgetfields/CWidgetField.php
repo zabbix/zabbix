@@ -23,6 +23,7 @@ class CWidgetField {
 	const FLAG_ACKNOWLEDGES = 0x01;
 	const FLAG_NOT_EMPTY = 0x02;
 	const FLAG_LABEL_ASTERISK = 0x04;
+	const FLAG_DISABLED = 0x08;
 
 	protected	$name;
 	protected	$label;
@@ -83,12 +84,12 @@ class CWidgetField {
 				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
 				break;
 
+			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
 			case ZBX_WIDGET_FIELD_TYPE_HOST:
 				$this->validation_rules = ['type' => API_IDS];
 				break;
 
-			case ZBX_WIDGET_FIELD_TYPE_ITEM:
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 				$this->validation_rules = ['type' => API_ID];

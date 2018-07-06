@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Zabbix</title>
-		<link rel="stylesheet" href="stylesheets/screen.css">
-		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
-        <link rel="icon" href="favicon.ico">
-        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
-        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
-        <meta name="msapplication-TileColor" content="#d40000">
-	</head>
-<body>
-	<!--<header role="banner">
-		<div><div class="signin-logo"></div></div>
-	</header>-->
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Zabbix</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
 	<div class="article">
 
 		<form>
@@ -37,7 +49,7 @@
 		</div>
 		<div class="setup-right">
 		<div class="setup-right-body">
-		<div class="setup-title"><span>Welcome to</span>Zabbix 3.4</div>
+		<div class="setup-title"><span>Welcome to</span>Zabbix 4.0</div>
 		</div>
 		</div>
 	<div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
@@ -285,15 +297,16 @@
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
 		<p>Create database manually and set the configuration parameters for connection to this database.</p>
-		<div class="msg-bad">
-	Oh snap! Check form fields and try submitting again.
-	<div class="msg-details"><a href="" class="link-action">Details</a>
-	<ul>
-	<li>Something</li>
-	<li>Something</li>
-	<li>Something</li>
-	</ul></div>
-	</div>
+		<div class="msg-bad"><span class="link-action">Details <span id="details-arrow" class="arrow-up"></span></span>
+			Oh snap! Check form fields and try submitting again.
+			<div class="msg-details">
+			<ul class="msg-details-border">
+			<li>Something</li>
+			<li>Something</li>
+			<li>Something</li>
+			</ul></div>
+			<button class="overlay-close-btn" title="Close"></button>
+			</div>
 		<ul class="table-forms">
 		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
@@ -403,17 +416,19 @@
 		<div class="setup-right">
 		<h1>Install</h1>
 		<div class="setup-right-body">
-		<div class="msg-bad">Error creating configuration file
-	    <div class="msg-details"><a href="" class="link-action">Details</a>
-	    <ul>
-	    <li>/home/user/2.4.1/frontends/php/conf/zabbix.conf.php</li>
-	    <li>Unable to overwrite existing configuration file</li>
-	    </ul></div>
-	    </div>
+		<div class="msg-bad"><span class="link-action">Details <span id="details-arrow" class="arrow-up"></span></span>
+		Error creating configuration file.
+		<div class="msg-details">
+		<ul class="msg-details-border">
+		<li>/home/user/4.0/frontends/php/conf/zabbix.conf.php</li>
+		<li>Unable to overwrite existing configuration file</li>
+		</ul></div>
+		<button class="overlay-close-btn" title="Close"></button>
+		</div>
 	    <p>For manual installation:</p>
 	    <ol>
 	    <li><a href="">Download the configuration file</a></li>
-	    <li>Save it as "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"</li>
+	    <li>Save it as "/home/user/4.0/frontends/php/conf/zabbix.conf.php"</li>
 	    </ol>
 		</div>
 		</div>
@@ -444,7 +459,7 @@
 		<h1>Install</h1>
 		<div class="setup-right-body">
 		<h1 class="green">Nice! You've successfully installed Zabbix front end</h1>
-		<p>Configuration file "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php" created</p>
+		<p>Configuration file "/home/user/4.0/frontends/php/conf/zabbix.conf.php" created</p>
 		</div>
 		</div>
 		 <div class="setup-footer"><div><button type="button">Finish</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
@@ -454,8 +469,6 @@
 	<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
 
 	</div>
-	<div class="footer">
-	Zabbix 3.4. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
-	</div>
+<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
 </body>
 </html>

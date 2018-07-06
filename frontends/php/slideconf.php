@@ -374,7 +374,9 @@ else {
 			'name' => CProfile::get('web.slideconf.filter_name', '')
 		],
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'profileIdx' => 'web.slideconf.filter',
+		'active_tab' => CProfile::get('web.slideconf.filter.active', 1)
 	];
 
 	if ($data['filter']['name'] !== '') {

@@ -124,9 +124,7 @@ class CScreenGraph extends CScreenBase {
 			'containerid' => $containerId,
 			'objDims' => $graphDims,
 			'loadSBox' => 0,
-			'loadImage' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+			'loadImage' => 1
 		];
 
 		$isDefault = false;
@@ -136,15 +134,12 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($resourceId));
-
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
 				'&height='.$this->screenitem['height'].'&legend='.$legend.
 				'&graph3d='.$graph3d.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time()).'&isNow=1'
-				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'].
-					'&isNow='.$this->timeline['isNow'];
+				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
+				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
@@ -161,9 +156,8 @@ class CScreenGraph extends CScreenBase {
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
 				'&height='.$this->screenitem['height'].'&legend='.$legend.$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&period=3600&stime='.date(TIMESTAMP_FORMAT, time()).'&isNow=1'
-				: '&period='.$this->timeline['period'].'&stime='.$this->timeline['stime'].
-					'&isNow='.$this->timeline['isNow'];
+				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
+				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 		}
 
 		// output
@@ -187,8 +181,8 @@ class CScreenGraph extends CScreenBase {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&period='.$this->timeline['period'].
-					'&stime='.$this->timeline['stime'].'&isNow='.$this->timeline['isNow']
+				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&from='.$this->timeline['from'].
+					'&to='.$this->timeline['to']
 				);
 			}
 

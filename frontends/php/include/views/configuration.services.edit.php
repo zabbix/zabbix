@@ -284,11 +284,11 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		)
 		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')))
+			(new CDiv(createDateSelector('new_service_time_from', $fromDate)))
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')))
+			(new CDiv(createDateSelector('new_service_time_to', $toDate)))
 		);
 }
 else {

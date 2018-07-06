@@ -379,8 +379,11 @@ $itemFormList->addRow(
 	'ssl_key_password_row'
 );
 
+$master_itemname = ($data['master_itemid'] != 0) ? $data['hostname'].NAME_DELIMITER.$data['master_itemname'] : '';
+
 // Append master item select.
-$master_item = [(new CTextBox('master_itemname', $data['master_itemname'], true))
+$master_item = [
+	(new CTextBox('master_itemname', $master_itemname, true))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CVar('master_itemid', $data['master_itemid'], 'master_itemid'))
@@ -392,9 +395,26 @@ if (!$readonly) {
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.generic",'.
 			CJs::encodeJson([
+				'srctbl' => 'items',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'name',
+				'dstfrm' => $itemForm->getName(),
+				'dstfld1' => 'master_itemid',
+				'dstfld2' => 'master_itemname',
+				'only_hostid' => $data['hostid'],
+				'excludeids' => [$data['itemid']],
+				'with_webitems' => 1,
+				'normal_only' => 1
+			]).', null, this);'
+		);
+	$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$master_item[] = (new CButton('button', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.generic",'.
+			CJs::encodeJson([
 				'srctbl' => 'item_prototypes',
 				'srcfld1' => 'itemid',
-				'srcfld2' => 'master_itemname',
+				'srcfld2' => 'name',
 				'dstfrm' => $itemForm->getName(),
 				'dstfld1' => 'master_itemid',
 				'dstfld2' => 'master_itemname',
@@ -848,13 +868,12 @@ foreach ($data['preprocessing'] as $i => $step) {
 }
 
 $preprocessing->addRow(
-	$readonly
-		? null
-		: (new CCol(
-			(new CButton('param_add', _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-add')
-		))->setColSpan(5)
+	(new CCol(
+		(new CButton('param_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled(!$readonly)
+	))->setColSpan(5)
 );
 
 $item_preproc_list = (new CFormList('item_preproc_list'))

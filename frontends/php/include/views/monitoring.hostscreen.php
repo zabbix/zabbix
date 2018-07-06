@@ -21,19 +21,12 @@
 
 $screen_widget = new CWidget();
 
-$form = (new CFilter('web.hostscreen.filter.state'))->addNavigator();
-
-$screen_widget->addItem($form);
+$filter = new CFilter();
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget
 		->setTitle(_('Screens'))
 		->addItem(new CTableInfo());
-
-	$screen_builder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen_builder->timeline
-	]);
 }
 else {
 	$screen_widget->setTitle([
@@ -77,22 +70,24 @@ else {
 		'screen' => $data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'hostid' => $data['hostid'],
-		'period' => $data['period'],
-		'stime' => $data['stime'],
-		'isNow' => $data['isNow'],
-		'profileIdx' => 'web.screens',
-		'profileIdx2' => $data['screen']['screenid']
+		'profileIdx' => $data['profileIdx'],
+		'profileIdx2' => $data['profileIdx2'],
+		'from' => $data['from'],
+		'to' => $data['to']
 	]);
 
-	$screen_widget->addItem(
-		(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-	);
+	$filter
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 
-	CScreenBuilder::insertScreenStandardJs([
-		'timeline' => $screen_builder->timeline,
-		'profileIdx' => $screen_builder->profileIdx,
-		'profileIdx2' => $screen_builder->profileIdx2
-	]);
+	$screen_widget
+		->addItem($filter)
+		->addItem(
+			(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+		);
+
+	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }
 
 return $screen_widget;

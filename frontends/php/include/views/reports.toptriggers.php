@@ -21,9 +21,7 @@
 
 require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
-$filterForm = (new CFilter('web.toptriggers.filter.state'))
-	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
-	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
+$filterForm = new CFilter();
 
 // severities
 $severity_columns = [0 => [], 1 => []];
@@ -35,35 +33,32 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 }
 
 $filterColumn1 = (new CFormList())
-	->addRow(_('Host groups'),
+	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $this->data['multiSelectHostGroupData'],
+			'object_name' => 'hostGroup',
+			'data' => $data['multiSelectHostGroupData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'groupids_',
 					'srcfld1' => 'groupid',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Hosts'),
+	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'data' => $this->data['multiSelectHostData'],
+			'object_name' => 'hosts',
+			'data' => $data['multiSelectHostData'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
-					'dstfrm' => $filterForm->getName(),
-					'dstfld1' => 'hostids_',
 					'srcfld1' => 'hostid',
-					'real_hosts' => '1',
-					'multiselect' => '1'
+					'dstfrm' => $filterForm->getName(),
+					'dstfld1' => 'hostids_'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -109,8 +104,11 @@ $filterColumn2 = (new CFormList())
 	]);
 
 $filterForm
-	->addColumn($filterColumn1)
-	->addColumn($filterColumn2);
+	->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
+	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
+	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 // table
 $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);

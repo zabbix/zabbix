@@ -107,7 +107,7 @@ class CMenuPopupHelper {
 	 * @param array  $gotos                      Enable goto links.
 	 * @param array  $gotos['graphs']            Link to host graphs page with url parameters ("name" => "value") (optional).
 	 * @param array  $gotos['screens']           Link to host screen page with url parameters ("name" => "value") (optional).
-	 * @param array  $gotos['triggerStatus']     Link to trigger status page with url parameters ("name" => "value") (optional).
+	 * @param array  $gotos['triggerStatus']     Link to "Problems" page with url parameters ("name" => "value") (optional).
 	 * @param array  $gotos['submap']            Link to submap page with url parameters ("name" => "value") (optional).
 	 * @param array  $gotos['events']            Link to events page with url parameters ("name" => "value") (optional).
 	 * @param array  $urls                       Local and global map links (optional).

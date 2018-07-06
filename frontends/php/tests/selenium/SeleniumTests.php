@@ -26,9 +26,8 @@ require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
-require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
-require_once dirname(__FILE__).'/testPageAdministrationAuditActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
+require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
@@ -37,6 +36,7 @@ require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDiscovery.php';
 require_once dirname(__FILE__).'/testPageDiscoveryRules.php';
+require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -51,6 +51,10 @@ require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
+require_once dirname(__FILE__).'/testPageReportsActionLog.php';
+require_once dirname(__FILE__).'/testPageReportsAudit.php';
+require_once dirname(__FILE__).'/testPageReportsNotifications.php';
+require_once dirname(__FILE__).'/testPageReportsTriggerTop.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
@@ -61,6 +65,7 @@ require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralMacro.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
@@ -120,9 +125,8 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testPageActions');
-		$suite->addTestSuite('testPageAdministrationAudit');
-		$suite->addTestSuite('testPageAdministrationAuditActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
+		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationGeneralValuemap');
@@ -132,6 +136,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageDiscoveryRules');
+		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHosts');
@@ -149,6 +154,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
+		$suite->addTestSuite('testPageReportsActionLog');
+		$suite->addTestSuite('testPageReportsAudit');
+		$suite->addTestSuite('testPageReportsNotifications');
+		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
@@ -161,6 +170,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
+		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');

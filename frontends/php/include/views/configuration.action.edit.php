@@ -151,19 +151,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hostGroup',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'groupid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -172,11 +168,8 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TEMPLATE:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'templates',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'templates',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -184,9 +177,7 @@ switch ($data['new_condition']['conditiontype']) {
 					'srcfld2' => 'host',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'templated_hosts' => '1',
-					'multiselect' => '1',
-					'writeonly' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -195,19 +186,15 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'hosts',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'hostid',
-					'writeonly' => '1',
-					'multiselect' => '1'
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -216,20 +203,16 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_TRIGGER:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
-			'objectName' => 'triggers',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'defaultValue' => 0,
+			'object_name' => 'triggers',
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'triggers',
+					'srcfld1' => 'triggerid',
 					'dstfrm' => $actionForm->getName(),
 					'dstfld1' => 'new_condition_value_',
-					'srcfld1' => 'triggerid',
-					'writeonly' => '1',
-					'multiselect' => '1',
-					'noempty' => '1'
+					'editable' => true,
+					'noempty' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -300,9 +283,9 @@ switch ($data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value]',
-			'objectName' => 'proxies',
-			'selectedLimit' => 1,
-			'defaultValue' => 0,
+			'object_name' => 'proxies',
+			'multiple' => false,
+			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'proxies',
@@ -1036,20 +1019,18 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
+				(new CLabel(_('Host groups'), 'new_operation_groupids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
-					'objectName' => 'hostGroup',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'hostGroup',
 					'data' => $data['new_operation']['groups'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_groupids_',
-							'srcfld1' => 'groupid',
-							'writeonly' => '1',
-							'multiselect' => '1'
+							'editable' => true
 						]
 					]
 				]))
@@ -1061,11 +1042,10 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
+				(new CLabel(_('Templates'), 'new_operation_templateids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
-					'objectName' => 'templates',
-					'objectOptions' => ['editable' => true],
+					'object_name' => 'templates',
 					'data' => $data['new_operation']['templates'],
 					'popup' => [
 						'parameters' => [
@@ -1074,9 +1054,7 @@ if (!empty($data['new_operation'])) {
 							'srcfld2' => 'host',
 							'dstfrm' => $actionForm->getName(),
 							'dstfld1' => 'new_operation_templateids_',
-							'templated_hosts' => '1',
-							'multiselect' => '1',
-							'writeonly' => '1'
+							'editable' => true
 						]
 					]
 				]))
@@ -1880,7 +1858,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$bottom_note = _('At least one operation, recovery operation or acknowledge operation must exist.');
+	$bottom_note = _('At least one operation, recovery operation or update operation must exist.');
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList())
@@ -2365,7 +2343,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		);
 	}
 
-	$action_tabs->addTab('acknowledgeTab', _('Acknowledgement operations'), $acknowledge_tab);
+	$action_tabs->addTab('acknowledgeTab', _('Update operations'), $acknowledge_tab);
 }
 
 if (!hasRequest('form_refresh')) {
