@@ -96,7 +96,7 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 		 * Used to select either data are loaded from History or Trends or turning automatic mode on.
 		 */
 		$field_data_source = (new CWidgetFieldRadioButtonList('source', _('History data selection'), [
-				SVG_GRAPH_DATA_SOURCE_AUTO => _('Auto'),
+				SVG_GRAPH_DATA_SOURCE_AUTO => _x('Auto', 'history source selection method'),
 				SVG_GRAPH_DATA_SOURCE_HISTORY => _('History'),
 				SVG_GRAPH_DATA_SOURCE_TRENDS => _('Trends')
 			]))
@@ -186,8 +186,8 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 
 		// Specify the type of units on left Y axis.
 		$field_left_y_units = (new CWidgetFieldComboBox('lefty_units', _('Units'), [
-			SVG_GRAPH_AXIS_UNITS_AUTO => _('Auto'),
-			SVG_GRAPH_AXIS_UNITS_STATIC => _('Static')
+			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
+			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#lefty_static_units")'.
@@ -247,8 +247,8 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 
 		// Specify the type of units on right Y axis.
 		$field_right_y_units = (new CWidgetFieldComboBox('righty_units', _('Units'), [
-			SVG_GRAPH_AXIS_UNITS_AUTO => _('Auto'),
-			SVG_GRAPH_AXIS_UNITS_STATIC => _('Static')
+			SVG_GRAPH_AXIS_UNITS_AUTO => _x('Auto', 'history source selection method'),
+			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
 			->setAction('jQuery("#righty_static_units")'.
@@ -319,7 +319,7 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 		$this->tabs['problems']['fields'][] = $field_severities;
 
 		// Problem name input-text field.
-		$field_problem_name = new CWidgetFieldTextBox('problem_name', _('Problem name'));
+		$field_problem_name = new CWidgetFieldTextBox('problem_name', _('Problem'));
 		if (array_key_exists('problem_name', $this->data)) {
 			$field_problem_name->setValue($this->data['problem_name']);
 		}
