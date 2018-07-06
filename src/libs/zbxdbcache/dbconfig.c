@@ -12064,25 +12064,32 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
  *                                                                            *
  * Purpose: calculate start time for the specified maintenance period         *
  *                                                                            *
- * Parameter: period        - [IN] the maintenance period                     *
- *            active_since  - [IN] the maintenance activation start time      *
+ * Parameter: maintenance   - [IN] the maintenance                            *
+ *            period        - [IN] the maintenance period                     *
  *            start_date    - [IN] the period starting timestamp based on     *
  *                                 current time                               *
  *            running_since - [IN] the actual period starting timestamp       *
+ *            running_since - [IN] the actual period ending timestamp         *
  *                                                                            *
  * Return value: SUCCEED - a valid period was found                           *
  *               FAIL    - period started before maintenance activation time  *
  *                                                                            *
  ******************************************************************************/
-static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_period_t *period, time_t active_since,
-		time_t start_date, time_t *running_since)
+static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenance,
+		const zbx_dc_maintenance_period_t *period, time_t start_date, time_t *running_since,
+		time_t *running_until)
 {
 	int		day, wday, week;
 	struct tm	*tm;
+	time_t		active_since = maintenance->active_since;
 
 	if (TIMEPERIOD_TYPE_ONETIME == period->type)
 	{
-		*running_since = period->start_date;
+		*running_since = (period->start_date < active_since ? active_since : period->start_date);
+		*running_until = period->start_date + period->period;
+		if (maintenance->active_until < *running_until)
+			*running_until = maintenance->active_until;
+
 		return SUCCEED;
 	}
 
@@ -12093,8 +12100,8 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_period_t *pe
 				return FAIL;
 
 			tm = localtime(&active_since);
-			active_since = active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN
-					+ tm->tm_sec);
+			active_since = active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN +
+					tm->tm_sec);
 
 			day = (start_date - active_since) / SEC_PER_DAY;
 			start_date -= SEC_PER_DAY * (day % period->every);
@@ -12170,6 +12177,9 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_period_t *pe
 	}
 
 	*running_since = start_date;
+	*running_until = start_date + period->period;
+	if (maintenance->active_until < *running_until)
+		*running_until = maintenance->active_until;
 
 	return SUCCEED;
 }
@@ -12206,7 +12216,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 					stopped_num = 0;
 	unsigned char			state;
 	struct tm			*tm;
-	time_t				now, period_start, running_since, running_until;
+	time_t				now, period_start, period_end, running_since, running_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -12234,19 +12244,20 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 				if (seconds < period->start_time)
 					period_start -= SEC_PER_DAY;
 
-				ret = dc_calculate_maintenance_period(period, maintenance->active_since,
-						period_start, &period_start);
+				ret = dc_calculate_maintenance_period(maintenance, period, period_start, &period_start,
+						&period_end);
 
-				if (SUCCEED == ret && period_start <= now && now < period_start + period->period)
+				if (SUCCEED == ret && period_start <= now && now < period_end)
 				{
 					state = ZBX_MAINTENANCE_RUNNING;
-					if (period_start + period->period > running_until)
+					if (period_end > running_until)
 					{
 						running_since = period_start;
-						running_until = period_start + period->period;
+						running_until = period_end;
 					}
 				}
 			}
+
 		}
 
 		if (state == ZBX_MAINTENANCE_RUNNING)
