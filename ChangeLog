@@ -9,9 +9,6 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
-.........T [ZBX-12171] added missing items zabbix[process,vmware collector,avg,busy] and zabbix[vmware,buffer,pfree] to Template App Zabbix Proxy (yurii)
-
-Bug fixes:
 ..F....... [ZBX-14519] fixed displaying timeline points of days in Problems widget (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
 ..F....... [ZBX-12994] improved maintenance period translation strings in maintenance form (gcalenko)
@@ -40,6 +37,7 @@ A......... [ZBX-14409] fixed icon mapping expression validation (miks)
 ..F....... [ZBXNEXT-4361] fixed selected breadcrumbs item style; fixed active time range tabs hover cursor style (Andzs, ashubin)
 ..F....... [ZBX-14420] fixed link to Problems screen in map element's context menu (miks)
 .......PS. [ZBX-12957] removed time adjustment of received packets for server and proxy (MVekslers)
+.........T [ZBX-12171] added missing items zabbix[process,vmware collector,avg,busy] and zabbix[vmware,buffer,pfree] to Template App Zabbix Proxy (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha8
