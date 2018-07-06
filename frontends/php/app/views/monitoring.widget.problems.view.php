@@ -172,7 +172,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {
-			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $data['sortorder']);
 		}
 		$last_clock = $problem['clock'];
 
