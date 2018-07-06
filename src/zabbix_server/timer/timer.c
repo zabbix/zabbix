@@ -213,7 +213,7 @@ void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
  *          data structures                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_events(int process_num, zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
 {
 	DB_ROW				row;
 	DB_RESULT			result;
@@ -448,12 +448,11 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vect
  * Purpose: create/update event suppress data to reflect latest maintenance   *
  *          changes in cache                                                  *
  *                                                                            *
- * Parameters: process_num    - [IN] the timer process number                 *
- *             revision       - [IN] the revision of last maintenance update  *
+ * Parameters: revision       - [IN] the revision of last maintenance update  *
  *             suppressed_num - [OUT] the number of suppressed events         *
  *                                                                            *
  ******************************************************************************/
-static void	db_update_event_suppress_data(int process_num, int revision, int *suppressed_num)
+static void	db_update_event_suppress_data(int revision, int *suppressed_num)
 {
 	zbx_vector_ptr_t		event_queries, event_data;
 	zbx_event_suppress_query_t	*query;
@@ -467,7 +466,7 @@ static void	db_update_event_suppress_data(int process_num, int revision, int *su
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
 
-	db_get_query_events(process_num, &event_queries, &event_data);
+	db_get_query_events(&event_queries, &event_data);
 
 	if (0 != event_queries.values_num)
 	{
@@ -679,7 +678,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				db_remove_expired_event_suppress_data((int)sec);
 
 				if (0 != modified_num - stopped_num)
-					db_update_event_suppress_data(process_num, maintenance_revision, &events_num);
+					db_update_event_suppress_data(maintenance_revision, &events_num);
 				else
 					events_num = 0;
 
@@ -702,7 +701,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 					zbx_setproctitle("%s #%d [%s, processing maintenances]",
 							get_process_type_string(process_type), process_num, info);
 
-					db_update_event_suppress_data(process_num, maintenance_revision, &events_num);
+					db_update_event_suppress_data(maintenance_revision, &events_num);
 
 					info_offset = 0;
 					zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
