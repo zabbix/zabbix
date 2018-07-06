@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -19,19 +18,28 @@
 **/
 
 
-show_messages();
+jQuery(function($) {
+	var $norm_mode_btn = $('.btn-dashbrd-normal'),
+		$layout_mode = $('.layout-mode');
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	if ($norm_mode_btn.length) {
+		$(window).on('mousemove keyup scroll', function() {
+			clearTimeout($norm_mode_btn.data('timer'));
+			$norm_mode_btn
+				.removeClass('hidden')
+				.data('timer', setTimeout(function() {
+					$norm_mode_btn.addClass('hidden');
+				}, 2000));
+		}).trigger('mousemove');
+	}
+	if ($layout_mode.length) {
+        $layout_mode.on('click', function(e) {
+			e.stopPropagation();
+			var xhr = updateUserProfile('web.layout.mode',$(this).data('layoutMode'), []);
 
-if ($web_layout_mode === ZBX_LAYOUT_NORMAL) {
-	makePageFooter()->show();
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	CProfiler::getInstance()->show();
-	makeDebugButton()->show();
-}
-
-insertPagePostJs();
-require_once 'include/views/js/common.init.js.php';
+			xhr.always(function(){
+				location.reload();
+			});
+		});
+	}
+});

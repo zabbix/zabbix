@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layoutmode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -40,7 +40,6 @@ $fields = [
 	'graphid' =>	[T_ZBX_INT,			O_OPT, P_SYS, DB_ID,		null],
 	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
 	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS, null,			null],
-	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS, IN('0,1'),	null],
 	'action' =>		[T_ZBX_STR,			O_OPT, P_SYS, IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'"'), null]
 ];
 check_fields($fields);
@@ -93,7 +92,6 @@ updateTimeSelectorPeriod($timeselector_options);
 $data = [
 	'pageFilter' => $pageFilter,
 	'graphid' => $pageFilter->graphid,
-	'fullscreen' => $_REQUEST['fullscreen'],
 	'action' => getRequest('action', HISTORY_GRAPH),
 	'actions' => [
 		HISTORY_GRAPH => _('Graph'),

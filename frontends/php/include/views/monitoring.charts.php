@@ -21,7 +21,6 @@
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 	->addVar('page', 1)
 	->addItem((new CList())
 		->addItem([
@@ -54,19 +53,24 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+$content_control->addItem(get_icon('fullscreen', []));
 $content_control = (new CTag('nav', true, $content_control))
 	->setAttribute('aria-label', _('Content controls'));
 
-$chartsWidget = (new CWidget())
+$chartsWidget = new CWidget();
+$chartsWidget
 	->setTitle(_('Graphs'))
 	->setControls(new CList([$controls, $content_control]));
 
 $filterForm = (new CFilter())
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-$chartsWidget->addItem($filterForm);
+	->setActiveTab($data['active_tab']);
+
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$filterForm->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
+	$chartsWidget->addItem($filterForm);
+}
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget

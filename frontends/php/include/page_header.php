@@ -27,8 +27,9 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-$_REQUEST['fullscreen'] = getRequest('fullscreen', 0);
-if ($_REQUEST['fullscreen'] === '1') {
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
+if ($web_layout_mode === ZBX_LAYOUT_FULLSREEN) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
@@ -192,7 +193,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 	// show GUI messages in pages with menus and in fullscreen mode
-	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;
+	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSREEN) ? 1 : 0;
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
 	$pageHeader->addJsFile($path);
 
@@ -241,7 +242,7 @@ if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
 	CSession::unsetValue(['messageOk', 'messageError']);
 }
 
-if (!defined('ZBX_PAGE_NO_MENU')) {
+if (!defined('ZBX_PAGE_NO_MENU') && $web_layout_mode === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [

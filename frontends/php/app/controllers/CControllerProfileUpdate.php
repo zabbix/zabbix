@@ -64,6 +64,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.active':
+				case 'web.layout.mode':
 					$ret = true;
 					break;
 
@@ -113,6 +114,10 @@ class CControllerProfileUpdate extends CController {
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 				}
+				break;
+
+			case 'web.layout.mode':
+				CProfile::update($idx, $value_int, PROFILE_TYPE_INT);
 				break;
 
 			default:

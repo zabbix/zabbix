@@ -31,7 +31,6 @@ class CControllerReportServices extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>	'in 0,1',
 			'serviceid' =>	'fatal|required|db services.serviceid',
 			'period' =>		'in daily,weekly,monthly,yearly',
 			'year' =>		'int32'
@@ -68,7 +67,6 @@ class CControllerReportServices extends CController {
 	protected function doAction() {
 		// default values
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'period' => $this->getInput('period', 'yearly'),
 			'service' => $this->service,
 			'year' => $this->getInput('year', date('Y')),

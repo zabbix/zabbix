@@ -44,6 +44,17 @@ class CWidget {
 		return $this;
 	}
 
+	public function setBreadcrumbs($breadcrumbs = null) {
+		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+		$show_breadcrumbs = ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE);
+
+		if ($show_breadcrumbs && !is_null($breadcrumbs)) {
+			$this->body[] = $breadcrumbs;
+		}
+
+		return $this;
+	}
+
 	public function addItem($items = null) {
 		if (!is_null($items)) {
 			$this->body[] = $items;
@@ -53,9 +64,16 @@ class CWidget {
 	}
 
 	public function get() {
+		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+		$show_top_header = ($web_layout_mode !== 2);
+		if (!$show_top_header) {
+			$this->addItem(get_icon('fullscreen', [$web_layout_mode])
+				->setAttribute('aria-label', _('Content controls')));
+		}
+
 		$widget = [];
 
-		if ($this->title !== null || $this->controls !== null) {
+		if ($show_top_header && ($this->title !== null || $this->controls !== null)) {
 			$widget[] = $this->createTopHeader();
 		}
 

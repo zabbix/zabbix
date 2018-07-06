@@ -30,7 +30,6 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEM_HOSTS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
@@ -306,7 +305,6 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'hosts_data' => $hosts_data,
 			'groups' => $groups,
 			'hosts' => $hosts,
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

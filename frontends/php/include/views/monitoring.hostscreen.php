@@ -36,8 +36,7 @@ else {
 
 	$url = (new CUrl('host_screen.php'))
 		->setArgument('hostid', $data['hostid'])
-		->setArgument('screenid', $data['screenid'])
-		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+		->setArgument('screenid', $data['screenid']);
 
 	// host screen list
 	if (!empty($data['screens'])) {
@@ -58,7 +57,7 @@ else {
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_combobox)
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+					->addItem(get_icon('fullscreen', []))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
@@ -78,8 +77,13 @@ else {
 
 	$filter
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
+		->setActiveTab($data['active_tab']);
+
+	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+		$filter->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
+	}
+
 
 	$screen_widget
 		->addItem($filter)

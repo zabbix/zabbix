@@ -72,40 +72,40 @@ if ($blink_period > 0) {
 
 // header right
 $widget = (new CWidget())
-	->setTitle(_('Overview'))
-	->setControls(new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Type'), 'type'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('type', $this->data['type'], 'submit()', [
-						SHOW_TRIGGERS => _('Triggers'),
-						SHOW_DATA => _('Data')
+		->setTitle(_('Overview'))
+		->setControls(new CList([
+			(new CForm('get'))
+				->cleanItems()
+				->setAttribute('aria-label', _('Main filter'))
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('Group'), 'groupid'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						$this->data['pageFilter']->getGroupsCB()
 					])
-				])
-				->addItem([
-					new CLabel(_('Hosts location'), 'view_style'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-						STYLE_TOP => _('Top'),
-						STYLE_LEFT => _('Left')
+					->addItem([
+						new CLabel(_('Type'), 'type'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('type', $this->data['type'], 'submit()', [
+							SHOW_TRIGGERS => _('Triggers'),
+							SHOW_DATA => _('Data')
+						])
 					])
-				])
-			),
-		(new CTag('nav', true, (new CList())
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-			->addItem(get_icon('overviewhelp')->setHint($help_hint))
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	]));
+					->addItem([
+						new CLabel(_('Hosts location'), 'view_style'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+							STYLE_TOP => _('Top'),
+							STYLE_LEFT => _('Left')
+						])
+					])
+				),
+			(new CTag('nav', true, (new CList())
+			->addItem(get_icon('fullscreen', []))
+				->addItem(get_icon('overviewhelp')->setHint($help_hint))
+			))
+				->setAttribute('aria-label', _('Content controls'))
+		]));
 
 // filter
 $filter = $data['filter'];
@@ -121,8 +121,7 @@ $filterFormView = new CView('common.filter.trigger', [
 		'inventory' => $filter['inventory'],
 		'showMaintenance' => $filter['showMaintenance'],
 		'hostId' => $data['hostid'],
-		'groupId' => $data['groupid'],
-		'fullScreen' => $data['fullscreen']
+		'groupId' => $data['groupid']
 	],
 	'config' => $data['config'],
 	'profileIdx' => $data['profileIdx'],
@@ -137,8 +136,7 @@ if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
 	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style'], null,
-		$data['fullscreen']
-	);
+		false);
 }
 else {
 	$dataTable = new CTableInfo();

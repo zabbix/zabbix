@@ -293,11 +293,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $config
  * @param string $config['severity_name_*']
  * @param string $backurl
- * @param int    $fullscreen
  *
  * @return CDiv
  */
-function makeSystemStatus(array $filter, array $data, array $config, $backurl, $fullscreen = 0) {
+function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
@@ -330,8 +329,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 		->setArgument('filter_maintenance', (array_key_exists('maintenance', $filter) && $filter['maintenance'])
 			? 1
 			: null
-		)
-		->setArgument('fullscreen', $fullscreen ? '1' : null);
+		);
 
 	foreach ($data['groups'] as $group) {
 		if ($filter_hide_empty_groups && !$group['has_problems']) {

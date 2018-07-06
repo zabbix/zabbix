@@ -162,39 +162,34 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			$fullscreen = (bool) $params['fullscreen'];
-			$kioskmode = array_key_exists('kioskmode', $params) ? (bool) $params['kioskmode'] : null;
-
-			$url = new CUrl();
-
-			if ($fullscreen) {
-				if ($kioskmode === null || $kioskmode) {
-					$url
-						->setArgument('fullscreen', null)
-						->setArgument('kioskmode', null);
-
-					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
-						->setTitle(_('Normal view'))
-						->addClass(ZBX_STYLE_BTN_MIN)
-						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
-				}
-				else {
-					$url
-						->setArgument('fullscreen', '1')
-						->setArgument('kioskmode', '1');
-
-					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
-						->setTitle(_('Kiosk mode'))
-						->addClass(ZBX_STYLE_BTN_KIOSK);
-				}
+			if (count($params) === 0) {
+				$web_layout_mode = (int) CProfile::get('web.layout.mode', 0);
 			}
 			else {
-				$url
-					->setArgument('fullscreen', '1')
-					->setArgument('kioskmode', null);
+				$web_layout_mode = (int) $params[0];
+			}
 
-				$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
+			if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+				$icon = (new CButton('&nbsp;'))
+					->setTitle(_('Normal view'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+					->addClass(ZBX_LAYOUT_MODE)
+					->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+					->addClass(ZBX_STYLE_BTN_MIN);
+
+			}
+			elseif ($web_layout_mode === ZBX_LAYOUT_FULLSREEN) {
+				$icon = (new CButton('&nbsp;'))
+					->setTitle(_('Kiosk mode'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+					->addClass(ZBX_LAYOUT_MODE)
+					->addClass(ZBX_STYLE_BTN_KIOSK);
+			}
+			else {
+				$icon = (new CButton('&nbsp;'))
 					->setTitle(_('Fullscreen'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSREEN)
+					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_MAX);
 			}
 
@@ -524,12 +519,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  *
  * @param int    $sysmapid      Used as value for sysmaid in map link generation.
  * @param string $name          Used as label for map link generation.
- * @param int    $fullscreen    Used as value for fullscreen in map link generation.
  * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
  * @return object
  */
-function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
+function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 	$list = (new CList())
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
@@ -545,7 +539,6 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 						->setArgument('action', 'map.view')
 						->setArgument('sysmapid', $sysmapid)
 						->setArgument('severity_min', $severity_min)
-						->setArgument('fullscreen', $fullscreen ? '1' : null)
 					)
 				)
 		]);
@@ -564,7 +557,6 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
-					->setArgument('fullscreen', $fullscreen ? '1' : null)
 				)
 			);
 		}

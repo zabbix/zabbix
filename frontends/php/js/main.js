@@ -798,7 +798,7 @@ function rm4favorites(object, objectid) {
  * @param {object} 	idx2				An array of IDs
  */
 function updateUserProfile(idx, value_int, idx2) {
-	sendAjaxData('zabbix.php?action=profile.update', {
+	return sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
 			value_int: value_int,
@@ -846,7 +846,7 @@ function sendAjaxData(url, options) {
 	options.type = 'post';
 	options.url = url.getUrl();
 
-	jQuery.ajax(options);
+	return jQuery.ajax(options);
 }
 
 /**

@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
+$page['scripts'] = ['layoutmode.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -44,8 +45,7 @@ $fields = [
 								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
 								null
 							],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null],
-	'fullscreen' =>		    [T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null]
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -71,10 +71,6 @@ $hostId = getRequest('hostid', 0);
  * Display
  */
 if ($hostId > 0) {
-	$data = [
-		'fullscreen' => getRequest('fullscreen', 0)
-	];
-
 	// host scripts
 	$data['hostScripts'] = API::Script()->getScriptsByHosts([$hostId]);
 

@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['layoutmode.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -36,7 +37,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
-	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// Ajax
 	'widget' =>	[T_ZBX_STR, O_OPT, P_ACT,
 		IN('"'.WIDGET_HAT_EVENTACK.'","'.WIDGET_HAT_EVENTACTIONMSGS.'","'.WIDGET_HAT_EVENTACTIONMCMDS.'","'.
@@ -160,7 +160,7 @@ $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+			->addItem(get_icon('fullscreen', []))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)

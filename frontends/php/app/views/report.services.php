@@ -50,10 +50,9 @@ $widget->setControls(new CList([
 		->setMethod('get')
 		->addVar('action', 'report.services')
 		->addVar('serviceid', $data['service']['serviceid'])
-		->addVar('fullscreen', $data['fullscreen'])
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls),
-	(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+	(new CTag('nav', true, get_icon('fullscreen', [])))
 		->setAttribute('aria-label', _('Content controls'))
 ]));
 

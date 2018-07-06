@@ -1182,6 +1182,12 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+// Layout
+define('ZBX_LAYOUT_NORMAL',    0);
+define('ZBX_LAYOUT_FULLSREEN', 1);
+define('ZBX_LAYOUT_KIOSKMODE', 2);
+define('ZBX_LAYOUT_MODE', 'layout-mode');
+
 // input fields
 define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);

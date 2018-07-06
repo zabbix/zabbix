@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$hostInventoryWidget = (new CWidget())
+$hostInventoryWidget = new CWidget();
+
+$hostInventoryWidget
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))

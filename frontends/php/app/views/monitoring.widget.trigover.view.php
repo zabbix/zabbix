@@ -20,12 +20,9 @@
 
 
 $back_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
+	->setArgument('action', 'dashboard.view');
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style'], null,
-	$data['fullscreen']);
+$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style'], null);
 
 $output = [
 	'header' => $data['name'],

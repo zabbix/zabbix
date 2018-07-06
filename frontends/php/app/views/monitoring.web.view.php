@@ -21,30 +21,30 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('layoutmode.js');
 
 (new CWidget())
-	->setTitle(_('Web monitoring'))
-	->setControls((new CList([
-		(new CForm('get'))
-			->cleanItems()
-			->setAttribute('aria-label', _('Main filter'))
-			->addVar('action', 'web.view')
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Group'), 'groupid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Host'), 'hostid'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$data['pageFilter']->getHostsCB()
-				])
-			),
-		(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
+		->setTitle(_('Web monitoring'))
+		->setControls((new CList([
+			(new CForm('get'))
+				->cleanItems()
+				->setAttribute('aria-label', _('Main filter'))
+				->addVar('action', 'web.view')
+				->addItem((new CList())
+					->addItem([
+						new CLabel(_('Group'), 'groupid'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						$data['pageFilter']->getGroupsCB()
+					])
+					->addItem([
+						new CLabel(_('Host'), 'hostid'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						$data['pageFilter']->getHostsCB()
+					])
+				),
+		(new CTag('nav', true, get_icon('fullscreen', [])))
 			->setAttribute('aria-label', _('Content controls'))
-	])))
+			])))
 	->addItem(
 		CScreenBuilder::getScreen([
 			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
@@ -55,7 +55,6 @@ $this->addJsFile('flickerfreescreen.js');
 			'page' => $data['page'],
 			'data' => [
 				'hosts_selected' => $data['pageFilter']->hostsSelected,
-				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder'],
 				'groupid' => $data['pageFilter']->groupid

@@ -495,8 +495,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 
 		$url_details = (new CUrl('tr_events.php'))
 			->setArgument('triggerid', '')
-			->setArgument('eventid', '')
-			->setArgument('fullscreen', $fullscreen ? '1' : null);
+			->setArgument('eventid', '');
 
 		foreach ($problems as $problem) {
 			if (array_key_exists($problem['r_eventid'], $r_events)) {

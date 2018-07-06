@@ -26,7 +26,6 @@ $options = [
 	'page' => $data['page'],
 	'data' => [
 		'action' => $data['action'],
-		'fullscreen' => $data['fullscreen'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
 		'page' => $data['page'],
@@ -76,6 +75,7 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
+	$this->addJsFile('layoutmode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
@@ -301,7 +301,6 @@ if ($data['action'] == 'problem.view') {
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
@@ -311,23 +310,22 @@ if ($data['action'] == 'problem.view') {
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 	(new CWidget())
-		->setTitle(_('Problems'))
-		->setControls((new CTag('nav', true,
-			(new CForm('get'))
-				->cleanItems()
-				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-				->addVar('page', $data['page'])
-				->addItem((new CList())
-					->addItem(new CRedirectButton(_('Export to CSV'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'problem.view.csv')
-							->setArgument('page',  $data['page'])
-					))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-				)
-			))
-				->setAttribute('aria-label', _('Content controls'))
+			->setTitle(_('Problems'))
+			->setControls((new CTag('nav', true,
+				(new CForm('get'))
+					->cleanItems()
+					->addVar('action', 'problem.view')
+					->addVar('page', $data['page'])
+					->addItem((new CList())
+						->addItem(new CRedirectButton(_('Export to CSV'),
+							(new CUrl('zabbix.php'))
+								->setArgument('action', 'problem.view.csv')
+								->setArgument('page',  $data['page'])
+						))
+					->addItem(get_icon('fullscreen', []))
+					)
+				))
+					->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem($filter)
 		->addItem($screen->get())

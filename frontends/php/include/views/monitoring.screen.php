@@ -17,26 +17,29 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
+$widget = new CWidget();
 
-$widget = (new CWidget())
-	->setTitle(_('Screens'))
-	->addItem((new CList())
-		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'))
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-			'/',
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(
-					new CLink($data['screen']['name'], (new CUrl('screens.php'))
-						->setArgument('elementid', $data['screen']['screenid'])
-						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-				))
-	]));
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$widget
+		->setTitle(_('Screens'))
+		->addItem((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _('Breadcrumbs'))
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+			->addItem([
+				(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+				'/',
+				(new CSpan())
+					->addClass(ZBX_STYLE_SELECTED)
+					->addItem(
+						new CLink($data['screen']['name'], (new CUrl('screens.php'))
+							->setArgument('elementid', $data['screen']['screenid'])
+					))
+		]));
+}
 
 $controls = (new CList())
 	->addItem(
@@ -88,16 +91,15 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
+	->addItem(get_icon('fullscreen', []));
 
-$widget->setControls((new CTag('nav', true, (new CList())
-	->addItem((new CForm('get'))
-		->setName('headerForm')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
-		->addItem($controls)
-	)))
-		->setAttribute('aria-label', _('Content controls'))
-);
+	$widget->setControls((new CTag('nav', true, (new CList())
+		->addItem((new CForm('get'))
+			->setName('headerForm')
+			->addItem($controls)
+		)))
+			->setAttribute('aria-label', _('Content controls'))
+	);
 
 // Append screens to widget.
 $screenBuilder = new CScreenBuilder([
@@ -111,12 +113,16 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$widget
+		->addItem((new CFilter())
+			->setProfile($data['profileIdx'], $data['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
+		);
+}
+
 $widget
-	->addItem((new CFilter())
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
-	)
 	->addItem(
 		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 	);

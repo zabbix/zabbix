@@ -22,26 +22,25 @@
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
+$this->addJsFile('layoutmode.js');
 
 $widget = (new CWidget())
-	->setTitle(_('Dashboards'))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create dashboard'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'dashboard.view')
-					->setArgument('new', '1')
-					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-					->getUrl()
+		->setTitle(_('Dashboards'))
+		->setControls((new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create dashboard'),
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'dashboard.view')
+						->setArgument('new', '1')
+						->getUrl()
+				))
+			->addItem(get_icon('fullscreen', []))
 			))
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+				->setAttribute('aria-label', _('Content controls'))
+		);
 
 $form = (new CForm())
-	->setName('dashboardForm')
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setName('dashboardForm');
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -54,8 +53,7 @@ $table = (new CTableInfo())
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('dashboardid', '')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('dashboardid', '');
 
 foreach ($data['dashboards'] as $dashboard) {
 	$table->addRow([

@@ -27,7 +27,10 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = [
+	'multiselect.js',
+	'layoutmode.js'
+];
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -39,7 +42,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'show_without_data' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'show_details' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
@@ -318,19 +320,21 @@ if ($filter['hostids']) {
 /*
  * Display
  */
-$widget = (new CWidget())
+$widget = new CWidget();
+
+$widget
 	->setTitle(_('Latest data'))
-	->setControls((new CTag('nav', true, (new CList())
-		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
-	))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(get_icon('fullscreen', []))
+		))
+			->setAttribute('aria-label', _('Content controls'))
 	);
 
 // Filter
 $filterForm = (new CFilter())
 	->setProfile('web.latest.filter')
-	->setActiveTab(CProfile::get('web.latest.filter.active', 1))
-	->addVar('fullscreen', getRequest('fullscreen'));
+	->setActiveTab(CProfile::get('web.latest.filter.active', 1));
 
 $filterColumn1 = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),

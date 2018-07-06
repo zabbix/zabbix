@@ -31,8 +31,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>			'in 0,1',
-			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db hstgrp.groupid',
@@ -82,8 +80,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
 
 		list($this->dashboard, $error) = $this->getDashboard();
 
@@ -94,8 +90,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 		}
 		elseif ($this->dashboard === null) {
 			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->setArgument('fullscreen', $fullscreen ? '1' : null);
+				->setArgument('action', 'dashboard.list');
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -114,8 +109,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 			$data = [
 				'dashboard' => $dashboard,
-				'fullscreen' => $fullscreen,
-				'kioskmode' => $kioskmode,
 				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
 				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),

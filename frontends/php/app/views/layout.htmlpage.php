@@ -78,7 +78,8 @@ function local_generateHeader($data) {
 	]);
 	echo $pageHeader->getOutput();
 
-	if ($data['fullscreen'] == 0) {
+	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	if ($web_layout_mode === ZBX_LAYOUT_NORMAL) {
 		global $ZBX_SERVER_NAME;
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
@@ -123,9 +124,8 @@ function local_generateHeader($data) {
 	show_messages();
 }
 
-function local_generateFooter($fullscreen) {
+function local_generateFooter() {
 	$pageFooter = new CView('layout.htmlpage.footer', [
-		'fullscreen' => $fullscreen,
 		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
@@ -160,7 +160,7 @@ local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
-local_generateFooter($data['fullscreen']);
+local_generateFooter();
 show_messages();
 
 echo '</body></html>';

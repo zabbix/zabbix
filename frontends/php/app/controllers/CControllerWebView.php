@@ -27,7 +27,6 @@ class CControllerWebView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'fullscreen' =>	'in 0,1',
 			'groupid' =>	'db hstgrp.groupid',
 			'hostid' =>		'db hosts.hostid',
 			'sort' =>		'in hostname,name',
@@ -82,7 +81,6 @@ class CControllerWebView extends CController {
 		CProfile::update('web.httpmon.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'page' => $this->getInput('page', 1)

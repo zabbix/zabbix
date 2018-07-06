@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layoutmode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -36,8 +36,7 @@ $fields = [
 	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS|P_ACT, null,	null],
-	'httptestid' =>	[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null],
-	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'),	null]
+	'httptestid' =>	[T_ZBX_INT,			O_MAND, P_SYS,	DB_ID,		null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -85,7 +84,7 @@ $details_screen = CScreenBuilder::getScreen([
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+				->addItem(get_icon('fullscreen', []))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -198,12 +197,17 @@ $graph_time->insertFlickerfreeJs();
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
+$filter = (new CFilter())
+	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1));
+
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addTimeSelector($timeline['from'], $timeline['to']);
+}
+
 (new CWidget())
-	->addItem((new CFilter())
-		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-		->addTimeSelector($timeline['from'], $timeline['to'])
-	)
+	->addItem($filter)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 

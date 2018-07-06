@@ -31,8 +31,7 @@ class CControllerDiscoveryView extends CController {
 		$fields = [
 			'druleid' =>	'db drules.druleid',
 			'sort' =>		'in ip',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'fullscreen' =>	'in 0,1'
+			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,7 +73,6 @@ class CControllerDiscoveryView extends CController {
 		 * Display
 		 */
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'druleid' => $this->getInput('druleid', 0),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder

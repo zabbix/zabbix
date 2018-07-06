@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
+$page['scripts'] = ['layoutmode.js'];
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -46,8 +47,7 @@ $periods = [
 $fields = [
 	'serviceid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null],
 	'showgraph' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'],
-	'period' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null],
-	'fullscreen' => [T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null]
+	'period' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null]
 ];
 check_fields($fields);
 
@@ -160,7 +160,6 @@ else {
 			->setControls(new CList([
 				(new CForm('get'))
 					->cleanItems()
-					->addVar('fullscreen', getRequest('fullscreen'))
 					->setAttribute('aria-label', _('Main filter'))
 					->addItem((new CList())
 						->addItem([
@@ -169,7 +168,7 @@ else {
 							$period_combo
 						])
 					),
-				(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+			(new CTag('nav', true, get_icon('fullscreen', [])))
 					->setAttribute('aria-label', _('Content controls'))
 			]))
 			->addItem(BR())

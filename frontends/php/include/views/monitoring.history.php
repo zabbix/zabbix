@@ -26,7 +26,6 @@ $header = [
 	'right' => (new CForm('get'))
 		->addVar('itemids', getRequest('itemids'))
 		->addVar('page', 1)
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
 $first_item = reset($data['items']);
@@ -95,7 +94,7 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 
 $action_list->addItem([
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])
+	get_icon('fullscreen', [])
 ]);
 
 $header['right']->addItem($action_list);
@@ -107,7 +106,6 @@ $filter_tab = [];
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
 		$filter_form
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addVar('action', $data['action']);
 
 		$items_data = [];
@@ -214,14 +212,15 @@ else {
 			->setAttribute('aria-label', _('Content controls'))
 		);
 
-	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
+	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {
 		$filter_form
 			->hideFilterButtons()
-			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addVar('action', $data['action'])
 			->addVar('itemids', $data['itemids']);
 		$filter_tab = [
