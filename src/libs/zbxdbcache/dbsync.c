@@ -3519,9 +3519,8 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 
 	if (NULL == (result = DBselect("select t.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,"
 						"t.start_time,t.period,t.start_date,m.maintenanceid"
-					" from maintenances_windows m"
-					" left join timeperiods t"
-					" on t.timeperiodid=m.timeperiodid")))
+					" from maintenances_windows m,timeperiods t"
+					" where t.timeperiodid=m.timeperiodid")))
 	{
 		return FAIL;
 	}
