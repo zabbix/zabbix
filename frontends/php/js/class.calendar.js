@@ -457,10 +457,12 @@ calendar.prototype = {
 		else {
 			if (is_string(val)) {
 				var datetime = val.split(' '),
+					// Date separator must be synced with ZBX_FULL_DATE_TIME and ZBX_DATE_TIME in defines.inc.php.
 					date = datetime[0].split('-');
 					time = new Array();
 
 				if (datetime.length > 1) {
+					// Time separator must be synced with ZBX_FULL_DATE_TIME and ZBX_DATE_TIME in defines.inc.php.
 					var time = datetime[1].split(':');
 				}
 

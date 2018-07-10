@@ -264,6 +264,11 @@ jQuery(function ($){
 				updateTimeSelectorUI(request_data);
 
 				if (json.error) {
+					if (typeof json.error === 'string') {
+						// Error message originates from CControllerTimeSelectorUpdate::checkInput().
+						alert(json.error);
+					}
+
 					container.find('.time-input-error').each(function (i, elm) {
 						var node = $(elm),
 							field = node.attr('data-error-for');
@@ -276,6 +281,7 @@ jQuery(function ($){
 							node.hide();
 						}
 					});
+
 					delete request_data.error;
 				}
 				else {
@@ -286,14 +292,24 @@ jQuery(function ($){
 
 				xhr = null;
 			},
-			error: function () {
-				var request = this,
+			error: function (request, status, error) {
+				/*
+				 * In case there is something very wrong with the code like "echo '<br>'" in the middle where there is
+				 * supposed to be JSON, show error. Otherwise it could've been just a temporary connection issue
+				 * like 404, for example, so just retry.
+				 */
+				if (request.status != 200) {
+					var request = this,
 					retry = function() {
 						$.ajax(request);
 					};
 
-				// Retry with 2s interval.
-				setTimeout(retry, 2000);
+					// Retry with 2s interval.
+					setTimeout(retry, 2000);
+				}
+				else {
+					alert(error);
+				}
 			}
 		});
 	}

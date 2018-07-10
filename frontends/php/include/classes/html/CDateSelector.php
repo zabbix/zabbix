@@ -35,7 +35,7 @@ class CDateSelector extends CTag {
 	 *
 	 * @var string
 	 */
-	private $is_required = true;
+	private $is_required = false;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -70,7 +70,7 @@ class CDateSelector extends CTag {
 	 *
 	 * @return CDateSelector
 	 */
-	public function setAriaRequired($is_required = true) {
+	public function setAriaRequired($is_required = false) {
 		$this->is_required = $is_required;
 
 		return $this;

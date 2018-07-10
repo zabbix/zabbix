@@ -38,7 +38,7 @@ class CControllerTimeSelectorUpdate extends CController {
 	protected function checkInput() {
 		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httpdetails.filter',
 			'web.problem.filter', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
-			'web.item.graph.filter'
+			'web.item.graph.filter', 'web.toptriggers.filter'
 		];
 
 		$fields = [
@@ -51,7 +51,24 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to_offset' => 'int32|ge 0'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateInputDateRange();
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			/*
+			 * This block executes if, for example, a missing profile is given. Since this is an AJAX request, it should
+			 * throw a JS alert() with current message in timeSelectorEventHandler() in gtlc.js.
+			 */
+
+			global $ZBX_MESSAGES;
+
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['error' => $ZBX_MESSAGES[0]['message']])
+			]));
+
+			return $ret;
+		}
+
+		$ret = $this->validateInputDateRange();
 
 		if ($this->getInput('method') === 'rangeoffset' && (!$this->hasInput('from_offset')
 				|| !$this->hasInput('to_offset'))) {
