@@ -12494,7 +12494,7 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
 
 	WRLOCK_CACHE;
 
-	for (i = 0; i < updates->values_num;)
+	for (i = 0; i < updates->values_num; i++)
 	{
 		diff = (zbx_host_maintenance_diff_t *)updates->values[i];
 
@@ -12512,8 +12512,6 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
 
 		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
 			host->maintenance_from = diff->maintenance_from;
-
-		i++;
 	}
 
 	UNLOCK_CACHE;
