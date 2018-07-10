@@ -12875,6 +12875,9 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 		{
 			maintenance = (zbx_dc_maintenance_t *)maintenances.values[j];
 
+			if (ZBX_MAINTENANCE_RUNNING != maintenance->state)
+				continue;
+
 			for (k = 0; k < hostids.values_num; k++)
 			{
 				if (SUCCEED == dc_maintenance_match_host(maintenance, hostids.values[k]) &&

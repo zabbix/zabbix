@@ -1767,9 +1767,13 @@ static void	save_event_suppress_data()
 
 	/* prepare query data  */
 
+	zbx_vector_uint64_create(&maintenanceids);
+
+	if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+		goto out;
+
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_refs);
-	zbx_vector_uint64_create(&maintenanceids);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -1799,7 +1803,7 @@ static void	save_event_suppress_data()
 		zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
-	if (0 != event_queries.values_num && SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+	if (0 != event_queries.values_num)
 	{
 		zbx_db_lock_maintenanceids(&maintenanceids);
 
@@ -1840,9 +1844,10 @@ static void	save_event_suppress_data()
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
 
-	zbx_vector_uint64_destroy(&maintenanceids);
 	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_ptr_destroy(&event_queries);
+out:
+	zbx_vector_uint64_destroy(&maintenanceids);
 }
 
 /******************************************************************************
