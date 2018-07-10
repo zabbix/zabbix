@@ -641,16 +641,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	/* temporary block other timer processes until trigger based maintenance is merged in */
-	if (1 != process_num)
-	{
-		zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
-
-		for (;;)
-			zbx_sleep_loop(SEC_PER_DAY);
-	}
-
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
