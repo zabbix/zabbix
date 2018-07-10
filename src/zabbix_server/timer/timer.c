@@ -461,6 +461,11 @@ static void	db_update_event_suppress_data(int revision, int *suppressed_num)
 
 	*suppressed_num = 0;
 
+	zbx_vector_uint64_create(&maintenanceids);
+
+	if (SUCCEED != zbx_dc_get_running_maintenanceids(revision, &maintenanceids))
+		goto out;
+
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
 
@@ -474,16 +479,12 @@ static void	db_update_event_suppress_data(int revision, int *suppressed_num)
 
 		zbx_vector_ptr_create(&inserts);
 		zbx_vector_ptr_create(&updates);
-		zbx_vector_uint64_create(&maintenanceids);
 
 		db_get_query_functions(&event_queries, &event_data);
 		db_get_query_tags(&event_queries);
 		db_get_suppress_data(&event_queries, &event_data);
 
 		DBbegin();
-
-		if (SUCCEED != zbx_dc_get_running_maintenanceids(revision, &maintenanceids))
-			goto cleanup;
 
 		zbx_db_lock_maintenanceids(&maintenanceids);
 		zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
@@ -558,7 +559,6 @@ cleanup:
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
 
-		zbx_vector_uint64_destroy(&maintenanceids);
 		zbx_vector_ptr_destroy(&updates);
 		zbx_vector_ptr_destroy(&inserts);
 
@@ -568,6 +568,8 @@ cleanup:
 
 	zbx_vector_ptr_destroy(&event_data);
 	zbx_vector_ptr_destroy(&event_queries);
+out:
+	zbx_vector_uint64_destroy(&maintenanceids);
 }
 
 /******************************************************************************
