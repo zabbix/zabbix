@@ -128,13 +128,12 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 		{
 			if (0 != diff->maintenanceid)
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid="
-						ZBX_FS_UI64, delim, diff->maintenanceid);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=" ZBX_FS_UI64, delim,
+						diff->maintenanceid);
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null",
-						delim);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null", delim);
 			}
 
 			delim = ',';
@@ -142,26 +141,25 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 
 		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_type=%u",
-					delim, diff->maintenance_type);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_type=%u", delim,
+					diff->maintenance_type);
 			delim = ',';
 		}
 
 		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_status=%u",
-					delim, diff->maintenance_status);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_status=%u", delim,
+					diff->maintenance_status);
 			delim = ',';
 		}
 
 		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_from=%d",
-					delim, diff->maintenance_from);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_from=%d", delim,
+					diff->maintenance_from);
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n",
-				diff->hostid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", diff->hostid);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			break;
