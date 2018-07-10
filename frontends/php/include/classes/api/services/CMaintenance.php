@@ -1004,18 +1004,18 @@ class CMaintenance extends CApiService {
 			$result = $relationMap->mapMany($result, $groups, 'hosts');
 		}
 
-		// selectTags
+		// Adding problem tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
 				$options['selectTags'] = ['tag', 'operator', 'value'];
 			}
-			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'maintenancetagid', 'maintenance_tag');
+			$relation_map = $this->createRelationMap($result, 'maintenanceid', 'maintenancetagid', 'maintenance_tag');
 			$tags = API::getApiService()->select('maintenance_tag', [
 				'output' => $options['selectTags'],
-				'filter' => ['maintenancetagid' => $relationMap->getRelatedIds()],
+				'filter' => ['maintenanceid' => $relation_map->getRelatedIds()],
 				'preservekeys' => true
 			]);
-			$result = $relationMap->mapMany($result, $tags, 'tags');
+			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
 		// selectTimeperiods

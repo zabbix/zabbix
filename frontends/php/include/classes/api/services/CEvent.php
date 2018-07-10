@@ -87,6 +87,7 @@ class CEvent extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
+			'suppressed'				=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,
@@ -101,6 +102,7 @@ class CEvent extends CApiService {
 			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
+			'selectSuppressionData'		=> null,
 			'selectTags'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -375,6 +377,16 @@ class CEvent extends CApiService {
 			$sqlParts['where'][] = 'e.acknowledged='.$acknowledged;
 		}
 
+		// suppressed
+		if ($options['suppressed'] !== null) {
+			$sqlParts['where'][] = ($options['suppressed'] == EVENT_NOT_SUPPRESSED ? 'NOT ' : '').
+					'EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_suppress es'.
+						' WHERE es.eventid=p.eventid'.
+					')';
+		}
+
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
@@ -538,6 +550,13 @@ class CEvent extends CApiService {
 		]);
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
+		}
+
+		$supressed_validator = new CLimitedSetValidator([
+			'values' => [EVENT_NOT_SUPPRESSED, EVENT_SUPPRESSED]
+		]);
+		if (!$supressed_validator->validate($options['suppressed'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect suppressed value.'));
 		}
 	}
 
@@ -922,6 +941,34 @@ class CEvent extends CApiService {
 
 		$eventIds = array_keys($result);
 
+		// Adding suppressed value.
+		if ($this->outputIsRequested('suppressed', $options['output'])) {
+			$suppressed_eventids = [];
+			foreach ($result as &$event) {
+				if (array_key_exists('suppression_data', $event)) {
+					$event['suppressed'] = $event['suppression_data'] ? EVENT_SUPPRESSED : EVENT_NOT_SUPPRESSED;
+				}
+				else {
+					$suppressed_eventids[] = $event['eventid'];
+				}
+			}
+			unset($event);
+
+			if ($suppressed_eventids) {
+				$suppressed_events = API::getApiService()->select('event_suppress', [
+					'output' => ['eventid'],
+					'filter' => ['eventid' => $suppressed_eventids],
+					'preservekeys' => true
+				]);
+				foreach ($result as &$event) {
+					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_events)
+						? EVENT_SUPPRESSED
+						: EVENT_NOT_SUPPRESSED;
+				}
+				unset($event);
+			}
+		}
+
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			// trigger events
@@ -1074,6 +1121,20 @@ class CEvent extends CApiService {
 				}
 				unset($event);
 			}
+		}
+
+		// Adding suppression data.
+		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
+			if ($options['selectSuppressionData'] === API_OUTPUT_EXTEND) {
+				$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
+			}
+			$relation_map = $this->createRelationMap($result, 'eventid', 'maintenanceid', 'event_suppress');
+			$suppression_data = API::getApiService()->select('event_suppress', [
+				'output' => $options['selectSuppressionData'],
+				'filter' => ['eventid' => $relation_map->getRelatedIds()],
+				'preservekeys' => true
+			]);
+			$result = $relation_map->mapOne($result, $suppression_data, 'suppression_data');
 		}
 
 		// Adding event tags.
