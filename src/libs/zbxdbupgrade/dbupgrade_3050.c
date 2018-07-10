@@ -1554,6 +1554,80 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3050123(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050124(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_login_form", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_strip_domains", "0", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050126(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"login_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050127(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
+	res = DBexecute(
+		"update config set authentication_type=0, http_auth_enabled=1 where authentication_type=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050128(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* New GUI access type is added GROUP_GUI_ACCESS_LDAP, update value of GROUP_GUI_ACCESS_DISABLED. */
+	res = DBexecute(
+		"update usrgrp set gui_access=3 where gui_access=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1679,5 +1753,11 @@ DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
+DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
 
 DBPATCH_END()
