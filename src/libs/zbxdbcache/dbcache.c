@@ -68,6 +68,7 @@ extern unsigned char	program_type;
 
 /* the maximum number of items in one synchronization batch */
 #define ZBX_HC_SYNC_MAX		1000
+#define ZBX_HC_TIMER_MAX	(ZBX_HC_SYNC_MAX / 2)
 
 /* the minimum processed item percentage of item candidates to continue synchronizing */
 #define ZBX_HC_SYNC_MIN_PCNT	10
@@ -94,13 +95,6 @@ typedef struct
 ZBX_DC_IDS;
 
 static ZBX_DC_IDS	*ids = NULL;
-
-#define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
-#define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
-#define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
-#define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
-#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
-#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
 
 typedef struct
 {
@@ -1466,19 +1460,21 @@ static void	DCsync_trends(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBmass_update_triggers                                           *
+ * Function: recalculate_triggers                                             *
  *                                                                            *
  * Purpose: re-calculate and update values of triggers related to the items   *
  *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
+ * Parameters: history           - [IN] array of history data                 *
+ *             history_num       - [IN] number of history structures          *
+ *             timer_triggerids  - [IN] the timer triggerids to process       *
+ *             trigger_diff      - [OUT] trigger updates                      *
+ *             timers_num        - [OUT] processed timer triggers             *
  *                                                                            *
  ******************************************************************************/
-static void	DBmass_update_triggers(const ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *trigger_diff)
+static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
+		const zbx_vector_uint64_t *timer_triggerids, zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "DBmass_update_triggers";
+	const char		*__function_name = "recalculate_triggers";
 	int			i, item_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
@@ -1487,46 +1483,56 @@ static void	DBmass_update_triggers(const ZBX_DC_HISTORY *history, int history_nu
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
-	timespecs = (zbx_timespec_t *)zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
-
-	for (i = 0; i < history_num; i++)
+	if (0 != history_num)
 	{
-		const ZBX_DC_HISTORY	*h = &history[i];
+		itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * (size_t)history_num);
+		timespecs = (zbx_timespec_t *)zbx_malloc(timespecs, sizeof(zbx_timespec_t) * (size_t)history_num);
 
-		if (0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
-			continue;
+		for (i = 0; i < history_num; i++)
+		{
+			const ZBX_DC_HISTORY	*h = &history[i];
 
-		itemids[item_num] = h->itemid;
-		timespecs[item_num] = h->ts;
-		item_num++;
+			if (0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
+				continue;
+
+			itemids[item_num] = h->itemid;
+			timespecs[item_num] = h->ts;
+			item_num++;
+		}
 	}
 
-	if (0 == item_num)
-		goto clean_items;
+	if (0 == item_num && 0 == timer_triggerids->values_num)
+		goto out;
 
-	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num),
+	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num + timer_triggerids->values_num),
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&trigger_order);
-	zbx_vector_ptr_reserve(&trigger_order, item_num);
+	zbx_vector_ptr_reserve(&trigger_order, trigger_info.num_slots);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
+	if (0 != item_num)
+	{
+		DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
+		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
+	}
 
-	zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
+	if (0 != timer_triggerids->values_num)
+	{
+		zbx_timespec_t	ts;
 
-	if (0 == trigger_order.values_num)
-		goto clean_triggers;
+		zbx_timespec(&ts);
+		zbx_dc_get_timer_triggers_by_triggerids(&trigger_info, &trigger_order, timer_triggerids, &ts);
+	}
 
+	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	evaluate_expressions(&trigger_order);
-
 	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
-clean_triggers:
+
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
-clean_items:
+out:
 	zbx_free(timespecs);
 	zbx_free(itemids);
 
@@ -2725,41 +2731,363 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-
-
-/******************************************************************************
- *                                                                            *
- * Function: DCsync_history                                                   *
- *                                                                            *
- * Purpose: writes updates and new data from pool to database                 *
- *                                                                            *
- * Return value: the timestamp of next history queue value to sync,           *
- *               0 if the queue is empty or most of items are locked by       *
- *               triggers.                                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	DCsync_history(int sync_type, int *total_num)
+int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 {
-	const char			*__function_name = "DCsync_history";
+	int			history_num, next_sync = 0;
+	time_t			sync_start, now;
+	zbx_vector_ptr_t	history_items;
 
-	static ZBX_DC_HISTORY		*history = NULL;	/* array of structures where item data from history  */
-								/* cache are copied into to process triggers, trends */
-								/* etc and finally write into db */
+	zbx_vector_ptr_create(&history_items);
+	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+
+	sync_start = time(NULL);
+
+	do
+	{
+		LOCK_CACHE;
+
+		hc_pop_items(&history_items);		/* select and take items out of history cache */
+		history_num = history_items.values_num;
+
+		UNLOCK_CACHE;
+
+		if (0 == history_num)
+			break;
+
+		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
+
+		do
+		{
+			DBbegin();
+
+			DCmass_proxy_add_history(history, history_num);
+			DCmass_proxy_update_items(history, history_num);
+		}
+		while (ZBX_DB_DOWN == DBcommit());
+
+		LOCK_CACHE;
+
+		next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
+		cache->history_num -= history_num;
+
+		UNLOCK_CACHE;
+
+		*total_num += history_num;
+
+		now = time(NULL);
+
+		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+					(double)*total_num / (cache->history_num + *total_num) * 100);
+			sync_start = now;
+		}
+
+		zbx_vector_ptr_clear(&history_items);
+		hc_free_item_values(history, history_num);
+
+		/* Exit from sync loop if we have spent too much time here */
+		/* unless we are doing full sync. This is done to allow    */
+		/* syncer process to update their statistics.              */
+	}
+	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
+
+	zbx_vector_ptr_destroy(&history_items);
+
+	return next_sync;
+}
+
+int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
+{
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
-	int				history_num, candidate_num, next_sync = 0, history_float_num,
-					history_integer_num, history_string_num, history_text_num, history_log_num, ret,
+	int				i, history_num, candidate_num, next_sync = 0, history_float_num,
+					history_integer_num, history_string_num, history_text_num, history_log_num,
 					txn_error;
 	time_t				sync_start, now;
-	zbx_vector_uint64_t		triggerids;
+	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
-	zbx_binary_heap_t		tmp_history_queue;
+
+	if (NULL == history_float && NULL != history_float_cbs)
+	{
+		history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
+	}
+
+	if (NULL == history_integer && NULL != history_integer_cbs)
+	{
+		history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
+	}
+
+	if (NULL == history_string && NULL != history_string_cbs)
+	{
+		history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
+	}
+
+	if (NULL == history_text && NULL != history_text_cbs)
+	{
+		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
+	}
+
+	if (NULL == history_log && NULL != history_log_cbs)
+	{
+		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
+				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
+	}
+
+	zbx_vector_ptr_create(&inventory_values);
+	zbx_vector_ptr_create(&item_diff);
+	zbx_vector_ptr_create(&trigger_diff);
+	zbx_vector_uint64_pair_create(&trends_diff);
+
+	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+
+	zbx_vector_uint64_create(&timer_triggerids);
+	zbx_vector_uint64_reserve(&timer_triggerids, ZBX_HC_TIMER_MAX);
+
+	zbx_vector_ptr_create(&history_items);
+	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+
+	sync_start = time(NULL);
+
+	do
+	{
+		DC_ITEM			*items;
+		int			*errcodes, trends_num = 0, timers_num = 0, ret = SUCCEED;
+		zbx_vector_uint64_t	itemids;
+		ZBX_DC_TREND		*trends = NULL;
+
+		LOCK_CACHE;
+
+		hc_pop_items(&history_items);		/* select and take items out of history cache */
+
+		if (0 != history_items.values_num)
+		{
+			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
+
+			/* if there are unavailable items, push them back in history queue */
+			if (history_num != history_items.values_num)
+				hc_push_busy_items(&history_items);
+		}
+		else
+			history_num = 0;
+
+		UNLOCK_CACHE;
+
+		if (0 != history_num)
+		{
+			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
+
+			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
+			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
+
+			zbx_vector_uint64_create(&itemids);
+			zbx_vector_uint64_reserve(&itemids, history_num);
+
+			for (i = 0; i < history_num; i++)
+				zbx_vector_uint64_append(&itemids, history[i].itemid);
+
+			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
+
+			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
+					&inventory_values);
+
+			if (FAIL != (ret = DBmass_add_history(history, history_num)))
+			{
+				DCconfig_items_apply_changes(&item_diff);
+				DCmass_update_trends(history, history_num, &trends, &trends_num);
+
+				do
+				{
+					DBbegin();
+
+					DBmass_update_items(&item_diff, &inventory_values);
+					DBmass_update_trends(trends, trends_num, &trends_diff);
+
+					/* process internal events generated by DCmass_prepare_history() */
+					zbx_process_events(NULL, NULL);
+
+					if (ZBX_DB_OK == (txn_error = DBcommit()))
+						DCupdate_trends(&trends_diff);
+					else
+						zbx_reset_event_recovery();
+
+					zbx_vector_uint64_pair_clear(&trends_diff);
+				}
+				while (ZBX_DB_DOWN == txn_error);
+			}
+
+			zbx_clean_events();
+
+			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
+			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
+		}
+
+		if (FAIL != ret)
+		{
+			zbx_dc_get_timer_triggerids(&timer_triggerids, time(NULL), ZBX_HC_TIMER_MAX);
+			timers_num = timer_triggerids.values_num;
+
+			if (0 != history_num || 0 != timers_num)
+			{
+				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
+						timer_triggerids.values_num);
+				do
+				{
+					DBbegin();
+
+					recalculate_triggers(history, history_num, &timer_triggerids, &trigger_diff);
+
+					/* process trigger events generated by recalculate_triggers() */
+					if (0 != zbx_process_events(&trigger_diff, &triggerids))
+						zbx_db_save_trigger_changes(&trigger_diff);
+
+					if (ZBX_DB_OK == (txn_error = DBcommit()))
+					{
+						DCconfig_triggers_apply_changes(&trigger_diff);
+						DBupdate_itservices(&trigger_diff);
+					}
+					else
+						zbx_clean_events();
+
+					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+				}
+				while (ZBX_DB_DOWN == txn_error);
+			}
+
+			zbx_vector_uint64_clear(&timer_triggerids);
+		}
+
+		if (0 != triggerids.values_num)
+		{
+			DCconfig_unlock_triggers(&triggerids);
+			zbx_vector_uint64_clear(&triggerids);
+		}
+
+		if (0 != history_num)
+		{
+			LOCK_CACHE;
+
+			next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
+			cache->history_num -= history_num;
+
+			UNLOCK_CACHE;
+
+			*total_num += history_num;
+			candidate_num = history_items.values_num;
+		}
+
+		if (FAIL != ret)
+		{
+			if (0 != history_num)
+			{
+				DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
+						history_integer, &history_integer_num, history_string,
+						&history_string_num, history_text, &history_text_num, history_log,
+						&history_log_num);
+
+				DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
+						history_text_num, history_log_num, history_float, history_integer,
+						history_string, history_text, history_log);
+			}
+
+			if (SUCCEED == zbx_is_export_enabled())
+			{
+				if (0 != history_num)
+				{
+					DCexport_history_and_trends(history, history_num, &itemids, items, errcodes,
+							trends, trends_num);
+				}
+
+				zbx_export_events();
+			}
+		}
+
+		now = time(NULL);
+
+		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+					(double)*total_num / (cache->history_num + *total_num) * 100);
+			sync_start = now;
+		}
+
+		if (0 != history_num || 0 != timers_num)
+			zbx_clean_events();
+
+		if (0 != history_num)
+		{
+			zbx_free(trends);
+			zbx_vector_uint64_destroy(&itemids);
+			DCconfig_clean_items(items, errcodes, history_num);
+			zbx_free(errcodes);
+			zbx_free(items);
+
+			zbx_vector_ptr_clear(&history_items);
+			hc_free_item_values(history, history_num);
+		}
+
+		if ((0 == history_num || ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num) &&
+				ZBX_HC_TIMER_MAX != timers_num)
+		{
+			/* Stop sync if only small percentage of sync candidates were processed     */
+			/* (meaning most of sync candidates are locked by triggers).                */
+			/* In this case is better to wait a bit for other syncers to unlock items   */
+			/* rather than trying and failing to sync locked items over and over again. */
+
+			next_sync = 0;
+			break;
+		}
+
+
+		/* Exit from sync loop if we have spent too much time here */
+		/* unless we are doing full sync. This is done to allow    */
+		/* syncer process to update their statistics.              */
+	}
+	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
+
+	zbx_vector_ptr_destroy(&history_items);
+	zbx_vector_ptr_destroy(&inventory_values);
+	zbx_vector_ptr_destroy(&item_diff);
+	zbx_vector_ptr_destroy(&trigger_diff);
+	zbx_vector_uint64_pair_destroy(&trends_diff);
+
+	zbx_vector_uint64_destroy(&timer_triggerids);
+	zbx_vector_uint64_destroy(&triggerids);
+
+	return next_sync;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: sync_history_cache                                               *
+ *                                                                            *
+ * Purpose: writes updates and new data from history cache to database        *
+ *                                                                            *
+ * Return value: the timestamp of next history queue value to sync,           *
+ *               0 if the queue is empty or most of items are locked by       *
+ *               triggers.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	sync_history_cache(int sync_type, int *total_num)
+{
+	const char		*__function_name = "sync_history_cache";
+
+	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history  */
+							/* cache are copied into to process triggers, trends */
+							/* etc and finally write into db */
+	int			ret = 0;
+	zbx_binary_heap_t	tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -2801,249 +3129,14 @@ int	DCsync_history(int sync_type, int *total_num)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 	}
 
-	if (0 == cache->history_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		/* try flushing correlated event queue in the case      */
-		/* some OK events are queued from the last history sync */
-		zbx_flush_correlated_events();
-		goto finish;
-	}
-
-	sync_start = time(NULL);
-
 	if (NULL == history)
 		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		if (NULL == history_float && NULL != history_float_cbs)
-		{
-			history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float,
-					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
-		}
+		ret = sync_server_history(history, sync_type, total_num);
+	else
+		ret = sync_proxy_history(history, sync_type, total_num);
 
-		if (NULL == history_integer && NULL != history_integer_cbs)
-		{
-			history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer,
-					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
-		}
-
-		if (NULL == history_string && NULL != history_string_cbs)
-		{
-			history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string,
-					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
-		}
-
-		if (NULL == history_text && NULL != history_text_cbs)
-		{
-			history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
-					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
-		}
-
-		if (NULL == history_log && NULL != history_log_cbs)
-		{
-			history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
-					ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
-		}
-
-		zbx_vector_ptr_create(&inventory_values);
-		zbx_vector_ptr_create(&item_diff);
-		zbx_vector_ptr_create(&trigger_diff);
-		zbx_vector_uint64_pair_create(&trends_diff);
-
-		zbx_vector_uint64_create(&triggerids);
-		zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
-	}
-
-	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
-
-	do
-	{
-		DC_ITEM			*items;
-		int			*errcodes, trends_num = 0;
-		zbx_vector_uint64_t	itemids;
-		ZBX_DC_TREND		*trends = NULL;
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			zbx_vector_uint64_clear(&triggerids);
-
-		LOCK_CACHE;
-
-		hc_pop_items(&history_items);		/* select and take items out of history cache */
-
-		if (0 != history_items.values_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
-
-			/* if there are unavailable items, push them back in history queue */
-			if (history_num != history_items.values_num)
-				hc_push_busy_items(&history_items);
-		}
-		else
-			history_num = history_items.values_num;
-
-		UNLOCK_CACHE;
-
-		if (0 == history_num)
-			break;
-
-		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			int	i;
-
-			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
-			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
-
-			zbx_vector_uint64_create(&itemids);
-			zbx_vector_uint64_reserve(&itemids, history_num);
-
-			for (i = 0; i < history_num; i++)
-				zbx_vector_uint64_append(&itemids, history[i].itemid);
-
-			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-			DCconfig_get_items_by_itemids(items, itemids.values, errcodes, history_num);
-
-			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
-					&inventory_values);
-
-			/* process values only if they were successfully stored by the history backend */
-			if (FAIL != (ret = DBmass_add_history(history, history_num)))
-			{
-				/* trigger calculation requires up to date information */
-				/* in configuration and value caches                   */
-				DCconfig_items_apply_changes(&item_diff);
-				DCmass_update_trends(history, history_num, &trends, &trends_num);
-
-				do
-				{
-					DBbegin();
-
-					DBmass_update_items(&item_diff, &inventory_values);
-					DBmass_update_triggers(history, history_num, &trigger_diff);
-					DBmass_update_trends(trends, trends_num, &trends_diff);
-
-					/* processing of events, generated in functions: */
-					/* DBmass_update_items() */
-					/* DBmass_update_triggers() */
-					if (0 != zbx_process_events(&trigger_diff, &triggerids))
-						zbx_db_save_trigger_changes(&trigger_diff);
-
-					if (ZBX_DB_OK == (txn_error = DBcommit()))
-					{
-						DCconfig_triggers_apply_changes(&trigger_diff);
-						DCupdate_trends(&trends_diff);
-						DBupdate_itservices(&trigger_diff);
-					}
-					else
-						zbx_clean_events();
-
-					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-
-					zbx_vector_uint64_pair_clear(&trends_diff);
-				}
-				while (ZBX_DB_DOWN == txn_error);
-			}
-
-			DCconfig_unlock_triggers(&triggerids);
-			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
-			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
-		}
-		else
-		{
-			do
-			{
-				DBbegin();
-
-				DCmass_proxy_add_history(history, history_num);
-				DCmass_proxy_update_items(history, history_num);
-			}
-			while (ZBX_DB_DOWN == (txn_error = DBcommit()));
-
-			ret = ZBX_DB_OK == txn_error ? SUCCEED : FAIL;
-		}
-
-		LOCK_CACHE;
-
-		next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
-		cache->history_num -= history_num;
-
-		UNLOCK_CACHE;
-
-		*total_num += history_num;
-		candidate_num = history_items.values_num;
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && SUCCEED == ret)
-		{
-			if (SUCCEED == zbx_is_export_enabled())
-			{
-				DCexport_history_and_trends(history, history_num, &itemids, items, errcodes, trends,
-						trends_num);
-				zbx_export_events();
-			}
-
-			DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
-					history_integer, &history_integer_num, history_string, &history_string_num,
-					history_text, &history_text_num, history_log, &history_log_num);
-
-			DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, history_float, history_integer,
-					history_string, history_text, history_log);
-		}
-
-		now = time(NULL);
-
-		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)*total_num / (cache->history_num + *total_num) * 100);
-			sync_start = now;
-		}
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			zbx_clean_events();
-			zbx_free(trends);
-			zbx_vector_uint64_destroy(&itemids);
-			DCconfig_clean_items(items, errcodes, history_num);
-			zbx_free(errcodes);
-			zbx_free(items);
-		}
-
-		zbx_vector_ptr_clear(&history_items);
-		hc_free_item_values(history, history_num);
-
-		if (ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num)
-		{
-			/* Stop sync if only small percentage of sync candidates were processed     */
-			/* (meaning most of sync candidates are locked by triggers).                */
-			/* In this case is better to wait a bit for other syncers to unlock items   */
-			/* rather than trying and failing to sync locked items over and over again. */
-
-			next_sync = 0;
-			break;
-		}
-
-		/* Exit from sync loop if we have spent too much time here */
-		/* unless we are doing full sync. This is done to allow    */
-		/* syncer process to update their statistics.              */
-	}
-	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
-
-	zbx_vector_ptr_destroy(&history_items);
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		zbx_vector_ptr_destroy(&inventory_values);
-		zbx_vector_ptr_destroy(&item_diff);
-		zbx_vector_ptr_destroy(&trigger_diff);
-		zbx_vector_uint64_pair_destroy(&trends_diff);
-
-		zbx_vector_uint64_destroy(&triggerids);
-	}
-finish:
 	if (ZBX_SYNC_FULL == sync_type)
 	{
 		LOCK_CACHE;
@@ -3053,17 +3146,12 @@ finish:
 
 		UNLOCK_CACHE;
 
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			/* try flushing correlated event queue until it's empty */
-			while (0 != zbx_flush_correlated_events())
-				;
-		}
-
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
 
-	return next_sync;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -3422,19 +3510,6 @@ void	dc_flush_history(void)
  ******************************************************************************/
 ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
 ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
-
-struct zbx_hc_data
-{
-	history_value_t	value;
-	zbx_uint64_t	lastlogsize;
-	zbx_timespec_t	ts;
-	int		mtime;
-	unsigned char	value_type;
-	unsigned char	flags;
-	unsigned char	state;
-
-	struct zbx_hc_data	*next;
-};
 
 /******************************************************************************
  *                                                                            *
@@ -4144,7 +4219,7 @@ static void	DCsync_all(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	DCsync_history(ZBX_SYNC_FULL, &sync_num);
+	sync_history_cache(ZBX_SYNC_FULL, &sync_num);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 

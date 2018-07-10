@@ -61,16 +61,28 @@ foreach ($this->data['items'] as $item) {
 	$description = [];
 	if (!empty($item['templateid'])) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
-		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
-		$description[] = (new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId))
+		$description[] = (new CLink($template_host['name'],
+			(new CUrl('disc_prototypes.php'))
+				->setArgument('parent_discoveryid',
+					get_realrule_by_itemid_and_hostid($data['parent_discoveryid'], $template_host['hostid'])
+				)
+				->getUrl()
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		$link = ($item['master_item']['source'] === 'itemprototypes')
+			? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
+
 		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-			'?form=update&parent_discoveryid='.$data['parent_discoveryid'].'&itemid='.$item['master_item']['itemid']
+			$link
+				->setArgument('form', 'update')
+				->setArgument('itemid', $item['master_item']['itemid'])
+				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_TEAL);
@@ -79,17 +91,23 @@ foreach ($this->data['items'] as $item) {
 
 	$description[] = new CLink(
 		$item['name_expanded'],
-		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('itemid', $item['itemid'])
+			->getUrl()
 	);
 
 	$status = (new CLink(
 		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes'),
-		'?group_itemid[]='.$item['itemid'].
-			'&parent_discoveryid='.$this->data['parent_discoveryid'].
-			'&action='.(($item['status'] == ITEM_STATUS_DISABLED)
+		(new CUrl('disc_prototypes.php'))
+			->setArgument('group_itemid[]', $item['itemid'])
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+			->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
 			)
+			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status']))
