@@ -1790,7 +1790,8 @@ static void	save_event_suppress_data()
 		get_functionids(&query->functionids, events[i].trigger.recovery_expression);
 
 		zbx_vector_ptr_create(&query->tags);
-		zbx_vector_ptr_append_array(&query->tags, events[i].tags.values, events[i].tags.values_num);
+		if (0 != events[i].tags.values_num)
+			zbx_vector_ptr_append_array(&query->tags, events[i].tags.values, events[i].tags.values_num);
 
 		zbx_vector_uint64_pair_create(&query->maintenances);
 
