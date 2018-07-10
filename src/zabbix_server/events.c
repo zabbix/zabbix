@@ -1807,6 +1807,9 @@ static void	save_event_suppress_data()
 	{
 		zbx_db_lock_maintenanceids(&maintenanceids);
 
+		if (0 == maintenanceids->values_num)
+			goto cleanup;
+
 		/* get maintenance data and save it in database */
 		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, &maintenanceids))
 		{
@@ -1843,7 +1846,7 @@ static void	save_event_suppress_data()
 		}
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
-
+cleanup:
 	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_ptr_destroy(&event_queries);
 out:

@@ -487,6 +487,9 @@ static void	db_update_event_suppress_data(int revision, int *suppressed_num)
 		DBbegin();
 
 		zbx_db_lock_maintenanceids(&maintenanceids);
+		if (0 == maintenanceids->values_num)
+			goto cleanup;
+
 		zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",

@@ -24,9 +24,17 @@
  *                                                                            *
  * Function: zbx_db_lock_maintenanceids                                       *
  *                                                                            *
- * Purpose: lock maintenances in base                                         *
+ * Purpose: lock maintenances in database                                     *
  *                                                                            *
  * Parameters: maintenanceids - [IN/OUT] the maintenance ids                  *
+ *                                 IN - the maintenances to lock              *
+ *                                 OUT - the locked maintenances              *
+ *                                                                            *
+ * Comments: This function locks maintenances in database to avoid foreign    *
+ *           key errors when a maintenance is removed in the middle of        *
+ *           processing.                                                      *
+ *           The output vector might contain less values than input vector if *
+ *           a maintenance was removed before lock attempt.                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
