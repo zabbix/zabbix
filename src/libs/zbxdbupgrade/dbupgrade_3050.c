@@ -1579,7 +1579,7 @@ static int	DBpatch_3050125(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	const ZBX_FIELD	field = {"http_strip_domains", "0", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"http_strip_domains", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
