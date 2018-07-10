@@ -1568,19 +1568,24 @@ static int	DBpatch_3050125(void)
 
 static int	DBpatch_3050126(void)
 {
+	return DBcreate_index("event_suppress", "event_suppress_3", "maintenanceid", 0);
+}
+
+static int	DBpatch_3050127(void)
+{
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 1, &field);
 }
 
-static int	DBpatch_3050127(void)
+static int	DBpatch_3050128(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 2, &field);
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050129(void)
 {
 	const ZBX_TABLE table =
 		{"maintenance_tag",	"maintenancetagid",	0,
@@ -1598,33 +1603,33 @@ static int	DBpatch_3050128(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050129(void)
+static int	DBpatch_3050130(void)
 {
 	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
 }
 
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050131(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("maintenance_tag", 1, &field);
 }
 
-static int	DBpatch_3050131(void)
+static int	DBpatch_3050132(void)
 {
 	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
 
-static int	DBpatch_3050132(void)
+static int	DBpatch_3050133(void)
 {
 	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("maintenances", &field);
 }
 
-static int	DBpatch_3050133(void)
+static int	DBpatch_3050134(void)
 {
 	int		ret;
 
@@ -1641,7 +1646,7 @@ static int	DBpatch_3050133(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050134(void)
+static int	DBpatch_3050135(void)
 {
 	int		ret;
 
@@ -1658,8 +1663,7 @@ static int	DBpatch_3050134(void)
 	return SUCCEED;
 }
 
-
-static int	DBpatch_3050135(void)
+static int	DBpatch_3050136(void)
 {
 	int		ret;
 
@@ -1680,7 +1684,7 @@ static int	DBpatch_3050135(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050136(void)
+static int	DBpatch_3050137(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1856,5 +1860,7 @@ DBPATCH_ADD(3050133, 0, 1)
 DBPATCH_ADD(3050134, 0, 1)
 DBPATCH_ADD(3050135, 0, 1)
 DBPATCH_ADD(3050136, 0, 1)
+DBPATCH_ADD(3050137, 0, 1)
 
 DBPATCH_END()
+

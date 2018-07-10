@@ -1631,6 +1631,7 @@ FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
 UNIQUE		|1		|eventid,maintenanceid
 INDEX		|2		|suppress_until
+INDEX		|3		|maintenanceid
 
 TABLE|maintenance_tag|maintenancetagid|ZBX_DATA
 FIELD		|maintenancetagid|t_id		|	|NOT NULL	|0
@@ -1643,4 +1644,4 @@ INDEX|1|maintenanceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050136	|3050136
+ROW		|3050137	|3050137
