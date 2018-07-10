@@ -80,10 +80,9 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (502, 9, 20, 1, '20001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (503, 9, 20, 0, '20000');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (504, 10, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (505, 11, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (506, 12, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (507, 12, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (504, 10, 16, 11, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (505, 11, 16, 11, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (507, 12, 16, 10, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (508, 12, 15, 3, 'PostgreSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (509, 12, 15, 2, 'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (510, 12, 15, 0, 'MySQL');
@@ -104,8 +103,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (530, 13, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (531, 13, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (530, 13, 16, 11, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (532, 13, 15, 3, 'PostgreSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (533, 13, 15, 2, 'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (534, 13, 15, 0, 'MySQL');
@@ -126,8 +124,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 0, 0, '2');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (554, 14, 16, 7, '');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (555, 14, 16, 4, '');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (554, 14, 16, 11, '');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (556, 14, 15, 3, 'PostgreSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (557, 14, 15, 2, 'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (558, 14, 15, 0, 'MySQL');

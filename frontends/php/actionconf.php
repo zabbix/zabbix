@@ -90,7 +90,7 @@ $fields = [
 	'maintenance_mode' =>				[T_ZBX_STR, O_OPT, null,
 											IN([ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]),
 											null,
-											_('Pause operations while in maintenance')
+											_('Pause operations for suppressed problems')
 										],
 	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -262,8 +262,8 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 	if ($newCondition) {
 		$conditions = getRequest('conditions', []);
 
-		// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
-		if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+		// when adding new condition, in order to check for an existing condition, it must have a not null value
+		if ($newCondition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
 			$newCondition['value'] = '';
 		}
 
