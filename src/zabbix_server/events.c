@@ -1769,7 +1769,7 @@ static void	save_event_suppress_data()
 
 	zbx_vector_uint64_create(&maintenanceids);
 
-	if (SUCCEED == zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+	if (SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
 		goto out;
 
 	zbx_vector_ptr_create(&event_queries);
