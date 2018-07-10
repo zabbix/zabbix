@@ -628,7 +628,8 @@ static int	update_host_maintenances()
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 	double		sec = 0.0;
-	int		maintenance_time, update_time = 0, idle = 1, events_num, hosts_num, modified_num, stopped_num;
+	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, modified_num,
+			stopped_num;
 	char		*info = NULL;
 	size_t		info_alloc = 0, info_offset = 0;
 	zbx_uint64_t	update_revision, maintenance_revision = 0;
@@ -653,10 +654,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	maintenance_time = 0;
 
 	for (;;)
 	{
@@ -666,7 +664,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		{
 			if (sec - maintenance_time >= ZBX_TIMER_DELAY)
 			{
-
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
