@@ -2616,6 +2616,12 @@ $icon-widget-btn: (
 			display: inline-block;
 			vertical-align: baseline;
 			padding: 0 0 0 10px;
+
+			.icon-cal {
+				position: relative;
+				vertical-align: middle;
+				margin-left: 2px;
+			}
 		}
 	}
 
