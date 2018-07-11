@@ -1603,7 +1603,10 @@ static int	DBpatch_3050127(void)
 
 	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
 	res = DBexecute(
-		"update config set authentication_type=0, http_auth_enabled=1 where authentication_type=2");
+		"update config"
+		" set authentication_type=0,"
+		"  http_auth_enabled=1"
+		" where authentication_type=2");
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
@@ -1619,8 +1622,9 @@ static int	DBpatch_3050128(void)
 		return SUCCEED;
 
 	/* New GUI access type is added GROUP_GUI_ACCESS_LDAP, update value of GROUP_GUI_ACCESS_DISABLED. */
-	res = DBexecute(
-		"update usrgrp set gui_access=3 where gui_access=2");
+	/* 2 - old value of GROUP_GUI_ACCESS_DISABLED */
+	/* 3 - new value of GROUP_GUI_ACCESS_DISABLED */
+	res = DBexecute("update usrgrp set gui_access=3 where gui_access=2");
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
