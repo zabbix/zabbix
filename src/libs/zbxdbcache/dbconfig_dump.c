@@ -1009,8 +1009,11 @@ static void	DCdump_maintenance_groups(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_uint64_create(&index);
 
-	zbx_vector_uint64_append_array(&index, maintenance->groupids.values, maintenance->groupids.values_num);
-	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 != maintenance->groupids.values)
+	{
+		zbx_vector_uint64_append_array(&index, maintenance->groupids.values, maintenance->groupids.values_num);
+		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "  groups:");
 
@@ -1027,8 +1030,11 @@ static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_uint64_create(&index);
 
-	zbx_vector_uint64_append_array(&index, maintenance->hostids.values, maintenance->hostids.values_num);
-	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 != maintenance->hostids.values)
+	{
+		zbx_vector_uint64_append_array(&index, maintenance->hostids.values, maintenance->hostids.values_num);
+		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "  hosts:");
 
@@ -1062,8 +1068,11 @@ static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_ptr_create(&index);
 
-	zbx_vector_ptr_append_array(&index, maintenance->tags.values, maintenance->tags.values_num);
-	zbx_vector_ptr_sort(&index, maintenance_tag_compare);
+	if (0 != maintenance->tags.values)
+	{
+		zbx_vector_ptr_append_array(&index, maintenance->tags.values, maintenance->tags.values_num);
+		zbx_vector_ptr_sort(&index, maintenance_tag_compare);
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
 
