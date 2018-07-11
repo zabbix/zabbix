@@ -582,7 +582,7 @@ out:
  * Purpose: update host maintenance parameters in cache and database          *
  *                                                                            *
  ******************************************************************************/
-static int	update_host_maintenances()
+static int	update_host_maintenances(void)
 {
 	zbx_vector_uint64_t	maintenanceids;
 	zbx_vector_ptr_t	updates;
@@ -664,6 +664,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				if (0 != modified_num)
 					hosts_num = update_host_maintenances();
+				else
+					hosts_num = 0;
 
 				db_remove_expired_event_suppress_data((int)sec);
 
