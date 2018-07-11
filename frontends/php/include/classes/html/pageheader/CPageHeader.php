@@ -64,7 +64,7 @@ class CPageHeader {
 	 */
 	public function __construct($title = '') {
 		$this->title = CHtml::encode($title);
-		$this->sid = substr(get_cookie('zbx_sessionid'), 16, 16);
+		$this->sid = substr(get_cookie(ZBX_SESSION_NAME), 16, 16);
 	}
 
 	/**

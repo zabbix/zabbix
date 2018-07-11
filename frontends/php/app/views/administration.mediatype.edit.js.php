@@ -30,6 +30,8 @@
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
 					setMaxSessionsType(media_type);
+
+					$('#passwd').parent().prev().find('label').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -57,6 +59,8 @@
 						.hide();
 					$('#eztext_link').hide();
 					setMaxSessionsType(media_type);
+
+					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
@@ -66,6 +70,8 @@
 						.closest('li')
 						.hide();
 					setMaxSessionsType(media_type);
+
+					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 			}
 		});

@@ -2468,12 +2468,6 @@ return [
 				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid',
 			],
-			'event_ack_enable' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 			'default_theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4879,6 +4873,12 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'trends' => [
@@ -5000,6 +5000,18 @@ return [
 				'default' => '',
 			],
 			'action' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'old_severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'new_severity' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -6441,6 +6453,18 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => '',
+			],
+			'acknowledged' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
