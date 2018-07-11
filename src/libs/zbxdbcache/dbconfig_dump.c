@@ -113,8 +113,9 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 		/* timestamp of last availability status (available/error) field change on any interface */
 		zabbix_log(LOG_LEVEL_TRACE, "  availability_ts:%d", host->availability_ts);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  maintenance_status:%u maintenance_type:%u maintenance_from:%d",
-				host->maintenance_status, host->maintenance_type, host->maintenance_from);
+		zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64 " maintenance_status:%u maintenance_type:%u"
+				" maintenance_from:%d", host->maintenanceid, host->maintenance_status,
+				host->maintenance_type, host->maintenance_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  number of items: zabbix:%d snmp:%d ipmi:%d jmx:%d", host->items_num,
 				host->snmp_items_num, host->ipmi_items_num, host->jmx_items_num);
