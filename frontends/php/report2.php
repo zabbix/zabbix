@@ -106,12 +106,6 @@ if (!hasRequest('filter_rst')) {
 	$_REQUEST['filter_hostid'] = getRequest('filter_hostid',
 		CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0)
 	);
-	$_REQUEST['filter_timesince'] = getRequest('filter_timesince',
-		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0)
-	);
-	$_REQUEST['filter_timetill'] = getRequest('filter_timetill',
-		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0)
-	);
 
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		$_REQUEST['tpl_triggerid'] = getRequest('tpl_triggerid',
@@ -142,7 +136,7 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 }
 
 $timeselector_options = [
-	'profileIdx' => 'web.avail_report.'.$availabilityReportMode,
+	'profileIdx' => 'web.avail_report.filter',
 	'profileIdx2' => 0,
 	'from' => getRequest('from'),
 	'to' => getRequest('to')
@@ -421,7 +415,7 @@ elseif (hasRequest('filter_hostid')) {
 
 	$reportWidget->addItem(
 		(new CFilter())
-			->setProfile('web.avail_report.filter')
+			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
 			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'])
