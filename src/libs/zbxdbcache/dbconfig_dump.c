@@ -1010,7 +1010,7 @@ static void	DCdump_maintenance_groups(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_uint64_create(&index);
 
-	if (0 != maintenance->groupids.values)
+	if (0 != maintenance->groupids.values_num)
 	{
 		zbx_vector_uint64_append_array(&index, maintenance->groupids.values, maintenance->groupids.values_num);
 		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1031,7 +1031,7 @@ static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_uint64_create(&index);
 
-	if (0 != maintenance->hostids.values)
+	if (0 != maintenance->hostids.values_num)
 	{
 		zbx_vector_uint64_append_array(&index, maintenance->hostids.values, maintenance->hostids.values_num);
 		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
