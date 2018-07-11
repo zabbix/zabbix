@@ -1807,7 +1807,7 @@ static void	save_event_suppress_data()
 	{
 		zbx_db_lock_maintenanceids(&maintenanceids);
 
-		if (0 == maintenanceids->values_num)
+		if (0 == maintenanceids.values_num)
 			goto cleanup;
 
 		/* get maintenance data and save it in database */
