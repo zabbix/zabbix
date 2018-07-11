@@ -1805,32 +1805,40 @@ static void	save_event_suppress_data()
 
 	if (0 != event_queries.values_num)
 	{
-		zbx_db_lock_maintenanceids(&maintenanceids);
-
-		if (0 == maintenanceids.values_num)
-			goto cleanup;
+		zbx_db_insert_t	db_insert;
 
 		/* get maintenance data and save it in database */
-		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, &maintenanceids))
+		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, &maintenanceids) &&
+				SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
 		{
-			zbx_db_insert_t	db_insert;
-
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
 					"maintenanceid", "suppress_until", NULL);
 
 			for (k = 0; k < event_queries.values_num; k++)
 			{
+				unsigned char	suppressed = EVENT_SUPPRESSED_FALSE;
+
 				query = (zbx_event_suppress_query_t *)event_queries.values[k];
 
 				for (j = 0; j < query->maintenances.values_num; j++)
 				{
+					/* when locking maintenances not-locked (deleted) maintenance ids */
+					/* are removeved from the maintenanceids vector                   */
+					if (FAIL == zbx_vector_uint64_bsearch(&maintenanceids,
+							query->maintenances.values[j].first,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					{
+						continue;
+					}
+
 					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
 							query->maintenances.values[j].first,
 							(int)query->maintenances.values[j].second);
+
+					suppressed = EVENT_SUPPRESSED_TRUE;
 				}
 
-				((DB_EVENT *)event_refs.values[k])->suppressed = (0 == query->maintenances.values_num ?
-						EVENT_SUPPRESSED_FALSE : EVENT_SUPPRESSED_TRUE);
+				((DB_EVENT *)event_refs.values[k])->suppressed = suppressed;
 			}
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
@@ -1846,7 +1854,7 @@ static void	save_event_suppress_data()
 		}
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
-cleanup:
+
 	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_ptr_destroy(&event_queries);
 out:

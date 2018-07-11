@@ -30,6 +30,11 @@
  *                                 IN - the maintenances to lock              *
  *                                 OUT - the locked maintenances              *
  *                                                                            *
+ * Return value: SUCCEED - at least one maintenance was locked                *
+ *               FAIL    - no maintenances were locked (all target            *
+ *                         maintenances were removed by user and              *
+ *                         configuration cache was not yet updated)           *
+ *                                                                            *
  * Comments: This function locks maintenances in database to avoid foreign    *
  *           key errors when a maintenance is removed in the middle of        *
  *           processing.                                                      *
@@ -37,7 +42,7 @@
  *           a maintenance was removed before lock attempt.                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
+int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -67,4 +72,6 @@ void	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 		i++;
 	}
 	DBfree_result(result);
+
+	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
