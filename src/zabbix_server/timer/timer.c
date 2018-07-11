@@ -586,7 +586,7 @@ static int	update_host_maintenances()
 {
 	zbx_vector_uint64_t	maintenanceids;
 	zbx_vector_ptr_t	updates;
-	int			hosts_num;
+	int			hosts_num = 0;
 	int			tnx_error;
 
 	zbx_vector_uint64_create(&maintenanceids);
