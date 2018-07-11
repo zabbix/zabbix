@@ -52,6 +52,13 @@ $filter = (new CFilter())
 					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 					->setModern(true)
 			)
+			->addRow(_('Value'),
+				(new CRadioButtonList('filter_value', (int) $this->data['filter_value']))
+					->addValue(_('all'), -1)
+					->addValue(_('OK'), TRIGGER_VALUE_FALSE)
+					->addValue(_('PROBLEM'), TRIGGER_VALUE_TRUE)
+					->setModern(true)
+			)
 	]);
 
 $widget = (new CWidget())
@@ -101,6 +108,7 @@ $triggersTable = (new CTableInfo())
 			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
+		_('Value'),
 		($this->data['hostid'] == 0) ? _('Host') : null,
 		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
 		_('Expression'),
@@ -226,9 +234,23 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$expression = $trigger['expression'];
 	}
 
+	// value
+	$valueSpan = new CSpan(trigger_value2str($trigger['value']));
+	//$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
+	$is_acknowledged = false;
+
+	// add colors and blinking to span depending on configuration and trigger parameters
+	addTriggerValueStyle(
+		$valueSpan,
+		$trigger['value'],
+		$trigger['lastchange'],
+		$is_acknowledged
+	);
+
 	$triggersTable->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		getSeverityCell($trigger['priority'], $this->data['config']),
+		$valueSpan,
 		$hosts,
 		$description,
 		$expression,

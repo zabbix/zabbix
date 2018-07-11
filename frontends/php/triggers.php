@@ -80,6 +80,8 @@ $fields = [
 	'filter_status' =>							[T_ZBX_INT, O_OPT, null,
 		IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
 	],
+	'filter_value' =>							[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), null],
+
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -605,17 +607,20 @@ else {
 		CProfile::update('web.triggers.filter_priority', getRequest('filter_priority', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.triggers.filter_value', getRequest('filter_value', -1), PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.triggers.filter_priority');
 		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
+		CProfile::delete('web.triggers.filter_value');
 	}
 
 	$data = [
 		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),
 		'filter_state' => CProfile::get('web.triggers.filter_state', -1),
 		'filter_status' => CProfile::get('web.triggers.filter_status', -1),
+		'filter_value' => CProfile::get('web.triggers.filter_value', -1),
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
@@ -670,6 +675,9 @@ else {
 				}
 		}
 
+		if ($data['filter_value'] != -1) {
+			$options['filter']['value'] = $data['filter_value'];
+		}
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
@@ -698,7 +706,7 @@ else {
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
-			'recovery_mode', 'recovery_expression'
+			'recovery_mode', 'recovery_expression', 'value', 'lastchange'
 		],
 		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectDependencies' => ['triggerid', 'description'],
