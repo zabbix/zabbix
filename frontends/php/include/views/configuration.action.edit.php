@@ -418,8 +418,8 @@ $operation_tab
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab->addRow(_('Pause operations for suppressed problems'),
-		(new CCheckBox('maintenance_mode', ACTION_MAINTENANCE_MODE_PAUSE))
-			->setChecked($data['action']['maintenance_mode'] == ACTION_MAINTENANCE_MODE_PAUSE)
+		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED))
+			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED)
 	);
 }
 

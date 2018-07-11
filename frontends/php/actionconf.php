@@ -87,8 +87,8 @@ $fields = [
 	'cancel_new_ack_operation' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'maintenance_mode' =>				[T_ZBX_STR, O_OPT, null,
-											IN([ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]),
+	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
+											IN([ACTION_DONT_PAUSE_SUPPRESSED, ACTION_PAUSE_SUPPRESSED]),
 											null,
 											_('Pause operations for suppressed problems')
 										],
@@ -211,7 +211,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-		$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
+		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_DONT_PAUSE_SUPPRESSED);
 	}
 
 	DBstart();
@@ -618,7 +618,7 @@ if (hasRequest('form')) {
 			$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
+				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_DONT_PAUSE_SUPPRESSED);
 			}
 		}
 		else {
@@ -629,8 +629,8 @@ if (hasRequest('form')) {
 				$data['action']['r_longdata'] = getRequest('r_longdata', ACTION_DEFAULT_MSG_RECOVERY);
 				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', ACTION_DEFAULT_SUBJ_ACKNOWLEDGE);
 				$data['action']['ack_longdata'] = getRequest('ack_longdata', ACTION_DEFAULT_MSG_ACKNOWLEDGE);
-				$data['action']['maintenance_mode'] = getRequest('maintenance_mode',
-					hasRequest('form_refresh') ? ACTION_MAINTENANCE_MODE_NORMAL : ACTION_MAINTENANCE_MODE_PAUSE
+				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
+					hasRequest('form_refresh') ? ACTION_DONT_PAUSE_SUPPRESSED : ACTION_PAUSE_SUPPRESSED
 				);
 			}
 			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
