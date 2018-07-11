@@ -383,7 +383,7 @@ class CEvent extends CApiService {
 					'EXISTS ('.
 						'SELECT NULL'.
 						' FROM event_suppress es'.
-						' WHERE es.eventid=p.eventid'.
+						' WHERE es.eventid=e.eventid'.
 					')';
 		}
 
@@ -959,11 +959,11 @@ class CEvent extends CApiService {
 			if ($suppressed_eventids) {
 				$suppressed_events = API::getApiService()->select('event_suppress', [
 					'output' => ['eventid'],
-					'filter' => ['eventid' => $suppressed_eventids],
-					'preservekeys' => true
+					'filter' => ['eventid' => $suppressed_eventids]
 				]);
+				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
 				foreach ($result as &$event) {
-					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_events)
+					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
 						? EVENT_SUPPRESSED
 						: EVENT_NOT_SUPPRESSED;
 				}
@@ -1133,7 +1133,7 @@ class CEvent extends CApiService {
 			$relation_map = $this->createRelationMap($result, 'eventid', 'maintenanceid', 'event_suppress');
 			$suppression_data = API::getApiService()->select('event_suppress', [
 				'output' => $options['selectSuppressionData'],
-				'filter' => ['eventid' => $relation_map->getRelatedIds()],
+				'filter' => ['maintenanceid' => $relation_map->getRelatedIds()],
 				'preservekeys' => true
 			]);
 			$result = $relation_map->mapOne($result, $suppression_data, 'suppression_data');

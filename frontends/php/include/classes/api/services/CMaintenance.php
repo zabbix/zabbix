@@ -1012,7 +1012,7 @@ class CMaintenance extends CApiService {
 			$relation_map = $this->createRelationMap($result, 'maintenanceid', 'maintenancetagid', 'maintenance_tag');
 			$tags = API::getApiService()->select('maintenance_tag', [
 				'output' => $options['selectTags'],
-				'filter' => ['maintenanceid' => $relation_map->getRelatedIds()],
+				'filter' => ['maintenancetagid' => $relation_map->getRelatedIds()],
 				'preservekeys' => true
 			]);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
