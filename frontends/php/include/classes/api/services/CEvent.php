@@ -552,11 +552,13 @@ class CEvent extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
 		}
 
-		$supressed_validator = new CLimitedSetValidator([
-			'values' => [EVENT_NOT_SUPPRESSED, EVENT_SUPPRESSED]
-		]);
-		if (!$supressed_validator->validate($options['suppressed'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect suppressed value.'));
+		if ($options['suppressed'] !== null) {
+			$suppressed_validator = new CLimitedSetValidator([
+				'values' => [EVENT_NOT_SUPPRESSED, EVENT_SUPPRESSED]
+			]);
+			if (!$suppressed_validator->validate($options['suppressed'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect suppressed value.'));
+			}
 		}
 	}
 
