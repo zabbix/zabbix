@@ -654,9 +654,9 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
 
-/* action maintenance mode */
-#define ACTION_MAINTENANCE_MODE_NORMAL	0	/* ignore maintenance */
-#define ACTION_MAINTENANCE_MODE_PAUSE	1	/* pause escalation while host is in maintenance */
+/* action escalation processing mode */
+#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3

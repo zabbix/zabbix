@@ -444,7 +444,7 @@ typedef struct
 	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
-	unsigned char	maintenance_mode;
+	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
 }

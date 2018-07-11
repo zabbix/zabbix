@@ -1631,6 +1631,13 @@ static int	DBpatch_3050133(void)
 
 static int	DBpatch_3050134(void)
 {
+	const ZBX_FIELD	field = {"pause_suppressed", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("actions", "maintenance_mode", &field);
+}
+
+static int	DBpatch_3050135(void)
+{
 	int		ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -1646,7 +1653,7 @@ static int	DBpatch_3050134(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050135(void)
+static int	DBpatch_3050136(void)
 {
 	int		ret;
 
@@ -1663,7 +1670,7 @@ static int	DBpatch_3050135(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050136(void)
+static int	DBpatch_3050137(void)
 {
 	int		ret;
 
@@ -1684,7 +1691,7 @@ static int	DBpatch_3050136(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050137(void)
+static int	DBpatch_3050138(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1861,6 +1868,7 @@ DBPATCH_ADD(3050134, 0, 1)
 DBPATCH_ADD(3050135, 0, 1)
 DBPATCH_ADD(3050136, 0, 1)
 DBPATCH_ADD(3050137, 0, 1)
+DBPATCH_ADD(3050138, 0, 1)
 
 DBPATCH_END()
 

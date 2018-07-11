@@ -1915,7 +1915,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
-			ACTION_MAINTENANCE_MODE_PAUSE == action->maintenance_mode &&
+			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
 			HOST_MAINTENANCE_STATUS_ON == maintenance &&
 			escalation->acknowledgeid == 0)
 	{
