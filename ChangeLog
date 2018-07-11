@@ -9,6 +9,7 @@ New features:
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+....I..... [ZBX-14370] fixed deleting of files after compiling a program (make clean) for Solaris (MVekslers)
 ..F....... [ZBX-14519] fixed displaying timeline points of days in Problems widget (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
 ..F....... [ZBX-12994] improved maintenance period translation strings in maintenance form (gcalenko)
@@ -394,6 +395,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-14370] fixed deleting of files after compiling a program (make clean) for Solaris (MVekslers)
 ..F....... [ZBX-14519] fixed displaying timeline points of days in Problems widget (vasilijs)
 ..F....... [ZBX-14491] fixed link "show value mappings", which leads to no permission page (vasilijs)
 ........S. [ZBX-12380] improved function parameter parsing for trigger functions (MVekslers)
