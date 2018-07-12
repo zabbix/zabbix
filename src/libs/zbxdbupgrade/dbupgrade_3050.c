@@ -1451,18 +1451,16 @@ static void	DBpatch_3050122_add_anchors(char *src, char **dst, const char *orig_
 		size_t param_len, size_t sep_pos, int quotes)
 {
 	char	*pin, *pout;
-	size_t	required_len, twsl;
+	size_t	required_len, twsl = 0;
 
 	/* calculate trailing whitespace length */
-	twsl = sep_pos - param_pos - param_len;
+	if (QUOTED_PARAM != quotes)
+		twsl = sep_pos - param_pos - param_len;
 
 	required_len = strlen(src);
 
 	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
-	if (QUOTED_PARAM == quotes)
-		*dst = (char *)zbx_malloc(NULL, required_len + 3);
-	else
-		*dst = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
+	*dst = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
 
 	pin = src;
 	pout = *dst;
