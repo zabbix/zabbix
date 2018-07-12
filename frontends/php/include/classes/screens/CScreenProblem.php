@@ -780,14 +780,18 @@ class CScreenProblem extends CScreenBase {
 							break;
 					}
 				}
+				$header = array_merge($header, [
+					$header_check_box,
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					)->addStyle('width: 120px;'),
+				]);
+				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+					$header[] = (new CColHeader(_('Recovery time')))->addStyle('width: 115px;');
+				}
 
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
-						$header_check_box,
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						)->addStyle('width: 120px;'),
-						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
@@ -803,13 +807,18 @@ class CScreenProblem extends CScreenBase {
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			}
 			else {
+				$header = array_merge($header, [
+					$header_check_box,
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					),
+				]);
+				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+					$header[] = (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH);
+				}
+
 				$table = (new CTableInfo())
 					->setHeader(array_merge($header, [
-						$header_check_box,
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						),
-						(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 						_('Status'),
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
@@ -965,6 +974,13 @@ class CScreenProblem extends CScreenBase {
 							->addClass(ZBX_STYLE_RIGHT)
 					];
 				}
+				$row = array_merge($row, [
+					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
+					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE)
+				]);
+				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+					$row[] = $cell_r_clock;
+				}
 
 				// Create acknowledge link.
 				$problem_update_url->setArgument('eventids', [$problem['eventid']]);
@@ -975,9 +991,6 @@ class CScreenProblem extends CScreenBase {
 
 				// Add table row.
 				$table->addRow(array_merge($row, [
-					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
-					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
-					$cell_r_clock,
 					$cell_status,
 					makeInformationList($info_icons),
 					$triggers_hosts[$trigger['triggerid']],
