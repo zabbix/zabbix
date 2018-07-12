@@ -32,29 +32,31 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'serviceid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'name' => 							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'algorithm' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'showsla' =>						[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
-	'goodsla' => 						[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')],
-	'sortorder' => 						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
-	'times' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
-	'triggerid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'trigger' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time_from' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
-	'new_service_time_till' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
-	'children' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'parentid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'parentname' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'serviceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'name' => 					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'algorithm' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
+	'showsla' =>				[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
+	'goodsla' => 				[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null,
+									_('Calculate SLA, acceptable SLA (in %)')
+								],
+	'sortorder' => 				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
+	'times' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'trigger' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time_from' =>	[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
+	'new_service_time_till' =>	[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
+	'children' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'parentid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'parentname' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_service_time' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_service_time' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	// others
-	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,	null,		null]
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null]
 ];
 check_fields($fields);
 

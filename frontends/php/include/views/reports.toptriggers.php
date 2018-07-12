@@ -30,7 +30,7 @@ foreach (range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1) as $
 		->setChecked(in_array($severity, $data['filter']['severities']));
 }
 
-$filterColumn = (new CFormList())
+$filter_column = (new CFormList())
 	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
 		(new CMultiSelect([
 			'name' => 'groupids[]',
@@ -71,7 +71,7 @@ $filterForm
 	->setProfile($data['filter']['timeline']['profileIdx'])
 	->setActiveTab($data['filter']['active_tab'])
 	->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], ZBX_DATE_TIME)
-	->addFilterTab(_('Filter'), [$filterColumn]);
+	->addFilterTab(_('Filter'), [$filter_column]);
 
 // table
 $table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);
@@ -96,7 +96,7 @@ foreach ($data['triggers'] as $trigger) {
 	]);
 }
 
-$objData = [
+$obj_data = [
 	'id' => 'timeline_1',
 	'domid' => 'toptriggers',
 	'loadSBox' => 0,
@@ -104,7 +104,7 @@ $objData = [
 	'dynamic' => 0,
 	'mainObject' => 1
 ];
-zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($objData).');');
+zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');');
 zbx_add_post_js('timeControl.processObjects();');
 
 return (new CWidget())

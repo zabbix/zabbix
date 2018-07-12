@@ -208,9 +208,11 @@ elseif (hasRequest('filter_hostid')) {
 	/*
 	 * Filter
 	 */
-	$data['filter'] = [
-		'timeline' => getTimeSelectorPeriod($timeselector_options),
-		'active_tab' => CProfile::get('web.avail_report.filter.active', 1)
+	$data = [
+		'filter' => [
+			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'active_tab' => CProfile::get('web.avail_report.filter.active', 1)
+		]
 	];
 
 	$filter_column = new CFormList();
@@ -463,7 +465,7 @@ elseif (hasRequest('filter_hostid')) {
 		]);
 	}
 
-	$objData = [
+	$obj_data = [
 		'id' => 'timeline_1',
 		'domid' => 'avail_report',
 		'loadSBox' => 0,
@@ -472,7 +474,7 @@ elseif (hasRequest('filter_hostid')) {
 		'mainObject' => 1
 	];
 	zbx_add_post_js(
-		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($objData).');'
+		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'
 	);
 	zbx_add_post_js('timeControl.processObjects();');
 
