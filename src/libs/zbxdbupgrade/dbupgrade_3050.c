@@ -1445,14 +1445,16 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
+#define	QUOTED_PARAM	1
+
 static int	DBpatch_3050122(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			ret = FAIL;
-	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
-	char			*unquoted_parameter = NULL, *processed_parameter = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = FAIL;
+	char		*sql = NULL, *parameter = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
+			*parameter_esc_anchored = NULL, *parameter_DB_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1460,44 +1462,44 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0,
-			unquoted_param_len, twsl;
-		int	quoted = 0;
+		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, twsl;
+		int	quotes;
 		char	*pin, *pout;
 
 		parameter = zbx_strdup(NULL, row[1]);
 		zbx_function_param_parse(parameter, &param_pos, &param_len, &sep_pos);
 
-		/* copy what was before the parameter */
+		/* copy what was before the parameter (leading whitespace)*/
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter, param_pos);
 
-		unquoted_parameter = zbx_function_param_unquote_dyn(parameter + param_pos, param_len, &quoted);
+		unquoted_parameter = zbx_function_param_unquote_dyn(parameter + param_pos, param_len, &quotes);
 
 		zbx_regexp_escape(&unquoted_parameter);
 
 		/* calculate trailing whitespace length */
 		twsl = sep_pos - param_pos - param_len;
 
-		unquoted_param_len = strlen(unquoted_parameter);
+		required_len = strlen(unquoted_parameter);
 
-		if (1 == quoted)
-			parameter_esc_anchored = (char *)zbx_malloc(NULL, unquoted_param_len + 3);
+		/* trailing whitespace is a part of unquoted regexp inside anchors */
+		if (QUOTED_PARAM == quotes)
+			parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3);
 		else
-			parameter_esc_anchored = (char *)zbx_malloc(NULL, unquoted_param_len + 3 + twsl);
+			parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
 
 		pin = unquoted_parameter;
 		pout = parameter_esc_anchored;
 
 		*pout++ = '^';		/* start anchor */
 
-		if (0 != unquoted_param_len)
+		if (0 != required_len)
 		{
-			memcpy(pout, pin, unquoted_param_len);
-			pout += unquoted_param_len;
+			memcpy(pout, pin, required_len);
+			pout += required_len;
 		}
 
 		/* for unquoted parameters copy what was after the parameter before adding appending $ */
-		if (0 == quoted)
+		if (QUOTED_PARAM != quotes)
 		{
 			memcpy(pout, parameter + param_pos + param_len, twsl);
 			pout += twsl;
@@ -1506,14 +1508,14 @@ static int	DBpatch_3050122(void)
 		*pout++ = '$';		/* end anchor */
 		*pout = '\0';
 
-		if (1 == quoted)
-			zbx_function_param_quote(&parameter_esc_anchored, quoted);
+		if (QUOTED_PARAM == quotes)
+			zbx_function_param_quote(&parameter_esc_anchored, quotes);
 
 		/* copy the parameter */
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
 
-		/* for quoted parameters copy what was after the parameter when parameter processing has been completed */
-		if (1 == quoted && 0 < sep_pos - param_pos + param_len)
+		/* for quoted parameters copy what was after the parameter and add that after quotes */
+		if (QUOTED_PARAM == quotes && 0 < sep_pos - param_pos + param_len)
 		{
 			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
 					parameter + param_pos + param_len, sep_pos - param_pos - param_len + 1);
@@ -1528,23 +1530,23 @@ static int	DBpatch_3050122(void)
 					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(parameter);
+			zbx_free(processed_parameter);
 			zbx_free(unquoted_parameter);
 			zbx_free(parameter_esc_anchored);
-			zbx_free(processed_parameter);
 			continue;
 		}
 
-		parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		parameter_DB_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
-				parameter_esc, row[0]);
+				parameter_DB_esc, row[0]);
 
 		zbx_free(parameter);
-		zbx_free(unquoted_parameter);
-		zbx_free(parameter_esc);
-		zbx_free(parameter_esc_anchored);
 		zbx_free(processed_parameter);
+		zbx_free(unquoted_parameter);
+		zbx_free(parameter_esc_anchored);
+		zbx_free(parameter_DB_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
