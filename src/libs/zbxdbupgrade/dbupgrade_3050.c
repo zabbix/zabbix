@@ -1447,6 +1447,45 @@ static int	DBpatch_3050121(void)
 
 #define	QUOTED_PARAM	1
 
+static void	DBpatch_3050122_add_anchors(char *src, char **dst, char *orig_param, size_t param_pos,
+		size_t param_len, size_t sep_pos, int quotes)
+{
+	char	*pin, *pout;
+	size_t	required_len, twsl;
+
+	/* calculate trailing whitespace length */
+	twsl = sep_pos - param_pos - param_len;
+
+	required_len = strlen(src);
+
+	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
+	if (QUOTED_PARAM == quotes)
+		*dst = (char *)zbx_malloc(NULL, required_len + 3);
+	else
+		*dst = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
+
+	pin = src;
+	pout = *dst;
+
+	*pout++ = '^';		/* start anchor */
+
+	if (0 != required_len)
+	{
+		memcpy(pout, pin, required_len);
+		pout += required_len;
+	}
+
+	/* for unquoted parameters copy what was after the parameter before adding appending $ */
+	if (QUOTED_PARAM != quotes)
+	{
+		memcpy(pout, orig_param + param_pos + param_len, twsl);
+		pout += twsl;
+	}
+
+	*pout++ = '$';		/* end anchor */
+	*pout = '\0';
+}
+
 static int	DBpatch_3050122(void)
 {
 	DB_ROW		row;
@@ -1462,9 +1501,8 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, twsl;
+		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
 		int	quotes;
-		char	*pin, *pout;
 
 		parameter = zbx_strdup(NULL, row[1]);
 		zbx_function_param_parse(parameter, &param_pos, &param_len, &sep_pos);
@@ -1476,37 +1514,8 @@ static int	DBpatch_3050122(void)
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		/* calculate trailing whitespace length */
-		twsl = sep_pos - param_pos - param_len;
-
-		required_len = strlen(unquoted_parameter);
-
-		/* trailing whitespace is a part of unquoted regexp inside anchors */
-		if (QUOTED_PARAM == quotes)
-			parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3);
-		else
-			parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
-
-		pin = unquoted_parameter;
-		pout = parameter_esc_anchored;
-
-		*pout++ = '^';		/* start anchor */
-
-		if (0 != required_len)
-		{
-			memcpy(pout, pin, required_len);
-			pout += required_len;
-		}
-
-		/* for unquoted parameters copy what was after the parameter before adding appending $ */
-		if (QUOTED_PARAM != quotes)
-		{
-			memcpy(pout, parameter + param_pos + param_len, twsl);
-			pout += twsl;
-		}
-
-		*pout++ = '$';		/* end anchor */
-		*pout = '\0';
+		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, parameter, param_pos, param_len,
+				sep_pos, quotes);
 
 		if (QUOTED_PARAM == quotes)
 			zbx_function_param_quote(&parameter_esc_anchored, quotes);
