@@ -1447,7 +1447,7 @@ static int	DBpatch_3050121(void)
 
 #define	QUOTED_PARAM	1
 
-static void	DBpatch_3050122_add_anchors(char *src, char **dst, char *orig_param, size_t param_pos,
+static void	DBpatch_3050122_add_anchors(char *src, char **dst, const char *orig_param, size_t param_pos,
 		size_t param_len, size_t sep_pos, int quotes)
 {
 	char	*pin, *pout;
