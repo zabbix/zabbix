@@ -86,7 +86,7 @@ class testPageHostPrototypes extends CWebTest {
 	 */
 	protected function checkPageAction($data, $action, $status = null) {
 		// Click on button with required action.
-		if ($action === 'xpath') {
+		if ($action === 'Click on state') {
 			foreach ($data['hosts'] as $host) {
 				$id = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host)));
 				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid=".$id['hostid']."')]");
@@ -162,7 +162,7 @@ class testPageHostPrototypes extends CWebTest {
 					'item' => 'Discovery rule 1',
 					'hosts' => [
 						'Host prototype {#2}'
-						],
+					],
 					'status' => HOST_STATUS_NOT_MONITORED
 				]
 			],
@@ -171,7 +171,7 @@ class testPageHostPrototypes extends CWebTest {
 					'item' => 'Discovery rule 1',
 					'hosts' => [
 						'Host prototype {#3}'
-						],
+					],
 					'status' => HOST_STATUS_MONITORED
 				]
 			]
@@ -185,6 +185,6 @@ class testPageHostPrototypes extends CWebTest {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
 		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
 
-		$this->checkPageAction($data, 'xpath', $data['status']);
+		$this->checkPageAction($data, 'Click on state', $data['status']);
 	}
 }
