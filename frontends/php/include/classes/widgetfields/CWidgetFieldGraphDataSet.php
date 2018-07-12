@@ -82,6 +82,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';'),
 						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
+							->setAttribute('placeholder', _('(pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -99,6 +100,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					]))->addClass(ZBX_STYLE_COLUMNS_6),
 					(new CDiv([
 						(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
+							->setAttribute('placeholder', _('(pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

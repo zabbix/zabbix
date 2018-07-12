@@ -279,17 +279,39 @@ class CControllerDashboardWidgetEdit extends CController {
 			$disabled = ($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 			if ($field instanceof CWidgetFieldComboBox) {
+				$html_field = (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
+					->setAriaRequired($aria_required)
+					->setEnabled(!$disabled);
+
+				if ($field->getAttribute('style') !== null) {
+					$html_field->addStyle($field->getAttribute('style'));
+				}
+				else {
+					$html_field->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+				}
+
 				$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
-					(new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
-						->setAriaRequired($aria_required)
-						->setEnabled(!$disabled)
+					$html_field
 				);
 			}
 			elseif ($field instanceof CWidgetFieldTextBox || $field instanceof CWidgetFieldUrl) {
+				$html_field = (new CTextBox($field->getName(), $field->getValue()))
+					->setAriaRequired($aria_required)
+					->setEnabled(!$disabled);
+
+				if ($field->getAttribute('style') !== null) {
+					$html_field->addStyle($field->getAttribute('style'));
+				}
+				else {
+					$html_field->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+				}
+
+				if ($field->getAttribute('placeholder') !== null) {
+					$html_field->setAttribute('placeholder', $field->getAttribute('placeholder'));
+				}
+
 				$form_list->addRow((new CLabel($field->getLabel(), $field->getName()))->setAsteriskMark($aria_required),
-					(new CTextBox($field->getName(), $field->getValue()))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-						->setAriaRequired($aria_required)
-						->setEnabled(!$disabled)
+					$html_field
 				);
 			}
 			elseif ($field instanceof CWidgetFieldCheckBox) {

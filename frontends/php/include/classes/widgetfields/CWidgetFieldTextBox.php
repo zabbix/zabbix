@@ -21,6 +21,8 @@
 
 class CWidgetFieldTextBox extends CWidgetField {
 
+	protected $attributes;
+
 	/**
 	 * Text box widget field.
 	 *
@@ -32,6 +34,7 @@ class CWidgetFieldTextBox extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setDefault('');
+		$this->attributes = [];
 	}
 
 	public function validate($strict = false) {
@@ -42,5 +45,14 @@ class CWidgetFieldTextBox extends CWidgetField {
 		}
 
 		return $errors;
+	}
+
+	public function setAttribute($name, $value) {
+		$this->attributes[$name] = $value;
+		return $this;
+	}
+
+	public function getAttribute($name) {
+		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
 	}
 }

@@ -21,6 +21,7 @@
 
 class CWidgetFieldComboBox extends CWidgetField {
 
+	protected $attributes;
 	protected $values;
 
 	/**
@@ -36,6 +37,7 @@ class CWidgetFieldComboBox extends CWidgetField {
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 		$this->values = $values;
 		$this->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this->attributes = [];
 	}
 
 	public function setValue($value) {
@@ -44,5 +46,14 @@ class CWidgetFieldComboBox extends CWidgetField {
 
 	public function getValues() {
 		return $this->values;
+	}
+
+	public function setAttribute($name, $value) {
+		$this->attributes[$name] = $value;
+		return $this;
+	}
+
+	public function getAttribute($name) {
+		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
 	}
 }

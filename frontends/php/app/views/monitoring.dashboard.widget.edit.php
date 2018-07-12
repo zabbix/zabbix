@@ -47,7 +47,8 @@ $form->addItem($form_list);
 if ($data['dialogue']['tabs']) {
 	$form_tabs = (new CTabView())
 		->addClass(ZBX_STYLE_TABS_LEFT_PADDING_15_PERCENTS) // TODO miks: ugly solution. Should make more pretty.
-		->addStyle('width: 1000px;'); // TODO miks: later graph preview will define actual width of window.
+		->addStyle('width: 1000px;') // TODO miks: later graph preview will define actual width of window.
+		->setSelected(0);
 
 	foreach ($data['dialogue']['tabs'] as $tab_key => $tab) {
 		$tab_form_list = new CFormList();

@@ -21,6 +21,8 @@
 
 class CWidgetFieldUrl extends CWidgetField {
 
+	protected $attributes;
+
 	/**
 	 * URL widget field.
 	 *
@@ -33,6 +35,7 @@ class CWidgetFieldUrl extends CWidgetField {
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
 		$this->setDefault('');
+		$this->attributes = [];
 	}
 
 	public function validate($strict = false) {
@@ -43,5 +46,14 @@ class CWidgetFieldUrl extends CWidgetField {
 		}
 
 		return $errors;
+	}
+
+	public function setAttribute($name, $value) {
+		$this->attributes[$name] = $value;
+		return $this;
+	}
+
+	public function getAttribute($name) {
+		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
 	}
 }

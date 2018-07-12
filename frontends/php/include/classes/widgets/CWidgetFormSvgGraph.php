@@ -127,7 +127,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Date from.
 		$field_time_from = new CWidgetFieldDatePicker('time_from', 'From');
-		if ($field_time_mode->getValue() == SVG_GRAPH_CUSTOM_TIME) {
+		if ($field_time_mode->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_from->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('time_from', $this->data)) {
@@ -137,7 +137,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Time to.
 		$field_time_to = new CWidgetFieldDatePicker('time_to', 'To');
-		if ($field_time_mode->getValue() == SVG_GRAPH_CUSTOM_TIME) {
+		if ($field_time_mode->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_to->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('time_to', $this->data)) {
@@ -165,7 +165,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_left_y;
 
 		// Min value on left Y axis.
-		$field_left_y_min = new CWidgetFieldTextBox('lefty_min', _('Min'));
+		$field_left_y_min = (new CWidgetFieldTextBox('lefty_min', _('Min')))
+			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_left_y_min->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -175,7 +177,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_left_y_min;
 
 		// Max value on left Y axis.
-		$field_left_y_max = new CWidgetFieldTextBox('lefty_max', _('Max'));
+		$field_left_y_max = (new CWidgetFieldTextBox('lefty_max', _('Max')))
+			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_left_y_max->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -190,6 +194,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;')
 			->setAction('jQuery("#lefty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
@@ -201,7 +206,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_left_y_units;
 
 		// Static units on left Y axis.
-		$field_left_y_static_units = new CWidgetFieldTextBox('lefty_static_units', null);
+		$field_left_y_static_units = (new CWidgetFieldTextBox('lefty_static_units', null))
+			->setAttribute('placeholder', _('(value)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW
 				|| $field_left_y_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
 			$field_left_y_static_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -226,7 +233,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_right_y;
 
 		// Min value on right Y axis.
-		$field_right_y_min = new CWidgetFieldTextBox('righty_min', _('Min'));
+		$field_right_y_min = (new CWidgetFieldTextBox('righty_min', _('Min')))
+			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_right_y_min->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -236,7 +245,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_right_y_min;
 
 		// Max value on right Y axis.
-		$field_right_y_max = new CWidgetFieldTextBox('righty_max', _('Max'));
+		$field_right_y_max = (new CWidgetFieldTextBox('righty_max', _('Max')))
+			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_right_y_max->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -251,6 +262,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;')
 			->setAction('jQuery("#righty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
@@ -262,7 +274,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['axes']['fields'][] = $field_right_y_units;
 
 		// Static units on right Y axis.
-		$field_right_y_static_units = new CWidgetFieldTextBox('righty_static_units', null);
+		$field_right_y_static_units = (new CWidgetFieldTextBox('righty_static_units', null))
+			->setAttribute('placeholder', _('(value)'))
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW
 				|| $field_right_y_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
 			$field_right_y_static_units->setFlags(CWidgetField::FLAG_DISABLED);
@@ -322,7 +336,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['problems']['fields'][] = $field_problems;
 
 		// Problem hosts.
-		$field_problem_hosts = new CWidgetFieldTextBox('problem_hosts', _('Hosts'));
+		$field_problem_hosts = (new CWidgetFieldTextBox('problem_hosts', _('Hosts')))
+			->setAttribute('placeholder', _('(pattern)'));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -343,7 +358,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->tabs['problems']['fields'][] = $field_severities;
 
 		// Problem name input-text field.
-		$field_problem_name = new CWidgetFieldTextBox('problem_name', _('Problem'));
+		$field_problem_name = (new CWidgetFieldTextBox('problem_name', _('Problem')))
+			->setAttribute('placeholder', _('(pattern)'));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_name->setFlags(CWidgetField::FLAG_DISABLED);
 		}

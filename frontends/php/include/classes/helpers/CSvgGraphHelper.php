@@ -69,15 +69,7 @@ class CSvgGraphHelper {
 		// Draw SVG graph using what's left in $options as well as newly made arrays $metrics and $problems.
 		return [
 			// Demo SVG.
-			'svg' => (new CTag('svg', true))
-						->setAttribute('viewBox', '0 0 500 100')
-						->addItem(
-							(new CTag('polyline', true))
-								->setAttribute('fill', 'none')
-								->setAttribute('stroke', '#0074d9')
-								->setAttribute('stroke-width', 2)
-								->setAttribute('points', '00,120 20,60 40,80 60,20 80,80 100,80 120,60 140,100 160,90 180,80 200, 110 220, 10 240, 70 260, 100 280, 100 300, 40 320, 0 340, 100 360, 100 380, 120 400, 60 420, 70 440, 80')
-						),
+			'svg' => '',
 			'errors' => $errors
 		];
 	}
