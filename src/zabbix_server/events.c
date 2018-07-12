@@ -1765,16 +1765,11 @@ static void	save_event_suppress_data()
 	int				j, k;
 	size_t				i;
 
-	/* prepare query data  */
-
 	zbx_vector_uint64_create(&maintenanceids);
-
-	if (SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
-		goto out;
-
-	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_refs);
+	zbx_vector_ptr_reserve(&event_refs, events_num);
 
+	/* prepare trigger problem event vector */
 	for (i = 0; i < events_num; i++)
 	{
 		if (0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
@@ -1786,21 +1781,34 @@ static void	save_event_suppress_data()
 		if (TRIGGER_VALUE_PROBLEM != events[i].value)
 			continue;
 
+		zbx_vector_ptr_append(&event_refs, &events[i]);
+	}
+
+	if (0 == event_refs.values_num || SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+		goto out;
+
+	/* prepare query data  */
+
+	zbx_vector_ptr_create(&event_queries);
+
+	for (j = 0; j < event_refs.values_num; j++)
+	{
+		DB_EVENT	*event = (DB_EVENT *)event_refs.values[j];
+
 		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
-		query->eventid = events[i].eventid;
+		query->eventid = event->eventid;
 
 		zbx_vector_uint64_create(&query->functionids);
-		get_functionids(&query->functionids, events[i].trigger.expression);
-		get_functionids(&query->functionids, events[i].trigger.recovery_expression);
+		get_functionids(&query->functionids, event->trigger.expression);
+		get_functionids(&query->functionids, event->trigger.recovery_expression);
 
 		zbx_vector_ptr_create(&query->tags);
-		if (0 != events[i].tags.values_num)
-			zbx_vector_ptr_append_array(&query->tags, events[i].tags.values, events[i].tags.values_num);
+		if (0 != event->tags.values_num)
+			zbx_vector_ptr_append_array(&query->tags, event->tags.values, event->tags.values_num);
 
 		zbx_vector_uint64_pair_create(&query->maintenances);
 
 		zbx_vector_ptr_append(&event_queries, query);
-		zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
 	if (0 != event_queries.values_num)
@@ -1855,9 +1863,9 @@ static void	save_event_suppress_data()
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	}
 
-	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_ptr_destroy(&event_queries);
 out:
+	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_uint64_destroy(&maintenanceids);
 }
 
