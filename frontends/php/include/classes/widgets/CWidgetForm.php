@@ -140,7 +140,7 @@ class CWidgetForm {
 
 		foreach ($this->tabs as $tab) {
 			foreach ($tab['fields'] as $field) {
-				$errors = array_merge($errors, $field->validate($strict));
+				$data[$field->getName()] = $field->getValue();
 			}
 		}
 

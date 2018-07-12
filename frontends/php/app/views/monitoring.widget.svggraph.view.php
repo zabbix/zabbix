@@ -15,34 +15,24 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetFieldEmbed extends CWidgetField {
-	protected $item;
+$output = [
+	'header' => $data['name'],
+	'body' => (new CDiv($data['svg']))->toString(),
+	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
+	'script_inline' => $data['script_inline']
+];
 
-	/**
-	 * HTML Embed element (not a field).
-	 *
-	 * This class is temporary solution to make graph preview available in widget configuration window.
-	 *
-	 * @param object $item   Item to embed.
-	 */
-	public function __construct($item) {
-		$this->name = 'svgpreview';
-		$this->flags = 0x00;
-
-		//parent::__construct(null, null);
-		$this->item = $item;
-	}
-
-	public function getItem() {
-		return $this->item;
-	}
-
-	// Since it is not a field, no need to validate input values.
-	public function validate($strict = false) {
-		return [];
-	}
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
 }
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

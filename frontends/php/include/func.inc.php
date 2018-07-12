@@ -767,19 +767,25 @@ function convert_units($options = []) {
  * Examples:
  *		10m = 600
  *		3d = 10800
+ *		-10m = -600
  *
  * @param string $time
+ * @param bool   $allow_negative   Allow time to be negative.
  *
  * @return int
  */
-function timeUnitToSeconds($time) {
-	preg_match('/^((\d)+)(['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+function timeUnitToSeconds($time, $allow_negative = false) {
+	$re = $allow_negative
+		? '/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/'
+		: '/^(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/';
+	preg_match($re, $time, $matches);
 
-	if (array_key_exists(3, $matches)) {
-		$suffix = $matches[3];
-		$time = $matches[1];
+	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
-		switch ($suffix) {
+	if (array_key_exists('suffix', $matches)) {
+		$time = $matches['number'];
+
+		switch ($matches['suffix']) {
 			case 's':
 				$sec = $time;
 				break;
@@ -798,10 +804,10 @@ function timeUnitToSeconds($time) {
 		}
 	}
 	else {
-		$sec = $matches[0];
+		$sec = $matches['number'];
 	}
 
-	return $sec;
+	return $is_negative ? bcmul($sec, -1) : $sec;
 }
 
 /**

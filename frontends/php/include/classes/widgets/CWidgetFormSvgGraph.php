@@ -19,7 +19,7 @@
 **/
 
 
-class CWidgetFormSVGGraph extends CWidgetForm {
+class CWidgetFormSvgGraph extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_SVG_GRAPH);
@@ -116,7 +116,7 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 		 */
 		// Checkbox to specify either relative dashboard time or widget's own time.
 		$field_time_mode = (new CWidgetFieldCheckBox('graph_time', _('Override relative time')))
-			->setDefault(SVG_GRAPH_RELATIVE_TIME)
+			->setDefault(SVG_GRAPH_CUSTOM_TIME)
 			->setAction('jQuery("#time_from, #time_to, #time_from_dp, #time_to_dp")'.
 							'.prop("disabled", !jQuery(this).is(":checked"));'
 			);
@@ -127,7 +127,7 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 
 		// Date from.
 		$field_time_from = new CWidgetFieldDatePicker('time_from', 'From');
-		if ($field_time_mode->getValue() == SVG_GRAPH_RELATIVE_TIME) {
+		if ($field_time_mode->getValue() == SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_from->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('time_from', $this->data)) {
@@ -137,7 +137,7 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 
 		// Time to.
 		$field_time_to = new CWidgetFieldDatePicker('time_to', 'To');
-		if ($field_time_mode->getValue() == SVG_GRAPH_RELATIVE_TIME) {
+		if ($field_time_mode->getValue() == SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_to->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('time_to', $this->data)) {
@@ -296,31 +296,58 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 		 * Contains fields to configure highlighted problem areas in graph.
 		 */
 		// Checkbox: Selected items only.
+		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
+			->setDefault(SVG_GRAPH_PROBLEMS_SHOW)
+			->setAction(
+				'var on = jQuery(this).is(":checked");'.
+				'jQuery("#graph_item_problems, #problem_hosts, #problem_name").prop("disabled", !on);'.
+				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
+				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
+				'jQuery("input, button", jQuery("#tags_table")).prop("disabled", !on);'
+			);
+		if (array_key_exists('show_problems', $this->data)) {
+			$field_show_problems->setValue($this->data['show_problems']);
+		}
+		$this->tabs['problems']['fields'][] = $field_show_problems;
+
+		// Checkbox: Selected items only.
 		$field_problems = (new CWidgetFieldCheckBox('graph_item_problems', _('Selected items only')))
 			->setDefault(SVG_GRAPH_SELECTED_ITEM_PROBLEMS);
-		if (array_key_exists('graph_item_problems', $this->data)) {
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_problems->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('graph_item_problems', $this->data)) {
 			$field_problems->setValue($this->data['graph_item_problems']);
 		}
 		$this->tabs['problems']['fields'][] = $field_problems;
 
 		// Problem hosts.
 		$field_problem_hosts = new CWidgetFieldTextBox('problem_hosts', _('Hosts'));
-		if (array_key_exists('problem_hosts', $this->data)) {
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('problem_hosts', $this->data)) {
 			$field_problem_hosts->setValue($this->data['problem_hosts']);
 		}
 		$this->tabs['problems']['fields'][] = $field_problem_hosts;
 
 		// Severity checkboxes list.
-		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
-		if (array_key_exists('severities', $this->data)) {
+		$field_severities = (new CWidgetFieldSeverities('severities', _('Severity')))
+			->setStyle(ZBX_STYLE_LIST_HOR_CHECK_RADIO);
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_severities->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('severities', $this->data)) {
 			$field_severities->setValue($this->data['severities']);
 		}
-		$field_severities->setStyle(ZBX_STYLE_LIST_HOR_CHECK_RADIO);
 		$this->tabs['problems']['fields'][] = $field_severities;
 
 		// Problem name input-text field.
 		$field_problem_name = new CWidgetFieldTextBox('problem_name', _('Problem'));
-		if (array_key_exists('problem_name', $this->data)) {
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_problem_name->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('problem_name', $this->data)) {
 			$field_problem_name->setValue($this->data['problem_name']);
 		}
 		$this->tabs['problems']['fields'][] = $field_problem_name;
@@ -332,14 +359,20 @@ class CWidgetFormSVGGraph extends CWidgetForm {
 		]))
 			->setDefault(TAG_EVAL_TYPE_AND_OR)
 			->setModern(true);
-		if (array_key_exists('evaltype', $this->data)) {
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_evaltype->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('evaltype', $this->data)) {
 			$field_evaltype->setValue($this->data['evaltype']);
 		}
 		$this->tabs['problems']['fields'][] = $field_evaltype;
 
 		// Problem tags field.
 		$field_tags = new CWidgetFieldTags('tags', '');
-		if (array_key_exists('tags', $this->data)) {
+		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
+			$field_tags->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		elseif (array_key_exists('tags', $this->data)) {
 			$field_tags->setValue($this->data['tags']);
 		}
 		$this->tabs['problems']['fields'][] = $field_tags;

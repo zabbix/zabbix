@@ -168,6 +168,7 @@ class CWidgetConfig {
 	 */
 	public static function usesTimeline($type) {
 		switch ($type) {
+			case WIDGET_SVG_GRAPH:
 			case WIDGET_GRAPH:
 				return true;
 			default:
@@ -200,7 +201,7 @@ class CWidgetConfig {
 				return new CWidgetFormGraph($data);
 
 			case WIDGET_SVG_GRAPH:
-				return new CWidgetFormSVGGraph($data);
+				return new CWidgetFormSvgGraph($data);
 
 			case WIDGET_MAP:
 				return new CWidgetFormMap($data);

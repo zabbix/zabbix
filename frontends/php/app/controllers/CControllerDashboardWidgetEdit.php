@@ -438,7 +438,9 @@ class CControllerDashboardWidgetEdit extends CController {
 					->setAriaRequired($aria_required);
 
 				foreach ($field->getValues() as $key => $value) {
-					$radio_button_list->addValue($value, $key, null, $field->getAction());
+					$radio_button_list
+						->addValue($value, $key, null, $field->getAction())
+						->setEnabled(!$disabled);
 				}
 
 				$form_list->addRow(
@@ -456,6 +458,7 @@ class CControllerDashboardWidgetEdit extends CController {
 							->setLabel(getSeverityName($severity, $data['config']))
 							->setId($field->getName().'_'.$severity)
 							->setChecked(in_array($severity, $field->getValue()))
+							->setEnabled(!$disabled)
 					);
 				}
 
@@ -478,19 +481,23 @@ class CControllerDashboardWidgetEdit extends CController {
 						(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 							->setAttribute('placeholder', _('tag'))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-							->setAriaRequired($aria_required),
+							->setAriaRequired($aria_required)
+							->setEnabled(!$disabled),
 						(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
 							->addValue(_('Like'), TAG_OPERATOR_LIKE)
 							->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
-							->setModern(true),
+							->setModern(true)
+							->setEnabled(!$disabled),
 						(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-							->setAriaRequired($aria_required),
+							->setAriaRequired($aria_required)
+							->setEnabled(!$disabled),
 						(new CCol(
 							(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->addClass('element-table-remove')
+								->setEnabled(!$disabled)
 						))->addClass(ZBX_STYLE_NOWRAP)
 					], 'form_row');
 
@@ -502,6 +509,7 @@ class CControllerDashboardWidgetEdit extends CController {
 						(new CButton('tags_add', _('Add')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-add')
+							->setEnabled(!$disabled)
 					))->setColSpan(3)
 				);
 
