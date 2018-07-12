@@ -389,18 +389,18 @@ static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
  * Purpose: get event query maintenance information from database             *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vector_ptr_t *event_data)
+static void	db_get_suppress_data(const zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
 {
-	DB_ROW				row;
-	DB_RESULT			result;
-	int				i;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_event_suppress_query_t	*query;
-	zbx_event_suppress_data_t	*data;
-	zbx_vector_uint64_t		eventids;
-	zbx_uint64_t			eventid;
-	zbx_uint64_pair_t		pair;
+	DB_ROW					row;
+	DB_RESULT				result;
+	int					i;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	const zbx_event_suppress_query_t	*query;
+	zbx_event_suppress_data_t		*data;
+	zbx_vector_uint64_t			eventids;
+	zbx_uint64_t				eventid;
+	zbx_uint64_pair_t			pair;
 
 	zbx_vector_uint64_create(&eventids);
 
@@ -419,14 +419,14 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_queries, const zbx_vect
 	zbx_free(sql);
 
 	i = 0;
-	query = (zbx_event_suppress_query_t *)event_queries->values[0];
+	query = (const zbx_event_suppress_query_t *)event_queries->values[0];
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(eventid, row[0]);
 
 		while (query->eventid != eventid)
-			query = (zbx_event_suppress_query_t *)event_queries->values[++i];
+			query = (const zbx_event_suppress_query_t *)event_queries->values[++i];
 
 		data = (zbx_event_suppress_data_t *)event_data->values[i];
 
