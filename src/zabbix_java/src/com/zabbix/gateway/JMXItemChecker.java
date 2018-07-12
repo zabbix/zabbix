@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 
-import javax.lang.model.util.ElementScanner6;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
