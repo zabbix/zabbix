@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 
+import javax.lang.model.util.ElementScanner6;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -196,10 +197,18 @@ class JMXItemChecker extends ItemChecker
 
 		if (fieldNames.equals(""))
 		{
-			if (isPrimitiveAttributeType(dataObject.getClass()))
-				return dataObject.toString();
-			else
-				throw new ZabbixException("data object type is not primitive: %s", dataObject.getClass());
+			try
+			{
+				// check if the type is either primitive or overrides toString()
+				if (isPrimitiveAttributeType(dataObject.getClass()) || dataObject.getClass().getMethod("toString").getDeclaringClass() != Object.class)
+					return dataObject.toString();
+				else
+					throw new NoSuchMethodException();
+			}
+			catch (NoSuchMethodException e)
+			{
+				throw new ZabbixException("data object type cannot be converted to string");
+			}
 		}
 
 		if (dataObject instanceof CompositeData)
