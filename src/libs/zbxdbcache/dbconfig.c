@@ -11485,23 +11485,22 @@ const char	*zbx_dc_get_session_token(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_data_session                                          *
+ * Function: zbx_dc_get_or_create_data_session                                *
  *                                                                            *
- * Purpose: returns data session                                              *
+ * Purpose: returns data session, creates a new session if none found         *
  *                                                                            *
  * Parameter: hostid - [IN] the host (proxy) identifier                       *
  *            token  - [IN] the session token                                 *
  *                                                                            *
- * Return value: The data session.                                            *
+ * Return value: pointer to data session.                                     *
  *                                                                            *
- * Comments: A new session is created if none found.                          *
- *           The last_valueid property of the returned session object can be  *
+ * Comments: The last_valueid property of the returned session object can be  *
  *           updated directly without locking cache because only one data     *
  *           session is updated at the same time and after retrieving the     *
  *           session object will not be deleted for 24 hours.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_data_session_t	*zbx_dc_get_data_session(zbx_uint64_t hostid, const char *token)
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token)
 {
 	zbx_data_session_t	*session, session_local;
 	int			now;
