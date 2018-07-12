@@ -99,7 +99,7 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
  * Purpose: copies string into configuration cache shared memory              *
  *                                                                            *
  ******************************************************************************/
-char	*dc_strdup(const char *source)
+static char	*dc_strdup(const char *source)
 {
 	char	*dst;
 	size_t	len;
