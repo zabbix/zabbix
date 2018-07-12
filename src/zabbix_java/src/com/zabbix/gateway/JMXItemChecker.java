@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -117,7 +118,7 @@ class JMXItemChecker extends ItemChecker
 		{
 			if (2 != item.getArgumentCount())
 				throw new ZabbixException("required key format: jmx[<object name>,<attribute name>]");
-
+			
 			ObjectName objectName = new ObjectName(item.getArgument(1));
 			String attributeName = item.getArgument(2);
 			String realAttributeName;
@@ -146,7 +147,18 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
-			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+			try
+			{
+				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+			}
+			catch (InstanceNotFoundException e)
+			{
+				throw new ZabbixException("Object or attribute not found.");
+			}
+			catch (Exception e)
+			{
+				throw new ZabbixException(e);
+			}
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
