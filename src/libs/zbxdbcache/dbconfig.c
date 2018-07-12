@@ -11478,7 +11478,7 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
  *           is required.                                                     *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_dc_get_session_token()
+const char	*zbx_dc_get_session_token(void)
 {
 	return config->session_token;
 }
@@ -11540,7 +11540,7 @@ zbx_data_session_t	*zbx_dc_get_data_session(zbx_uint64_t hostid, const char *tok
  * Purpose: removes data sessions not accessed for 24 hours                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_cleanup_data_sessions()
+void	zbx_dc_cleanup_data_sessions(void)
 {
 	zbx_data_session_t	*session;
 	zbx_hashset_iter_t	iter;
