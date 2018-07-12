@@ -1447,29 +1447,45 @@ static int	DBpatch_3050121(void)
 
 static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
 {
-	char	*d = dst;
-	int	quoted = 0;
+	const char	*pin = src;
+	char		*pout = dst;
+	size_t		pos, len, sep;
+	int		quoted = 0;
 
-	if ('"' == *src)
+	zbx_function_param_parse(src, &pos, &len, &sep);
+
+	if (0 != pos)		/* copy leading spaces */
 	{
+		memcpy(pout, src, pos);
+		pout += pos;
+		pin += pos;
+	}
+
+	if ('"' == *pin)
+	{
+		*pout++ = *pin++;
+		len -= 2;	/* length without starting and ending quotes */
 		quoted = 1;
-		*d++ = *src++;
 	}
 
-	*d++ = '^';			/* start anchor */
+	*pout++ = '^';		/* start anchor */
 
-	for(; '\0' != *src; src++)
+	if (0 != len)
 	{
-		if (1 == quoted && '"' == *src && '\0' == src[1])
-			*d++ = '$';	/* end anchor if parameter is quoted */
-
-		*d++ = *src;
+		memcpy(pout, pin, len);
+		pout += len;
+		pin += len;
 	}
 
-	if (0 == quoted)
-		*d++ = '$';		/* end anchor */
+	*pout++ = '$';		/* end anchor */
 
-	*d = '\0';
+	if (0 != quoted)
+	{
+		memcpy(pout, pin, sep - (size_t)(pin - src));
+		pout += sep - (size_t)(pin - src);
+	}
+
+	*pout = '\0';
 }
 
 static int	DBpatch_3050122(void)
@@ -1486,21 +1502,20 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	regexp_esc_param_len;
+		size_t	required_len;
 
 		parameter = zbx_strdup(NULL, row[1]);
 		zbx_regexp_escape(&parameter);
 
 		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
-		regexp_esc_param_len = strlen(parameter) + 2;
 
-		if (FUNCTION_PARAM_LEN < regexp_esc_param_len)
+		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(parameter) + 2))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], regexp_esc_param_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(parameter);
 			continue;
@@ -1508,7 +1523,7 @@ static int	DBpatch_3050122(void)
 
 		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
 
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, regexp_esc_param_len + 1);
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 3);	/* 3 for ^, $, '\0' */
 		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
