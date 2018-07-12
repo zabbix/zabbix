@@ -206,7 +206,7 @@ class JMXItemChecker extends ItemChecker
 			}
 			catch (NoSuchMethodException e)
 			{
-				throw new ZabbixException("data object type cannot be converted to string");
+				throw new ZabbixException("Data object type cannot be converted to string.");
 			}
 		}
 
