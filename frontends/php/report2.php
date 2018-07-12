@@ -418,7 +418,7 @@ elseif (hasRequest('filter_hostid')) {
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
-			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'])
+			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], ZBX_DATE_TIME)
 			->addFilterTab(_('Filter'), [$filter_column])
 	);
 

@@ -98,9 +98,15 @@ calendar.prototype = {
 	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid, date_time_format) {
 		this.id = id;
 		this.timeobjects = new Array();
+
 		if (!(this.status = this.checkOuterObj(timeobjects))) {
 			throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
 		}
+
+		if (typeof date_time_format !== 'undefined') {
+			this.date_time_format = date_time_format;
+		}
+
 		this.calendarcreate(parentNodeid);
 
 		addListener(this.clndr_monthdown, 'click', this.monthdown.bindAsEventListener(this));
@@ -119,10 +125,6 @@ calendar.prototype = {
 		}
 		else {
 			this.setSDateFromOuterObj();
-		}
-
-		if (typeof date_time_format !== 'undefined') {
-			this.date_time_format = date_time_format;
 		}
 
 		this.cdt.setTime(this.sdt.getTime());
