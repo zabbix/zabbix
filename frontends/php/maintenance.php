@@ -48,7 +48,7 @@ $fields = [
 	'active_till' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
 												'isset({add}) || isset({update})', _('Active till')
 											],
-	'new_timeperiod_start_date' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null],
+	'new_timeperiod_start_date' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Date')],
 	'new_timeperiod' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'],
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
