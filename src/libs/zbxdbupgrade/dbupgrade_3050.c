@@ -1514,8 +1514,8 @@ static int	DBpatch_3050122(void)
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, parameter, param_pos, param_len,
-				sep_pos, quotes);
+		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, parameter, param_pos,
+				param_len, sep_pos, quotes);
 
 		if (QUOTED_PARAM == quotes)
 			zbx_function_param_quote(&parameter_esc_anchored, quotes);
