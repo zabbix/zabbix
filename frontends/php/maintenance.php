@@ -200,7 +200,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
 			$maintenance += [
-				'tags_evaltype' => getRequest('tags_evaltype', TAG_EVAL_TYPE_AND_OR),
+				'tags_evaltype' => getRequest('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
 				'tags' => getRequest('tags', [])
 			];
 
@@ -466,7 +466,7 @@ if (!empty($data['form'])) {
 		}
 		$data['description'] = getRequest('description', '');
 		$data['timeperiods'] = getRequest('timeperiods', []);
-		$data['tags_evaltype'] = getRequest('tags_evaltype', TAG_EVAL_TYPE_AND_OR);
+		$data['tags_evaltype'] = getRequest('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR);
 		$data['tags'] = getRequest('tags', []);
 
 		$hostids = getRequest('hostids', []);

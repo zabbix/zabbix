@@ -42,7 +42,7 @@ $options = [
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
 			'show_tags' => $data['filter']['show_tags'],
-			'maintenance' => $data['filter']['maintenance'],
+			'show_suppressed' => $data['filter']['show_suppressed'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
@@ -265,8 +265,8 @@ if ($data['action'] == 'problem.view') {
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
 		)
-		->addRow(_('Show hosts in maintenance'), [
-			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
+		->addRow(_('Show suppressed problems'), [
+			(new CCheckBox('filter_show_suppressed'))->setChecked($data['filter']['show_suppressed'] == 1),
 			(new CDiv([
 				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),

@@ -3,9 +3,9 @@
 		(new CTextBox('tags[#{rowNum}][tag]'))
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CRadioButtonList('tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-			->addValue(_('Like'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
+			->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
+			->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 			->setModern(true),
 		(new CTextBox('tags[#{rowNum}][value]'))
 			->setAttribute('placeholder', _('value'))
@@ -27,12 +27,12 @@
 				var $maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
 				if ($maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
 					$('#tags input, #tags button').prop('disabled', true);
-					$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').prop('placeholder', '');
+					$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
 				}
 				else {
 					$('#tags input, #tags button').prop('disabled', false);
-					$('#tags input[name$="[tag]"]').prop('placeholder', '<?= _('tag') ?>');
-					$('#tags input[name$="[value]"]').prop('placeholder', '<?= _('value') ?>');
+					$('#tags input[name$="[tag]"]').attr('placeholder', '<?= _('tag') ?>');
+					$('#tags input[name$="[value]"]').attr('placeholder', '<?= _('value') ?>');
 				}
 			});
 

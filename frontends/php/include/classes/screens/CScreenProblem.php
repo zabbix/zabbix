@@ -165,7 +165,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
-	 * @param int    $filter['maintenance']           (optional)
+	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 *
@@ -253,6 +253,7 @@ class CScreenProblem extends CScreenBase {
 				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
+				'suppressed' => 0,
 				'limit' => $config['search_limit'] + 1
 			];
 
@@ -293,6 +294,9 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
+			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
+				unset($options['suppressed']);
+			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
 				? self::getDataEvents($options)
@@ -325,9 +329,6 @@ class CScreenProblem extends CScreenBase {
 
 					if (array_key_exists('details', $filter) && $filter['details'] == 1) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
-					}
-					if (array_key_exists('maintenance', $filter) && $filter['maintenance'] == 0) {
-						$options['maintenance'] = false;
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);

@@ -2756,7 +2756,7 @@ class CAction extends CApiService {
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 		$pause_suppressed_validator = new CLimitedSetValidator([
-			'values' => [ACTION_DONT_PAUSE_SUPPRESSED, ACTION_PAUSE_SUPPRESSED]
+			'values' => [ACTION_PAUSE_SUPPRESSED_TRUE, ACTION_PAUSE_SUPPRESSED_FALSE]
 		]);
 
 		$conditionsToValidate = [];
@@ -2881,7 +2881,7 @@ class CAction extends CApiService {
 		$actions = zbx_toHash($actions, 'actionid');
 
 		$pause_suppressed_validator = new CLimitedSetValidator([
-			'values' => [ACTION_DONT_PAUSE_SUPPRESSED, ACTION_PAUSE_SUPPRESSED]
+			'values' => [ACTION_PAUSE_SUPPRESSED_TRUE, ACTION_PAUSE_SUPPRESSED_FALSE]
 		]);
 
 		// check fields

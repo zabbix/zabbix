@@ -450,14 +450,17 @@ class CMaintenance extends CApiService {
 			'maintenance_type' => [
 				'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])
 			],
-			'tags_evaltype' => ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'tags_evaltype' => [
+				'type' => API_INT32,
+				'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])
+			],
 			'tags' => ['type' => API_OBJECTS, 'fields' => [
 				'tag' => [
 					'type' => API_STRING_UTF8,
 					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength('maintenance_tag', 'tag')
 				],
-				'operator' => ['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL])],
+				'operator' => ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL])],
 				'value' => ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value')]
 			]]
 		];
@@ -483,7 +486,7 @@ class CMaintenance extends CApiService {
 			if (array_key_exists('tags', $maintenance)) {
 				foreach ($maintenance['tags'] as &$tag) {
 					$tag += [
-						'operator' => TAG_OPERATOR_LIKE,
+						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
 						'value' => ''
 					];
 				}

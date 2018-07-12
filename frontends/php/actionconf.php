@@ -88,7 +88,7 @@ $fields = [
 	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
-											IN([ACTION_DONT_PAUSE_SUPPRESSED, ACTION_PAUSE_SUPPRESSED]),
+											IN([ACTION_PAUSE_SUPPRESSED_TRUE, ACTION_PAUSE_SUPPRESSED_FALSE]),
 											null,
 											_('Pause operations for suppressed problems')
 										],
@@ -211,7 +211,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_DONT_PAUSE_SUPPRESSED);
+		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 	}
 
 	DBstart();
@@ -618,7 +618,7 @@ if (hasRequest('form')) {
 			$data['action']['ack_longdata'] = getRequest('ack_longdata', '');
 
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_DONT_PAUSE_SUPPRESSED);
+				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			}
 		}
 		else {
@@ -630,7 +630,7 @@ if (hasRequest('form')) {
 				$data['action']['ack_shortdata'] = getRequest('ack_shortdata', ACTION_DEFAULT_SUBJ_ACKNOWLEDGE);
 				$data['action']['ack_longdata'] = getRequest('ack_longdata', ACTION_DEFAULT_MSG_ACKNOWLEDGE);
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
-					hasRequest('form_refresh') ? ACTION_DONT_PAUSE_SUPPRESSED : ACTION_PAUSE_SUPPRESSED
+					hasRequest('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
 				);
 			}
 			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {

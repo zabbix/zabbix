@@ -418,8 +418,8 @@ $operation_tab
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab->addRow(_('Pause operations for suppressed problems'),
-		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED))
-			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED)
+		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
 	);
 }
 

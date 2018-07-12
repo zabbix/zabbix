@@ -189,7 +189,7 @@ if (isset($_REQUEST['new_timeperiod'])) {
  */
 $tags = $data['tags'];
 if (!$tags) {
-	$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
+	$tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
 }
 
 $tag_table = new CTable();
@@ -198,8 +198,8 @@ $tag_table->setId('tags');
 $tag_table->addRow(
 	(new CCol(
 		(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+			->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+			->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 			->setModern(true)
 			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
 	))->setColSpan(4)
@@ -213,8 +213,8 @@ foreach ($tags as $tag) {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setEnabled(false),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true)
 				->setEnabled(false),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
@@ -234,8 +234,8 @@ foreach ($tags as $tag) {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
