@@ -1756,7 +1756,7 @@ exit:
  *          event_suppress table                                              *
  *                                                                            *
  ******************************************************************************/
-static void	save_event_suppress_data()
+static void	save_event_suppress_data(void)
 {
 	zbx_vector_ptr_t		event_queries;
 	zbx_vector_ptr_t		event_refs;
