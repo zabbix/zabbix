@@ -1824,8 +1824,6 @@ static void	save_event_suppress_data()
 
 			for (k = 0; k < event_queries.values_num; k++)
 			{
-				unsigned char	suppressed = EVENT_SUPPRESSED_FALSE;
-
 				query = (zbx_event_suppress_query_t *)event_queries.values[k];
 
 				for (j = 0; j < query->maintenances.values_num; j++)
@@ -1843,10 +1841,8 @@ static void	save_event_suppress_data()
 							query->maintenances.values[j].first,
 							(int)query->maintenances.values[j].second);
 
-					suppressed = EVENT_SUPPRESSED_TRUE;
+					((DB_EVENT *)event_refs.values[k])->suppressed = EVENT_SUPPRESSED_TRUE;
 				}
-
-				((DB_EVENT *)event_refs.values[k])->suppressed = suppressed;
 			}
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
