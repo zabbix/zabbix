@@ -2047,7 +2047,7 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'maintenance_mode' => [
+			'pause_suppressed' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -7443,8 +7443,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'events',
-				'ref_field' => 'event_suppressid',
 			],
 			'eventid' => [
 				'null' => false,
