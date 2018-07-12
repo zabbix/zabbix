@@ -521,7 +521,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clear_ext(&received_metrics, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
 	zbx_vector_str_destroy(&received_metrics);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

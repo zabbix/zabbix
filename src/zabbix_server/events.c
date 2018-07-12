@@ -908,7 +908,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 				zbx_chrcpy_alloc(&filter, &filter_alloc, &filter_offset, ')');
 
 				zbx_free(tag_esc);
-				zbx_vector_str_clear_ext(&values, zbx_ptr_free);
+				zbx_vector_str_clear_ext(&values, zbx_str_free);
 			}
 
 			zbx_vector_str_destroy(&values);

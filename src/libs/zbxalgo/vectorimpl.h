@@ -268,7 +268,7 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 	vector->values_num = 0;											\
 }														\
 														\
-void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_clean_ ## __id ## _func_t clean_func)	\
+void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_clean_type_ ## __id ## _func_t clean_func)	\
 {														\
 	if (0 != vector->values_num)										\
 	{													\
@@ -286,7 +286,7 @@ void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_c
 														\
 ZBX_VECTOR_IMPL(__id, __type);											\
 														\
-void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_func_t clean_func)	\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_  ## __id ## _func_t clean_func)	\
 {														\
 	if (0 != vector->values_num)										\
 	{													\
@@ -297,6 +297,11 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_cl
 														\
 		vector->values_num = 0;										\
 	}													\
+}														\
+														\
+void	zbx_  ## __id ## _free(__type data)									\
+{														\
+	zbx_free(data);												\
 }
 
 #endif	/* ZABBIX_VECTORIMPL_H */

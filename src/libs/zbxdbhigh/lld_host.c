@@ -1404,7 +1404,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 
 	zbx_free(sql);
 	zbx_vector_ptr_clear_ext(&group_rights, (zbx_clean_func_t)lld_group_rights_free);
-	zbx_vector_str_clear_ext(&group_names, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
 out:
 	zbx_vector_ptr_destroy(&group_rights);
 	zbx_vector_str_destroy(&group_names);
