@@ -339,7 +339,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_TEMPLATE		13
 #define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
 #define CONDITION_TYPE_APPLICATION		15
-#define CONDITION_TYPE_MAINTENANCE		16
+#define CONDITION_TYPE_SUPPRESSED		16
 #define CONDITION_TYPE_DRULE			18
 #define CONDITION_TYPE_DCHECK			19
 #define CONDITION_TYPE_PROXY			20
@@ -361,6 +361,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_OPERATOR_NOT_IN		7
 #define CONDITION_OPERATOR_REGEXP		8
 #define CONDITION_OPERATOR_NOT_REGEXP		9
+#define CONDITION_OPERATOR_YES			10
+#define CONDITION_OPERATOR_NO			11
 
 /* maintenance tag operators */
 #define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0

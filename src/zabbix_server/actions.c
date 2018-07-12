@@ -381,15 +381,15 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		zbx_free(period);
 	}
-	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
+	else if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
 	{
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_IN:
+			case CONDITION_OPERATOR_YES:
 				if (EVENT_SUPPRESSED_TRUE == event->suppressed)
 					ret = SUCCEED;
 				break;
-			case CONDITION_OPERATOR_NOT_IN:
+			case CONDITION_OPERATOR_NO:
 				if (EVENT_SUPPRESSED_FALSE == event->suppressed)
 					ret = SUCCEED;
 				break;

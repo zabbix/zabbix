@@ -1743,6 +1743,49 @@ static int	DBpatch_3050138(void)
 
 	return ret;
 }
+
+static int	DBpatch_3050139(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* CONDITION_OPERATOR_IN (4) -> CONDITION_OPERATOR_YES (10) */
+	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)         */
+	ret = DBexecute("update conditions"
+			" set operator=10"
+			" where conditiontype=16"
+				" and operator=4");
+
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050140(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* CONDITION_OPERATOR_NOT_IN (7) -> CONDITION_OPERATOR_NO (11) */
+	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)            */
+	ret = DBexecute("update conditions"
+			" set operator=11"
+			" where conditiontype=16"
+				" and operator=7");
+
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1884,6 +1927,8 @@ DBPATCH_ADD(3050135, 0, 1)
 DBPATCH_ADD(3050136, 0, 1)
 DBPATCH_ADD(3050137, 0, 1)
 DBPATCH_ADD(3050138, 0, 1)
+DBPATCH_ADD(3050139, 0, 1)
+DBPATCH_ADD(3050140, 0, 1)
 
 DBPATCH_END()
 
