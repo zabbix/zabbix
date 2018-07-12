@@ -187,7 +187,7 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 
-	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws ZabbixException
+	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws Exception
 	{
 		logger.trace("drilling down with data object '{}' and field names '{}'", dataObject, fieldNames);
 
@@ -196,10 +196,10 @@ class JMXItemChecker extends ItemChecker
 
 		if (fieldNames.equals(""))
 		{
+
 			try
 			{
-				// check if the type is either primitive or overrides toString()
-				if (isPrimitiveAttributeType(dataObject.getClass()) || dataObject.getClass().getMethod("toString").getDeclaringClass() != Object.class)
+				if (isPrimitiveAttributeType(dataObject.getClass()))
 					return dataObject.toString();
 				else
 					throw new NoSuchMethodException();
@@ -301,7 +301,7 @@ class JMXItemChecker extends ItemChecker
 		}
 	}
 
-	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws JSONException
+	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws NoSuchMethodException, JSONException
 	{
 		logger.trace("drilling down with attribute path '{}'", attrPath);
 
@@ -336,13 +336,14 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
 	}
 
-	private boolean isPrimitiveAttributeType(Class<?> clazz)
+	private boolean isPrimitiveAttributeType(Class<?> clazz) throws NoSuchMethodException
 	{
 		Class<?>[] clazzez = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
 			Float.class, Double.class, String.class, java.math.BigDecimal.class, java.math.BigInteger.class,
 			java.util.Date.class, javax.management.ObjectName.class, java.util.concurrent.atomic.AtomicBoolean.class,
 			java.util.concurrent.atomic.AtomicInteger.class, java.util.concurrent.atomic.AtomicLong.class};
 
-		return HelperFunctionChest.arrayContains(clazzez, clazz);
+			// check if the type is either primitive or overrides toString()
+			return HelperFunctionChest.arrayContains(clazzez, clazz) || clazz.getMethod("toString").getDeclaringClass() != Object.class;
 	}
 }
