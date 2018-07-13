@@ -1447,10 +1447,10 @@ static int	DBpatch_3050121(void)
 
 #define	QUOTED_PARAM	1
 
-static void	DBpatch_3050122_add_anchors(char *src, char **dst, const char *orig_param, size_t param_pos,
+static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char *orig_param, size_t param_pos,
 		size_t param_len, size_t sep_pos, int quotes)
 {
-	char	*pin, *pout;
+	char	*pout;
 	size_t	required_len, twsl = 0;
 
 	/* calculate trailing whitespace length */
@@ -1461,15 +1461,13 @@ static void	DBpatch_3050122_add_anchors(char *src, char **dst, const char *orig_
 
 	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
 	*dst = (char *)zbx_malloc(NULL, required_len + 3 + twsl);
-
-	pin = src;
 	pout = *dst;
 
 	*pout++ = '^';		/* start anchor */
 
 	if (0 != required_len)
 	{
-		memcpy(pout, pin, required_len);
+		memcpy(pout, src, required_len);
 		pout += required_len;
 	}
 
