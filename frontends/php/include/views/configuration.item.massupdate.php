@@ -81,7 +81,7 @@ if ($this->data['displayInterfaces']) {
 		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(
-		(new CVisibilityBox('visible[interface]', 'interfaceDiv', _('Original')))
+		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
 			->setChecked(isset($this->data['visible']['interface']))
 			->setAttribute('data-multiple-interface-types', $this->data['multiple_interface_types']),
@@ -506,9 +506,9 @@ $update_interval->addRow(
 
 // append delay to form list
 $itemFormList->addRow(
-	(new CVisibilityBox('visible[update_interval]', 'update_interval_div', _('Original')))
+	(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))
 		->setLabel(_('Update interval'))
-		->setChecked(isset($data['visible']['update_interval'])),
+		->setChecked(isset($data['visible']['delay'])),
 	(new CDiv($update_interval))->setId('update_interval_div')
 );
 

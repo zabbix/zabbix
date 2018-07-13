@@ -910,7 +910,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 	$result = true;
 
-	if (isset($visible['update_interval'])) {
+	if (isset($visible['delay'])) {
 		$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
 		if (hasRequest('delay_flex')) {
