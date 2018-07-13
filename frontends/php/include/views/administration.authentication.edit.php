@@ -63,6 +63,7 @@ if ($data['change_bind_password'] || zbx_empty($data['ldap_bind_password'])) {
 else {
 	$password_box = (new CSubmitButton(_('Change password'), 'change_bind_password', 1))
 		->setEnabled($data['ldap_enabled'])
+		->onClick('jQuery("[name=action]").val("'.$data['action_passw_change'].'")')
 		->addClass(ZBX_STYLE_BTN_GREY);
 }
 
@@ -109,14 +110,14 @@ $ldap_tab
 );
 
 $confirm_script = 'return jQuery("[name=authentication_type]:checked").val() == '.$data['config']['authentication_type'].
-	' || confirm('.
-		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?'))
+	'|| confirm('.
+			CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?'))
 		.')';
 
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->addItem((new CForm())
-		->addVar('action', $data['form_action'])
+		->addVar('action', $data['action_submit'])
 		->setName('form_auth')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem((new CTabView())

@@ -87,7 +87,8 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		$data = [
-			'form_action' => 'administration.auth.update',
+			'action_submit' => 'administration.auth.update',
+			'action_passw_change' => 'administration.auth.edit',
 			'active_tab' => get_cookie('tab', 0),
 			'ldap_enabled' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK),
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
