@@ -5494,7 +5494,6 @@ void	DCsync_configuration(unsigned char mode)
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
 		dc_maintenance_precache_nested_groups();
 
-
 	update_sec = zbx_time() - sec;
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
