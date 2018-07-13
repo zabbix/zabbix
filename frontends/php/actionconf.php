@@ -88,7 +88,7 @@ $fields = [
 	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
-											IN([ACTION_PAUSE_SUPPRESSED_TRUE, ACTION_PAUSE_SUPPRESSED_FALSE]),
+											IN([ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]),
 											null,
 											_('Pause operations for suppressed problems')
 										],

@@ -894,6 +894,29 @@ function makeInformationIcon($message) {
 }
 
 /**
+ * Renders an icon for suppressed problem.
+ *
+ * @param array  $icon_data
+ * @param string $icon_data['suppress_until']   Time until the problem is suppressed.
+ * @param string $icon_data['maintenance_name'] Name of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeSuppressedProblemIcon(array $icon_data) {
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INVISIBLE)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint(
+			_s('Suppressed till: %s', ($icon_data['suppress_until'] >= strtotime('today'))
+				? zbx_date2str(TIME_FORMAT_SECONDS, $icon_data['suppress_until'])
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $icon_data['suppress_until'])
+			).
+			"\n".
+			_s('Maintenance: %s', $icon_data['maintenance_name'])
+		);
+}
+
+/**
  * Renders an action icon.
  *
  * @param array  $icon_data

@@ -133,6 +133,7 @@ $var-icons: (
 	depend-up: url(../img/icon-sprite.svg) no-repeat -203px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -203px -766px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px,
+	invisible: url(../img/icon-sprite.svg) no-repeat -249px -803px,
 );
 
 @each $var-icons, $bgimage in $var-icons {

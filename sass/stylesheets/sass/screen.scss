@@ -2849,6 +2849,7 @@ $var-icons: (
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
+	invisible: url(../img/icon-sprite.svg) no-repeat -89px -803px,
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -5301,6 +5302,7 @@ tr.cursor-move {
 .rel-container {
 	position: relative;
 	display: inline-block;
+	min-height: 16px;
 	min-width: 16px;
 	white-space: nowrap;
 

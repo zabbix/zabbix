@@ -296,6 +296,7 @@ class CScreenProblem extends CScreenBase {
 			}
 			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 				unset($options['suppressed']);
+				$options['selectSuppressionData'] = API_OUTPUT_EXTEND;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -307,6 +308,10 @@ class CScreenProblem extends CScreenBase {
 			if ($problems) {
 				$eventid_till = end($problems)['eventid'] - 1;
 				$triggerids = [];
+
+				if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
+					self::addMaintenanceNames($problems);
+				}
 
 				foreach ($problems as $problem) {
 					if (!array_key_exists($problem['objectid'], $seen_triggerids)) {
@@ -348,6 +353,37 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'] + 1, true);
 
 		return $data;
+	}
+
+	/**
+	 * Adds maintenance names of suppressed problems.
+	 *
+	 * @param array  $problems
+	 * @param array  $problems['suppression_data']
+	 * @param array  $problems['suppression_data']['maintenanceid']
+	 *
+	 * @static
+	 */
+	private static function addMaintenanceNames(array &$problems) {
+		$maintenanceids = array_unique(
+			zbx_objectValues(zbx_objectValues($problems, 'suppression_data'), 'maintenanceid')
+		);
+		$maintenances = $maintenanceids
+			? API::Maintenance()->get([
+				'output' => ['name'],
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => true
+			])
+			: [];
+		if ($maintenances) {
+			foreach ($problems as &$problem) {
+				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+					$problem['suppression_data']['maintenance_name'] =
+						$maintenances[$problem['suppression_data']['maintenanceid']]['name'];
+				}
+			}
+			unset($problem);
+		}
 	}
 
 	/**
@@ -922,6 +958,19 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
+				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+					$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+				}
+
+				$cell_info = ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
+						&& count($info_icons) > 1)
+					? (new CSpan(
+							(new CButton(null))
+								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
+							))->addClass(ZBX_STYLE_REL_CONTAINER)
+					: makeInformationList($info_icons);
+
 				$options = [
 					'description_enabled' => ($trigger['comments'] !== ''
 						|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
@@ -980,7 +1029,7 @@ class CScreenProblem extends CScreenBase {
 					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
 					$cell_r_clock,
 					$cell_status,
-					makeInformationList($info_icons),
+					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
 					($problem['r_eventid'] != 0)
