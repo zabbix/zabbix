@@ -676,8 +676,9 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				db_remove_expired_event_suppress_data((int)sec);
 
-				/* event suppress expiration is handled by suppress_until time,  */
-				/* so update events if there are started or changed maintenances */
+				/* event suppress expiration is handled by suppress_until time,       */
+				/* so update events only if there are started or changed maintenances */
+				/* and ignore stopped maintenances                                    */
 				if (0 != modified_num - stopped_num)
 					db_update_event_suppress_data(maintenance_revision, &events_num);
 				else
@@ -695,8 +696,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		{
 			zbx_dc_get_maintenance_update_stats(&update_revision, &modified_num, &stopped_num);
 
+			/* check if a maintenance was updated by the first timer */
 			if (maintenance_revision < update_revision)
 			{
+				/* event suppress expiration is handled by suppress_until time,       */
+				/* so update events only if there are started or changed maintenances */
+				/* and ignore stopped maintenances                                    */
 				if (0 != modified_num - stopped_num)
 				{
 					zbx_setproctitle("%s #%d [%s, processing maintenances]",
