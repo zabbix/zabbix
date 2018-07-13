@@ -369,8 +369,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
 
 /* maintenance tag evaluation types */
-#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
-#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
+#define MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
+#define MAINTENANCE_TAG_EVAL_TYPE_OR	2
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0

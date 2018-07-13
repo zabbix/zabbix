@@ -450,7 +450,7 @@ static void	db_get_suppress_data(const zbx_vector_ptr_t *event_queries, zbx_vect
  *             suppressed_num - [OUT] the number of suppressed events         *
  *                                                                            *
  ******************************************************************************/
-static void	db_update_event_suppress_data(int revision, int *suppressed_num)
+static void	db_update_event_suppress_data(zbx_uint64_t revision, int *suppressed_num)
 {
 	zbx_vector_ptr_t		event_queries, event_data;
 	zbx_event_suppress_query_t	*query;
@@ -661,6 +661,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				zbx_dc_update_maintenances(&update_revision, &modified_num, &stopped_num);
 
+				/* update hosts if there are modified (stopped, started, changed) maintenances */
 				if (0 != modified_num)
 					hosts_num = update_host_maintenances();
 				else
@@ -668,6 +669,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				db_remove_expired_event_suppress_data((int)sec);
 
+				/* event suppress expiration is handled by suppress_until time,  */
+				/* so update events if there are started or changed maintenances */
 				if (0 != modified_num - stopped_num)
 					db_update_event_suppress_data(maintenance_revision, &events_num);
 				else
