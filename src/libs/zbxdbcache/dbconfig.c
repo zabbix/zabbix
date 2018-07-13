@@ -12965,7 +12965,7 @@ int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t
  *           until all timers have finished event suppress updates,           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_maintenance_finish_event_update()
+void	zbx_dc_maintenance_finish_event_update(void)
 {
 	WRLOCK_CACHE;
 	config->maintenance_event_updates_num++;
@@ -12985,7 +12985,7 @@ void	zbx_dc_maintenance_finish_event_update()
  *           until all timers have finished event suppress updates,           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_maintenance_get_event_updates()
+int	zbx_dc_maintenance_get_event_updates(void)
 {
 	int	updates_num;
 
