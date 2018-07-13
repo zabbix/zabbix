@@ -24,6 +24,12 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_SVG_GRAPH);
 
+//		$color_palette = [
+//			'bd0036', 'af0045', '9a0058', '8b0067', '6a006c', '460072', '290076', '010080',
+//			'002f73', '004a65', '00584c', '008001', '4fad01', '8bbc00', 'b8d000', 'f7eb01',
+//			'f6b000', 'f58402', 'f36300', 'f24a01', 'f13601', 'f11e00', 'f01100', 'f00001'
+//		];
+
 		$this->data = self::convertDottedKeys($this->data);
 
 		$this->tabs = [

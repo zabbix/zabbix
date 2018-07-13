@@ -379,6 +379,57 @@ function hex2rgb($color) {
 	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
+function getColorComplementaries(array $color_palette, $colors_requested, $start = 0) {
+	$color_palette_length = count($color_palette);
+	$shift = round($color_palette_length / $colors_requested);
+	$complementaries = [];
+	$found = 0;
+
+	while ($colors_requested > $found) {
+		$complementaries[] = $color_palette[($start + (++$found * $shift)) % $color_palette_length];
+	}
+	return $complementaries;
+}
+
+function getColorVariations($color, $variations_requested = 1) {
+	if (1 >= $variations_requested) {
+		return [$color];
+	}
+
+	$change = hex2rgb('#ffffff');
+	$max = 50;
+
+	$color = hex2rgb($color);
+	$variations = [];
+
+	/**
+	 * To prevent too extreme hue variations with small number of $variations requested, the range is made larger
+	 * artificially to select only colors closer to the original one.
+	 */
+	$variation_step = $max * 2 / $variations_requested;
+	$range = range(-1 * $max, $max, min([$variation_step, 10]));
+
+	// Remove redundant values.
+	while (count($range) > $variations_requested) {
+		(count($range) % 2) ? array_shift($range) : array_pop($range);
+	}
+
+	// Calculate colors.
+	foreach ($range as $var) {
+		$r = $color[0] + ($change[0] / 100 * $var);
+		$g = $color[1] + ($change[1] / 100 * $var);
+		$b = $color[2] + ($change[2] / 100 * $var);
+
+		$variations[] = rgb2hex([
+			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
+			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
+			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)
+		]);
+	}
+
+	return $variations;
+}
+
 function zbx_num2bitstr($num, $rev = false) {
 	if (!is_numeric($num)) {
 		return 0;
