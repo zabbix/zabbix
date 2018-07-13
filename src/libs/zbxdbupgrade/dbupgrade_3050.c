@@ -1557,7 +1557,7 @@ out:
 static int	DBpatch_3050123(void)
 {
 	const ZBX_TABLE table =
-		{"event_suppress",	"event_suppressid",	0,
+		{"event_suppress", "event_suppressid",	0,
 			{
 				{"event_suppressid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1603,7 +1603,7 @@ static int	DBpatch_3050128(void)
 static int	DBpatch_3050129(void)
 {
 	const ZBX_TABLE table =
-		{"maintenance_tag",	"maintenancetagid",	0,
+		{"maintenance_tag", "maintenancetagid", 0,
 			{
 				{"maintenancetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1687,7 +1687,7 @@ static int	DBpatch_3050136(void)
 
 static int	DBpatch_3050137(void)
 {
-	int		ret;
+	int	ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1746,7 +1746,7 @@ static int	DBpatch_3050138(void)
 
 static int	DBpatch_3050139(void)
 {
-	int		ret;
+	int	ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1758,7 +1758,6 @@ static int	DBpatch_3050139(void)
 			" where conditiontype=16"
 				" and operator=4");
 
-
 	if (ZBX_DB_OK > ret)
 		return FAIL;
 
@@ -1767,7 +1766,7 @@ static int	DBpatch_3050139(void)
 
 static int	DBpatch_3050140(void)
 {
-	int		ret;
+	int	ret;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1778,7 +1777,6 @@ static int	DBpatch_3050140(void)
 			" set operator=11"
 			" where conditiontype=16"
 				" and operator=7");
-
 
 	if (ZBX_DB_OK > ret)
 		return FAIL;
