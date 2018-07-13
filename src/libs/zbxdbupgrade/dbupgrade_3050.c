@@ -1461,18 +1461,17 @@ static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char 
 
 	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
 	*dst = (char *)zbx_malloc(NULL, src_len + 3 + twsl);
-	pout = *dst;
 
+	pout = *dst;
 	*pout++ = '^';		/* start anchor */
 
-	if (0 != src_len)
+	if (0 != src_len)	/* parameter body */
 	{
 		memcpy(pout, src, src_len);
 		pout += src_len;
 	}
 
-	/* for unquoted parameters copy what was after the parameter before adding appending $ */
-	if (QUOTED_PARAM != was_quoted)
+	if (QUOTED_PARAM != was_quoted)	/* trailing whitespace */
 	{
 		memcpy(pout, orig_param + param_pos + param_len, twsl);
 		pout += twsl;
