@@ -1448,13 +1448,13 @@ static int	DBpatch_3050121(void)
 #define	QUOTED_PARAM	1
 
 static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char *orig_param, size_t param_pos,
-		size_t param_len, size_t sep_pos, int quotes)
+		size_t param_len, size_t sep_pos, int was_quoted)
 {
 	char	*pout;
 	size_t	src_len, twsl = 0;
 
 	/* calculate trailing whitespace length */
-	if (QUOTED_PARAM != quotes)
+	if (QUOTED_PARAM != was_quoted)
 		twsl = sep_pos - param_pos - param_len;
 
 	src_len = strlen(src);
@@ -1472,7 +1472,7 @@ static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char 
 	}
 
 	/* for unquoted parameters copy what was after the parameter before adding appending $ */
-	if (QUOTED_PARAM != quotes)
+	if (QUOTED_PARAM != was_quoted)
 	{
 		memcpy(pout, orig_param + param_pos + param_len, twsl);
 		pout += twsl;
@@ -1498,7 +1498,7 @@ static int	DBpatch_3050122(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
-		int	quotes;
+		int	was_quoted;
 
 		parameter = zbx_strdup(NULL, row[1]);
 		zbx_function_param_parse(parameter, &param_pos, &param_len, &sep_pos);
@@ -1506,21 +1506,21 @@ static int	DBpatch_3050122(void)
 		/* copy what was before the parameter (leading whitespace)*/
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter, param_pos);
 
-		unquoted_parameter = zbx_function_param_unquote_dyn(parameter + param_pos, param_len, &quotes);
+		unquoted_parameter = zbx_function_param_unquote_dyn(parameter + param_pos, param_len, &was_quoted);
 
 		zbx_regexp_escape(&unquoted_parameter);
 
 		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, parameter, param_pos,
-				param_len, sep_pos, quotes);
+				param_len, sep_pos, was_quoted);
 
-		if (QUOTED_PARAM == quotes)
-			zbx_function_param_quote(&parameter_esc_anchored, quotes);
+		if (QUOTED_PARAM == was_quoted)
+			zbx_function_param_quote(&parameter_esc_anchored, was_quoted);
 
 		/* copy the parameter */
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
 
 		/* for quoted parameters copy what was after the parameter and add that after quotes */
-		if (QUOTED_PARAM == quotes && 0 < sep_pos - param_pos + param_len)
+		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
 		{
 			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
 					parameter + param_pos + param_len, sep_pos - param_pos - param_len + 1);
