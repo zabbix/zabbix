@@ -15,17 +15,25 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetFieldset {
+/**
+ * Favourite maps widget form view.
+ */
+$fields = $data['dialogue']['fields'];
 
-	const COLUMN_LEFT = 0;
-	const COLUMN_MIDDLE = 1;
-	const COLUMN_RIGHT = 2;
+$form = CWidgetHelper::createForm();
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['known_widget_types']
+);
 
-	public function __construct() {
+// Refresh rate.
+$form_list->addRow(CWidgetHelper::getLabel($fields['rf_rate']), CWidgetHelper::getComboBox($fields['rf_rate']));
 
-	}
-}
+$form->addItem($form_list);
+
+return [
+	'form' => $form
+];

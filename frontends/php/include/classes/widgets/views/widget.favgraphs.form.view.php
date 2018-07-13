@@ -15,13 +15,25 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
-class CWidgetComponentTabs {
+/**
+ * Favourite graphs widget form view.
+ */
+$fields = $data['dialogue']['fields'];
 
-	public function __construct() {
+$form = CWidgetHelper::createForm();
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['known_widget_types']
+);
 
-	}
-}
+// Refresh rate.
+$form_list->addRow(CWidgetHelper::getLabel($fields['rf_rate']), CWidgetHelper::getComboBox($fields['rf_rate']));
+
+$form->addItem($form_list);
+
+return [
+	'form' => $form
+];
