@@ -6196,6 +6196,7 @@ int	init_configuration_cache(char **error)
 	config->maintenance_update_revision = 0;
 	config->maintenance_modified_num = 0;
 	config->maintenance_stopped_num = 0;
+	config->maintenance_event_updates_num = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
@@ -12315,6 +12316,12 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 		config->maintenance_stopped_num = stopped_num;
 	}
 
+	/* If any maintenance has been started/updated then timers will have to */
+	/* perform maintenance updates for problem events. Reset event update   */
+	/* counter to track the event update progress by timers.                */
+	if (0 != modified_num - stopped_num)
+		config->maintenance_event_updates_num = 0;
+
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() started:%d stopped:%d running:%d modified:%d", __function_name,
@@ -12947,3 +12954,47 @@ int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t
 
 	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_finish_event_update                           *
+ *                                                                            *
+ * Purpose: registers finished event update                                   *
+ *                                                                            *
+ * Comments: Event update completion is used to delay maintenance update      *
+ *           until all timers have finished event suppress updates,           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_maintenance_finish_event_update()
+{
+	WRLOCK_CACHE;
+	config->maintenance_event_updates_num++;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_get_event_updates                             *
+ *                                                                            *
+ * Purpose: gets finished event updates                                       *
+ *                                                                            *
+ * Return value: the number of finished event updates since last maintenance  *
+ *               update                                                       *
+ *                                                                            *
+ * Comments: Event update completion is used to delay maintenance update      *
+ *           until all timers have finished event suppress updates,           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_maintenance_get_event_updates()
+{
+	int	updates_num;
+
+	RDLOCK_CACHE;
+	updates_num = config->maintenance_event_updates_num;
+	UNLOCK_CACHE;
+
+	return updates_num;
+}
+
+
+

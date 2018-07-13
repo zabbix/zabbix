@@ -572,6 +572,8 @@ cleanup:
 	zbx_vector_ptr_destroy(&event_queries);
 out:
 	zbx_vector_uint64_destroy(&maintenanceids);
+
+	zbx_dc_maintenance_finish_event_update();
 }
 
 /******************************************************************************
@@ -646,6 +648,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
+	zbx_dc_maintenance_finish_event_update();
+
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
@@ -654,7 +658,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
-			if (sec - maintenance_time >= ZBX_TIMER_DELAY)
+			/* start update process only if the timer delay has been passed since the last update */
+			/* and all other timers have finished their event updates                             */
+			if (sec - maintenance_time >= ZBX_TIMER_DELAY &&
+					CONFIG_TIMER_FORKS == zbx_dc_maintenance_get_event_updates())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);

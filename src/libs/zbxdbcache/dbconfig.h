@@ -692,10 +692,12 @@ typedef struct
 	int			item_sync_ts;
 	/* maintenance update statistics */
 	zbx_uint64_t		maintenance_revision;		/* global maintenance revision incremented by */
-								/* any changes to cached maintenance data */
-	zbx_uint64_t		maintenance_update_revision;	/* last update revision */
+								/* any changes to cached maintenance data     */
+	zbx_uint64_t		maintenance_update_revision;	/* last maintenance update revision */
 	zbx_uint64_t		maintenance_modified_num;	/* number of modified maintenances since last update */
 	int			maintenance_stopped_num;	/* number of stopped maintenances since last update */
+	int			maintenance_event_updates_num;	/* number of event updates done since last */
+								/* maintenance update                      */
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
