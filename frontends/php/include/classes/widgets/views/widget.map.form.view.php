@@ -48,11 +48,11 @@ $form_list->addRow(
 
 // Filter.
 if (array_key_exists('filter_widget_reference', $fields)) {
-	$form->addItem(new CJsScript(get_js($fields['filter_widget_reference']->getJavascript(), true)));
 	$form_list->addRow(
 		CWidgetHelper::getLabel($fields['filter_widget_reference']),
 		CWidgetHelper::getListComboBox($fields['filter_widget_reference'])
 	);
+	$form->addItem(new CJsScript(get_js($fields['filter_widget_reference']->getJavascript(), true)));
 }
 
 // Map.

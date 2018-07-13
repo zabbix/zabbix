@@ -32,6 +32,9 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 // Map widget reference.
 $field = $fields['reference'];
 $form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');
+if (!$field->getValue()) {
+	$form->addItem(new CJsScript(get_js($field->getJavascript('#'.$form->getAttribute('id')), true)));
+}
 
 // Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
 foreach ($fields as $field) {
