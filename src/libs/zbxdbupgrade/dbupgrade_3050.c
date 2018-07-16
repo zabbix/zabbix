@@ -1488,7 +1488,7 @@ static int	DBpatch_3050122(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	int		ret = FAIL;
-	char		*sql = NULL, *parameter = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
+	char		*sql = NULL, *orig_param = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
 			*parameter_esc_anchored = NULL, *parameter_DB_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -1501,17 +1501,17 @@ static int	DBpatch_3050122(void)
 		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
 		int	was_quoted;
 
-		parameter = zbx_strdup(NULL, row[1]);
-		zbx_function_param_parse(parameter, &param_pos, &param_len, &sep_pos);
+		orig_param = zbx_strdup(NULL, row[1]);
+		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter (leading whitespace)*/
-		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter, param_pos);
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
-		unquoted_parameter = zbx_function_param_unquote_dyn(parameter + param_pos, param_len, &was_quoted);
+		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted);
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, parameter, param_pos,
+		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, orig_param, param_pos,
 				param_len, sep_pos, was_quoted);
 
 		if (QUOTED_PARAM == was_quoted)
@@ -1524,7 +1524,7 @@ static int	DBpatch_3050122(void)
 		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
 		{
 			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
-					parameter + param_pos + param_len, sep_pos - param_pos - param_len + 1);
+					orig_param + param_pos + param_len, sep_pos - param_pos - param_len + 1);
 		}
 
 		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(processed_parameter)))
@@ -1535,7 +1535,7 @@ static int	DBpatch_3050122(void)
 					" Allowed length is %d characters.",
 					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
 
-			zbx_free(parameter);
+			zbx_free(orig_param);
 			zbx_free(processed_parameter);
 			zbx_free(unquoted_parameter);
 			zbx_free(parameter_esc_anchored);
@@ -1548,7 +1548,7 @@ static int	DBpatch_3050122(void)
 				"update functions set parameter='%s' where functionid=%s;\n",
 				parameter_DB_esc, row[0]);
 
-		zbx_free(parameter);
+		zbx_free(orig_param);
 		zbx_free(processed_parameter);
 		zbx_free(unquoted_parameter);
 		zbx_free(parameter_esc_anchored);
