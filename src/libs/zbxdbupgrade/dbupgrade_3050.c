@@ -1488,7 +1488,7 @@ static int	DBpatch_3050122(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	int		ret = FAIL;
-	char		*sql = NULL, *orig_param = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
+	char		*sql = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
 			*parameter_esc_anchored = NULL, *parameter_DB_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -1498,13 +1498,13 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
-		int	was_quoted;
+		const char	*orig_param = row[1];
+		size_t		required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
+		int		was_quoted;
 
-		orig_param = zbx_strdup(NULL, row[1]);
 		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
 
-		/* copy what was before the parameter (leading whitespace)*/
+		/* copy leading whitespace (if any) or empty string */
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
 		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted);
@@ -1535,7 +1535,6 @@ static int	DBpatch_3050122(void)
 					" Allowed length is %d characters.",
 					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
 
-			zbx_free(orig_param);
 			zbx_free(processed_parameter);
 			zbx_free(unquoted_parameter);
 			zbx_free(parameter_esc_anchored);
@@ -1548,7 +1547,6 @@ static int	DBpatch_3050122(void)
 				"update functions set parameter='%s' where functionid=%s;\n",
 				parameter_DB_esc, row[0]);
 
-		zbx_free(orig_param);
 		zbx_free(processed_parameter);
 		zbx_free(unquoted_parameter);
 		zbx_free(parameter_esc_anchored);
