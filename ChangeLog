@@ -11,6 +11,7 @@ A.F....... [ZBX-1357] added and enabled Norwegian translation to be displayed by
 ..F....... [ZBXNEXT-4530] implemented changeable session cookie name (miks)
 
 Bug fixes:
+..F....... [ZBX-13165] fixed Y-axis small value gradation issue in graphs (Ivo)
 ..F....... [ZBX-14575] fixed Norwegian locale key for windows (vmurzins)
 .......PS. [ZBX-14566] fixed possible data loss due to MariaDB server restart (vso)
 .......PS. [ZBX-13010] fixed crash of poller processes in ODBC checks, simplified code (Andris, wiper)
@@ -400,6 +401,7 @@ Changes for 3.4.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13165] fixed Y-axis small value gradation issue in graphs (Ivo)
 ..F....... [ZBX-14575] fixed Norwegian locale key for windows (vmurzins)
 .......PS. [ZBX-14566] fixed possible data loss due to MariaDB server restart (vso)
 .......PS. [ZBX-13010] fixed crash of poller processes in ODBC checks, simplified code (Andris, wiper)
