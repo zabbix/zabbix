@@ -35,10 +35,11 @@ class CWidgetHelper {
 	 * @param string $dialogue_name
 	 * @param string $type
 	 * @param array $known_widget_types
+	 * @param CWidgetFieldComboBox $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
-	public static function createFormList($dialogue_name, $type, $known_widget_types) {
+	public static function createFormList($dialogue_name, $type, $known_widget_types, $field_rf_rate) {
 		return (new CFormList())
 			->addRow((new CLabel(_('Type'), 'type')),
 				(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types))
@@ -47,7 +48,8 @@ class CWidgetHelper {
 				(new CTextBox('name',$dialogue_name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			);
+			)
+			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
 	}
 
 	/**

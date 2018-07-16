@@ -25,12 +25,10 @@
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['known_widget_types']
-);
 
-// Refresh rate.
-$form_list->addRow(CWidgetHelper::getLabel($fields['rf_rate']), CWidgetHelper::getComboBox($fields['rf_rate']));
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['known_widget_types'], $fields['rf_rate']
+);
 
 // Items.
 $field_itemids = CWidgetHelper::getItem($fields['itemids'], $data['captions']['ms']['items']['itemids'],
