@@ -1499,7 +1499,7 @@ static int	DBpatch_3050122(void)
 	{
 		const char	*orig_param = row[1];
 		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_esc_anchored = NULL,
-				*parameter_DB_esc;
+				*db_parameter_esc;
 		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, required_len;
 		int		was_quoted;
 
@@ -1553,14 +1553,14 @@ static int	DBpatch_3050122(void)
 			continue;
 		}
 
-		parameter_DB_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
 		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
-				parameter_DB_esc, row[0]);
+				db_parameter_esc, row[0]);
 
-		zbx_free(parameter_DB_esc);
+		zbx_free(db_parameter_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
