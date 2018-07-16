@@ -83,12 +83,12 @@ class CWidgetFormProblems extends CWidgetForm {
 		}
 		$this->fields[] = $field_severities;
 
-		// Tag evalype (AND/OR).
+		// Tag evalype (And/Or).
 		$field_evaltype = (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
-			TAG_EVAL_TYPE_AND => _('AND'),
-			TAG_EVAL_TYPE_OR => _('OR')
+			TAG_EVAL_TYPE_AND_OR => _('And/Or'),
+			TAG_EVAL_TYPE_OR => _('Or')
 		]))
-			->setDefault(TAG_EVAL_TYPE_AND)
+			->setDefault(TAG_EVAL_TYPE_AND_OR)
 			->setModern(true);
 
 		if (array_key_exists('evaltype', $this->data)) {
@@ -137,6 +137,11 @@ class CWidgetFormProblems extends CWidgetForm {
 		}
 		$this->fields[] = $field_unacknowledged;
 
+		$enabled_show_timeline = [
+			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
+			SCREEN_SORT_TRIGGERS_TIME_ASC => true
+		];
+
 		// sort entries by
 		$field_sort = (new CWidgetFieldComboBox('sort_triggers', _('Sort entries by'), [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
@@ -147,12 +152,33 @@ class CWidgetFormProblems extends CWidgetForm {
 			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
-		]))->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC);
+		]))
+			->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
+			->setAction(
+				'jQuery(":checkbox[name=show_timeline]")'.
+					'.filter(":disabled").prop("checked", true).end()'.
+					'.prop("disabled", !'.CJs::encodeJson($enabled_show_timeline).'[this.value])'.
+					'.filter(":disabled").prop("checked", false)'
+			);
 
 		if (array_key_exists('sort_triggers', $this->data)) {
 			$field_sort->setValue($this->data['sort_triggers']);
 		}
 		$this->fields[] = $field_sort;
+
+		// show timeline
+		$field_show_timeline = (new CWidgetFieldCheckBox('show_timeline', _('Show timeline')))->setDefault(1);
+
+		if (array_key_exists('show_timeline', $this->data)) {
+			$field_show_timeline->setValue($this->data['show_timeline']);
+		}
+		elseif (count($this->data) === 0) {
+			$field_show_timeline->setValue(1);
+		}
+		if (!array_key_exists($field_sort->getValue(), $enabled_show_timeline)) {
+			$field_show_timeline->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+		$this->fields[] = $field_show_timeline;
 
 		// show lines
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,

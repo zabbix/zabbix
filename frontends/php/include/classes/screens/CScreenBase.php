@@ -110,11 +110,6 @@ class CScreenBase {
 	public $profileIdx2;
 
 	/**
-	 * @see CScreenBuilder::updateProfile
-	 */
-	public $updateProfile;
-
-	/**
 	 * Time control dom element id
 	 *
 	 * @var string
@@ -157,11 +152,10 @@ class CScreenBase {
 	 * @param string	$options['action']
 	 * @param int		$options['groupid']
 	 * @param int		$options['hostid']
-	 * @param int		$options['period']
-	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
-	 * @param boolean	$options['updateProfile']
+	 * @param string	$options['profileIdx']          Profile idx value.
+	 * @param int		$options['profileIdx2']         Profile idx2 value.
+	 * @param string	$options['from']                Start time of selected time period.
+	 * @param string	$options['to']                  End time of selected time period.
 	 * @param array		$options['timeline']
 	 * @param string	$options['dataId']
 	 */
@@ -179,7 +173,6 @@ class CScreenBase {
 			'pageFile'			=> null,
 			'profileIdx'		=> '',
 			'profileIdx2'		=> null,
-			'updateProfile'		=> false,
 			'timeline'			=> null,
 			'dataId'			=> null,
 			'page'				=> 1
@@ -206,7 +199,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> false
 				];
@@ -222,7 +214,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> false
 				];
@@ -238,7 +229,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
-					'updateProfile'		=> false,
 					'timeline'			=> false,
 					'page'				=> true
 				];
@@ -254,7 +244,6 @@ class CScreenBase {
 					'pageFile'			=> false,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> true
 				];
@@ -270,7 +259,6 @@ class CScreenBase {
 					'pageFile'			=> true,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> true
 				];
@@ -286,7 +274,6 @@ class CScreenBase {
 					'pageFile'			=> true,
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
-					'updateProfile'		=> true,
 					'timeline'			=> true,
 					'page'				=> false
 				];
@@ -341,13 +328,11 @@ class CScreenBase {
 
 		// Calculate timeline.
 		if ($this->required_parameters['timeline'] && $this->timeline === null) {
-			$this->timeline = calculateTime([
+			$this->timeline = getTimeSelectorPeriod([
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
-				'updateProfile' => $this->updateProfile,
-				'period' => array_key_exists('period', $options) ? $options['period'] : null,
-				'stime' => array_key_exists('stime', $options) ? $options['stime'] : null,
-				'isNow' => array_key_exists('isNow', $options) ? $options['isNow'] : null
+				'from' => array_key_exists('from', $options) ? $options['from'] : null,
+				'to' => array_key_exists('to', $options) ? $options['to'] : null
 			]);
 		}
 

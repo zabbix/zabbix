@@ -116,13 +116,13 @@ class testPageApplications extends CWebTest {
 			// Check disabled creation button of application
 			$this->zbxTestAssertElementText("//button[@id='form']", 'Create application (select host first)');
 			$this->zbxTestAssertAttribute("//button[@id='form']",'disabled','true');
-			$this->zbxTestAssertElementNotPresentXpath("//ul[@class='object-group']");
+			$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		}
 
 		if ($data['group'] != 'all') {
 			$group_app= [];
 			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
-					. " WHERE hg.groupid=(SELECT groupid FROM groups WHERE name='".$data['group']."')";
+					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['group']."')";
 			$result = DBselect($sql_all_applications);
 			while ($row = DBfetch($result)) {
 				$group_app[] = $row['name'];

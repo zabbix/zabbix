@@ -25,6 +25,7 @@ $widget = (new CWidget())
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
 			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
 			'/',
@@ -35,8 +36,7 @@ $widget = (new CWidget())
 						->setArgument('elementid', $data['screen']['screenid'])
 						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 				))
-	]))
-	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
+	]));
 
 $controls = (new CList())
 	->addItem(
@@ -103,23 +103,24 @@ $widget->setControls((new CTag('nav', true, (new CList())
 $screenBuilder = new CScreenBuilder([
 	'screenid' => $data['screen']['screenid'],
 	'mode' => SCREEN_MODE_PREVIEW,
-	'profileIdx' => 'web.screens',
-	'profileIdx2' => $data['screen']['screenid'],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
-	'period' => $data['period'],
-	'stime' => $data['stime'],
-	'isNow' => $data['isNow'],
-	'updateProfile' => ($data['period'] !== null || $data['stime'] !== null || $data['isNow'] !== null)
+	'profileIdx' => $data['profileIdx'],
+	'profileIdx2' => $data['profileIdx2'],
+	'from' => $data['from'],
+	'to' => $data['to']
 ]);
-$widget->addItem(
-	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-);
 
-CScreenBuilder::insertScreenStandardJs([
-	'timeline' => $screenBuilder->timeline,
-	'profileIdx' => $screenBuilder->profileIdx,
-	'profileIdx2' => $screenBuilder->profileIdx2
-]);
+$widget
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
+	)
+	->addItem(
+		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	);
+
+CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 
 return $widget;

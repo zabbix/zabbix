@@ -32,7 +32,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	public static function allGroups() {
 
-		return DBdata('SELECT name FROM groups ORDER BY groupid');
+		return DBdata('SELECT name FROM hstgrp ORDER BY groupid');
 	}
 
 	public static function AlertUsrgrpid() {
@@ -76,7 +76,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
-		$sql = 'SELECT groupid FROM groups';
+		$sql = 'SELECT groupid FROM hstgrp';
 		$hgroups = DBfetchArray(DBselect($sql));
 		foreach ($hgroups as $group) {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");

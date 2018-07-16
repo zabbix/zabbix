@@ -95,7 +95,10 @@ $widget->setControls((new CList([
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-$filter = (new CFilter('web.slides.filter.state'))->addNavigator();
+$filter = (new CFilter())
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 $widget->addItem($filter);
 
 $widget->addItem(
