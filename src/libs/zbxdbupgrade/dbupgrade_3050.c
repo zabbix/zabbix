@@ -1447,36 +1447,16 @@ static int	DBpatch_3050121(void)
 
 #define	QUOTED_PARAM	1
 
-static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char *orig_param, size_t param_pos,
-		size_t param_len, size_t sep_pos, int was_quoted)
+static void	DBpatch_3050122_add_anchors(const char *src, char **dst, size_t src_len)
 {
-	char	*pout;
-	size_t	src_len, twsl;
+	char	*pout = *dst;
 
-	src_len = strlen(src);
-
-	/* calculate trailing whitespace length */
-	if (QUOTED_PARAM != was_quoted)
-		twsl = sep_pos - param_pos - param_len;
-	else
-		twsl = 0;
-
-	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
-	*dst = (char *)zbx_malloc(NULL, src_len + 3 + twsl);
-
-	pout = *dst;
 	*pout++ = '^';		/* start anchor */
 
 	if (0 != src_len)	/* parameter body */
 	{
 		memcpy(pout, src, src_len);
 		pout += src_len;
-	}
-
-	if (QUOTED_PARAM != was_quoted)	/* trailing whitespace */
-	{
-		memcpy(pout, orig_param + param_pos + param_len, twsl);
-		pout += twsl;
 	}
 
 	*pout++ = '$';		/* end anchor */
@@ -1512,8 +1492,12 @@ static int	DBpatch_3050122(void)
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, orig_param, param_pos,
-				param_len, sep_pos, was_quoted);
+		required_len = strlen(unquoted_parameter);
+
+		/* increasing length by 3 for ^, $, '\0' */
+		parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3);
+
+		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, required_len);
 
 		zbx_free(unquoted_parameter);
 
@@ -1534,12 +1518,9 @@ static int	DBpatch_3050122(void)
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
 		zbx_free(parameter_esc_anchored);
 
-		/* for quoted parameters copy trailing part and add that after quotes */
-		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
-		{
-			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
-					orig_param + param_pos + param_len, sep_pos - param_pos - param_len + 1);
-		}
+		/* copy trailing whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
+				sep_pos - param_pos - param_len + 1);
 
 		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(processed_parameter)))
 		{
