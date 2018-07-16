@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha9
 
 New features:
+..F....... [ZBXNEXT-4454] added screen reader attributes for common elements (ashubin)
 A.F.....S. [ZBXNEXT-4200] added ability to create LLD item prototype of type "dependent" with a master item not only item prototype (Ivo, Sergejs)
 ........S. [ZBXNEXT-1701] added support of regular expressions and global regular expressions to "logsource()" trigger function (viktors)
 ........S. [ZBXNEXT-4586] added support of macros {ITEM.VALUE} and {ITEM.LASTVALUE} to trigger URL (vasilijs, viktors)
