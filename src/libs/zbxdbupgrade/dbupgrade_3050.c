@@ -1488,8 +1488,7 @@ static int	DBpatch_3050122(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 	int		ret = FAIL;
-	char		*sql = NULL, *processed_parameter = NULL, *unquoted_parameter = NULL,
-			*parameter_esc_anchored = NULL, *parameter_DB_esc;
+	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1499,7 +1498,9 @@ static int	DBpatch_3050122(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*orig_param = row[1];
-		size_t		required_len, param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0;
+		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_esc_anchored = NULL,
+				*parameter_DB_esc;
+		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, required_len;
 		int		was_quoted;
 
 		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
@@ -1520,7 +1521,7 @@ static int	DBpatch_3050122(void)
 		/* copy the parameter */
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
 
-		/* for quoted parameters copy what was after the parameter and add that after quotes */
+		/* for quoted parameters copy trailing part and add that after quotes */
 		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
 		{
 			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
