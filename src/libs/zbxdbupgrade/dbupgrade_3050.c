@@ -1517,8 +1517,18 @@ static int	DBpatch_3050122(void)
 
 		zbx_free(unquoted_parameter);
 
-		if (QUOTED_PARAM == was_quoted)
-			zbx_function_param_quote(&parameter_esc_anchored, was_quoted);	/* cannot return FAIL */
+		if (QUOTED_PARAM == was_quoted &&
+				SUCCEED != zbx_function_param_quote(&parameter_esc_anchored, was_quoted))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
+					" logsource (functionid: %s) to regexp during database upgrade. The"
+					" parameter needs to but cannot be quoted after conversion.",
+					row[1], row[0]);
+
+			zbx_free(parameter_esc_anchored);
+			zbx_free(processed_parameter);
+			continue;
+		}
 
 		/* copy the parameter */
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
