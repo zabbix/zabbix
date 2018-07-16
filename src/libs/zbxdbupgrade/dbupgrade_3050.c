@@ -1515,11 +1515,14 @@ static int	DBpatch_3050122(void)
 		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, orig_param, param_pos,
 				param_len, sep_pos, was_quoted);
 
+		zbx_free(unquoted_parameter);
+
 		if (QUOTED_PARAM == was_quoted)
-			zbx_function_param_quote(&parameter_esc_anchored, was_quoted);
+			zbx_function_param_quote(&parameter_esc_anchored, was_quoted);	/* cannot return FAIL */
 
 		/* copy the parameter */
 		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
+		zbx_free(parameter_esc_anchored);
 
 		/* for quoted parameters copy trailing part and add that after quotes */
 		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
@@ -1537,20 +1540,16 @@ static int	DBpatch_3050122(void)
 					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
-			zbx_free(unquoted_parameter);
-			zbx_free(parameter_esc_anchored);
 			continue;
 		}
 
 		parameter_DB_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
 				parameter_DB_esc, row[0]);
 
-		zbx_free(processed_parameter);
-		zbx_free(unquoted_parameter);
-		zbx_free(parameter_esc_anchored);
 		zbx_free(parameter_DB_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
