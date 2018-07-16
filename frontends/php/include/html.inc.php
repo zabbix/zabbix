@@ -897,22 +897,30 @@ function makeInformationIcon($message) {
  * Renders an icon for suppressed problem.
  *
  * @param array  $icon_data
- * @param string $icon_data['suppress_until']   Time until the problem is suppressed.
- * @param string $icon_data['maintenance_name'] Name of the maintenance.
+ * @param string $icon_data[]['suppress_until']   Time until the problem is suppressed.
+ * @param string $icon_data[]['maintenance_name'] Name of the maintenance.
  *
  * @return CSpan
  */
 function makeSuppressedProblemIcon(array $icon_data) {
+	$suppress_until = zbx_objectValues($icon_data, 'suppress_until');
+	rsort($suppress_until);
+	$suppress_until = reset($suppress_until);
+
+	$maintenance_name = zbx_objectValues($icon_data, 'maintenance_name');
+	asort($maintenance_name);
+	$maintenance_name = implode(', ', $maintenance_name);
+
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(
-			_s('Suppressed till: %s', ($icon_data['suppress_until'] >= strtotime('today'))
-				? zbx_date2str(TIME_FORMAT_SECONDS, $icon_data['suppress_until'])
-				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $icon_data['suppress_until'])
+			_s('Suppressed till: %s', ($suppress_until >= strtotime('today'))
+				? zbx_date2str(TIME_FORMAT_SECONDS, $suppress_until)
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $suppress_until)
 			).
 			"\n".
-			_s('Maintenance: %s', $icon_data['maintenance_name'])
+			_s('Maintenance: %s', $maintenance_name)
 		);
 }
 

@@ -1130,13 +1130,13 @@ class CEvent extends CApiService {
 			if ($options['selectSuppressionData'] === API_OUTPUT_EXTEND) {
 				$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
 			}
-			$relation_map = $this->createRelationMap($result, 'eventid', 'maintenanceid', 'event_suppress');
+			$relation_map = $this->createRelationMap($result, 'eventid', 'event_suppressid', 'event_suppress');
 			$suppression_data = API::getApiService()->select('event_suppress', [
 				'output' => $options['selectSuppressionData'],
-				'filter' => ['maintenanceid' => $relation_map->getRelatedIds()],
+				'filter' => ['event_suppressid' => $relation_map->getRelatedIds()],
 				'preservekeys' => true
 			]);
-			$result = $relation_map->mapOne($result, $suppression_data, 'suppression_data');
+			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
 		}
 
 		// Adding event tags.

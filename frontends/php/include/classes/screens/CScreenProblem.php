@@ -358,16 +358,21 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * Adds maintenance names of suppressed problems.
 	 *
-	 * @param array  $problems
-	 * @param array  $problems['suppression_data']
-	 * @param array  $problems['suppression_data']['maintenanceid']
+	 * @param array $problems
+	 * @param array $problems[]['suppression_data']
+	 * @param int   $problems[]['suppression_data']['maintenanceid']
 	 *
 	 * @static
 	 */
 	private static function addMaintenanceNames(array &$problems) {
-		$maintenanceids = array_unique(
-			zbx_objectValues(zbx_objectValues($problems, 'suppression_data'), 'maintenanceid')
-		);
+		$maintenanceids = [];
+		foreach ($problems as $problem) {
+			if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+				foreach ($problem['suppression_data'] as $data) {
+					$maintenanceids[] = $data['maintenanceid'];
+				}
+			}
+		}
 		$maintenances = $maintenanceids
 			? API::Maintenance()->get([
 				'output' => ['name'],
@@ -378,8 +383,10 @@ class CScreenProblem extends CScreenBase {
 		if ($maintenances) {
 			foreach ($problems as &$problem) {
 				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-					$problem['suppression_data']['maintenance_name'] =
-						$maintenances[$problem['suppression_data']['maintenanceid']]['name'];
+					foreach ($problem['suppression_data'] as &$data) {
+						$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
+					}
+					unset($data);
 				}
 			}
 			unset($problem);
@@ -968,7 +975,9 @@ class CScreenProblem extends CScreenBase {
 							(new CButton(null))
 								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
 								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
-							))->addClass(ZBX_STYLE_REL_CONTAINER)
+							))
+								->addClass(ZBX_STYLE_REL_CONTAINER)
+								->addStyle('min-height: 16px;')
 					: makeInformationList($info_icons);
 
 				$options = [
