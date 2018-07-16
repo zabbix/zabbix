@@ -1784,7 +1784,7 @@ static void	save_event_suppress_data(void)
 		zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
-	if (0 == event_refs.values_num || SUCCEED != zbx_dc_get_running_maintenanceids(0, &maintenanceids))
+	if (0 == event_refs.values_num || SUCCEED != zbx_dc_get_running_maintenanceids(&maintenanceids))
 		goto out;
 
 	/* prepare query data  */

@@ -6194,7 +6194,6 @@ int	init_configuration_cache(char **error)
 	config->maintenance_revision = 0;
 	config->maintenance_update_revision = 0;
 	config->maintenance_modified_num = 0;
-	config->maintenance_stopped_num = 0;
 	config->maintenance_event_updates_num = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
@@ -12197,15 +12196,13 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
  *                                      Note that started/stopped maintenances*
  *                                      also counts as modified.              *
  *                                      (ignored if pupdate_revision is null) *
- *             pstopped_num     - [OUT] the number of stopped maintenances    *
- *                                      (ignored if pupdate_revision is null) *
  *                                                                            *
  * Comments: This function calculates if any maintenance period is running    *
  *           and based on that sets current maintenance state - running/idle  *
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_num, int *pstopped_num)
+void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_num)
 {
 	const char			*__function_name = "zbx_dc_update_maintenances";
 
@@ -12308,17 +12305,15 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	{
 		*pupdate_revision = config->maintenance_revision;
 		*pmodified_num = modified_num;
-		*pstopped_num = stopped_num;
 
 		config->maintenance_update_revision = *pupdate_revision;
 		config->maintenance_modified_num = modified_num;
-		config->maintenance_stopped_num = stopped_num;
 	}
 
-	/* If any maintenance has been started/updated then timers will have to */
+	/* If any maintenance has been modified then timers will have to        */
 	/* perform maintenance updates for problem events. Reset event update   */
 	/* counter to track the event update progress by timers.                */
-	if (0 != modified_num - stopped_num)
+	if (0 != modified_num)
 		config->maintenance_event_updates_num = 0;
 
 	UNLOCK_CACHE;
@@ -12577,12 +12572,11 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
  *             stopped_num     - [OUT] the number of stopped maintenances     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_maintenance_update_stats(zbx_uint64_t *update_revision, int *modified_num, int *stopped_num)
+void	zbx_dc_get_maintenance_update_stats(zbx_uint64_t *update_revision, int *modified_num)
 {
 	RDLOCK_CACHE;
 	*update_revision = config->maintenance_update_revision;
 	*modified_num = config->maintenance_modified_num;
-	*stopped_num = config->maintenance_stopped_num;
 	UNLOCK_CACHE;
 }
 
@@ -12935,7 +12929,7 @@ void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
  *               FAIL    - no running maintenances were found                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t *maintenanceids)
+int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 {
 	zbx_dc_maintenance_t	*maintenance;
 	zbx_hashset_iter_t	iter;
@@ -12945,7 +12939,7 @@ int	zbx_dc_get_running_maintenanceids(zbx_uint64_t revision, zbx_vector_uint64_t
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
 	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_MAINTENANCE_RUNNING == maintenance->state && maintenance->revision > revision)
+		if (ZBX_MAINTENANCE_RUNNING == maintenance->state)
 			zbx_vector_uint64_append(maintenanceids, maintenance->maintenanceid);
 	}
 
