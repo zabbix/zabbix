@@ -1445,8 +1445,6 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
-#define	QUOTED_PARAM	1
-
 static void	DBpatch_3050122_add_anchors(const char *src, char **dst, size_t src_len)
 {
 	char	*pout = *dst;
@@ -1462,6 +1460,8 @@ static void	DBpatch_3050122_add_anchors(const char *src, char **dst, size_t src_
 	*pout++ = '$';				/* end anchor */
 	*pout = '\0';
 }
+
+#define	QUOTED_PARAM	1
 
 static int	DBpatch_3050122(void)
 {
