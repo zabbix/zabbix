@@ -32,6 +32,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'uniqueid' => 'required|string',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'initial_load' => 'in 0,1',
+			'content_width' => 'int32',
+			'content_height' => 'int32',
 			//'edit_mode' => 'in 0,1',
 			'fields' => 'json'
 		]);
@@ -41,6 +43,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$initial_load = $this->getInput('initial_load', 1);
 		$uniqueid = $this->getInput('uniqueid');
+		$width = (int) $this->getInput('content_width', 100);
+		$height = (int) $this->getInput('content_height', 100);
 		$script_inline = '';
 
 		$graph_data = [
@@ -98,16 +102,15 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		// Set left Y axis options.
 		if (array_key_exists('lefty', $fields) && $fields['lefty'] == SVG_GRAPH_AXIS_Y_SHOW) {
-			$graph_data['left_y_axis'] = [
-				'min' => (array_key_exists('lefty_min', $fields) && $fields['lefty_min'] !== '')
-					? $fields['lefty_min']
-					: null,
-				'max' => (array_key_exists('lefty_max', $fields) && $fields['lefty_max'] !== '')
-					? $fields['lefty_max']
-					: null
-			];
+			$graph_data['left_y_axis'] = [];
 
-			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] != SVG_GRAPH_AXIS_UNITS_STATIC) {
+			if (array_key_exists('lefty_min', $fields) && $fields['lefty_min'] !== '') {
+				$graph_data['left_y_axis']['min'] = $fields['lefty_min'];
+			}
+			if (array_key_exists('lefty_max', $fields) && $fields['lefty_max'] !== '') {
+				$graph_data['left_y_axis']['max'] = $fields['lefty_max'];
+			}
+			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['left_y_axis']['units'] = array_key_exists('lefty_static_units', $fields)
 					? $fields['lefty_static_units']
 					: '';
@@ -116,16 +119,15 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		// Set right Y axis options.
 		if (array_key_exists('righty', $fields) && $fields['righty'] == SVG_GRAPH_AXIS_Y_SHOW) {
-			$graph_data['right_y_axis'] = [
-				'min' => (array_key_exists('righty_min', $fields) && $fields['righty_min'] !== '')
-					? $fields['righty_min']
-					: null,
-				'max' => (array_key_exists('righty_max', $fields) && $fields['righty_max'] !== '')
-					? $fields['righty_max']
-					: null
-			];
+			$graph_data['right_y_axis'] = [];
 
-			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] != SVG_GRAPH_AXIS_UNITS_STATIC) {
+			if (array_key_exists('righty_min', $fields) && $fields['righty_min'] !== '') {
+				$graph_data['right_y_axis']['min'] = $fields['righty_min'];
+			}
+			if (array_key_exists('righty_max', $fields) && $fields['righty_max'] !== '') {
+				$graph_data['right_y_axis']['max'] = $fields['righty_max'];
+			}
+			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['right_y_axis']['units'] = array_key_exists('righty_static_units', $fields)
 					? $fields['righty_static_units']
 					: '';
@@ -137,10 +139,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_data['x_axis'] = SVG_GRAPH_AXIS_X_SHOW;
 		}
 
-		// Show legend.
-		if (array_key_exists('legend', $fields) && $fields['legend'] == SVG_GRAPH_LEGEND_SHOW) {
-			$graph_data['show_legend'] = SVG_GRAPH_AXIS_X_SHOW;
-		}
+		// Legend type.
+		$graph_data['legend'] = array_key_exists('legend', $fields) ? $fields['legend'] : SVG_GRAPH_LEGEND_TYPE_NONE;
 
 		// Show problems.
 		if (array_key_exists('show_problems', $fields) && $fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
@@ -156,7 +156,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			}
 
 			// Problem severities.
-			$graph_data['problems']['severities'] = array_key_exists('severities', $fields)
+			$graph_data['problems']['severities'] = (array_key_exists('severities', $fields) && $fields['severities'])
 				? $fields['severities']
 				: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 
@@ -182,8 +182,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_data['overrides'] = $fields['or'];
 		}
 
-		$svg_data = CSvgGraphHelper::get($graph_data);
-
+		$svg_data = CSvgGraphHelper::get($graph_data, $width, $height);
 		if ($svg_data['errors']) {
 			error($svg_data['errors']);
 		}

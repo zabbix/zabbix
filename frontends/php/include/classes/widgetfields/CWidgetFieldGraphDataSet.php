@@ -37,7 +37,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
+			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'fill'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
@@ -55,9 +55,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'color' => '0062fd',
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'width' => 1,
-			'radius' => 0,
+			'radius' => 3,
 			'transparency' => 5,
-			'fill' => 5,
+			'fill' => 3,
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE
@@ -166,7 +166,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Width'),
 						(new CInput('range', $fn.'['.$options['row_num'].'][width]', (int) $value['width']))
 							->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-							->setAttribute('min', 1)
+							->setAttribute('min', 0)
 							->setAttribute('max', 10)
 					)
 					->addRow(_('Radius'),

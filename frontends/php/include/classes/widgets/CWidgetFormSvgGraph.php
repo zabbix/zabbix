@@ -304,7 +304,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 *
 		 * Contains single check-box field to show/hide legend.
 		 */
-		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(SVG_GRAPH_LEGEND_SHOW);
+		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(SVG_GRAPH_LEGEND_TYPE_SHORT);
 		if (array_key_exists('legend', $this->data)) {
 			$field_legend->setValue($this->data['legend']);
 		}

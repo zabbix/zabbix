@@ -38,7 +38,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 7],
 			'type'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
+			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'fill'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
@@ -213,6 +213,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'options' => [
 						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '#000000']],
 
+						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
 						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
 						['name' => _('Width').'/2', 'callback' => 'addOverride', 'args' => ['width', 2]],
 						['name' => _('Width').'/3', 'callback' => 'addOverride', 'args' => ['width', 3]],
@@ -228,6 +229,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						['name' => _('Draw').'/'._('Points'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_POINTS]],
 						['name' => _('Draw').'/'._('Staircase'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_STAIRCASE]],
 
+						['name' => _('Transparency').'/0', 'callback' => 'addOverride', 'args' => ['transparency', 0]],
 						['name' => _('Transparency').'/1', 'callback' => 'addOverride', 'args' => ['transparency', 1]],
 						['name' => _('Transparency').'/2', 'callback' => 'addOverride', 'args' => ['transparency', 2]],
 						['name' => _('Transparency').'/3', 'callback' => 'addOverride', 'args' => ['transparency', 3]],
@@ -239,6 +241,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						['name' => _('Transparency').'/9', 'callback' => 'addOverride', 'args' => ['transparency', 9]],
 						['name' => _('Transparency').'/10', 'callback' => 'addOverride', 'args' => ['transparency', 10]],
 
+						['name' => _('Fill').'/0', 'callback' => 'addOverride', 'args' => ['fill', 0]],
 						['name' => _('Fill').'/1', 'callback' => 'addOverride', 'args' => ['fill', 1]],
 						['name' => _('Fill').'/2', 'callback' => 'addOverride', 'args' => ['fill', 2]],
 						['name' => _('Fill').'/3', 'callback' => 'addOverride', 'args' => ['fill', 3]],
