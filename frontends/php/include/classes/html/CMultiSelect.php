@@ -33,14 +33,21 @@ class CMultiSelect extends CTag {
 
 		$options = $this->mapOptions($options);
 
-		$this->addClass('multiselect');
-		$this->setId(zbx_formatDomId($options['name']));
+		$this
+			->setId(zbx_formatDomId($options['name']))
+			->addClass('multiselect')
+			->setAttribute('role', 'application')
+			->addItem((new CDiv())
+				->setAttribute('aria-live', 'assertive')
+				->setAttribute('aria-atomic', 'true')
+			)
+			->js_event_name = sprintf('multiselect_%s_init', $this->getId());
 
 		// Autocomplete url.
-		$url = new CUrl('jsrpc.php');
-		$url->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
-		$url->setArgument('method', 'multiselect.get');
-		$url->setArgument('objectName', $options['objectName']);
+		$url = (new CUrl('jsrpc.php'))
+			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
+			->setArgument('method', 'multiselect.get')
+			->setArgument('objectName', $options['objectName']);
 
 		if (array_key_exists('objectOptions', $options)) {
 			foreach ($options['objectOptions'] as $option_name => $option_value) {

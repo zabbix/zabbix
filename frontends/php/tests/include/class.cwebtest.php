@@ -247,6 +247,25 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function zbxTestTextPresentInMessageDetails($strings) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-details'));
+		if (!is_array($strings)) {
+			$strings = [$strings];
+		}
+
+		foreach ($strings as $string) {
+			$quote = '"';
+			if (strpos($string, $quote) !== false) {
+				$quote = '\'';
+				if (strpos($string, $quote) !== false) {
+					$this->fail('Cannot assert message detail text containig both single and double quotes.');
+				}
+			}
+
+			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.$quote.$string.$quote.')]');
+		}
+	}
+
 	public function zbxTestTextVisibleOnPage($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
@@ -269,8 +288,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 
 		foreach ($strings as $string) {
-			$elements = $this->webDriver->findElement(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
-			$this->assertFalse($elements->isDisplayed());
+			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			foreach ($elements as $element) {
+				$this->assertFalse($element->isDisplayed());
+			}
 		}
 	}
 
@@ -433,6 +454,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if ($validate) {
 			$this->zbxTestWaitUntilElementValuePresent(WebDriverBy::xpath($xpath), $str);
 		}
+	}
+
+	public function zbxTestInputClearAndTypeByXpath($xpath, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->clear()->sendKeys($str);
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {

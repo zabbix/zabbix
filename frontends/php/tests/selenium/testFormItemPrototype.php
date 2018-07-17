@@ -1132,7 +1132,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestAssertVisibleId('interval_add');
 				break;
 			default:
-				$this->zbxTestTextNotVisibleOnPage(['Custom intervals', 'Interval',  'Period', 'Action']);
+				$this->zbxTestTextNotVisibleOnPage(['Custom intervals', 'Interval', 'Period']);
 				$this->zbxTestAssertNotVisibleId('delayFlexTable');
 
 				$this->zbxTestTextNotVisibleOnPage(['Flexible', 'Scheduling']);
