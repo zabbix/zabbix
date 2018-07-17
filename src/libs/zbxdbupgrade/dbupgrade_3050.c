@@ -1459,8 +1459,6 @@ static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_l
 	*dst = '\0';
 }
 
-#define	QUOTED_PARAM	1
-
 static int	DBpatch_3050122(void)
 {
 	DB_ROW		row;
