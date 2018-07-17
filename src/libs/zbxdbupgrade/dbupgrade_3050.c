@@ -1451,15 +1451,15 @@ static void	DBpatch_3050122_add_anchors(const char *src, char **dst, size_t src_
 {
 	char	*pout = *dst;
 
-	*pout++ = '^';		/* start anchor */
+	*pout++ = '^';				/* start anchor */
 
-	if (0 != src_len)	/* parameter body */
+	if (0 != src_len)
 	{
-		memcpy(pout, src, src_len);
+		memcpy(pout, src, src_len);	/* parameter body */
 		pout += src_len;
 	}
 
-	*pout++ = '$';		/* end anchor */
+	*pout++ = '$';				/* end anchor */
 	*pout = '\0';
 }
 
@@ -1478,9 +1478,9 @@ static int	DBpatch_3050122(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*orig_param = row[1];
-		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_esc_anchored = NULL,
+		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_anchored = NULL,
 				*db_parameter_esc;
-		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, required_len;
+		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, current_len;
 		int		was_quoted;
 
 		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
@@ -1492,43 +1492,41 @@ static int	DBpatch_3050122(void)
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		required_len = strlen(unquoted_parameter);
+		current_len = strlen(unquoted_parameter);
 
 		/* increasing length by 3 for ^, $, '\0' */
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, required_len + 3);
-
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, required_len);
-
+		parameter_anchored = (char *)zbx_malloc(NULL, current_len + 3);
+		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_anchored, current_len);
 		zbx_free(unquoted_parameter);
 
 		if (QUOTED_PARAM == was_quoted &&
-				SUCCEED != zbx_function_param_quote(&parameter_esc_anchored, was_quoted))
+				SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
 					" logsource (functionid: %s) to regexp during database upgrade. The"
 					" parameter needs to but cannot be quoted after conversion.",
 					row[1], row[0]);
 
-			zbx_free(parameter_esc_anchored);
+			zbx_free(parameter_anchored);
 			zbx_free(processed_parameter);
 			continue;
 		}
 
 		/* copy the parameter */
-		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
-		zbx_free(parameter_esc_anchored);
+		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_anchored);
+		zbx_free(parameter_anchored);
 
 		/* copy trailing whitespace (if any) or empty string */
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
 				sep_pos - param_pos - param_len + 1);
 
-		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(processed_parameter)))
+		if (FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
