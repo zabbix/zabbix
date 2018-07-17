@@ -1761,10 +1761,13 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 			if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 					&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
-				$login_form = 'index_http.php';
-			}
-			else {
-				$login_form = 'index.php';
+				$redirect = (new CUrl('index_http.php'))
+					->setArgument('request', getRequest('request', $_SERVER['REQUEST_URI']))
+					->removeArgument('sid')
+					->getUrl();
+
+				redirect($redirect);
+				exit;
 			}
 
 			$data = [
@@ -1774,11 +1777,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					(new CButton('login', _('Login')))->onClick('document.location = "'.
-						(new CUrl($login_form))
-							->setArgument('request', $url)
-							->getUrl().
-						'";')
+					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
 				]
 			];
 		}
