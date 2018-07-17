@@ -66,6 +66,7 @@ class testFormItemHttpAgent extends CWebTest {
 	 */
 	private function checkFormFields($rows) {
 		$this->zbxTestClickLinkTextWait($rows['Name']);
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@name]';
@@ -103,9 +104,11 @@ class testFormItemHttpAgent extends CWebTest {
 					// break is not missing here.
 				case 'update':
 					if (array_key_exists('name', $field_pair)) {
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
 						$this->zbxTestInputType($id_part.'_name_'.$i, $field_pair['name']);
 					}
 					if (array_key_exists('value', $field_pair)) {
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_value_'.$i));
 						$this->zbxTestInputType($id_part.'_value_'.$i, $field_pair['value']);
 					}
 					break;
@@ -1006,7 +1009,7 @@ class testFormItemHttpAgent extends CWebTest {
 	 *
 	 * @dataProvider getCreataData
 	 */
-	public function testFormItemHttpAgent_Create($data) {
+	public function testFormItemHttpAgent_Sreate($data) {
 		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
