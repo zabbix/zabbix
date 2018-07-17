@@ -1762,7 +1762,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 					&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
 				$redirect = (new CUrl('index_http.php'))
-					->setArgument('request', getRequest('request', $_SERVER['REQUEST_URI']))
+					->setArgument('request', getRequest('request', (new CUrl())->getUrl()))
 					->removeArgument('sid')
 					->getUrl();
 
