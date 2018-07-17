@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -146,7 +147,14 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
-			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+			try
+			{
+				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
+			}
+			catch (InstanceNotFoundException e)
+			{
+				throw new ZabbixException("Object or attribute not found.");
+			}
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
