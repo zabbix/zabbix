@@ -196,10 +196,9 @@ class JMXItemChecker extends ItemChecker
 
 		if (fieldNames.equals(""))
 		{
-
 			try
 			{
-				if (isPrimitiveAttributeType(dataObject.getClass()))
+				if (isPrimitiveAttributeType(dataObject))
 					return dataObject.toString();
 				else
 					throw new NoSuchMethodException();
@@ -305,7 +304,7 @@ class JMXItemChecker extends ItemChecker
 	{
 		logger.trace("drilling down with attribute path '{}'", attrPath);
 
-		if (isPrimitiveAttributeType(attribute.getClass()))
+		if (isPrimitiveAttributeType(attribute))
 		{
 			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
 
@@ -336,7 +335,7 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
 	}
 
-	private boolean isPrimitiveAttributeType(Class<?> clazz) throws NoSuchMethodException
+	private boolean isPrimitiveAttributeType(Object obj) throws NoSuchMethodException
 	{
 		Class<?>[] clazzez = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
 			Float.class, Double.class, String.class, java.math.BigDecimal.class, java.math.BigInteger.class,
@@ -344,6 +343,9 @@ class JMXItemChecker extends ItemChecker
 			java.util.concurrent.atomic.AtomicInteger.class, java.util.concurrent.atomic.AtomicLong.class};
 
 			// check if the type is either primitive or overrides toString()
-			return HelperFunctionChest.arrayContains(clazzez, clazz) || clazz.getMethod("toString").getDeclaringClass() != Object.class;
+			return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
+					(!(obj instanceof CompositeData)) &&
+					(!(obj instanceof TabularDataSupport)) &&
+					(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
 	}
 }
