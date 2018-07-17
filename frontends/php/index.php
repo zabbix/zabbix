@@ -111,9 +111,6 @@ else {
 // the user is not logged in, display the login form
 if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
-		case ZBX_AUTH_HTTP:
-			echo _('User name does not match with DB');
-			break;
 		case ZBX_AUTH_LDAP:
 		case ZBX_AUTH_INTERNAL:
 			if (isset($_REQUEST['enter'])) {
@@ -124,7 +121,13 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 				$messages = array_pop($messages);
 				$_REQUEST['message'] = $messages['message'];
 			}
-			$loginForm = new CView('general.login');
+
+			$data = [
+				'http_auth_enabled' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED,
+				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid')
+			];
+
+			$loginForm = new CView('general.login', $data);
 			$loginForm->render();
 	}
 }

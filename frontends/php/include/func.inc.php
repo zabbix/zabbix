@@ -1757,6 +1757,16 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		}
 		// if the user is not logged in - offer to login
 		else {
+			$config = select_config();
+
+			if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+					&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
+				$login_form = 'index_http.php';
+			}
+			else {
+				$login_form = 'index.php';
+			}
+
 			$data = [
 				'header' => _('You are not logged in'),
 				'messages' => [
@@ -1764,7 +1774,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
+					(new CButton('login', _('Login')))->onClick('document.location = "'.
+						(new CUrl($login_form))
+							->setArgument('request', $url)
+							->getUrl().
+						'";')
 				]
 			];
 		}

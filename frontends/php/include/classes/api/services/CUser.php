@@ -1070,79 +1070,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Attempt to auth user using HTTP authentication. If auth attempt was successful user data will be returned, empty
-	 * array otherwise.
-	 *
-	 * @param string $alias    User alias to login.
-	 *
-	 * @return array
-	 */
-	private function loginAttemptHTTP($alias) {
-		$db_user = [];
-		$http_user = '';
-
-		foreach(['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-			if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-				$http_user = $_SERVER[$key];
-			}
-		}
-
-		if ($http_user === '') {
-			return $db_user;
-		}
-
-		$config = select_config();
-		$parser = new CADNameAttributeParser(['strict' => true]);
-
-		if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-			$strip_domain = explode(',', $config['http_strip_domains']);
-			$strip_domain = array_map('trim', $strip_domain);
-
-			if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
-				$http_user = $parser->getUserName();
-			}
-		}
-
-		$valid_request = ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
-			? ($http_user === $alias)
-			: (strtolower($http_user) === strtolower($alias));
-
-		if (!$valid_request) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Login name "%1$s" does not match the name "%2$s" used to pass HTTP authentication.',
-					$alias, $http_user
-				)
-			);
-		}
-
-		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
-		];
-
-		if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['alias' => $http_user]
-			]);
-		}
-		else {
-			$db_users = DBfetchArray(DBselect(
-				'SELECT '.implode(',', $fields).
-				' FROM users'.
-					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_user))
-			));
-		}
-
-		if (count($db_users) > 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Authentication failed: %1$s', _('supplied credentials are not unique.'))
-			);
-		}
-
-		return reset($db_users);
-	}
-
-	/**
 	 * @param array $user
 	 *
 	 * @return string|array
@@ -1157,29 +1084,80 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_user = [];
+		$http_alias = '';
+		$http_authenticated = false;
 		$config = select_config();
-		$http_auth_success = false;
 
-		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED) {
-			$db_user = $this->loginAttemptHTTP($user['user']);
-			$http_auth_success = ($db_user !== []);
-		}
-
-		if (!$db_user) {
-			$db_users = DB::select('users', [
-				'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-					'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
-				],
-				'filter' => ['alias' => $user['user']]
-			]);
-
-			if (!$db_users) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['user'] !== ZBX_GUEST_USER) {
+			// HTTP authentication.
+			foreach(['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+				if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
+					$http_alias = $_SERVER[$key];
+				}
 			}
 
-			$db_user = $db_users[0];
+			if ($http_alias !== '' && strtolower($http_alias) === strtolower($user['user'])) {
+				$parser = new CADNameAttributeParser(['strict' => true]);
+
+				if ($parser->parse($http_alias) === CParser::PARSE_SUCCESS) {
+					$strip_domain = explode(',', $config['http_strip_domains']);
+					$strip_domain = array_map('trim', $strip_domain);
+
+					if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
+						$http_alias = $parser->getUserName();
+					}
+				}
+			}
 		}
+
+		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+		];
+
+		// Try to login user with passed credentials.
+		if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
+			$db_users = DB::select('users', [
+				'output' => $fields,
+				'filter' => ['alias' => $user['user']]
+			]);
+		}
+		else {
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
+			));
+		}
+
+		// Try to login user with HTTP authentication module passed user alias.
+		if (!$db_users && $http_alias !== '') {
+			$http_authenticated = true;
+
+			if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
+				$db_users = DB::select('users', [
+					'output' => $fields,
+					'filter' => ['alias' => $http_alias]
+				]);
+			}
+			else {
+				$db_users = DBfetchArray(DBselect(
+					'SELECT '.implode(',', $fields).
+					' FROM users'.
+						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
+				));
+			}
+		}
+
+		if (!$db_users) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+		}
+		elseif (count($db_users) > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Authentication failed: %1$s', _('supplied credentials are not unique.'))
+			);
+		}
+
+		$db_user = reset($db_users);
 
 		// Check if user is blocked.
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
@@ -1208,10 +1186,13 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 		}
 
-		if (!$http_auth_success) {
-			$authentication_type = ($db_user['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)
-				? $config['authentication_type']
-				: $db_user['gui_access'];
+		if (!$http_authenticated && $usrgrps['gui_access'] != GROUP_GUI_ACCESS_DISABLED) {
+			$access = [
+				GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
+				GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+				GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
+			];
+			$authentication_type = $access[$db_user['gui_access']];
 
 			try {
 				switch ($authentication_type) {
@@ -1220,7 +1201,11 @@ class CUser extends CApiService {
 						break;
 
 					case ZBX_AUTH_INTERNAL:
-						if (md5($user['password']) !== $db_user['passwd']) {
+						$same_case = $http_authenticated
+							? ($db_user['alias'] === $http_alias)
+							: ($db_user['alias'] === $user['user']);
+
+						if (md5($user['password']) !== $db_user['passwd'] || !$same_case) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 						}
 						break;

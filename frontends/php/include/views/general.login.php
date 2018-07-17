@@ -33,6 +33,9 @@ $guest = (CWebUser::$data['userid'] > 0)
 	? (new CListItem(['or ', new CLink('sign in as guest', ZBX_DEFAULT_URL)]))
 		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
+$http_login_link = $data['http_auth_enabled']
+	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
+	: null;
 
 global $ZBX_SERVER_NAME;
 
@@ -61,6 +64,7 @@ global $ZBX_SERVER_NAME;
 					)
 					->addItem(new CSubmit('enter', _('Sign in')))
 					->addItem($guest)
+					->addItem($http_login_link)
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
