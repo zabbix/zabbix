@@ -1009,7 +1009,7 @@ class testFormItemHttpAgent extends CWebTest {
 	 *
 	 * @dataProvider getCreataData
 	 */
-	public function testFormItemHttpAgent_Sreate($data) {
+	public function testFormItemHttpAgent_Create($data) {
 		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
