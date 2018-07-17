@@ -1497,8 +1497,7 @@ static int	DBpatch_3050122(void)
 		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
 		zbx_free(unquoted_parameter);
 
-		if (QUOTED_PARAM == was_quoted &&
-				SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
+		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
 					" logsource (functionid: %s) to regexp during database upgrade. The"
