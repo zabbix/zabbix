@@ -1445,20 +1445,18 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
-static void	DBpatch_3050122_add_anchors(const char *src, char **dst, size_t src_len)
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_len)
 {
-	char	*pout = *dst;
-
-	*pout++ = '^';				/* start anchor */
+	*dst++ = '^';				/* start anchor */
 
 	if (0 != src_len)
 	{
-		memcpy(pout, src, src_len);	/* parameter body */
-		pout += src_len;
+		memcpy(dst, src, src_len);	/* parameter body */
+		dst += src_len;
 	}
 
-	*pout++ = '$';				/* end anchor */
-	*pout = '\0';
+	*dst++ = '$';				/* end anchor */
+	*dst = '\0';
 }
 
 #define	QUOTED_PARAM	1
@@ -1496,7 +1494,7 @@ static int	DBpatch_3050122(void)
 
 		/* increasing length by 3 for ^, $, '\0' */
 		parameter_anchored = (char *)zbx_malloc(NULL, current_len + 3);
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_anchored, current_len);
+		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
 		zbx_free(unquoted_parameter);
 
 		if (QUOTED_PARAM == was_quoted &&
