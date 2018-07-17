@@ -786,7 +786,7 @@ class CScreenProblem extends CScreenBase {
 						$link
 					)->addStyle('width: 120px;'),
 				]);
-				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+				if ($this->data['filter']['show'] < TRIGGERS_OPTION_IN_PROBLEM) {
 					$header[] = (new CColHeader(_('Recovery time')))->addStyle('width: 115px;');
 				}
 
@@ -813,7 +813,7 @@ class CScreenProblem extends CScreenBase {
 						$link
 					),
 				]);
-				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+				if ($this->data['filter']['show'] < TRIGGERS_OPTION_IN_PROBLEM) {
 					$header[] = (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 
@@ -978,7 +978,7 @@ class CScreenProblem extends CScreenBase {
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
 					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE)
 				]);
-				if ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL) {
+				if ($this->data['filter']['show'] < TRIGGERS_OPTION_IN_PROBLEM) {
 					$row[] = $cell_r_clock;
 				}
 
