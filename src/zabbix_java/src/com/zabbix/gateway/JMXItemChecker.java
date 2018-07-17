@@ -342,10 +342,10 @@ class JMXItemChecker extends ItemChecker
 			java.util.Date.class, javax.management.ObjectName.class, java.util.concurrent.atomic.AtomicBoolean.class,
 			java.util.concurrent.atomic.AtomicInteger.class, java.util.concurrent.atomic.AtomicLong.class};
 
-			// check if the type is either primitive or overrides toString()
-			return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
-					(!(obj instanceof CompositeData)) &&
-					(!(obj instanceof TabularDataSupport)) &&
-					(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
+		// check if the type is either primitive or overrides toString()
+		return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
+				(!(obj instanceof CompositeData)) &&
+				(!(obj instanceof TabularDataSupport)) &&
+				(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
 	}
 }
