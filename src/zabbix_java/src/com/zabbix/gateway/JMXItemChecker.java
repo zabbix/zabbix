@@ -344,8 +344,7 @@ class JMXItemChecker extends ItemChecker
 
 		// check if the type is either primitive or overrides toString()
 		return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
-				(!(obj instanceof CompositeData)) &&
-				(!(obj instanceof TabularDataSupport)) &&
+				(!(obj instanceof CompositeData)) && (!(obj instanceof TabularDataSupport)) &&
 				(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
 	}
 }
