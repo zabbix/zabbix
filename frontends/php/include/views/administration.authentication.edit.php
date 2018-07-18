@@ -29,25 +29,25 @@ $auth_tab = (new CFormList('list_auth'))
 			->setModern(true)
 			->removeId()
 	)
-	->addRow('Enable HTTP authentication',
+	->addRow(_('Enable HTTP authentication'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 			->onChange('jQuery("input,select", ".http_auth").attr("disabled", !this.checked)')
 	)
-	->addRow('Default login form',
+	->addRow(_('Default login form'),
 		(new CComboBox('http_login_form', $data['http_login_form'], null, [
 			ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
 			ZBX_AUTH_FORM_HTTP => _('HTTP login form')
 		]))->setEnabled($data['http_auth_enabled']),
 		null, 'http_auth'
 	)
-	->addRow('Remove domain name',
+	->addRow(_('Remove domain name'),
 		(new CTextBox('http_strip_domains', $data['http_strip_domains']))
 			->setEnabled($data['http_auth_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		null, 'http_auth'
 	)
-	->addRow('Case sensitive login', (new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
+	->addRow(_('Case sensitive login'), (new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
 		->setChecked($data['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
 );
 
