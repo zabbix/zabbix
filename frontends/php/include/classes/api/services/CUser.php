@@ -1086,6 +1086,12 @@ class CUser extends CApiService {
 
 		$http_alias = '';
 		$config = select_config();
+		$group_to_auth_map = [
+			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
+			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
+			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
+		];
 
 		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {
 			// HTTP authentication.
@@ -1121,6 +1127,7 @@ class CUser extends CApiService {
 		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
 		];
+		$db_users = [];
 
 		// Try to login user with HTTP authentication module passed user alias.
 		if ($http_alias !== '') {
@@ -1152,11 +1159,22 @@ class CUser extends CApiService {
 				]);
 			}
 			else {
-				$db_users = DBfetchArray(DBselect(
+				$db_users_rows = DBfetchArray(DBselect(
 					'SELECT '.implode(',', $fields).
 					' FROM users'.
 						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
 				));
+
+				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
+				$db_users = [];
+				foreach($db_users_rows as $db_user_row) {
+					$permissions = $this->getUserGroupsData($db_user_row['userid']);
+
+					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
+							|| $db_user_row['alias'] === $user['user']) {
+						$db_users[] = $db_user_row;
+					}
+				}
 			}
 		}
 
@@ -1198,26 +1216,15 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 		}
 
-		if (!$http_authenticated && $usrgrps['gui_access'] != GROUP_GUI_ACCESS_DISABLED) {
-			$access = [
-				GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
-				GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
-				GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
-			];
-			$authentication_type = $access[$db_user['gui_access']];
-
+		if (!$http_authenticated) {
 			try {
-				switch ($authentication_type) {
+				switch ($group_to_auth_map[$db_user['gui_access']]) {
 					case ZBX_AUTH_LDAP:
 						$this->ldapLogin($user);
 						break;
 
 					case ZBX_AUTH_INTERNAL:
-						$same_case = $http_authenticated
-							? ($db_user['alias'] === $http_alias)
-							: ($db_user['alias'] === $user['user']);
-
-						if (md5($user['password']) !== $db_user['passwd'] || !$same_case) {
+						if (md5($user['password']) !== $db_user['passwd']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 						}
 						break;
