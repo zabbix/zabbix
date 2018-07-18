@@ -681,7 +681,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 			zbx_rtrim(c, " \"");
 			zbx_ltrim(c, " \"+");
 
-			if (SUCCEED == is_double(c))
+			if (SUCCEED == is_double(c, 0))
 			{
 				SET_DBL_RESULT(result, atof(c));
 				ret = SUCCEED;
@@ -777,7 +777,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"+");
 
-		if (SUCCEED != is_double(result->str))
+		if (SUCCEED != is_double(result->str, 0))
 			return NULL;
 		value = atof(result->str);
 
@@ -788,7 +788,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"+");
 
-		if (SUCCEED != is_double(result->text))
+		if (SUCCEED != is_double(result->text, 0))
 			return NULL;
 		value = atof(result->text);
 
