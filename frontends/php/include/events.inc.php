@@ -394,7 +394,7 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $backurl							URL to return to.
  * @param bool   $fullscreen
  * @param bool   $show_timeline						show time line flag.
- * @param string $sortorder							'ASC'|'DESC'
+ * @param string $sortorder							ZBX_SORT_UP|ZBX_SORT_DOWN
  *
  * @return CDiv
  */
