@@ -1624,8 +1624,6 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 
 -- testInheritanceHostPrototype
 INSERT INTO groups (groupid, name, internal) VALUES (15, 'Inheritance test', 0);
-INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (15, 'Inheritance test', 'Inheritance test', 0, NULL, 'Inheritance test');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15, 15, 1);
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, 'testInheritanceHostPrototype {#TEST}');
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, 'testInheritanceHostPrototype {#TEST}');
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);

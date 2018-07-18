@@ -267,6 +267,8 @@ class testInheritanceHostPrototype extends CWebTest {
 		return [
 			[
 				[
+					'host' => 'Host for inheritance host prototype tests',
+					'template' => 'Inheritance test template with host prototype',
 					'host_prototype' => 'Host prototype for update {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'update_name' => 'New host prototype name {#TEST}',
@@ -345,13 +347,10 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestCheckHeader('Host prototypes');
 		$this->zbxTestCheckFatalErrors();
 
-		$prototype_on_template = $this->sqlForHostPrototypeCompare($data['update_name']);
+		$prototype_on_template = $this->sqlForHostPrototypeCompare($data['template']);
+		$prototype_on_host = $this->sqlForHostPrototypeCompare($data['host']);
 
-		foreach ($data['templates'] as $template) {
-			$host_templ = $this->sqlForHostPrototypeCompare($template['name']);
-		}
-
-		$this->assertEquals($prototype_on_template, $host_templ);
+		$this->assertEquals($prototype_on_template, $prototype_on_host);
 	}
 
 	public static function getDeleteData() {
