@@ -1085,18 +1085,18 @@ class CUser extends CApiService {
 		}
 
 		$http_alias = '';
-		$http_authenticated = false;
 		$config = select_config();
 
-		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['user'] !== ZBX_GUEST_USER) {
+		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {
 			// HTTP authentication.
 			foreach(['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
 				if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
 					$http_alias = $_SERVER[$key];
+					break;
 				}
 			}
 
-			if ($http_alias !== '' && strtolower($http_alias) === strtolower($user['user'])) {
+			if ($http_alias !== '') {
 				$parser = new CADNameAttributeParser(['strict' => true]);
 
 				if ($parser->parse($http_alias) === CParser::PARSE_SUCCESS) {
@@ -1107,6 +1107,14 @@ class CUser extends CApiService {
 						$http_alias = $parser->getUserName();
 					}
 				}
+
+				$is_requested_user = ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+					? ($user['user'] === $http_alias)
+					: (strtolower($user['user']) === strtolower($http_alias));
+
+				if (!$is_requested_user) {
+					$http_alias = '';
+				}
 			}
 		}
 
@@ -1114,23 +1122,8 @@ class CUser extends CApiService {
 			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
 		];
 
-		// Try to login user with passed credentials.
-		if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['alias' => $user['user']]
-			]);
-		}
-		else {
-			$db_users = DBfetchArray(DBselect(
-				'SELECT '.implode(',', $fields).
-				' FROM users'.
-					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
-			));
-		}
-
 		// Try to login user with HTTP authentication module passed user alias.
-		if (!$db_users && $http_alias !== '') {
+		if ($http_alias !== '') {
 			$http_authenticated = true;
 
 			if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
@@ -1144,6 +1137,25 @@ class CUser extends CApiService {
 					'SELECT '.implode(',', $fields).
 					' FROM users'.
 						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
+				));
+			}
+		}
+
+		// Try to login user with passed credentials.
+		if (!$db_users) {
+			$http_authenticated = false;
+
+			if ($config['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
+				$db_users = DB::select('users', [
+					'output' => $fields,
+					'filter' => ['alias' => $user['user']]
+				]);
+			}
+			else {
+				$db_users = DBfetchArray(DBselect(
+					'SELECT '.implode(',', $fields).
+					' FROM users'.
+						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
 				));
 			}
 		}
