@@ -204,7 +204,7 @@ class testInheritanceHostPrototype extends CWebTest {
 					' ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
 					' jmx_errors_from, jmx_error,description, tls_connect,'.
 					' tls_accept, tls_issuer, tls_subject, tls_psk_identity,'.
-					' tls_psk, auto_compres s, flags'.
+					' tls_psk, auto_compress, flags'.
 					' FROM hosts'.
 					' WHERE flags=2 AND hostid IN ('.
 						'SELECT hostid'.
