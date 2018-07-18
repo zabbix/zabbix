@@ -52,7 +52,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$discovery_id = $discovery_id['itemid'];
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, \'?form=update&hostid='.$host_prototype.'&parent_discoveryid='.$discovery_id.'\')]');
+		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "?form=update&hostid='.$host_prototype.'&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
@@ -67,8 +67,8 @@ class testInheritanceHostPrototype extends CWebTest {
 						')'
 		));
 		$interface = $interface['interfaceid'];
-		$this->zbxTestAssertElementPresentXpath('//td/ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//td/ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementText('//tr[@id="SNMPInterfacesFooter"]', 'No SNMP interfaces found.');
 		$this->zbxTestAssertElementText('//tr[@id="JMXInterfacesFooter"]', 'No JMX interfaces found.');
@@ -83,10 +83,10 @@ class testInheritanceHostPrototype extends CWebTest {
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
-		$this->zbxTestAssertElementPresentXpath('//input[@id=\'ipmi_authtype\'][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id=\'ipmi_privilege\'][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id=\'ipmi_username\'][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id=\'ipmi_password\'][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_authtype"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_privilege"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_username"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_password"][@readonly]');
 
 		//Check layout at Host Inventory tab.
 		$this->zbxTestTabSwitch('Host inventory');
@@ -103,7 +103,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_in_cert"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_in_psk"][@disabled]');
 
-		$this->zbxTestAssertAttribute('//button[@id=\'delete\']', 'disabled');
+		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
 
 		// Macro tab check must be after IPMI tab (this must be changed when ZBX-14609 will CLOSED).
 		// Check layout at Macros tab.
@@ -159,7 +159,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		foreach ($data['templates'] as $template) {
 			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 			$this->zbxTestClickLinkTextWait($template['name']);
-			$this->zbxTestClickXpath('//div[@id=\'templateTab\']//button[text()=\'Add\']');
+			$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestWaitForPageToLoad();
 		}
 
@@ -311,7 +311,7 @@ class testInheritanceHostPrototype extends CWebTest {
 			foreach ($data['groups'] as $group) {
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->zbxTestClickXpath('//div[@id=\'overlay_dialogue\']//a[text()="'.$group.'"]');
+				$this->zbxTestClickXpath('//div[@id="overlay_dialogue"]//a[text()="'.$group.'"]');
 			}
 		}
 
@@ -327,7 +327,7 @@ class testInheritanceHostPrototype extends CWebTest {
 				$this->zbxTestLaunchOverlayDialog('Templates');
 				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 				$this->zbxTestClickLinkTextWait($template['name']);
-				$this->zbxTestClickXpath('//div[@id=\'templateTab\']//button[text()=\'Add\']');
+				$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 				$this->zbxTestWaitForPageToLoad();
 			}
 		}
