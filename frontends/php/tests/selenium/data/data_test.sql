@@ -1649,7 +1649,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99004, 'Host
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10026,99004,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99004, 99004, 15);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (15004, 99004, 99006);
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid, flags) VALUES (99084, 99004, 2,    'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083, 1);
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, templateid, flags) VALUES (99084, 99004, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 99083, 1);
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99008, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 99007, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1003, 99008, '', 15, 1002);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
