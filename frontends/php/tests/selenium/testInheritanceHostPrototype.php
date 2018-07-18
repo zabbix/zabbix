@@ -170,17 +170,17 @@ class testInheritanceHostPrototype extends CWebTest {
 		foreach ($data['templates'] as $template) {
 			// Linked templates on host.
 			$hosts_templates = 'SELECT NULL'.
-					' FROM hosts_templates'.
-					' WHERE hostid IN ('.
-					'SELECT hostid'.
-					' FROM hosts'.
-					' WHERE host='.zbx_dbstr($data['host']).
-					')'.
-					' AND templateid IN ('.
-					'SELECT hostid'.
-					' FROM hosts'.
-					' WHERE host='.zbx_dbstr($template['name']).
-					')';
+							' FROM hosts_templates'.
+							' WHERE hostid IN ('.
+								'SELECT hostid'.
+								' FROM hosts'.
+								' WHERE host='.zbx_dbstr($data['host']).
+								')'.
+							' AND templateid IN ('.
+								'SELECT hostid'.
+								' FROM hosts'.
+								' WHERE host='.zbx_dbstr($template['name']).
+								')';
 
 			$this->assertEquals(1, DBcount($hosts_templates));
 
@@ -198,28 +198,28 @@ class testInheritanceHostPrototype extends CWebTest {
 	 */
 	private function sqlForHostPrototypeCompare($data) {
 		$sql = 'SELECT host, status, name, disable_until, error, available,'.
-				' errors_from, lastaccess, ipmi_authtype, ipmi_privilege,'.
-				' ipmi_username, ipmi_password, ipmi_disable_until,'.
-				' snmp_disable_until, snmp_available, ipmi_errors_from,'.
-				' ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
-				' jmx_errors_from, jmx_error,description, tls_connect,'.
-				' tls_accept, tls_issuer, tls_subject, tls_psk_identity,'.
-				' tls_psk, auto_compress, flags'.
-				' FROM hosts'.
-				' WHERE flags=2 AND hostid IN ('.
-				'SELECT hostid'.
-				' FROM host_discovery'.
-				' WHERE parent_itemid IN ('.
-				'SELECT itemid'.
-				' FROM items'.
-				' WHERE hostid in ('.
-				'SELECT hostid'.
-				' FROM hosts'.
-				' WHERE host='.zbx_dbstr($data).
-				')'.
-				')'.
-				')'.
-				' ORDER BY host, name';
+					' errors_from, lastaccess, ipmi_authtype, ipmi_privilege,'.
+					' ipmi_username, ipmi_password, ipmi_disable_until,'.
+					' snmp_disable_until, snmp_available, ipmi_errors_from,'.
+					' ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
+					' jmx_errors_from, jmx_error,description, tls_connect,'.
+					' tls_accept, tls_issuer, tls_subject, tls_psk_identity,'.
+					' tls_psk, auto_compres s, flags'.
+					' FROM hosts'.
+					' WHERE flags=2 AND hostid IN ('.
+						'SELECT hostid'.
+						' FROM host_discovery'.
+						' WHERE parent_itemid IN ('.
+							'SELECT itemid'.
+							' FROM items'.
+							' WHERE hostid in ('.
+								'SELECT hostid'.
+								' FROM hosts'.
+								' WHERE host='.zbx_dbstr($data).
+								')'.
+							')'.
+						')'.
+					' ORDER BY host, name';
 
 		return DBhash($sql);
 	}
