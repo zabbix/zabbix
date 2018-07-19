@@ -1,4 +1,5 @@
 <?php
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -39,6 +40,17 @@ class testInheritanceHostPrototype extends CWebTest {
 	}
 
 	/**
+	 * Select a single value from DB.
+	 *
+	 * @param string $query	sql query
+	 *
+	 * @return mixed
+	 */
+	private function DBSelectValue($query) {
+		return (($result = DBSelect($query)) && ($row = DBfetch($result)) && $row) ? reset($row) : null;
+	}
+
+	/**
 	 * @dataProvider getLayoutData
 	 */
 	public function testInheritanceHostPrototype_CheckLayout($data) {
@@ -46,27 +58,30 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Get hostid and discoveryid to check href to template.
-		$host_prototype = DBfetch(DBSelect('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype'])));
-		$discovery_id = DBfetch(DBSelect('SELECT itemid FROM items WHERE templateid IS NULL AND name='.zbx_dbstr($data['discovery'])));
-		$host_prototype = $host_prototype['hostid'];
-		$discovery_id = $discovery_id['itemid'];
+		$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+				zbx_dbstr($data['host_prototype'])
+		);
+		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+				zbx_dbstr($data['discovery'])
+		);
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "?form=update&hostid='.$host_prototype.'&parent_discoveryid='.$discovery_id.'")]');
+		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "?form=update&hostid='.$host_prototype.
+				'&parent_discoveryid='.$discovery_id.'")]'
+		);
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@type="text"][@readonly]');
-		$interface = DBfetch(DBSelect('SELECT interfaceid'.
-						' FROM interface'.
-						' WHERE hostid IN ('.
-						'SELECT hostid'.
-						' FROM items'.
-						' WHERE templateid IS NOT NULL'.
-						' AND name='.zbx_dbstr($data['discovery']).
-						')'
-		));
-		$interface = $interface['interfaceid'];
+		$interface = $this->DBSelectValue('SELECT interfaceid'.
+				' FROM interface'.
+				' WHERE hostid IN ('.
+					'SELECT hostid'.
+					' FROM items'.
+					' WHERE templateid IS NOT NULL'.
+					' AND name='.zbx_dbstr($data['discovery']).
+				')'
+		);
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-port"]/input[@type="text"][@readonly]');
@@ -83,25 +98,21 @@ class testInheritanceHostPrototype extends CWebTest {
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_authtype"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_privilege"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_username"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="ipmi_password"][@readonly]');
+		foreach (['ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'] as $id) {
+			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
+		}
 
 		//Check layout at Host Inventory tab.
 		$this->zbxTestTabSwitch('Host inventory');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_0"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_1"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_2"][@disabled]');
+		for ($i = 0; $i < 3; $i++) {
+			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@disabled]');
+		}
 
 		//Check layout at Encryption tab.
 		$this->zbxTestTabSwitch('Encryption');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_connect_0"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_connect_1"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_connect_2"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_in_none"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_in_cert"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="tls_in_psk"][@disabled]');
+		foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2', 'tls_in_none', 'tls_in_cert', 'tls_in_psk'] as $id) {
+			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@disabled]');
+		}
 
 		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
 
@@ -116,17 +127,26 @@ class testInheritanceHostPrototype extends CWebTest {
 		foreach ($macros as $macro) {
 			$macro = $macro[0];
 			// Macro check and row selection.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.$macro['macro'].'"]/../..'));
+			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.
+					$macro['macro'].'"]/../..')
+			);
 			// Effective value.
-			$this->assertEquals($macro['value'], $element->findElement(WebDriverBy::xpath('./td[3]/input[@type="text"][@readonly]'))->getAttribute('value'));
+			$this->assertEquals($macro['value'], $element->findElement(
+					WebDriverBy::xpath('./td[3]/input[@type="text"][@readonly]')
+			)->getAttribute('value'));
+
 			// Template value.
 			$this->assertEquals('', $element->findElement(WebDriverBy::xpath('./td[5]/div'))->getText());
 			// Global value.
-			$this->assertEquals('"'.$macro['value'].'"', $element->findElement(WebDriverBy::xpath('./td[7]/div'))->getText());
+			$this->assertEquals('"'.$macro['value'].'"', $element->findElement(
+					WebDriverBy::xpath('./td[7]/div')
+			)->getText());
 		}
 
 		// Total macro count.
-		$this->assertEquals(count($macros), count($this->webDriver->findElements(WebDriverBy::xpath('//input[@class="macro"]'))));
+		$this->assertEquals(count($macros), count($this->webDriver->findElements(
+				WebDriverBy::xpath('//input[@class="macro"]')
+		)));
 	}
 
 	public static function getCreateData() {
@@ -170,17 +190,17 @@ class testInheritanceHostPrototype extends CWebTest {
 		foreach ($data['templates'] as $template) {
 			// Linked templates on host.
 			$hosts_templates = 'SELECT NULL'.
-							' FROM hosts_templates'.
-							' WHERE hostid IN ('.
-								'SELECT hostid'.
-								' FROM hosts'.
-								' WHERE host='.zbx_dbstr($data['host']).
-								')'.
-							' AND templateid IN ('.
-								'SELECT hostid'.
-								' FROM hosts'.
-								' WHERE host='.zbx_dbstr($template['name']).
-								')';
+					' FROM hosts_templates'.
+					' WHERE hostid IN ('.
+						'SELECT hostid'.
+						' FROM hosts'.
+						' WHERE host='.zbx_dbstr($data['host']).
+					')'.
+					' AND templateid IN ('.
+						'SELECT hostid'.
+						' FROM hosts'.
+						' WHERE host='.zbx_dbstr($template['name']).
+					')';
 
 			$this->assertEquals(1, DBcount($hosts_templates));
 
@@ -197,29 +217,26 @@ class testInheritanceHostPrototype extends CWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function sqlForHostPrototypeCompare($data) {
-		$sql = 'SELECT host, status, name, disable_until, error, available,'.
-					' errors_from, lastaccess, ipmi_authtype, ipmi_privilege,'.
-					' ipmi_username, ipmi_password, ipmi_disable_until,'.
-					' snmp_disable_until, snmp_available, ipmi_errors_from,'.
-					' ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
-					' jmx_errors_from, jmx_error,description, tls_connect,'.
-					' tls_accept, tls_issuer, tls_subject, tls_psk_identity,'.
-					' tls_psk, auto_compress, flags'.
-					' FROM hosts'.
-					' WHERE flags=2 AND hostid IN ('.
-						'SELECT hostid'.
-						' FROM host_discovery'.
-						' WHERE parent_itemid IN ('.
-							'SELECT itemid'.
-							' FROM items'.
-							' WHERE hostid in ('.
-								'SELECT hostid'.
-								' FROM hosts'.
-								' WHERE host='.zbx_dbstr($data).
-								')'.
-							')'.
+		$sql = 'SELECT host, status, name, disable_until, error, available, errors_from, lastaccess, ipmi_authtype,'.
+				' ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, snmp_disable_until,'.
+				' snmp_available, ipmi_errors_from, ipmi_error, snmp_error, jmx_disable_until, jmx_available,'.
+				' jmx_errors_from, jmx_error, description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+				' tls_psk_identity, tls_psk, auto_compress, flags'.
+				' FROM hosts'.
+				' WHERE flags=2 AND hostid IN ('.
+					'SELECT hostid'.
+					' FROM host_discovery'.
+					' WHERE parent_itemid IN ('.
+						'SELECT itemid'.
+						' FROM items'.
+						' WHERE hostid in ('.
+							'SELECT hostid'.
+							' FROM hosts'.
+							' WHERE host='.zbx_dbstr($data).
 						')'.
-					' ORDER BY host, name';
+					')'.
+				')'.
+				' ORDER BY host, name';
 
 		return DBhash($sql);
 	}
@@ -255,6 +272,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		elseif ($data['update'] === 'template') {
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
 		}
+
 		$old_host = DBhash($sql);
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
 		$this->zbxTestClickWait('update');
@@ -375,13 +393,10 @@ class testInheritanceHostPrototype extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testInheritanceHost_Delete($data) {
-		if (array_key_exists('error', $data)) {
-			$discovery_id = DBfetch(DBSelect('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.zbx_dbstr($data['discovery'])));
-		}
-		else {
-			$discovery_id = DBfetch(DBSelect('SELECT itemid FROM items WHERE templateid IS NULL AND name='.zbx_dbstr($data['discovery'])));
-		}
-		$discovery_id = $discovery_id['itemid'];
+		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS '.
+				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
+		);
+
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.$discovery_id);
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Delete');
@@ -389,7 +404,6 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		if (array_key_exists('error', $data)) {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete host prototypes');
-			// $this->zbxTestTextPresentInMessageDetails('Cannot delete templated host prototype.');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype']);
 			$this->assertEquals(1, DBcount($sql));
 		}
@@ -407,17 +421,24 @@ class testInheritanceHostPrototype extends CWebTest {
 	 */
 	private function selectHostPrototypeForUpdate($action, $data) {
 		if ($action === 'host') {
-			$host_prototype = DBfetch(DBSelect('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype'])));
-			$discovery_id = DBfetch(DBSelect('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.zbx_dbstr($data['discovery'])));
+			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
+					zbx_dbstr($data['host_prototype'])
+			);
+			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
+					zbx_dbstr($data['discovery'])
+			);
 		}
 		elseif ($action === 'template') {
-			$host_prototype = DBfetch(DBSelect('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype'])));
-			$discovery_id = DBfetch(DBSelect('SELECT itemid FROM items WHERE templateid IS NULL AND name='.zbx_dbstr($data['discovery'])));
+			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+					zbx_dbstr($data['host_prototype'])
+			);
+			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+					zbx_dbstr($data['discovery'])
+			);
 		}
 
-		$host_prototype = $host_prototype['hostid'];
-		$discovery_id = $discovery_id['itemid'];
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.$host_prototype);
+		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
+				$host_prototype
+		);
 	}
-
 }
