@@ -27,13 +27,12 @@ if (!isset($page['type'])) {
 if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
-if ($web_layout_mode === ZBX_LAYOUT_FULLSREEN) {
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+if ($web_layout_mode === ZBX_LAYOUT_FULLSREEN || $web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
-	define('ZBX_PAGE_FULLSCREEN', 1);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -165,6 +164,8 @@ if ($denied_page_requested) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
+	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSREEN
+		|| $web_layout_mode === ZBX_LAYOUT_KIOSKMODE);
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
@@ -178,8 +179,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$pageHeader->addStyle(getTriggerStatusCss($config));
 
 			// perform Zabbix server check only for standard pages
-			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
-					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+			if ($is_standard_page && $config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}
@@ -193,8 +193,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 	// show GUI messages in pages with menus and in fullscreen mode
-	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSREEN) ? 1 : 0;
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;showGuiMessaging='
+		.($is_standard_page ? '1' : '0');
 	$pageHeader->addJsFile($path);
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -203,7 +203,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		}
 		$pageHeader->addJsFile($path);
 	}
-
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
@@ -267,7 +266,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 // unset multiple variables
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
-if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
+if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
 	zbx_add_post_js('initMessages({});');
 }
 

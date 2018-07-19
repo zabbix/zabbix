@@ -310,22 +310,22 @@ if ($data['action'] == 'problem.view') {
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 	(new CWidget())
-			->setTitle(_('Problems'))
-			->setControls((new CTag('nav', true,
-				(new CForm('get'))
-					->cleanItems()
-					->addVar('action', 'problem.view')
-					->addVar('page', $data['page'])
-					->addItem((new CList())
-						->addItem(new CRedirectButton(_('Export to CSV'),
-							(new CUrl('zabbix.php'))
-								->setArgument('action', 'problem.view.csv')
-								->setArgument('page',  $data['page'])
-						))
+		->setTitle(_('Problems'))
+		->setControls((new CTag('nav', true,
+			(new CForm('get'))
+				->cleanItems()
+				->addVar('action', 'problem.view')
+				->addVar('page', $data['page'])
+				->addItem((new CList())
+					->addItem(new CRedirectButton(_('Export to CSV'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'problem.view.csv')
+							->setArgument('page',  $data['page'])
+					))
 					->addItem(get_icon('fullscreen', []))
-					)
-				))
-					->setAttribute('aria-label', _('Content controls'))
+				)
+			))
+				->setAttribute('aria-label', _('Content controls'))
 		)
 		->addItem($filter)
 		->addItem($screen->get())

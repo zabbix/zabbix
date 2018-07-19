@@ -36,7 +36,9 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+
 		$config = select_config();
+
 		$filter = [
 			'groupids' => getSubGroups($fields['groupids']),
 			'hostids' => $fields['hostids'],

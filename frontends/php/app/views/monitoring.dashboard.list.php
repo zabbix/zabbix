@@ -25,22 +25,21 @@ if ($data['uncheck']) {
 $this->addJsFile('layoutmode.js');
 
 $widget = (new CWidget())
-		->setTitle(_('Dashboards'))
-		->setControls((new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create dashboard'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'dashboard.view')
-						->setArgument('new', '1')
-						->getUrl()
-				))
-			->addItem(get_icon('fullscreen', []))
+	->setTitle(_('Dashboards'))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(new CRedirectButton(_('Create dashboard'),
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.view')
+					->setArgument('new', '1')
+					->getUrl()
 			))
-				->setAttribute('aria-label', _('Content controls'))
-		);
+		->addItem(get_icon('fullscreen', []))
+		))
+		->setAttribute('aria-label', _('Content controls'))
+	);
 
-$form = (new CForm())
-	->setName('dashboardForm');
+$form = (new CForm())->setName('dashboardForm');
 
 $table = (new CTableInfo())
 	->setHeader([

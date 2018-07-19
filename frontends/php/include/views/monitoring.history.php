@@ -92,10 +92,7 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	get_icon('fullscreen', [])
-]);
+$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen', [])]);
 
 $header['right']->addItem($action_list);
 
@@ -105,8 +102,7 @@ $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
-		$filter_form
-			->addVar('action', $data['action']);
+		$filter_form->addVar('action', $data['action']);
 
 		$items_data = [];
 		if ($data['items']) {
@@ -208,9 +204,7 @@ if ($data['plaintext']) {
 else {
 	$historyWidget
 		->setTitle($header['left'])
-		->setControls((new CTag('nav', true, $header['right']))
-			->setAttribute('aria-label', _('Content controls'))
-		);
+		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
 	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 

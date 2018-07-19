@@ -17,10 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 
 $widget = new CWidget();
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 	$widget
 		->setTitle(_('Screens'))
@@ -93,13 +94,13 @@ $controls
 	))
 	->addItem(get_icon('fullscreen', []));
 
-	$widget->setControls((new CTag('nav', true, (new CList())
-		->addItem((new CForm('get'))
-			->setName('headerForm')
-			->addItem($controls)
-		)))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+$widget->setControls((new CTag('nav', true, (new CList())
+	->addItem((new CForm('get'))
+		->setName('headerForm')
+		->addItem($controls)
+	)))
+		->setAttribute('aria-label', _('Content controls'))
+);
 
 // Append screens to widget.
 $screenBuilder = new CScreenBuilder([
@@ -114,18 +115,14 @@ $screenBuilder = new CScreenBuilder([
 ]);
 
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-	$widget
-		->addItem((new CFilter())
-			->setProfile($data['profileIdx'], $data['profileIdx2'])
-			->setActiveTab($data['active_tab'])
-			->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
-		);
+	$widget->addItem((new CFilter())
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
+	);
 }
 
-$widget
-	->addItem(
-		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-	);
+$widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 

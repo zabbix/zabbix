@@ -47,6 +47,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.items.filter.active':
 				case 'web.item.graph.filter.active':
 				case 'web.latest.filter.active':
+				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
 				case 'web.media_types.filter.active':
 				case 'web.overview.filter.active':
@@ -64,7 +65,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.active':
-				case 'web.layout.mode':
 					$ret = true;
 					break;
 

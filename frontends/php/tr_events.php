@@ -132,8 +132,7 @@ $mediatypes = API::Mediatype()->get([
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
-				->setHeader(_('Trigger details')),
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))->setHeader(_('Trigger details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')

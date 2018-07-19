@@ -29,7 +29,6 @@ $url = (new CUrl('zabbix.php'))
 	->setArgument('groupid', '')
 	->setArgument('hostid', '0');
 
-
 foreach ($data['groups'] as $group) {
 	$url->setArgument('groupid', $group['groupid']);
 

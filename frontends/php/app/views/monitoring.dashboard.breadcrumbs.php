@@ -19,8 +19,7 @@
 **/
 
 
-$url_list = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.list');
+$url_list = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 
 $breadcrumbs = [
 	(new CSpan())->addItem(new CLink(_('All dashboards'), $url_list->getUrl()))

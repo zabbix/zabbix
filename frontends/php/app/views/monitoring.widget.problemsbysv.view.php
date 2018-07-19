@@ -19,8 +19,7 @@
 **/
 
 
-$backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view');
+$backurl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
 $table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl());
 

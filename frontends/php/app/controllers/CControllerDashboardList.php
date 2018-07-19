@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * controller dashboard list
  *
@@ -32,7 +33,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		$fields = [
 			'sort' =>		'in name',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1',
+			'uncheck' =>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,7 +64,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
-			'sortorder' => $sort_order,
+			'sortorder' => $sort_order
 		];
 
 		// list of dashboards
@@ -76,8 +77,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.list');
+		$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 
 		$data['paging'] = getPagingLine($data['dashboards'], $sort_order, $url);
 

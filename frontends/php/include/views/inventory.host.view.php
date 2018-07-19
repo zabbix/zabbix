@@ -20,9 +20,7 @@
 
 $this->addJsFile('kioskmode.js');
 
-$hostInventoryWidget = new CWidget();
-
-$hostInventoryWidget
+$hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CList())
 		->addItem(get_icon('fullscreen', []))
@@ -146,7 +144,12 @@ $overviewFormList->addRow(_('Monitoring'),
 			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
 		),
 		new CLink(_('Latest data'),
-			'latest.php?form=1&select=&show_details=1&filter_set=Filter'.'&hostids[]='.$data['host']['hostid']
+			(new CUrl('latest.php'))
+				->setArgument('form', '1')
+				->setArgument('select', '')
+				->setArgument('show_details', '1')
+				->setArgument('filter_set', 'Filter')
+				->setArgument('hostids[]', $data['host']['hostid'])
 		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))

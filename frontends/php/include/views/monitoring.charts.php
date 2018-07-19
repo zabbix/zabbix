@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
@@ -57,8 +58,7 @@ $content_control->addItem(get_icon('fullscreen', []));
 $content_control = (new CTag('nav', true, $content_control))
 	->setAttribute('aria-label', _('Content controls'));
 
-$chartsWidget = new CWidget();
-$chartsWidget
+$chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
 	->setControls(new CList([$controls, $content_control]));
 

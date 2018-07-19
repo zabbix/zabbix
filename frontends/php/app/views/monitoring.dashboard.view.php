@@ -69,8 +69,6 @@ else {
 			->setArgumentSID();
 	}
 
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
 	$widget = new CWidget();
 
 	$widget
@@ -152,6 +150,8 @@ else {
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
+
+		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 			$timeline = (new CDiv($timeline))->addStyle('display: none;');
 		}

@@ -27,10 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = [
-	'multiselect.js',
-	'layoutmode.js'
-];
+$page['scripts'] = ['multiselect.js', 'layoutmode.js'];
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -320,9 +317,7 @@ if ($filter['hostids']) {
 /*
  * Display
  */
-$widget = new CWidget();
-
-$widget
+$widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setControls((new CTag('nav', true,
 		(new CList())

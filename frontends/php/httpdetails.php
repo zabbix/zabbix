@@ -83,9 +83,7 @@ $details_screen = CScreenBuilder::getScreen([
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())
-				->addItem(get_icon('fullscreen', []))
-			)
+			->addItem((new CList())->addItem(get_icon('fullscreen', [])))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

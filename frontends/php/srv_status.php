@@ -42,7 +42,6 @@ $periods = [
 	24 * DAY_IN_YEAR => _('Last 365 days')
 ];
 
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'serviceid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null],
@@ -168,8 +167,7 @@ else {
 							$period_combo
 						])
 					),
-			(new CTag('nav', true, get_icon('fullscreen', [])))
-					->setAttribute('aria-label', _('Content controls'))
+				(new CTag('nav', true, get_icon('fullscreen', [])))->setAttribute('aria-label', _('Content controls'))
 			]))
 			->addItem(BR())
 			->addItem($tree->getHTML())

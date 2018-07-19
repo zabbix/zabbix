@@ -80,7 +80,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
-
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
@@ -89,8 +88,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list');
+			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;

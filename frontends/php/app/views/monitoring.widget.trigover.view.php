@@ -19,10 +19,9 @@
 **/
 
 
-$back_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view');
+$back_url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
-$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style'], null);
+$table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUrl(), $data['style']);
 
 $output = [
 	'header' => $data['name'],

@@ -20,8 +20,7 @@
 
 
 // indicator of sort field
-$sort_div = (new CSpan())
-	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+$sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
@@ -30,7 +29,6 @@ $backurl = (new CUrl('zabbix.php'))
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
 	->setArgument('eventid', '');
-
 
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);

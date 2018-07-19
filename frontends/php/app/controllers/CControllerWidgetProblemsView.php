@@ -34,7 +34,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 	}
 
 	protected function doAction() {
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();

@@ -84,7 +84,6 @@ else {
 		$filter->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 	}
 
-
 	$screen_widget
 		->addItem($filter)
 		->addItem(

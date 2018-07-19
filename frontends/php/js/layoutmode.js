@@ -19,27 +19,25 @@
 
 
 jQuery(function($) {
-	var $norm_mode_btn = $('.btn-dashbrd-normal'),
-		$layout_mode = $('.layout-mode');
+	var $layout_mode_btn = $('.layout-mode');
 
-	if ($norm_mode_btn.length) {
-		$(window).on('mousemove keyup scroll', function() {
-			clearTimeout($norm_mode_btn.data('timer'));
-			$norm_mode_btn
-				.removeClass('hidden')
-				.data('timer', setTimeout(function() {
-					$norm_mode_btn.addClass('hidden');
-				}, 2000));
-		}).trigger('mousemove');
-	}
-	if ($layout_mode.length) {
-        $layout_mode.on('click', function(e) {
+	if ($layout_mode_btn.length) {
+		$layout_mode_btn.on('click', function(e) {
 			e.stopPropagation();
-			var xhr = updateUserProfile('web.layout.mode',$(this).data('layoutMode'), []);
-
-			xhr.always(function(){
+			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
 				location.reload();
 			});
 		});
+
+		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($layout_mode_btn.data('timer'));
+				$layout_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$layout_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
 	}
 });
