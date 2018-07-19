@@ -790,7 +790,7 @@ class CScreenProblem extends CScreenBase {
 				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link);
 
 			$this->data['filter']['compact_view']
-				? $header_clock->addStyle('width: 115px;')
+				? $header_clock->addStyle('width: 114px;')
 				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			if ($show_timeline) {
@@ -831,9 +831,9 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 							$link
 						)->addStyle('width: 120px;'),
-						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
+						(new CColHeader(_('Recovery time')))->addStyle('width: 114px;'),
 						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
-						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
+						(new CColHeader(_('Info')))->addStyle('width: 24px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 42%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
@@ -975,9 +975,7 @@ class CScreenProblem extends CScreenBase {
 							(new CButton(null))
 								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
 								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
-							))
-								->addClass(ZBX_STYLE_REL_CONTAINER)
-								->addStyle('min-height: 16px;')
+							))->addClass(ZBX_STYLE_REL_CONTAINER)
 					: makeInformationList($info_icons);
 
 				$options = [

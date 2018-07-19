@@ -851,6 +851,16 @@ output {
 				}
 			}
 
+			.icon-maint {
+				position: relative;
+				top: -2px;
+				left: 0;
+				display: inline-block;
+				height: 12px;
+				width: 14px;
+				vertical-align: bottom;
+			}
+
 			.icon-wzrd-action {
 				background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
 				height: 12px;
@@ -2848,8 +2858,7 @@ $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
-	invisible: url(../img/icon-sprite.svg) no-repeat -89px -803px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -5306,7 +5315,7 @@ tr.cursor-move {
 	white-space: nowrap;
 
 	.icon-info {
-		margin-right: 10px;
+		margin-right: 5px;
 
 		&:only-of-type {
 			margin-right: 0;
@@ -5314,6 +5323,9 @@ tr.cursor-move {
 
 		&:last-child {
 			margin-right: 0;
+		}
+		&.status-green {
+			border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
 		}
 	}
 }
@@ -5723,6 +5735,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -5783,6 +5796,9 @@ svg {
 }
 .icon-action-ack::before {
 	background-position: -323px -245px;
+}
+.icon-invisible::before {
+	background-position: -89px -803px;
 }
 .icon-problem-generated::before {
 	background-position: -449px -245px;
