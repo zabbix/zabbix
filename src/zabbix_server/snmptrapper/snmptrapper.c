@@ -81,6 +81,7 @@ static void	DBupdate_lastsize(void)
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
+	const char* __function_name = "process_trap_for_interface";
 	DC_ITEM			*items = NULL;
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];
@@ -148,8 +149,16 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				}
 			}
 
-			if (ZBX_REGEXP_MATCH != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
+			int rret = regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE);
+
+			if (ZBX_REGEXP_NO_MATCH == rret)
 				goto next;
+			else if (FAIL == rret)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", regex, __function_name);
+				errcodes[i] = NOTSUPPORTED;
+				ret = FAIL;
+			}
 		}
 
 		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);

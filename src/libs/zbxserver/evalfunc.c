@@ -271,13 +271,24 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 		char	logeventid[16];
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
-		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
-			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-		else
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		zbx_history_record_clear(&vc_value, item->value_type);
+		int rret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE);
 
-		ret = SUCCEED;
+		if (rret == FAIL)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1, __function_name);
+			ret = FAIL;
+		}
+		else
+		{
+			if (rret == ZBX_REGEXP_MATCH)
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			else if (rret == ZBX_REGEXP_NO_MATCH)
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+
+			zbx_history_record_clear(&vc_value, item->value_type);
+
+			ret = SUCCEED;
+		}
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
@@ -1813,6 +1824,8 @@ out:
 
 static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *value, const char *arg1)
 {
+	const char* __function_name = "evaluate_STR_one";
+
 	switch (func)
 	{
 		case ZBX_FUNC_STR:
@@ -1820,11 +1833,35 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE) ?
-					SUCCEED : FAIL);
+		{
+			int rret = regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
+
+			if (rret == ZBX_REGEXP_MATCH)
+				return SUCCEED;
+			else if (rret = ZBX_REGEXP_NO_MATCH)
+				return FAIL;
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1, __function_name);
+				return FAIL;
+			}
+			break;
+		}
 		case ZBX_FUNC_IREGEXP:
-			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE) ?
-					SUCCEED : FAIL);
+		{
+			int rret = regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
+
+			if (rret == ZBX_REGEXP_MATCH)
+				return SUCCEED;
+			else if (rret == ZBX_REGEXP_NO_MATCH)
+				return FAIL;
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1, __function_name);
+				return FAIL;
+			}
+			break;
+		}
 	}
 
 	return FAIL;
