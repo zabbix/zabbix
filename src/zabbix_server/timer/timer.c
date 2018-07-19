@@ -569,6 +569,8 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			}
 		}
 
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 		if (16 < sql_offset)
 		{
 			if (ZBX_DB_OK > DBexecute("%s", sql))
