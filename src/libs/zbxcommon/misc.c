@@ -3532,7 +3532,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 		*ptr++ = hex[hash[i] & 15];
 	}
 
-	*ptr++ = '\0';
+	*ptr = '\0';
 
 	return token;
 }
