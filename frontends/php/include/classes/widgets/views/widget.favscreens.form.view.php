@@ -20,7 +20,7 @@
 
 
 /**
- * Favourite screens widget form view.
+ * Favorite screens widget form view.
  */
 $fields = $data['dialogue']['fields'];
 

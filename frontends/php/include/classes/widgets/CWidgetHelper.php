@@ -22,6 +22,8 @@
 class CWidgetHelper {
 
 	/**
+	 * Create CForm for widget configuration form.
+	 *
 	 * @return CForm
 	 */
 	public static function createForm() {
@@ -32,6 +34,8 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Create CFormList for widget configuration form with default fields in it.
+	 *
 	 * @param string $dialogue_name
 	 * @param string $type
 	 * @param array $known_widget_types
@@ -218,11 +222,13 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldComboBox $field
+	 * Creates CComboBox field without values, to later fill it by JS script.
+	 *
+	 * @param CWidgetFieldWidgetListComboBox $field
 	 *
 	 * @return CComboBox
 	 */
-	public static function getListComboBox($field) {
+	public static function getEmptyComboBox($field) {
 		return (new CComboBox($field->getName(), [], $field->getAction(), []))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
@@ -289,7 +295,7 @@ class CWidgetHelper {
 			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
-		$tags_table = (new CTable())->setId('tags_table');
+		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
 		$i = 0;
 
 		foreach ($tags as $tag) {
@@ -328,17 +334,6 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @return string
-	 */
-	public static function getTagsScripts() {
-		return 'var tags_table = jQuery("#tags_table");'.
-			'tags_table.dynamicRows({template: "#tag-row"});'.
-			'tags_table.parent().addClass("has-before");';
-	}
-
-	/**
-	 * Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
-	 *
 	 * @param CWidgetFieldTags $field
 	 *
 	 * @return string

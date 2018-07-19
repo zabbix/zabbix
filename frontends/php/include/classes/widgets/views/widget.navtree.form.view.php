@@ -31,10 +31,11 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 );
 
 // Map widget reference.
-$field = $fields['reference'];
-$form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');
-if (!$field->getValue()) {
-	$form->addItem(new CJsScript(get_js($field->getJavascript('#'.$form->getAttribute('id')), true)));
+$field = $fields[CWidgetFieldReference::FIELD_NAME];
+$form->addVar($field->getName(), $field->getValue());
+
+if ($field->getValue() === '') {
+	$scripts = [$field->getJavascript('#'.$form->getAttribute('id'))];
 }
 
 // Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
@@ -53,5 +54,6 @@ $form_list->addRow(
 $form->addItem($form_list);
 
 return [
-	'form' => $form
+	'form' => $form,
+	'scripts' => $scripts
 ];

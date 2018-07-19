@@ -20,7 +20,7 @@
 
 
 /**
- * Favourite maps widget form view.
+ * Favorite maps widget form view.
  */
 $fields = $data['dialogue']['fields'];
 

@@ -41,7 +41,7 @@ if (array_key_exists('itemid', $fields)) {
 		$form->getName()
 	);
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts = [$field_itemid->getPostJS()];
+	$scripts[] = $field_itemid->getPostJS();
 }
 
 $form->addItem($form_list);

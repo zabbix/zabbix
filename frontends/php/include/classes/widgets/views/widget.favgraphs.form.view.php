@@ -20,7 +20,7 @@
 
 
 /**
- * Favourite graphs widget form view.
+ * Favorite graphs widget form view.
  */
 $fields = $data['dialogue']['fields'];
 

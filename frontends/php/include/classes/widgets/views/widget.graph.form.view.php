@@ -42,9 +42,11 @@ $form_list->addRow(
 if (array_key_exists('graphid', $fields)) {
 	$field = $fields['graphid'];
 
+	// Needed for popup script.
 	$form->addVar($field->getName(), $field->getValue());
 
-	$field_graphid = CWidgetHelper::getSelectResource($field,
+	$field_graphid = CWidgetHelper::getSelectResource(
+		$field,
 		($field->getValue() != 0) ? $data['captions']['simple'][$field->getResourceType()][$field->getValue()] : '',
 		$form->getName()
 	);
@@ -57,13 +59,13 @@ if (array_key_exists('itemid', $fields)) {
 		$form->getName()
 	);
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts = [$field_itemid->getPostJS()];
+	$scripts[] = $field_itemid->getPostJS();
 }
 
-// Show legend
+// Show legend.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend']));
 
-// Dynamic item
+// Dynamic item.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
 
 $form->addItem($form_list);

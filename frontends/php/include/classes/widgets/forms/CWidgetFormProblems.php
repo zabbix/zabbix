@@ -147,7 +147,7 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		$this->fields[$field_unacknowledged->getName()] = $field_unacknowledged;
 
-		$enabled_show_timeline = [
+		$sort_with_enabled_show_timeline = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
 			SCREEN_SORT_TRIGGERS_TIME_ASC => true
 		];
@@ -167,7 +167,7 @@ class CWidgetFormProblems extends CWidgetForm {
 			->setAction(
 				'jQuery(":checkbox[name=show_timeline]")'.
 					'.filter(":disabled").prop("checked", true).end()'.
-					'.prop("disabled", !'.CJs::encodeJson($enabled_show_timeline).'[this.value])'.
+					'.prop("disabled", !'.CJs::encodeJson($sort_with_enabled_show_timeline).'[this.value])'.
 					'.filter(":disabled").prop("checked", false)'
 			);
 
@@ -186,7 +186,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		elseif (count($this->data) === 0) {
 			$field_show_timeline->setValue(1);
 		}
-		if (!array_key_exists($field_sort->getValue(), $enabled_show_timeline)) {
+		if (!array_key_exists($field_sort->getValue(), $sort_with_enabled_show_timeline)) {
 			$field_show_timeline->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 

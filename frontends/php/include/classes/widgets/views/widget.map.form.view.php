@@ -30,12 +30,14 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['known_widget_types'], $fields['rf_rate']
 );
 
-// Map widget reference.
-$field = $fields['reference'];
-$form->addVar($field->getName(), $field->getValue() ? $field->getValue() : '');
+$scripts = [];
 
-if (!$field->getValue()) {
-	$form->addItem(new CJsScript(get_js($field->getJavascript('#'.$form->getAttribute('id')), true)));
+// Map widget reference.
+$field = $fields[CWidgetFieldReference::FIELD_NAME];
+$form->addVar($field->getName(), $field->getValue());
+
+if ($field->getValue() === '') {
+	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
 }
 
 // Source.
@@ -48,9 +50,9 @@ $form_list->addRow(
 if (array_key_exists('filter_widget_reference', $fields)) {
 	$form_list->addRow(
 		CWidgetHelper::getLabel($fields['filter_widget_reference']),
-		CWidgetHelper::getListComboBox($fields['filter_widget_reference'])
+		CWidgetHelper::getEmptyComboBox($fields['filter_widget_reference'])
 	);
-	$form->addItem(new CJsScript(get_js($fields['filter_widget_reference']->getJavascript(), true)));
+	$scripts[] = $fields['filter_widget_reference']->getJavascript();
 }
 
 // Map.
@@ -69,5 +71,6 @@ if (array_key_exists('sysmapid', $fields)) {
 $form->addItem($form_list);
 
 return [
-	'form' => $form
+	'form' => $form,
+	'scripts' => $scripts
 ];
