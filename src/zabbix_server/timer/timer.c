@@ -385,17 +385,11 @@ static void	db_get_suppress_data(zbx_vector_ptr_t *event_data)
 {
 	DB_ROW					row;
 	DB_RESULT				result;
-	char					*sql = NULL;
-	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_event_suppress_data_t		*data = NULL;
 	zbx_uint64_t				eventid;
 	zbx_uint64_pair_t			pair;
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,maintenanceid,suppress_until"
-			" from event_suppress order by eventid");
-
-	result = DBselect("%s", sql);
-	zbx_free(sql);
+	result = DBselect("select eventid,maintenanceid,suppress_until from event_suppress order by eventid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
