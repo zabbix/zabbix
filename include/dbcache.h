@@ -761,7 +761,7 @@ typedef struct
 	int		severity;
 	int		logeventid;
 	unsigned char	state;
-	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
+	unsigned char	meta;	/* non-zero if contains meta information (lastlogsize and mtime) */
 }
 zbx_agent_value_t;
 
