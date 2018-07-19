@@ -89,7 +89,7 @@ function graph_item_calc_fnc2str($calc_fnc) {
 function getGraphDims($graphid = null) {
 	$graphDims = [];
 
-	$graphDims['shiftYtop'] = 35;
+	$graphDims['shiftYtop'] = CGraphDraw::DEFAULT_HEADER_PADDING_TOP;
 	if (is_null($graphid)) {
 		$graphDims['graphHeight'] = 200;
 		$graphDims['graphtype'] = 0;
@@ -119,7 +119,7 @@ function getGraphDims($graphid = null) {
 
 		$graphDims['yaxis'] = $yaxis;
 		$graphDims['graphtype'] = $graph['graphtype'];
-		$graphDims['graphHeight'] = $graph['height'];
+		$graphDims['graphHeight'] = (int) $graph['height'];
 	}
 
 	if ($yaxis == 2) {
@@ -134,6 +134,8 @@ function getGraphDims($graphid = null) {
 		$graphDims['shiftXleft'] = 30;
 		$graphDims['shiftXright'] = 85;
 	}
+
+	$graphDims['graphHeight']++;
 
 	return $graphDims;
 }
@@ -154,23 +156,6 @@ function get_hosts_by_graphid($graphid) {
 			' AND gi.itemid=i.itemid'.
 			' AND gi.graphid='.zbx_dbstr($graphid)
 	);
-}
-
-/**
- * Description:
- *	Return the time of the 1st appearance of items included in graph in trends
- * Comment:
- *	sql is split to many sql's to optimize search on history tables
- */
-function get_min_itemclock_by_graphid($graphid) {
-	$items = DBfetchArray(DBselect(
-		'SELECT DISTINCT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
-		' FROM items i,graphs_items gi'.
-		' WHERE i.itemid=gi.itemid'.
-			' AND gi.graphid='.zbx_dbstr($graphid)
-	));
-
-	return Manager::History()->getMinClock($items);
 }
 
 function getGraphByGraphId($graphId) {

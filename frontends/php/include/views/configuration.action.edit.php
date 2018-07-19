@@ -1019,7 +1019,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Host groups'), 'new_operation[groupids][]'))->setAsteriskMark(),
+				(new CLabel(_('Host groups'), 'new_operation_groupids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[groupids][]',
 					'object_name' => 'hostGroup',
@@ -1042,7 +1042,7 @@ if (!empty($data['new_operation'])) {
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			$new_operation_formlist->addRow(
-				(new CLabel(_('Templates'), 'new_operation[templateids][]'))->setAsteriskMark(),
+				(new CLabel(_('Templates'), 'new_operation_templateids__ms'))->setAsteriskMark(),
 				(new CMultiSelect([
 					'name' => 'new_operation[templateids][]',
 					'object_name' => 'templates',
@@ -1858,7 +1858,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 // Acknowledge operations
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$bottom_note = _('At least one operation, recovery operation or acknowledge operation must exist.');
+	$bottom_note = _('At least one operation, recovery operation or update operation must exist.');
 	$action_formname = $actionForm->getName();
 
 	$acknowledge_tab = (new CFormList())
@@ -2343,7 +2343,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 		);
 	}
 
-	$action_tabs->addTab('acknowledgeTab', _('Acknowledgement operations'), $acknowledge_tab);
+	$action_tabs->addTab('acknowledgeTab', _('Update operations'), $acknowledge_tab);
 }
 
 if (!hasRequest('form_refresh')) {

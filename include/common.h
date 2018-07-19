@@ -721,8 +721,13 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
 /* acknowledgement actions (flags) */
-#define ZBX_ACKNOWLEDGE_ACTION_NONE		0x0000
-#define ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM	0x0001
+#define ZBX_PROBLEM_UPDATE_CLOSE	0x0001
+#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE	0x0002
+#define ZBX_PROBLEM_UPDATE_MESSAGE	0x0004
+#define ZBX_PROBLEM_UPDATE_SEVERITY	0x0008
+
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	4
+
 
 #define ZBX_USER_ONLINE_TIME	600
 
@@ -1283,6 +1288,7 @@ int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len);
+char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);

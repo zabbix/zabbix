@@ -73,7 +73,9 @@ class CControllerScriptList extends CController {
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
-			'filter' => $filter
+			'filter' => $filter,
+			'profileIdx' => 'web.scripts.filter',
+			'active_tab' => CProfile::get('web.scripts.filter.active', 1)
 		];
 
 		// list of scripts

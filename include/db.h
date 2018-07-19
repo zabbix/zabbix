@@ -199,6 +199,8 @@ struct	_DC_TRIGGER;
 
 #define EVENT_NAME_LEN			2048
 
+#define FUNCTION_PARAM_LEN		255
+
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
 				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
@@ -309,6 +311,7 @@ typedef struct
 	int			value;
 	int			acknowledged;
 	int			ns;
+	int			severity;
 
 	zbx_vector_ptr_t	tags;
 
@@ -450,6 +453,9 @@ typedef struct
 	zbx_uint64_t	userid;
 	char		*message;
 	int		clock;
+	int		action;
+	int		old_severity;
+	int		new_severity;
 }
 DB_ACKNOWLEDGE;
 
@@ -718,12 +724,12 @@ typedef struct
 	const char	*error;
 
 	zbx_uint64_t	flags;
-#define ZBX_FLAGS_ITEM_DIFF_UNSET			0x0000
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE		0x0001
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		0x0002
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		0x0004
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		0x0008
-#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		0x1000
+#define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE		__UINT64_C(0x0001)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR		__UINT64_C(0x0002)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME		__UINT64_C(0x0004)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE		__UINT64_C(0x0008)
+#define ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTCLOCK		__UINT64_C(0x1000)
 #define ZBX_FLAGS_ITEM_DIFF_UPDATE_DB			\
 	(ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR |\
 	ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME | ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE)
@@ -747,10 +753,10 @@ typedef struct
 	int		version;
 	int		lastaccess;
 
-#define ZBX_FLAGS_PROXY_DIFF_UNSET				0x0000
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			0x0001
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			0x0002
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			0x0004
+#define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION | 	\

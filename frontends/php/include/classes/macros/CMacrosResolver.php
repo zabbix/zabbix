@@ -316,7 +316,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param int    $triggers[$triggerid]['ns']			(optional)
 	 * @param array  $options
 	 * @param bool   $options['references_only']			resolve only $1-$9 macros
-	 * @param bool   $options['events']						resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields
 	 *
 	 * @return array
 	 */
@@ -409,7 +408,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Get macro value.
 			$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 			$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-			$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, $options['events']);
+			$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 
 			if ($usermacros) {
 				// Get hosts for triggers.
@@ -536,7 +535,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -591,7 +590,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	public function resolveTriggerUrls(array $triggers) {
 		$macros = [
 			'host' => [],
-			'interface' => []
+			'interface' => [],
+			'item' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
@@ -602,7 +602,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			],
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
+			'macro_funcs_n' => [
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
 			],
 			'usermacros' => true
 		];
@@ -633,6 +637,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
+			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'function' => $data['function'],
+						'parameters' => $data['parameters']
+					];
+				}
+			}
+
 			if ($matched_macros['usermacros']) {
 				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 			}
@@ -641,6 +665,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -735,7 +760,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Selecting functions.
 			$result = DBselect(
-				'SELECT f.functionid,f.itemid,f.function,f.parameter'.
+				'SELECT f.functionid,f.itemid,f.name,f.parameter'.
 				' FROM functions f'.
 				' WHERE '.dbConditionInt('f.functionid', $functionids)
 			);
@@ -747,6 +772,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			while ($row = DBfetch($result)) {
 				$itemids[$row['itemid']] = true;
+				$row['function'] = $row['name'];
+				unset($row['name']);
 
 				$functions['{'.$row['functionid'].'}'] = $row;
 				unset($functions['{'.$row['functionid'].'}']['functionid']);

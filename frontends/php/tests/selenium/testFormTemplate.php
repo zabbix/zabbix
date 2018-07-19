@@ -163,7 +163,7 @@ class testFormTemplate extends CWebTest {
 				}
 			}
 			if (isset ($data['new_group'])) {
-				$this->assertEquals(1, DBcount("SELECT groupid FROM groups WHERE name='".$data['new_group']."'"));
+				$this->assertEquals(1, DBcount("SELECT groupid FROM hstgrp WHERE name='".$data['new_group']."'"));
 			}
 		}
 

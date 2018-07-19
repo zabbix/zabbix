@@ -516,6 +516,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Jabber',
+					'passwd' => 'Secret password',
 					'name' => 'Jabber with custom concurrent sessions and default options',
 					'sessions' => 'Custom',
 					'maxsessions' => 0
@@ -549,6 +550,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'name' => 'Ez Texting media type',
 					'type' => 'Ez Texting',
 					'username' => 'test',
+					'passwd' => 'Secret password',
 					'sessions' => 'Custom',
 					'maxsessions' => 10,
 					'attempts' => 5,
@@ -575,6 +577,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		elseif ($data['type'] == 'Ez Texting') {
 			$this->zbxTestInputType('eztext_username', $data['username']);
 		}
+
+		if (array_key_exists('passwd', $data)){
+			$this->zbxTestInputType('passwd', $data['passwd']);
+		}
+
 		$this->zbxTestTabSwitch('Options');
 
 		if (array_key_exists('attempts', $data)){

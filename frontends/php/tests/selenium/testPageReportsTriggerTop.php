@@ -30,11 +30,6 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		$this->zbxTestClickButtonText('Reset');
 
-		// Check the calendar button for 'From' field
-		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li/div[2]/button');
-		// Check the calendar button for 'Till' field
-		$this->zbxTestAssertElementPresentXpath('//form[@id=\'id\']/div/div/div[2]/ul/li[2]/div[2]/button');
-
 		// Check selected severities
 		$severities = ['Not classified', 'Warning', 'High', 'Information', 'Average', 'Disaster'];
 		foreach ($severities as $severity) {
@@ -43,13 +38,11 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		// Check closed filter
-		$this->zbxTestClickWait('filter-mode');
-		$this->zbxTestAssertNotVisibleId('filter-space');
+		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
 		$this->zbxTestAssertNotVisibleId('groupids_');
 
 		// Check opened filter
-		$this->zbxTestClickWait('filter-mode');
-		$this->zbxTestAssertVisibleId('filter-space');
+		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
 		$this->zbxTestAssertVisibleId('groupids_');
 
 		// Ckeck empty trigger list
@@ -192,6 +185,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickLinkTextWait($data['host_group']);
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('groupids_', $data['host_group']);
 		}
 
@@ -203,6 +197,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			);
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
 
@@ -218,7 +213,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickXpath('//button[@name=\'filter_set\']');
+		$this->zbxTestClickXpathWait('//button[@name=\'filter_set\']');
+		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
 			$this->zbxTestTextPresent($data['result']);
 		}
@@ -230,7 +226,6 @@ class testPageReportsTriggerTop extends CWebTest {
 	/*
 	 * Update date in 'From' and/or 'Till' filter field
 	 */
-
 	public function fillInDate($data) {
 		foreach ($data as $i => $full_date) {
 			$split_date = explode(' ', $full_date);
@@ -242,7 +237,14 @@ class testPageReportsTriggerTop extends CWebTest {
 			];
 
 			foreach ($fields as $key => $value) {
+				$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('filter_'.$i.'_'.$key));
 				$this->zbxTestInputTypeOverwrite('filter_'.$i.'_'.$key, $value);
+
+				// Fire onchange event.
+				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+						'event.initEvent("change", false, true);'.
+						'document.getElementById("filter_'.$i.'_'.$key.'").dispatchEvent(event);'
+				);
 			}
 		}
 	}

@@ -2,7 +2,9 @@ if SERVER
 SERVER_tests = \
 	zbx_function_find \
 	parse_key \
-	replace_key_params_dyn
+	replace_key_params_dyn \
+	calculate_item_nextcheck \
+	zbx_function_get_param_dyn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -117,5 +119,32 @@ replace_key_params_dyn_LDADD += @SERVER_LIBS@
 replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@
 
 replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+calculate_item_nextcheck_SOURCES = \
+	calculate_item_nextcheck.c \
+	$(COMMON_SRC_FILES)
+
+calculate_item_nextcheck_LDADD = \
+	$(COMMON_LIB_FILES)
+
+calculate_item_nextcheck_LDADD += @SERVER_LIBS@
+
+calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+
+calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_function_get_param_dyn_SOURCES = \
+	zbx_function_get_param_dyn.c \
+	$(COMMON_SRC_FILES)
+
+zbx_function_get_param_dyn_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
+
+zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_function_get_param_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
