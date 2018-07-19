@@ -872,7 +872,7 @@ function getItemParentTemplates(array $items) {
 			]
 			: [
 				'hostid' => $hostid,
-				'name' => _('Inaccessible application'),
+				'name' => _('Inaccessible template'),
 				'permission' => PERM_DENY
 			];
 	}
@@ -908,10 +908,7 @@ function makeItemTemplatePrefix($itemid, array $parent_templates) {
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(($template['permission'] == PERM_READ)
-			? CHtml::encode($template['name'])
-			: _('Inaccessible template')
-		);
+		$name = new CSpan(CHtml::encode($template['name']));
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
