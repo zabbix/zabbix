@@ -3505,7 +3505,7 @@ int	zbx_alarm_timed_out(void)
  *                                                                            *
  * Parameters:  seed - [IN] the seed                                          *
  *                                                                            *
- * Return value: Hexadecimal token string, must be freed by caller.           *
+ * Return value: Hexadecimal token string, must be freed by caller            *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_create_token(zbx_uint64_t seed)
@@ -3522,8 +3522,8 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	zbx_timespec(&ts);
 
 	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)&seed, sizeof(seed));
-	zbx_md5_append(&state, (const md5_byte_t *)&ts, sizeof(ts));
+	zbx_md5_append(&state, (const md5_byte_t *)&seed, (int)sizeof(seed));
+	zbx_md5_append(&state, (const md5_byte_t *)&ts, (int)sizeof(ts));
 	zbx_md5_finish(&state, hash);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)

@@ -11471,7 +11471,7 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
  *                                                                            *
  * Purpose: returns session token                                             *
  *                                                                            *
- * Return value: The session token (NULL for server).                         *
+ * Return value: pointer to session token (NULL for server).                  *
  *                                                                            *
  * Comments: The session token is generated during configuration cache        *
  *           initialization and is not changed later. Therefore no locking    *
