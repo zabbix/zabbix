@@ -71,10 +71,8 @@ foreach ($data['applications'] as $application) {
 	$info_icons = [];
 
 	// inherited app, display the template list
-	if ($application['templateids']
-			&& array_key_exists($application['applicationid'], $data['parent_templates'])) {
-		$name = getApplicationTemplateList($data['parent_templates'][$application['applicationid']]);
-		$name[] = NAME_DELIMITER;
+	if ($application['templateids']) {
+		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
 		$name[] = $application['name'];
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {

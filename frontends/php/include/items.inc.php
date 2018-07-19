@@ -793,92 +793,165 @@ function get_realhost_by_itemid($itemid) {
  */
 function getItemParentTemplates(array $items) {
 	$parent_itemids = [];
-	$parent_templates = [];
-	$child_to_parent = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
 	foreach ($items as $item) {
-		if ($item['templateid']) {
-			$parent_itemids[] = $item['templateid'];
-			$parent_templates[$item['itemid']] = [];
-			$child_to_parent[$item['itemid']] = $item['templateid'];
+		if ($item['templateid'] != 0) {
+			$parent_itemids[$item['templateid']] = true;
+			$data['links'][$item['itemid']] = ['itemid' => $item['templateid']];
 		}
 	}
 
 	if (!$parent_itemids) {
-		return [];
+		return $data;
 	}
 
+	$all_parent_itemids = [];
 	$hostids = [];
-	$templateids = [];
 
-	while ($parent_itemids) {
-		$items = API::Item()->get([
+	do {
+		$db_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'templateid'],
-			'itemids' => $parent_itemids,
-			'preservekeys' => true
+			'itemids' => array_keys($parent_itemids),
+			'webitems' => true
 		]);
 
+		$all_parent_itemids += $parent_itemids;
 		$parent_itemids = [];
-		foreach ($items as $item) {
-			if (!array_key_exists($item['itemid'], $child_to_parent)) {
-				if ($item['templateid'] && !in_array($item['templateid'], $child_to_parent)) {
-					$parent_itemids[] = $item['templateid'];
+
+		foreach ($db_items as $db_item) {
+			$data['templates'][$db_item['hostid']] = [];
+			$hostids[$db_item['itemid']] = $db_item['hostid'];
+
+			if ($db_item['templateid'] != 0) {
+				if (!array_key_exists($db_item['templateid'], $all_parent_itemids)) {
+					$parent_itemids[$db_item['templateid']] = true;
 				}
 
-				$child_to_parent[$item['itemid']] = $item['templateid'];
+				$data['links'][$db_item['itemid']] = ['itemid' => $db_item['templateid']];
 			}
-
-			$hostids[$item['itemid']] = $item['hostid'];
-			$templateids[$item['hostid']] = $item['hostid'];
 		}
 	}
+	while ($parent_itemids);
 
-	$accessible_templates = $templateids
+	foreach ($data['links'] as $itemid => &$parent_item) {
+		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
+			? $hostids[$parent_item['itemid']]
+			: 0;
+	}
+	unset($parent_item);
+
+	$db_templates = $data['templates']
 		? API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $templateids,
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
 			'preservekeys' => true
 		])
 		: [];
 
-	$editable_templates = $accessible_templates
+	$rw_templates = $db_templates
 		? API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($accessible_templates),
+			'output' => [],
+			'templateids' => array_keys($db_templates),
 			'editable' => true,
 			'preservekeys' => true
 		])
 		: [];
 
-	foreach ($parent_templates as $itemid => &$templates) {
-		if (array_key_exists($itemid, $child_to_parent)) {
-			$parent_itemid = $child_to_parent[$itemid];
+	$data['templates'][0] = [];
 
-			while ($parent_itemid) {
-				if (array_key_exists($parent_itemid, $hostids)) {
-					$templateid = $hostids[$parent_itemid];
-					$templates[] = [
-						'templateid' => $templateid,
-						'name' => $accessible_templates[$templateid]['name'],
-						'itemid' => $parent_itemid,
-						'accessible' => true,
-						'editable' => array_key_exists($templateid, $editable_templates) ? true : false
-					];
-					$parent_itemid = $child_to_parent[$parent_itemid];
-				}
-				else {
-					$templates[] = [
-						'accessible' => false,
-						'editable' => false
-					];
-					$parent_itemid = null;
-				}
-			}
-		}
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible application'),
+				'permission' => PERM_DENY
+			];
 	}
-	unset($templates);
+	unset($template);
 
-	return $parent_templates;
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected item.
+ *
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ *
+ * @return CLink|CSpan|null
+ */
+function makeItemTemplatePrefix($itemid, array $parent_templates) {
+	if (!array_key_exists($itemid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$itemid]['itemid'], $parent_templates['links'])) {
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
+
+	if ($template['permission'] == PERM_READ_WRITE) {
+		$name = (new CLink(CHtml::encode($template['name']),
+			(new CUrl('items.php'))
+				->setArgument('hostid', $template['hostid'])
+				->setArgument('filter_set', 1)
+		))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(($template['permission'] == PERM_READ)
+			? CHtml::encode($template['name'])
+			: _('Inaccessible template')
+		);
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of item templates.
+ *
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ *
+ * @return array
+ */
+function makeItemTemplatesHtml($itemid, array $parent_templates) {
+	$list = [];
+
+	while (array_key_exists($itemid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
+
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = new CLink(CHtml::encode($template['name']),
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+			);
+		}
+		else {
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 function get_realrule_by_itemid_and_hostid($itemid, $hostid) {

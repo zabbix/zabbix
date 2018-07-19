@@ -84,25 +84,7 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
-	if (array_key_exists($item['itemid'], $data['parent_templates'])) {
-		$parent_template = end($data['parent_templates'][$item['itemid']]);
-
-		if ($parent_template['editable']) {
-			$description[] = (new CLink(CHtml::encode($parent_template['name']),
-				'?hostid='.$parent_template['templateid'].'&filter_set=1'
-			))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$description[] = (new CSpan($parent_template['accessible']
-				? CHtml::encode($parent_template['name'])
-				: _('Inaccessible template')
-			))->addClass(ZBX_STYLE_GREY);
-		}
-
-		$description[] = NAME_DELIMITER;
-	}
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates']);
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),

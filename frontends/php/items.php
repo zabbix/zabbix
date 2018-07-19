@@ -1981,24 +1981,14 @@ else {
 		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
 	}
 
-	foreach ($data['parent_templates'] as $templates) {
-		$parent_template = end($templates);
-
-		if ($parent_template['accessible']) {
-			$hostids[] = $parent_template['templateid'];
-		}
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
+	$data['writable_templates'] = $hostids
+		? API::Template()->get([
 			'output' => ['templateid'],
 			'templateids' => array_keys(array_flip($hostids)),
 			'editable' => true,
 			'preservekeys' => true
-		]);
-	}
+		])
+		: [];
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

@@ -241,8 +241,7 @@ else {
 			'selectApplicationDiscovery' => ['ts_delete'],
 			'editable' => true,
 			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
-			'preservekeys' => true
+			'limit' => $config['search_limit'] + 1
 		]);
 
 		order_result($data['applications'], $sortField, $sortOrder);
@@ -254,7 +253,7 @@ else {
 		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
 		 * 'applicationDiscovery' property.
 		 */
-		foreach ($data['applications'] as $applicationid => &$application) {
+		foreach ($data['applications'] as &$application) {
 			if ($application['applicationDiscovery']) {
 				if (count($application['applicationDiscovery']) > 1) {
 					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
