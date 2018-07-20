@@ -5364,7 +5364,8 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 					{
 						data_alloc = data_len = strlen(*data) + 1;
 						pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.token.l,
-								token.token.r - token.token.l + 1, replace_to, strlen(replace_to));
+								token.token.r - token.token.l + 1, replace_to,
+								strlen(replace_to));
 						zbx_free(replace_to);
 					}
 					pos = token.token.r;

@@ -4587,15 +4587,16 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
  *               FAIL    - macro does not point at valid function or simple   *
  *                         macro                                              *
  *                                                                            *
- * Comments: This function parses token with a macro inside it. There are two *
- *           types of nested macros - function macros and a specific case     *
- *           of simple macros where {HOST.HOSTn} macro is used as host name.  *
- *           In both cases another macro is found at the beginning of token.  *
+ * Comments: This function parses token with a macro inside it. There are     *
+ *           three types of nested macros - low-level discovery function      *
+ *           macros, function macros and a specific case of simple macros     *
+ *           where {HOST.HOSTn} macro is used as host name.                   *
  *                                                                            *
  *           If the macro points at valid macro in the expression then        *
  *           the generic token fields are set and either the                  *
- *           token->data.func_macro or token->data.simple_macro (depending on *
- *           token type) structure is filled with macro specific data.        *
+ *           token->data.lld_func_macro, token->data.func_macro or            *
+ *           token->data.simple_macro (depending on token type) structure is  *
+ *           filled with macro specific data.                                 *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
@@ -4622,9 +4623,11 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 	if (macro_loc == ptr - macro)
 		return FAIL;
 
-	/* Determine the token type by checking the next character after nested macro. */
-	/* Function macros have format {{MACRO}.function()} while simple macros        */
-	/* have format {{MACRO}:key.function()}.                                       */
+	/* Determine the token type.                                                   */
+	/* Nested macros formats:                                                      */
+	/*               low-level discovery function macros  {{#MACRO}.function()}    */
+	/*               function macros                      {{MACRO}.function()}     */
+	/*               simple macros                        {{MACRO}:key.function()} */
 	if ('.' == ptr[1])
 	{
 		if ('#' == macro[2])
