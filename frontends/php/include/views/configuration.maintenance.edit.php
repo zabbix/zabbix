@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
@@ -331,7 +333,5 @@ else {
 $maintenanceForm->addItem($maintenanceTab);
 
 $widget->addItem($maintenanceForm);
-
-require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
 return $widget;

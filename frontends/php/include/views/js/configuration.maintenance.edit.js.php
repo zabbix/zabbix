@@ -24,15 +24,15 @@
 	jQuery(function($) {
 		$(function() {
 			$('#maintenance_type').change(function() {
-				var $maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
-				if ($maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
+				var maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
+				if (maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
 					$('#tags input, #tags button').prop('disabled', true);
 					$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
 				}
 				else {
 					$('#tags input, #tags button').prop('disabled', false);
-					$('#tags input[name$="[tag]"]').attr('placeholder', '<?= _('tag') ?>');
-					$('#tags input[name$="[value]"]').attr('placeholder', '<?= _('value') ?>');
+					$('#tags input[name$="[tag]"]').attr('placeholder', '<?= CJs::encodeJson(_('tag')) ?>');
+					$('#tags input[name$="[value]"]').attr('placeholder', '<?= CJs::encodeJson(_('value')) ?>');
 				}
 			});
 
