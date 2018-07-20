@@ -5149,69 +5149,75 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
-		const struct zbx_json_parse *jp_row, char *error, size_t error_len)
+		const struct zbx_json_parse *jp_row, char **replace_to, char *error, size_t error_len)
 {
-	char	c, *replace_to = NULL;
-	int	ret = SUCCEED;
+	char	c;
+	int	ret = SUCCEED, l ,r;
 	size_t	replace_to_alloc = 0;
 
-	c = (*data)[token->token.r + 1];
-	(*data)[token->token.r + 1] = '\0';
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
+	{
+		l = token->data.lld_func_macro.macro.l;
+		r = token->data.lld_func_macro.macro.r;
+	}
+	else
+	{
+		l = token->token.l;
+		r = token->token.r;
+	}
 
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + token->token.l, &replace_to, &replace_to_alloc))
+	c = (*data)[r + 1];
+	(*data)[r + 1] = '\0';
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + l, replace_to, &replace_to_alloc))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
-				*data + token->token.l);
+				*data + l);
 
 		if (0 != (flags & ZBX_TOKEN_NUMERIC))
 		{
-			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
+			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + l);
 			ret = FAIL;
 		}
 
-		zbx_free(replace_to);
+		zbx_free(*replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_NUMERIC))
 	{
-		if (SUCCEED == (ret = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+		if (SUCCEED == (ret = is_double_suffix(*replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
 		{
-			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
+			wrap_negative_double_suffix(replace_to, &replace_to_alloc);
 		}
 		else
 		{
-			zbx_free(replace_to);
-			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
+			zbx_free(*replace_to);
+			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + l);
 			ret = FAIL;
 		}
 	}
 	else if (0 != (flags & ZBX_TOKEN_JSON))
 	{
-		zbx_json_escape(&replace_to);
+		zbx_json_escape(replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_XML))
 	{
 		char	*replace_to_esc;
 
-		replace_to_esc = xml_escape_dyn(replace_to);
-		zbx_free(replace_to);
-		replace_to = replace_to_esc;
+		replace_to_esc = xml_escape_dyn(*replace_to);
+		zbx_free(*replace_to);
+		*replace_to = replace_to_esc;
 	}
 	else if (0 != (flags & ZBX_TOKEN_REGEXP))
 	{
-		zbx_regexp_escape(&replace_to);
+		zbx_regexp_escape(replace_to);
 	}
 	else if (0 != (flags & ZBX_TOKEN_XPATH))
 	{
-		xml_escape_xpath(&replace_to);
+		xml_escape_xpath(replace_to);
 	}
 
-	(*data)[token->token.r + 1] = c;
+	(*data)[r + 1] = c;
 
-	if (NULL != replace_to)
-	{
-		zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
-		zbx_free(replace_to);
-	}
 
 	return ret;
 }
@@ -5336,13 +5342,31 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
+		size_t	data_alloc, data_len;
+		char	*replace_to = NULL;
+
 		if (0 != (token.type & flags))
 		{
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
-					ret = process_lld_macro_token(data, &token, flags, jp_row, error,
+				case ZBX_TOKEN_LLD_FUNC_MACRO:
+					ret = process_lld_macro_token(data, &token, flags, jp_row, &replace_to, error,
 							max_error_len);
+
+					if (ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
+					{
+						ret = zbx_calculate_macro_function(*data, &token.data.lld_func_macro,
+								&replace_to);
+					}
+
+					if (NULL != replace_to)
+					{
+						data_alloc = data_len = strlen(*data) + 1;
+						pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.token.l,
+								token.token.r - token.token.l + 1, replace_to, strlen(replace_to));
+						zbx_free(replace_to);
+					}
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
