@@ -1690,19 +1690,15 @@ INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastchec
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99001, NULL, 15016, '', 0, 0);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1010, 99000, '', 15, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1011, 99001, '', 15, 1010);
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99000, -1, '', '', '', '', '', '', '', '', '');
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99001, -1, '', '', '', '', '', '', '', '', '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99006, 'Inheritance test template with host prototype', 'Inheritance test template with host prototype', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99006, 99006, 15);
 INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula, params, description, posts, headers, flags) VALUES (99083, 99006, 2, 'Discovery rule for host prototype test', 'key_test', '30s', 4, '', '', '', '', '', 1);
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99007, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1012, 99007, '', 15, NULL);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99007, NULL, 99083, '', 0, 0);
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99007, -1, '', '', '', '', '', '', '', '', '');
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (99009, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1013, 99009, '', 15, NULL);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99009, NULL, 99083, '', 0, 0);
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99009, -1, '', '', '', '', '', '', '', '', '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99004, 'Host for inheritance host prototype tests', 'Host for inheritance host prototype tests', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10026,99004,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99004, 99004, 15);
@@ -1711,11 +1707,9 @@ INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, formula,
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99008, 'Host prototype for update {#TEST}', 'Host prototype for update {#TEST}', 0, '', 99007, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1014, 99008, '', 15, 1002);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99008, NULL, 99084, '', 0, 0);
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99008, -1, '', '', '', '', '', '', '', '', '');
 INSERT INTO hosts (hostid, host, name, status, description, templateid, flags) VALUES (99010, 'Host prototype for delete {#TEST}', 'Host prototype for delete {#TEST}', 0, '', 99009, 2);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (1015, 99010, '', 15, 1004);
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99010, NULL, 99084, '', 0, 0);
-INSERT INTO host_inventory (hostid, inventory_mode, hardware_full, software_full, contact, location, notes, host_networks, site_notes, poc_1_notes, poc_2_notes) VALUES (99010, -1, '', '', '', '', '', '', '', '', '');
 
 -- testFormItemHttpAgent:
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'Host for different item types', 'Host for different items types', 0, '');
