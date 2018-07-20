@@ -3070,7 +3070,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	struct zbx_json_parse	jp_data;
 	zbx_timespec_t		client_timediff;
 	const char		*pnext = NULL;
-	char			*error = NULL, *token = 0;
+	char			*error = NULL, *token = NULL;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	zbx_host_key_t		*hostkeys;
 	DC_ITEM			*items;
