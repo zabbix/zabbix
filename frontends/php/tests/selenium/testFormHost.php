@@ -263,7 +263,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestDropdownSelect('groupid', 'Templates');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
@@ -325,7 +325,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
-		$this->zbxTestDropdownSelect('groupid', 'Templates');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
