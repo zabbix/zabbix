@@ -389,25 +389,14 @@ if (!empty($data['form'])) {
 			$data['new_timeperiod']['start_date'] = getRequest('new_timeperiod_start_date');
 		}
 
-		$data['mname'] = getRequest('mname', '');
-		$data['maintenance_type'] = getRequest('maintenance_type', 0);
-
-		if (hasRequest('active_since')) {
-			$data['active_since'] = getRequest('active_since');
-		}
-		else {
-			$data['active_since'] = date(ZBX_DATE_TIME, strtotime('today'));
-		}
-
-		if (hasRequest('active_till')) {
-			$data['active_till'] = getRequest('active_till');
-		}
-		else {
-			$data['active_till'] = date(ZBX_DATE_TIME, strtotime('tomorrow'));
-		}
-
-		$data['description'] = getRequest('description', '');
-		$data['timeperiods'] = getRequest('timeperiods', []);
+		$data += [
+			'mname' => getRequest('mname', ''),
+			'maintenance_type' => getRequest('maintenance_type', 0),
+			'active_since' => getRequest('active_since', date(ZBX_DATE_TIME, strtotime('today'))),
+			'active_till' => getRequest('active_till', date(ZBX_DATE_TIME, strtotime('tomorrow'))),
+			'description' => getRequest('description', ''),
+			'timeperiods' => getRequest('timeperiods', [])
+		];
 
 		$hostids = getRequest('hostids', []);
 		$groupids = getRequest('groupids', []);

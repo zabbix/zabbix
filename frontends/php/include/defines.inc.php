@@ -1297,10 +1297,6 @@ define('ZBX_DEFAULT_THEME', 'blue-theme');
 
 define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
 
-// non translatable date formats
-define('TIMESTAMP_FORMAT', 'YmdHis');
-define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
-
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
 
