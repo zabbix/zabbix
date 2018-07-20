@@ -5342,11 +5342,10 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
-		size_t	data_alloc, data_len;
-		char	*replace_to = NULL;
-
 		if (0 != (token.type & flags))
 		{
+			char	*replace_to = NULL;
+
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
@@ -5362,6 +5361,8 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 
 					if (NULL != replace_to)
 					{
+						size_t	data_alloc, data_len;
+
 						data_alloc = data_len = strlen(*data) + 1;
 						pos += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token.token.l,
 								token.token.r - token.token.l + 1, replace_to,
