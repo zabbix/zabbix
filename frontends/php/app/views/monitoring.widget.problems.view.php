@@ -150,7 +150,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen']), '', true)
+			->setHint(
+				make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen'], $show_timeline,
+					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+					$data['fields']['tag_priority']),
+				'',
+				true
+			)
 	]));
 
 	$description_style = getSeverityStyle($problem['severity']);

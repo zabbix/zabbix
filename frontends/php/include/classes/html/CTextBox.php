@@ -34,4 +34,10 @@ class CTextBox extends CInput {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
 	}
+
+	public function setCalcWidth($value) {
+		$this->addStyle('width: calc(100% - '.$value.'px);');
+		return $this;
+	}
+
 }

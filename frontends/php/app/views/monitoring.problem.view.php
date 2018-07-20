@@ -42,6 +42,8 @@ $options = [
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
 			'show_tags' => $data['filter']['show_tags'],
+			'tag_name_format' => $data['filter']['tag_name_format'],
+			'tag_priority' => $data['filter']['tag_priority'],
 			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'compact_view' => $data['filter']['compact_view'],
@@ -254,16 +256,32 @@ if ($data['action'] == 'problem.view') {
 				->addClass('element-table-add')
 		))->setColSpan(3)
 	);
-	$filter_column2 = (new CFormList())
-		->addRow(_('Host inventory'), $filter_inventory_table)
-		->addRow(_('Tags'), $filter_tags_table)
-		->addRow(_('Show tags'),
-			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
+
+	$tag_format_line = (new CHorList())
+		->addItem((new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
 				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
 				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
 				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
+		)
+		->addItem((new CDiv())->setWidth(23))  // ENG-form right align
+		->addItem(_('Tag name'))
+		->addItem((new CRadioButtonList('tag_name_format', (int) $data['filter']['tag_name_format']))
+				->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
+				->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
+				->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
+				->setModern(true)
+		);
+
+	$filter_column2 = (new CFormList())
+		->addRow(_('Host inventory'), $filter_inventory_table)
+		->addRow(_('Tags'), $filter_tags_table)
+		->addRow(_('Show tags'), $tag_format_line)
+		->addRow(_('Tag display priority'),
+			(new CTextBox('tag_priority', $data['filter']['tag_priority']))
+				->setCalcWidth(ZBX_TEXTAREA_CALC_MARGIN)
+				->setAttribute('placeholder', _('Comma separated list'))
 		)
 		->addRow(_('Show hosts in maintenance'), [
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),

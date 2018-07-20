@@ -1202,6 +1202,7 @@ define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
+define('ZBX_TEXTAREA_CALC_MARGIN',		    	55);   // width:calc(100% - Zpx);
 
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
@@ -1273,6 +1274,7 @@ define('ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE',	5);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
+define('ZBX_WIDGET_FIELD_TYPE_HORLIST',			9);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
@@ -1620,6 +1622,11 @@ define('PROBLEMS_SHOW_TAGS_NONE', 0);
 define('PROBLEMS_SHOW_TAGS_1', 1);
 define('PROBLEMS_SHOW_TAGS_2', 2);
 define('PROBLEMS_SHOW_TAGS_3', 3);
+
+// Tag name format to display in Problems widget and Monitoring > Problems.
+define('PROBLEMS_TAG_NAME_FULL',      0);
+define('PROBLEMS_TAG_NAME_SHORTENED', 1);
+define('PROBLEMS_TAG_NAME_NONE',      2);
 
 // HTTP headers
 /*

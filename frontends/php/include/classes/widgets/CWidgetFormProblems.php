@@ -120,6 +120,27 @@ class CWidgetFormProblems extends CWidgetForm {
 		}
 		$this->fields[] = $field_show_tags;
 
+		// tag_format_line
+		$tag_format_line = (new CWidgetFieldRadioButtonList('tag_name_format', _('Tag name'), [
+			PROBLEMS_TAG_NAME_FULL => _('Full'),
+			PROBLEMS_TAG_NAME_SHORTENED => _('Shortened'),
+			PROBLEMS_TAG_NAME_NONE => _('None')
+		]))
+			->setDefault(PROBLEMS_TAG_NAME_FULL)
+			->setModern(true);
+
+		if (array_key_exists('tag_name_format', $this->data)) {
+			$tag_format_line->setValue($this->data['tag_name_format']);
+		}
+		$this->fields[] = $tag_format_line;
+
+		$tag_priority = (new CWidgetFieldTextBox('tag_priority', _('Tag display priority')));
+
+		if (array_key_exists('tag_priority', $this->data)) {
+			$tag_priority->setValue($this->data['tag_priority']);
+		}
+		$this->fields[] = $tag_priority;
+
 		// show hosts in maintenance
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
 

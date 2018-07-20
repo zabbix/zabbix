@@ -393,10 +393,20 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
  * @param bool   $fullscreen
+ * @param bool   $show_timeline
+ * @param int    $show_tags       PROBLEMS_SHOW_TAGS_NONE|PROBLEMS_SHOW_TAGS_1|PROBLEMS_SHOW_TAGS_2|PROBLEMS_SHOW_TAGS_3
+ * @param array  $filter_tags
+ * @param string $filter_tags[]['tag']
+ * @param int    $filter_tags[]['operator']
+ * @param string $filter_tags[]['value']
+ * @param int    $tag_name_format              PROBLEMS_TAG_NAME_FULL|PROBLEMS_TAG_NAME_SHORTENED|PROBLEMS_TAG_NAME_NONE
+ * @param string $tag_priority                 Comma separated tag names list
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false, $show_timeline = true,
+	$show_tags = PROBLEMS_SHOW_TAGS_3, array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL,
+	$tag_priority = '') {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -423,8 +433,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 		);
 	}
 
-	$show_timeline = true;
-
 	// indicator of sort field
 	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 
@@ -442,12 +450,12 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 	// Select and show events.
 	$table = (new CTableInfo())
 		->setHeader(array_merge($header, [
-			_('Recovery time'),
-			_('Status'),
-			_('Duration'),
-			_('Ack'),
-			_('Tags')
-		]));
+				_('Recovery time'),
+				_('Status'),
+				_('Duration'),
+				_('Ack')
+			], ($show_tags > PROBLEMS_SHOW_TAGS_NONE) ? [_('Tags')] : []
+		));
 
 	if ($eventid_till != 0) {
 		$problems = API::Event()->get([
@@ -488,9 +496,10 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 
 		$today = strtotime('today');
 		$last_clock = 0;
+		$tags = [];
 
-		if ($problems) {
-			$tags = makeEventsTags($problems);
+		if ($problems && $show_tags > PROBLEMS_SHOW_TAGS_NONE) {
+			$tags = makeEventsTags($problems, true, $show_tags, $filter_tags, $tag_name_format, $tag_priority);
 		}
 
 		$url_details = (new CUrl('tr_events.php'))
@@ -599,7 +608,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 				))
 					->addClass(ZBX_STYLE_NOWRAP),
 				$problem_update_link,
-				$tags[$problem['eventid']]
+				($tags) ? $tags[$problem['eventid']] : ''
 			]));
 		}
 	}
@@ -642,6 +651,30 @@ function orderEventTags(array $event_tags, array $f_tags) {
 }
 
 /**
+ * Place priority tags at the beginning of tags array.
+ *
+ * @param array  $event_tags
+ * @param string $event_tags[]['tag']
+ * @param string $event_tags[]['value']
+ * @param array $priorities
+ *
+ * @return array
+ */
+function orderEventTagsByPriority(array $event_tags, array $priorities) {
+	$first_tags = [];
+
+	foreach ($priorities as $priority) {
+		foreach ($event_tags as $i => $tag) {
+			if ($tag['tag'] === $priority) {
+				$first_tags[] = $tag;
+				unset($event_tags[$i]);
+			}
+		}
+	}
+	return array_merge($first_tags, $event_tags);
+}
+
+/**
  * Create element with event tags.
  *
  * @param array  $events
@@ -655,11 +688,13 @@ function orderEventTags(array $event_tags, array $f_tags) {
  * @param string $filter_tags[]['tag']
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']
+ * @param int    $tag_name_format              PROBLEMS_TAG_NAME_FULL|PROBLEMS_TAG_NAME_SHORTENED|PROBLEMS_TAG_NAME_NONE
+ * @param string $tag_priority                 Comma separated tag names list
  *
  * @return array
  */
 function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_LIST_TAGS_COUNT,
-		array $filter_tags = []) {
+		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	$tags = [];
 
 	// Convert $filter_tags to a more usable format.
@@ -680,16 +715,41 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 			// Show first n tags and "..." with hint box if there are more.
 
 			$event_tags = $f_tags ? orderEventTags($event['tags'], $f_tags) : $event['tags'];
-			$tags_shown = array_slice($event_tags, 0, $list_tags_count);
 
-			foreach ($tags_shown as $tag) {
-				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
-				$tags[$event['eventid']][] = (new CSpan($value))
-					->addClass(ZBX_STYLE_TAG)
-					->setHint($value);
+			if ($tag_priority !== '') {
+				$p_tags = explode(',', $tag_priority);
+				$p_tags = array_map('trim', $p_tags);
+				$event_tags = orderEventTagsByPriority($event_tags, $p_tags);
+			}
+			$tags_shown = 0;
+
+			foreach ($event_tags as $tag) {
+				$separator = ': ';
+
+				switch ($tag_name_format) {
+					case PROBLEMS_TAG_NAME_NONE:
+						$tagname = '';
+						$separator = '';
+						break;
+					case PROBLEMS_TAG_NAME_SHORTENED:
+						$tagname = substr($tag['tag'], 0, 3);
+						break;
+					default:
+						$tagname = $tag['tag'];
+				}
+				$value = $tagname.(($tag['value'] === '') ? '' : $separator.$tag['value']);
+				if ($value !== '') {
+					$tags[$event['eventid']][] = (new CSpan($value))
+						->addClass(ZBX_STYLE_TAG)
+						->setHint($value);
+					$tags_shown++;
+					if ($tags_shown >= $list_tags_count) {
+						break;
+					}
+				}
 			}
 
-			if (count($event['tags']) > count($tags_shown)) {
+			if (count($event['tags']) > $tags_shown) {
 				// Display all tags in hint box.
 
 				$hint_content = [];
