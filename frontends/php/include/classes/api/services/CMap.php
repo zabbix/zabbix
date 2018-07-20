@@ -58,7 +58,6 @@ class CMap extends CMapElement {
 		'limit'						=> null
 	];
 
-
 	/**
 	 * Get map data.
 	 *
@@ -97,8 +96,6 @@ class CMap extends CMapElement {
 	 *						 parameter has been used.
 	 */
 	public function get(array $options = []) {
-		$user_data = self::$userData;
-
 		$options = zbx_array_merge($this->defOptions, $options);
 
 		$limit = $options['limit'];

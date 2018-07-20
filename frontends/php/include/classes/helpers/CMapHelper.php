@@ -37,7 +37,7 @@ class CMapHelper {
 				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
 				'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
 				'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid',
-				'severity_min'
+				'severity_min', 'show_suppressed'
 			],
 			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -107,7 +107,6 @@ class CMapHelper {
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
 			'label_location' => $map['label_location'],
-			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
