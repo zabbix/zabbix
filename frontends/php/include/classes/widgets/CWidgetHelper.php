@@ -57,6 +57,8 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Creates label linked to the field
+	 *
 	 * @param CWidgetField $field
 	 *
 	 * @return CLabel
@@ -67,6 +69,8 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Creates label linked to the multiselect field
+	 *
 	 * @param CMultiSelect $field
 	 *
 	 * @return CLabel
@@ -334,6 +338,8 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * JS Template for one tag line for Tags field
+	 *
 	 * @param CWidgetFieldTags $field
 	 *
 	 * @return string
