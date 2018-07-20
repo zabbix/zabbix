@@ -57,7 +57,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Creates label linked to the field
+	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
 	 *
@@ -69,7 +69,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Creates label linked to the multiselect field
+	 * Creates label linked to the multiselect field.
 	 *
 	 * @param CMultiSelect $field
 	 *
