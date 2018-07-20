@@ -903,24 +903,21 @@ function makeInformationIcon($message) {
  * @return CSpan
  */
 function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = zbx_objectValues($icon_data, 'suppress_until');
-	rsort($suppress_until);
-	$suppress_until = reset($suppress_until);
+	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
 
-	$maintenance_name = zbx_objectValues($icon_data, 'maintenance_name');
-	asort($maintenance_name);
-	$maintenance_name = implode(', ', $maintenance_name);
+	CArrayHelper::sort($icon_data, ['maintenance_name']);
+	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
 
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint(
-			_s('Suppressed till: %s', ($suppress_until >= strtotime('today'))
-				? zbx_date2str(TIME_FORMAT_SECONDS, $suppress_until)
-				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $suppress_until)
+			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
+				? zbx_date2str(TIME_FORMAT, $suppress_until)
+				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
 			).
 			"\n".
-			_s('Maintenance: %s', $maintenance_name)
+			_s('Maintenance: %1$s', $maintenance_names)
 		);
 }
 
