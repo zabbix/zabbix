@@ -405,8 +405,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.12rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-14548] fixed the disk usage counters reading for ESX/ESXi hosts (MVekslers)
 ..F....... [ZBX-9236] fixed timeselector period used to select 'all' values of particular item (miks)
