@@ -76,11 +76,13 @@ $fields = [
 			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
 		]), null
 	],
-	'filter_state' =>							[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null],
+	'filter_state' =>							[T_ZBX_INT, O_OPT, null,
+		IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null],
 	'filter_status' =>							[T_ZBX_INT, O_OPT, null,
 		IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
 	],
-	'filter_value' =>							[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), null],
+	'filter_value' =>							[T_ZBX_INT, O_OPT, null,
+		IN([-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), null],
 
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -638,6 +640,7 @@ else {
 	]);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
+	$data['is_template'] = ((int) $data['pageFilter']->hosts[$data['hostid']]['status'] === HOST_STATUS_TEMPLATE);
 
 	// get triggers
 	if ($data['pageFilter']->hostsSelected) {
@@ -675,7 +678,7 @@ else {
 				}
 		}
 
-		if ($data['filter_value'] != -1) {
+		if (!$data['is_template'] && $data['filter_value'] != -1) {
 			$options['filter']['value'] = $data['filter_value'];
 		}
 		if ($data['pageFilter']->hostid > 0) {
