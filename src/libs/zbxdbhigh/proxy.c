@@ -3076,7 +3076,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	DC_ITEM			*items;
 	double			sec;
 	size_t			token_size = 0;
-	zbx_data_session_t	*session;
+	zbx_data_session_t	*session = NULL;
 	zbx_uint64_t		last_hostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -3114,7 +3114,9 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 			if (last_hostid != items[i].host.hostid)
 			{
 				last_hostid = items[i].host.hostid;
-				session = zbx_dc_get_or_create_data_session(last_hostid, token);
+
+				if (NULL != token)
+					session = zbx_dc_get_or_create_data_session(last_hostid, token);
 			}
 
 			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_valueid)
@@ -3766,6 +3768,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 		processed_num += process_history_data(items, values, errcodes, values_num);
 
 		total_num += read_num;
+
 		if (NULL != session)
 			session->last_valueid = values[values_num - 1].id;
 
@@ -3888,7 +3891,9 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		zbx_data_session_t	*session;
 
 		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);
-		session = zbx_dc_get_or_create_data_session(proxy->hostid, token);
+
+		if (NULL != token)
+			session = zbx_dc_get_or_create_data_session(proxy->hostid, token);
 
 		/* use modifiable copy of client_timediff to allow unique clock,ns value timestamps */
 		process_proxy_history_data_33(proxy, &jp_data, session, &client_timediff_copy, &error_step);

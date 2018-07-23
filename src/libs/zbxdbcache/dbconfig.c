@@ -11490,7 +11490,7 @@ const char	*zbx_dc_get_session_token(void)
  * Purpose: returns data session, creates a new session if none found         *
  *                                                                            *
  * Parameter: hostid - [IN] the host (proxy) identifier                       *
- *            token  - [IN] the session token                                 *
+ *            token  - [IN] the session token (not NULL)                      *
  *                                                                            *
  * Return value: pointer to data session.                                     *
  *                                                                            *
@@ -11504,9 +11504,6 @@ zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const
 {
 	zbx_data_session_t	*session, session_local;
 	int			now;
-
-	if (NULL == token)
-		return NULL;
 
 	now = time(NULL);
 	session_local.hostid = hostid;
