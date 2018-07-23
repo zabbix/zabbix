@@ -798,7 +798,9 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'filter' => $filter,
-		'config' => $config
+		'config' => $config,
+		'profileIdx' => 'web.actionconf.filter',
+		'active_tab' => CProfile::get('web.actionconf.filter.active', 1)
 	];
 
 	$data['actions'] = API::Action()->get([

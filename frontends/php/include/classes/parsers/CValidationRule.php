@@ -56,8 +56,8 @@ class CValidationRule {
 							$is_empty = false;
 							$rule = [];
 
-							if (!$this->parseTime($buffer, $pos, $rule)					// time
-									&& !$this->parseString($buffer, $pos, $rule)		// string
+							if (!$this->parseString($buffer, $pos, $rule)		// string
+									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseLE($buffer, $pos, $rule)			// le
@@ -140,22 +140,6 @@ class CValidationRule {
 	}
 
 	/**
-	 * time
-	 *
-	 * 'time' => true
-	 */
-	private function parseTime($buffer, &$pos, &$rules) {
-		if (strncmp(substr($buffer, $pos), 'time', 4) != 0) {
-			return false;
-		}
-
-		$pos += 4;
-		$rules['time'] = true;
-
-		return true;
-	}
-
-	/**
 	 * string
 	 *
 	 * 'string' => true
@@ -167,6 +151,22 @@ class CValidationRule {
 
 		$pos += 6;
 		$rules['string'] = true;
+
+		return true;
+	}
+
+	/**
+	 * range_time
+	 *
+	 * 'range_time' => true
+	 */
+	private function parseRangeTime($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'range_time', 10) != 0) {
+			return false;
+		}
+
+		$pos += 10;
+		$rules['range_time'] = true;
 
 		return true;
 	}

@@ -159,7 +159,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		if (self::$cookie === null || $sessionid !== self::$cookie['value']) {
 			self::$cookie = [
-				'name' => 'zbx_sessionid',
+				'name' => ZBX_SESSION_NAME,
 				'value' => $sessionid,
 				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => parse_url(PHPUNIT_URL, PHP_URL_PATH)
@@ -247,6 +247,25 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function zbxTestTextPresentInMessageDetails($strings) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-details'));
+		if (!is_array($strings)) {
+			$strings = [$strings];
+		}
+
+		foreach ($strings as $string) {
+			$quote = '"';
+			if (strpos($string, $quote) !== false) {
+				$quote = '\'';
+				if (strpos($string, $quote) !== false) {
+					$this->fail('Cannot assert message detail text containig both single and double quotes.');
+				}
+			}
+
+			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.$quote.$string.$quote.')]');
+		}
+	}
+
 	public function zbxTestTextVisibleOnPage($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
@@ -269,8 +288,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 
 		foreach ($strings as $string) {
-			$elements = $this->webDriver->findElement(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
-			$this->assertFalse($elements->isDisplayed());
+			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			foreach ($elements as $element) {
+				$this->assertFalse($element->isDisplayed());
+			}
 		}
 	}
 
@@ -401,6 +422,18 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		));
 	}
 
+	/**
+	 * If 'Filter' tab is closed, then open it
+	 */
+
+	public function zbxTestExpandFilterTab() {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"))->isDisplayed();
+		if (!$element) {
+			$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
+		}
+	}
+
 	public function zbxTestInputType($id, $str) {
 		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
 	}
@@ -421,6 +454,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if ($validate) {
 			$this->zbxTestWaitUntilElementValuePresent(WebDriverBy::xpath($xpath), $str);
 		}
+	}
+
+	public function zbxTestInputClearAndTypeByXpath($xpath, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->clear()->sendKeys($str);
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {
@@ -827,7 +865,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if (self::$shared_browser !== null) {
 			try {
 				if (self::$cookie !== null) {
-					$session_id = self::$shared_browser->manage()->getCookieNamed('zbx_sessionid');
+					$session_id = self::$shared_browser->manage()->getCookieNamed(ZBX_SESSION_NAME);
 
 					if ($session_id === null || !array_key_exists('value', $session_id)
 							|| $session_id['value'] !== self::$cookie['value']) {

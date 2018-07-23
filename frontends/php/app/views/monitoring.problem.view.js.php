@@ -49,5 +49,29 @@
 		});
 
 		$('#filter_show').trigger('change');
+
+		$('#filter_compact_view').change(function() {
+			if ($(this).is(':checked')) {
+				$('#filter_show_timeline, #filter_details').attr('disabled', true);
+				$('#filter_highlight_row').removeAttr('disabled');
+			}
+			else {
+				$('#filter_show_timeline, #filter_details').removeAttr('disabled');
+				$('#filter_highlight_row').attr('disabled', true);
+			}
+		});
+
+		$(document).on({
+			mouseenter: function() {
+				if ($(this).width() > $(this).parent('td').width()) {
+					$(this).attr({title: $(this).text()});
+				}
+			},
+			mouseleave: function() {
+				if ($(this).is('[title]')) {
+					$(this).removeAttr('title');
+				}
+			}
+		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
 	});
 </script>

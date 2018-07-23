@@ -76,11 +76,24 @@ void	zbx_mock_test_entry(void **state)
 int	__wrap_zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
+	ZBX_UNUSED(s);
+	ZBX_UNUSED(source_ip);
+	ZBX_UNUSED(ip);
+	ZBX_UNUSED(port);
+	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(tls_arg1);
+	ZBX_UNUSED(tls_arg2);
+
 	return SUCCEED;
 }
 
 int	__wrap_zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
+	ZBX_UNUSED(s);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(timeout);
+
 	http_req = data;
 	http_len = len;
 	return SUCCEED;
@@ -88,6 +101,9 @@ int	__wrap_zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsig
 
 ssize_t	__wrap_zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 {
+	ZBX_UNUSED(s);
+	ZBX_UNUSED(timeout);
+
 	s->buffer = (char *)http_req;
 	s->buffer[http_len++] = '*'; /* workaround for zbx_rtrim */
 	s->buffer[http_len++] = '\0';
@@ -96,4 +112,5 @@ ssize_t	__wrap_zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 
 void	__wrap_zbx_tcp_close(zbx_socket_t *s)
 {
+	ZBX_UNUSED(s);
 }

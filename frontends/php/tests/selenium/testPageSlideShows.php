@@ -88,7 +88,7 @@ class testPageSlideShows extends CWebTest {
 	 * @dataProvider allSlideShows
 	 * @backup-once slideshows
 	 */
-	public function testPageSlideShows_MassDelete($slideshow) {
+	public function testPageSlideShows_DeleteSelected($slideshow) {
 		$slideshowid = $slideshow['slideshowid'];
 		$name = $slideshow['name'];
 
@@ -106,5 +106,22 @@ class testPageSlideShows extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
+	}
+
+	/**
+	 * @backup-once slideshows
+	 */
+	public function testPageSlideShows_MassDeleteAll() {
+		$this->zbxTestLogin('slideconf.php');
+		$this->zbxTestCheckTitle('Configuration of slide shows');
+		$this->zbxTestCheckboxSelect('all_shows');
+		$this->zbxTestClickButton('slideshow.massdelete');
+		$this->zbxTestAcceptAlert();
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slideshows'));
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slides'));
 	}
 }

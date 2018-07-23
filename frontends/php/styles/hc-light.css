@@ -5,7 +5,7 @@
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
 b,
-strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, .nav, output, ruby, section, summary,
+strong, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, .table-forms .tfoot-buttons, thead, tr, th, td, article, main, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@ time, mark, audio, video {
   font: inherit;
   vertical-align: baseline; }
 
-article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, .nav, section {
+article, main, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   display: block; }
 
 body {
@@ -164,18 +164,23 @@ pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
-.nav {
-  background-color: #000; }
-
-nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hover, nav a:focus, .nav a:focus, nav a:active, .nav a:active, .ui-tabs-nav li a, .ui-tabs-nav li.ui-state-disabled a {
-  border: none; }
-
 .top-nav-container {
+  background-color: #fff;
   height: 45px;
   line-height: 45px;
-  padding: 0 10px 0 10px;
-  position: relative;
-  background-color: #fff; }
+  padding: 0 10px;
+  position: relative; }
+
+.top-nav a:active, .top-nav a:hover, .top-nav a:link, .top-nav a:visited,
+.top-subnav a:active,
+.top-subnav a:hover,
+.top-subnav a:link,
+.top-subnav a:visited,
+.header-logo:active,
+.header-logo:hover,
+.header-logo:link,
+.header-logo:visited {
+  border: none; }
 
 .top-nav {
   font-size: 1.167em;
@@ -184,9 +189,9 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
   .top-nav li {
     display: block;
     float: left; }
-    .top-nav li.selected, .top-nav .calendar li.selected:hover, .calendar .top-nav li.selected:hover {
+    .top-nav li.selected {
       position: relative; }
-      .top-nav li.selected::after, .top-nav .calendar li.selected:hover::after, .calendar .top-nav li.selected:hover::after {
+      .top-nav li.selected::after {
         content: '';
         position: absolute;
         bottom: -1px;
@@ -200,7 +205,7 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
         border-left: 9px solid transparent;
         border-right: 9px solid transparent;
         border-bottom: 9px solid #000; }
-      .top-nav li.selected a, .top-nav .calendar li.selected:hover a, .calendar .top-nav li.selected:hover a, .top-nav li.selected a:hover {
+      .top-nav li.selected a, .top-nav li.selected a:hover {
         color: black; }
   .top-nav a {
     padding: 15px 10px;
@@ -268,6 +273,10 @@ ul.top-nav-icons {
     width: auto;
     padding: 0 6px 0 17px;
     -webkit-transform-style: preserve-3d; }
+  ul.top-nav-icons .top-nav-support {
+    background: url(../img/icon-sprite.svg) no-repeat -245px 4px;
+    width: auto;
+    padding: 0 6px 0 17px; }
   ul.top-nav-icons form {
     position: relative; }
   ul.top-nav-icons input {
@@ -278,7 +287,12 @@ ul.top-nav-icons {
     color: #000;
     padding: 4px 24px 4px 5px;
     opacity: 1;
-    filter: alpha(opacity=100); }
+    filter: alpha(opacity=100);
+    transition: width 0.5s;
+    -webkit-transition: width 0.5s; }
+    @media (max-width: 1050px) {
+      ul.top-nav-icons input {
+        width: 130px; } }
     ul.top-nav-icons input:focus {
       background-color: #fff;
       border: 1px solid #888;
@@ -289,11 +303,11 @@ ul.top-nav-icons {
       filter: alpha(opacity=100); }
 
 .top-subnav-container {
+  background-color: #000;
   height: 30px;
   line-height: 30px;
-  background-color: #000;
-  position: relative;
-  padding: 0 10px; }
+  padding: 0 10px;
+  position: relative; }
 
 .top-subnav {
   background-color: #000;
@@ -316,24 +330,26 @@ ul.top-nav-icons {
     color: rgba(255, 255, 255, 0.8); }
   .top-subnav a:hover {
     color: white; }
-  .top-subnav a:focus {
-    color: white;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid rgba(244, 244, 244, 0.5) !important;
-    outline: none; }
   .top-subnav a:active {
     color: white; }
-  .top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+  .top-subnav a:focus {
+    border-bottom: 4px solid rgba(244, 244, 244, 0.5) !important;
     color: white;
-    padding: 8px 0 4px 0;
-    border-bottom: 4px solid gray; }
+    outline: none;
+    padding-bottom: 4px; }
+  .top-subnav a.selected {
+    border-bottom: 4px solid gray;
+    color: white;
+    padding-bottom: 4px; }
 
 .arrow-up {
+  border: none;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-bottom: 6px solid #000; }
 
 .arrow-down {
+  border: none;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 6px solid #000; }
@@ -411,20 +427,22 @@ article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
-  margin: 0 0 10px 0; }
+  min-height: 24px;
+  line-height: 24px;
+  margin-bottom: 5px; }
   .object-group li {
-    display: inline-block;
-    padding: 0 5px 0 0;
-    vertical-align: middle; }
+    float: left;
+    margin-right: 5px; }
     .object-group li span {
-      padding: 4px 7px; }
+      display: inline-block;
+      padding: 0 7px; }
     .object-group li .status-container, .object-group li .rel-container {
       margin: 0 5px 0 0; }
       .object-group li .status-container span, .object-group li .rel-container span {
         padding: 2px 3px 1px 3px; }
     .object-group li .rel-container {
       margin: 0; }
-  .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
+  .object-group .selected {
     background-color: #fff;
     -webkit-box-shadow: inset 0 0 0 1px #9f9f9f;
     -moz-box-shadow: inset 0 0 0 1px #9f9f9f;
@@ -440,6 +458,30 @@ article, main {
   margin: 0 6px 0 0; }
   .hor-list li:last-child {
     margin: 0; }
+.hor-list .object-group {
+  margin: 0; }
+
+.filter-breadcrumb {
+  display: inline-block;
+  position: relative;
+  top: 0;
+  z-index: 3;
+  margin-bottom: 0; }
+  .filter-breadcrumb > li:first-child {
+    float: left;
+    white-space: nowrap; }
+    .filter-breadcrumb > li:first-child > span {
+      display: inline-block;
+      line-height: 1;
+      padding: 4px 7px; }
+      .filter-breadcrumb > li:first-child > span a {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: top; }
+  .filter-breadcrumb + .filter-space {
+    margin-top: -28px; }
 
 footer {
   position: absolute;
@@ -473,6 +515,57 @@ output {
   background-color: #fff;
   border-collapse: separate;
   border: 1px solid #9f9f9f; }
+  .list-table.compact-view .link-action {
+    color: #000; }
+    .list-table.compact-view .link-action.red {
+      color: #990000; }
+    .list-table.compact-view .link-action.orange {
+      color: #ed3400; }
+    .list-table.compact-view .link-action.yellow {
+      color: #af6b00; }
+    .list-table.compact-view .link-action.green {
+      color: #009900; }
+    .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
+      color: #000; }
+  .list-table.compact-view td {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-bottom: none;
+    box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+    color: #000;
+    height: 22px;
+    line-height: 1;
+    vertical-align: middle; }
+    .list-table.compact-view td [class*='icon-'] {
+      vertical-align: middle; }
+      .list-table.compact-view td [class*='icon-']:after {
+        margin: 0;
+        line-height: 14px; }
+      .list-table.compact-view td [class*='icon-']:last-of-type {
+        margin-right: 0; }
+    .list-table.compact-view td .rel-container span {
+      margin: 0; }
+    .list-table.compact-view td .tag {
+      display: inline-block;
+      line-height: 16px;
+      margin-right: 3px;
+      padding: 0 3px;
+      max-width: 40px; }
+      @media screen and (min-width: 1200px) {
+        .list-table.compact-view td .tag {
+          max-width: 71px; } }
+      @media screen and (min-width: 1400px) {
+        .list-table.compact-view td .tag {
+          max-width: 102px; } }
+      @media screen and (min-width: 1600px) {
+        .list-table.compact-view td .tag {
+          max-width: 133px; } }
+    .list-table.compact-view td .icon-wzrd-action {
+      background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
+      height: 12px;
+      min-height: 12px;
+      margin: 0;
+      position: relative; }
   .list-table thead th {
     color: #333;
     height: 100%;
@@ -482,6 +575,33 @@ output {
     vertical-align: bottom;
     border-bottom: 2px solid #7b7b7b;
     text-align: left; }
+    .list-table thead th.column-tags-1 {
+      width: 75px; }
+    .list-table thead th.column-tags-2 {
+      width: 124px; }
+    .list-table thead th.column-tags-3 {
+      width: 173px; }
+    @media screen and (min-width: 1200px) {
+      .list-table thead th.column-tags-1 {
+        width: 106px; }
+      .list-table thead th.column-tags-2 {
+        width: 186px; }
+      .list-table thead th.column-tags-3 {
+        width: 266px; } }
+    @media screen and (min-width: 1400px) {
+      .list-table thead th.column-tags-1 {
+        width: 137px; }
+      .list-table thead th.column-tags-2 {
+        width: 248px; }
+      .list-table thead th.column-tags-3 {
+        width: 359px; } }
+    @media screen and (min-width: 1600px) {
+      .list-table thead th.column-tags-1 {
+        width: 168px; }
+      .list-table thead th.column-tags-2 {
+        width: 310px; }
+      .list-table thead th.column-tags-3 {
+        width: 452px; } }
     .list-table thead th .arrow-up {
       margin: 0 0 0 3px;
       border-bottom-color: #333; }
@@ -502,13 +622,7 @@ output {
       -webkit-transition: background-color 0.2s ease-out;
       -moz-transition: background-color 0.2s ease-out;
       transition: background-color 0.2s ease-out; }
-      .list-table thead th a:hover {
-        text-decoration: none;
-        background-color: #f4f4f4; }
-      .list-table thead th a:focus {
-        text-decoration: none;
-        background-color: #f4f4f4; }
-      .list-table thead th a:active {
+      .list-table thead th a:hover, .list-table thead th a:focus, .list-table thead th a:active {
         text-decoration: none;
         background-color: #f4f4f4; }
   .list-table tbody tr:hover {
@@ -532,7 +646,9 @@ output {
   .list-table td {
     padding: 6px 5px;
     position: relative;
-    border-bottom: 1px solid #888; }
+    border-bottom: 1px solid #888;
+    line-height: 18px;
+    vertical-align: top; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -760,13 +876,15 @@ output {
   border-bottom-color: #fff !important; }
 
 .filter-btn-container {
-  text-align: center; }
+  position: relative;
+  text-align: right; }
 
 .filter-container {
-  padding: 10px 0;
-  margin: 0 0 10px 0;
   background-color: #fff;
-  border: 1px solid #9f9f9f; }
+  border: 1px solid #9f9f9f;
+  margin: 0 0 10px 0;
+  padding: 10px 0;
+  position: relative; }
   .filter-container .table {
     border-bottom: 1px solid #888; }
   .filter-container .filter-forms {
@@ -781,13 +899,19 @@ output {
       padding: 8px 5px 5px 5px;
       border-bottom-width: 1px; }
 
+.subfilter,
 .subfilter-enabled {
   display: inline-block;
-  position: relative;
   height: 18px;
-  padding: 0 4px;
-  color: #fff;
+  position: relative; }
+
+.subfilter {
+  margin-right: 10px; }
+
+.subfilter-enabled {
   background-color: #333;
+  color: #fff;
+  padding: 0 4px;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -873,6 +997,13 @@ output {
           background-color: #4d4d4d;
           opacity: 1;
           filter: alpha(opacity=100); }
+  .multiselect div[aria-live] {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1; }
 
 .multiselect-button, .multiselect {
   display: inline-block;
@@ -918,119 +1049,7 @@ output {
 
 .suggest-found {
   font-weight: bold;
-  color: #e99003; }
-
-.scrollbar {
-  position: relative;
-  margin: 0 auto;
-  margin-bottom: 10px;
-  line-height: 1em;
-  height: 52px; }
-  .scrollbar .selected, .scrollbar .calendar .selected:hover, .calendar .scrollbar .selected:hover {
-    font-weight: bold; }
-
-.sublevel {
-  height: 22px;
-  border: 1px solid #888;
-  background-color: #888;
-  margin: 5px 0;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px; }
-  .sublevel button:first-child {
-    float: left;
-    margin-left: -1px; }
-  .sublevel button:last-child {
-    float: right;
-    margin-right: -1px; }
-  .sublevel .btn-grey {
-    height: 22px;
-    line-height: 22px;
-    background-color: #fff;
-    margin-top: -1px; }
-
-.info {
-  height: 14px; }
-  .info .zoom, .info .subline .nav_links, .subline .info .nav_links {
-    float: left;
-    white-space: nowrap; }
-    .info .zoom a, .info .subline .nav_links a, .subline .info .nav_links a {
-      margin: 0 4px; }
-  .info .timeline {
-    float: right;
-    white-space: nowrap; }
-
-.overlevel {
-  position: absolute;
-  top: 14px;
-  left: 30px;
-  height: 24px;
-  margin: 5px 0; }
-
-.bar {
-  position: absolute;
-  z-index: 1;
-  height: 22px;
-  border: 1px solid #888;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px; }
-
-.icon {
-  position: relative;
-  height: 22px;
-  background-color: #fff;
-  border-color: #888;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
-  -webkit-transition: background-color 0.2s ease-out;
-  -moz-transition: background-color 0.2s ease-out;
-  transition: background-color 0.2s ease-out; }
-  .icon:hover {
-    background-color: #f4f4f4; }
-  .icon:focus {
-    background-color: #f4f4f4;
-    border-color: #000; }
-  .icon:active {
-    background-color: #f4f4f4;
-    border-color: #000; }
-  .icon .center {
-    width: 10px;
-    height: 22px;
-    background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
-    margin: 0 auto; }
-
-.ghost {
-  position: absolute;
-  top: 0;
-  height: 22px;
-  line-height: 22px;
-  border: 1px solid #888;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px; }
-
-.left_arr, .right_arr {
-  position: absolute;
-  top: 1px;
-  width: auto;
-  height: 22px;
-  line-height: 22px;
-  padding: 0 5px;
-  z-index: 99;
-  cursor: e-resize; }
-
-.subline {
-  height: 14px; }
-  .subline .nav_links {
-    float: left; }
-    .subline .nav_links a {
-      margin: 0 4px; }
-  .subline .period, .subline .info_period {
-    float: right;
-    text-align: right;
-    margin-left: 8px; }
+  color: #af6b00; }
 
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
@@ -1151,18 +1170,30 @@ output {
     position: relative;
     display: inline-block;
     margin: 0 -1px 0 0; }
-    .radio-segmented li:first-child label {
-      -webkit-border-radius: 2px 0 0 2px;
-      -moz-border-radius: 2px 0 0 2px;
-      border-radius: 2px 0 0 2px; }
-    .radio-segmented li:last-child label {
-      -webkit-border-radius: 0 2px 2px 0;
-      -moz-border-radius: 0 2px 2px 0;
-      border-radius: 0 2px 2px 0; }
-    .radio-segmented li:only-child label {
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px; }
+    .radio-segmented li:first-child {
+      -webkit-border-radius: 3px 0 0 3px;
+      -moz-border-radius: 3px 0 0 3px;
+      border-radius: 3px 0 0 3px; }
+      .radio-segmented li:first-child label {
+        -webkit-border-radius: 2px 0 0 2px;
+        -moz-border-radius: 2px 0 0 2px;
+        border-radius: 2px 0 0 2px; }
+    .radio-segmented li:last-child {
+      -webkit-border-radius: 0 3px 3px 0;
+      -moz-border-radius: 0 3px 3px 0;
+      border-radius: 0 3px 3px 0; }
+      .radio-segmented li:last-child label {
+        -webkit-border-radius: 0 2px 2px 0;
+        -moz-border-radius: 0 2px 2px 0;
+        border-radius: 0 2px 2px 0; }
+    .radio-segmented li:only-child {
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px; }
+      .radio-segmented li:only-child label {
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px; }
   .radio-segmented label {
     padding: 4px 11px;
     border: 1px solid #888;
@@ -1494,31 +1525,12 @@ button {
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-
-.filter-trigger {
-  position: relative;
-  margin: 0;
-  padding-right: 21px;
-  min-width: 94px;
-  -webkit-border-radius: 2px 2px 0 0;
-  -moz-border-radius: 2px 2px 0 0;
-  border-radius: 2px 2px 0 0; }
-  .filter-trigger.filter-active {
-    color: #000;
-    background-color: #fff;
-    border: 1px solid #9f9f9f;
-    border-bottom: none;
-    margin-bottom: -1px; }
-    .filter-trigger.filter-active .arrow-up {
-      position: absolute;
-      top: 45%;
-      margin: 0 0 0 6px;
-      border-bottom-color: #000; }
-  .filter-trigger .arrow-down {
-    position: absolute;
-    top: 45%;
-    margin: 0 0 0 6px;
-    border-top-color: #fff; }
+  .btn-search[disabled] {
+    background-color: transparent; }
+    .btn-search[disabled]:hover {
+      background-color: transparent;
+      opacity: 0.75;
+      filter: alpha(opacity=75); }
 
 .btn-conf {
   background: #555 url(../img/icon-sprite.svg) no-repeat -7px -187px; }
@@ -1543,9 +1555,6 @@ button {
 
 .btn-info {
   background: #555 url(../img/icon-sprite.svg) no-repeat -7px -403px; }
-
-.btn-reset {
-  background: #555 url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
   background: url(../img/icon-sprite.svg) no-repeat -6px -618px; }
@@ -1574,19 +1583,226 @@ button {
 .btn-sound-off {
   background: url(../img/icon-sprite.svg) no-repeat -6px -510px; }
 
+.ui-tabs-nav .btn-time,
+.ui-tabs-nav .filter-trigger {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  color: #fff;
+  background-color: #555;
+  border: 1px solid #555;
+  position: relative;
+  margin: 0 0 0 6px;
+  min-height: 24px;
+  vertical-align: bottom; }
+  .ui-tabs-nav .btn-time:after,
+  .ui-tabs-nav .filter-trigger:after {
+    content: "";
+    position: absolute; }
+  .ui-tabs-nav .btn-time:focus, .ui-tabs-nav .btn-time:hover,
+  .ui-tabs-nav .filter-trigger:focus,
+  .ui-tabs-nav .filter-trigger:hover {
+    color: #fff;
+    background-color: #484848;
+    border-color: #484848;
+    cursor: pointer; }
+.ui-tabs-nav .btn-time {
+  padding: 0 34px 0 10px; }
+  .ui-tabs-nav .btn-time:after {
+    margin: 0 5px;
+    right: 0;
+    top: 0;
+    height: 24px;
+    width: 24px;
+    background: url(../img/icon-sprite.svg) no-repeat -87px -583px; }
+.ui-tabs-nav .filter-trigger {
+  padding: 0 34px 0 10px; }
+  .ui-tabs-nav .filter-trigger:after {
+    margin: 0 5px;
+    right: 0;
+    top: 0;
+    height: 24px;
+    width: 24px;
+    background: url(../img/icon-sprite.svg) no-repeat -87px -547px; }
+.ui-tabs-nav .ui-state-focus .btn-time,
+.ui-tabs-nav .ui-state-focus .filter-trigger {
+  -webkit-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+  -moz-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+  color: #fff;
+  background-color: #484848;
+  border-color: #484848; }
+.ui-tabs-nav .ui-tabs-active .btn-time,
+.ui-tabs-nav .ui-tabs-active .filter-trigger {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #9f9f9f;
+  border-bottom: none;
+  margin: 0 0 0 6px;
+  padding: 0 34px 7px 10px;
+  -webkit-border-radius: 2px 2px 0 0;
+  -moz-border-radius: 2px 2px 0 0;
+  border-radius: 2px 2px 0 0; }
+.ui-tabs-nav .ui-tabs-active .btn-time:after {
+  background-position: -246px -583px; }
+.ui-tabs-nav .ui-tabs-active .filter-trigger:after {
+  background-position: -246px -547px; }
+.ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-time,
+.ui-tabs-nav .ui-state-hover.ui-tabs-active .filter-trigger {
+  background-color: #f4f4f4; }
+.ui-tabs-nav .ui-state-focus.ui-tabs-active .btn-time,
+.ui-tabs-nav .ui-state-focus.ui-tabs-active .filter-trigger {
+  -webkit-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+  -moz-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
+
+.filter-space {
+  box-sizing: border-box; }
+  .filter-space li a.ui-tabs-anchor {
+    vertical-align: top; }
+  .filter-space ul.ui-tabs-nav li:focus {
+    outline: none; }
+  .filter-space .filter-btn-container {
+    height: 29px;
+    z-index: 2; }
+  .filter-space .ui-tabs-nav {
+    height: 29px;
+    border-bottom: none; }
+    .filter-space .ui-tabs-nav a {
+      display: inline-block;
+      box-sizing: border-box;
+      line-height: 22px;
+      margin-bottom: 5px;
+      text-align: center; }
+
+.btn-time-left,
+.btn-time-right {
+  background: url(../img/icon-sprite.svg) no-repeat;
+  content: "";
+  border: none;
+  height: 24px;
+  width: 24px;
+  vertical-align: top; }
+  .btn-time-left:focus, .btn-time-left:hover,
+  .btn-time-right:focus,
+  .btn-time-right:hover {
+    border: 1px solid #9f9f9f;
+    color: #fff;
+    background-color: #484848;
+    border-color: #484848; }
+  .btn-time-left:disabled,
+  .btn-time-right:disabled {
+    border: none;
+    opacity: 0.4; }
+
+.btn-time-right {
+  background-position: -83px -623px; }
+  .btn-time-right:focus, .btn-time-right:hover {
+    background-position: -396px -624px; }
+  .btn-time-right:disabled {
+    background-position: -83px -623px; }
+
+.btn-time-left {
+  background-position: -85px -657px; }
+  .btn-time-left:focus, .btn-time-left:hover {
+    background-position: -398px -658px; }
+  .btn-time-left:disabled {
+    background-position: -85px -657px; }
+
+.btn-time-out {
+  background: none;
+  border: 1px solid transparent;
+  color: #000;
+  height: 24px;
+  margin: 0 5px;
+  vertical-align: top; }
+  .btn-time-out:disabled {
+    background: transparent !important;
+    border-color: transparent !important;
+    opacity: 0.8; }
+
+.time-quick {
+  font-size: 12px;
+  line-height: 20px; }
+  .time-quick li:last-of-type a {
+    margin-bottom: 0; }
+  .time-quick li a {
+    display: inline-block;
+    padding: 2px 10px;
+    margin-bottom: 2px;
+    margin-left: -10px;
+    border-bottom: 0; }
+    .time-quick li a:hover, .time-quick li a:focus, .time-quick li a.selected {
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      border-bottom: 0; }
+    .time-quick li a:hover {
+      background: #f4f4f4;
+      -webkit-transition: background-color 0.2s ease-out;
+      -moz-transition: background-color 0.2s ease-out;
+      transition: background-color 0.2s ease-out; }
+    .time-quick li a:focus {
+      -webkit-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+      -moz-box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35);
+      box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
+    .time-quick li a.selected {
+      background: #333;
+      color: #fff;
+      -webkit-transition: background-color 0.2s ease-out;
+      -moz-transition: background-color 0.2s ease-out;
+      transition: background-color 0.2s ease-out; }
+
+.time-selection-container {
+  display: flex;
+  justify-content: flex-end; }
+  .time-selection-container .time-input {
+    border-right: 1px solid #9f9f9f;
+    padding: 0 30px 0 10px;
+    text-align: right;
+    white-space: nowrap; }
+    .time-selection-container .time-input .time-input-error {
+      margin: -8px 29px 0 0; }
+    .time-selection-container .time-input ul {
+      padding: 0 0 10px 0; }
+    .time-selection-container .time-input li {
+      display: inline-block;
+      vertical-align: baseline;
+      padding: 0 0 0 10px; }
+      .time-selection-container .time-input li .icon-cal {
+        position: relative;
+        vertical-align: middle;
+        margin-left: -5px; }
+  .time-selection-container .time-quick-range {
+    text-align: right;
+    white-space: nowrap;
+    margin: 0 0 0 20px; }
+    .time-selection-container .time-quick-range .cell {
+      display: inline-flex;
+      vertical-align: top;
+      text-align: left;
+      margin: 0 10px 0 10px; }
+    .time-selection-container .time-quick-range .time-quick-selected {
+      display: inline-block;
+      padding: 2px 10px;
+      margin-left: -10px;
+      color: #fff;
+      background-color: #333;
+      border-bottom: 0; }
+
 .btn-dashbrd-conf {
   background: url(../img/icon-sprite.svg) no-repeat -42px -619px; }
 
 .btn-dashbrd-normal {
-  position: fixed;
-  right: 45px;
-  top: 5px;
-  z-index: 1010;
   -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   opacity: 1;
   filter: alpha(opacity=100);
+  position: fixed;
+  right: 45px;
+  top: 5px;
+  z-index: 1010;
   -webkit-transition: opacity 1s;
   -moz-transition: opacity 1s;
   transition: opacity 1s; }
@@ -1614,7 +1830,7 @@ button {
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
 
-.btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
+.btn-conf, .btn-kiosk, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .icon-help, .icon-cal, .icon-wzrd-action, .drag-icon {
   width: 24px;
   height: auto;
   padding: 0; }
@@ -1678,6 +1894,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .ui-tabs-nav li {
     display: inline-block; }
     .ui-tabs-nav li a {
+      border: none;
       padding: 8px 10px;
       -webkit-transition: background-color 0.2s ease-out;
       -moz-transition: background-color 0.2s ease-out;
@@ -1700,7 +1917,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .ui-tabs-nav li.ui-state-disabled a {
       cursor: default;
       color: #999;
-      background-color: transparent; }
+      background-color: transparent;
+      border: none; }
 
 .icon-maint {
   margin: 0 18px 0 0; }
@@ -1899,7 +2117,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-container {
   position: relative;
-  margin: 0 -.25rem; }
+  margin: -.25rem; }
 
 .dashbrd-grid-widget-placeholder {
   border-color: #f0f0f0 !important;
@@ -1908,18 +2126,19 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 999; }
 
 .dashbrd-grid-empty-placeholder {
-  width: 16%;
-  height: 200px;
-  background-color: #fff;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #9f9f9f;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: .25rem;
-  padding: 10px; }
+  background-color: #fff;
+  border: 1px solid #9f9f9f;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% / 6 - .65rem);
+  height: 200px;
+  margin: .25rem; }
   .dashbrd-grid-empty-placeholder h1 {
+    padding: 10px;
     text-align: center; }
 
 .dashbrd-grid-widget-mask {
@@ -2204,9 +2423,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .list-table tbody tr.nothing-to-show td:hover {
     background-color: #fff; }
 
-.dashbrd-grid-widget-content .list-table th, .dashbrd-grid-widget-content .list-table td, .dashbrd-widget .list-table th, .dashbrd-widget .list-table td, .overlay-dialogue .list-table th, .overlay-dialogue .list-table td {
-  padding-right: 10px;
+.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
+.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+  padding-right: 10px; }
 
 .dashbrd-widget-head {
   position: relative;
@@ -2448,9 +2668,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar {
   width: 200px; }
-  .calendar .selected, .calendar .selected:hover {
-    background-color: #333;
-    color: #fff; }
+  .calendar .calendar-year.highlighted, .calendar .highlighted.calendar-month,
+  .calendar .calendar-month.highlighted {
+    background-color: #f4f4f4; }
+  .calendar .calendar-year:focus, .calendar .calendar-month:focus,
+  .calendar .calendar-month:focus {
+    outline: none; }
   .calendar table {
     width: 100%;
     margin: 5px 0; }
@@ -2460,13 +2683,28 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .calendar table tbody {
       text-align: center; }
       .calendar table tbody td {
-        padding: 4px;
         -webkit-transition: background-color 0.2s ease-out;
         -moz-transition: background-color 0.2s ease-out;
         transition: background-color 0.2s ease-out; }
+        .calendar table tbody td.selected {
+          background-color: #333;
+          color: #fff; }
+          .calendar table tbody td.selected:hover {
+            background-color: #292929; }
         .calendar table tbody td:hover {
           background-color: #f4f4f4;
           cursor: pointer; }
+        .calendar table tbody td.highlighted {
+          color: #fff;
+          background-color: #484848;
+          border-color: #484848;
+          cursor: pointer; }
+        .calendar table tbody td:focus {
+          outline: none; }
+        .calendar table tbody td span {
+          z-index: -1;
+          padding: 4px;
+          display: block; }
 
 .calendar-header {
   text-align: center; }
@@ -2476,11 +2714,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .calendar-year, .calendar-month {
   height: 24px;
-  line-height: 26px; }
+  line-height: 26px;
+  display: table;
+  width: 100%; }
   .calendar-year button:first-child, .calendar-month button:first-child {
     float: left; }
   .calendar-year button:last-child, .calendar-month button:last-child {
     float: right; }
+  .calendar-year button:hover, .calendar-month button:hover {
+    background-color: #f4f4f4;
+    cursor: pointer; }
 
 .calendar-time {
   text-align: center; }
@@ -2539,10 +2782,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     margin: 0 2px 0 0; }
 
-.box_on {
-  position: absolute;
-  z-index: 99; }
-
 .screen-table {
   background-color: #fff;
   width: 100%; }
@@ -2598,7 +2837,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 98;
   overflow: hidden;
   background-color: rgba(167, 136, 32, 0.35);
-  border: 1px solid rgba(233, 144, 3, 0.6);
+  border: 1px solid rgba(175, 107, 0, 0.6);
   border-top: none;
   border-bottom: none; }
 
@@ -2606,13 +2845,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 100;
   background-color: rgba(167, 136, 32, 0.35);
-  border: 1px solid rgba(233, 144, 3, 0.6); }
+  border: 1px solid rgba(175, 107, 0, 0.6); }
 
 #map-area .map-element-area-bg {
   background-color: rgba(244, 244, 244, 0.35); }
 
 .map-element-selected {
-  border: 3px dashed #e99003;
+  border: 3px dashed #af6b00;
   margin: -3px; }
 
 .debug-output {
@@ -2672,7 +2911,7 @@ a.orange:hover, a.orange:focus {
   color: #000; }
 
 .yellow, a.yellow {
-  color: #e99003; }
+  color: #af6b00; }
 
 a.yellow:hover, a.yellow:focus {
   color: #000; }
@@ -2699,10 +2938,14 @@ a.link-action {
   color: #000; }
   a.link-action.red {
     color: #990000; }
-  a.link-action.green {
-    color: #009900; }
   a.link-action.orange {
     color: #ed3400; }
+  a.link-action.yellow {
+    color: #af6b00; }
+  a.link-action.green {
+    color: #009900; }
+  a.link-action.grey {
+    color: #333; }
   a.link-action:hover {
     color: #000;
     border-bottom: 1px solid rgba(0, 0, 0, 0.5); }
@@ -2919,6 +3162,14 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   color: #4b0c0c;
   background-color: #e45959; }
 
+.table-forms-second-column {
+  display: inline-block;
+  width: 50%;
+  min-width: 200px;
+  text-align: right; }
+  .table-forms-second-column .second-column-label {
+    padding: 0 10px; }
+
 .problem-unack-fg {
   color: #cc0000; }
 
@@ -2931,7 +3182,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .ok-ack-fg {
   color: #009900; }
 
-.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .calendar .tree-item.selected:hover > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
+.list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #f4f4f4; }
 
 .msg-good {
@@ -3235,14 +3486,59 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px; }
+    width: 18px;
+    height: 18px;
+    border: 1px solid #888;
+    background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+    cursor: pointer; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
   .input-color-picker.disabled {
     opacity: 1; }
     .input-color-picker.disabled div {
-      background: #9f9f9f !important; }
+      background: #9f9f9f !important;
+      border: 1px solid #9f9f9f; }
+
+.in-progress {
+  position: relative; }
+  .in-progress img {
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none; }
+  .in-progress:before {
+    z-index: 3;
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: fadein 2s ease-in 0.5s normal forwards; }
+  .in-progress.delayed-15s::before {
+    animation-delay: 15s; }
+  .in-progress:after {
+    z-index: 3;
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -12px 0 0 -12px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccd5d9;
+    border-bottom: 2px solid #0275b8;
+    opacity: 0;
+    animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear; }
+  .in-progress.delayed-15s::after {
+    animation-delay: 15s; }
 
 .preloader-container {
   z-index: 10;
@@ -3359,6 +3655,8 @@ tr.cursor-move td * {
   white-space: nowrap; }
   .rel-container .icon-info {
     margin-right: 10px; }
+    .rel-container .icon-info:only-of-type {
+      margin-right: 0; }
     .rel-container .icon-info:last-child {
       margin-right: 0; }
 
@@ -3565,7 +3863,7 @@ svg {
   .navtree .tree .tree-item > .tree-row {
     width: 100%;
     min-width: 320px;
-    border-bottom: 1px solid #9f9f9f;
+    border-bottom: 1px solid #888;
     padding: 8px 0; }
     .navtree .tree .tree-item > .tree-row:hover {
       background-color: #f4f4f4; }
@@ -3703,885 +4001,111 @@ svg {
 :placeholder-shown {
   color: #777; }
 
-/*doc
----
-//title: About
-name: about
-category: About
----
+.icon-action-command,
+.icon-action-close,
+.icon-action-msg,
+.icon-action-msgs,
+.icon-action-severity-up,
+.icon-action-severity-down,
+.icon-action-severity-changed,
+.icon-action-message,
+.icon-action-ack,
+.icon-problem-generated,
+.icon-problem-recovery,
+.icon-actions-number-gray,
+.icon-actions-number-yellow,
+.icon-actions-number-red {
+  display: inline-block;
+  position: relative;
+  height: 18px;
+  width: 18px;
+  margin: 0 5px 0 0;
+  top: 0;
+  bottom: 0;
+  vertical-align: bottom; }
+  .icon-action-command::before,
+  .icon-action-close::before,
+  .icon-action-msg::before,
+  .icon-action-msgs::before,
+  .icon-action-severity-up::before,
+  .icon-action-severity-down::before,
+  .icon-action-severity-changed::before,
+  .icon-action-message::before,
+  .icon-action-ack::before,
+  .icon-problem-generated::before,
+  .icon-problem-recovery::before,
+  .icon-actions-number-gray::before,
+  .icon-actions-number-yellow::before,
+  .icon-actions-number-red::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    background-image: url(../img/icon-sprite.svg);
+    background-repeat: no-repeat; }
+
+[data-count][class*='icon-']::after {
+  position: absolute;
+  content: attr(data-count);
+  text-align: center;
+  margin-top: -2px;
+  font-size: 9px;
+  letter-spacing: -0.25px;
+  width: 18px; }
+
+.icon-action-command::before {
+  background-position: -249px -245px; }
+
+.icon-action-close::before {
+  background-position: -224px -245px; }
+
+.icon-action-msg::before {
+  background-position: -299px -245px; }
+
+.icon-action-severity-up::before {
+  background-position: -349px -245px; }
+
+.icon-action-severity-down::before {
+  background-position: -375px -245px; }
+
+.icon-action-severity-changed::before {
+  background-position: -399px -245px; }
+
+.icon-action-message::before {
+  background-position: -199px -245px; }
+
+.icon-action-ack::before {
+  background-position: -323px -245px; }
+
+.icon-problem-generated::before {
+  background-position: -449px -245px; }
+
+.icon-problem-recovery::before {
+  background-position: -424px -245px; }
+
+.icon-action-msgs[data-count]::after {
+  color: #fff; }
+.icon-action-msgs::before {
+  background-position: -474px -245px; }
+
+.icon-actions-number-gray[data-count]::after {
+  color: #000; }
+.icon-actions-number-gray::before {
+  background-position: -499px -245px; }
+
+.icon-actions-number-yellow[data-count]::after {
+  color: #000; }
+.icon-actions-number-yellow::before {
+  background-position: -549px -245px; }
+
+.icon-actions-number-red[data-count]::after {
+  color: #000; }
+.icon-actions-number-red::before {
+  background-position: -524px -245px; }
 
-##About the Zabbix Styleguide
-
-The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
-
-* A common design language inside the company and community
-* More modular approach to design, reusable components
-* A single source of information for front-end developers
-
-May the force be with you!
-*/
-/*doc
----
-//title: Components
-name: components
-category: Components
----
-*/
-/*doc
----
-parent: components
-title: Typography
-name: typography
----
-
-The default font face is Arial. Relative units (em) should be used to set the type size and line height.
-
-##Headings
-
-```html_example
-<h1>Main Heading</h1><br>
-<h2>Section Header</h2><br>
-<h3>Contextual Menu Heading</h3><br>
-<h4>Widget and Dialog Heading</h4>
-```
-
-##Paragraphs
-
-Paragraphs are used to visually separate blocks of multiple sentences.
-
-```html_example
-<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-```
-*/
-/*doc
----
-parent: components
-title: Tables
-name: table
----
-
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Table with Pagination
-
-Pagination is used to separate large amounts of tabular data into descrete peices.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="table-paging">
-   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
-</div>
-```
-
-##Table with No Results
-
-In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="nothing-to-show">
-            <td colspan="11">We couldn't find any results</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Tables with Elements and Highlights
-
-Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Alert labels</td>
-            <td>asdasasdasd</td>
-            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
-         </tr>
-         <tr>
-            <td>Icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Links with icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Labels</td>
-            <td>asdasasdasd</td>
-            <td>
-               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
-               <div class="status-container"><span class="status-red">label</span></div>
-            </td>
-         </tr>
-         <tr>
-            <td>Tree</td>
-            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
-            <td>
-               <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a>
-               <div class="treeview"><span class="arrow-down"></span></div>
-               <a href="#">Expanded</a>
-            </td>
-         </tr>
-          <tr>
-            <td>Severity</td>
-            <td>asdasd</td>
-            <td class="normal-bg">
-               <span class="link-action">25</span>
-            </td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Forms
-name: forms
----
-
-Forms contain UI elements that are used to submit information.
-
-##Primary Button
-
-```html_example
-<button type="button">Primary Button</button>
-<button type="button" disabled>Primary Button</button>
-```
-
-##Secondary Button
-
-```html_example
-<button type="button" class="btn-alt">Secondary Button</button>
-<button type="button" class="btn-alt" disabled>Secondary Button</button>
-```
-
-##Form Button
-
-```html_example
-<button type="button" class="btn-grey">Form Button</button>
-<button type="button" class="btn-grey" disabled>Form Button</button>
-```
-
-##Link Button
-
-```html_example
-<button type="button" class="btn-link">Link Button</button>
-<button type="button" class="btn-link" disabled>Link Button</button>
-```
-
-##Icon Button
-
-```html_example
-<button type="button" class="btn-max" title="Maximize"></button>
-<button type="button" class="btn-max" title="Maximize" disabled></button>
-```
-
-##Inputs
-
-Text on html5 input types
-
-```html_example
-<ul class="table-forms">
-   <li>
-      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="DefaultInput">
-         <div class="red">You can't leave this empty.</div>
-      </div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
-      </div>
-   </li>
-</ul>
-```
-
-##Selects
-
-```html_example
-<select>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-<select disabled>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-```
-
-## Radios
-
-```html_example
-<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
-<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
-```
-
-## Segmented Radio Controls
-
-```html_example
-<p>
-<ul class="radio-segmented">
-   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
-</ul>
-</p>
-```
-
-## Checkboxes
-
-```html_example
-<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
-<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
-```
-
-## Radio and Checkbox Lists
-
-```html_example
-<ul class="list-check-radio">
-   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-</ul>
-```
-*/
-/*doc
----
-parent: components
-title: Dialogs
-name: dialog
----
-
-Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
-
-##Alert Dialogs
-
-Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
-
-```html_example
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body">Some explanatory information</div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body"></div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-```
-
-##Dialogs with Scrollable Content
-
-In exceptional cases dialogs may contain additional information inside a scrollable area.
-
-```html_example
-<div class="overlay-dialogue" style="max-width: 500px">
-   <span class="overlay-close-btn"></span>
-   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
-   </div>
-   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Duration</th>
-            <th>Age</th>
-            <th>Ack</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>2015-09-08 13:47:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>15d 23h 45m</td>
-            <td>15d 23h 45m</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 06:14:58</td>
-            <td><span class="green">OK</span></td>
-            <td>1m 4d 7h</td>
-            <td>1m 20d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 05:32:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>42m</td>
-            <td>1m 20d 8h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 06:11:58</td>
-            <td><span class="green">OK</span></td>
-            <td>23h 21m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 05:38:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>33m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Contextual Dialogs
-
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
-
-```html_example
-<ul class="action-menu">
-   <li>
-      <h3>Favourite screens</h3>
-   </li>
-   <li><span class="action-menu-item">Add</span></li>
-   <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
-      </ul>
-   </li>
-   <li><span class="action-menu-item">Remove all</span></li>
-   <li>
-      <div></div>
-   </li>
-   <li>
-      <h3>Favourite slide shows</h3>
-   </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
-</ul>
-```
-*/
-/*doc
----
-parent: components
-title: Notifications
-name: notifications
----
-
-Notificatiions are used to provide feedback after certain actions or give information.
-
-##Success Notification
-
-Success notification appears after an action has been completed without errors. Has green background.
-
-```html_example
-<div class="msg-good">
-   Well done! You successfully added new parameters.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Error Notification
-
-Error notification appears after an action has been completed with errors or an error in general. Has red background.
-
-```html_example
-<div class="msg-bad">
-   Oh snap! Check form fields and try submitting again.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Global Notification
-
-Global notification.
-
-```html_example
-<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
-```
-*/
-/*doc
----
-parent: components
-title: Icons
-name: icons
----
-
-Icons:
-
-```html_example
-<div class="icon-help"></div>
-```
-*/
-/*doc
----
-parent: components
-title: Datepickers
-name: date
----
-
-Datepickers are used to select a single date or a date range.
-
-```html_example
-<div class="overlay-dialogue calendar">
-   <div class="calendar-header">
-      <div class="calendar-year">
-         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
-      </div>
-      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
-   </div>
-   <table>
-      <thead>
-         <tr>
-            <th>M</th>
-            <th>T</th>
-            <th>W</th>
-            <th>T</th>
-            <th>F</th>
-            <th>S</th>
-            <th>S</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td class="grey">29</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-         </tr>
-         <tr>
-            <td>7</td>
-            <td>8</td>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-         </tr>
-         <tr>
-            <td>14</td>
-            <td>15</td>
-            <td class="selected">16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-         </tr>
-         <tr>
-            <td>21</td>
-            <td>22</td>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td>26</td>
-            <td>27</td>
-         </tr>
-         <tr>
-            <td>28</td>
-            <td>29</td>
-            <td>30</td>
-            <td>31</td>
-            <td class="grey">1</td>
-            <td class="grey">2</td>
-            <td class="grey">3</td>
-         </tr>
-         <tr>
-            <td class="grey">4</td>
-            <td class="grey">5</td>
-            <td class="grey">6</td>
-            <td class="grey">7</td>
-            <td class="grey">8</td>
-            <td class="grey">9</td>
-            <td class="grey">10</td>
-         </tr>
-      </tbody>
-   </table>
-   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
-   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Navigation
-name: navigation
----
-
-##Main Navigation
-
-Main navigation is used to jump between high level sections of the application.
-
-```html_example
-<nav role="navigation">
-   <div class="top-nav-container">
-      <ul class="top-nav">
-         <li class="selected"><a href="#">Monitoring</a></li>
-         <li><a href="#">Inventory</a></li>
-         <li><a href="#">Reports</a></li>
-         <li><a href="#">Configuration</a></li>
-         <li><a href="#">Administration</a></li>
-      </ul>
-      <!--<ul class="top-nav-icons">
-         <li>
-            <form><input type="text"><button type="button" class="btn-search"></button></form>
-         </li>
-         <li><a href="#" class="top-nav-help" title="Help"></a></li>
-         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
-         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
-         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
-      </ul>-->
-   </div>
-   <div class="top-subnav-container">
-      <ul class="top-subnav">
-         <li><a href="#" class="selected">Dashboard</a></li>
-         <li><a href="#">Overview</a></li>
-         <li><a href="#">Web</a></li>
-         <li><a href="#">Latest data</a></li>
-         <li><a href="#">Triggers</a></li>
-         <li><a href="#">Events</a></li>
-         <li><a href="#">Graphs</a></li>
-         <li><a href="#">Screens</a></li>
-         <li><a href="#">Maps</a></li>
-         <li><a href="#">Discovery</a></li>
-         <li><a href="#">Services</a></li>
-      </ul>
-      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
-   </div>
-</nav>
-```
-
-##Object Navigation
-
-```html_example
-<ul class="object-group">
-   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
-   <li class="green">Enabled</li>
-   <li>
-      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
-   </li>
-   <li><span class="selected"><a href="#">Discovery</a></span></li>
-   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
-   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
-   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
-   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
-   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
-   <li><span><a href="#">Web scenarios</a></span></li>
-</ul>
-```
-
-##Tabs
-
-Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
-
-```html_example
-<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
-```
-*/
-/*doc
----
-parent: components
-title: Links
-name: links
----
-
-A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
-
-```html_example
-<p><a href="#">Default link</a></p>
-<p><a href="#" class="grey link-alt">Alternative link</a></p>
-<p><a href="#" class="green link-alt">Alternative link</a></p>
-<p><a href="#" class="red link-alt">Alternative link</a></p>
-<p><span class="link-action">Action link</span></p>
-<p><span class="green link-action">Action link</span></p>
-<p><span class="yellow link-action">Action link</span></p>
-<span class="red link-action">Action link</span>
-```
-*/
-/*doc
----
-parent: components
-title: Labels
-name: labels
----
-
-Labels add information. Different colors
-
-```html_example
-<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
-```
-*/
-/*doc
----
-parent: components
-title: Progress Indicators
-name: progress
----
-
-Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
-
-```html_example
-<div class="preloader-container">
-   <div class="preloader"></div>
-</div>
-```
-*/
-/*doc
----
-parent: components
-title: Widgets
-name: widgets
----
-
-Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
-
-```html_example
-<div class="dashbrd-widget">
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Favorite screens</h4>
-      <ul>
-         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
-         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
-         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
-      </ul>
-   </div>
-   <table class="list-table">
-      <tbody>
-         <tr>
-            <td><a href="#">Zabbix server</a></td>
-         </tr>
-         <tr>
-            <td><a href="#">My 2nd megaserver</a></td>
-         </tr>
-      </tbody>
-   </table>
-   <ul class="dashbrd-widget-foot">
-      <li><a href="#">Screens</a></li>
-      <li><a href="#">Slide shows</a></li>
-   </ul>
-</div>
-```
-*/
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {
@@ -4651,6 +4175,9 @@ Widgets are used as containers to group any related information. Widget consists
 .top-nav-zbbshare {
   background: url(../img/icon-sprite.svg) no-repeat -165px -68px !important; }
 
+.top-nav-support {
+  background: url(../img/icon-sprite.svg) no-repeat -245px -68px !important; }
+
 .btn-search {
   background: url(../img/icon-sprite.svg) no-repeat -162px -7px !important; }
 
@@ -4676,9 +4203,6 @@ Widgets are used as containers to group any related information. Widget consists
   border-right-color: #272727 !important; }
   .timeline-axis::before {
     background-color: #272727 !important; }
-
-.icon .center {
-  background: url(../img/icon-sprite.svg) no-repeat -172px -799px !important; }
 
 .action-menu .action-menu-item-disabled {
   color: #9f9f9f; }
@@ -4791,13 +4315,13 @@ a.link-action {
   -moz-transition: box-shadow 0.2s ease-out;
   transition: box-shadow 0.2s ease-out; }
 
-.top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+.top-subnav a.selected {
   font-weight: bold;
-  border-bottom: 4px solid #fff !important; }
+  border-bottom: 4px solid #fff; }
 .top-subnav a:focus {
   color: white;
   padding: 8px 0 4px 0;
-  border-bottom: 4px solid rgba(244, 244, 244, 0.8) !important;
+  border-bottom: 4px solid rgba(244, 244, 244, 0.8);
   outline: none; }
 
 ul.top-nav-icons a:focus {
@@ -4808,6 +4332,9 @@ ul.top-nav-icons a:focus {
   -webkit-transition: box-shadow 0.2s ease-out;
   -moz-transition: box-shadow 0.2s ease-out;
   transition: box-shadow 0.2s ease-out; }
+
+.filter-breadcrumb a:focus {
+  margin-bottom: -1px; }
 
 .server-name {
   color: rgba(255, 255, 255, 0.8); }
@@ -4832,7 +4359,7 @@ ul.top-nav-icons a:focus {
 .filter-trigger .arrow-down {
   border-top-color: #FFF !important; }
 
-.top-subnav a.selected, .top-subnav .calendar a.selected:hover, .calendar .top-subnav a.selected:hover {
+.top-subnav a.selected {
   font-weight: bold; }
 
 .disabled {
@@ -4896,12 +4423,28 @@ ul.top-nav-icons a:focus {
     color: #ffd98c; }
 
 .suggest-found {
-  color: #b77102; }
+  color: #7c4c00; }
 
 .dashbrd-widget-graph-link:focus:after {
   background: #111;
   height: 3px;
   bottom: -3px; }
+
+.list-table.compact-view .flh-na-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-info-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-warning-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-average-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-high-bg:not(.row-selected):not(:hover), .list-table.compact-view .flh-disaster-bg:not(.row-selected):not(:hover) {
+  background: none; }
+.list-table.compact-view td.na-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before, .list-table.compact-view td.normal-bg:before, .list-table.compact-view td.info-bg:before, .list-table.compact-view td.warning-bg:before, .list-table.compact-view td.average-bg:before, .list-table.compact-view td.high-bg:before, .list-table.compact-view td.disaster-bg:before {
+  min-height: 20px;
+  box-shadow: inset 0 -1px 0 0 #888; }
+.list-table.compact-view td.na-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after, .list-table.compact-view td.normal-bg:after, .list-table.compact-view td.info-bg:after, .list-table.compact-view td.warning-bg:after, .list-table.compact-view td.average-bg:after, .list-table.compact-view td.high-bg:after, .list-table.compact-view td.disaster-bg:after {
+  top: 1px;
+  transform: scale(0.8); }
+.list-table.compact-view td {
+  box-shadow: inset 0 -1px 0 0 #888; }
+  .list-table.compact-view td .icon-wzrd-action {
+    background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px; }
+
+.filter-highlight-row-cb {
+  display: none; }
 
 td.log-na-bg, td.log-info-bg, td.log-warning-bg, td.log-high-bg, td.log-disaster-bg {
   padding-left: 42px !important;
@@ -5200,4 +4743,97 @@ td.inactive-bg {
 .btn-back-map-container a {
   border-bottom: none; }
 .btn-back-map-container .btn-back-map .btn-back-map-icon {
-  background: url(../img/icon-sprite.svg) no-repeat -85px -725px; }
+  background-position: -85px -725px; }
+
+.ui-tabs-nav .btn-time:hover,
+.ui-tabs-nav .filter-trigger:hover {
+  background-color: #3c3c3c; }
+.ui-tabs-nav .btn-time:focus,
+.ui-tabs-nav .filter-trigger:focus {
+  -webkit-box-shadow: 0 0 0 2px #111111;
+  -moz-box-shadow: 0 0 0 2px #111111;
+  box-shadow: 0 0 0 2px #111111;
+  background-color: #6f6f6f; }
+.ui-tabs-nav .ui-state-focus .btn-time,
+.ui-tabs-nav .ui-state-focus .filter-trigger {
+  -webkit-box-shadow: 0 0 0 2px #111111;
+  -moz-box-shadow: 0 0 0 2px #111111;
+  box-shadow: 0 0 0 2px #111111;
+  background-color: #6f6f6f; }
+.ui-tabs-nav .ui-state-focus.ui-tabs-active .btn-time,
+.ui-tabs-nav .ui-state-focus.ui-tabs-active .filter-trigger {
+  -webkit-box-shadow: 0 0 0 2px #111111;
+  -moz-box-shadow: 0 0 0 2px #111111;
+  box-shadow: 0 0 0 2px #111111;
+  background-color: #f4f4f4;
+  border-color: #f4f4f4; }
+
+.btn-time-left {
+  background-position: -244px -657px; }
+  .btn-time-left:disabled {
+    background-position: -244px -657px; }
+
+.btn-time-right {
+  background-position: -242px -623px; }
+  .btn-time-right:disabled {
+    background-position: -242px -623px; }
+
+.btn-time-right:hover, .btn-time-right:focus,
+.btn-time-left:hover,
+.btn-time-left:focus {
+  color: #fff;
+  background-color: #484848;
+  border-color: #484848; }
+.btn-time-right:focus,
+.btn-time-left:focus {
+  background-color: #6f6f6f; }
+
+.time-quick li a:focus {
+  -webkit-box-shadow: 0 0 0 2px #111111;
+  -moz-box-shadow: 0 0 0 2px #111111;
+  box-shadow: 0 0 0 2px #111111;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px; }
+
+.icon-action-command::before {
+  background-position: -249px -325px; }
+
+.icon-action-close::before {
+  background-position: -224px -325px; }
+
+.icon-action-msg::before {
+  background-position: -299px -285px; }
+
+.icon-action-severity-up::before {
+  background-position: -349px -285px; }
+
+.icon-action-severity-down::before {
+  background-position: -375px -285px; }
+
+.icon-action-severity-changed::before {
+  background-position: -399px -285px; }
+
+.icon-action-message::before {
+  background-position: -199px -285px; }
+
+.icon-action-ack::before {
+  background-position: -323px -285px; }
+
+.icon-problem-generated::before {
+  background-position: -449px -285px; }
+
+.icon-problem-recovery::before {
+  background-position: -424px -285px; }
+
+.icon-action-msgs::before {
+  background-position: -474px -285px; }
+
+.icon-actions-number-gray::before {
+  background-position: -499px -285px; }
+
+.icon-actions-number-yellow::before {
+  background-position: -549px -285px; }
+
+.icon-actions-number-red::before {
+  background-position: -524px -285px; }

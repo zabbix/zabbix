@@ -76,7 +76,7 @@ jQuery(function($) {
 				data[data.length] = {
 					id: id,
 					name: item.name,
-					prefix: (item.prefix === 'undefined') ? '' : item.prefix
+					prefix: (typeof item.prefix === 'undefined') ? '' : item.prefix
 				};
 			}
 
@@ -84,7 +84,7 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Rezise multiselect selected text
+		 * Resize multiselect selected text
 		 *
 		 * @return jQuery
 		 */
@@ -152,7 +152,7 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
-	 * @param array  options['ignored']				preload ignored {id: name} (optional)
+	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -185,7 +185,8 @@ jQuery(function($) {
 				'Select': 'Select'
 			},
 			data: [],
-			ignored: {},
+			only_hostid: 0,
+			excludeids: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
@@ -209,7 +210,8 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
-			var obj = $(this);
+			var obj = $(this),
+				aria_live = $('[aria-live]', obj);
 
 			var ms = {
 				options: options,
@@ -221,8 +223,7 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpened: false,
 					selected: {},
-					available: {},
-					ignored: empty(options.ignored) ? {} : options.ignored
+					available: {}
 				}
 			};
 
@@ -244,279 +245,239 @@ jQuery(function($) {
 			var selected_ul = $('<ul>', {
 				'class': 'multiselect-list'
 			});
+
+			obj.append(selected_div.append(selected_ul));
+
 			if (options.disabled) {
 				selected_ul.addClass('disabled');
 			}
-			obj.append(selected_div.append(selected_ul));
+			else {
+				var label = $('label[for='+obj.attr('id')+'_ms]'),
+					input = $('<input>', {
+						'id': label.length ? label.attr('for') : null,
+						'class': 'input',
+						'type': 'text',
+						'placeholder': options.labels['type here to search'],
+						'aria-label': (label.length ? label.text()+'. ' : '')+options.labels['type here to search']
+					})
+					.on('keyup change', function(e) {
 
-			// search input
-			if (!options.disabled) {
-				var input = $('<input>', {
-					'class': 'input',
-					type: 'text'
-				})
-				.attr('placeholder', options.labels['type here to search'])
-				.on('keyup change', function(e) {
-					if (typeof(e.which) === 'undefined') {
-						return false;
-					}
-
-					switch (e.which) {
-						case KEY.ARROW_DOWN:
-						case KEY.ARROW_LEFT:
-						case KEY.ARROW_RIGHT:
-						case KEY.ARROW_UP:
+						if (typeof e.which === 'undefined') {
 							return false;
-						case KEY.ESCAPE:
-							cleanSearchInput(obj);
+						}
+
+						switch (e.which) {
+							case KEY.ARROW_DOWN:
+							case KEY.ARROW_LEFT:
+							case KEY.ARROW_RIGHT:
+							case KEY.ARROW_UP:
+								return false;
+							case KEY.ESCAPE:
+								cleanSearchInput(obj);
+								return false;
+						}
+
+						if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
+							setSearchFieldVisibility(false, obj, options);
 							return false;
-					}
+						}
 
-					if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-						setSearchFieldVisibility(false, obj, options);
-						return false;
-					}
+						var search = input.val();
 
-					var search = input.val();
+						// Replace trailing slashes to check if search term contains anything else.
+						if (search !== '') {
+							$('.selected li.selected', obj).removeClass('selected');
 
-					// Replace trailing slashes to check if search term contains anything else.
-					if (!empty(search)) {
-						if (input.data('lastSearch') != search) {
-							if (!values.isWaiting) {
-								values.isWaiting = true;
+							if (input.data('lastSearch') != search) {
+								if (!values.isWaiting) {
+									values.isWaiting = true;
 
-								var jqxhr = null;
-								window.setTimeout(function() {
-									values.isWaiting = false;
+									var jqxhr = null;
+									window.setTimeout(function() {
+										values.isWaiting = false;
 
-									var search = input.val();
+										var search = input.val();
 
-									// re-check search after delay
-									if (!empty(search) && input.data('lastSearch') != search) {
-										values.search = search;
+										// re-check search after delay
+										if (search !== '' && input.data('lastSearch') != search) {
+											values.search = search;
 
-										input.data('lastSearch', values.search);
+											input.data('lastSearch', values.search);
 
-										if (!empty(jqxhr)) {
-											jqxhr.abort();
-										}
+											if (jqxhr != null) {
+												jqxhr.abort();
+											}
 
-										values.isAjaxLoaded = false;
-
-										jqxhr = $.ajax({
-											url: options.url + '&curtime=' + new CDate().getTime(),
-											type: 'GET',
-											dataType: 'json',
-											cache: false,
-											data: {
+											values.isAjaxLoaded = false;
+											var request_data = {
 												search: values.search,
 												limit: getLimit(values, options)
-											},
-											success: function(data) {
-												values.isAjaxLoaded = true;
-
-												loadAvailable(data.result, obj, values, options);
 											}
-										});
-									}
-								}, 500);
+
+											jqxhr = $.ajax({
+												url: options.url + '&curtime=' + new CDate().getTime(),
+												type: 'GET',
+												dataType: 'json',
+												cache: false,
+												data: request_data,
+												success: function(data) {
+													values.isAjaxLoaded = true;
+													loadAvailable(data.result, obj, values, options);
+												}
+											});
+										}
+									}, 500);
+								}
+							}
+							else {
+								if ($('.available', obj).is(':hidden')) {
+									showAvailable(obj, values);
+								}
 							}
 						}
 						else {
-							if ($('.available', obj).is(':hidden')) {
-								showAvailable(obj, values);
-							}
+							hideAvailable(obj);
 						}
-					}
-					else {
-						hideAvailable(obj);
-					}
-				})
-				.on('keypress keydown', function(e) {
-					switch (e.which) {
-						case KEY.ENTER:
-							if (!empty(input.val())) {
-								var selected = $('.available li.suggest-hover', obj);
+					})
+					.on('keypress keydown', function(e) {
+						switch (e.which) {
 
-								if (selected.length > 0) {
-									select(selected.data('id'), obj, values, options);
-								}
+							case KEY.TAB:
+							case KEY.ESCAPE:
+								hideAvailable(obj);
+								cleanSearchInput(obj);
+								break;
 
-								// stop form submit
-								cancelEvent(e);
+							case KEY.ENTER:
+								if (input.val() !== '') {
+									var selected = $('.available li.suggest-hover', obj);
 
-								return false;
-							}
-							break;
-
-						case KEY.BACKSPACE:
-							if (empty(input.val())) {
-								var selected = $('.selected li.selected', obj);
-
-								if (selected.length > 0) {
-									var prev = selected.prev(),
-										id = selected.data('id'),
-										item = values.selected[id];
-
-									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
-										removeSelected(id, obj, values, options);
+									if (selected.length) {
+										select(selected.data('id'), obj, values, options);
+										aria_live.text(sprintf(t('Added, %1$s'), selected.data('label')));
 									}
 
-									if (prev.length > 0) {
-										prev.addClass('selected');
-									}
-									else {
-										$('.selected li:first-child', obj).addClass('selected');
+									return cancelEvent(e);
+								}
+								break;
+
+							case KEY.ARROW_LEFT:
+								if (input.val() === '') {
+									var collection = $('.selected li', obj);
+
+									if (collection.length) {
+										var prev = collection.filter('.selected').removeClass('selected').prev();
+										prev = (prev.length ? prev : collection.last()).addClass('selected');
+
+										aria_live.text((prev.hasClass('disabled'))
+											? sprintf(t('%1$s, read only'), prev.data('label'))
+											: prev.data('label')
+										);
 									}
 								}
-								else if ($('.selected li', obj).length > 0) {
-									$('.selected li:last-child', obj).addClass('selected');
+								break;
+
+							case KEY.ARROW_RIGHT:
+								if (input.val() === '') {
+									var collection = $('.selected li', obj);
+
+									if (collection.length) {
+										var next = collection.filter('.selected').removeClass('selected').next();
+										next = (next.length ? next : collection.first()).addClass('selected');
+
+										aria_live.text((next.hasClass('disabled'))
+											? sprintf(t('%1$s, read only'), next.data('label'))
+											: next.data('label')
+										);
+									}
+								}
+								break;
+
+							case KEY.ARROW_UP:
+							case KEY.ARROW_DOWN:
+								var collection = $('.available:visible li', obj),
+									selected = collection.filter('.suggest-hover').removeClass('suggest-hover');
+
+								if (selected.length) {
+									selected = (e.which == KEY.ARROW_UP)
+										? (selected.is(':first-child') ? collection.last() : selected.prev())
+										: (selected.is(':last-child') ? collection.first() : selected.next());
+
+									selected.addClass('suggest-hover');
+									aria_live.text(selected.data('label'));
 								}
 
-								cancelEvent(e);
+								scrollAvailable(obj);
+								return cancelEvent(e);
 
-								return false;
-							}
-							break;
+							case KEY.BACKSPACE:
+							case KEY.DELETE:
+								if (input.val() === '') {
+									var selected = $('.selected li.selected', obj);
 
-						case KEY.DELETE:
-							if (empty(input.val())) {
-								var selected = $('.selected li.selected', obj);
+									if (selected.length) {
+										var id = selected.data('id'),
+											item = values.selected[id];
 
-								if (selected.length > 0) {
-									var next = selected.next(),
-										id = selected.data('id'),
-										item = values.selected[id];
+										if (typeof item.disabled === 'undefined' || !item.disabled) {
+											var aria_text = sprintf(t('Removed, %1$s'), selected.data('label'));
 
-									if (typeof(item.disabled) === 'undefined' || !item.disabled) {
-										removeSelected(id, obj, values, options);
+											selected = (e.which == KEY.BACKSPACE)
+												? (selected.is(':first-child') ? selected.next() : selected.prev())
+												: (selected.is(':last-child') ? selected.prev() : selected.next());
 
-										if (next.length > 0) {
-											next.addClass('selected');
+											removeSelected(id, obj, values, options);
+
+											if (selected.length) {
+												var collection = $('.selected li', obj);
+												selected.addClass('selected');
+
+												aria_text += ', ' + sprintf(
+													(selected.hasClass('disabled'))
+														? t('Selected, %1$s, read only, in position %2$d of %3$d')
+														: t('Selected, %1$s in position %2$d of %3$d'),
+													selected.data('label'),
+													collection.index(selected) + 1,
+													collection.length
+												);
+											}
+
+											aria_live.text(aria_text);
 										}
 										else {
-											$('.selected li:last-child', obj).addClass('selected');
+											aria_live.text(t('Can not be removed'));
 										}
 									}
-								}
-
-								cancelEvent(e);
-
-								return false;
-							}
-							break;
-
-						case KEY.ARROW_LEFT:
-							if (empty(input.val())) {
-								if ($('.selected li.selected', obj).length > 0) {
-									var prev = $('.selected li.selected', obj).removeClass('selected').prev();
-
-									if (prev.length > 0) {
-										prev.addClass('selected');
+									else if (e.which == KEY.BACKSPACE) {
+										/* Pressing Backspace on empty input field should select last element in
+										 * multiselect. For next Backspace press to be able to remove it.
+										 */
+										selected = $('.selected li:last-child', obj).addClass('selected');
+										aria_live.text(selected.data('label'));
 									}
-									else {
-										$('.selected li:first-child', obj).addClass('selected');
-									}
+
+									return cancelEvent(e);
 								}
-								else if ($('.selected li', obj).length > 0) {
-									$('.selected li:last-child', obj).addClass('selected');
-								}
-							}
-							break;
-
-						case KEY.ARROW_RIGHT:
-							if ($('.selected li.selected', obj).length > 0) {
-								var next = $('.selected li.selected', obj).removeClass('selected').next('li');
-
-								if (next.length > 0) {
-									next.addClass('selected');
-								}
-								else if (getSearchFieldVisibility(obj) == false) {
-									$('.selected li:first-child', obj).addClass('selected');
-								}
-							}
-							break;
-
-						case KEY.ARROW_UP:
-							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj);
-									prev = null;
-
-								if (selected.length === 0) {
-									// Select last element.
-									prev = $('ul.multiselect-suggest li:last-child', obj);
-								}
-								else {
-									selected.removeClass('suggest-hover');
-									prev = selected.prev();
-								}
-
-								if (prev.length === 0) {
-									// Select search input.
-									$('input[type="text"]', obj).val(values.search);
-								}
-								else {
-									prev.addClass('suggest-hover');
-									$('input[type="text"]', obj).val(values.available[prev.data('id')]['name']);
-								}
-
-								// Position cursor at the end of search input.
-								cancelEvent(e);
-
-								scrollAvailable(obj);
-							}
-							break;
-
-						case KEY.ARROW_DOWN:
-							if ($('.available', obj).is(':visible') && $('.available li', obj).length > 0) {
-								var selected = $('.available li.suggest-hover', obj),
-									next;
-
-								if (selected.length === 0) {
-									// Select first element.
-									next = $('ul.multiselect-suggest li:first-child', obj);
-								}
-								else {
-									selected.removeClass('suggest-hover');
-
-									next = selected.next();
-								}
-
-								if (next.length === 0) {
-									// Select search input.
-									$('input[type="text"]', obj).val(values.search);
-								}
-								else {
-									next.addClass('suggest-hover');
-									$('input[type="text"]', obj).val(values.available[next.data('id')]['name']);
-								}
-
-								scrollAvailable(obj);
-							}
-							break;
-
-						case KEY.TAB:
-						case KEY.ESCAPE:
-							hideAvailable(obj);
-							cleanSearchInput(obj);
-							break;
-					}
-				})
-				.focusin(function() {
-					$(obj).addClass('active');
+								break;
+						}
+					})
+				.on('focusin', function() {
+					obj.addClass('active');
 
 					if (getSearchFieldVisibility(obj) == false) {
 						$('.selected li:first-child', obj).addClass('selected');
 					}
 				})
-				.focusout(function() {
-					$(obj).removeClass('active').find('li.selected').removeClass('selected');
+				.on('focusout', function() {
+					obj.removeClass('active').find('li.selected').removeClass('selected');
 					cleanSearchInput(obj);
 				});
+
 				if (obj.attr('aria-required')) {
 					input.attr('aria-required', obj.attr('aria-required'));
 					obj.removeAttr('aria-required');
 				}
+
 				obj.append(input);
 			}
 
@@ -552,12 +513,8 @@ jQuery(function($) {
 			if (options.popup.parameters != null) {
 				var popup_options = options.popup.parameters;
 
-				if (options.ignored) {
-					var excludeids = [];
-					$.each(options.ignored, function(i, value) {
-						excludeids.push(i);
-					});
-					popup_options['excludeids'] = excludeids;
+				if (typeof popup_options['only_hostid'] !== 'undefined') {
+					options.only_hostid = popup_options['only_hostid'];
 				}
 
 				var popupButton = $('<button>', {
@@ -578,10 +535,6 @@ jQuery(function($) {
 				obj.parent().append($('<div>', {
 					'class': 'multiselect-button'
 				}).append(popupButton));
-			}
-
-			if ('postInitEvent' in options) {
-				jQuery(document).trigger(options.postInitEvent);
 			}
 		});
 	};
@@ -671,7 +624,7 @@ jQuery(function($) {
 				if (options.limit != 0 && objectLength(values.available) < options.limit) {
 					if (typeof values.available[item.id] === 'undefined'
 							&& typeof values.selected[item.id] === 'undefined'
-							&& typeof values.ignored[item.id] === 'undefined') {
+							&& options.excludeids.indexOf(item.id) === -1) {
 						values.available[item.id] = item;
 					}
 				}
@@ -680,6 +633,9 @@ jQuery(function($) {
 				}
 			});
 		}
+
+		var found = 0,
+			preselected = '';
 
 		// write empty result label
 		if (objectLength(values.available) == 0) {
@@ -696,7 +652,8 @@ jQuery(function($) {
 		else {
 			$('.available', obj)
 				.append($('<ul>', {
-					'class': 'multiselect-suggest'
+					'class': 'multiselect-suggest',
+					'aria-hidden': true
 				}))
 				.mouseenter(function() {
 					values.isAvailableOpened = true;
@@ -707,9 +664,25 @@ jQuery(function($) {
 
 			$.each(data, function (i, item) {
 				if (typeof values.available[item.id] !== 'undefined') {
+					if (found == 0) {
+						preselected = (item.prefix || '') + item.name;
+					}
 					addAvailable(item, obj, values, options);
+					found++;
 				}
 			});
+		}
+
+		if (found > 0) {
+			$('[aria-live]', obj).text(
+				(values.isMoreMatchesFound
+					? sprintf(t('More than %1$d matches for %2$s found'), found, values.search)
+					: sprintf(t('%1$d matches for %2$s found'), found, values.search)) +
+				', ' + sprintf(t('%1$s preselected, use down,up arrow keys and enter to select'), preselected)
+			);
+		}
+		else {
+			$('[aria-live]', obj).text(options.labels['No matches found']);
 		}
 
 		// write more matches found label
@@ -733,7 +706,7 @@ jQuery(function($) {
 			removeDefaultValue(obj, options);
 			values.selected[item.id] = item;
 
-			var prefix = (typeof item.prefix === 'undefined') ? '' : item.prefix,
+			var prefix = (item.prefix || ''),
 				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
 
 			// add hidden input
@@ -756,7 +729,8 @@ jQuery(function($) {
 			}
 
 			var li = $('<li>', {
-				'data-id': item.id
+				'data-id': item.id,
+				'data-label': prefix + item.name
 			}).append(
 				$('<span>', {
 					'class': 'subfilter-enabled'
@@ -810,7 +784,8 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		var li = $('<li>', {
-			'data-id': item.id
+			'data-id': item.id,
+			'data-label': (item.prefix || '') + item.name
 		})
 		.click(function() {
 			select(item.id, obj, values, options);
@@ -997,6 +972,7 @@ jQuery(function($) {
 				.find('input[type="text"]')
 				.attr({
 					placeholder: options.labels['type here to search'],
+					'aria-label': options.labels['type here to search'],
 					readonly: false
 				});
 		}
@@ -1005,6 +981,7 @@ jQuery(function($) {
 				.find('input[type="text"]')
 				.attr({
 					placeholder: '',
+					'aria-label': '',
 					readonly: true
 				});
 		}
@@ -1016,26 +993,8 @@ jQuery(function($) {
 
 	function getLimit(values, options) {
 		return (options.limit != 0)
-			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
+			? options.limit + objectLength(values.selected) + options.excludeids.length + 1
 			: null;
-	}
-
-	function countMatches(data, search) {
-		var count = 0;
-
-		if (empty(data)) {
-			return count;
-		}
-
-		for (var id in data) {
-			var name = (typeof(data[id]) == 'object') ? data[id].name : data[id];
-
-			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	function objectLength(obj) {

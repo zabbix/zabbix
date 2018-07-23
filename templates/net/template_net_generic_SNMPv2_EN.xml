@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Network Generic Device SNMPv2</template>
          <name>Template Net Network Generic Device SNMPv2</name>
-         <description>Template Net Network Generic Device version: 0.14
+         <description>Template Net Network Generic Device version: 0.14&#13;
 Overview: Use this template if you can't find the template for specific vendor or device family.</description>
          <groups>
             <group>

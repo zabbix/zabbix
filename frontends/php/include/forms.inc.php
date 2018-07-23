@@ -198,24 +198,23 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
 					)),
-				SPACE,
+				' ',
 				new CSup($element['count'])
-			]))->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
+			]))
+				->addClass(ZBX_STYLE_SUBFILTER)
+				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
 		// isn't activated
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$output[] = (new CSpan($element['name']))->addClass(ZBX_STYLE_GREY);
-				$output[] = SPACE;
-				$output[] = new CSup($element['count']);
+				$output[] = (new CSpan([
+					(new CSpan($element['name']))->addClass(ZBX_STYLE_GREY),
+					' ',
+					new CSup($element['count'])
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 			else {
-				// this level has no active subfilters
-				$nspan = $subfilter
-					? new CSup('+'.$element['count'])
-					: new CSup($element['count']);
-
 				$link = (new CLinkAction($element['name']))
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
@@ -226,16 +225,14 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 						');'
 					));
 
-				$output[] = $link;
-				$output[] = SPACE;
-				$output[] = $nspan;
+				$output[] = (new CSpan([
+					$link,
+					' ',
+					new CSup(($subfilter ? '+' : '').$element['count'])
+				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
-
-		$output[] = '&nbsp;&nbsp;&nbsp;';
 	}
-
-	array_pop($output);
 
 	return $output;
 }
@@ -273,7 +270,9 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$form = (new CFilter('web.items.filter.state'))
+	$filter = (new CFilter())
+		->setProfile('web.items.filter')
+		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)
 		->addVar('subfilter_apps', $subfilter_apps)
 		->addVar('subfilter_types', $subfilter_types)
@@ -326,37 +325,26 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// row 1
-	$groupFilter = null;
-	if (!empty($filter_groupId)) {
-		$getHostInfo = API::HostGroup()->get([
-			'groupids' => $filter_groupId,
-			'output' => ['name']
-		]);
-		$getHostInfo = reset($getHostInfo);
-		if (!empty($getHostInfo)) {
-			$groupFilter[] = [
-				'id' => $getHostInfo['groupid'],
-				'name' => $getHostInfo['name']
-			];
-		}
-	}
+	$group_filter = !empty($filter_groupId)
+		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'groupids' => $filter_groupId
+		]), ['groupid' => 'id'])
+		: [];
 
-	$filterColumn1->addRow(_('Host group'),
+	$filterColumn1->addRow((new CLabel(_('Host group'), 'filter_groupid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_groupid',
-			'selectedLimit' => 1,
-			'objectName' => 'hostGroup',
-			'objectOptions' => [
-				'editable' => true
-			],
-			'data' => $groupFilter,
+			'object_name' => 'hostGroup',
+			'multiple' => false,
+			'data' => $group_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'filter_groupid',
 					'srcfld1' => 'groupid',
-					'writeonly' => '1'
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_groupid',
+					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -382,39 +370,28 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 2
-	$hostFilterData = null;
-	if (!empty($filter_hostId)) {
-		$getHostInfo = API::Host()->get([
+	$host_filter = !empty($filter_hostId)
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $filter_hostId,
-			'templated_hosts' => true,
-			'output' => ['name']
-		]);
-		$getHostInfo = reset($getHostInfo);
-		if (!empty($getHostInfo)) {
-			$hostFilterData[] = [
-				'id' => $getHostInfo['hostid'],
-				'name' => $getHostInfo['name']
-			];
-		}
-	}
+			'templated_hosts' => true
+		]), ['hostid' => 'id'])
+		: [];
 
-	$filterColumn1->addRow(_('Host'),
+	$filterColumn1->addRow((new CLabel(_('Host'), 'filter_hostid_ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostid',
-			'selectedLimit' => 1,
-			'objectName' => 'hosts',
-			'objectOptions' => [
-				'editable' => true,
-				'templated_hosts' => true
-			],
-			'data' => $hostFilterData,
+			'object_name' => 'hosts',
+			'multiple' => false,
+			'data' => $host_filter,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_templates',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'filter_hostid',
 					'srcfld1' => 'hostid',
-					'writeonly' => '1'
+					'dstfrm' => $filter->getName(),
+					'dstfld1' => 'filter_hostid',
+					'editable' => true,
+					'templated_hosts' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -443,7 +420,7 @@ function getItemFilterForm(&$items) {
 					CJs::encodeJson([
 						'srctbl' => 'applications',
 						'srcfld1' => 'name',
-						'dstfrm' => $form->getName(),
+						'dstfrm' => $filter->getName(),
 						'dstfld1' => 'filter_application',
 						'with_applications' => '1'
 					]).
@@ -509,11 +486,6 @@ function getItemFilterForm(&$items) {
 			ZBX_FLAG_DISCOVERY_NORMAL => _('Regular items')
 		])
 	);
-
-	$form->addColumn($filterColumn1);
-	$form->addColumn($filterColumn2);
-	$form->addColumn($filterColumn3);
-	$form->addColumn($filterColumn4);
 
 	// subfilters
 	$table_subfilter = (new CTableInfo())
@@ -917,9 +889,11 @@ function getItemFilterForm(&$items) {
 		$table_subfilter->addRow([$interval_output]);
 	}
 
-	$form->setFooter($table_subfilter);
+	$filter->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2, $filterColumn3, $filterColumn4],
+		$table_subfilter
+	);
 
-	return $form;
+	return $filter;
 }
 
 /**
@@ -991,7 +965,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'description' => getRequest('description', ''),
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
-		'master_itemname' => getRequest('master_itemname', ''),
 		'hostname' => getRequest('hostname'),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
@@ -1073,12 +1046,11 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// Dependent item initialization by master_itemid.
-	if (!hasRequest('form_refresh') && array_key_exists('master_item', $item)) {
+	if (array_key_exists('master_item', $item)) {
 		$expanded = CMacrosResolverHelper::resolveItemNames([$item['master_item']]);
 		$master_item = reset($expanded);
-		$data['type'] = ITEM_TYPE_DEPENDENT;
 		$data['master_itemid'] = $master_item['itemid'];
-		$data['master_itemname'] = $master_item['name_expanded'].NAME_DELIMITER.$master_item['key_'];
+		$data['master_itemname'] = $master_item['name_expanded'];
 		// Do not initialize item data if only master_item array was passed.
 		unset($item['master_item']);
 	}
@@ -2146,11 +2118,11 @@ function get_timeperiod_form() {
 					(new CLabel(_('Day of week'), 'new_timeperiod_dayofweek'))->setAsteriskMark(),
 					(new CTable())
 						->addRow((new CCol(new CComboBox('new_timeperiod[every]', $new_timeperiod['every'], null, [
-								1 => _('First'),
-								2 => _x('Second', 'adjective'),
-								3 => _('Third'),
-								4 => _('Fourth'),
-								5 => _('Last')
+								1 => _('first'),
+								2 => _x('second', 'adjective'),
+								3 => _('third'),
+								4 => _('fourth'),
+								5 => _('last')
 							])))
 						)
 						->addRow(

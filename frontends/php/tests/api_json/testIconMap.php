@@ -21,6 +21,9 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
+/**
+ * @backup icon_map
+ */
 class testIconMap extends CZabbixTest {
 
 	public static function iconmap_create() {
@@ -38,7 +41,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "iconmapid".'
 			],
 			// Check iconmap name.
@@ -53,7 +55,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
 			[
@@ -68,7 +69,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -83,7 +83,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
@@ -98,7 +97,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Icon map "API icon map" already exists.'
 			],
 			[
@@ -126,7 +124,6 @@ class testIconMap extends CZabbixTest {
 						]
 					],
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API icon map the same name) already exists.'
 			],
 			// Check iconmap default_iconid.
@@ -141,7 +138,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "default_iconid" is missing.'
 			],
 			[
@@ -156,7 +152,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -171,7 +166,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -186,7 +180,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -201,7 +194,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Icon with ID "123456" is not available.'
 			],
 			// Check mappings.
@@ -210,7 +202,6 @@ class testIconMap extends CZabbixTest {
 					'name' => 'API icon map without mappings',
 					'default_iconid' => '2',
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "mappings" is missing.'
 			],
 			// Check successfully creation.
@@ -228,7 +219,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -250,7 +240,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -278,7 +267,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -287,31 +275,24 @@ class testIconMap extends CZabbixTest {
 	/**
 	* @dataProvider iconmap_create
 	*/
-	public function testIconMap_Create($iconmap, $success_expected, $expected_error) {
-		$result = $this->api_acall('iconmap.create', $iconmap, $debug);
+	public function testIconMap_Create($iconmap, $expected_error) {
+		$result = $this->call('iconmap.create', $iconmap, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['iconmapids'] as $key => $id) {
-				$dbResult = DBSelect('select * from icon_map where iconmapid='.$id);
+				$dbResult = DBSelect('select * from icon_map where iconmapid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $iconmap[$key]['name']);
 				$this->assertEquals($dbRow['default_iconid'], $iconmap[$key]['default_iconid']);
 
 				foreach ($iconmap[$key]['mappings'] as $values) {
-					$sql = "select * from icon_mapping where iconmapid='".$id."' and iconid='".$values['iconid']."'".
-							" and inventory_link='".$values['inventory_link']."' and expression='".$values['expression']."'";
-					$this->assertEquals(1, DBcount($sql));
+					$this->assertEquals(1, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
+							' and iconid='.zbx_dbstr($values['iconid']).
+							' and inventory_link='.zbx_dbstr($values['inventory_link']).
+							' and expression='.zbx_dbstr($values['expression']))
+					);
 				}
 			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -628,10 +609,7 @@ class testIconMap extends CZabbixTest {
 				$data['iconmap']['iconmapid'] = '2';
 				$data['iconmap']['name'] = 'Update '.$data['iconmap']['name'];
 			}
-			$result = $this->api_acall($method, $data['iconmap'], $debug);
-
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
+			$result = $this->call($method, $data['iconmap'], true);
 
 			// condition for one test case, because of the different error message text
 			if (array_key_exists('expected_error_pattern', $data)) {
@@ -641,8 +619,7 @@ class testIconMap extends CZabbixTest {
 				$this->assertSame($data['expected_error'], $result['error']['data']);
 			}
 
-			$dbResult = "select * from icon_map where name='".$data['iconmap']['name']."'";
-			$this->assertEquals(0, DBcount($dbResult));
+			$this->assertEquals(0, DBcount('select * from icon_map where name='.zbx_dbstr($data['iconmap']['name'])));
 		}
 	}
 
@@ -654,7 +631,6 @@ class testIconMap extends CZabbixTest {
 					'name' => 'non existent parametr',
 					'default_iconid' => '2',
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "iconmappingid".'
 			],
 			// Check iconmap id.
@@ -662,7 +638,6 @@ class testIconMap extends CZabbixTest {
 				'iconmap' => [[
 					'name' => 'without iconmap id'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": the parameter "iconmapid" is missing.'
 			],
 			[
@@ -670,7 +645,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => '',
 					'name' => 'empty iconmap id'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/iconmapid": a number is expected.'
 			],
 			[
@@ -678,7 +652,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => '123456',
 					'name' => 'non existent iconmap id'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -686,7 +659,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => 'æų',
 					'name' => 'æųæų'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/iconmapid": a number is expected.'
 			],
 			[
@@ -694,7 +666,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => '1.1',
 					'name' => 'invalid iconmap id'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/iconmapid": a number is expected.'
 			],
 			[
@@ -708,7 +679,6 @@ class testIconMap extends CZabbixTest {
 						'name' => 'the same iconmap id2'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (iconmapid)=(2) already exists.'
 			],
 			// Check iconmap name.
@@ -717,7 +687,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => 2,
 					'name' => ''
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
@@ -725,7 +694,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => 2,
 					'name' => 'LongNameqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwerr'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
 			[
@@ -733,7 +701,6 @@ class testIconMap extends CZabbixTest {
 					'iconmapid' => 2,
 					'name' => 'API icon map'
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Icon map "API icon map" already exists.'
 			],
 			[
@@ -747,7 +714,6 @@ class testIconMap extends CZabbixTest {
 						'name' => 'API icon map the same name'
 					]
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API icon map the same name) already exists.'
 			],
 			// Check iconmap default_iconid.
@@ -757,7 +723,6 @@ class testIconMap extends CZabbixTest {
 					'name' => 'API icon map with empty default_iconid',
 					'default_iconid' => '',
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -766,7 +731,6 @@ class testIconMap extends CZabbixTest {
 					'name' => 'API icon map with string default_iconid',
 					'default_iconid' => 'abc',
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -775,7 +739,6 @@ class testIconMap extends CZabbixTest {
 					'name' => '☺',
 					'default_iconid' => '0.0',
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1/default_iconid": a number is expected.'
 			],
 			[
@@ -784,7 +747,6 @@ class testIconMap extends CZabbixTest {
 					'name' => 'API icon map nonexistent default_iconid',
 					'default_iconid' => '123456',
 				]],
-				'success_expected' => false,
 				'expected_error' => 'Icon with ID "123456" is not available.'
 			],
 			// Check successfully update.
@@ -803,7 +765,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -826,7 +787,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -856,7 +816,6 @@ class testIconMap extends CZabbixTest {
 						]
 					]
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -865,35 +824,29 @@ class testIconMap extends CZabbixTest {
 	/**
 	* @dataProvider iconmap_update
 	*/
-	public function testIconMap_Update($iconmaps, $success_expected, $expected_error) {
-		$result = $this->api_acall('iconmap.update', $iconmaps, $debug);
+	public function testIconMap_Update($iconmaps, $expected_error) {
+		$result = $this->call('iconmap.update', $iconmaps, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['iconmapids'] as $key => $id) {
-				$dbResult = DBSelect('select * from icon_map where iconmapid='.$id);
+				$dbResult = DBSelect('select * from icon_map where iconmapid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $iconmaps[$key]['name']);
 				$this->assertEquals($dbRow['default_iconid'], $iconmaps[$key]['default_iconid']);
 
 				foreach ($iconmaps[$key]['mappings'] as $values) {
-					$sql = "select * from icon_mapping where iconmapid='".$id."' and iconid='".$values['iconid']."'".
-							" and inventory_link='".$values['inventory_link']."' and expression='".$values['expression']."'";
-					$this->assertEquals(1, DBcount($sql));
+					$this->assertEquals(1, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id).
+							' and iconid='.zbx_dbstr($values['iconid']).
+							' and inventory_link='.zbx_dbstr($values['inventory_link']).
+							' and expression='.zbx_dbstr($values['expression']))
+					);
 				}
 			}
 		}
 		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-			$this->assertSame($expected_error, $result['error']['data']);
-
 			foreach ($iconmaps as $iconmap) {
-				if (array_key_exists('name', $iconmap) && $iconmap['name'] != 'API icon map'){
-					$dbResult = "select * from icon_map where name='".$iconmap['name']."'";
-					$this->assertEquals(0, DBcount($dbResult));
+				if (array_key_exists('name', $iconmap) && $iconmap['name'] !== 'API icon map'){
+					$this->assertEquals(0, DBcount('select * from icon_map where name='.zbx_dbstr($iconmap['name'])));
 				}
 			}
 		}
@@ -905,28 +858,24 @@ class testIconMap extends CZabbixTest {
 				'iconmap' => [
 					''
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'iconmap' => [
 					'123456'
 				],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
 				'iconmap' => [
 					'abc'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
 				'iconmap' => [
 					'.'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
@@ -934,7 +883,6 @@ class testIconMap extends CZabbixTest {
 					'4',
 					'123456'
 				],
-				'success_expected' => false,
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
@@ -942,7 +890,6 @@ class testIconMap extends CZabbixTest {
 					'4',
 					'abc'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -950,7 +897,6 @@ class testIconMap extends CZabbixTest {
 					'4',
 					''
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
 			],
 			[
@@ -958,21 +904,18 @@ class testIconMap extends CZabbixTest {
 					'4',
 					'4'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Invalid parameter "/2": value (4) already exists.'
 			],
 			[
 				'iconmap' => [
 					'7'
 				],
-				'success_expected' => false,
 				'expected_error' => 'Icon map "API iconmap in map" cannot be deleted. Used in map "Map with iconmap".'
 			],
 			[
 				'iconmap' => [
 					'4'
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			],
 			[
@@ -980,7 +923,6 @@ class testIconMap extends CZabbixTest {
 					'5',
 					'6'
 				],
-				'success_expected' => true,
 				'expected_error' => null
 			]
 		];
@@ -989,25 +931,14 @@ class testIconMap extends CZabbixTest {
 	/**
 	* @dataProvider iconmap_delete
 	*/
-	public function testIconMap_Delete($iconmap, $success_expected, $expected_error) {
-		$result = $this->api_acall('iconmap.delete', $iconmap, $debug);
+	public function testIconMap_Delete($iconmap, $expected_error) {
+		$result = $this->call('iconmap.delete', $iconmap, $expected_error);
 
-		if ($success_expected) {
-			$this->assertTrue(array_key_exists('result', $result));
-			$this->assertFalse(array_key_exists('error', $result));
-
+		if ($expected_error === null) {
 			foreach ($result['result']['iconmapids'] as $id) {
-				$dbResult = 'select * from icon_map where iconmapid='.$id;
-				$this->assertEquals(0, DBcount($dbResult));
-				$dbResultMappings = 'select * from icon_mapping where iconmapid='.$id;
-				$this->assertEquals(0, DBcount($dbResultMappings));
+				$this->assertEquals(0, DBcount('select * from icon_map where iconmapid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from icon_mapping where iconmapid='.zbx_dbstr($id)));
 			}
-		}
-		else {
-			$this->assertFalse(array_key_exists('result', $result));
-			$this->assertTrue(array_key_exists('error', $result));
-
-			$this->assertEquals($expected_error, $result['error']['data']);
 		}
 	}
 
@@ -1084,11 +1015,7 @@ class testIconMap extends CZabbixTest {
 	* @dataProvider iconmap_user_permissions
 	*/
 	public function testIconMap_UserPermissions($method, $user, $valuemap, $expected_error) {
-		$result = $this->api_call_with_user($method, $user, $valuemap, $debug);
-
-		$this->assertFalse(array_key_exists('result', $result));
-		$this->assertTrue(array_key_exists('error', $result));
-
-		$this->assertEquals($expected_error, $result['error']['data']);
+		$this->authorize($user['user'], $user['password']);
+		$this->call($method, $valuemap, $expected_error);
 	}
 }

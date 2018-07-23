@@ -26,14 +26,15 @@ $sort_div = (new CSpan())
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
+	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null)
+	->getUrl();
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
 	->setArgument('eventid', '')
 	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
-$show_timeline = ($data['sortfield'] === 'clock');
+$show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
 $header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
@@ -58,10 +59,10 @@ $table = (new CTableInfo())
 		[
 			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
 			' &bullet; ',
-			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
+			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		_('Duration'),
-		$data['config']['event_ack_enable'] ? _('Ack') : null,
+		_('Ack'),
 		_('Actions'),
 		$data['fields']['show_tags'] ? _('Tags') : null
 	]));
@@ -72,10 +73,6 @@ $last_clock = 0;
 if ($data['data']['problems']) {
 	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
 }
-if ($data['config']['event_ack_enable']) {
-	$acknowledges = makeEventsAcknowledges($data['data']['problems'], $backurl->getUrl());
-}
-$actions = makeEventsActions($data['data']['problems'], true);
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
@@ -88,12 +85,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	else {
 		$in_closing = false;
 
-		if ($data['config']['event_ack_enable']) {
-			foreach ($problem['acknowledges'] as $acknowledge) {
-				if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-					$in_closing = true;
-					break;
-				}
+		foreach ($problem['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+				$in_closing = true;
+				break;
 			}
 		}
 
@@ -111,7 +106,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 	$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-	$is_acknowledged = $data['config']['event_ack_enable'] && (bool) $problem['acknowledges'];
+	$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
 
 	if ($show_recovery_data) {
 		if ($problem['r_eventid'] != 0) {
@@ -153,10 +148,12 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	$sortorder = ($show_timeline) ? $data['sortorder'] : ZBX_SORT_DOWN;
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
 			->setHint(
-				make_popup_eventlist($trigger, $eventid, $backurl->getUrl(), $data['config'], $data['fullscreen']), '',
+				make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen'], $show_timeline, $sortorder),
+				'',
 				true
 			)
 			->setAttribute('aria-label', _x('%1$s, Severity, %2$s', 'screen reader',
@@ -164,7 +161,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			))
 	]));
 
-	$description_style = getSeverityStyle($trigger['priority']);
+	$description_style = getSeverityStyle($problem['severity']);
 
 	if ($value == TRIGGER_VALUE_TRUE) {
 		$description->addClass($description_style);
@@ -184,7 +181,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {
-			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $data['sortorder']);
 		}
 		$last_clock = $problem['clock'];
 
@@ -204,6 +201,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
+	// Create acknowledge url.
+	$problem_update_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'acknowledge.edit')
+		->setArgument('eventids', [$problem['eventid']])
+		->setArgument('backurl', $backurl)
+		->getUrl();
+
 	$r_clock = ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0;
 
 	$table->addRow(array_merge($row, [
@@ -215,10 +219,12 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		(new CCol(zbx_date2age($problem['clock'], $r_clock)))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setAttribute('aria-label', zbx_date2age($problem['clock'], $r_clock, false)),
-		$data['config']['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
-		array_key_exists($eventid, $actions)
-			? (new CCol($actions[$eventid]))->addClass(ZBX_STYLE_NOWRAP)
-			: '',
+		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
+			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ALT),
+		makeEventActionsIcons($problem['eventid'], $data['data']['actions'], $data['data']['mediatypes'],
+			$data['data']['users'], $data['config']
+		),
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }

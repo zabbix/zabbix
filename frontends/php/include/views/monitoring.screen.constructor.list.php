@@ -28,8 +28,7 @@ if ($data['screen']['templateid']) {
 $screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
 	'screen' => $data['screen'],
-	'mode' => SCREEN_MODE_EDIT,
-	'updateProfile' => false
+	'mode' => SCREEN_MODE_EDIT
 ]);
 
 $widget->addItem(

@@ -533,9 +533,9 @@ void	zbx_lrtrim(char *str, const char *charlist)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_remove_chars(register char *str, const char *charlist)
+void	zbx_remove_chars(char *str, const char *charlist)
 {
-	register char *p;
+	char	*p;
 
 	if (NULL == str || NULL == charlist || '\0' == *str || '\0' == *charlist)
 		return;
@@ -862,21 +862,16 @@ int	parse_key(const char **exp)
 					else if (']' == *s && 0 != array)
 					{
 						array = 0;
+						s++;
 
-						while (' ' == s[1])	/* skip trailing spaces after closing ']' */
+						while (' ' == *s)	/* skip trailing spaces after closing ']' */
 							s++;
 
-						if (0 == array && ']' == s[1])
-						{
-							s++;
+						if (']' == *s)
 							goto succeed;
-						}
 
-						if (',' != s[1] && !(0 != array && ']' == s[1]))
-						{
-							s++;
+						if (',' != *s)
 							goto fail;	/* incorrect syntax */
-						}
 					}
 					else if (']' == *s && 0 == array)
 						goto succeed;
@@ -993,7 +988,7 @@ int	parse_host_key(char *exp, char **host, char **key)
  *                                                                            *
  * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
  *            containing only spaces is handled as having one empty parameter *
- *            and 1 ir returned.                                              *
+ *            and 1 is returned.                                              *
  *                                                                            *
  ******************************************************************************/
 int	num_param(const char *p)
@@ -1030,7 +1025,7 @@ int	num_param(const char *p)
 				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
 					p++;
 
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+				if (',' != p[1] && '\0' != p[1])
 					return 0;	/* incorrect syntax */
 			}
 			else if (']' == *p && 0 == array)
@@ -1617,52 +1612,6 @@ void	remove_param(char *param, int num)
 	}
 
 	*param = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_num2hex                                                      *
- *                                                                            *
- * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
- *                                                                            *
- * Parameters:                                                                *
- *      c - number 0-15                                                       *
- *                                                                            *
- * Return value:                                                              *
- *      '0'-'f'                                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-char	zbx_num2hex(u_char c)
-{
-	if (c >= 10)
-		return c + 0x57; /* a-f */
-	else
-		return c + 0x30; /* 0-9 */
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_hex2num                                                      *
- *                                                                            *
- * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
- *                                                                            *
- * Parameters:                                                                *
- *      c - char ('0'-'9''a'-'f')                                             *
- *                                                                            *
- * Return value:                                                              *
- *      0-15                                                                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-u_char	zbx_hex2num(char c)
-{
-	if (c >= 'a')
-		return c - 0x57; /* a-f */
-	else
-		return c - 0x30; /* 0-9 */
 }
 
 /******************************************************************************
@@ -3758,6 +3707,44 @@ int	zbx_function_param_quote(char **param, int forced)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_function_get_param_dyn                                       *
+ *                                                                            *
+ * Purpose: return parameter by index (Nparam) from parameter list (params)   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      params - [IN] parameter list                                          *
+ *      Nparam - [IN] requested parameter index (from 1)                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *      NULL - requested parameter missing                                    *
+ *      otherwise - requested parameter                                       *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_get_param_dyn(const char *params, int Nparam)
+{
+	const char	*ptr;
+	size_t		sep_pos, params_len;
+	char		*out = NULL;
+	int		idx = 0;
+
+	params_len = strlen(params) + 1;
+
+	for (ptr = params; ++idx <= Nparam && ptr < params + params_len; ptr += sep_pos + 1)
+	{
+		size_t	param_pos, param_len;
+		int	quoted;
+
+		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+
+		if (idx == Nparam)
+			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+	}
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_no_function                                                  *
  *                                                                            *
  * Purpose: count calculated item (prototype) formula characters that can be  *
@@ -3963,23 +3950,26 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 	size_t	lpp_offset, lpp_len;
 
 	/* try to validate function name */
-	if (SUCCEED != function_parse_name(expr, par_l))
-		return FAIL;
-
-	/* now we know the position of '(', try to find ')' */
-	if (SUCCEED != function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
+	if (SUCCEED == function_parse_name(expr, par_l))
 	{
+		/* now we know the position of '(', try to find ')' */
+		if (SUCCEED == function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
+			return SUCCEED;
+
 		if (*par_l > *par_r && NULL != error)
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
-				"Check expression part starting from %.*s",
+				"Check expression part starting from: %.*s",
 				*par_l, expr, lpp_len, expr + lpp_offset);
-		}
 
-		return FAIL;
+			return FAIL;
+		}
 	}
 
-	return SUCCEED;
+	if (NULL != error)
+		zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -4026,6 +4016,8 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 		*par_r += *func_pos;
 		return SUCCEED;
 	}
+
+	zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
 
 	return FAIL;
 }

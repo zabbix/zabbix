@@ -6,8 +6,9 @@ use warnings;
 use YAML::XS qw(LoadFile Dump);
 use Path::Tiny qw(path);
 use IPC::Run3 qw(run3);
-use Time::HiRes qw(clock);
+use Time::HiRes qw(time);
 use File::Basename qw(dirname);
+use Getopt::Long qw(GetOptions);
 
 use constant TEST_SUITE_ATTRIBUTES	=> ('name', 'tests', 'skipped', 'errors', 'failures', 'time');
 use constant TEST_CASE_ATTRIBUTES	=> ('name', 'assertions', 'time');
@@ -45,7 +46,7 @@ sub launch($$$)
 	my $test_exec = shift;
 	my $test_data = shift;
 
-	my $start = clock();
+	my $start = time();
 
 	$test_suite->{'tests'}++;
 
@@ -84,12 +85,16 @@ sub launch($$$)
 		$test_suite->{'skipped'}++;
 	}
 
-	my $end = clock();
+	my $end = time();
 
 	$test_suite->{'time'} += $test_case->{'time'} = $end - $start;
 
 	push(@{$test_suite->{'testcases'}}, $test_case);
 }
+
+my $xml;
+
+die("Bad command-line arguments") unless(GetOptions(('xml:s' => \$xml)));
 
 my $iter = path(".")->iterator({
 	'recurse'		=> 1,
@@ -121,7 +126,7 @@ while (my $path = $iter->())
 	push(@test_suites, $test_suite);
 }
 
-if (-t STDOUT)
+unless (defined($xml))
 {
 	use Term::ANSIColor qw(:constants);
 
@@ -299,6 +304,8 @@ foreach my $test_suite (@test_suites)
 {
 	print("  <testsuite");
 
+	$test_suite->{'name'} = $xml . "." . $test_suite->{'name'} unless ($xml eq "");
+
 	foreach my $attribute (TEST_SUITE_ATTRIBUTES)
 	{
 		die("missing test suite attribute \"$attribute\"") unless (exists($test_suite->{$attribute}));
@@ -358,3 +365,8 @@ foreach my $test_suite (@test_suites)
 }
 
 print("</testsuites>\n");
+
+foreach my $test_suite (@test_suites)
+{
+	exit(-1) unless ($test_suite->{'failures'} + $test_suite->{'errors'} == 0);
+}
