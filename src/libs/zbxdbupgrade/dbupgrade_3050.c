@@ -1639,7 +1639,7 @@ static int	DBpatch_3050129(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	const ZBX_FIELD	field = {"ldap_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -1651,10 +1651,10 @@ static int	DBpatch_3050130(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	/* Update ldap_enabled to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
+	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
 	res = DBexecute(
 		"update config"
-		" set ldap_enabled=1"
+		" set ldap_configured=1"
 		" where authentication_type=1");
 
 	if (ZBX_DB_OK > res)
