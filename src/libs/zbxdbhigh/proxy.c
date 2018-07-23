@@ -3118,6 +3118,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 					session = zbx_dc_get_or_create_data_session(last_hostid, token);
 			}
 
+			/* check and discard if duplicate data */
 			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_valueid)
 			{
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);
@@ -3159,9 +3160,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	zbx_free(hostkeys);
 	zbx_free(items);
-out:
 	zbx_free(token);
-
+out:
 	if (NULL == error)
 	{
 		ret = SUCCEED;
