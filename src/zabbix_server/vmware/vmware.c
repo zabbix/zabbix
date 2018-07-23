@@ -88,11 +88,6 @@ ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
 
 static zbx_vmware_t	*vmware = NULL;
 
-/* vmware service types */
-#define ZBX_VMWARE_TYPE_UNKNOWN	0
-#define ZBX_VMWARE_TYPE_VSPHERE	1
-#define ZBX_VMWARE_TYPE_VCENTER	2
-
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /* according to libxml2 changelog XML_PARSE_HUGE option was introduced in version 2.7.0 */
@@ -941,6 +936,10 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
+
+	datastore->capacity = src->capacity;
+	datastore->free_space = src->free_space;
+	datastore->uncommitted = src->uncommitted;
 
 	return datastore;
 }
@@ -2314,6 +2313,45 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_refresh_datastore_info                            *
+ *                                                                            *
+ * Purpose: Refreshes all storage related information including free-space,   *
+ *          capacity, and detailed usage of virtual machines.                 *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             id           - [IN] the datastore id                           *
+ *                                                                            *
+ * Comments: This is required for ESX/ESXi hosts version < 6.0 only           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *id)
+{
+#	define ZBX_POST_REFRESH_DATASTORE							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RefreshDatastoreStorageInfo>"						\
+			"<ns0:_this type=\"HostSystem\">%s</ns0:_this>"				\
+		"</ns0:RefreshDatastoreStorageInfo>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_refresh_datastore_info";
+	char		tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_REFRESH_DATASTORE, id);
+	if (CURLE_OK != curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, tmp))
+		return FAIL;
+
+	page.offset = 0;
+
+	if (CURLE_OK != curl_easy_perform(easyhandle))
+		return FAIL;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_create_datastore                                  *
  *                                                                            *
  * Purpose: create vmware hypervisor datastore object                         *
@@ -2347,12 +2385,20 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *id_esc;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *id_esc, *value;
 	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __function_name, id);
 
 	id_esc = xml_escape_dyn(id);
+
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type
+			&& SUCCEED != vmware_service_refresh_datastore_info(easyhandle, id_esc))
+	{
+		zbx_free(id_esc);
+		goto out;
+	}
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATASTORE_GET,
 			vmware_service_objects[service->type].property_collector, id_esc);
@@ -2391,10 +2437,34 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		zbx_free(path);
 	}
 
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
+	{
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
+		{
+			is_uint64(value, &capacity);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
+		{
+			is_uint64(value, &free_space);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
+		{
+			is_uint64(value, &uncommitted);
+			zbx_free(value);
+		}
+	}
+
 	datastore = (zbx_vmware_datastore_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
 	datastore->uuid = uuid;
 	datastore->id = zbx_strdup(NULL, id);
+	datastore->capacity = capacity;
+	datastore->free_space = free_space;
+	datastore->uncommitted = uncommitted;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -3795,6 +3865,9 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: VirtualMachine hv id: %s hv uuid: %s linked vm id:"
 					" %s vm uuid: %s", __function_name, hv->id, hv->uuid, vm->id, vm->uuid);
 		}
+
+		if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
+			continue;
 
 		for (i = 0; i < hv->datastores.values_num; i++)
 		{
