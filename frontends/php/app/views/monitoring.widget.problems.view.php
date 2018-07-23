@@ -216,9 +216,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		(new CCol(zbx_date2age($problem['clock'], $r_clock)))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->setAttribute('aria-label', zbx_date2age($problem['clock'], $r_clock, false)),
+		(new CCol(zbx_date2age($problem['clock'], $r_clock)))->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT),
