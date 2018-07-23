@@ -1,0 +1,31 @@
+---
+test case: "successfully found low-level discovery function macros token #1"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  token_l: 0
+  token_r: 39
+  macro_l: 1
+  macro_r: 10
+  func_l: 12
+  func_r: 38
+  func_param_l: 18
+  func_param_r: 38
+---
+test case: "successfully found function macros token #2"
+in:
+  expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  token_l: 0
+  token_r: 55
+  macro_l: 1
+  macro_r: 16
+  func_l: 18
+  func_r: 54
+  func_param_l: 24
+  func_param_r: 54
+...
