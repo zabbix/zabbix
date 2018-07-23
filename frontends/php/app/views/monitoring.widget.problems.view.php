@@ -156,7 +156,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				'',
 				true
 			)
-			->setAttribute('aria-label', _x('%1$s, Severity, %2$s', 'screen reader',
+			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($trigger['priority'], $data['config'])
 			))
 	]));
@@ -230,7 +230,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 }
 
 $output = [
-	'aria_label' => _x('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
+	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
