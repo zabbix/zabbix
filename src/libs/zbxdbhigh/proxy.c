@@ -3095,7 +3095,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		goto out;
 	}
 
-	zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);
+	zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);	/* return value not checked */
 
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
@@ -3890,8 +3890,8 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		size_t			token_size = 0;
 		zbx_data_session_t	*session;
 
-		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);
-
+		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);	/* return value */
+												/* not checked */
 		if (NULL != token)
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, token);
 
