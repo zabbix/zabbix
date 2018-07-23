@@ -3065,19 +3065,19 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 {
 	const char		*__function_name = "process_client_history_data";
 
-	int			ret = FAIL, values_num, read_num, processed_num = 0, total_num = 0, i,
-				errcodes[ZBX_HISTORY_VALUES_MAX];
+	int			ret = FAIL, values_num, read_num, processed_num = 0, total_num = 0, i;
 	struct zbx_json_parse	jp_data;
 	zbx_timespec_t		client_timediff;
 	const char		*pnext = NULL;
 	char			*error = NULL, *token = NULL;
-	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
+	size_t			token_size = 0;
 	zbx_host_key_t		*hostkeys;
 	DC_ITEM			*items;
 	double			sec;
-	size_t			token_size = 0;
 	zbx_data_session_t	*session = NULL;
 	zbx_uint64_t		last_hostid = 0;
+	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
+	int			errcodes[ZBX_HISTORY_VALUES_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
