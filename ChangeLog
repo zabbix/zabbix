@@ -14,7 +14,6 @@ A.F....... [ZBX-1357] added and enabled Norwegian translation to be displayed by
 
 Bug fixes:
 ........S. [ZBX-14548] fixed the disk usage counters reading for ESX/ESXi hosts (MVekslers)
-..F....... [ZBX-9236] fixed timeselector period used to select 'all' values of particular item (miks)
 ..F....... [ZBXNEXT-4049] fixed option to hide timeline in Problems widget popup (vasilijs)
 ...G...... [ZBX-13393] fixed agent compilation error on AlphaServer Tru64 5.1B (Andris)
 ..F....... [ZBX-14491] fixed link "show value mappings", which leads to no permission page (vasilijs)
@@ -1698,6 +1697,7 @@ Changes for 3.0.20rc1
 
 Bug fixes:
 ........S. [ZBX-14548] fixed the disk usage counters reading for ESX/ESXi hosts (MVekslers)
+..F....... [ZBX-9236] fixed timeselector period used to select 'all' values of particular item (miks)
 ...G...... [ZBX-13393] fixed agent compilation error on AlphaServer Tru64 5.1B (Andris)
 .......PS. [ZBX-14566] fixed possible data loss due to MariaDB server restart (vso)
 .......PS. [ZBX-13010] fixed crash of poller processes in ODBC checks, simplified code (Andris, wiper)
