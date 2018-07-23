@@ -3722,10 +3722,10 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
 	double			sec;
-	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
 	DC_ITEM			*items;
 	char			*error = NULL;
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
+	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
