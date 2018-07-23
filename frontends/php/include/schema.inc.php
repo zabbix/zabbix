@@ -2829,6 +2829,12 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
+			'ldap_configured' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'triggers' => [

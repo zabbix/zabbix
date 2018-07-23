@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha9');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050128);
+define('ZABBIX_DB_VERSION',		3050130);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -106,6 +106,7 @@ define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
 define('ZBX_AUTH_HTTP',		2);
 define('ZBX_AUTH_HTTP_ENABLED',	1);
+define('ZBX_AUTH_LDAP_ENABLED',	1);
 define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_MATCH',	1);
