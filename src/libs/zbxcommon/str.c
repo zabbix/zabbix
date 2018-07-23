@@ -4602,15 +4602,15 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
 static int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char	*ptr;
-	int		macro_loc;
+	int		macro_offset;
 
 	if ('#' == macro[2])
-		macro_loc = 3;
+		macro_offset = 3;
 	else
-		macro_loc = 2;
+		macro_offset = 2;
 
 	/* find the end of the nested macro by validating its name until the closing bracket } */
-	for (ptr = macro + macro_loc; '}' != *ptr; ptr++)
+	for (ptr = macro + macro_offset; '}' != *ptr; ptr++)
 	{
 		if ('\0' == *ptr)
 			return FAIL;
@@ -4620,7 +4620,7 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 	}
 
 	/* empty macro name */
-	if (macro_loc == ptr - macro)
+	if (macro_offset == ptr - macro)
 		return FAIL;
 
 	/* Determine the token type.                                                   */
