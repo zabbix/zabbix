@@ -2829,7 +2829,7 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
-			'ldap_configured' => [
+			'ldap_enabled' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
