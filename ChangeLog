@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha9
 
 New features:
+.....J.... [ZBXNEXT-4558] added support for monitoring the string values of custom JMX MBeans (mindbound)
 .....J.... [ZBX-14586] added more informative error message for InstanceNotFoundException error (mindbound)
 ..F....... [ZBXNEXT-4454] added screen reader attributes for common elements (ashubin)
 A.F.....S. [ZBXNEXT-4200] added ability to create LLD item prototype of type "dependent" with a master item not only item prototype (Ivo, Sergejs)
