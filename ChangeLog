@@ -1698,8 +1698,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.20rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-14548] fixed the disk usage counters reading for ESX/ESXi hosts (MVekslers)
 ...G...... [ZBX-13393] fixed agent compilation error on AlphaServer Tru64 5.1B (Andris)
