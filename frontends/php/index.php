@@ -48,16 +48,6 @@ if (isset($_REQUEST['reconnect'])) {
 
 $config = select_config();
 
-if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (!empty($_SERVER['PHP_AUTH_USER'])) {
-		$_REQUEST['enter'] = _('Sign in');
-		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
-	}
-	else {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-}
-
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// try to login
