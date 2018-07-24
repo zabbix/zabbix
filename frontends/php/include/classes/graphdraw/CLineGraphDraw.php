@@ -2527,21 +2527,6 @@ class CLineGraphDraw extends CGraphDraw {
 					$absMaxY = $absMinY;
 					$absMinY = $oldAbMaxY;
 				}
-
-				if (bcdiv((bcsub($absMaxY, $absMinY)), $absMaxY) <= 0.1) {
-					if ($this->m_minY[$side] > 0) {
-						$this->m_minY[$side] = bcmul($this->m_minY[$side], 0.95);
-					}
-					else {
-						$this->m_minY[$side] = bcmul($this->m_minY[$side], 1.05);
-					}
-					if ($this->m_maxY[$side] > 0) {
-						$this->m_maxY[$side] = bcmul($this->m_maxY[$side], 1.05);
-					}
-					else {
-						$this->m_maxY[$side] = bcmul($this->m_maxY[$side], 0.95);
-					}
-				}
 			}
 		}
 	}
