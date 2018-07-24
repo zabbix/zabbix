@@ -2348,26 +2348,13 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
 
-			// add maintenance icon with hint if host is in maintenance
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-				$maintenance_icon = (new CSpan())
-					->addClass(ZBX_STYLE_ICON_MAINT)
-					->addClass(ZBX_STYLE_CURSOR_POINTER);
-
-				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
-					$db_maintenance = $db_maintenances[$host['maintenanceid']];
-
-					$hint = $db_maintenance['name'].' ['.($host['maintenance_type']
-						? _('Maintenance without data collection')
-						: _('Maintenance with data collection')).']';
-
-					if ($db_maintenance['description'] !== '') {
-						$hint .= "\n".$db_maintenance['description'];
-					}
-
-					$maintenance_icon->setHint($hint);
-				}
-
+			// Add maintenance icon with hint if host is in maintenance.
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
+				$maintenance = $db_maintenances[$host['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 

@@ -37,25 +37,12 @@ $host_name = (new CLinkAction($data['host']['host']))
 		false
 	));
 
-if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-	$maintenance_icon = (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
-		->addClass(ZBX_STYLE_CURSOR_POINTER);
-
-	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
-		$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
-
-		$hint = $maintenance['name'].' ['.($data['host']['maintenance_type']
-			? _('Maintenance without data collection')
-			: _('Maintenance with data collection')).']';
-
-		if ($maintenance['description']) {
-			$hint .= "\n".$maintenance['description'];
-		}
-
-		$maintenance_icon->setHint($hint);
-	}
-
+if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+		&& array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+	$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
+	$maintenance_icon = makeMaintenanceIcon($data['host']['maintenance_type'], $maintenance['name'],
+		$maintenance['description']
+	);
 	$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 }
 

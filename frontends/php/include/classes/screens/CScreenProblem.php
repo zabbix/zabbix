@@ -364,7 +364,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @static
 	 */
-	private static function addMaintenanceNames(array &$problems) {
+	public static function addMaintenanceNames(array &$problems) {
 		$maintenanceids = [];
 		foreach ($problems as $problem) {
 			if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
@@ -974,6 +974,7 @@ class CScreenProblem extends CScreenBase {
 					? (new CSpan(
 							(new CButton(null))
 								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+								->addStyle('margin-left: -3px;')
 								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
 							))->addClass(ZBX_STYLE_REL_CONTAINER)
 					: makeInformationList($info_icons);

@@ -894,6 +894,30 @@ function makeInformationIcon($message) {
 }
 
 /**
+ * Renders an icon for host in maintenance.
+ *
+ * @param int    $type        Type of the maintenance.
+ * @param string $name        Name of the maintenance.
+ * @param string $description Description of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeMaintenanceIcon($type, $name, $description) {
+	$hint = $name.' ['.($type
+		? _('Maintenance without data collection')
+		: _('Maintenance with data collection')).']';
+
+	if ($description !== '') {
+		$hint .= "\n".$description;
+	}
+
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint($hint);
+}
+
+/**
  * Renders an icon for suppressed problem.
  *
  * @param array  $icon_data
