@@ -745,21 +745,28 @@ class CControllerDashboardWidgetEdit extends CController {
 
 				// Initialize dynamicRows.
 				$js_scripts[] =
-					'jQuery("#data_sets").dynamicRows({'.
-						'template: "#dataset-row",'.
-						'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-						'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
-						'add: "#dataset-add",'.
-						'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
-						'dataCallback: function(data) {'.
-							'data.formulaId = num2letter(data.rowNum);'.
-							'data.orderNum = data.rowNum + 1;'.
-							'return data;'.
-						'}'.
-					'});';
+					'jQuery("#data_sets")'.
+						'.dynamicRows({'.
+							'template: "#dataset-row",'.
+							'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
+							'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
+							'add: "#dataset-add",'.
+							'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
+							'dataCallback: function(data) {'.
+								'data.formulaId = num2letter(data.rowNum);'.
+								'data.orderNum = data.rowNum + 1;'.
+								'return data;'.
+							'}'.
+						'})'.
+						'.bind("tableupdate.dynamicRows", function(event, options) {'.
+							'jQuery(".range-control[data-options]").rangeControl();'.
+						'});';
 
 				// Initialize accordion.
 				$js_scripts[] = 'jQuery("#data_sets").zbx_vertical_accordion({handler: ".'.ZBX_STYLE_BTN_GEAR.'"});';
+
+				// Initialize range control fields.
+				$js_scripts[] = 'jQuery(".range-control").rangeControl();';
 
 				// Initialize sortability.
 				$js_scripts[] =

@@ -1785,3 +1785,84 @@ jQuery(function ($) {
 		}
 	};
 });
+
+
+jQuery(function ($) {
+	"use strict"
+
+	$.fn.rangeControl = function() {
+		var tmpl = $('<div class="range-control">' +
+				'<div class="range-control-track"/>' +
+				'<div class="range-control-progress"/>' +
+				'<datalist/>' +
+				'<div class="range-control-thumb"/>' +
+				'<input type="range"/>' +
+			'</div>');
+
+		function getRange(start, end, step) {
+			return (new Array(Math.round((end - start) / step))).join(0).split(0).map(function(_, i) {
+				return start + i * step;
+			});
+		}
+
+		function generateRangeElements(elm, range) {
+			$.map(range, function(value) {
+				$('<option/>').attr('value', value).appendTo(elm);
+			});
+		}
+
+		return $(this).each(function(_, input) {
+			var options = $(this).data('options'),
+				listid = (new Date()).getTime().toString(34),
+				$input = $(input),
+				$control = tmpl.clone(),
+				$range = $control.find('[type=range]'),
+				step = options.step || 1,
+				min = options.min,
+				max = options.max,
+				range = getRange(min, max, step),
+				interval = Math.ceil((max - min) / step) * step,
+				$datalist = $control.find('datalist').attr('id', listid),
+				$progress = $control.find('.range-control-progress'),
+				$thumb = $control.find('.range-control-thumb'),
+				updateHandler = function() {
+					var value = $range.val(),
+						shift = ((value - min) * 100 / interval);
+
+					$input.val(value);
+					$progress.css({width: shift + '%'});
+					$thumb.css({left: shift + '%'});
+				};
+
+			if (range) {
+				generateRangeElements($datalist, range);
+			}
+
+			$(this).removeAttr('data-options');
+
+			$range
+				.attr({
+					'list': listid,
+					'min': min,
+					'max': max,
+					'step': step,
+					'value': $input.val()
+				})
+				.change(updateHandler)
+				.focus(function() {
+					$control.addClass("range-control-focus");
+					$(document).on("mousemove", updateHandler);
+				})
+				.blur(function() {
+					$control.removeClass("range-control-focus");
+					$(document).off("mousemove", updateHandler);
+				})
+				.change();
+
+			$input
+				.change(function() {$range.val(this.value); updateHandler();})
+				.before($control);
+		});
+	}
+});
+

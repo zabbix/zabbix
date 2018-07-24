@@ -4198,6 +4198,79 @@ svg {
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
 
+[type=range] {
+  cursor: pointer;
+  -webkit-appearance: none;
+  /* Hides the slider so that custom slider can be made */
+  width: 100%;
+  /* Specific width is required for Firefox. */
+  background: transparent;
+  /* Otherwise white in Chrome */
+  vertical-align: middle;
+  height: 24px; }
+
+[type=range]:focus {
+  outline: none; }
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  cursor: pointer;
+  margin-top: 1px;
+  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  height: 10px;
+  width: 10px;
+  opacity: 0; }
+
+input[type=range]::-webkit-slider-runnable-track {
+  height: 10px;
+  opacity: 0; }
+
+.range-control {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 10px 0 0; }
+  .range-control .range-control-track, .range-control .range-control-progress {
+    position: absolute;
+    top: 50%;
+    margin-top: -1px;
+    left: 0;
+    height: 2px;
+    cursor: pointer; }
+  .range-control .range-control-thumb {
+    position: absolute;
+    top: 50%;
+    margin-top: -5px;
+    margin-left: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 1px white;
+    background: #555; }
+  .range-control .range-control-track {
+    width: 100%;
+    background: silver; }
+  .range-control .range-control-progress {
+    background: #555; }
+  .range-control datalist {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    top: 50%;
+    margin-top: -1px; }
+    .range-control datalist option {
+      padding: 0;
+      font-size: 0;
+      flex: 1 0 0px;
+      height: 2px;
+      border-left: 1px solid white; }
+
+.range-control-focus .range-control-thumb {
+  background: #555;
+  box-shadow: 0 0 1px black; }
+.range-control-focus .range-control-progress {
+  background: #555; }
+
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {
