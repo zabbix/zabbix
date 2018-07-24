@@ -138,8 +138,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				// Left column fields.
 				(new CFormList())
 					->addRow(_('Base color'),
-						(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
-							->appendColorPickerJs(false)
+						// Replaced to simple input field, because we don't have usable color picker now.
+						(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 7))
+						//(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
+						//	->appendColorPickerJs(false)
 					)
 					->addRow(_('Draw'),
 						(new CRadioButtonList($fn.'['.$options['row_num'].'][type]', (int) $value['type']))
@@ -148,18 +150,18 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 							->onChange(
 								'var row_num = this.id.replace("'.$fn.'_","").replace("_type","");'.
-								'switch(jQuery(":checked", jQuery(this)).val()) {'.
+								'switch (jQuery(":checked", jQuery(this)).val()) {'.
 									'case "'.SVG_GRAPH_TYPE_LINE.'":'.
-										'jQuery("#'.$fn.'_"+row_num+"_width").prop("disabled", false);'.
-										'jQuery("#'.$fn.'_"+row_num+"_radius").prop("disabled", true);'.
+										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
+										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
 										'break;'.
 									'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-										'jQuery("#'.$fn.'_"+row_num+"_width").prop("disabled", true);'.
-										'jQuery("#'.$fn.'_"+row_num+"_radius").prop("disabled", false);'.
+										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
+										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("enable");'.
 										'break;'.
 									'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
-										'jQuery("#'.$fn.'_"+row_num+"_width").prop("disabled", false);'.
-										'jQuery("#'.$fn.'_"+row_num+"_radius").prop("disabled", true);'.
+										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
+										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
 										'break;'.
 								'}'
 							)
