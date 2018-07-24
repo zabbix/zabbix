@@ -27,7 +27,6 @@ class CColor extends CDiv {
 	private $value;
 	private $is_enabled = true;
 	private $is_required = false;
-	private $append_color_picker_js = true;
 
 	/**
 	 * Creates a color picker form element.
@@ -69,20 +68,6 @@ class CColor extends CDiv {
 	}
 
 	/**
-	 * Append color picker javascript.
-	 *
-	 * @param bool $append
-	 *
-	 * @return CColor
-	 */
-	public function appendColorPickerJs($append = true)
-	{
-		$this->append_color_picker_js = $append;
-
-		return $this;
-	}
-
-	/**
 	 * Gets string representation of widget HTML content.
 	 *
 	 * @param bool $destroy
@@ -105,10 +90,6 @@ class CColor extends CDiv {
 		]);
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
-
-		if ($this->append_color_picker_js) {
-			insert_show_color_picker_javascript();
-		}
 
 		return parent::toString($destroy);
 	}
