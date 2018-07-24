@@ -5822,6 +5822,10 @@ svg {
 	}
 }
 
+.block-sr-only {
+	display: none;
+}
+
 @if $theme_name == 'dev' {
 
 /*doc
