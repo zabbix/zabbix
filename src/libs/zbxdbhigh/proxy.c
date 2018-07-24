@@ -3888,7 +3888,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		zbx_timespec_t	client_timediff_copy = client_timediff;
 		char			*token = NULL;
 		size_t			token_size = 0;
-		zbx_data_session_t	*session;
+		zbx_data_session_t	*session = NULL;
 
 		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);	/* return value */
 												/* not checked */
