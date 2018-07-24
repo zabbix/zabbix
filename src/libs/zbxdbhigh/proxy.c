@@ -3064,7 +3064,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 {
 	const char		*__function_name = "process_client_history_data";
 
-	int			ret = FAIL, values_num, read_num, processed_num = 0, total_num = 0, i;
+	int			ret, values_num, read_num, processed_num = 0, total_num = 0, i;
 	struct zbx_json_parse	jp_data;
 	zbx_timespec_t		client_timediff;
 	const char		*pnext = NULL;
