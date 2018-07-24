@@ -2405,7 +2405,7 @@ int	is_double(const char* str, unsigned char flags)
 		i++;
 	}
 
-	if ('-' == str[i] || '+' == str[i])				/* check leading sign */
+	if ('-' == str[i] || (0 != (flags & ZBX_FLAG_DOUBLE_UNARY_PLUS) && '+' == str[i]))				/* check leading sign */
 		i++;
 
 	while (0 != isdigit(str[i]))					/* check digits before dot */
