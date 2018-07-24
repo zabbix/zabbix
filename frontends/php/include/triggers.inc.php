@@ -694,7 +694,7 @@ function replace_template_dependencies($deps, $hostid) {
 }
 
 function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = []) {
+		array $trigger_options = [], $show_suppressed = null) {
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
@@ -731,6 +731,20 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 	}
 
 	$triggers = getTriggersWithActualSeverity($options);
+
+	if ($show_suppressed == 0) {
+		$suppressed_problems = API::Problem()->get([
+			'output' => ['objectid'],
+			'objectids' => array_keys($triggers),
+			'suppressed' => true
+		]);
+
+		foreach ($suppressed_problems as $suppressed_problem) {
+			if (array_key_exists($suppressed_problem['objectid'], $triggers)) {
+				unset($triggers[$suppressed_problem['objectid']]);
+			}
+		}
+	}
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
