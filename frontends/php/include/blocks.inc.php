@@ -318,7 +318,9 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 		}
 	}
 
-	$table = (new CTableInfo())->setHeader($header);
+	$table = (new CTableInfo())
+		->setHeader($header)
+		->setHeadingColumn(0);
 
 	$url_group = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
@@ -338,16 +340,12 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			continue;
 		}
 
-		$row = new CRow();
-
 		$url_group->setArgument('filter_groupids', [$group['groupid']]);
-		$name = new CLink($group['name'], $url_group->getUrl());
-
-		$row->addItem($name);
+		$row = [new CLink($group['name'], $url_group->getUrl())];
 
 		foreach ($group['stats'] as $severity => $stat) {
 			if ($stat['count'] == 0 && $stat['count_unack'] == 0) {
-				$row->addItem('');
+				$row[] = '';
 				continue;
 			}
 
@@ -369,21 +367,21 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 
 			switch ($filter_ext_ack) {
 				case EXTACK_OPTION_ALL:
-					$row->addItem(getSeverityCell($severity, null, $allTriggersNum));
+					$row[] = getSeverityCell($severity, null, $allTriggersNum);
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$row->addItem(getSeverityCell($severity, null, $unackTriggersNum));
+					$row[] = getSeverityCell($severity, null, $unackTriggersNum);
 					break;
 
 				case EXTACK_OPTION_BOTH:
 					if ($stat['count_unack'] != 0) {
-						$row->addItem(getSeverityCell($severity, $config, [
+						$row[] = getSeverityCell($severity, $config, [
 							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
-						]));
+						]);
 					}
 					else {
-						$row->addItem(getSeverityCell($severity, $config, $allTriggersNum));
+						$row[] = getSeverityCell($severity, $config, $allTriggersNum);
 					}
 					break;
 			}
@@ -405,7 +403,9 @@ function make_status_of_zbx() {
 		$server_details = '';
 	}
 
-	$table = (new CTableInfo())->setHeader([_('Parameter'), _('Value'), _('Details')]);
+	$table = (new CTableInfo())
+		->setHeader([_('Parameter'), _('Value'), _('Details')])
+		->setHeadingColumn(0);
 
 	$status = get_status();
 

@@ -21,22 +21,22 @@
 
 class CRow extends CTag {
 
-	public function __construct($item = null) {
+	public function __construct($item = null, $heading_column = null) {
 		parent::__construct('tr', true);
-		$this->addItem($item);
+		$this->addItem($item, $heading_column);
 	}
 
-	public function addItem($item) {
+	public function addItem($item, $heading_column = null) {
 		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
 			parent::addItem($item);
 		}
 		elseif (is_array($item)) {
-			foreach ($item as $el) {
+			foreach ($item as $key => $el) {
 				if (is_object($el) && strtolower(get_class($el)) === 'ccol') {
 					parent::addItem($el);
 				}
 				elseif (!is_null($el)) {
-					parent::addItem(new CCol($el));
+					parent::addItem(new CCol($el, ($heading_column !== null && $key == $heading_column)));
 				}
 			}
 		}

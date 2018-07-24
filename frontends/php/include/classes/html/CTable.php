@@ -26,6 +26,8 @@ class CTable extends CTag {
 	protected $colnum;
 	protected $rownum;
 
+	protected $heading_column = null;
+
 	public function __construct() {
 		parent::__construct('table', true);
 		$this->rownum = 0;
@@ -56,7 +58,7 @@ class CTable extends CTag {
 		}
 
 		if (!is_object($item) || strtolower(get_class($item)) !== 'crow') {
-			$item = new CRow($item);
+			$item = new CRow($item, $this->heading_column);
 			if ($id !== null) {
 				$item->setId($id);
 			}
@@ -77,6 +79,19 @@ class CTable extends CTag {
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
+		return $this;
+	}
+
+	/**
+	 * Format given column as row header.
+	 *
+	 * @param $heading_column  Columns index starts from 0.
+	 *
+	 * @return CTable
+	 */
+	public function setHeadingColumn($heading_column) {
+		$this->heading_column = $heading_column;
+
 		return $this;
 	}
 
