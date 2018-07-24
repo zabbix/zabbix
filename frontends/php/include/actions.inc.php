@@ -30,7 +30,7 @@ function condition_operator2str($operator) {
 		CONDITION_OPERATOR_LESS_EQUAL => '<=',
 		CONDITION_OPERATOR_NOT_IN => _('not in'),
 		CONDITION_OPERATOR_YES => _('Yes'),
-		CONDITION_OPERATOR_NO => _('No'),
+		CONDITION_OPERATOR_NO => _('No')
 	];
 
 	return $operators[$operator];

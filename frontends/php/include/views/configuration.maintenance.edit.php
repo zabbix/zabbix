@@ -194,18 +194,17 @@ if (!$tags) {
 	$tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
 }
 
-$tag_table = new CTable();
-$tag_table->setId('tags');
-
-$tag_table->addRow(
-	(new CCol(
-		(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
-			->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
-			->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
-			->setModern(true)
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
-	))->setColSpan(4)
-);
+$tag_table = (new CTable())
+	->setId('tags')
+	->addRow(
+		(new CCol(
+			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
+				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
+				->setModern(true)
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
+		))->setColSpan(4)
+	);
 
 $i = 0;
 foreach ($tags as $tag) {

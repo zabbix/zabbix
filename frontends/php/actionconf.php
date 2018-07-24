@@ -262,7 +262,7 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 	if ($newCondition) {
 		$conditions = getRequest('conditions', []);
 
-		// when adding new condition, in order to check for an existing condition, it must have a not null value
+		// When adding new condition, in order to check for an existing condition, it must have a not null value.
 		if ($newCondition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
 			$newCondition['value'] = '';
 		}
