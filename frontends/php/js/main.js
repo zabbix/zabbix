@@ -1661,12 +1661,15 @@ jQuery(function ($) {
 		var graph = $(this),
 			data = graph.data('graph'),
 			hbox = graph.data('hintbox'),
+			line = graph.find('.svg-value-box'),
 			html = null;
 
 		if (typeof data.boxing === 'undefined' || data.boxing === false) {
 			if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 					&& e.offsetY <= data.dimY + data.dimH) {
 				e.stopPropagation();
+
+				line.attr({x: e.clientX - 14});
 
 				var values = findValues(graph, e.offsetX, e.offsetY);
 				if (values.length) {
@@ -1699,6 +1702,12 @@ jQuery(function ($) {
 						});
 				}
 			}
+			else {
+				line.attr('x', -1);
+			}
+		}
+		else {
+			line.attr('x', -1);
 		}
 
 		if (html === null) {
@@ -1716,8 +1725,9 @@ jQuery(function ($) {
 			}, options);
 
 			// ---<--- testing data:
-			//options.values = true;
-			//options.sbox = false;
+			options.values = true;
+			options.problems = false;
+			options.sbox = false;
 			// --->--- testing data.
 
 			this.each(function() {
@@ -1763,11 +1773,13 @@ jQuery(function ($) {
 						.on('mouseout', function() {
 							var graph = $(this),
 								data = graph.data('graph'),
+								line = graph.find('.svg-value-box'),
 								hbox = (options.values || options.problems) ? graph.data('hintbox') : false;
 
 							if (hbox) {
 								graph.removeData('hintbox');
 								$(hbox).remove();
+								line.attr('x', -1);
 							}
 
 							if (options.sbox) {
@@ -1790,7 +1802,6 @@ jQuery(function ($) {
 		}
 	};
 });
-
 
 jQuery(function ($) {
 	"use strict"
@@ -1896,4 +1907,3 @@ jQuery(function ($) {
 		}
 	};
 });
-
