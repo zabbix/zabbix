@@ -11549,7 +11549,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 	zbx_hashset_iter_reset(&config->data_sessions, &iter);
 	while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (session->lastaccess + SEC_PER_DAY >= now)
+		if (session->lastaccess + SEC_PER_DAY <= now)
 		{
 			__config_mem_free_func((char *)session->token);
 			zbx_hashset_iter_remove(&iter);
@@ -11558,4 +11558,3 @@ void	zbx_dc_cleanup_data_sessions(void)
 
 	UNLOCK_CACHE;
 }
-
