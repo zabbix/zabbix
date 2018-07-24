@@ -35,7 +35,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 7],
+			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
@@ -140,13 +140,47 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		foreach ($this->value as $index => $val) {
 			// At least host or item pattern must be specified.
-			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
-					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
+			if (!array_key_exists('hosts', $val) || $val['hosts'] === ''
+					|| !array_key_exists('items', $val) || $val['items'] === '') {
 				unset($this->value[$index]);
 			}
 		}
 
 		return $this;
+	}
+
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+		$values = $this->getValue();
+		$color_validator = new CColorValidator();
+
+		// Validate options.
+		if (!$errors && $strict) {
+			foreach ($values as $override) {
+				$options_set = 0;
+				foreach ($override as $option => $val) {
+					if (!in_array($option, $this->override_options)) {
+						continue;
+					}
+
+					if ($option === 'color' && !$color_validator->validate($val)) {
+						$errors[]
+							= _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $val);
+					}
+					elseif ($option === 'timeshift' && timeUnitToSeconds($val, true) === null) {
+						$errors[]
+							= _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
+					}
+					$options_set++;
+				}
+
+				if ($options_set == 0) {
+					$errors[] = _s('Override options are not specified.');
+				}
+			}
+		}
+
+		return $errors;
 	}
 
 	/**
@@ -221,7 +255,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				[
 					'name' => _('ADD OVERRIDE'),
 					'options' => [
-						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '#000000']],
+						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '000000']],
 
 						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
 						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
