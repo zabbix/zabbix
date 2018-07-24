@@ -31,7 +31,9 @@ else {
 $filter_form = (new CFormList())
 	->addRow(_('Severity'),
 		new CSeverity([
-			'name' => 'filter_priority', 'value' => (int) $data['filter_priority'], 'all' => true
+			'name' => 'filter_priority',
+			'value' => (int) $data['filter_priority'],
+			'all' => true
 		])
 	)
 	->addRow(_('State'),
@@ -49,7 +51,7 @@ $filter_form = (new CFormList())
 			->setModern(true)
 	);
 
-if (!$data['is_template']) {
+if ($data['show_value_column']) {
 	$filter_form->addRow(_('Value'),
 		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
@@ -63,6 +65,7 @@ $filter = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [$filter_form]);
+
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls(new CList([
@@ -99,31 +102,24 @@ if ($data['hostid']) {
 $widget->addItem($filter);
 
 // create form
-$triggersForm = (new CForm())
+$triggers_form = (new CForm())
 	->setName('triggersForm')
 	->addVar('hostid', $data['hostid']);
 
-
-$header = [
+// create table
+$triggers_table = (new CTableInfo())->setHeader([
 	(new CColHeader(
 		(new CCheckBox('all_triggers'))
-			->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'])
-];
-if (!$data['is_template']) {
-	$header[] =_('Value');
-}
-$header = array_merge($header, [
+	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder']),
+	$data['show_value_column'] ? _('Value') : null,
 	($data['hostid'] == 0) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder']),
 	$data['showInfoColumn'] ? _('Info') : null
 ]);
-
-// create table
-$triggersTable = (new CTableInfo())->setHeader($header);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
@@ -247,12 +243,14 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		getSeverityCell($trigger['priority'], $data['config'])
 	];
-	if (!$data['is_template']) {
+
+	if ($data['show_value_column']) {
 		$row[] = (new CSpan(trigger_value2str($trigger['value'])))->addClass(
-				($trigger['value'] == TRIGGER_VALUE_TRUE) ? ZBX_STYLE_PROBLEM_ACK_FG : ZBX_STYLE_OK_ACK_FG
+			($trigger['value'] == TRIGGER_VALUE_TRUE) ? ZBX_STYLE_PROBLEM_UNACK_FG : ZBX_STYLE_OK_UNACK_FG
 		);
 	}
-	$triggersTable->addRow(array_merge($row, [
+
+	$triggers_table->addRow(array_merge($row, [
 		$hosts,
 		$description,
 		$expression,
@@ -264,8 +262,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');
 
 // append table to form
-$triggersForm->addItem([
-	$triggersTable,
+$triggers_form->addItem([
+	$triggers_table,
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
@@ -280,6 +278,6 @@ $triggersForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($triggersForm);
+$widget->addItem($triggers_form);
 
 return $widget;
