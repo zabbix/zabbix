@@ -786,7 +786,7 @@ class CScreenProblem extends CScreenBase {
 						$link
 					)->addStyle('width: 120px;'),
 				]);
-				if ($this->data['filter']['show'] < TRIGGERS_OPTION_IN_PROBLEM) {
+				if ((int) $this->data['filter']['show'] !== TRIGGERS_OPTION_IN_PROBLEM) {
 					$header[] = (new CColHeader(_('Recovery time')))->addStyle('width: 115px;');
 				}
 
@@ -813,7 +813,7 @@ class CScreenProblem extends CScreenBase {
 						$link
 					),
 				]);
-				if ($this->data['filter']['show'] < TRIGGERS_OPTION_IN_PROBLEM) {
+				if ((int) $this->data['filter']['show'] !== TRIGGERS_OPTION_IN_PROBLEM) {
 					$header[] = (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 
