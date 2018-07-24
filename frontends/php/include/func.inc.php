@@ -379,18 +379,6 @@ function hex2rgb($color) {
 	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
-function getColorComplementaries(array $color_palette, $colors_requested, $start = 0) {
-	$color_palette_length = count($color_palette);
-	$shift = round($color_palette_length / $colors_requested);
-	$complementaries = [];
-	$found = 0;
-
-	while ($colors_requested > $found) {
-		$complementaries[] = $color_palette[($start + (++$found * $shift)) % $color_palette_length];
-	}
-	return $complementaries;
-}
-
 function getColorVariations($color, $variations_requested = 1) {
 	if (1 >= $variations_requested) {
 		return [$color];
@@ -823,7 +811,7 @@ function convert_units($options = []) {
  * @param string $time
  * @param bool   $allow_negative   Allow time to be negative.
  *
- * @return int
+ * @return int   Integer for valid input. Null otherwise.
  */
 function timeUnitToSeconds($time, $allow_negative = false) {
 	$re = $allow_negative
@@ -833,7 +821,10 @@ function timeUnitToSeconds($time, $allow_negative = false) {
 
 	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
-	if (array_key_exists('suffix', $matches)) {
+	if (!array_key_exists('number', $matches)) {
+		return null;
+	}
+	elseif (array_key_exists('suffix', $matches)) {
 		$time = $matches['number'];
 
 		switch ($matches['suffix']) {

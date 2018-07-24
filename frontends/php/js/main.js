@@ -1715,6 +1715,11 @@ jQuery(function ($) {
 				values: false
 			}, options);
 
+			// ---<--- testing data:
+			//options.values = true;
+			//options.sbox = false;
+			// --->--- testing data.
+
 			this.each(function() {
 				var graph = $(this),
 					graph_data = {

@@ -679,7 +679,7 @@ class CSvgGraph extends CSvg {
 		 * $gap_interval is a time distance between missing points used to fulfill gaps of missing data. It's unique
 		 * for each gap.
 		 */
-		$average_distance = array_sum($points_distance) / count($points_distance);
+		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
 		$threshold = $points_distance ? $average_distance * 3 : 0;
 		$added_value = [
 			SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO => 0,

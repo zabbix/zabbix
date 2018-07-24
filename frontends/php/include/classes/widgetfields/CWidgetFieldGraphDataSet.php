@@ -21,6 +21,8 @@
 
 class CWidgetFieldGraphDataSet extends CWidgetField {
 
+	public $color_palete;
+
 	/**
 	 * Create widget field for Data set selection.
 	 *
@@ -47,13 +49,19 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		]]);
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
 		$this->setDefault([]);
+
+		// Specify color palete for data-set colors.
+		$this->color_palete = [
+			'ff465c','b0af07','0ec9ac','524bbc','ed1248','d1e754','2ab5ff','385cc7','ec1594','bae37d',
+			'6ac8ff','ee2b29','3ca20d','6f4bbc','00a1ff','f3601b','1cae59','45cfdb','894bbc','6d6d6d'
+		];
 	}
 
 	public function getDefault() {
 		return [
 			'hosts' => '',
 			'items' => '',
-			'color' => '0062fd',
+			'color' => $this->color_palete[0],
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'width' => 1,
 			'radius' => 3,
@@ -139,7 +147,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				(new CFormList())
 					->addRow(_('Base color'),
 						// Replaced to simple input field, because we don't have usable color picker now.
-						(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 7))
+						(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 6))
 						//(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
 						//	->appendColorPickerJs(false)
 					)
@@ -234,9 +242,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		CArrayHelper::sort($this->value, ['order' => ZBX_SORT_UP]);
 
 		foreach ($this->value as $index => $val) {
-			// At least host or item pattern must be specified.
-			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
-					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
+			/**
+			 * Host pattern, item pattern and color are all mandatory fields.
+			 * Color is not validated here, because it makes wrong error message later (e.g., if color is not specified,
+			 * error message says that data set is empty).
+			 */
+			if (!array_key_exists('hosts', $val) || $val['hosts'] === ''
+					|| !array_key_exists('items', $val) || $val['items'] === '') {
 				unset($this->value[$index]);
 			}
 		}
@@ -246,10 +258,33 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 	public function validate($strict = false) {
 		$errors = parent::validate($strict);
+		$values = $this->getValue();
 
 		// At least on data set is mandatory.
-		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$this->getValue()) {
+		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$values) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Data set'), _('cannot be empty'));
+		}
+
+		// Validate timeshift values.
+		if (!$errors && $strict) {
+			foreach ($values as $val) {
+				if (array_key_exists('timeshift', $val) && $val['timeshift'] !== ''
+						&& timeUnitToSeconds($val['timeshift'], true) === null) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
+				}
+			}
+		}
+
+		// Validate color.
+		if (!$errors && $strict) {
+			$color_validator = new CColorValidator();
+
+			foreach ($values as $val) {
+				if (!array_key_exists('color', $val) || !$color_validator->validate($val['color'])) {
+					$errors[] = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).',
+						$val['color']);
+				}
+			}
 		}
 
 		return $errors;

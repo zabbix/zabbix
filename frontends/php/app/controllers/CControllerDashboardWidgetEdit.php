@@ -730,8 +730,10 @@ class CControllerDashboardWidgetEdit extends CController {
 				// Add dynamicRows template.
 				$jq_templates['dataset-row'] = (new CListItem(
 					$field->getFieldLayout(
-						$field->getDefault(),
-						[
+						array_merge(
+							$field->getDefault(),
+							['color' => '#{color}']
+						), [
 							'row_num' => '#{rowNum}',
 							'order_num' => '#{orderNum}',
 							'letter_id' => '#{formulaId}',
@@ -754,6 +756,10 @@ class CControllerDashboardWidgetEdit extends CController {
 							'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 							'dataCallback: function(data) {'.
 								'data.formulaId = num2letter(data.rowNum);'.
+								'data.color= function(num) {'.
+									'var palete = '.CJs::encodeJson($field->color_palete).';'.
+									'return palete[num % palete.length];'.
+								'}(data.rowNum);'.
 								'data.orderNum = data.rowNum + 1;'.
 								'return data;'.
 							'}'.

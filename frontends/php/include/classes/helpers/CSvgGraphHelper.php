@@ -275,80 +275,75 @@ class CSvgGraphHelper {
 			$data_set = $data_sets[$data_set_num];
 			$data_set_num++;
 
-			// TODO miks: still not clear how valid data set looks like. Fix this if needed.
-			if (!array_key_exists('hosts', $data_set)) {
-				$data_set['hosts'] = '*';
-			}
-			if (!array_key_exists('items', $data_set)) {
-				$data_set['items'] = '*';
-			}
-
-			if ($data_set['hosts'] === '' || $data_set['items'] === '') {
+			/**
+			 * TODO miks: still not clear how valid data set looks like. Fix this if needed.
+			 * Currently, both fields must be filed.
+			 */
+			if ((!array_key_exists('hosts', $data_set) || $data_set['hosts'] === '')
+					|| (!array_key_exists('items', $data_set) || $data_set['items'] === '')) {
 				continue;
 			}
 
 			// Find hosts.
-			if ($data_set['hosts'] !== '') {
-				$matching_hosts = API::Host()->get([
-					'output' => [],
+			$matching_hosts = API::Host()->get([
+				'output' => [],
+				'searchWildcardsEnabled' => true,
+				'search' => [
+					'name' => self::processPattern($data_set['hosts'])
+				],
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP,
+				'preservekeys' => true
+			]);
+
+			if ($matching_hosts) {
+				$matching_items = API::Item()->get([
+					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid',
+						'delay'
+					],
+					'hostids' => array_keys($matching_hosts),
+					'selectHosts' => ['hostid', 'name'],
 					'searchWildcardsEnabled' => true,
 					'search' => [
-						'name' => self::processPattern($data_set['hosts'])
+						'name' => self::processPattern($data_set['items'])
+					],
+					'filter' => [
+						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
+					'limit' => SVG_GRAPH_MAX_NUMBER_OF_METRICS - count($metrics),
 					'preservekeys' => true
 				]);
 
-				if ($matching_hosts) {
-					$matching_items = API::Item()->get([
-						'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid',
-							'delay'
-						],
-						'hostids' => array_keys($matching_hosts),
-						'selectHosts' => ['hostid', 'name'],
-						'searchWildcardsEnabled' => true,
-						'search' => [
-							'name' => self::processPattern($data_set['items'])
-						],
-						'filter' => [
-							'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
-						],
-						'sortfield' => 'name',
-						'sortorder' => ZBX_SORT_UP,
-						'limit' => SVG_GRAPH_MAX_NUMBER_OF_METRICS - count($metrics),
-						'preservekeys' => true
-					]);
+				if (!$matching_items) {
+					continue;
+				}
 
-					if (!$matching_items) {
-						continue;
-					}
+				unset($data_set['hosts'], $data_set['items']);
 
-					unset($data_set['hosts'], $data_set['items']);
+				// Add display options and append to $metrics list.
+				if (!array_key_exists('color', $data_set) && $data_set['color'] === '') {
+					// TODO miks: no workflow specified. Consult Andzs and fix it.
+					exit('No color specified');
+				}
+				if (substr($data_set['color'], 0, 1) !== '#') {
+					$data_set['color'] = '#'.$data_set['color'];
+				}
 
-					// Add display options and append to $metrics list.
-					if (!array_key_exists('color', $data_set) && $data_set['color'] === '') {
-						// TODO miks: no workflow specified. Consult Andzs and fix it.
-						exit('No color specified');
-					}
-					if (substr($data_set['color'], 0, 1) !== '#') {
-						$data_set['color'] = '#'.$data_set['color'];
-					}
+				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
+					? (int) timeUnitToSeconds($data_set['timeshift'], true)
+					: 0;
 
-					$data_set['timeshift'] = ($data_set['timeshift'] !== '')
-						? (int) timeUnitToSeconds($data_set['timeshift'], true)
-						: 0;
+				$colors = (count($matching_items) > 1)
+					? getColorVariations($data_set['color'], count($matching_items))
+					: [$data_set['color']];
 
-					$colors = (count($matching_items) > 1)
-						? getColorVariations($data_set['color'], count($matching_items))
-						: [$data_set['color']];
-
-					$i = 0;
-					foreach ($matching_items as $item) {
-						$data_set['color'] = $colors[$i];
-						$metrics[] = $item + ['options' => $data_set];
-						$i++;
-					}
+				$i = 0;
+				foreach ($matching_items as $item) {
+					$data_set['color'] = $colors[$i];
+					$metrics[] = $item + ['options' => $data_set];
+					$i++;
 				}
 			}
 		}
@@ -369,14 +364,8 @@ class CSvgGraphHelper {
 			}
 
 			// TODO miks: still not clear how valid override looks like. Fix this if needed.
-			if (!array_key_exists('hosts', $override)) {
-				$override['hosts'] = '*';
-			}
-			if (!array_key_exists('items', $override)) {
-				$override['items'] = '*';
-			}
-
-			if ($override['hosts'] === '' || $override['items'] === '') {
+			if ((!array_key_exists('hosts', $override) || $override['hosts'] === '')
+					|| (!array_key_exists('items', $override) || $override['items'] === '')) {
 				continue;
 			}
 
