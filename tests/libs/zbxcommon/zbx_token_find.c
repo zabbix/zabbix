@@ -24,6 +24,17 @@
 
 #include "common.h"
 
+static void	compare_token(const char *prefix, const char *path, char *expression, size_t l, size_t r)
+{
+	char	*end, c;
+
+	end = &expression[r + 1];
+	c = *end;
+	*end = '\0';
+	zbx_mock_assert_str_eq(prefix, zbx_mock_get_parameter_string(path), expression + l);
+	*end = c;
+}
+
 static void	get_exp_value_and_compare(const char *param, size_t found_value)
 {
 	zbx_uint32_t	expected_value;
@@ -52,30 +63,39 @@ static void	compare_token_user_macro(zbx_token_t *token)
 	get_exp_value_and_compare("out.context_r", token->data.user_macro.context.r);
 }
 
-static void	compare_token_func_macro_values(zbx_token_t *token)
+static void	compare_token_func_macro_values(char *expression, zbx_token_t *token)
 {
-	get_exp_value_and_compare("out.token_l", token->token.l);
-	get_exp_value_and_compare("out.token_r", token->token.r);
+	zbx_mock_handle_t	handle;
+	char			*parameter;
 
-	get_exp_value_and_compare("out.macro_l", token->data.func_macro.macro.l);
-	get_exp_value_and_compare("out.macro_r", token->data.func_macro.macro.r);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
+	{
+		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
 
-	get_exp_value_and_compare("out.func_l", token->data.func_macro.func.l);
-	get_exp_value_and_compare("out.func_r", token->data.func_macro.func.r);
+		compare_token("Invalid macro", "out.macro", expression, token->data.func_macro.macro.l,
+				token->data.lld_func_macro.macro.r);
 
-	get_exp_value_and_compare("out.func_param_l", token->data.func_macro.func_param.l);
-	get_exp_value_and_compare("out.func_param_r", token->data.func_macro.func_param.r);
-}
+		compare_token("Invalid func", "out.func", expression, token->data.func_macro.func.l,
+				token->data.lld_func_macro.func.r);
 
-static void	compare_token(const char *prefix, const char *path, char *expression, size_t l, size_t r)
-{
-	char	*end, c;
+		compare_token("Invalid param", "out.param", expression, token->data.func_macro.func_param.l,
+				token->data.lld_func_macro.func_param.r);
+	}
+	else
+	{
+		get_exp_value_and_compare("out.token_l", token->token.l);
+		get_exp_value_and_compare("out.token_r", token->token.r);
 
-	end = &expression[r + 1];
-	c = *end;
-	*end = '\0';
-	zbx_mock_assert_str_eq(prefix, zbx_mock_get_parameter_string(path), expression + l);
-	*end = c;
+		get_exp_value_and_compare("out.macro_l", token->data.func_macro.macro.l);
+		get_exp_value_and_compare("out.macro_r", token->data.func_macro.macro.r);
+
+		get_exp_value_and_compare("out.func_l", token->data.func_macro.func.l);
+		get_exp_value_and_compare("out.func_r", token->data.func_macro.func.r);
+
+		get_exp_value_and_compare("out.func_param_l", token->data.func_macro.func_param.l);
+		get_exp_value_and_compare("out.func_param_r", token->data.func_macro.func_param.r);
+	}
 }
 
 static void	compare_token_lld_func_macro_values(char *expression, zbx_token_t *token)
@@ -140,7 +160,7 @@ void	zbx_mock_test_entry(void **state)
 				compare_token_lld_func_macro_values(expression, &token);
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
-				compare_token_func_macro_values(&token);
+				compare_token_func_macro_values(expression, &token);
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				compare_token_user_macro(&token);
