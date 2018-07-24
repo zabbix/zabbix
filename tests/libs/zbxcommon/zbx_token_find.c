@@ -67,19 +67,50 @@ static void	compare_token_func_macro_values(zbx_token_t *token)
 	get_exp_value_and_compare("out.func_param_r", token->data.func_macro.func_param.r);
 }
 
-static void	compare_token_lld_func_macro_values(zbx_token_t *token)
+static void	compare_token(const char *prefix, const char *path, char *expression, size_t l, size_t r)
 {
-	get_exp_value_and_compare("out.token_l", token->token.l);
-	get_exp_value_and_compare("out.token_r", token->token.r);
+	char	*end, c;
 
-	get_exp_value_and_compare("out.macro_l", token->data.lld_func_macro.macro.l);
-	get_exp_value_and_compare("out.macro_r", token->data.lld_func_macro.macro.r);
+	end = &expression[r + 1];
+	c = *end;
+	*end = '\0';
+	zbx_mock_assert_str_eq(prefix, zbx_mock_get_parameter_string(path), expression + l);
+	*end = c;
+}
 
-	get_exp_value_and_compare("out.func_l", token->data.lld_func_macro.func.l);
-	get_exp_value_and_compare("out.func_r", token->data.lld_func_macro.func.r);
+static void	compare_token_lld_func_macro_values(char *expression, zbx_token_t *token)
+{
+	zbx_mock_handle_t	handle;
+	char			*parameter;
 
-	get_exp_value_and_compare("out.func_param_l", token->data.lld_func_macro.func_param.l);
-	get_exp_value_and_compare("out.func_param_r", token->data.lld_func_macro.func_param.r);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
+	{
+		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+
+		compare_token("Invalid macro", "out.macro", expression, token->data.lld_func_macro.macro.l,
+				token->data.lld_func_macro.macro.r);
+
+		compare_token("Invalid func", "out.func", expression, token->data.lld_func_macro.func.l,
+				token->data.lld_func_macro.func.r);
+
+		compare_token("Invalid param", "out.param", expression, token->data.lld_func_macro.func_param.l,
+				token->data.lld_func_macro.func_param.r);
+	}
+	else
+	{
+		get_exp_value_and_compare("out.token_l", token->token.l);
+		get_exp_value_and_compare("out.token_r", token->token.r);
+
+		get_exp_value_and_compare("out.macro_l", token->data.lld_func_macro.macro.l);
+		get_exp_value_and_compare("out.macro_r", token->data.lld_func_macro.macro.r);
+
+		get_exp_value_and_compare("out.func_l", token->data.lld_func_macro.func.l);
+		get_exp_value_and_compare("out.func_r", token->data.lld_func_macro.func.r);
+
+		get_exp_value_and_compare("out.func_param_l", token->data.lld_func_macro.func_param.l);
+		get_exp_value_and_compare("out.func_param_r", token->data.lld_func_macro.func_param.r);
+	}
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -98,8 +129,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == expected_ret)
 	{
-		zbx_mock_str_to_token_type(zbx_mock_get_parameter_string("out.token_type"),
-				&expected_token_type);
+		zbx_mock_str_to_token_type(zbx_mock_get_parameter_string("out.token_type"), &expected_token_type);
 
 		if (expected_token_type != token.type)
 			fail_msg("Expected token type does not match type found");
@@ -107,7 +137,7 @@ void	zbx_mock_test_entry(void **state)
 		switch (expected_token_type)
 		{
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
-				compare_token_lld_func_macro_values(&token);
+				compare_token_lld_func_macro_values(expression, &token);
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
 				compare_token_func_macro_values(&token);

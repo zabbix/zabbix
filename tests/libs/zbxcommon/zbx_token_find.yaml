@@ -59,4 +59,15 @@ in:
   expression: '{$:"A"}'
 out:
   return: 'FAIL'
+---
+test case: "LLD macro with function"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
 ...
