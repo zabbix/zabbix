@@ -128,9 +128,12 @@
 				methods.hide();
 			},
 			/**
-			 * TODO: docs
+			 * Set desired color to input element and color box associated with input element.
+			 *
+			 * @param string id       Id of input element.
+			 * @param string color    Hex color value.
 			 */
-			set_color_by_name: function(id, event) {
+			set_color_by_name: function(id, color) {
 				current_label = $('#lbl_' + id);
 				current_text = $('#' + id);
 				methods.set_color(color);
