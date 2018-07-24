@@ -1,5 +1,5 @@
 ---
-test case: "successfully found low-level discovery function macros token #1"
+test case: "successfully found low-level discovery function macros token"
 in:
   expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
 out:
@@ -14,7 +14,13 @@ out:
   func_param_l: 18
   func_param_r: 38
 ---
-test case: "successfully found function macros token #2"
+test case: "invalid low-level discovery function macros token"
+in:
+  expression: '{{#}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found function macros token"
 in:
   expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")}'
 out:
@@ -28,4 +34,29 @@ out:
   func_r: 54
   func_param_l: 24
   func_param_r: 54
+---
+test case: "invalid function macros token"
+in:
+  expression: '{{}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found user macros token"
+in:
+  expression: '{$MACRO:"A"}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_USER_MACRO
+  token_l: 0
+  token_r: 11
+  name_l: 2
+  name_r: 6
+  context_l: 8
+  context_r: 10
+---
+test case: "invalid user macros token"
+in:
+  expression: '{$:"A"}'
+out:
+  return: 'FAIL'
 ...

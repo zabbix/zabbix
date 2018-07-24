@@ -40,6 +40,18 @@ static void	get_exp_value_and_compare(const char *param, size_t found_value)
 	}
 }
 
+static void	compare_token_user_macro(zbx_token_t *token)
+{
+	get_exp_value_and_compare("out.token_l", token->token.l);
+	get_exp_value_and_compare("out.token_r", token->token.r);
+
+	get_exp_value_and_compare("out.name_l", token->data.user_macro.name.l);
+	get_exp_value_and_compare("out.name_r", token->data.user_macro.name.r);
+
+	get_exp_value_and_compare("out.context_l", token->data.user_macro.context.l);
+	get_exp_value_and_compare("out.context_r", token->data.user_macro.context.r);
+}
+
 static void	compare_token_func_macro_values(zbx_token_t *token)
 {
 	get_exp_value_and_compare("out.token_l", token->token.l);
@@ -80,25 +92,28 @@ void	zbx_mock_test_entry(void **state)
 
 	expression = zbx_mock_get_parameter_string("in.expression");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	zbx_mock_str_to_token_type(zbx_mock_get_parameter_string("out.token_type"),
-			&expected_token_type);
 
 	zbx_mock_assert_result_eq("zbx_token_find() return code", expected_ret,
 			zbx_token_find(expression, 0, &token, ZBX_TOKEN_SEARCH_BASIC));
 
 	if (SUCCEED == expected_ret)
 	{
+		zbx_mock_str_to_token_type(zbx_mock_get_parameter_string("out.token_type"),
+				&expected_token_type);
+
 		if (expected_token_type != token.type)
 			fail_msg("Expected token type does not match type found");
 
 		switch (expected_token_type)
 		{
-			case ZBX_TOKEN_FUNC_MACRO:
-				compare_token_func_macro_values(&token);
-				break;
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				compare_token_lld_func_macro_values(&token);
 				break;
+			case ZBX_TOKEN_FUNC_MACRO:
+				compare_token_func_macro_values(&token);
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				compare_token_user_macro(&token);
 		}
 	}
 }
