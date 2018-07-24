@@ -608,6 +608,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				foreach ($overrides as $override) {
 					$options = [
 						'row_num' => $i,
+						'order_num' => $i + 1,
 						'form_name' => $form->getName()
 					];
 
@@ -630,7 +631,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				$jq_templates['overrides-row'] = (new CListItem(
 					$field->getFieldLayout(
 						['hosts' => '', 'items' => ''],
-						['row_num' => '#{rowNum}', 'form_name' => $form->getName()]
+						['row_num' => '#{rowNum}', 'order_num' => '#{orderNum}', 'form_name' => $form->getName()]
 					)
 				))
 					->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
@@ -657,7 +658,11 @@ class CControllerDashboardWidgetEdit extends CController {
 						'beforeRow: ".overrides-foot",'.
 						'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
 						'add: "#override-add",'.
-						'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
+						'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
+						'dataCallback: function(data) {'.
+							'data.orderNum = data.rowNum + 1;'.
+							'return data;'.
+						'}'.
 					'})'.
 					'.bind("tableupdate.dynamicRows", function(event, options) {'.
 						'initializeOverrides();'.
@@ -674,7 +679,14 @@ class CControllerDashboardWidgetEdit extends CController {
 					'tolerance: "pointer",'.
 					'cursor: "move",'.
 					'opacity: 0.6,'.
-					'axis: "y"'.
+					'axis: "y",'.
+					'update: function() {'.
+						'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
+							'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
+						'}).each(function(i) {'.
+							'jQuery(this).val(i + 1);'.
+						'});'.
+					'}'.
 				'});';
 			}
 			elseif ($field instanceof CWidgetFieldGraphDataSet) {
@@ -694,6 +706,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 					$options = [
 						'row_num' => $i,
+						'order_num' => $i + 1,
 						'letter_id' => num2letter($i),
 						'form_name' => $form->getName(),
 						'is_opened' => ($i == 0)
@@ -720,6 +733,7 @@ class CControllerDashboardWidgetEdit extends CController {
 						$field->getDefault(),
 						[
 							'row_num' => '#{rowNum}',
+							'order_num' => '#{orderNum}',
 							'letter_id' => '#{formulaId}',
 							'form_name' => $form->getName(),
 							'is_opened' => false
@@ -739,6 +753,7 @@ class CControllerDashboardWidgetEdit extends CController {
 						'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 						'dataCallback: function(data) {'.
 							'data.formulaId = num2letter(data.rowNum);'.
+							'data.orderNum = data.rowNum + 1;'.
 							'return data;'.
 						'}'.
 					'});';
@@ -755,7 +770,14 @@ class CControllerDashboardWidgetEdit extends CController {
 						'tolerance: "pointer",'.
 						'cursor: "move",'.
 						'opacity: 0.6,'.
-						'axis: "y"'.
+						'axis: "y",'.
+						'update: function() {'.
+							'jQuery("input[type=hidden]", jQuery("#data_sets")).filter(function() {'.
+								'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
+							'}).each(function(i) {'.
+								'jQuery(this).val(i + 1);'.
+							'});'.
+						'}'.
 					'});';
 			}
 			elseif ($field instanceof CWidgetFieldEmbed) {

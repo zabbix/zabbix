@@ -40,6 +40,7 @@ class CSvgGraph extends CSvg {
 	protected $draw_line_width;
 	protected $height;
 	//protected $max_clock;
+	protected $make_sbox;
 	protected $max_value_left;
 	protected $max_value_right;
 	protected $metrics;
@@ -48,6 +49,12 @@ class CSvgGraph extends CSvg {
 	protected $min_value_left;
 	protected $min_value_right;
 	protected $legend_type;
+
+	protected $left_y_max;
+	protected $left_y_min;
+	protected $left_y_show;
+	protected $left_y_units;
+
 	protected $offset_bottom;
 	protected $offset_left;
 	protected $offset_right;
@@ -56,8 +63,12 @@ class CSvgGraph extends CSvg {
 	protected $time_from;
 	protected $time_to;
 	protected $width;
-	protected $left_y_axis;
-	protected $right_y_axis;
+
+	protected $right_y_max;
+	protected $right_y_min;
+	protected $right_y_show;
+	protected $right_y_units;
+
 	protected $x_axis;
 
 	public function __construct($width, $height, $options) {
@@ -66,8 +77,6 @@ class CSvgGraph extends CSvg {
 		$this->metrics = [];
 		$this->points = [];
 		$this->problems = [];
-//		$this->annotations_simple = [];
-//		$this->annotations_range = [];
 
 		$this->width = $width;
 		$this->height = $height;
@@ -76,17 +85,22 @@ class CSvgGraph extends CSvg {
 		$this->draw_fill = 0.1;
 
 		$this->legend_type = SVG_GRAPH_LEGEND_TYPE_NONE;
-
-		$this->left_y_axis = false;
-		$this->right_y_axis = false;
 		$this->x_axis = false;
 
 		$this->min_value_left = null;
 		$this->max_value_left = null;
 		$this->min_value_right = null;
 		$this->max_value_right = null;
-		//$this->min_clock = null;
-		//$this->max_clock = null;
+
+		$this->left_y_show = false;
+		$this->left_y_min = null;
+		$this->left_y_max = null;
+		$this->left_y_units = null;
+
+		$this->right_y_show = false;
+		$this->right_y_min = null;
+		$this->right_y_max = null;
+		$this->right_y_units = null;
 
 		$this->color_background = '#FFFFFF';
 		$this->color_metric = '#00AA00';
@@ -95,8 +109,27 @@ class CSvgGraph extends CSvg {
 		$this->color_legend = '#BBBBBB';
 		$this->color_annotation = '#AA4455';
 
+		// SBox available only for graphs without overriten relative time.
+		$this->make_sbox = (array_key_exists('dashboard_time', $options) && $options['dashboard_time']);
+
 		$this->setAttribute('width', $this->width.'px');
 		$this->setAttribute('height', $this->height.'px');
+	}
+
+	public function getCanvasX() {
+		return $this->canvas_x;
+	}
+
+	public function getCanvasY() {
+		return $this->canvas_y;
+	}
+
+	public function getCanvasWidth() {
+		return $this->canvas_width;
+	}
+
+	public function getCanvasHeight() {
+		return $this->canvas_height;
 	}
 
 	public function addProblems(array $problems = []) {
@@ -163,92 +196,105 @@ class CSvgGraph extends CSvg {
 		return $this;
 	}
 
-	private function calculateDimensions() {
-		// Get values for left Y axis if not specified by user.
-		if ($this->left_y_axis !== false) {
-			if (!array_key_exists('min', $this->left_y_axis)) {
-				$this->left_y_axis['min'] = $this->min_value_left;
-			}
-			if (!array_key_exists('max', $this->left_y_axis)) {
-				$this->left_y_axis['max'] = $this->max_value_left;
-			}
-			if (!array_key_exists('units', $this->left_y_axis)) {
-				$this->left_y_axis['units'] = reset($this->metrics)['units'];
-			}
-
-			// Disable left Y axis if it is not used for metrics.
-			if ($this->left_y_axis['min'] === null) {
-				$this->left_y_axis = false;
-			}
-		}
-
-		// Get values for right Y axis if not specified by user.
-		if ($this->right_y_axis !== false) {
-			if (!array_key_exists('min', $this->right_y_axis)) {
-				$this->right_y_axis['min'] = $this->min_value_right;
-			}
-			if (!array_key_exists('max', $this->right_y_axis)) {
-				$this->right_y_axis['max'] = $this->max_value_right;
-			}
-			if (!array_key_exists('units', $this->right_y_axis)) {
-				$this->right_y_axis['units'] = reset($this->metrics)['units'];
-			}
-
-			// Disable right Y axis if it is not used for metrics.
-			if ($this->right_y_axis['min'] === null) {
-				$this->right_y_axis = false;
-			}
-		}
-
-		// Define offsets.
-		$this->offset_left = ($this->left_y_axis !== false) ? 50 : 20;
-		$this->offset_right = ($this->right_y_axis !== false) ? 50 : 20;
-		$this->offset_top = 10;
-
-		if ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_NONE) {
-			$this->offset_bottom = 20;
-		} elseif ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) {
-			$this->offset_bottom = 40;
-		}
-
-		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
-		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
-		$this->canvas_x = $this->offset_left;
-		$this->canvas_y = $this->offset_top;
-	}
-
 	public function setLegendType($type) {
 		$this->legend_type = $type;
 
 		return $this;
 	}
 
-//	public function setDrawLineWidth($width) {
-//		$this->draw_line_width = $width;
-//	}
+	public function setYAxisLeft($options) {
+		if ($options !== false) {
+			$this->left_y_show = true;
 
-//	public function setDrawFill($fill) {
-//		$this->draw_fill = $fill;
-//	}
+			if (array_key_exists('min', $options)) {
+				$this->left_y_min = $options['min'];
+			}
+			if (array_key_exists('max', $options)) {
+				$this->left_y_max = $options['max'];
+			}
+			if (array_key_exists('units', $options)) {
+				$this->left_y_units = $options['units'];
+			}
+		}
 
-//	public function setDrawColor($color) {
-//		$this->color_metric = '#'.$color;
-//	}
+		return $this;
+	}
 
-//	public function setDrawColorPalette($palette) {
-//		$this->draw_color_palette = $palette;
-//	}
+	public function setYAxisRight($options) {
+		if ($options !== false) {
+			$this->right_y_show = true;
 
-//	public function setBackgroundColor($color) {
-//		$this->color_background = '#'.$color;
-//	}
+			if (array_key_exists('min', $options)) {
+				$this->right_y_min = $options['min'];
+			}
+			if (array_key_exists('max', $options)) {
+				$this->right_y_max = $options['max'];
+			}
+			if (array_key_exists('units', $options)) {
+				$this->right_y_units = $options['units'];
+			}
+		}
 
-//	public function setGridColor($color) {
-//		$this->color_grid = '#'.$color;
-//	}
+		return $this;
+	}
+
+	public function setXAxis($options) {
+		$this->x_axis = $options;
+
+		return $this;
+	}
+
+	private function calculateDimensions() {
+		// Set missing properties for left Y axis.
+		if ($this->left_y_min === null) {
+			$this->left_y_min = $this->min_value_left ? : 0;
+		}
+		if ($this->left_y_max === null) {
+			$this->left_y_max = $this->max_value_left ? : 1;
+		}
+		if ($this->left_y_units === null) {
+			$this->left_y_units = '';
+			foreach ($this->metrics as $metric) {
+				if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+					$this->left_y_units = $metric['units'];
+					break;
+				}
+			}
+		}
+
+		// Set missing properties for right Y axis.
+		if ($this->right_y_min === null) {
+			$this->right_y_min = $this->min_value_right ? : 0;
+		}
+		if ($this->right_y_max === null) {
+			$this->right_y_max = $this->max_value_right ? : 1;
+		}
+
+		if ($this->right_y_units === null) {
+			$this->right_y_units = '';
+			foreach ($this->metrics as $metric) {
+				if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+					$this->right_y_units = $metric['units'];
+					break;
+				}
+			}
+		}
+
+		// Define offsets.
+		$this->offset_left = $this->left_y_show ? 50 : 20;
+		$this->offset_right = $this->right_y_show ? 50 : 20;
+		$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 : 20;
+		$this->offset_top = 10;
+
+		// Define canvas size.
+		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
+		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
+		$this->canvas_x = $this->offset_left;
+		$this->canvas_y = $this->offset_top;
+	}
 
 	private function addCanvasLeftYAxis() {
-		if ($this->left_y_axis !== false) {
+		if ($this->left_y_show) {
 			$this->addItem([
 				new CSvgLine(
 					$this->canvas_x,
@@ -264,14 +310,13 @@ class CSvgGraph extends CSvg {
 				]))
 					->setStrokeWidth(1)
 					->setStrokeColor($this->color_axis)
-					->setFillColor($this->color_background)
+					->setFillColor($this->color_background)//???
 			]);
 		}
 	}
 
 	private function addCanvasRightYAxis() {
-		if ($this->right_y_axis !== false) {
-			// Draw arrow.
+		if ($this->right_y_show) {
 			$this->addItem([
 				new CSvgLine(
 					$this->canvas_x + $this->canvas_width,
@@ -312,36 +357,24 @@ class CSvgGraph extends CSvg {
 			);
 	}
 
-	private function addCanvas() {
-		$this->addItem(
-			(new CSvgRect($this->canvas_x, $this->canvas_y, $this->canvas_width, $this->canvas_height))
-				->setFillColor($this->color_background)
-				->setStrokeColor($this->color_background)
-		);
-	}
+//	private function addCanvas() {
+//		$this->addItem(
+//			(new CSvgRect($this->canvas_x, $this->canvas_y, $this->canvas_width, $this->canvas_height))
+//				->setFillColor($this->color_background)
+//				->setStrokeColor($this->color_background)
+//		);
+//	}
 
 	private function getValueGrid($min, $max) {
 		$mul = 1 / pow(10, floor(log10($max)));
-//		$max10 = 0.1*ceil(10*$mul*$max)/$mul;
-//		$min10 = 0.1*floor(10*$mul*$min)/$mul;
 		$max10 = ceil($mul * $max) / $mul;
 		$min10 = floor($mul * $min) / $mul;
 		$delta = $max10 - $min10;
 		$delta = ceil($mul * $delta) / $mul;
 
-/*		$this->addItem((new CSvgText(20, $this->height - 20,
-			sprintf("Min %.2f", $min).
-			sprintf(" Max %.2f", $max).
-			sprintf(" Mul %.2f", $mul).
-			sprintf(" Min10 %.2f", $min10).
-			sprintf(" Max10 %.2f", $max10).
-			sprintf(" max-min %.2f", $max10-$min10).
-			sprintf(" Delta %.2f", $delta).
-			"", "white")));*/
-
 		$res = [];
-		if ($delta != 0) {
-			for($i = 0; $i <= $delta; $i += $delta / 5) {
+		if ($delta) {
+			for($i = 0; $delta >= $i; $i += $delta / 5) {
 				$res[] = $i + $min10;
 			}
 		}
@@ -352,61 +385,55 @@ class CSvgGraph extends CSvg {
 		return $res;
 	}
 
-	private function drawValueGrid($side = null) {
+	private function drawValueGrid($side = null, $add_desc = true) {
 		if ($side !== 'right' && $side !== 'left') {
 			return;
 		}
 
-		$min_value = ($side === 'right') ? $this->min_value_right : $this->min_value_left;
-		$max_value = ($side === 'right') ? $this->max_value_right : $this->max_value_left;
-
-		if ($min_value === null || $max_value === null) {
-			return;
+		if ($side === 'right') {
+			$min_value = $this->right_y_min;
+			$max_value = $this->right_y_max;
+			$units = $this->right_y_units;
+			$text_x_offset = $this->canvas_width + 8;
+		}
+		else {
+			$min_value = $this->left_y_min;
+			$max_value = $this->left_y_max;
+			$units = $this->left_y_units;
+			$text_x_offset = - 6;
 		}
 
 		$grid = $this->getValueGrid($min_value, $max_value);
 
-		if ($side === 'right') {
-			$this->min_value_right = $grid[0];
-			$this->max_value_right = end($grid);
-		}
-		else {
-			$this->min_value_left = $grid[0];
-			$this->max_value_left = end($grid);
-		}
-
-		$text_x_offset = ($side === 'right') ? $this->canvas_width + 25 :  - 6;
-
 		foreach ($grid as $value) {
 			$x1 = $this->canvas_x;
-			$y1 = $this->canvas_y + $this->canvas_height * ($max_value - $value) / ($max_value - $min_value);
+			$y1 = $this->canvas_y + $this->canvas_height * ($max_value - $value) / ($max_value - $min_value ? : 1);
 			$x2 = $this->canvas_x + $this->canvas_width;
 			$y2 = $y1;
-			$suffix = '';
 
-			// TODO
-//			$suffix = '';
-//			if ($value > 1000) {
-//				$value = $value/1000;
-//				$suffix = 'K';
-//			}
-//			if ($value > 1000) {
-//				$value = $value/1000;
-//				$suffix = 'M';
-//			}
+			// If value is lower than X axis, don't draw it.
+			if ($y1 > $this->canvas_y + $this->canvas_height) {
+				continue;
+			}
 
-			$this->addItem([
-				(new CSvgLine($x1, $y1, $x2, $y2, $this->color_grid))
-					->setDashed(),
-				(new CSvgText($x1 + $text_x_offset, $y2 + 4, sprintf('%g%s', floatval($value), $suffix), $this->color_legend))
-					->setAttribute('text-anchor', 'end'),
-//				(new CSvgText($x1 - 6, $y2 + 4, convert_units(['value'=>$value, 'units'=>'%']), $this->color_legend))
-//					->setAttribute('text-anchor', 'end'),
-			]);
+			$grid_line = [];
+			$grid_line[] = (new CSvgLine($x1, $y1, $x2, $y2, $this->color_grid))->setDashed();
+
+			if ($add_desc) {
+				$descr = convert_units([
+					'value' => $value,
+					'units' => $units
+				]);
+
+				$grid_line[] = (new CSvgText($x1 + $text_x_offset, $y2 + 4, $descr, $this->color_legend))
+					->setAttribute('text-anchor', $side === 'right' ? 'start' : 'end');
+			}
+
+			$this->addItem($grid_line);
 		}
 	}
 
-	private function drawTimeGrid() {
+	private function drawTimeGrid($add_desc = true) {
 		$formats = [
 			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
 			['sec' => 60,	'step' => 30,	'time_fmt' => 'H:i:s'],
@@ -439,12 +466,16 @@ class CSvgGraph extends CSvg {
 			$y1 = $this->canvas_y;
 			$x2 = $x1;
 			$y2 = $this->canvas_y + $this->canvas_height;
-			$this->addItem([
-				(new CSvgLine($x1, $y1, $x2, $y2, $this->color_grid))
-					->setDashed(),
-				(new CSvgText($x1, $y2 + 16, date($time_fmt, $clock), $this->color_legend))
-					->setAttribute('text-anchor', 'middle'),
-			]);
+
+			$grid_line = [];
+			$grid_line[] = (new CSvgLine($x1, $y1, $x2, $y2, $this->color_grid))->setDashed();
+
+			if ($add_desc) {
+				$desc = date($time_fmt, $clock);
+				$grid_line[] = (new CSvgText($x1, $y2 + 16, $desc, $this->color_legend))->setAttribute('text-anchor', 'middle');
+			}
+
+			$this->addItem($grid_line);
 		}
 	}
 
@@ -466,51 +497,75 @@ class CSvgGraph extends CSvg {
 		]);
 	}
 
-	private function drawPoints($points, $options) {
-		foreach ($points as $point) {
-			$this->addItem(
-				(new CSvgCircle($point[0], $point[1], $options['radius']))
-					->setStrokeOpacity($options['transparency'] * 0.1)
-					->setFillColor($options['color'])
-			);
-		}
+	private function drawPoints($points, $metric) {
+		/**
+		 * Item grouping is used for two reasons:
+		 * - to increase client side performance;
+		 * - to decrease amount of CSV code, using property inheritance.
+		 */
+		$group = (new CSvgGroup())
+			->setAttribute('data-set', 'points')
+			->setAttribute('data-metric', $metric['host']['name'] . ': ' . $metric['name'])
+			->setAttribute('data-color', $metric['options']['color'])
+			->setFillColor($metric['options']['color'])
+			->setStrokeOpacity($metric['options']['transparency'] * 0.1)
+			->setAttribute('data-tolerance', $metric['options']['radius']);
 
-		if ($options['fill'] != 0) {
+		foreach ($points as $point) {
+			$group->addItem((new CSvgCircle($point[0], $point[1], $metric['options']['radius'])));
+		}
+		$this->addItem($group);
+
+		if ($metric['options']['fill'] != 0) {
 			$points[] = [end($points)[0], $this->canvas_y + $this->canvas_height];
 			$points[] = [$points[0][0], $this->canvas_y + $this->canvas_height];
 
 			$this->addItem(
 				(new CSvgPolyline($points))
-					->setFillColor($options['color'])
-					->setFillOpacity($options['fill'] * 0.1)
+					->setFillColor($metric['options']['color'])
+					->setFillOpacity($metric['options']['fill'] * 0.1)
 					->setStrokeWidth(0)
 			);
 		}
 	}
 
-	private function drawLines($points, $options) {
+	private function drawLines($points, $metric) {
+		// Item grouping is used to increase client side performance.
 		$this->addItem(
-			(new CSvgPolyline($points))
-				->setStrokeColor($options['color'])
-				->setStrokeOpacity($options['transparency'] * 0.1)
-				->setStrokeWidth($options['width'])
-				->setFillColor('none')
+			(new CSvgGroup())
+				->addItem(
+					(new CSvgPolyline($points))
+						->setStrokeColor($metric['options']['color'])
+						->setStrokeOpacity($metric['options']['transparency'] * 0.1)
+						->setStrokeWidth($metric['options']['width'])
+						->setFillColor('none')
+				)
+				->setAttribute('data-set', 'line')
+				->setAttribute('data-metric', $metric['host']['name'] . ': ' . $metric['name'])
+				->setAttribute('data-color', $metric['options']['color'])
+				->setAttribute('data-tolerance', $metric['options']['width'])
 		);
 
-		if ($options['fill'] != 0) {
-			$points[] = [end($points)[0], $this->canvas_y + $this->canvas_height];
-			$points[] = [$points[0][0], $this->canvas_y + $this->canvas_height];
+		if ($metric['options']['fill'] != 0) {
+			if (count($points) > 1) {
+				$points[] = [end($points)[0], $this->canvas_y + $this->canvas_height];
+				$points[] = [$points[0][0], $this->canvas_y + $this->canvas_height];
+			}
+			else {
+				$points[] = [$points[0][0]-10, $this->canvas_y + $this->canvas_height];
+				$points[] = [$points[0][0]+10, $this->canvas_y + $this->canvas_height];
+			}
 
 			$this->addItem(
 				(new CSvgPolyline($points))
-					->setFillColor($options['color'])
-					->setFillOpacity($options['fill'] * 0.1)
+					->setFillColor($metric['options']['color'])
+					->setFillOpacity($metric['options']['fill'] * 0.1)
 					->setStrokeWidth(0)
 			);
 		}
 	}
 
-	private function drawLinesStaircase($points, $options) {
+	private function drawLinesStaircase($points, $metric) {
 		$path = [];
 		$num = count($points);
 		for ($i = 0; $i < $num; $i++) {
@@ -520,22 +575,30 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
+		// Item grouping is used to increase client side performance.
 		$this->addItem(
-			(new CSvgPolyline($path))
-				->setStrokeColor($options['color'])
-				->setStrokeOpacity($options['transparency'] * 0.1)
-				->setStrokeWidth($options['width'])
-				->setFillColor('none')
+			(new CSvgGroup())
+				->addItem(
+					(new CSvgPolyline($path))
+						->setStrokeColor($metric['options']['color'])
+						->setStrokeOpacity($metric['options']['transparency'] * 0.1)
+						->setStrokeWidth($metric['options']['width'])
+						->setFillColor('none')
+				)
+				->setAttribute('data-set', 'staircase')
+				->setAttribute('data-metric', $metric['host']['name'] . ': ' . $metric['name'])
+				->setAttribute('data-color', $metric['options']['color'])
+				->setAttribute('data-tolerance', $metric['options']['width'])
 		);
 
-		if ($options['fill'] != 0) {
+		if ($metric['options']['fill'] != 0) {
 			$path[] = [end($path)[0], $this->canvas_y + $this->canvas_height];
 			$path[] = [$path[0][0], $this->canvas_y + $this->canvas_height];
 
 			$this->addItem(
 				(new CSvgPolyline($path))
-					->setFillColor($options['color'])
-					->setFillOpacity($options['fill'] * 0.1)
+					->setFillColor($metric['options']['color'])
+					->setFillOpacity($metric['options']['fill'] * 0.1)
 					->setStrokeWidth(0)
 			);
 		}
@@ -543,95 +606,111 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricData($metric_num) {
 		$metric = $this->metrics[$metric_num];
-		$points = $this->points[$metric_num];
-		$draw_type = $metric['options']['type'];
 		$max_value = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
 			? $this->max_value_right
 			: $this->max_value_left;
 		$min_value = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
 			? $this->min_value_right
 			: $this->min_value_left;
-		$time_range = $this->time_till - $this->time_from;
-		$value_diff = $max_value - $min_value;
-		$timeshift = $metric['options']['timeshift'];
-		$path = [];
 
-		foreach ($points as $clock => $point) {
+		$time_range = $this->time_till - $this->time_from ? : 1;
+		$value_diff = $max_value - $min_value ? : 1;
+		$timeshift = $metric['options']['timeshift'];
+		$paths = [];
+
+		/**
+		 * SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of graphs, so no need to calculate
+		 * anything. Points will be connected anyway.
+		 */
+		if ($metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
+			$this->applyMissingDataFunc($this->points[$metric_num], $metric['options']['missingdatafunc']);
+		}
+
+		$path_num = 0;
+		foreach ($this->points[$metric_num] as $clock => $point) {
+			// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be skipped in multiple svg shapes.
+			if ($point === null) {
+				$path_num++;
+				continue;
+			}
+
 			$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 			$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-			$path[] = [$x, $y];
+			$paths[$path_num][] = [$x, $y];
 		}
-
-		// Make options.
-		$def_options = [
-			'color' => $this->color_metric,
-			'width' => $this->draw_line_width,
-			'transparency' => 10,
-			'fill' => 0,
-			'radius' => 3
-		];
-
-		$options = zbx_array_merge($def_options, $metric['options']);
 
 		// Draw path.
-		switch ($draw_type) {
-			case SVG_GRAPH_TYPE_LINE:
-				$this->drawLines($path, $options);
-				break;
+		foreach ($paths as $path) {
+			switch ($metric['options']['type']) {
+				case SVG_GRAPH_TYPE_LINE:
+					$this->drawLines($path, $metric);
+					break;
 
-			case SVG_GRAPH_TYPE_POINTS:
-				$this->drawPoints($path, $options);
-				break;
+				case SVG_GRAPH_TYPE_POINTS:
+					$this->drawPoints($path, $metric);
+					break;
 
-			case SVG_GRAPH_TYPE_STAIRCASE:
-				$this->drawLinesStaircase($path, $options);
-				break;
+				case SVG_GRAPH_TYPE_STAIRCASE:
+					$this->drawLinesStaircase($path, $metric);
+					break;
+			}
 		}
+	}
+
+	private function applyMissingDataFunc(array &$points = [], $missingdatafunc) {
+		if (!$points) {
+			return;
+		}
+
+		// Get average distance between points to detect gaps of missing data.
+		$prev_clock = null;
+		$points_distance = [];
+		foreach ($points as $clock => $point) {
+			if ($prev_clock !== null) {
+				$points_distance[] = $clock - $prev_clock;
+			}
+			$prev_clock = $clock;
+		}
+
+		/**
+		 * $threshold is a minimal period of time at what we assume that data point is missed;
+		 * $average_distance is an average distance between existing data points;
+		 * $added_value is a value that will be applied in time gaps that are longer than $threshold;
+		 * $gap_interval is a time distance between missing points used to fulfill gaps of missing data. It's unique
+		 * for each gap.
+		 */
+		$average_distance = array_sum($points_distance) / count($points_distance);
+		$threshold = $points_distance ? $average_distance * 3 : 0;
+		$added_value = [
+			SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO => 0,
+			SVG_GRAPH_MISSING_DATA_NONE => null
+		][$missingdatafunc];
+
+		// Add missing values.
+		$prev_clock = null;
+		foreach ($points as $clock => $point) {
+			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
+				$gap_interval = floor(($clock - $prev_clock) / $average_distance);
+
+				$new_point_clock = $prev_clock;
+				do {
+					$new_point_clock = $new_point_clock + $gap_interval;
+					$points[$new_point_clock] = $added_value;
+				}
+				while ($clock > $new_point_clock);
+			}
+
+			$prev_clock = $clock;
+		}
+
+		// Sort according new clock times.
+		ksort($points);
 	}
 
 	private function drawMetrics() {
 		foreach ($this->metrics as $i => $metric) {
 			$this->drawMetricData($i);
 		}
-	}
-
-	private function applyMissingDataFunc() {
-		/*
-		foreach ($this->metrics as $metric) {
-			if ($metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_NONE) {
-				continue;
-			}
-
-			// Make array of all points on X axis.
-			$x_points = array_keys($this->points[$metric['itemid']]);
-			sort($x_points, SORT_NUMERIC); // Also reseting keys.
-
-			// Find the shortest gap between 2 non-empty X points.
-			$shortest_gap = null;
-			foreach ($x_points as $i => $point) {
-				if ($shortest_gap === null) {
-					$shortest_gap = 0;
-				}
-				elseif ($shortest_gap == 0 || $shortest_gap > ($point - $x_points[$i - 1])) {
-					$shortest_gap = $point - $x_points[$i - 1];
-
-					// The shortest expected gap possible.
-					if ($shortest_gap == 1) {
-						break;
-					}
-				}
-			}
-
-			if (!$shortest_gap) {
-				return;
-			}
-		}
-
-		// Fill missing values.
-		$range_x_points = range($this->min_clock, $this->max_clock, $shortest_gap);
-
-		$x_missing = array_diff($x_points, $this->points[$metric_id]);
-		*/
 	}
 
 	private function drawLegend() {
@@ -684,19 +763,20 @@ class CSvgGraph extends CSvg {
 
 		$this->addItem([
 			(new CSvgRect($x1, $y1_1, $x2 - $x1, $y1_2  - $y1_1))
-			->setFillColor($this->color_annotation)
-			->setStrokeColor($this->color_annotation)
-			->setFillOpacity('0.1')
-			->setStrokeOpacity('0.1')
+				->setFillColor($this->color_annotation)
+				->setStrokeColor($this->color_annotation)
+				->setFillOpacity('0.1')
+				->setStrokeOpacity('0.1')
+				//->addCLass('svg-graph-problem')
 		]);
 
-		$tooltip = new CTag('title', false, $text);
-		$this->addItem([
-			(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
-			->setFillColor($this->color_annotation)
-			->setStrokeColor($this->color_annotation)
-			->addItem($tooltip)
-		]);
+//		$tooltip = new CTag('title', false, $text);
+//		$this->addItem([
+//			(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
+//				->setFillColor($this->color_annotation)
+//				->setStrokeColor($this->color_annotation)
+//				->addItem($tooltip)
+//		]);
 	}
 
 	/*
@@ -752,36 +832,6 @@ class CSvgGraph extends CSvg {
 	}
 	*/
 
-	public function setYAxisLeft($options) {
-		$this->left_y_axis = $options;
-
-		return $this;
-	}
-
-	public function setYAxisRight($options) {
-		$this->right_y_axis = $options;
-
-		return $this;
-	}
-
-	public function setXAxis($options) {
-		$this->x_axis = $options;
-
-		return $this;
-	}
-
-//	private function addAnnotationsSimple() {
-//		foreach ($this->annotations_simple as $annotation) {
-//			$this->drawAnnotationSimple($annotation['clock'], $annotation['text']);
-//		}
-//	}
-
-//	private function addAnnotationsRange() {
-//		foreach ($this->annotations_range as $annotation) {
-//			$this->drawAnnotationRange($annotation['time_from'], $annotation['time_to'], $annotation['text']);
-//		}
-//	}
-
 	private function drawProblems() {
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph.
@@ -793,7 +843,7 @@ class CSvgGraph extends CSvg {
 			$x1 = (int) ($this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range);
 			$x2 = (int) ($this->canvas_width - $this->canvas_width * ($this->time_till - $problem['r_clock']) / $time_range);
 
-			// At least 2 pixels should be occupied to show range.
+			// At least 3 pixels expected to be occupied to show range.
 			if ($x2 - $x1 > 2) {
 				$this->drawAnnotationRange($problem['clock'], $problem['r_clock'], $problem['name']);
 			}
@@ -803,34 +853,71 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
+	public function addSBox() {
+		$this->addItem([
+			(new CSvgRect(0, 0, 0, 0))->addClass('svg-graph-selection'),
+			(new CSvgText(0, 0, '', 'black'))->addClass('svg-graph-selection-text')
+		]);
+
+		return $this;
+	}
+
+	private function addToolTip() {
+		$this->addItem([
+			(new CSvgTag('switch', true))
+				->addItem(
+					(new CSvgTag('foreignObject', true))
+						->setAttribute('x', 0)
+						->setAttribute('y', 0)
+						->setAttribute('width', 0)
+						->setAttribute('height', 0)
+						->addClass('svg-tool-tip')
+				)
+		]);
+	}
+
+	private function addValueBox() {
+		$this->addItem([
+			(new CSvgRect(-5, $this->canvas_y, 3, $this->canvas_height))
+				->addClass('svg-value-box')
+				->setFillColor($this->color_annotation)
+				->setStrokeColor($this->color_annotation)
+				->setFillOpacity('0.2')
+				->setStrokeOpacity('0.2')
+		]);
+	}
+
 	public function draw() {
 		$this->calculateDimensions();
-		$this->addCanvas();
+		//$this->addCanvas();
 
 		// Add Y axes.
 		$this->addCanvasLeftYAxis();
 		$this->addCanvasRightYAxis();
 
 		// Add grid lines.
-		if ($this->left_y_axis !== false) {
-			$this->drawValueGrid('left');
-		}
-		if ($this->right_y_axis !== false) {
-			$this->drawValueGrid('right');
-		}
+		$this->drawValueGrid('left', $this->left_y_show);
+		$this->drawValueGrid('right', $this->right_y_show);
 
 		// Add X axis.
-		$this->drawTimeGrid();
-		if ($this->x_axis !== false) {
+		$this->drawTimeGrid($this->x_axis);
+		if ($this->x_axis) {
 			$this->addCanvasXAxis();
 		}
 
+		// Add vertical highlihtinh line that follows mouse.
+		$this->addValueBox();
+
 		// Draw problem zones.
 		$this->drawProblems();
-
-		//$this->applyMissingDataFunc();
 		$this->drawMetrics();
 		$this->drawLegend();
+
+		// Add UI components.
+		if ($this->make_sbox) {
+			$this->addSBox();
+		}
+		$this->addToolTip();
 
 		return $this;
 	}

@@ -42,7 +42,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'fill'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO])]
+			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO])],
+			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED]
 		]]);
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
 		$this->setDefault([]);
@@ -73,6 +74,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		return [
 			// Accordion head - data set selection fields and tools.
 			(new CDiv([
+				(new CVar($fn.'['.$options['row_num'].'][order]', $options['order_num'])),
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
@@ -217,6 +219,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	public function setValue($value) {
 		$this->value = (array) $value;
 
+		// Sort data sets according order field.
+		CArrayHelper::sort($this->value, ['order' => ZBX_SORT_UP]);
+
 		foreach ($this->value as $index => $val) {
 			// At least host or item pattern must be specified.
 			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
@@ -294,6 +299,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 				'name' => $this->name.'.missingdatafunc.'.$index,
 				'value' => $val['missingdatafunc']
+			];
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+				'name' => $this->name.'.order.'.$index,
+				'value' => $val['order']
 			];
 
 			if (array_key_exists('width', $val)) {

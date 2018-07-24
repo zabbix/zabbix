@@ -24,16 +24,17 @@ class CSvgGraphHelper {
 	/**
 	 * Calculate graph data and draw SVG graph based on given graph configuration.
 	 *
-	 * @param array $options				Options for graph.
-	 * @param array $options[data_sets]		Graph data set options.
-	 * @param array $options[problems]		Graph problems options.
-	 * @param array $options[overrides]		Graph problems options.
-	 * @param array $options[data_source]	Data source of graph.
-	 * @param array $options[time_period]	Graph time period used.
-	 * @param array $options[left_y_axis]	Options for graph left Y axis.
-	 * @param array $options[right_y_axis]	Options for graph right Y axis.
-	 * @param array $options[x_axis]		Options for graph X axis.
-	 * @param array $options[legend]	Options for graph legend.
+	 * @param array $options					Options for graph.
+	 * @param array $options[data_sets]			Graph data set options.
+	 * @param array $options[problems]			Graph problems options.
+	 * @param array $options[overrides]			Graph problems options.
+	 * @param array $options[data_source]		Data source of graph.
+	 * @param array $options[time_period]		Graph time period used.
+	 * @param bool  $options[dashboard_time]	True if dashboard time is used.
+	 * @param array $options[left_y_axis]		Options for graph left Y axis.
+	 * @param array $options[right_y_axis]		Options for graph right Y axis.
+	 * @param array $options[x_axis]			Options for graph X axis.
+	 * @param array $options[legend]			Options for graph legend.
 	 *
 	 * @return array
 	 */
@@ -79,6 +80,15 @@ class CSvgGraphHelper {
 
 		return [
 			'svg' => $graph,
+			'data' => [
+				'dims' => [
+					'x' => $graph->getCanvasX(),
+					'y' => $graph->getCanvasY(),
+					'w' => $graph->getCanvasWidth(),
+					'h' => $graph->getCanvasHeight()
+				],
+				'spp' => (int) ($options['time_period']['time_to'] - $options['time_period']['time_from']) / $graph->getCanvasWidth()
+			],
 			'errors' => $errors
 		];
 	}
@@ -115,6 +125,7 @@ class CSvgGraphHelper {
 				foreach ($tr_group['items'] as $metric_num => $m) {
 					$metric = &$metrics[$metric_num];
 
+					// Collect and sort data points.
 					if (array_key_exists($m['itemid'], $results)) {
 						$points = [];
 						foreach ($results[$m['itemid']]['data'] as $point) {
@@ -123,9 +134,7 @@ class CSvgGraphHelper {
 						usort($points, [__CLASS__, 'sortByClock']);
 						$metric['points'] = $points;
 
-						unset($metric['history'], $metric['source'], $metric['trends'],
-							$metric['value_type']
-						);
+						unset($metric['history'], $metric['source'], $metric['trends']);
 					}
 				}
 				unset($metric);
@@ -258,6 +267,10 @@ class CSvgGraphHelper {
 		$data_set_num = 0;
 		$metrics = [];
 
+		if (!$data_sets) {
+			return;
+		}
+
 		do {
 			$data_set = $data_sets[$data_set_num];
 			$data_set_num++;
@@ -289,7 +302,9 @@ class CSvgGraphHelper {
 
 				if ($matching_hosts) {
 					$matching_items = API::Item()->get([
-						'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+						'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid',
+							'delay'
+						],
 						'hostids' => array_keys($matching_hosts),
 						'selectHosts' => ['hostid', 'name'],
 						'searchWildcardsEnabled' => true,

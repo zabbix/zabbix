@@ -19,17 +19,10 @@
 **/
 
 
-class CSvgPolyline extends CSvgTag {
+class CSvgGroup extends CSvgTag {
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
-
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
-		}
-
-		$this->setAttribute('points', trim($p));
+	public function __construct() {
+		parent::__construct('g', true);
 
 		return $this;
 	}

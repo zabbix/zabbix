@@ -54,6 +54,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_from' => null,
 				'time_to' => null
 			],
+			'dashboard_time' => false,
 			'overrides' => []
 		];
 
@@ -91,6 +92,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_to' => $timeline['to_ts']
 			];
 
+			$graph_data['dashboard_time'] = true;
+
 			// Init script that refreshes widget once timeselector changes.
 			if ($initial_load) {
 				$script_inline .=
@@ -104,10 +107,10 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if (array_key_exists('lefty', $fields) && $fields['lefty'] == SVG_GRAPH_AXIS_Y_SHOW) {
 			$graph_data['left_y_axis'] = [];
 
-			if (array_key_exists('lefty_min', $fields) && $fields['lefty_min'] !== '') {
+			if (array_key_exists('lefty_min', $fields) && is_numeric($fields['lefty_min'])) {
 				$graph_data['left_y_axis']['min'] = $fields['lefty_min'];
 			}
-			if (array_key_exists('lefty_max', $fields) && $fields['lefty_max'] !== '') {
+			if (array_key_exists('lefty_max', $fields) && is_numeric($fields['lefty_max'])) {
 				$graph_data['left_y_axis']['max'] = $fields['lefty_max'];
 			}
 			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
@@ -121,10 +124,10 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if (array_key_exists('righty', $fields) && $fields['righty'] == SVG_GRAPH_AXIS_Y_SHOW) {
 			$graph_data['right_y_axis'] = [];
 
-			if (array_key_exists('righty_min', $fields) && $fields['righty_min'] !== '') {
+			if (array_key_exists('righty_min', $fields) && is_numeric($fields['righty_min'])) {
 				$graph_data['right_y_axis']['min'] = $fields['righty_min'];
 			}
-			if (array_key_exists('righty_max', $fields) && $fields['righty_max'] !== '') {
+			if (array_key_exists('righty_max', $fields) && is_numeric($fields['righty_max'])) {
 				$graph_data['right_y_axis']['max'] = $fields['righty_max'];
 			}
 			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
@@ -186,6 +189,16 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if ($svg_data['errors']) {
 			error($svg_data['errors']);
 		}
+
+		$graph_options = zbx_array_merge($svg_data['data'], [
+			'sbox' => $graph_data['dashboard_time'], // SBox available only for graphs without overriten relative time.
+			'values' => true
+		]);
+
+		$script_inline .=
+			'var widget = jQuery(".dashbrd-grid-widget-container")'.
+					'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
+			'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).');';
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),

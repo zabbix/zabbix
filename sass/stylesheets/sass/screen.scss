@@ -4151,6 +4151,19 @@ $form-icon-btn: (
 	border-top: none;
 	border-bottom: none;
 }
+.svg-graph-selection {
+	fill: $yellow;
+	fill-opacity: 0.35;
+	stroke-color: rgba($dark-yellow,0.6);
+	stroke-width: 1px;
+}
+.svg-tool-tip > * {
+	background: rgba($white,0.75);
+	border: 1px solid rgba(black, 0.3);
+	white-space: nowrap;
+	padding: 7px 10px;
+	display: table;
+}
 
 .ui-selectable-helper {
 	position: absolute;
