@@ -1,0 +1,281 @@
+---
+test case: "successfully parsed plain positive real number"
+in:
+  str: "2.5"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed plain positive integer number"
+in:
+  str: "3"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed plain negative real number"
+in:
+  str: "-6.224"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed plain negative integer number"
+in:
+  str: "-435"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with positive unsigned lower case exponent"
+in:
+  str: "3.12e7"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with positive signed lower case exponent"
+in:
+  str: "223.576843e+16"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with positive unsigned upper case exponent"
+in:
+  str: "74.245E11"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with positive signed upper case exponent"
+in:
+  str: "13.432E+8"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with negative lower case exponent"
+in:
+  str: "4.3546e-3"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with negative upper case exponent"
+in:
+  str: "88.24325E-12"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with positive unsigned lower case exponent"
+in:
+  str: "-12.12e3"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with positive signed lower case exponent"
+in:
+  str: "-125.43e+8"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with positive unsigned upper case exponent"
+in:
+  str: "-1.3E2"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with positive signed upper case exponent"
+in:
+  str: "-435453.3232317E+31"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with negative lower case exponent"
+in:
+  str: "-243.2e-5"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with negative upper case exponent"
+in:
+  str: "-99.1E-4"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with positive unsigned lower case exponent"
+in:
+  str: "3e7"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with positive signed lower case exponent"
+in:
+  str: "223e+16"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with positive unsigned upper case exponent"
+in:
+  str: "74E11"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with positive signed upper case exponent"
+in:
+  str: "13E+8"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with negative lower case exponent"
+in:
+  str: "4e-3"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive integer number with negative upper case exponent"
+in:
+  str: "88E-12"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with positive unsigned lower case exponent"
+in:
+  str: "-12e3"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with positive signed lower case exponent"
+in:
+  str: "-125e+8"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with positive unsigned upper case exponent"
+in:
+  str: "-1E2"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with positive signed upper case exponent"
+in:
+  str: "-435453E+31"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with negative lower case exponent"
+in:
+  str: "-243e-5"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative integer number with negative upper case exponent"
+in:
+  str: "-99E-4"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number with valid suffix"
+in:
+  str: "2.5m"
+  flags: 2
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed negative real number with valid suffix"
+in:
+  str: "-4.6K"
+  flags: 2
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number prefixed with space(s)"
+in:
+  str: "   4.33"
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number suffixed with space(s)"
+in:
+  str: "2432.232 "
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "successfully parsed positive real number surrounded with space(s)"
+in:
+  str: "   0.241   "
+  flags: 0
+out:
+  return: "SUCCEED"
+---
+test case: "failed to parse positive real number with invalid suffix"
+in:
+  str: "1.99x"
+  flags: 2
+out:
+  return: "FAIL"
+---
+test case: "failed to parse negative real number with invalid suffix"
+in:
+  str: "-3.2q"
+  flags: 2
+out:
+  return: "FAIL"
+---
+test case: "failed to parse positive real number prefixed with unary plus sign"
+in:
+  str: "+53.1"
+  flags: 0
+out:
+  return: "FAIL"
+---
+test case: "failed to parse positive real number prefixed with a letter"
+in:
+  str: "x25.667"
+  flags: 0
+out:
+  return: "FAIL"
+---
+test case: "failed to parse positive real number with a repeated unsigned upper case exponent"
+in:
+  str: "24.1E2E5"
+  flags: 0
+out:
+  return: "FAIL"
+---
+test case: "failed to parse positive real number with multiple fractional parts"
+in:
+  str: "0.71.9"
+  flags: 0
+out:
+  return: "FAIL"
+---
+test case: "failed to parse positive integer number with a malformed exponent"
+in:
+  str: "2432143e+222+"
+  flags: 0
+out:
+  return: "FAIL"
+...
