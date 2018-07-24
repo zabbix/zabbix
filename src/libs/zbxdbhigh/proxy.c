@@ -3744,6 +3744,7 @@ static int	process_proxy_history_data_33(const DC_PROXY *proxy, struct zbx_json_
 			if (SUCCEED != errcodes[i])
 				continue;
 
+			/* check and discard if duplicate data */
 			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_valueid)
 			{
 				DCconfig_clean_items(&items[i], &errcodes[i], 1);
