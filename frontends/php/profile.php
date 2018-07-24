@@ -161,6 +161,9 @@ elseif (hasRequest('update')) {
 		if (!isset($messages['triggers.severities'])) {
 			$messages['triggers.severities'] = [];
 		}
+		if (!array_key_exists('show_suppressed', $messages)) {
+			$messages['show_suppressed'] = 0;
+		}
 
 		DBstart();
 		$result = updateMessageSettings($messages);
