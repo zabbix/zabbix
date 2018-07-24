@@ -2394,7 +2394,7 @@ int	is_double(const char* str, unsigned char flags)
 {
 	int i = 0, digits = 0, sq = 0, dq = 0;
 
-	while (' ' == str[i] || '\'' == str[i] || '\"' == str[i])	/* trim left spaces, check for opening quotes */
+	while (' ' == str[i]/* || '\'' == str[i] || '\"' == str[i]*/)	/* trim left spaces, check for opening quotes */
 	{
 		if ('\'' == str[i])
 			sq++;
@@ -2445,7 +2445,7 @@ int	is_double(const char* str, unsigned char flags)
 				'm' == str[i] || 'h' == str[i] || 'd' == str[i] || 'w' == str[i])
 			i++;
 
-	while (' ' == str[i] || '\'' == str[i] || '\"' == str[i])	/* trim right spaces, check for closing quotes */
+	while (' ' == str[i]/* || '\'' == str[i] || '\"' == str[i]*/)	/* trim right spaces, check for closing quotes */
 	{
 		if ('\'' == str[i])
 			sq--;

@@ -917,8 +917,11 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-#define ZBX_FLAG_DOUBLE_PLAIN	0x00
-#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
+#define ZBX_FLAG_DOUBLE_PLAIN		1 << 0
+#define ZBX_FLAG_DOUBLE_SUFFIX		1 << 1
+#define ZBX_FLAG_DOUBLE_UNARY_PLUS	1 << 2
+#define ZBX_FLAG_DOUBLE_QUOTES		1 << 3
+#define ZBX_FLAG_DOUBLE_SPACES		1 << 4
 int	is_double(const char *str, unsigned char flags);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
