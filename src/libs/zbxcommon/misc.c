@@ -2761,7 +2761,7 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
 {
 	int	res;
 
-	if (SUCCEED == (res = is_double(str, 0)))
+	if (SUCCEED == (res = is_double(str, ZBX_FLAG_DOUBLE_PLAIN)))
 		*value = (0 != atof(str));
 	else
 	{
