@@ -30,7 +30,7 @@ class CRangeControl extends CTextBox {
 	protected $options;
 
 	public function __construct($name, $value = '') {
-		parent::__construct();
+		parent::__construct($name);
 
 		$this->options = [];
 		$this->setValue($value);
