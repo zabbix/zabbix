@@ -97,52 +97,47 @@ if (!$this->data['is_profile']) {
 }
 
 // append password to form list
-if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
-	if ($data['userid'] == 0 || isset($this->data['change_password'])) {
-		$password_box = new CPassBox('password1', $this->data['password1']);
+if ($data['userid'] == 0 || isset($this->data['change_password'])) {
+	$password_box = new CPassBox('password1', $this->data['password1']);
 
-		if (!$form_autofocus) {
-			$form_autofocus = true;
-			$password_box->setAttribute('autofocus', 'autofocus');
-		}
-
-		$userFormList->addRow(
-			(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
-			$password_box
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		);
-		$userFormList->addRow(
-			(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
-			(new CPassBox('password2', $this->data['password2']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		);
-
-		if (isset($this->data['change_password'])) {
-			$userForm->addVar('change_password', $this->data['change_password']);
-		}
+	if (!$form_autofocus) {
+		$form_autofocus = true;
+		$password_box->setAttribute('autofocus', 'autofocus');
 	}
-	else {
-		$passwdButton = (new CSimpleButton(_('Change password')))
-			->onClick('javascript: submitFormWithParam("'.$userForm->getName().'", "change_password", "1");')
-			->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled', 'disabled');
-		}
 
-		if (!$form_autofocus) {
-			$form_autofocus = true;
-			$passwdButton->setAttribute('autofocus', 'autofocus');
-		}
+	$userFormList->addRow(
+		(new CLabel(_('Password'), 'password1'))->setAsteriskMark(),
+		$password_box
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+	);
+	$userFormList->addRow(
+		(new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
+		(new CPassBox('password2', $this->data['password2']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+	);
 
-		$userFormList->addRow(_('Password'), $passwdButton);
+	if (isset($this->data['change_password'])) {
+		$userForm->addVar('change_password', $this->data['change_password']);
 	}
+
+	$userFormList->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$userFormList->addRow(_('Password'),
-		new CSpan(_s('Unavailable for users with %1$s.', authentication2str($data['auth_type'])))
-	);
+	$passwdButton = (new CSimpleButton(_('Change password')))
+		->onClick('javascript: submitFormWithParam("'.$userForm->getName().'", "change_password", "1");')
+		->addClass(ZBX_STYLE_BTN_GREY);
+	if ($this->data['alias'] == ZBX_GUEST_USER) {
+		$passwdButton->setAttribute('disabled', 'disabled');
+	}
+
+	if (!$form_autofocus) {
+		$form_autofocus = true;
+		$passwdButton->setAttribute('autofocus', 'autofocus');
+	}
+
+	$userFormList->addRow(_('Password'), $passwdButton);
 }
 
 // append languages to form list

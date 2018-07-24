@@ -21,7 +21,7 @@
 
 // Authentication general fields and HTTP authentication fields.
 $auth_tab = (new CFormList('list_auth'))
-	->addRow(_('Default authentication'),
+	->addRow(new CLabel(_('Default authentication'), 'authentication_type'),
 		(new CRadioButtonList('authentication_type', (int)$data['authentication_type']))
 			->setAttribute('autofocus', 'autofocus')
 			->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
@@ -29,26 +29,27 @@ $auth_tab = (new CFormList('list_auth'))
 			->setModern(true)
 			->removeId()
 	)
-	->addRow(_('Enable HTTP authentication'),
+	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 			->onChange('jQuery("input,select", ".http_auth").attr("disabled", !this.checked)')
 	)
-	->addRow(_('Default login form'),
+	->addRow(new CLabel(_('Default login form'), 'http_login_form'),
 		(new CComboBox('http_login_form', $data['http_login_form'], null, [
 			ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
 			ZBX_AUTH_FORM_HTTP => _('HTTP login form')
 		]))->setEnabled($data['http_auth_enabled']),
 		null, 'http_auth'
 	)
-	->addRow(_('Remove domain name'),
+	->addRow(new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		(new CTextBox('http_strip_domains', $data['http_strip_domains']))
 			->setEnabled($data['http_auth_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		null, 'http_auth'
 	)
-	->addRow(_('Case sensitive login'), (new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
-		->setChecked($data['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+	->addRow(new CLabel(_('Case sensitive login'), 'login_case_sensitive'),
+		(new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
+			->setChecked($data['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
 );
 
 // LDAP configuration fields.
@@ -61,55 +62,65 @@ if ($data['change_bind_password'] || zbx_empty($data['ldap_bind_password'])) {
 	];
 }
 else {
-	$password_box = (new CSubmitButton(_('Change password'), 'change_bind_password', 1))
+	$password_box = (new CButton('change_bind_password', _('Change password')))
 		->setEnabled($data['ldap_enabled'])
+		->setAttribute('type', 'action')
+		->setAttribute('value', 1)
 		->onClick('jQuery("[name=action]").val("'.$data['action_passw_change'].'")')
 		->addClass(ZBX_STYLE_BTN_GREY);
 }
 
 $ldap_tab = (new CFormList('list_ldap'));
 
-if ($data['ldap_error']) {
-	$ldap_tab->addRow('', $data['ldap_error']
-		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-		: null
-	);
-}
-
 $ldap_tab
-	->addRow((new CLabel(_('LDAP host'), 'ldap_host')),
-		(new CTextBox('ldap_host', $data['ldap_host'], !$data['ldap_enabled']))
+	->addRow(new CLabel(_('Configure LDAP authentication'), 'ldap_configured'),
+		$data['ldap_error']
+		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
+		: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
+			->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			->onChange('jQuery("[name^=ldap_],button[name=change_bind_password]")'.
+				'.not(this).attr("disabled", !this.checked)'
+			)
+	)
+	->addRow(new CLabel(_('LDAP host'), 'ldap_host'),
+		(new CTextBox('ldap_host', $data['ldap_host']))
+			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Port'),
-		(new CNumericBox('ldap_port', $data['ldap_port'], 5, !$data['ldap_enabled']))
+	->addRow(new CLabel(_('Port'), 'ldap_port'),
+		(new CNumericBox('ldap_port', $data['ldap_port'], 5))
+			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Base DN'), 'ldap_base_dn')),
-		(new CTextBox('ldap_base_dn', $data['ldap_base_dn'], !$data['ldap_enabled']))
+	->addRow(new CLabel(_('Base DN'), 'ldap_base_dn'),
+		(new CTextBox('ldap_base_dn', $data['ldap_base_dn']))
+			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('Search attribute'), 'ldap_search_attribute')),
-		(new CTextBox('ldap_search_attribute', $data['ldap_search_attribute'],  !$data['ldap_enabled'], 128))
+	->addRow(new CLabel(_('Search attribute'), 'ldap_search_attribute'),
+		(new CTextBox('ldap_search_attribute', $data['ldap_search_attribute']))
+			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Bind DN'),
-		(new CTextBox('ldap_bind_dn', $data['ldap_bind_dn'],  !$data['ldap_enabled']))
+	->addRow(new CLabel(_('Bind DN'), 'ldap_bind_dn'),
+		(new CTextBox('ldap_bind_dn', $data['ldap_bind_dn']))
+			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Bind password'), $password_box)
+	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
 	->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']')
-	->addRow(_('Login'), $data['users_list']
-		? new CComboBox('user', $data['user'], null, $data['users_list'])
-		: (new CTextBox('user', $data['user'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->addRow(new CLabel(_('Login'), 'ldap_test_user'),
+		(new CTextBox('ldap_test_user', $data['ldap_test_user']))
+			->setEnabled($data['ldap_enabled'])
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(_('User password'), 'user_password')),
-		(new CPassBox('user_password'))
+	->addRow(new CLabel(_('User password'), 'ldap_test_password'),
+		(new CPassBox('ldap_test_password'))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
-$confirm_script = 'return jQuery("[name=authentication_type]:checked").val() == '.$data['config']['authentication_type'].
+$confirm_script = 'return jQuery("[name=authentication_type]:checked").val() == '.$data['db_authentication_type'].
 	'|| confirm('.
 			CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?'))
 		.')';
@@ -121,14 +132,11 @@ $confirm_script = 'return jQuery("[name=authentication_type]:checked").val() == 
 		->setName('form_auth')
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem((new CTabView())
-			// Change 'Test' button enabled state according active tab: 'Authentication' or 'LDAP configuration'.
-			->onTabChange($data['ldap_enabled'] ? 'jQuery("[name=test]").attr("disabled", tab != 1);' : '')
+			->setSelected($data['form_refresh'] ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
 			->addTab('ldap', _('LDAP settings'), $ldap_tab)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update')))->onClick($confirm_script),
-				[(new CSubmitButton(_('Test'), 'test', 1))
-					->setEnabled($data['active_tab'] == 1 && $data['ldap_enabled'])
-				]
+				[(new CSubmitButton(_('Test'), 'ldap_test', 1))->setEnabled($data['ldap_enabled'])]
 			))
 ))->show();

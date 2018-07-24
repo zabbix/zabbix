@@ -37,11 +37,14 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'user' => 'string',
-			'user_password' => 'string',
-			'test' => 'in 1',
+			'form_refresh' => 'string',
+			'ldap_test_user' => 'string',
+			'ldap_test_password' => 'string',
+			'ldap_test' => 'in 1',
+			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'login_case_sensitive' => 'in 0,'.ZBX_AUTH_CASE_MATCH,
+			'ldap_configured' => 'in 0,'.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_host' => 'db config.ldap_host',
 			'ldap_port' => 'int32',
 			'ldap_base_dn' => 'db config.ldap_base_dn',
@@ -54,11 +57,10 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
-		/*
-			Validate LDAP settings if there are groups with GROUP_GUI_ACCESS_LDAP or system default authentication
-			method is ZBX_AUTH_LDAP. Method will set errors, if any exists, on $response property.
-		*/
-		$ret = $ret && $this->validateLdap();
+
+		if ($ret && $this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED) {
+			$ret = $this->validateLdap();
+		}
 
 		if (!$ret) {
 			$this->response->setFormData($this->getInputAll());
@@ -77,30 +79,14 @@ class CControllerAuthenticationUpdate extends CController {
 		$isvalid = true;
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute',
-			'ldap_bind_password'
+			'ldap_bind_password', 'ldap_configured'
 		];
 		$config = select_config();
 		$this->getInputs($config, $ldap_fields);
+		$ldap_settings_changed = array_diff_assoc($config, select_config());
 
-		if (!$this->hasInput('test')) {
-			// Do not validate LDAP connection if there was no changes in LDAP settings.
-			$ldap_settings_changed = array_diff_assoc($config, select_config());
-
-			if (!$ldap_settings_changed) {
-				return $isvalid;
-			}
-
-			$ldap_groups_count = (int) API::UserGroup()->get([
-				'output' => [],
-				'filter' => [
-					'gui_access' => GROUP_GUI_ACCESS_LDAP
-				],
-				'countOutput' => true
-			]);
-
-			if ($this->getInput('authentication_type', ZBX_AUTH_INTERNAL) != ZBX_AUTH_LDAP && $ldap_groups_count === 0) {
-				return $isvalid;
-			}
+		if (!$ldap_settings_changed && !$this->hasInput('ldap_test')) {
+			return $isvalid;
 		}
 
 		foreach($ldap_fields as $field) {
@@ -136,8 +122,8 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			$login = $ldap_validator->validate([
-				'user' => $this->getInput('user', CWebUser::$data['alias']),
-				'password' => $this->getInput('user_password', '')
+				'user' => $this->getInput('ldap_test_user', CWebUser::$data['alias']),
+				'password' => $this->getInput('ldap_test_password', '')
 			]);
 
 			if (!$login) {
@@ -164,12 +150,14 @@ class CControllerAuthenticationUpdate extends CController {
 	protected function doAction() {
 		$data = [
 			'login_case_sensitive' => 0,
-			'http_auth_enabled' => 0
+			'http_auth_enabled' => 0,
+			'ldap_configured' => 0
 		];
 
 		$this->getInputs($data, [
 			'authentication_type',
 			'login_case_sensitive',
+			'ldap_configured',
 			'ldap_host',
 			'ldap_port',
 			'ldap_base_dn',
@@ -181,25 +169,42 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_strip_domains'
 		]);
 
-		if ($this->hasInput('test')) {
-			// Only ZBX_AUTH_LDAP have'Test' option.
-			$this->response->setMessageOk(_('LDAP login successful'));
+		if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
+			$data = array_merge($data, [
+				'ldap_host' => '',
+				'ldap_port' => '389',
+				'ldap_base_dn' => '',
+				'ldap_bind_dn' => '',
+				'ldap_search_attribute' => '',
+				'ldap_bind_password' => '',
+			]);
 		}
-		else if ($data) {
+
+		if ($this->hasInput('ldap_test')) {
+			// Only ZBX_AUTH_LDAP have 'Test' option.
+			$this->response->setMessageOk(_('LDAP login successful'));
+			$this->response->setFormData($this->getInputAll());
+		}
+		else {
 			$config = select_config();
-			$result = update_config($data);
+			$data = array_diff_assoc($data, $config);
 
-			if ($result) {
-				if ($config['authentication_type'] != $data['authentication_type']) {
-					$this->invalidateSessions();
+			if ($data) {
+				$result = update_config($data);
+
+				if ($result) {
+					if (array_key_exists('authentication_type', $data)
+							&& $config['authentication_type'] != $data['authentication_type']) {
+						$this->invalidateSessions();
+					}
+
+					$this->response->setMessageOk(_('Authentication settings updated'));
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
 				}
-
-				$this->response->setMessageOk(_('Authentication settings updated'));
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
-			}
-			else {
-				$this->response->setFormData($this->getInputAll());
-				$this->response->setMessageError(_('Cannot update authentication'));
+				else {
+					$this->response->setFormData($this->getInputAll());
+					$this->response->setMessageError(_('Cannot update authentication'));
+				}
 			}
 		}
 

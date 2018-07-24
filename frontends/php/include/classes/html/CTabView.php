@@ -26,7 +26,6 @@ class CTabView extends CDiv {
 	protected $headers = [];
 	protected $footer = null;
 	protected $selectedTab = null;
-	protected $on_tabchange_script = null;
 
 	/**
 	 * Disabled tabs IDs, tab option
@@ -77,11 +76,6 @@ class CTabView extends CDiv {
 		return $this;
 	}
 
-	public function onTabChange($script) {
-		$this->on_tabchange_script = $script;
-		return $this;
-	}
-
 	public function toString($destroy = true) {
 		// No header if we have only one Tab
 		if (count($this->tabs) == 1) {
@@ -117,10 +111,8 @@ class CTabView extends CDiv {
 					'.$disabledTabs.'
 					active: '.CJs::encodeJson($activeTab).',
 					activate: function(event, ui) {
-						var tab = ui.newTab ? ui.newTab.index().toString() : "";
-						jQuery.cookie("tab",tab);'.
-						$this->on_tabchange_script.
-					'}
+						jQuery.cookie("tab", ui.newTab.index().toString());
+					}
 				})
 				.css("visibility", "visible");'
 			);

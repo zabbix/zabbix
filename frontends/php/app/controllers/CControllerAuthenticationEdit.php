@@ -32,11 +32,13 @@ class CControllerAuthenticationEdit extends CController {
 	 */
 	protected function checkInput() {
 		$fields = [
-			'user' => 'string',
-			'user_password' => 'string',
+			'form_refresh' => 'string',
+			'ldap_test_user' => 'string',
+			'ldap_test_password' => 'string',
 			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'login_case_sensitive' => 'in 0,1',
+			'login_case_sensitive' => 'in 0,'.ZBX_AUTH_CASE_MATCH,
+			'ldap_configured' => 'in 0,'.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_host' => 'db config.ldap_host',
 			'ldap_port' => 'int32',
 			'ldap_base_dn' => 'db config.ldap_base_dn',
@@ -71,32 +73,15 @@ class CControllerAuthenticationEdit extends CController {
 		$config = select_config();
 		$test_users = [];
 
-		if ($ldap_status['result'] == CFrontendSetup::CHECK_OK
-				&& getUserGuiAccess(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
-			$internal_auth_users = API::User()->get([
-				'output' => ['alias'],
-				'getAccess' => true
-			]);
-
-			foreach($internal_auth_users as $user) {
-				if ($user['gui_access'] != GROUP_GUI_ACCESS_DISABLED
-						&& $user['users_status'] != GROUP_STATUS_DISABLED) {
-					$test_users[$user['alias']] = $user['alias'];
-				}
-			}
-		}
-
 		$data = [
 			'action_submit' => 'administration.auth.update',
 			'action_passw_change' => 'administration.auth.edit',
-			'active_tab' => get_cookie('tab', 0),
-			'ldap_enabled' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK),
+			'ldap_configured' => $config['ldap_configured'],
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
-			'user' => CWebUser::$data['alias'],
-			'user_password' => '',
-			'users_list' => $test_users,
+			'ldap_test_password' => '',
 			'change_bind_password' => 0,
 			'authentication_type' => $config['authentication_type'],
+			'db_authentication_type' => $config['authentication_type'],
 			'login_case_sensitive' => $config['login_case_sensitive'],
 			'ldap_host' => $config['ldap_host'],
 			'ldap_port' => $config['ldap_port'],
@@ -104,29 +89,37 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_bind_dn' => $config['ldap_bind_dn'],
 			'ldap_search_attribute' => $config['ldap_search_attribute'],
 			'ldap_bind_password' => $config['ldap_bind_password'],
+			'ldap_test_user' => '',
 			'http_auth_enabled' => $config['http_auth_enabled'],
 			'http_login_form' => $config['http_login_form'],
 			'http_strip_domains' => $config['http_strip_domains'],
-			'config' => $config
+			'form_refresh' => 0,
 		];
 
 		$this->getInputs($data, [
-			'user',
-			'user_password',
+			'form_refresh',
 			'change_bind_password',
 			'authentication_type',
 			'login_case_sensitive',
+			'ldap_configured',
 			'ldap_host',
 			'ldap_port',
 			'ldap_base_dn',
 			'ldap_bind_dn',
 			'ldap_search_attribute',
 			'ldap_bind_password',
+			'ldap_test_user',
 			'http_auth_enabled',
 			'http_login_form',
 			'http_strip_domains'
 		]);
 
+		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
+			&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+
+		if ($data['ldap_test_user'] === '') {
+			$data['ldap_test_user'] = CWebUser::$data['alias'];
+		}
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Authentication'));
 		$this->setResponse($response);
