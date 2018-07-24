@@ -26,7 +26,7 @@
 
 static void	get_exp_value_and_compare(const char *param, size_t found_value)
 {
-	size_t	expected_value;
+	zbx_uint32_t	expected_value;
 
 	/* get expected values */
 	if (FAIL == is_uint32(zbx_mock_get_parameter_string(param), &expected_value))
