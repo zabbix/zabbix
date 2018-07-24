@@ -47,8 +47,11 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$height = (int) $this->getInput('content_height', 100);
 		$script_inline = '';
 
+		// Sort fields by its natural order.
+		CArrayHelper::sort($fields['ds'], ['order']);
+
 		$graph_data = [
-			'data_sets' => $fields['ds'],
+			'data_sets' => array_values($fields['ds']),
 			'data_source' => SVG_GRAPH_DATA_SOURCE_AUTO,
 			'time_period' => [
 				'time_from' => null,
