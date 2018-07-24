@@ -350,7 +350,7 @@ class testFormItemHttpAgent extends CWebTest {
 			$this->fillFields($data['fields']);
 		}
 		if (array_key_exists('request_type', $data)) {
-			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
+			$this->zbxTestClickXpathWait("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
 		if (array_key_exists('query', $data)) {
 			$this->processPairFields($data['query'], 'query_fields');
