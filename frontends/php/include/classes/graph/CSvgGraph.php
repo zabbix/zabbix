@@ -727,7 +727,6 @@ class CSvgGraph extends CSvg {
 		$y1 = $this->canvas_y;
 		$x2 = $x1;
 		$y2 = $this->canvas_y + $this->canvas_height;
-		//$tooltip = new CTag('title', false, $text);
 
 		$this->addItem([
 			(new CSvgLine($x1, $y1, $x2, $y2, $this->color_annotation))->setDashed(),
@@ -739,50 +738,53 @@ class CSvgGraph extends CSvg {
 				->setStrokeWidth(3)
 				->setStrokeColor($this->color_annotation)
 				->setFillColor($this->color_annotation)
-				//->addItem($tooltip)
 		]);
 	}
 
 	private function drawAnnotationRange($time_from, $time_to, $text) {
-		$time_range = $this->time_till - $this->time_from;
-		$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_from) / $time_range;
+		$time_range = $this->time_till - $this->time_from ? : 1;
+
+		// If highligted zone has started before $this->time_from, use the most left point of canvas.
+		$x1 = ($time_from > $this->time_from)
+			? $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_from) / $time_range
+			: $this->canvas_x;
+		$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
 		$y1_1 = $this->canvas_y;
 		$y1_2 = $this->canvas_y + $this->canvas_height;
-		$this->addItem([
-			(new CSvgLine($x1, $y1_1, $x1, $y1_2, $this->color_annotation))
-			->setDashed()
-		]);
-
-		$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
 		$y2_1 = $this->canvas_y;
 		$y2_2 = $this->canvas_y + $this->canvas_height;
-		$this->addItem([
-			(new CSvgLine($x2, $y2_1, $x2, $y2_2, $this->color_annotation))
-			->setDashed()
-		]);
 
+		// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
+		$start_line = new CSvgLine($x1, $y1_1, $x1, $y1_2, $this->color_annotation);
+		if ($time_from >= $this->time_from) {
+			$start_line->setDashed();
+		}
+		$end_line = new CSvgLine($x2, $y2_1, $x2, $y2_2, $this->color_annotation);
+		if ($this->time_till >= $time_to) {
+			$end_line->setDashed();
+		}
+
+		// Add to the canvas.
 		$this->addItem([
+			$start_line,
 			(new CSvgRect($x1, $y1_1, $x2 - $x1, $y1_2  - $y1_1))
 				->setFillColor($this->color_annotation)
-				->setStrokeColor($this->color_annotation)
-				->setFillOpacity('0.1')
-				->setStrokeOpacity('0.1')
-				//->addCLass('svg-graph-problem')
+				->setFillOpacity('0.1'),
+			$end_line
 		]);
 	}
 
 	private function drawProblems() {
 		foreach ($this->problems as $problem) {
-			// If problem is never recovered, it will be drown till the end of graph.
+			// If problem is never recovered, it will be drown till the end of graph or till current time.
 			if ($problem['r_clock'] == 0) {
-				$problem['r_clock'] = $this->time_till;
+				$problem['r_clock'] = min($this->time_till, time());
 			}
 
+			// At least 3 pixels expected to be occupied to show the range. Show simple anotation otherwise.
 			$time_range = $this->time_till - $this->time_from;
-			$x1 = (int) ($this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range);
-			$x2 = (int) ($this->canvas_width - $this->canvas_width * ($this->time_till - $problem['r_clock']) / $time_range);
-
-			// At least 3 pixels expected to be occupied to show range.
+			$x1 = $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
+			$x2 = $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['r_clock']) / $time_range;
 			if ($x2 - $x1 > 2) {
 				$this->drawAnnotationRange($problem['clock'], $problem['r_clock'], $problem['name']);
 			}
@@ -830,6 +832,9 @@ class CSvgGraph extends CSvg {
 		$this->calculateDimensions();
 		//$this->addCanvas();
 
+		// Draw problem zones.
+		$this->drawProblems();
+
 		// Add Y axes.
 		$this->addCanvasLeftYAxis();
 		$this->addCanvasRightYAxis();
@@ -847,8 +852,7 @@ class CSvgGraph extends CSvg {
 		// Add vertical highlihtinh line that follows mouse.
 		$this->addValueBox();
 
-		// Draw problem zones.
-		$this->drawProblems();
+		// Draw metrics & legend.
 		$this->drawMetrics();
 		$this->drawLegend();
 
