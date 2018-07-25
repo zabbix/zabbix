@@ -162,35 +162,32 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			if (count($params) === 0) {
-				$web_layout_mode = (int) CProfile::get('web.layout.mode', 0);
-			}
-			else {
-				$web_layout_mode = (int) $params[0];
-			}
+			$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
-			if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-				$icon = (new CButton('&nbsp;'))
-					->setTitle(_('Normal view'))
-					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
-					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
-					->addClass(ZBX_STYLE_BTN_MIN);
+			switch ($web_layout_mode) {
+				case ZBX_LAYOUT_KIOSKMODE:
+					$icon = (new CButton('&nbsp;'))
+						->setTitle(_('Normal view'))
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+						->addClass(ZBX_LAYOUT_MODE)
+						->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
+						->addClass(ZBX_STYLE_BTN_MIN);
+					break;
 
-			}
-			elseif ($web_layout_mode === ZBX_LAYOUT_FULLSREEN) {
-				$icon = (new CButton('&nbsp;'))
-					->setTitle(_('Kiosk mode'))
-					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
-					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_KIOSK);
-			}
-			else {
-				$icon = (new CButton('&nbsp;'))
-					->setTitle(_('Fullscreen'))
-					->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSREEN)
-					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_MAX);
+				case ZBX_LAYOUT_FULLSREEN:
+					$icon = (new CButton('&nbsp;'))
+						->setTitle(_('Kiosk mode'))
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+						->addClass(ZBX_LAYOUT_MODE)
+						->addClass(ZBX_STYLE_BTN_KIOSK);
+					break;
+
+				default:
+					$icon = (new CButton('&nbsp;'))
+						->setTitle(_('Fullscreen'))
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSREEN)
+						->addClass(ZBX_LAYOUT_MODE)
+						->addClass(ZBX_STYLE_BTN_MAX);
 			}
 
 			return $icon;
