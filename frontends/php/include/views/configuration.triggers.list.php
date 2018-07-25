@@ -239,24 +239,23 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$expression = $trigger['expression'];
 	}
 
-	$row = [
-		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
-		getSeverityCell($trigger['priority'], $data['config'])
-	];
-
-	if ($data['show_value_column']) {
-		$row[] = (new CSpan(trigger_value2str($trigger['value'])))->addClass(
+	$host = reset($trigger['hosts']);
+	$trigger_value = ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)
+		? (new CSpan(trigger_value2str($trigger['value'])))->addClass(
 			($trigger['value'] == TRIGGER_VALUE_TRUE) ? ZBX_STYLE_PROBLEM_UNACK_FG : ZBX_STYLE_OK_UNACK_FG
-		);
-	}
+		)
+		: '';
 
-	$triggers_table->addRow(array_merge($row, [
+	$triggers_table->addRow([
+		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
+		getSeverityCell($trigger['priority'], $data['config']),
+		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
 		$description,
 		$expression,
 		$status,
 		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
-	]));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$data['hostid'].'";');

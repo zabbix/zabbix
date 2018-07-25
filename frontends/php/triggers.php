@@ -745,7 +745,7 @@ else {
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
 			'recovery_mode', 'recovery_expression', 'value'
 		],
-		'selectHosts' => ['hostid', 'host', 'name'],
+		'selectHosts' => ['hostid', 'host', 'name', 'status'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
