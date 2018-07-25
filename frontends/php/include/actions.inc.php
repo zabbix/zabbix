@@ -1839,15 +1839,15 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
-		$aria_label = 'Severity decreased';
+		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
-		$aria_label = 'Severity increased';
+		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
-		$aria_label = 'Severity changed';
+		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
 	return $total
