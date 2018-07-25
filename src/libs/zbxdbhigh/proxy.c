@@ -3956,7 +3956,7 @@ out:
  *          ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY seconds                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_flush_proxy_lastaccess()
+static void	zbx_db_flush_proxy_lastaccess(void)
 {
 	zbx_vector_uint64_pair_t	lastaccess;
 
