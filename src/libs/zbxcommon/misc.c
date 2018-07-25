@@ -2395,12 +2395,8 @@ int	is_double(const char* str, unsigned char flags)
 	int i = 0, digits = 0;
 
 	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
-	{
 		while (' ' == str[i])	/* trim left spaces */
-		{
 			i++;
-		}
-	}
 
 	if ('-' == str[i] || (0 != (flags & ZBX_FLAG_DOUBLE_UNARY_PLUS) && '+' == str[i]))				/* check leading sign */
 		i++;
@@ -2442,12 +2438,8 @@ int	is_double(const char* str, unsigned char flags)
 		i++;
 
 	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
-	{
 		while (' ' == str[i])	/* trim right spaces */
-		{
 			i++;
-		}
-	}
 
 	if (i > (int)strlen(str))
 	{
