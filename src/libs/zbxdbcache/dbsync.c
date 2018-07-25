@@ -95,7 +95,7 @@ static void	dbsync_strfree(char *str)
  ******************************************************************************/
 static int	dbsync_numeric_validator(const char *value)
 {
-	if (SUCCEED == is_double(value, ZBX_FLAG_DOUBLE_SUFFIX))
+	if (SUCCEED == is_double(value, ZBX_FLAG_DOUBLE_SUFFIX | ZBX_FLAG_DOUBLE_UNARY_PLUS))
 		return SUCCEED;
 
 	return FAIL;

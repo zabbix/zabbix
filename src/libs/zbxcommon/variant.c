@@ -96,7 +96,7 @@ static int	variant_to_dbl(zbx_variant_t *value)
 	zbx_ltrim(buffer, " \"+");
 	zbx_rtrim(buffer, " \"\n\r");
 
-	if (SUCCEED != is_double(buffer, ZBX_FLAG_DOUBLE_PLAIN))
+	if (SUCCEED != is_double(buffer, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_UNARY_PLUS))
 		return FAIL;
 
 	value_dbl = atof(buffer);
@@ -201,7 +201,7 @@ int	zbx_variant_set_numeric(zbx_variant_t *value, const char *text)
 		return SUCCEED;
 	}
 
-	if (SUCCEED == is_double(buffer, ZBX_FLAG_DOUBLE_PLAIN))
+	if (SUCCEED == is_double(buffer, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_UNARY_PLUS))
 	{
 		zbx_variant_set_dbl(value, atof(buffer));
 		return SUCCEED;

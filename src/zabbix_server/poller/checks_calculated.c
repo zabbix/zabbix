@@ -276,7 +276,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			ret_unknown = 1;
 		}
 
-		if (1 == ret_unknown || SUCCEED != is_double(f->value, ZBX_FLAG_DOUBLE_SUFFIX) || '-' == *f->value)
+		if (1 == ret_unknown || SUCCEED != is_double(f->value, ZBX_FLAG_DOUBLE_SUFFIX | ZBX_FLAG_DOUBLE_UNARY_PLUS) || '-' == *f->value)
 		{
 			char	*wrapped;
 
