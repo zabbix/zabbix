@@ -198,14 +198,14 @@ out:
 test case: "successfully parsed positive real number with valid suffix"
 in:
   str: "2.5m"
-  flags: 2
+  flags: 1
 out:
   return: "SUCCEED"
 ---
 test case: "successfully parsed negative real number with valid suffix"
 in:
   str: "-4.6K"
-  flags: 2
+  flags: 1
 out:
   return: "SUCCEED"
 ---
@@ -233,14 +233,14 @@ out:
 test case: "failed to parse positive real number with invalid suffix"
 in:
   str: "1.99x"
-  flags: 2
+  flags: 1
 out:
   return: "FAIL"
 ---
 test case: "failed to parse negative real number with invalid suffix"
 in:
   str: "-3.2q"
-  flags: 2
+  flags: 1
 out:
   return: "FAIL"
 ---
@@ -282,7 +282,7 @@ out:
 test case: "successfully parsed number with unary plus"
 in:
   str: "+2"
-  flags: 4
+  flags: 2
 out:
   return: "SUCCEED"
 ...
