@@ -712,15 +712,26 @@ else {
 				}
 		}
 
-		if ($data['show_value_column'] && $data['filter_value'] != -1) {
-			$options['filter']['value'] = $data['filter_value'];
-		}
-
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
 		elseif ($data['pageFilter']->groupid > 0) {
 			$options['groupids'] = $data['pageFilter']->groupids;
+		}
+
+		if ($data['show_value_column'] && $data['filter_value'] != -1) {
+			$options['filter']['value'] = $data['filter_value'];
+
+			// Exclude templates when all hosts selected and filtered by specific values.
+			if ($data['hostid'] == 0) {
+				$hosts = API::Host()->get([
+					'output' => [],
+					'editable' => true,
+					'groupids' => ($data['pageFilter']->groupid > 0) ? $data['pageFilter']->groupid : null,
+					'preservekeys' => true
+				]);
+				$options['hostids'] = array_keys($hosts);
+			}
 		}
 
 		$data['triggers'] = API::Trigger()->get($options);
