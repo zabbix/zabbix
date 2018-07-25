@@ -1008,6 +1008,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+						'tag'	=> ['type' => API_STRING_UTF8],
+					]]
+				]],
+				[
+					'tags' => null
+				],
+				'/',
+				[
+					'tags' => null
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
 					'tags' => ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
 						'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 						'operator'	=> ['type' => API_INT32, 'in' => implode(',', [0, 2]), 'default' => 2],
