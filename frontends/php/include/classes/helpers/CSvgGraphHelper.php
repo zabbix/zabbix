@@ -253,6 +253,7 @@ class CSvgGraphHelper {
 			if (array_key_exists('problem_hosts', $problem_options)) {
 				$options += [
 					'searchWildcardsEnabled' => true,
+					'searchByAny' => true,
 					'search' => [
 						'name' => self::processPattern($problem_options['problem_hosts'])
 					]
@@ -299,7 +300,9 @@ class CSvgGraphHelper {
 		// Prepare API request to select problems.
 		$options = [
 			'output' => ['objectid', 'name', 'severity', 'clock', 'r_clock'],
+			'selectAcknowledges' => ['action'],
 			'eventids' => $eventids,
+			'recent' => true,
 			'preservekeys' => true
 		];
 		if (array_key_exists('problem_name', $problem_options)) {

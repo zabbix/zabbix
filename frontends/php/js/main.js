@@ -508,9 +508,10 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles) {
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
+			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			appendTo = appendTo || 'body';
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -550,7 +551,7 @@ var hintBox = {
 			box.prepend(close_link);
 		}
 
-		jQuery('body').append(box);
+		jQuery(appendTo).append(box);
 
 		return box;
 	},
@@ -1513,18 +1514,6 @@ jQuery(function ($) {
 		}
 	}
 
-	function showProblems(e) {
-		var graph = $(this),
-			data = graph.data('graph');
-
-		if (typeof data.boxing === 'undefined' || data.boxing === false) {
-			if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
-					&& e.offsetY <= data.dimY + data.dimH) {
-				e.stopPropagation();
-			}
-		}
-	}
-
 	function findValues(graph, x, y) {
 		/**
 		 * Find mouse-overed data points.
@@ -1657,20 +1646,78 @@ jQuery(function ($) {
 		return matching_xy.length ? matching_xy : matching_x;
 	}
 
-	function startValueDisplaying(e) {
+	function findProblems(graph, x) {
+		var problems = [],
+			problem_start,
+			problem_width;
+
+		graph[0].querySelectorAll('[data-info]').forEach(function(problem) {
+			problem_start = +problem.getAttribute('x');
+			problem_width = +problem.getAttribute('width');
+
+			if (x > problem_start && problem_start + problem_width > x) {
+				problems.push(JSON.parse(problem.getAttribute('data-info')));
+			}
+		});
+
+		return problems;
+	}
+
+	function hideHelper(graph) {
+		graph.find('.svg-value-box').attr('x', -10);
+	}
+
+	function showHintbox(e) {
 		var graph = $(this),
 			data = graph.data('graph'),
 			hbox = graph.data('hintbox'),
 			line = graph.find('.svg-value-box'),
-			html = null;
+			html = null,
+			inx = false;
 
 		if (typeof data.boxing === 'undefined' || data.boxing === false) {
-			if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
-					&& e.offsetY <= data.dimY + data.dimH) {
-				e.stopPropagation();
+			e.stopPropagation();
+			inx = (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW);
 
+			// Show problems when mouse is in the 15px high zone under the graph canvas.
+			if (inx && data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15) {
+				hideHelper(graph);
+
+				var values = findProblems(graph, e.offsetX);
+				if (values.length) {
+					var tbody = $('<tbody>');
+
+					values.forEach(function(val) {
+						tbody.append(
+							$('<tr>')
+								.append($('<td>').text(val.clock))
+								.append($('<td>').text(val.r_clock || ''))
+								.append($('<td>', {'class': val.status_color}).text(val.status))
+								.append($('<td>', {'class': val.severity}).text(val.name))
+						);
+					});
+
+					// TODO miks: replace with translation strings.
+					html = $('<table></table>')
+						.addClass('list-table')
+						.append(tbody)
+						.append(
+							$('<thead>').append(
+								$('<tr>')
+									.append($('<th>').text('Time').addClass('right'))
+									.append($('<th>').text('Recovery time'))
+									.append($('<th>').text('Status'))
+									.append($('<th>').text('Problem'))
+							)
+						);
+				}
+			}
+			// Show graph values if mouse is over the graph canvas.
+			else if (inx && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH) {
+				// Helper line should follow the mouse.
 				line.attr({x: e.clientX - 14});
 
+				// Find values and draw HTML for value hintbox.
 				var values = findValues(graph, e.offsetX, e.offsetY);
 				if (values.length) {
 					html = $('<ul></ul>');
@@ -1689,25 +1736,23 @@ jQuery(function ($) {
 							.append(val.metric + ': ' + val.val)
 							.appendTo(html);
 					});
-
-					if (typeof hbox === 'undefined') {
-						hbox = hintBox.createBox(e, graph, null, false);
-						graph.data('hintbox', hbox);
-					}
-
-					hbox.html(html)
-						.css({
-							'left': e.clientX + 10,
-							'top': e.clientY + 10
-						});
 				}
 			}
 			else {
-				line.attr('x', -1);
+				hideHelper(graph);
+			}
+
+			if (html !== null) {
+				if (typeof hbox === 'undefined') {
+					hbox = hintBox.createBox(e, graph, null, '', false, false, graph.parent());
+					graph.data('hintbox', hbox);
+				}
+
+				hbox.html(html).css({'left': e.offsetX + 20, 'top': e.offsetY + 20});
 			}
 		}
 		else {
-			line.attr('x', -1);
+			hideHelper(graph);
 		}
 
 		if (html === null) {
@@ -1726,7 +1771,7 @@ jQuery(function ($) {
 
 			// ---<--- testing data:
 			options.values = true;
-			options.problems = false;
+			options.problems = true;
 			options.sbox = false;
 			// --->--- testing data.
 
@@ -1744,14 +1789,8 @@ jQuery(function ($) {
 					.css('user-select', 'none')
 					.on('selectstart', false)
 
-				if (options.problems) {
-					//graph_data = $.extend({}, {}, graph_data);
-					graph.on('mousemove', showProblems);
-				}
-
-				if (options.values) {
-					//graph_data = $.extend({}, {}, graph_data);
-					graph.on('mousemove', startValueDisplaying);
+				if (options.values || options.problems) {
+					graph.on('mousemove', showHintbox);
 				}
 
 				if (options.sbox) {
@@ -1779,7 +1818,7 @@ jQuery(function ($) {
 							if (hbox) {
 								graph.removeData('hintbox');
 								$(hbox).remove();
-								line.attr('x', -1);
+								hideHelper(graph)
 							}
 
 							if (options.sbox) {

@@ -35,7 +35,7 @@ class CSvgGraph extends CSvg {
 	protected $color_grid;
 	protected $color_metric;
 	protected $color_legend;
-	protected $draw_color_palette;
+	//protected $draw_color_palette;
 	protected $draw_fill;
 	protected $draw_line_width;
 	protected $height;
@@ -721,7 +721,7 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
-	private function drawAnnotationSimple($clock, $text) {
+	private function drawAnnotationSimple($clock, $info) {
 		$time_range = $this->time_till - $this->time_from;
 		$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $time_range;
 		$y1 = $this->canvas_y;
@@ -738,10 +738,11 @@ class CSvgGraph extends CSvg {
 				->setStrokeWidth(3)
 				->setStrokeColor($this->color_annotation)
 				->setFillColor($this->color_annotation)
+				->setAttribute('data-info', CJs::encodeJson($info))
 		]);
 	}
 
-	private function drawAnnotationRange($time_from, $time_to, $text) {
+	private function drawAnnotationRange($time_from, $time_to, $info) {
 		$time_range = $this->time_till - $this->time_from ? : 1;
 
 		// If highligted zone has started before $this->time_from, use the most left point of canvas.
@@ -770,26 +771,68 @@ class CSvgGraph extends CSvg {
 			(new CSvgRect($x1, $y1_1, $x2 - $x1, $y1_2  - $y1_1))
 				->setFillColor($this->color_annotation)
 				->setFillOpacity('0.1'),
-			$end_line
+			$end_line,
+			(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
+				->setFillColor($this->color_annotation)
+				->setStrokeColor($this->color_annotation)
+				->setAttribute('data-info', CJs::encodeJson($info))
 		]);
 	}
 
 	private function drawProblems() {
+		$config = select_config();
+		$today = strtotime('today');
+
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
-			if ($problem['r_clock'] == 0) {
-				$problem['r_clock'] = min($this->time_till, time());
-			}
+			$time_to =  ($problem['r_clock'] == 0) ? min($this->time_till, time()) : $problem['r_clock'];
 
 			// At least 3 pixels expected to be occupied to show the range. Show simple anotation otherwise.
 			$time_range = $this->time_till - $this->time_from;
 			$x1 = $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
-			$x2 = $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['r_clock']) / $time_range;
-			if ($x2 - $x1 > 2) {
-				$this->drawAnnotationRange($problem['clock'], $problem['r_clock'], $problem['name']);
+			$x2 = $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
+
+			// Make problem info.
+			if ($problem['r_clock'] != 0) {
+				$status_str = _('RESOLVED');
+				$status_color = ZBX_STYLE_OK_UNACK_FG;
 			}
 			else {
-				$this->drawAnnotationSimple($problem['clock'], $problem['name']);
+				$in_closing = false;
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$in_closing = true;
+						break;
+					}
+				}
+
+				$status_str = $in_closing ? _('CLOSING') : _('PROBLEM');
+				$status_color = $in_closing ? ZBX_STYLE_OK_UNACK_FG : ZBX_STYLE_PROBLEM_UNACK_FG;
+			}
+
+			$info = [
+				'name' => $problem['name'],
+				'clock' => ($problem['clock'] >= $today)
+					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
+					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+				'r_clock' => $problem['r_clock'],
+				'severity' => getSeverityStyle($problem['severity']),
+				'status' => $status_str,
+				'status_color' => $status_color,
+				'r_clock' => ''
+			];
+
+			if ($problem['r_clock']) {
+				$info['r_clock'] = ($problem['r_clock'] >= $today)
+					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+			}
+
+			if ($x2 - $x1 > 2) {
+				$this->drawAnnotationRange($problem['clock'], $time_to, $info);
+			}
+			else {
+				$this->drawAnnotationSimple($problem['clock'], $info);
 			}
 		}
 	}
@@ -803,19 +846,19 @@ class CSvgGraph extends CSvg {
 		return $this;
 	}
 
-	private function addToolTip() {
-		$this->addItem([
-			(new CSvgTag('switch', true))
-				->addItem(
-					(new CSvgTag('foreignObject', true))
-						->setAttribute('x', 0)
-						->setAttribute('y', 0)
-						->setAttribute('width', 0)
-						->setAttribute('height', 0)
-						->addClass('svg-tool-tip')
-				)
-		]);
-	}
+//	private function addToolTip() {
+//		$this->addItem([
+//			(new CSvgTag('switch', true))
+//				->addItem(
+//					(new CSvgTag('foreignObject', true))
+//						->setAttribute('x', 0)
+//						->setAttribute('y', 0)
+//						->setAttribute('width', 0)
+//						->setAttribute('height', 0)
+//						->addClass('svg-tool-tip')
+//				)
+//		]);
+//	}
 
 	private function addValueBox() {
 		$this->addItem([
@@ -860,7 +903,7 @@ class CSvgGraph extends CSvg {
 		if ($this->make_sbox) {
 			$this->addSBox();
 		}
-		$this->addToolTip();
+		//$this->addToolTip();
 
 		return $this;
 	}
