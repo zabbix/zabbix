@@ -687,7 +687,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 			}
 			else
 			{
-				if (SUCCEED != is_double(arg2, ZBX_FLAG_DOUBLE_SUFFIX | ZBX_FLAG_DOUBLE_UNARY_PLUS))
+				if (SUCCEED != is_double(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
 							arg2);

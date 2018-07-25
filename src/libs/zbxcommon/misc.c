@@ -2438,6 +2438,12 @@ int	is_double(const char* str, unsigned char flags)
 	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]))
 		i++;
 
+	if (i > (int)strlen(str))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "str '%s' i:%d strlen %d", str, i, strlen(str));
+		exit(1);
+	}
+
 	while (' ' == str[i])	/* trim right spaces */
 	{
 		i++;
