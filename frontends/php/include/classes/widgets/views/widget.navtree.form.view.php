@@ -30,12 +30,14 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['known_widget_types'], $fields['rf_rate']
 );
 
+$scripts = [];
+
 // Map widget reference.
 $field = $fields[CWidgetFieldReference::FIELD_NAME];
 $form->addVar($field->getName(), $field->getValue());
 
 if ($field->getValue() === '') {
-	$scripts = [$field->getJavascript('#'.$form->getAttribute('id'))];
+	$scripts[] = $field->getJavascript('#'.$form->getAttribute('id'));
 }
 
 // Register dynamically created item fields. Only for map.name.#, map.parent.#, map.order.#, mapid.#
