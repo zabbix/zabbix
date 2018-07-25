@@ -88,9 +88,9 @@
 			 * Show colorpicker for specific element.
 			 *
 			 * @param string id       Id of input element which will be associated with opened colorpicker instance.
-			 * @param object event    jQuery event object.
+			 * @param object target   jQuery element (colorbox) which triggered show action.
 			 */
-			show: function(id, event) {
+			show: function(id, target) {
 				input = $('#' + id);
 
 				if (input.is(':disabled')) {
@@ -106,7 +106,7 @@
 					'display': 'block'
 				});
 
-				addToOverlaysStack('color_picker', event.target, 'color_picker');
+				addToOverlaysStack('color_picker', target, 'color_picker');
 				overlayDialogueOnLoad(true, overlay);
 			},
 			/**
@@ -173,7 +173,7 @@
 
 			$('<div/>').attr({
 				'id': 'lbl_' + id,
-				'title': '#' + element.value
+				'title': element.value ? '#' + element.value : ''
 			}).click(function(event) {
 				/**
 				 * Prefix 'lbl_' should be striped out of colorbox id attribute value to get id of associated
