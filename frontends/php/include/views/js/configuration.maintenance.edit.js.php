@@ -31,8 +31,8 @@
 				}
 				else {
 					$('#tags input, #tags button').prop('disabled', false);
-					$('#tags input[name$="[tag]"]').attr('placeholder', '<?= CJs::encodeJson(_('tag')) ?>');
-					$('#tags input[name$="[value]"]').attr('placeholder', '<?= CJs::encodeJson(_('value')) ?>');
+					$('#tags input[name$="[tag]"]').attr('placeholder', <?= CJs::encodeJson(_('tag')) ?>);
+					$('#tags input[name$="[value]"]').attr('placeholder', <?= CJs::encodeJson(_('value')) ?>);
 				}
 			});
 
