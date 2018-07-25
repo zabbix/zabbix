@@ -278,4 +278,11 @@ in:
   flags: 0
 out:
   return: "FAIL"
+---
+test case: "successfully parsed number with unary plus"
+in:
+  str: "+2"
+  flags: 0
+out:
+  return: "SUCCEED"
 ...

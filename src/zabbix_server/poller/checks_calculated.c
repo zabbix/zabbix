@@ -296,7 +296,7 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 		}
 		else
 			f->value = (char *)zbx_realloc(f->value, strlen(f->value) + 1);
-
+		zabbix_log(LOG_LEVEL_INFORMATION, "f->value  '%s'", f->value);
 		zbx_snprintf(replace, sizeof(replace), "{%d}", f->functionid);
 		buf = string_replace(exp->exp, replace, f->value);
 		zbx_free(exp->exp);

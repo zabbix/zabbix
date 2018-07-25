@@ -4234,7 +4234,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'", token.token.r - token.token.l + 1,
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot resolve macro '%.*s'", token.token.r - token.token.l + 1,
 					*data + token.token.l);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
@@ -4266,7 +4266,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	zbx_free(expression);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
+	zabbix_log(LOG_LEVEL_INFORMATION, "End %s() data:'%s' res:%d", __function_name, *data, res);
 
 	return res;
 }
@@ -4868,7 +4868,7 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 			continue;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i,
+		zabbix_log(LOG_LEVEL_INFORMATION, "%s() expression[%d]:'%s' => '%s'", __function_name, i,
 				tr->expression, out);
 
 		tr->expression = zbx_strdup(tr->expression, out);

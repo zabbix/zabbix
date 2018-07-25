@@ -675,7 +675,7 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
 						/* to catch errors */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() expression:'%s'", __function_name, expression);
 
 	ptr = expression;
 	level = 0;
@@ -728,11 +728,11 @@ int	evaluate(double *value, const char *expression, char *error, size_t max_erro
 
 	if (ZBX_INFINITY == *value)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
+		zabbix_log(LOG_LEVEL_INFORMATION, "End of %s() error:'%s'", __function_name, error);
 		return FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
+	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
 
 	return SUCCEED;
 }
