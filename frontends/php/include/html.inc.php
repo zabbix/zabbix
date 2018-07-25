@@ -920,6 +920,12 @@ function makeActionIcon(array $icon_data) {
 		$icon->setTitle($icon_data['title']);
 	}
 
+	if (array_key_exists('aria-label', $icon_data)) {
+		$icon
+			->addItem($icon_data['aria-label'])
+			->addClass(ZBX_STYLE_INLINE_SR_ONLY);
+	}
+
 	return $icon;
 }
 

@@ -5827,8 +5827,14 @@ svg {
 	}
 }
 
+// Screen reader
+
 .block-sr-only {
 	display: none;
+}
+
+.inline-sr-only {
+	font-size: 0;
 }
 
 @if $theme_name == 'dev' {

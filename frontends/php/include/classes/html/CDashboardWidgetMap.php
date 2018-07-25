@@ -238,7 +238,7 @@ class CDashboardWidgetMap extends CDiv {
 				$this->addItem($go_back_div);
 			}
 
-			$map_div = (new CDiv((new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_SCREEN_READER_ONLY)))
+			$map_div = (new CDiv((new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_BLOCK_SR_ONLY)))
 				->setId('map_'.$this->uniqueid)
 				->addClass('sysmap-widget-container');
 
