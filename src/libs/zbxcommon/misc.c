@@ -277,29 +277,6 @@ double	zbx_current_time(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strchr                                                       *
- *                                                                            *
- * Purpose: Tests whether a string contains a particular character            *
- *                                                                            *
- * Return value: SUCCEED - the string contains the character                  *
- *               FAIL    - the string doesn't contain the character           *
- *                                                                            *
- * Author: Arets Paeglis                                                      *
- *                                                                            *
- ******************************************************************************/
-int zbx_strchr(char* str, char ch)
-{
-	int i, pos = 0;
-
-	for (i = 0 ; str[i] != '\0'; i++)
-		if (str[i] == ch)
-			return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: is_leap_year                                                     *
  *                                                                            *
  * Return value:  SUCCEED - year is a leap year                               *
@@ -2461,7 +2438,7 @@ int	is_double(const char* str, unsigned char flags)
 	}
 
 	/* check valid suffixes if flag is enabled */
-	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && SUCCEED == zbx_strchr(ZBX_UNIT_SYMBOLS, str[i]))
+	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && ((NULL != strchr(ZBX_UNIT_SYMBOLS, str[i])) && str[i] != '\0'))
 		i++;
 
 	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
