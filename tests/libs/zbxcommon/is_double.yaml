@@ -282,7 +282,7 @@ out:
 test case: "successfully parsed number with unary plus"
 in:
   str: "+2"
-  flags: 0
+  flags: 4
 out:
   return: "SUCCEED"
 ...
