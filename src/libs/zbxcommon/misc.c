@@ -20,7 +20,6 @@
 #include "common.h"
 #include "log.h"
 #include "setproctitle.h"
-#include "md5.h"
 
 /* scheduler support */
 
@@ -3507,6 +3506,9 @@ int	zbx_alarm_timed_out(void)
  *                                                                            *
  * Return value: Hexadecimal token string, must be freed by caller            *
  *                                                                            *
+ * Comments: if you change token creation algorithm do not forget to adjust   *
+ *           ZBX_DATA_SESSION_TOKEN_SIZE definition                           *
+ *                                                                            *
  ******************************************************************************/
 char	*zbx_create_token(zbx_uint64_t seed)
 {
@@ -3517,7 +3519,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	int		i;
 	char		*token, *ptr;
 
-	ptr = token = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
+	ptr = token = (char *)zbx_malloc(NULL, ZBX_DATA_SESSION_TOKEN_SIZE);
 
 	zbx_timespec(&ts);
 

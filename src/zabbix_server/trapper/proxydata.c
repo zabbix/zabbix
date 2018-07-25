@@ -112,6 +112,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
+		status = FAIL;
 		goto out;
 	}
 

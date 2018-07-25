@@ -3069,7 +3069,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	zbx_timespec_t		client_timediff;
 	const char		*pnext = NULL;
 	char			*error = NULL, *token = NULL;
-	size_t			token_size = 0;
+	size_t			token_alloc = 0;
 	zbx_host_key_t		*hostkeys;
 	DC_ITEM			*items;
 	double			sec;
@@ -3094,7 +3094,18 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		goto out;
 	}
 
-	zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);	/* return value not checked */
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
+	{
+		size_t	token_len;
+
+		if (ZBX_DATA_SESSION_TOKEN_SIZE - 1 != (token_len = strlen(token)))
+		{
+			error = zbx_dsprintf(NULL, "invalid session token length %d", (int)token_len);
+			zbx_free(token);
+			ret = FAIL;
+			goto out;
+		}
+	}
 
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
@@ -3887,13 +3898,22 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 	{
 		zbx_timespec_t	client_timediff_copy = client_timediff;
 		char			*token = NULL;
-		size_t			token_size = 0;
+		size_t			token_alloc = 0;
 		zbx_data_session_t	*session = NULL;
 
-		zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_size);	/* return value */
-												/* not checked */
-		if (NULL != token)
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
+		{
+			size_t	token_len;
+
+			if (ZBX_DATA_SESSION_TOKEN_SIZE - 1 != (token_len = strlen(token)))
+			{
+				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
+				ret = FAIL;
+				goto out;
+			}
+
 			session = zbx_dc_get_or_create_data_session(proxy->hostid, token);
+		}
 
 		/* use modifiable copy of client_timediff to allow unique clock,ns value timestamps */
 		process_proxy_history_data_33(proxy, &jp_data, session, &client_timediff_copy, &error_step);
