@@ -199,13 +199,15 @@ $filter = (new CFilter())
 	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
 	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1));
 
+$widget = new CWidget();
+
 $web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 	$filter->addTimeSelector($timeline['from'], $timeline['to']);
+	$widget->addItem($filter);
 }
 
-(new CWidget())
-	->addItem($filter)
+$widget
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 
