@@ -289,7 +289,7 @@ out:
 test case: "successfully parsed number without suffix"
 in:
   str: "2"
-  flags: 0
+  flags: 1
 out:
   return: "SUCCEED"
 ...
