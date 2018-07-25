@@ -92,7 +92,7 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen', []));
+	->addItem(get_icon('fullscreen'));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))

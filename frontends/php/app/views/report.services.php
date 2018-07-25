@@ -52,7 +52,7 @@ $widget->setControls(new CList([
 		->addVar('serviceid', $data['service']['serviceid'])
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls),
-	(new CTag('nav', true, get_icon('fullscreen', [])))
+	(new CTag('nav', true, get_icon('fullscreen')))
 		->setAttribute('aria-label', _('Content controls'))
 ]));
 

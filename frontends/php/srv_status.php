@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
-$page['scripts'] = ['layoutmode.js'];
+$page['scripts'] = ['layout.mode.js'];
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -167,7 +167,7 @@ else {
 							$period_combo
 						])
 					),
-				(new CTag('nav', true, get_icon('fullscreen', [])))->setAttribute('aria-label', _('Content controls'))
+				(new CTag('nav', true, get_icon('fullscreen')))->setAttribute('aria-label', _('Content controls'))
 			]))
 			->addItem(BR())
 			->addItem($tree->getHTML())

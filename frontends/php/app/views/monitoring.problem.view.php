@@ -75,7 +75,7 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
-	$this->addJsFile('layoutmode.js');
+	$this->addJsFile('layout.mode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
@@ -322,7 +322,7 @@ if ($data['action'] == 'problem.view') {
 							->setArgument('action', 'problem.view.csv')
 							->setArgument('page',  $data['page'])
 					))
-					->addItem(get_icon('fullscreen', []))
+					->addItem(get_icon('fullscreen'))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))

@@ -54,7 +54,7 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen', []));
+$content_control->addItem(get_icon('fullscreen'));
 $content_control = (new CTag('nav', true, $content_control))
 	->setAttribute('aria-label', _('Content controls'));
 

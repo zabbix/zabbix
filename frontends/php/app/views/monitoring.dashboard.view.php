@@ -28,7 +28,7 @@ else {
 	$this->addJsFile('dashboard.grid.js');
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('multiselect.js');
-	$this->addJsFile('layoutmode.js');
+	$this->addJsFile('layout.mode.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
@@ -115,7 +115,7 @@ else {
 							]
 						])
 					)
-					->addItem(get_icon('fullscreen', []))
+					->addItem(get_icon('fullscreen'))
 				]))->setAttribute('aria-label', _('Content controls'))
 			)
 			->addItem((new CListItem([

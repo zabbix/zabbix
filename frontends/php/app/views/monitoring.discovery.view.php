@@ -21,7 +21,7 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('layoutmode.js');
+$this->addJsFile('layout.mode.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))
@@ -37,7 +37,7 @@ $widget = (new CWidget())
 					$data['pageFilter']->getDiscoveryCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen', [])))
+		(new CTag('nav', true, get_icon('fullscreen')))
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 

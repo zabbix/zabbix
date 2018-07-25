@@ -21,7 +21,7 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('layoutmode.js');
+$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Web monitoring'))
@@ -42,7 +42,7 @@ $this->addJsFile('layoutmode.js');
 					$data['pageFilter']->getHostsCB()
 				])
 			),
-		(new CTag('nav', true, get_icon('fullscreen', [])))
+		(new CTag('nav', true, get_icon('fullscreen')))
 			->setAttribute('aria-label', _('Content controls'))
 		])))
 	->addItem(

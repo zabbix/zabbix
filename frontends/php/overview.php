@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layoutmode.js'];
+$page['scripts'] = ['layout.mode.js'];
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS', 0);

@@ -60,7 +60,7 @@ $availableJScripts = [
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
-	'layoutmode.js' => '',
+	'layout.mode.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',

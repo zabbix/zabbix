@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layoutmode.js'];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -83,7 +83,7 @@ $details_screen = CScreenBuilder::getScreen([
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->addItem((new CList())->addItem(get_icon('fullscreen', [])))
+			->addItem((new CList())->addItem(get_icon('fullscreen')))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)

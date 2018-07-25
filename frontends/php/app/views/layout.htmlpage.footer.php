@@ -21,9 +21,7 @@
 
 show_messages();
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
-if ($web_layout_mode === ZBX_LAYOUT_NORMAL) {
+if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	makePageFooter()->show();
 }
 

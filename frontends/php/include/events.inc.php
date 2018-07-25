@@ -392,11 +392,10 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['url']					Trigger URL.
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
- * @param bool   $fullscreen
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 

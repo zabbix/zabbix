@@ -22,7 +22,7 @@
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
-$this->addJsFile('layoutmode.js');
+$this->addJsFile('layout.mode.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
@@ -34,7 +34,7 @@ $widget = (new CWidget())
 					->setArgument('new', '1')
 					->getUrl()
 			))
-		->addItem(get_icon('fullscreen', []))
+		->addItem(get_icon('fullscreen'))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	);

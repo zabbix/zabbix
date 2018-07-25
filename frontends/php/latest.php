@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js', 'layoutmode.js'];
+$page['scripts'] = ['multiselect.js', 'layout.mode.js'];
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -321,7 +321,7 @@ $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen', []))
+			->addItem(get_icon('fullscreen'))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	);

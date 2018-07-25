@@ -74,7 +74,8 @@ function local_generateHeader($data) {
 		'user' => [
 			'lang' => CWebUser::$data['lang'],
 			'theme' => CWebUser::$data['theme']
-		]
+		],
+		'web_layout_mode' => $data['web_layout_mode']
 	]);
 	echo $pageHeader->getOutput();
 
@@ -124,12 +125,13 @@ function local_generateHeader($data) {
 	show_messages();
 }
 
-function local_generateFooter() {
+function local_generateFooter($data) {
 	$pageFooter = new CView('layout.htmlpage.footer', [
 		'user' => [
 			'alias' => CWebUser::$data['alias'],
 			'debug_mode' => CWebUser::$data['debug_mode']
-		]
+		],
+		'web_layout_mode' => $data['web_layout_mode']
 	]);
 	echo '</main>'."\n";
 	echo $pageFooter->getOutput();
@@ -155,12 +157,14 @@ function local_showMessage() {
 	}
 }
 
+$data['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 local_generateHeader($data);
 local_showMessage();
 echo $data['javascript']['pre'];
 echo $data['main_block'];
 echo $data['javascript']['post'];
-local_generateFooter();
+local_generateFooter($data);
 show_messages();
 
 echo '</body></html>';

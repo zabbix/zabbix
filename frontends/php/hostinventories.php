@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['scripts'] = ['layoutmode.js'];
+$page['scripts'] = ['layout.mode.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

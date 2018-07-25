@@ -33,7 +33,7 @@ $page['scripts'] = [
 	'flickerfreescreen.js',
 	'class.svg.canvas.js',
 	'class.svg.map.js',
-	'layoutmode.js'
+	'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

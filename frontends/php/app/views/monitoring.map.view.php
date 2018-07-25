@@ -23,7 +23,7 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('layoutmode.js');
+$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Maps'))
@@ -53,7 +53,7 @@ $this->addJsFile('layoutmode.js');
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen', []))
+			->addItem(get_icon('fullscreen'))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))

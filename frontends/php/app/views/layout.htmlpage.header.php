@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
 $page_title = $data['page']['title'];
@@ -46,10 +45,8 @@ if (!empty($DB['DB'])) {
 $pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
 // show GUI messages in pages with menus and in fullscreen and kiosk mode
-$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode > ZBX_LAYOUT_NORMAL) ? 1 : 0;
+$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] > ZBX_LAYOUT_NORMAL) ? 1 : 0;
 
 $pageHeader->addJsFile('js/browsers.js');
 $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&showGuiMessaging='.$showGuiMessaging;

@@ -18,12 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$this->addJsFile('kioskmode.js');
 
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CList())
-		->addItem(get_icon('fullscreen', []))
+		->addItem(get_icon('fullscreen'))
 	);
 
 /*

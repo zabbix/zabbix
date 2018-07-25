@@ -18,24 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = new CWidget();
 
-$widget = (new CWidget())
-	->setTitle(_('Slide shows'))
-	->addItem((new CList())
-	->addClass(ZBX_STYLE_OBJECT_GROUP)
-	->addItem([
-		(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
-		'/',
-		(new CSpan())
-			->addClass(ZBX_STYLE_SELECTED)
-			->addItem(
-				new CLink($data['screen']['name'], (new CUrl('slides.php'))
-					->setArgument('elementid', $data['screen']['slideshowid'])
-					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+		$widget
+		->setTitle(_('Slide shows'))
+		->addItem((new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($data['screen']['name'], (new CUrl('slides.php'))
+						->setArgument('elementid', $data['screen']['slideshowid'])
+					)
 				)
-			)
-	]));
-
+		]));
+}
 $controls = (new CList())
 	->addItem(
 		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
@@ -80,7 +82,6 @@ $widget->setControls((new CList([
 	(new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))
 		->setName('slideHeaderForm')
-		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls),
 	(new CTag('nav', true, (new CList())
 		->addItem($data['screen']['editable']
@@ -90,16 +91,18 @@ $widget->setControls((new CList([
 		)
 		->addItem($favourite_icon)
 		->addItem($refresh_icon)
-		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+		->addItem(get_icon('fullscreen'))
 	))
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-$filter = (new CFilter())
-	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-$widget->addItem($filter);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$filter = (new CFilter())
+		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
+	$widget->addItem($filter);
+}
 
 $widget->addItem(
 	(new CDiv((new CDiv())->addClass('preloader')))

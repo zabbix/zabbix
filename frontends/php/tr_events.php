@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layoutmode.js'];
+$page['scripts'] = ['layout.mode.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -159,7 +159,7 @@ $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen', []))
+			->addItem(get_icon('fullscreen'))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)
