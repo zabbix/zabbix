@@ -175,7 +175,7 @@ class CApiInputValidator {
 
 			case API_OBJECT:
 				foreach ($rule['fields'] as $field_name => $field_rule) {
-					if (array_key_exists($field_name, $data)) {
+					if ($data !== null && array_key_exists($field_name, $data)) {
 						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
 							return false;
