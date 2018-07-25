@@ -89,9 +89,11 @@ foreach ($data['groups'] as $group) {
 	 * problems for each host, grouped per problem severity.
 	 */
 	if ($data['filter']['ext_ack'] != EXTACK_OPTION_UNACK && $group['hosts_problematic_count'] != 0) {
-		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))->setHint(
-			makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host)
-		);
+		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))
+			->setHint(makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host))
+			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
+				$group['hosts_problematic_count'], getSeverityName($group['highest_severity'], $data['config'])
+			));
 	}
 
 	// Add 'With problems' column with ext_ack specific content.

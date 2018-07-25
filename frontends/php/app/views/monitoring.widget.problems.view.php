@@ -157,7 +157,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				true
 			)
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$problem['name'], getSeverityName($trigger['priority'], $data['config'])
+				$problem['name'], getSeverityName($problem['severity'], $data['config'])
 			))
 	]));
 
