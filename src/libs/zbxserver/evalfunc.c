@@ -687,7 +687,6 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "arg2 '%s'", arg2);
 				if (SUCCEED != is_double(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
