@@ -98,6 +98,29 @@ static void	compare_token_func_macro_values(char *expression, zbx_token_t *token
 	}
 }
 
+static void	compare_token_lld_macro_values(char *expression, zbx_token_t *token)
+{
+	zbx_mock_handle_t	handle;
+	char			*parameter;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
+	{
+		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+
+		compare_token("Invalid macro", "out.name", expression, token->data.lld_macro.name.l,
+				token->data.lld_macro.name.r);
+	}
+	else
+	{
+		get_exp_value_and_compare("out.token_l", token->token.l);
+		get_exp_value_and_compare("out.token_r", token->token.r);
+
+		get_exp_value_and_compare("out.name_l", token->data.lld_macro.name.l);
+		get_exp_value_and_compare("out.name_r", token->data.lld_macro.name.r);
+	}
+}
+
 static void	compare_token_lld_func_macro_values(char *expression, zbx_token_t *token)
 {
 	zbx_mock_handle_t	handle;
@@ -152,7 +175,10 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_str_to_token_type(zbx_mock_get_parameter_string("out.token_type"), &expected_token_type);
 
 		if (expected_token_type != token.type)
-			fail_msg("Expected token type does not match type found");
+		{
+			fail_msg("Expected token type 0x%02X does not match type found 0x%02X", expected_token_type,
+					token.type);
+		}
 
 		switch (expected_token_type)
 		{
@@ -164,6 +190,10 @@ void	zbx_mock_test_entry(void **state)
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				compare_token_user_macro(&token);
+				break;
+			case ZBX_TOKEN_LLD_MACRO:
+				compare_token_lld_macro_values(expression, &token);
+				break;
 		}
 	}
 }

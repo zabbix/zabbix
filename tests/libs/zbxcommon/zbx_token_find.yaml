@@ -126,9 +126,23 @@ out:
   param: '("(.*)_([0-9]+)", \1)'
   return: 'SUCCEED'
 ---
+test case: "LLD macro"
+in:
+  expression: '{#VALUE}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
 test case: "LLD macro used as simple macro"
 in:
   expression: '{{#VALUE}:key.func(param)}'
 out:
-  return: 'FAIL'
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
 ...
