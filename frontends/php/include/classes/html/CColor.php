@@ -27,6 +27,7 @@ class CColor extends CDiv {
 	private $value;
 	private $is_enabled = true;
 	private $is_required = false;
+	private $append_color_picker_js = true;
 
 	/**
 	 * Creates a color picker form element.
@@ -68,6 +69,20 @@ class CColor extends CDiv {
 	}
 
 	/**
+	 * Append color picker javascript.
+	 *
+	 * @param bool $append
+	 *
+	 * @return CColor
+	 */
+	public function appendColorPickerJs($append = true)
+	{
+		$this->append_color_picker_js = $append;
+
+		return $this;
+	}
+
+	/**
 	 * Gets string representation of widget HTML content.
 	 *
 	 * @param bool $destroy
@@ -77,20 +92,18 @@ class CColor extends CDiv {
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		$this->addItem([
-			(new CColorCell('lbl_'.$this->name, $this->value))
-				->setTitle('#'.$this->value)
-				->onClick('javascript: show_color_picker("'.zbx_formatDomId($this->name).'", this)'),
+		$this->addItem(
 			(new CTextBox($this->name, $this->value))
 				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
 				->setAttribute('maxlength', self::MAX_LENGTH)
 				->setEnabled($this->is_enabled)
 				->setAriaRequired($this->is_required)
-				->onChange('set_color_by_name("'.zbx_formatDomId($this->name).'", this.value)')
-		]);
+		);
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		return parent::toString($destroy);
+		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
+
+		return parent::toString($destroy).$init_script;
 	}
 }

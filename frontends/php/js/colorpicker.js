@@ -20,8 +20,8 @@
 
 (function($) {
 	var overlay,
-		current_label,
-		current_text,
+		colorbox,
+		input,
 		defaults = {
 			'palette': [
 				['FF0000','FF0080','BF00FF','4000FF','0040FF','0080FF','00BFFF','00FFFF','00FFBF','00FF00','80FF00','BFFF00','FFFF00','FFBF00','FF8000','FF4000','CC6600','666699'],
@@ -45,7 +45,7 @@
 		 * Click handler for every colorpicker cell.
 		 */
 		setColorHandler = function() {
-			methods.set_color($(this).attr('title'));
+			methods.set_color($(this).attr('title').substr(1));
 			methods.hide();
 		},
 		methods = {
@@ -63,7 +63,7 @@
 					$.map(options.palette, function(colors) {
 						return $('<div class="color-picker"/>').append(
 							$.map(colors, function(color) {
-								return $('<div style="background: #%s" title="%s"/>'.replace(/%s/g, color));
+								return $('<div style="background: #%s" title="#%s"/>'.replace(/%s/g, color));
 							})
 						);
 					})
@@ -87,21 +87,21 @@
 			/**
 			 * Show colorpicker for specific element.
 			 *
-			 * @param string id       Id of element which will be associated with opened colorpicker instance.
+			 * @param string id       Id of input element which will be associated with opened colorpicker instance.
 			 * @param object event    jQuery event object.
 			 */
 			show: function(id, event) {
-				current_text = $('#' + id);
+				input = $('#' + id);
 
-				if (current_text.is(':disabled')) {
+				if (input.is(':disabled')) {
 					return;
 				}
 
-				current_label = $('#lbl_' + id);
-				var pos = current_label.offset();
+				colorbox = $('#lbl_' + id);
+				var pos = colorbox.offset();
 
 				overlay.css({
-					'left': (pos.left + current_label.outerWidth()) + 'px',
+					'left': (pos.left + colorbox.outerWidth()) + 'px',
 					'top': pos.top + 'px',
 					'display': 'block'
 				});
@@ -110,7 +110,7 @@
 				overlayDialogueOnLoad(true, overlay);
 			},
 			/**
-			 * Set color as background color value of current_label and as value for current_text.
+			 * Set color as background color value of colorbox and as value for input.
 			 * Hides opened colorpicker overlay.
 			 *
 			 * @param string color    Desired hex color.
@@ -119,23 +119,23 @@
 				var color = $.trim(color).toUpperCase(),
 					background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
 
-				current_label.css({
+				colorbox.css({
 					'color': background,
 					'background': background,
 					'title': background
 				});
-				current_text.val(color);
+				input.val(color);
 				methods.hide();
 			},
 			/**
-			 * Set desired color to input element and color box associated with input element.
+			 * Set desired color to input element and colorbox associated with input element.
 			 *
 			 * @param string id       Id of input element.
 			 * @param string color    Hex color value.
 			 */
-			set_color_by_name: function(id, color) {
-				current_label = $('#lbl_' + id);
-				current_text = $('#' + id);
+			set_color_by_id: function(id, color) {
+				colorbox = $('#lbl_' + id);
+				input = $('#' + id);
 				methods.set_color(color);
 			}
 		};
@@ -155,84 +155,41 @@
 			$.error('Invalid method "' +  method + '".');
 		}
 	}
+
+	$.fn.colorpicker = function(options) {
+		/**
+		 * Initialize colorpicker overlay if it is not initialized.
+		 */
+		if (!overlay) {
+			methods.init(options);
+		}
+
+		return this.each(function(_, element) {
+			var id = $(element).attr('id');
+			if ($('#lbl_' + id).length) {
+				// Prevent multiple initialization on same element.
+				return;
+			}
+
+			$('<div/>').attr({
+				'id': 'lbl_' + id,
+				'title': '#' + element.value
+			}).click(function(event) {
+				/**
+				 * Prefix 'lbl_' should be striped out of colorbox id attribute value to get id of associated
+				 * input element.
+				 */
+				methods.show($(this).attr('id').substr(4), event);
+			}).insertBefore(element);
+			$(element).change(function() {
+				/**
+				 * Id attribute value of input element can be changed dynamically, for example when row with colorpicker
+				 * is sorted in graph configuration form.
+				 */
+				methods.set_color_by_id($(element).attr('id'), this.value);
+			});
+
+			methods.set_color_by_id(id, element.value);
+		});
+	}
 })(jQuery);
-
-/**
- * TODO: remove.
- * old colorpicker functions.
- */
-function hide_color_picker() {
-	// if (!color_picker) {
-	// 	return;
-	// }
-
-	// color_picker.style.zIndex = 1000;
-	// color_picker.style.display = 'none';
-	// color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
-	// curr_lbl = null;
-	// curr_txt = null;
-
-	// removeFromOverlaysStack('color_picker');
-	jQuery.colorpicker('hide');
-}
-
-function show_color_picker(id, event) {
-	// if (!color_picker) {
-	// 	return;
-	// }
-
-	// curr_txt = document.getElementById(id);
-	// if (curr_txt.hasAttribute('disabled')) {
-	// 	return;
-	// }
-	// curr_lbl = document.getElementById('lbl_' + id);
-	// var pos = getPosition(curr_lbl);
-	// color_picker.x = pos.left;
-	// color_picker.y = pos.top;
-	// color_picker.style.left = (color_picker.x + 20) + 'px';
-	// color_picker.style.top = color_picker.y + 'px';
-	// color_picker.style.display = 'block';
-
-	// addToOverlaysStack('color_picker', event.target, 'color_picker');
-	// overlayDialogueOnLoad(true, color_picker);
-	jQuery.colorpicker('show', id, event);
-}
-
-function create_color_picker() {
-	// if (color_picker) {
-	// 	return;
-	// }
-
-	// color_picker = document.createElement('div');
-	// color_picker.setAttribute('class', 'overlay-dialogue');
-	// color_picker.innerHTML = color_table;
-	// document.body.appendChild(color_picker);
-	// hide_color_picker();
-	jQuery.colorpicker();
-}
-
-function set_color(color) {
-	// color = color.toString().trim().toUpperCase();
-
-	// if (curr_lbl) {
-	// 	var background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
-
-	// 	curr_lbl.style.color = background;
-	// 	curr_lbl.style.background = background;
-	// 	curr_lbl.title = background;
-	// }
-
-	// if (curr_txt) {
-	// 	curr_txt.value = color;
-	// }
-
-	// hide_color_picker();
-	jQuery.colorpicker('set_color', color)
-}
-
-function set_color_by_name(id, color) {
-	// curr_lbl = document.getElementById('lbl_' + id);
-	// curr_txt = document.getElementById(id);
-	// set_color(color);
-	jQuery.colorpicker('set_color_by_name', id, color);
-}

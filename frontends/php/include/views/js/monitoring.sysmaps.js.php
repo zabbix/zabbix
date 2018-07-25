@@ -299,9 +299,9 @@ function getFontComboBox($name) {
 				(new CFormList())
 					->addRow(_('Shape'), [
 						(new CRadioButtonList('type', SYSMAP_SHAPE_TYPE_RECTANGLE))
-							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
-							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
-							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE)
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE, null, 'jQuery.colorpicker("hide")')
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE, null, 'jQuery.colorpicker("hide")')
+							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE, null, 'jQuery.colorpicker("hide")')
 							->setModern(true),
 						new CVar('', '', 'last_shape_type')
 					])
@@ -322,7 +322,7 @@ function getFontComboBox($name) {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CColor('font_color', '#{color}')),
+							(new CColor('font_color', '#{color}'))->appendColorPickerJs(false),
 							BR(),
 							_('Horizontal align'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -343,7 +343,7 @@ function getFontComboBox($name) {
 						(new CDiv([
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CColor('background_color', '#{color}')),
+							(new CColor('background_color', '#{color}'))->appendColorPickerJs(false),
 						]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 						'shape-background-row'
 					)
@@ -362,7 +362,7 @@ function getFontComboBox($name) {
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 							_('Colour'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-							(new CColor('border_color', '#{color}')),
+							(new CColor('border_color', '#{color}'))->appendColorPickerJs(false),
 						]))
 							->addClass(ZBX_STYLE_NOWRAP)
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -477,7 +477,7 @@ function getFontComboBox($name) {
 					->addRow((new CCheckBox('chkbox_font_color'))
 							->setId('chkboxFontColor')
 							->setLabel(_('Font colour')),
-						(new CColor('mass_font_color', '#{color}')),
+						(new CColor('mass_font_color', '#{color}'))->appendColorPickerJs(false),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_text_halign'))
@@ -499,7 +499,7 @@ function getFontComboBox($name) {
 					->addRow((new CCheckBox('chkbox_background'))
 							->setId('chkboxBackground')
 							->setLabel(_('Background colour')),
-						(new CColor('mass_background_color', '#{color}')),
+						(new CColor('mass_background_color', '#{color}'))->appendColorPickerJs(false),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_border_type'))
@@ -530,7 +530,7 @@ function getFontComboBox($name) {
 								->setAttribute('data-value', _('Border colour'))
 								->setAttribute('data-value-2', _('Line colour'))
 							),
-						(new CColor('mass_border_color', '#{color}'))
+						(new CColor('mass_border_color', '#{color}'))->appendColorPickerJs(false)
 					)
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
@@ -703,7 +703,7 @@ function getFontComboBox($name) {
 						]))
 					)
 					->addRow(_('Colour (OK)'),
-						(new CColor('color', '#{color}'))
+						(new CColor('color', '#{color}'))->appendColorPickerJs(false)
 					)
 					->addRow(_('Link indicators'),
 						(new CDiv([
@@ -790,7 +790,7 @@ function getFontComboBox($name) {
 					GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
 				]))
 			],
-			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}')),
+			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}'))->appendColorPickerJs(false),
 			(new CCol(
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
