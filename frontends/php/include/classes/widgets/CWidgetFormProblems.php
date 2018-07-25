@@ -172,9 +172,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		if (array_key_exists('show_timeline', $this->data)) {
 			$field_show_timeline->setValue($this->data['show_timeline']);
 		}
-		elseif (count($this->data) === 0) {
-			$field_show_timeline->setValue(1);
-		}
+
 		if (!array_key_exists($field_sort->getValue(), $enabled_show_timeline)) {
 			$field_show_timeline->setFlags(CWidgetField::FLAG_DISABLED);
 		}
