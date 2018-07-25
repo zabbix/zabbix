@@ -285,4 +285,11 @@ in:
   flags: 2
 out:
   return: "SUCCEED"
+---
+test case: "successfully parsed number without suffix"
+in:
+  str: "2"
+  flags: 1
+out:
+  return: "SUCCEED"
 ...
