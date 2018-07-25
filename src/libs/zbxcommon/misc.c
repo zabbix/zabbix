@@ -2434,10 +2434,9 @@ int	is_double(const char* str, unsigned char flags)
 			i++;
 	}
 
-	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX))			/* check valid suffixes if flag is enabled */
-		if ('K' == str[i] || 'M' == str[i] || 'G' == str[i] || 'T' == str[i] || 's' == str[i] ||
-				'm' == str[i] || 'h' == str[i] || 'd' == str[i] || 'w' == str[i])
-			i++;
+	/* check valid suffixes if flag is enabled */
+	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]))
+		i++;
 
 	while (' ' == str[i])	/* trim right spaces */
 	{
