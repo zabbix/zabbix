@@ -125,4 +125,10 @@ out:
   func: 'regsub("(.*)_([0-9]+)", \1)'
   param: '("(.*)_([0-9]+)", \1)'
   return: 'SUCCEED'
+---
+test case: "LLD macro used as simple macro"
+in:
+  expression: '{{#HOST.HOST}:key.func(param)}'
+out:
+  return: 'FAIL'
 ...
