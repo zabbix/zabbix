@@ -128,7 +128,7 @@ out:
 ---
 test case: "LLD macro used as simple macro"
 in:
-  expression: '{{#HOST.HOST}:key.func(param)}'
+  expression: '{{#VALUE}:key.func(param)}'
 out:
   return: 'FAIL'
 ...
