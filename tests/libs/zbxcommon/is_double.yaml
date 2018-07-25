@@ -211,22 +211,22 @@ out:
 ---
 test case: "successfully parsed positive real number prefixed with space(s)"
 in:
-  str: "   4.33"
-  flags: 0
+  str: " 4.33"
+  flags: 2
 out:
   return: "SUCCEED"
 ---
 test case: "successfully parsed positive real number suffixed with space(s)"
 in:
   str: "2432.232 "
-  flags: 0
+  flags: 2
 out:
   return: "SUCCEED"
 ---
 test case: "successfully parsed positive real number surrounded with space(s)"
 in:
   str: "   0.241   "
-  flags: 0
+  flags: 2
 out:
   return: "SUCCEED"
 ---

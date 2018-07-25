@@ -1168,7 +1168,8 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 		return SUCCEED;
 	}
 
-	if (SUCCEED != is_double(max_delay_str, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_UNARY_PLUS) || 0.0f > (max_delay_tmp = (float)atof(max_delay_str)))
+	if (SUCCEED != is_double(max_delay_str, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_UNARY_PLUS | ZBX_FLAG_DOUBLE_SPACES) ||
+			0.0f > (max_delay_tmp = (float)atof(max_delay_str)))
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
 		return FAIL;

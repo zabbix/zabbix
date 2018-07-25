@@ -2394,9 +2394,12 @@ int	is_double(const char* str, unsigned char flags)
 {
 	int i = 0, digits = 0;
 
-	while (' ' == str[i])	/* trim left spaces */
+	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
 	{
-		i++;
+		while (' ' == str[i])	/* trim left spaces */
+		{
+			i++;
+		}
 	}
 
 	if ('-' == str[i] || (0 != (flags & ZBX_FLAG_DOUBLE_UNARY_PLUS) && '+' == str[i]))				/* check leading sign */
@@ -2444,9 +2447,12 @@ int	is_double(const char* str, unsigned char flags)
 		exit(1);
 	}
 
-	while (' ' == str[i])	/* trim right spaces */
+	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
 	{
-		i++;
+		while (' ' == str[i])	/* trim right spaces */
+		{
+			i++;
+		}
 	}
 
 	return ('\0' == str[i]) ? SUCCEED : FAIL;
@@ -2753,7 +2759,7 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
 {
 	int	res;
 
-	if (SUCCEED == (res = is_double(str, ZBX_FLAG_DOUBLE_PLAIN)))
+	if (SUCCEED == (res = is_double(str, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_SPACES)))
 		*value = (0 != atof(str));
 	else
 	{
