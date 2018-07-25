@@ -58,7 +58,7 @@ class CSvgGraphHelper {
 		if (array_key_exists('problems', $options)) {
 			$options['problems']['itemids_only'] = (array_key_exists('graph_item_problems_only', $options['problems'])
 					&& $options['problems']['graph_item_problems_only'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-				? array_keys($metrics)
+				? zbx_objectValues($metrics, 'itemid')
 				: null;
 
 			$problems = self::getProblems($options['problems'], $options['time_period']);
@@ -224,38 +224,90 @@ class CSvgGraphHelper {
 	}
 
 	protected static function getProblems(array $problem_options = [], array $time_period) {
-		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_clock'],
-			'severities' => $problem_options['severities'],
-			'time_from'	=> $time_period['time_from'],
-			'time_till'	=> $time_period['time_to'],
-			'recent' => true,
-			'preservekeys' => true
+		/**
+		 * There can be 2 problem groups in graph.
+		 *  - problems that begun before the graph start time and ended later than graph start time or never;
+		 *  - problems that has started between graph start time and end time.
+		 *
+		 * This is solved making 2 separate requests:
+		 * - First is made with raw SQL, requesting all eventids in calculated time period. This query also involves
+		 *   filtering by severity and triggerid (based on $problem_options[itemids_only] and
+		 *   $problem_options[problem_hosts]). This is done to make response smaller.
+		 * - Seconds request is made using problem.get API method. This involves checks for permissions as well as
+		 *   search by problem name and selected problem tags.
+		 */
+
+		$sql_parts = [
+			dbConditionInt('p.severity', $problem_options['severities']),
+			'p.source = '.EVENT_SOURCE_TRIGGERS,
+			'p.object = '.EVENT_OBJECT_TRIGGER
 		];
 
-		if ($problem_options['itemids_only'] !== null) {
-			$options['objectids'] = $problem_options['itemids_only'];
+		if (array_key_exists('problem_hosts', $problem_options) || array_key_exists('itemids_only', $problem_options)) {
+			$options = [
+				'output' => [],
+				'selectTriggers' => ['triggerid'],
+				'preservekeys' => true
+			];
+
+			if (array_key_exists('problem_hosts', $problem_options)) {
+				$options += [
+					'searchWildcardsEnabled' => true,
+					'search' => [
+						'name' => self::processPattern($problem_options['problem_hosts'])
+					]
+				];
+			}
+
+			if (array_key_exists('itemids_only', $problem_options)) {
+				$options += [
+					'itemids' => $problem_options['itemids_only']
+				];
+			}
+
+			$triggerids = [];
+			$problem_hosts = API::Host()->get($options);
+			foreach ($problem_hosts as $problem_host) {
+				$triggerids = zbx_array_merge($triggerids, zbx_objectValues($problem_host['triggers'], 'triggerid'));
+			}
+			$sql_parts[] = dbConditionInt('p.objectid', $triggerids);
 		}
 
+		// Raw SQL written as temporary solution because API doesn't allow make such request.
+		$query =
+		'SELECT problems.eventid FROM (
+			(
+				SELECT eventid
+				FROM problem p
+				WHERE '.implode(' AND ', $sql_parts).' AND
+					('.$time_period['time_from'].' > clock AND (r_clock > '.$time_period['time_from'].' OR r_clock = 0))
+			) UNION ALL (
+				SELECT eventid
+				FROM problem p
+				WHERE '.implode(' AND ', $sql_parts).' AND
+					(clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].')
+			)
+		) problems';
+
+		$eventids = [];
+		$config = select_config();
+		$problem_data = DBselect($query, $config['search_limit']);
+		while ($problem = DBfetch($problem_data)) {
+			$eventids[] = $problem['eventid'];
+		}
+
+		// Prepare API request to select problems.
+		$options = [
+			'output' => ['objectid', 'name', 'severity', 'clock', 'r_clock'],
+			'eventids' => $eventids,
+			'preservekeys' => true
+		];
 		if (array_key_exists('problem_name', $problem_options)) {
 			$options['search']['name'] = $problem_options['problem_name'];
 		}
-
-		if (array_key_exists('problem_hosts', $problem_options)) {
-			$options['hostids'] = array_keys(API::Host()->get([
-				'output' => [],
-				'searchWildcardsEnabled' => true,
-				'preservekeys' => true,
-				'search' => [
-					'name' => self::processPattern($problem_options['problem_hosts'])
-				]
-			]));
-		}
-
 		if (array_key_exists('evaltype', $problem_options)) {
 			$options['evaltype'] = $problem_options['evaltype'];
 		}
-
 		if (array_key_exists('tags', $problem_options)) {
 			$options['tags'] = $problem_options['tags'];
 		}
@@ -298,9 +350,7 @@ class CSvgGraphHelper {
 
 			if ($matching_hosts) {
 				$matching_items = API::Item()->get([
-					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid',
-						'delay'
-					],
+					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid'],
 					'hostids' => array_keys($matching_hosts),
 					'selectHosts' => ['hostid', 'name'],
 					'searchWildcardsEnabled' => true,

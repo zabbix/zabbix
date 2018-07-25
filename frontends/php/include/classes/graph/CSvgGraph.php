@@ -769,68 +769,7 @@ class CSvgGraph extends CSvg {
 				->setStrokeOpacity('0.1')
 				//->addCLass('svg-graph-problem')
 		]);
-
-//		$tooltip = new CTag('title', false, $text);
-//		$this->addItem([
-//			(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
-//				->setFillColor($this->color_annotation)
-//				->setStrokeColor($this->color_annotation)
-//				->addItem($tooltip)
-//		]);
 	}
-
-	/*
-	public function addElement($metric_id, $points) {
-		$this->metrics[$metric_id]['points'] = $points;
-
-		$this->min_clock = $this->time_from;
-		$this->max_clock = $this->time_to;
-
-		if (empty($points)) {
-			return;
-		}
-
-		if ($this->min_clock === null) {
-			$this->min_clock = min(array_column($points, 'clock'));
-		}
-		else {
-			$this->min_clock = min($this->min_clock, min(array_column($points, 'clock')));
-		}
-
-		if ($this->max_clock === null) {
-			$this->max_clock = max(array_column($points, 'clock'));
-		}
-		else {
-			$this->max_clock = max($this->max_clock, max(array_column($points, 'clock')));
-		}
-
-		if ($this->min_value === null) {
-			$this->min_value = min(array_column($points, 'value'));
-		}
-		else {
-			$this->min_value = min($this->min_value, min(array_column($points, 'value')));
-		}
-
-		if ($this->max_value === null) {
-			$this->max_value = max(array_column($points, 'value'));
-		}
-		else {
-			$this->max_value = max($this->max_value, max(array_column($points, 'value')));
-		}
-	}
-
-	public function addElementLegend($metric_id, $text) {
-		$this->metrics[$metric_id]['legend'] = $text;
-	}
-
-	public function addAnnotationSimple($time, $text) {
-		$this->annotations_simple[] = ['clock' => $time, 'text' => $text];
-	}
-
-	public function addAnnotationRange($time_from, $time_to, $text) {
-		$this->annotations_range[] = ['time_from' => $time_from, 'time_to' => $time_to, 'text' => $text];
-	}
-	*/
 
 	private function drawProblems() {
 		foreach ($this->problems as $problem) {
