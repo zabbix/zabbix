@@ -383,9 +383,9 @@ class CMaintenance extends CApiService {
 			}
 
 			$insert[$mnum] = $maintenance;
-		}
 
-		$this->validate($maintenances);
+			$this->validateTags($maintenance);
+		}
 
 		$maintenanceids = DB::insert('maintenances', $insert);
 		$timeperiodids = DB::insert('timeperiods', $insertTimeperiods);
@@ -439,71 +439,42 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
-	 * Validate maintenances.
+	 * Validates maintenance problem tags.
 	 *
-	 * @param array $maintenances
+	 * @param array  $maintenance
+	 * @param int    $maintenance['maintenance_type']
+	 * @param int    $maintenance['tags_evaltype']
+	 * @param array  $maintenance['tags']
+	 * @param string $maintenance['tags'][]['tag']
+	 * @param int    $maintenance['tags'][]['operator']
+	 * @param string $maintenance['tags'][]['value']
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validate(array &$maintenances) {
-		$api_input_rules = [
-			'maintenance_type' => [
-				'type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])
-			],
-			'tags_evaltype' => [
-				'type' => API_INT32,
-				'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])
-			],
-			'tags' => ['type' => API_OBJECTS, 'fields' => [
-				'tag' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('maintenance_tag', 'tag')
-				],
-				'operator' => ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL])],
-				'value' => ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value')]
+	private function validateTags(array $maintenance) {
+		if (array_key_exists('maintenance_type', $maintenance)
+				&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
+				&& array_key_exists('tags', $maintenance) && $maintenance['tags'] !== []) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'tags', _('should be empty'))
+			);
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'maintenance_type'	=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA])],
+			'tags_evaltype'		=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR])],
+			'tags'				=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'tag'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('maintenance_tag', 'tag')],
+				'operator'			=> ['type' => API_INT32, 'in' => implode(',', [MAINTENANCE_TAG_OPERATOR_EQUAL, MAINTENANCE_TAG_OPERATOR_LIKE]), 'default' => DB::getDefault('maintenance_tag', 'operator')],
+				'value'				=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('maintenance_tag', 'value'), 'default' => DB::getDefault('maintenance_tag', 'value')]
 			]]
-		];
+		]];
 
-		foreach ($maintenances as $maintenance) {
-			// Keep values only for fields with defined validation rules.
-			$maintenance = array_intersect_key($maintenance, $api_input_rules);
+		// Keep values only for fields with defined validation rules.
+		$maintenance = array_intersect_key($maintenance, $api_input_rules['fields']);
 
-			if (array_key_exists('maintenance_type', $maintenance)
-					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
-				if (array_key_exists('tags_evaltype', $maintenance)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Invalid parameter "/tags_evaltype": not allowed for maintenance with no data collection.')
-					);
-				}
-				if (array_key_exists('tags', $maintenance)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Invalid parameter "/tags": not allowed for maintenance with no data collection.')
-					);
-				}
-			}
-
-			if (array_key_exists('tags', $maintenance)) {
-				foreach ($maintenance['tags'] as &$tag) {
-					$tag += [
-						'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
-						'value' => ''
-					];
-				}
-				unset($tag);
-
-				// Check whether tags are unique.
-				if (count($maintenance['tags']) != count(array_unique($maintenance['tags'], SORT_REGULAR))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Duplicate tags are not allowed.')
-					);
-				}
-			}
-
-			if (!CApiInputValidator::validate(
-					['type' => API_OBJECT, 'fields' => $api_input_rules], $maintenance, '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
+		if (!CApiInputValidator::validate($api_input_rules, $maintenance, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -537,16 +508,15 @@ class CMaintenance extends CApiService {
 			if (!check_db_fields($db_fields, $maintenance)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
-		}
 
-		$this->validate($maintenances);
+			$this->validateTags($maintenance);
+		}
 
 		$db_maintenances = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'maintenanceids' => $maintenanceids,
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['hostid'],
-			'selectTags' => API_OUTPUT_EXTEND,
 			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
@@ -646,6 +616,18 @@ class CMaintenance extends CApiService {
 			if (!$has_hosts && !$has_groups) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
 			}
+
+			// Check if maintenance without data collection has no tags.
+			$db_maintenance_type = $db_maintenances[$maintenance['maintenanceid']]['maintenance_type'];
+			$maintenance_type = array_key_exists('maintenance_type', $maintenance)
+				? $maintenance['maintenance_type']
+				: $db_maintenance_type;
+			if ($db_maintenance_type == MAINTENANCE_TYPE_NODATA && $maintenance_type == $db_maintenance_type
+					&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tags', _('should be empty'))
+				);
+			}
 		}
 
 		// Check if maintenance already exists.
@@ -733,10 +715,6 @@ class CMaintenance extends CApiService {
 		$insert_hosts = [];
 		$insert_groups = [];
 
-		$del_maintenanceids = [];
-		$del_tagids = [];
-		$ins_tags = [];
-
 		foreach ($maintenances as $maintenance) {
 			if (array_key_exists('hostids', $maintenance)) {
 				// Putting apart those host<->maintenance connections that should be inserted, deleted and not changed:
@@ -784,29 +762,6 @@ class CMaintenance extends CApiService {
 					]);
 				}
 			}
-
-			// Collect maintenance IDs to delete tags if maintenance type is changed to 'With no data collection'
-			if (array_key_exists('maintenance_type', $maintenance)
-					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-					&& $db_maintenances[$maintenance['maintenanceid']]['tags']) {
-				$del_maintenanceids[] = $maintenance['maintenanceid'];
-				continue;
-			}
-
-			// Collect tags to be deleted and inserted.
-			if (array_key_exists('tags', $maintenance)) {
-				$tags = $this->getTagsToUpdate($maintenance['tags'],
-					$db_maintenances[$maintenance['maintenanceid']]['tags']);
-
-				foreach ($tags['to_delete'] as $tag) {
-					$del_tagids[] = $tag['maintenancetagid'];
-				}
-				foreach ($tags['to_insert'] as $tag) {
-					$ins_tags[] = [
-						'maintenanceid' => $maintenance['maintenanceid']
-					] + $tag;
-				}
-			}
 		}
 
 		if ($insert_hosts) {
@@ -817,50 +772,91 @@ class CMaintenance extends CApiService {
 			DB::insert('maintenances_groups', $insert_groups);
 		}
 
-		if ($del_maintenanceids) {
-			DB::delete('maintenance_tag', ['maintenanceid' => $del_maintenanceids]);
-		}
-
-		if ($del_tagids) {
-			DB::delete('maintenance_tag', ['maintenancetagid' => $del_tagids]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('maintenance_tag', $ins_tags);
-		}
+		$this->updateTags($maintenances, $db_maintenances);
 
 		return ['maintenanceids' => $maintenanceids];
 	}
 
 	/**
-	 * Compare input tags with tags stored in the database.
+	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
 	 *
-	 * @param array  $tags
-	 * @param string $tags[]['tag']
-	 * @param int    $tags[]['operator']
-	 * @param string $tags[]['value']
-	 * @param array  $db_tags
-	 * @param string $db_tags[]['tag']
-	 * @param int    $db_tags[]['operator']
-	 * @param string $db_tags[]['value']
-	 *
-	 * @return array An array of tags to be deleted and inserted.
+	 * @param array  $maintenances
+	 * @param int    $maintenances[]['maintenanceid']
+	 * @param int    $maintenances[]['maintenance_type']
+	 * @param array  $maintenances[]['tags']
+	 * @param string $maintenances[]['tags'][]['tag']
+	 * @param int    $maintenances[]['tags'][]['operator']
+	 * @param string $maintenances[]['tags'][]['value']
+	 * @param array  $db_maintenances
+	 * @param int    $db_maintenances[<maintenanceid>]
+	 * @param int    $db_maintenances[<maintenanceid>]['maintenance_type']
 	 */
-	private function getTagsToUpdate(array $tags, array $db_tags) {
-		foreach ($tags as $tnum => $tag) {
-			foreach ($db_tags as $dnum => $db_tag) {
-				if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
-						&& $tag['value'] === $db_tag['value']) {
-					unset($tags[$tnum], $db_tags[$dnum]);
-					continue 2;
+	private function updateTags(array $maintenances, array $db_maintenances) {
+		$db_tags = API::getApiService()->select('maintenance_tag', [
+			'output' => ['maintenancetagid', 'maintenanceid', 'tag', 'operator', 'value'],
+			'filter' => ['maintenanceid' => array_keys($db_maintenances)],
+			'preservekeys' => true
+		]);
+		$relation_map = $this->createRelationMap($db_tags, 'maintenanceid', 'maintenancetagid');
+		$db_maintenances = $relation_map->mapMany($db_maintenances, $db_tags, 'tags');
+
+		$ins_tags = [];
+		$del_maintenancetagids = [];
+
+		foreach ($maintenances as $mnum => $maintenance) {
+			$maintenanceid = $maintenance['maintenanceid'];
+
+			if (array_key_exists('maintenance_type', $maintenance)
+					&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
+					&& $db_maintenances[$maintenanceid]['tags']) {
+				foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag) {
+					$del_maintenancetagids[] = $db_tag['maintenancetagid'];
+				}
+				unset($maintenances[$mnum], $db_maintenances[$maintenanceid]);
+				continue;
+			}
+
+			if (!array_key_exists('tags', $maintenance)
+					|| (array_key_exists('tags', $maintenance) && !$maintenance['tags'])) {
+				unset($maintenances[$mnum], $db_maintenances[$maintenanceid]);
+				continue;
+			}
+
+			foreach ($maintenance['tags'] as $tag_num => $tag) {
+				$tag += [
+					'operator' => MAINTENANCE_TAG_OPERATOR_LIKE,
+					'value' => ''
+				];
+
+				foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag_num => $db_tag) {
+					if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
+							&& $tag['value'] === $db_tag['value']) {
+						unset($maintenance['tags'][$tag_num], $db_maintenances[$maintenanceid]['tags'][$db_tag_num]);
+						continue 2;
+					}
 				}
 			}
 		}
 
-		return [
-			'to_delete' => $db_tags,
-			'to_insert' => $tags
-		];
+		foreach ($maintenances as $maintenance) {
+			$maintenanceid = $maintenance['maintenanceid'];
+
+			foreach ($maintenance['tags'] as $tag) {
+				$ins_tags[] = ['maintenanceid' => $maintenanceid] + $tag;
+			}
+
+			foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag) {
+				$del_maintenancetagids[] = $db_tag['maintenancetagid'];
+			}
+		}
+
+		if ($del_maintenancetagids) {
+			DB::delete('maintenance_tag', ['maintenancetagid' => $del_maintenancetagids]);
+		}
+
+		if ($ins_tags) {
+			DB::insert('maintenance_tag', $ins_tags);
+		}
 	}
 
 	/**
@@ -1009,15 +1005,13 @@ class CMaintenance extends CApiService {
 
 		// Adding problem tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'operator', 'value'];
-			}
-			$relation_map = $this->createRelationMap($result, 'maintenanceid', 'maintenancetagid', 'maintenance_tag');
 			$tags = API::getApiService()->select('maintenance_tag', [
-				'output' => $options['selectTags'],
-				'filter' => ['maintenancetagid' => $relation_map->getRelatedIds()],
+				'output' => $this->outputExtend($options['selectTags'], ['maintenanceid']),
+				'filter' => ['maintenanceids' => array_keys($result)],
 				'preservekeys' => true
 			]);
+			$relation_map = $this->createRelationMap($tags, 'maintenanceid', 'maintenancetagid');
+			$tags = $this->unsetExtraFields($tags, ['maintenancetagid', 'maintenanceid'], []);
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
