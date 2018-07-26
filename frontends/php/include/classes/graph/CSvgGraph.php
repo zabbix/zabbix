@@ -281,8 +281,8 @@ class CSvgGraph extends CSvg {
 		}
 
 		// Define offsets.
-		$this->offset_left = $this->left_y_show ? 50 : 20;
-		$this->offset_right = $this->right_y_show ? 50 : 20;
+		$this->offset_left = ($this->left_y_show && $this->left_y_min) ? 50 : 20;
+		$this->offset_right = ($this->right_y_show && $this->right_y_min) ? 50 : 20;
 		$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 : 20;
 		$this->offset_top = 10;
 
@@ -294,7 +294,8 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function addCanvasLeftYAxis() {
-		if ($this->left_y_show) {
+		// Left Y must be enabled and at least one metric must be configured use left Y axis.
+		if ($this->left_y_show && $this->min_value_left !== null) {
 			$this->addItem([
 				new CSvgLine(
 					$this->canvas_x,
@@ -316,7 +317,8 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function addCanvasRightYAxis() {
-		if ($this->right_y_show) {
+		// Right Y must be enabled and at least one metric must be configured use right Y axis.
+		if ($this->right_y_show && $this->min_value_right !== null) {
 			$this->addItem([
 				new CSvgLine(
 					$this->canvas_x + $this->canvas_width,
@@ -411,8 +413,11 @@ class CSvgGraph extends CSvg {
 			$x2 = $this->canvas_x + $this->canvas_width;
 			$y2 = $y1;
 
-			// If value is lower than X axis, don't draw it.
-			if ($y1 > $this->canvas_y + $this->canvas_height) {
+			// Do not draw a grid line:
+			//  - if value overlaps X axis;
+			//  - if value is lower than X axis;
+			//  - if value should be drawn above canvas top border.
+			if ($y1 >= $this->canvas_y + $this->canvas_height || $y1 < $this->canvas_y) {
 				continue;
 			}
 
@@ -690,7 +695,7 @@ class CSvgGraph extends CSvg {
 		$prev_clock = null;
 		foreach ($points as $clock => $point) {
 			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
-				$gap_interval = floor(($clock - $prev_clock) / $average_distance);
+				$gap_interval = floor(($clock - $prev_clock) / $threshold);
 
 				$new_point_clock = $prev_clock;
 				do {
@@ -883,8 +888,8 @@ class CSvgGraph extends CSvg {
 		$this->addCanvasRightYAxis();
 
 		// Add grid lines.
-		$this->drawValueGrid('left', $this->left_y_show);
-		$this->drawValueGrid('right', $this->right_y_show);
+		$this->drawValueGrid('left', ($this->left_y_show && $this->left_y_min));
+		$this->drawValueGrid('right', ($this->right_y_show && $this->right_y_min));
 
 		// Add X axis.
 		$this->drawTimeGrid($this->x_axis);

@@ -390,12 +390,7 @@ function getColorVariations($color, $variations_requested = 1) {
 	$color = hex2rgb($color);
 	$variations = [];
 
-	/**
-	 * To prevent too extreme hue variations with small number of $variations requested, the range is made larger
-	 * artificially to select only colors closer to the original one.
-	 */
-	$variation_step = $max * 2 / $variations_requested;
-	$range = range(-1 * $max, $max, min([$variation_step, 15]));
+	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
 
 	// Remove redundant values.
 	while (count($range) > $variations_requested) {
