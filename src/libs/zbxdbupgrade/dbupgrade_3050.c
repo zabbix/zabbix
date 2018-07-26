@@ -1445,42 +1445,18 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
-#define	QUOTED_PARAM	1
-
-static void	DBpatch_3050122_add_anchors(const char *src, char **dst, const char *orig_param, size_t param_pos,
-		size_t param_len, size_t sep_pos, int was_quoted)
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_len)
 {
-	char	*pout;
-	size_t	src_len, twsl;
+	*dst++ = '^';				/* start anchor */
 
-	src_len = strlen(src);
-
-	/* calculate trailing whitespace length */
-	if (QUOTED_PARAM != was_quoted)
-		twsl = sep_pos - param_pos - param_len;
-	else
-		twsl = 0;
-
-	/* increasing length by 3 for ^, $, '\0', trailing whitespace is a part of unquoted regexp inside anchors */
-	*dst = (char *)zbx_malloc(NULL, src_len + 3 + twsl);
-
-	pout = *dst;
-	*pout++ = '^';		/* start anchor */
-
-	if (0 != src_len)	/* parameter body */
+	if (0 != src_len)
 	{
-		memcpy(pout, src, src_len);
-		pout += src_len;
+		memcpy(dst, src, src_len);	/* parameter body */
+		dst += src_len;
 	}
 
-	if (QUOTED_PARAM != was_quoted)	/* trailing whitespace */
-	{
-		memcpy(pout, orig_param + param_pos + param_len, twsl);
-		pout += twsl;
-	}
-
-	*pout++ = '$';		/* end anchor */
-	*pout = '\0';
+	*dst++ = '$';				/* end anchor */
+	*dst = '\0';
 }
 
 static int	DBpatch_3050122(void)
@@ -1498,9 +1474,9 @@ static int	DBpatch_3050122(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*orig_param = row[1];
-		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_esc_anchored = NULL,
-				*parameter_DB_esc;
-		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, required_len;
+		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_anchored = NULL,
+				*db_parameter_esc;
+		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, current_len;
 		int		was_quoted;
 
 		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
@@ -1512,55 +1488,53 @@ static int	DBpatch_3050122(void)
 
 		zbx_regexp_escape(&unquoted_parameter);
 
-		DBpatch_3050122_add_anchors(unquoted_parameter, &parameter_esc_anchored, orig_param, param_pos,
-				param_len, sep_pos, was_quoted);
+		current_len = strlen(unquoted_parameter);
 
+		/* increasing length by 3 for ^, $, '\0' */
+		parameter_anchored = (char *)zbx_malloc(NULL, current_len + 3);
+		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
 		zbx_free(unquoted_parameter);
 
-		if (QUOTED_PARAM == was_quoted &&
-				SUCCEED != zbx_function_param_quote(&parameter_esc_anchored, was_quoted))
+		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
 					" logsource (functionid: %s) to regexp during database upgrade. The"
 					" parameter needs to but cannot be quoted after conversion.",
 					row[1], row[0]);
 
-			zbx_free(parameter_esc_anchored);
+			zbx_free(parameter_anchored);
 			zbx_free(processed_parameter);
 			continue;
 		}
 
 		/* copy the parameter */
-		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_esc_anchored);
-		zbx_free(parameter_esc_anchored);
+		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_anchored);
+		zbx_free(parameter_anchored);
 
-		/* for quoted parameters copy trailing part and add that after quotes */
-		if (QUOTED_PARAM == was_quoted && 0 < sep_pos - param_pos + param_len)
-		{
-			zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset,
-					orig_param + param_pos + param_len, sep_pos - param_pos - param_len + 1);
-		}
+		/* copy trailing whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
+				sep_pos - param_pos - param_len + 1);
 
-		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(processed_parameter)))
+		if (FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
 		}
 
-		parameter_DB_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
 		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
-				parameter_DB_esc, row[0]);
+				db_parameter_esc, row[0]);
 
-		zbx_free(parameter_DB_esc);
+		zbx_free(db_parameter_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
@@ -1583,6 +1557,25 @@ out:
 }
 
 static int	DBpatch_3050123(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles where idx in ("
+			"'web.toptriggers.filter.from','web.toptriggers.filter.till','web.avail_report.0.timesince',"
+			"'web.avail_report.0.timetill','web.avail_report.1.timesince','web.avail_report.1.timetill'"
+		")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050124(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1718,5 +1711,6 @@ DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
 DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
 
 DBPATCH_END()

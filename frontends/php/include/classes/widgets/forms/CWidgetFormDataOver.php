@@ -32,14 +32,15 @@ class CWidgetFormDataOver extends CWidgetForm {
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
 		}
-		$this->fields[] = $field_groups;
+		$this->fields[$field_groups->getName()] = $field_groups;
 
 		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
 		if (array_key_exists('application', $this->data)) {
 			$field_application->setValue($this->data['application']);
 		}
-		$this->fields[] = $field_application;
+
+		$this->fields[$field_application->getName()] = $field_application;
 
 		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),
@@ -51,6 +52,7 @@ class CWidgetFormDataOver extends CWidgetForm {
 		if (array_key_exists('style', $this->data)) {
 			$field_style->setValue($this->data['style']);
 		}
-		$this->fields[] = $field_style;
+
+		$this->fields[$field_style->getName()] = $field_style;
 	}
 }

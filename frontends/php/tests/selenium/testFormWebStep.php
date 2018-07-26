@@ -783,6 +783,17 @@ class testFormWebStep extends CWebTest {
 				$input = $element->findElement(WebDriverBy::xpath('.//input[@data-type="'.$field.'"]'));
 				$input->sendKeys($value);
 
+				// TODO: debug info
+				$this->webDriver->wait(5, self::WAIT_ITERATION)->until(
+					function ($driver) use ($input, $value) {
+						try {
+							return $input->getAttribute('value') === $value;
+						} catch (StaleElementReferenceException $e) {
+							return null;
+						}
+					}
+				);
+
 				// Fire onchange event.
 				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
 						'event.initEvent("change", false, true);'.

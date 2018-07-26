@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha9');
+define('ZABBIX_VERSION',		'4.0.0alpha10');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		3050123);
@@ -39,7 +39,10 @@ define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
-define('ZBX_DATE_TIME',			'Y-m-d H:i:s');// Time selector date and time presentation format.
+
+// Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
+define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
+define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
 // the maximum period to display history data for the latest data and item overview pages in seconds
 // by default set to 86400 seconds (24 hours)
@@ -1293,10 +1296,6 @@ define('THEME_DEFAULT', 'default');
 define('ZBX_DEFAULT_THEME', 'blue-theme');
 
 define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
-
-// non translatable date formats
-define('TIMESTAMP_FORMAT', 'YmdHis');
-define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');
