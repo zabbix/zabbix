@@ -1577,9 +1577,6 @@ static int	DBpatch_3050123(void)
 
 static int	DBpatch_3050124(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
