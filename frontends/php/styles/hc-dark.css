@@ -998,6 +998,7 @@ output {
           opacity: 1;
           filter: alpha(opacity=100); }
   .multiselect div[aria-live] {
+    overflow: hidden;
     position: absolute;
     left: 0;
     right: 0;
