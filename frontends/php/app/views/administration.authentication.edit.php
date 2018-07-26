@@ -22,7 +22,7 @@
 // Authentication general fields and HTTP authentication fields.
 $auth_tab = (new CFormList('list_auth'))
 	->addRow(new CLabel(_('Default authentication'), 'authentication_type'),
-		(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
+		(new CRadioButtonList('authentication_type', (int)$data['authentication_type']))
 			->setAttribute('autofocus', 'autofocus')
 			->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
 			->addValue(_('LDAP'), ZBX_AUTH_LDAP)
@@ -70,7 +70,9 @@ else {
 		->addClass(ZBX_STYLE_BTN_GREY);
 }
 
-$ldap_tab = (new CFormList('list_ldap'))
+$ldap_tab = (new CFormList('list_ldap'));
+
+$ldap_tab
 	->addRow(new CLabel(_('Configure LDAP authentication'), 'ldap_configured'),
 		$data['ldap_error']
 		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
@@ -119,9 +121,9 @@ $ldap_tab = (new CFormList('list_ldap'))
 );
 
 $confirm_script = 'return jQuery("[name=authentication_type]:checked").val() == '.$data['db_authentication_type'].
-		'|| confirm('.
-			CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).
-		')';
+	'|| confirm('.
+			CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?'))
+		.')';
 
 (new CWidget())
 	->setTitle(_('Authentication'))
