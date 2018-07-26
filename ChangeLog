@@ -5,6 +5,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBXNEXT-4607] removed column Recovery time in Problems mode (vasilijs)
+........S. [ZBX-14615] fixed processing of JMX errors, now treated as distinct and separate from network errors (mindbound)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0alpha9
