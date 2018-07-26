@@ -5376,10 +5376,8 @@ static int	__config_psk_compare(const void *d1, const void *d2)
 static zbx_hash_t	__config_data_session_hash(const void *data)
 {
 	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
-	zbx_hash_t			hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&session->hostid);
-	return ZBX_DEFAULT_STRING_HASH_ALGO(session->token, strlen(session->token), hash);
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&session->hostid);
 }
 
 static int	__config_data_session_compare(const void *d1, const void *d2)
@@ -5388,7 +5386,7 @@ static int	__config_data_session_compare(const void *d1, const void *d2)
 	const zbx_data_session_t	*s2 = (const zbx_data_session_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
-	return strcmp(s1->token, s2->token);
+	return 0;
 }
 
 /******************************************************************************
@@ -11485,9 +11483,10 @@ const char	*zbx_dc_get_session_token(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_or_create_data_session                                *
+ * Function: zbx_dc_manage_data_session                                       *
  *                                                                            *
- * Purpose: returns data session, creates a new session if none found         *
+ * Purpose: returns data session, creates a new session if none found,        *
+ *          replaces token if changed                                         *
  *                                                                            *
  * Parameter: hostid - [IN] the host (proxy) identifier                       *
  *            token  - [IN] the session token (not NULL)                      *
@@ -11500,31 +11499,40 @@ const char	*zbx_dc_get_session_token(void)
  *           session object will not be deleted for 24 hours.                 *
  *                                                                            *
  ******************************************************************************/
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token)
+zbx_data_session_t	*zbx_dc_manage_data_session(zbx_uint64_t hostid, const char *token)
 {
 	zbx_data_session_t	*session, session_local;
-	int			now;
+	int			now, replace_token = 0;
 
 	now = time(NULL);
 	session_local.hostid = hostid;
-	session_local.token = token;
 
 	RDLOCK_CACHE;
-	session = (zbx_data_session_t *)zbx_hashset_search(&config->data_sessions, &session_local);
+	if (NULL != (session = (zbx_data_session_t *)zbx_hashset_search(&config->data_sessions, &session_local)) &&
+			0 != strncmp(session->token, token, ZBX_DATA_SESSION_TOKEN_SIZE - 1))
+	{
+		replace_token = 1;
+	}
 	UNLOCK_CACHE;
 
-	if (NULL == session)
+	if (NULL != session)	/* update session in cache */
 	{
+		session->lastaccess = now;
+
+		if (0 != replace_token)
+			memcpy(session->token, token, ZBX_DATA_SESSION_TOKEN_SIZE - 1);	/* without terminating '\0' */
+	}
+	else			/* create new session in cache */
+	{
+		session_local.last_valueid = 0;
+		session_local.lastaccess = now;
+		memcpy(&session_local.token, token, ZBX_DATA_SESSION_TOKEN_SIZE - 1);
+
 		WRLOCK_CACHE;
 		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
 				sizeof(session_local));
-		session->token = dc_strdup(token);
 		UNLOCK_CACHE;
-
-		session->last_valueid = 0;
 	}
-
-	session->lastaccess = now;
 
 	return session;
 }
@@ -11550,10 +11558,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 	while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (session->lastaccess + SEC_PER_DAY <= now)
-		{
-			__config_mem_free_func((char *)session->token);
 			zbx_hashset_iter_remove(&iter);
-		}
 	}
 
 	UNLOCK_CACHE;

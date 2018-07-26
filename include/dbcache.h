@@ -787,13 +787,13 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	last_valueid;
-	const char	*token;
 	int		lastaccess;
+	char		token[ZBX_DATA_SESSION_TOKEN_SIZE - 1];		/* without terminating '\0' */
 }
 zbx_data_session_t;
 
 const char	*zbx_dc_get_session_token(void);
-zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
+zbx_data_session_t	*zbx_dc_manage_data_session(zbx_uint64_t hostid, const char *token);
 void	zbx_dc_cleanup_data_sessions(void);
 
 #endif
