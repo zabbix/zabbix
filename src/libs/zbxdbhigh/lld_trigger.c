@@ -1652,7 +1652,7 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			}
 
 			buffer = zbx_strdup(buffer, tag_proto->value);
-			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_LLD_FUNC, NULL, 0);
+			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 			if (0 != strcmp(buffer, tag->value))
 			{
@@ -1673,7 +1673,7 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
 
 			tag->value = zbx_strdup(NULL, tag_proto->value);
-			substitute_lld_macros(&tag->value, &lld_row->jp_row, ZBX_MACRO_LLD_FUNC, NULL, 0);
+			substitute_lld_macros(&tag->value, &lld_row->jp_row, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(tag->value, ZBX_WHITESPACE);
 
 			tag->flags = ZBX_FLAG_LLD_TAG_UNSET;
