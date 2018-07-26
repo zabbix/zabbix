@@ -1271,15 +1271,17 @@ function zbx_toHash($value, $field = null) {
  * key.
  *
  * E.g:
- * zbx_toObject(array(1, 2), 'hostid')  // returns array(array('hostid' => 1), array('hostid' => 2))
- * zbx_toObject(3, 'hostid')            // returns array(array('hostid' => 3))
+ * zbx_toObject(array(1, 2), 'hostid')            // returns array(array('hostid' => 1), array('hostid' => 2))
+ * zbx_toObject(3, 'hostid')                      // returns array(array('hostid' => 3))
+ * zbx_toObject(array('a' => 1), 'hostid', true)  // returns array('a' => array('hostid' => 1))
  *
  * @param $value
  * @param $field
+ * @param $preserve_keys
  *
  * @return array
  */
-function zbx_toObject($value, $field) {
+function zbx_toObject($value, $field, $preserve_keys = false) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1290,10 +1292,14 @@ function zbx_toObject($value, $field) {
 		$result = [[$field => $value]];
 	}
 	elseif (!isset($value[$field])) {
-		foreach ($value as $val) {
+		foreach ($value as $key => $val) {
 			if (!is_array($val)) {
-				$result[] = [$field => $val];
+				$result[$key] = [$field => $val];
 			}
+		}
+
+		if (!$preserve_keys) {
+			$result = array_values($result);
 		}
 	}
 
@@ -1808,10 +1814,12 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 					->setId('details-arrow')
 					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
+				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
 				->onClick('javascript: '.
 					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
 						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
-					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'.
+					'jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0)'
 				);
 		}
 
@@ -1832,7 +1840,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
+		->addClass($class)
+		->setAttribute('role', 'contentinfo')
+		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1883,8 +1894,7 @@ function filter_messages(array $messages = []) {
  *
  * @return CDiv|null
  */
-function getMessages($good = false, $title = null)
-{
+function getMessages($good = false, $title = null) {
 	global $ZBX_MESSAGES;
 
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
@@ -2112,14 +2122,14 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {
@@ -2534,7 +2544,7 @@ function makeUpdateIntervalFilter($field_name, $values) {
  * @param string|null $options['from']
  * @param string|null $options['to']
  */
-function updateTimeSelectorPeriod($options) {
+function updateTimeSelectorPeriod(array $options) {
 	if ($options['from'] !== null && $options['to'] !== null) {
 		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
 		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);

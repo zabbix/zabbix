@@ -113,16 +113,15 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 					'error' => 'Global regular expression "regexpnotexist" does not exist.'
 				]
 			],
-			// TODO uncomment after ZBX-14409 will be modified
-//			[
-//				[
-//					'name' => 'Icon mapping add not existen global regular expression',
-//					'mappings' => [
-//						['expression' => '@']
-//					],
-//					'error' => 'Global regular expression "" does not exist.'
-//				]
-//			],
+			[
+				[
+					'name' => 'Icon mapping add not existen global regular expression',
+					'mappings' => [
+						['expression' => '@']
+					],
+					'error' => 'Global regular expression "" does not exist.'
+				]
+			],
 			[
 				[
 					'name' => 'Icon mapping without expressions',
@@ -149,7 +148,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Input new row for Icon mapping
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		$this->zbxTestClick('add');
@@ -268,7 +267,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Input new row for Icon mapping.
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		$this->zbxTestClick('add');
@@ -452,7 +451,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($update_icon, 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($update_icon);
 		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
@@ -461,7 +460,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		}
 
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
@@ -550,7 +549,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_Update($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($data['old_name'], 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($data['old_name']);
 		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
@@ -562,7 +561,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 
 		// Input new row for Icon mapping
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
@@ -728,13 +727,13 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestInputType('iconmap_name', $data['new_name']);
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		$this->zbxTestClick('add');
@@ -829,14 +828,14 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralIconMapping_Clone($data) {
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($data['old_name'], 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($data['old_name']);
 		$this->zbxTestClickWait('clone');
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('iconmap_name', $data['name']);
 		}
 
 		if (array_key_exists('mappings', $data)) {
-			$this->addExpressionRows($data['mappings']);
+			$this->processExpressionRows($data['mappings']);
 		}
 
 		if (array_key_exists('inventory', $data)) {
@@ -906,7 +905,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$name = 'Icon mapping to check delete functionality';
 
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		// Check the results in frontend.
@@ -928,7 +927,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->dismiss();
 
@@ -950,7 +949,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$old_hash = DBhash($sql_hash);
 
 		$this->zbxTestLogin('adm.iconmapping.php');
-		$this->zbxTestClickLinkTextWait($name, 'iconmap_name');
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		// Check the results in frontend.
@@ -971,7 +970,7 @@ class testFormAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestDropdownAssertSelected('iconmap[default_iconid]', $data['default_icon']);
 	}
 
-	private function addExpressionRows($rows) {
+	private function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
 			$action = (array_key_exists('action', $mapping_row) ? $mapping_row['action'] : 'add');
 

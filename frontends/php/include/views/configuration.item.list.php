@@ -27,20 +27,18 @@ $widget = (new CWidget())
 		(new CTag('nav', true,
 			(new CList())->addItem(
 				($data['hostid'] != 0)
-					? new CRedirectButton(_('Create item'), (new CUrl())
-							->setArgument('form', 'create')
-							->setArgument('hostid', $data['hostid'])
-							->getUrl()
-						)
+					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
+						->setArgument('form', 'create')
+						->setArgument('hostid', $data['hostid'])
+						->getUrl()
+					)
 					: (new CButton('form', _('Create item (select host first)')))->setEnabled(false)
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 if (!empty($this->data['hostid'])) {
-	$breadcrumb = get_header_host_table('items', $this->data['hostid']);
-	$breadcrumb->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
-	$widget->addItem($breadcrumb);
+	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 $widget->addItem($this->data['flicker']);
 

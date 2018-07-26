@@ -41,7 +41,7 @@ $userGroupFormList = (new CFormList())
 			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
 	)
 	->addRow(
-		new CLabel(_('Users'), 'userids[]'),
+		new CLabel(_('Users'), 'userids__ms'),
 		(new CMultiSelect([
 			'name' => 'userids[]',
 			'object_name' => 'users',

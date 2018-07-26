@@ -634,7 +634,6 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	max-width: calc(100% - 100px);
 	position: relative;
 	top: 0;
 	z-index: 3;
@@ -642,14 +641,20 @@ article {
 
 	& > li:first-child {
 		float: left;
-		max-width: 256px;
-		overflow: hidden;
-		text-overflow: ellipsis;
 		white-space: nowrap;
 
 		& > span {
-			display: inline; // FF overflow: ellipsis fix
+			display: inline-block;
+			line-height: 1;
 			padding: 4px 7px;
+
+			a {
+				display: inline-block;
+				max-width: 200px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				vertical-align: top;
+			}
 		}
 	}
 
@@ -703,7 +708,7 @@ output {
 
 	&.compact-view {
 		tr {
-			&.flh-na-bg, &.flh-info-bg, &.flh-warning-bg, &.flh-average-bg, &.flh-high-bg, &.flh-disaster-bg {
+			&[class*='flh-'] {
 
 				@if $theme_name == 'blue' {
 
@@ -716,12 +721,12 @@ output {
 								border-bottom-color: rgba($font-color, 0.5);
 							}
 
-							.icon-wzrd-action {
-								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
-							}
-
 							.tag {
 								background-color: rgba($font-color, 0.5);
+							}
+
+							.icon-wzrd-action {
+								background-position: -165px -624px;
 							}
 
 							button:focus {
@@ -743,11 +748,27 @@ output {
 							}
 
 							.icon-wzrd-action {
-								background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
+								background-position: -165px -624px;
 							}
 
 							button:focus {
 								box-shadow: 0 0 0 2px rgba(black, 0.5);
+							}
+						}
+					}
+				}
+
+				@if $theme_name == 'blue' or $theme_name == "dark" {
+
+					&:not(.row-selected):not(:hover) {
+						td {
+							[class*='icon-'] {
+								@include border-radius(2px);
+								background-color: $ui-bg-color;
+							}
+
+							.icon-wzrd-action {
+								background-color: transparent;
 							}
 						}
 					}
@@ -774,26 +795,48 @@ output {
 				color: $green;
 			}
 
-			&:hover {
-				color: $link-hover-color;
-			}
-
+			&:hover,
 			&:focus {
 				color: $link-hover-color;
 			}
 		}
 
 		td {
-			padding-top: 2px;
-			padding-bottom: 2px;
+			padding-top: 0px;
+			padding-bottom: 0px;
 			border-bottom: none;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
+			height: 22px;
+			line-height: 1;
+			vertical-align: middle;
+
+			[class*='icon-'] {
+				vertical-align: middle;
+
+				&:after {
+					margin: 0;
+					line-height: 14px;
+				}
+
+				&:last-of-type {
+					margin-right: 0;
+				}
+			}
+
+			.rel-container {
+
+				span {
+					margin: 0;
+				}
+			}
 
 			.tag {
+				display: inline-block;
+				line-height: 16px;
+				margin-right: 3px;
+				padding: 0 3px;
 				max-width: 40px;
-				margin: -2px 3px 0 0;
-				padding: 2px 3px;
 
 				@media screen and (min-width: 1200px) {
 					max-width: 71px;
@@ -808,15 +851,12 @@ output {
 				}
 			}
 
-			.rel-container {
-				display: inline;
-			}
-
 			.icon-wzrd-action {
-				margin: 2px 0 0 2px;
+				background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
-				background: transparent url(../img/icon-sprite.svg) no-repeat -6px -624px;
+				margin: 0;
+				position: relative;
 			}
 		}
 	}
@@ -915,16 +955,8 @@ output {
 			border: none;
 			@include transition(background-color .2s ease-out);
 
-			&:hover {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
-
-			&:focus {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
-
+			&:hover,
+			&:focus,
 			&:active {
 				text-decoration: none;
 				background-color: $ui-hover-color;
@@ -938,7 +970,7 @@ output {
 			background-color: $ui-hover-color;
 
 			.timeline-axis {
-				background-color:  $ui-bg-color;
+				background-color: $ui-bg-color;
 			}
 
 			.timeline-date {
@@ -983,6 +1015,8 @@ output {
 		padding: 6px 5px;
 		position: relative;
 		border-bottom: 1px solid $table-border-color;
+		line-height: 18px;
+		vertical-align: top;
 	}
 
 	.vertical_rotation_inner {
@@ -1472,6 +1506,16 @@ output {
 				}
 			}
 		}
+	}
+
+	div[aria-live] {
+		overflow: hidden;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		z-index: -1;
 	}
 }
 
@@ -2332,6 +2376,7 @@ $icon-widget-btn: (
 		&:focus,
 		&:hover {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			cursor: pointer;
 		}
 	}
 
@@ -2576,7 +2621,7 @@ $icon-widget-btn: (
 			.icon-cal {
 				position: relative;
 				vertical-align: middle;
-				margin-left: -5px;
+				margin-left: 2px;
 			}
 		}
 	}
@@ -5036,8 +5081,11 @@ a.overlay-close-btn {
 		position: absolute;
 		top: 2px;
 		left: 2px;
-		width: 20px;
-		height: 20px;
+		width: 18px;
+		height: 18px;
+		border: 1px solid $form-border-color;
+		background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+		cursor: pointer;
 	}
 
 	input[type="text"] {
@@ -5049,6 +5097,7 @@ a.overlay-close-btn {
 
 		div {
 			background: $form-disabled-font-color !important;
+			border: 1px solid $form-disabled-font-color;
 		}
 	}
 }
@@ -5663,6 +5712,115 @@ svg {
 
 :placeholder-shown {
 	color: $input-placeholder-color;
+}
+
+.icon-action-command,
+.icon-action-close,
+.icon-action-msg,
+.icon-action-msgs,
+.icon-action-severity-up,
+.icon-action-severity-down,
+.icon-action-severity-changed,
+.icon-action-message,
+.icon-action-ack,
+.icon-problem-generated,
+.icon-problem-recovery,
+.icon-actions-number-gray,
+.icon-actions-number-yellow,
+.icon-actions-number-red {
+	display: inline-block;
+	position: relative;
+	height: 18px;
+	width: 18px;
+	margin: 0 5px 0 0;
+	top:0;
+	bottom:0;
+	vertical-align: bottom;
+
+	&::before {
+		content: '';
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 18px;
+		height: 18px;
+		background-image: url(../img/icon-sprite.svg);
+		background-repeat: no-repeat;
+	}
+}
+
+[data-count][class*='icon-']::after {
+	position: absolute;
+	content: attr(data-count);
+	text-align: center;
+	margin-top: -2px;
+	font-size: 9px;
+	letter-spacing: -0.25px;
+	width: 18px;
+}
+
+.icon-action-command::before {
+	background-position: -249px -245px;
+}
+.icon-action-close::before {
+	background-position: -224px -245px;
+}
+.icon-action-msg::before {
+	background-position: -299px -245px;
+}
+.icon-action-severity-up::before {
+	background-position: -349px -245px;
+}
+.icon-action-severity-down::before {
+	background-position: -375px -245px;
+}
+.icon-action-severity-changed::before {
+	background-position: -399px -245px;
+}
+.icon-action-message::before {
+	background-position: -199px -245px;
+}
+.icon-action-ack::before {
+	background-position: -323px -245px;
+}
+.icon-problem-generated::before {
+	background-position: -449px -245px;
+}
+.icon-problem-recovery::before {
+	background-position: -424px -245px;
+}
+.icon-action-msgs {
+	&[data-count]::after {
+		color: $ui-bg-color;
+	}
+	&::before {
+		background-position: -474px -245px;
+	}
+}
+.icon-actions-number-gray {
+	&[data-count]::after {
+		color: $font-color;
+	}
+	&::before {
+		background-position: -499px -245px;
+	}
+}
+.icon-actions-number-yellow {
+	&[data-count]::after {
+		color: $font-color;
+	}
+	&::before {
+		background-position: -549px -245px;
+	}
+}
+.icon-actions-number-red {
+	&[data-count]::after {
+		color: $font-color;
+	}
+	&::before {
+		background-position: -524px -245px;
+	}
 }
 
 @if $theme_name == 'dev' {
@@ -6422,6 +6580,23 @@ Main navigation is used to jump between high level sections of the application.
          <li><a href="#" class="top-nav-help" title="Help"></a></li>
          <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
          <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+	display: inline-block;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	margin: 1px 3px 1px 0;
+	padding: 2px 3px;
+	text-align: center;
+	line-height: 1em;
+	max-width: 133px;
+	vertical-align: middle;
+	@extend %overflow-ellipsis;
+	@include border-radius(2px);
+
+	&:last-child {
+		margin: 0;
+	}
+}
+
          <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
       </ul>-->
    </div>

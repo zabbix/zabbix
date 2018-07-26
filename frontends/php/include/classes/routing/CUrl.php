@@ -124,7 +124,7 @@ class CUrl {
 	}
 
 	public function setArgumentSID() {
-		$this->arguments['sid'] = substr($_COOKIE['zbx_sessionid'], 16, 16);
+		$this->arguments['sid'] = substr($_COOKIE[ZBX_SESSION_NAME], 16, 16);
 
 		return $this;
 	}
