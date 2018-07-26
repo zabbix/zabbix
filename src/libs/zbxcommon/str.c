@@ -4377,7 +4377,7 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 	token->token.r = ptr - expression;
 
 	/* initialize token data */
-	data = ZBX_TOKEN_FUNC_MACRO == token->type ? &token->data.func_macro : &token->data.lld_func_macro;
+	data = ZBX_TOKEN_FUNC_MACRO == token_type ? &token->data.func_macro : &token->data.lld_func_macro;
 	data->macro.l = offset + 1;
 	data->macro.r = func_loc.l - 2;
 
