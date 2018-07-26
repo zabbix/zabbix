@@ -296,7 +296,7 @@ class CScreenProblem extends CScreenBase {
 			}
 			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 				unset($options['suppressed']);
-				$options['selectSuppressionData'] = API_OUTPUT_EXTEND;
+				$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -360,12 +360,13 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @param array $problems
 	 * @param array $problems[]['suppression_data']
-	 * @param int   $problems[]['suppression_data']['maintenanceid']
+	 * @param int   $problems[]['suppression_data'][]['maintenanceid']
 	 *
 	 * @static
 	 */
 	public static function addMaintenanceNames(array &$problems) {
 		$maintenanceids = [];
+
 		foreach ($problems as $problem) {
 			if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
 				foreach ($problem['suppression_data'] as $data) {
@@ -373,6 +374,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 		}
+
 		$maintenances = $maintenanceids
 			? API::Maintenance()->get([
 				'output' => ['name'],
@@ -380,6 +382,7 @@ class CScreenProblem extends CScreenBase {
 				'preservekeys' => true
 			])
 			: [];
+
 		if ($maintenances) {
 			foreach ($problems as &$problem) {
 				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
