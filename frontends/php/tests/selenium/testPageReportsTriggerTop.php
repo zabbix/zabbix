@@ -191,7 +191,7 @@ class testPageReportsTriggerTop extends CWebTest {
 				'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
 			);
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestClickXpathWait('//a[contains(@id,"spanid")][text()="'.$data['host'].'"]');
+			$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="'.$data['host'].'"]');
 			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
@@ -211,11 +211,12 @@ class testPageReportsTriggerTop extends CWebTest {
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);
 			}
-			$this->zbxTestClickXpathWait('//button[@id="apply"][text()="Apply"]');
+			$this->zbxTestClickWait('apply');
 		}
 
 		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a'));
 			$this->zbxTestTextPresent($data['result']);
 		}
 		else {

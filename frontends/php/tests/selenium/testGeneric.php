@@ -40,9 +40,9 @@ class testGeneric extends CWebTest {
 			['zabbix.php?action=problem.view',	'Problems'],
 
 			['charts.php',						'Custom graphs [refreshed every 30 sec.]'],
-			['screens.php',					'Custom screens [refreshed every 30 sec.]'],
+			['screens.php',					'Configuration of screens'],
 			['slides.php',						'Configuration of slide shows'],
-			['zabbix.php?action=map.view',							'Network maps'],
+			['zabbix.php?action=map.view',							'Configuration of network maps'],
 			['zabbix.php?action=discovery.view',					'Status of discovery'],
 			['srv_status.php',					'Services [refreshed every 30 sec.]'],
 
