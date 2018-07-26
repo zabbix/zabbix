@@ -6046,6 +6046,13 @@ input[type=range]::-webkit-slider-runnable-track {
 	}
 }
 
+.graph-legend {
+	text-align: left;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
 @if $theme_name == 'dev' {
 
 /*doc

@@ -4308,6 +4308,12 @@ input[type=range]::-webkit-slider-runnable-track {
 .range-control-focus .range-control-progress {
   background: #4796c4; }
 
+.graph-legend {
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; }
+
 .list-table thead th {
   border-color: #404040; }
 

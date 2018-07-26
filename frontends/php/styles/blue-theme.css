@@ -4283,3 +4283,9 @@ input[type=range]::-webkit-slider-runnable-track {
   box-shadow: 0 0 1px black; }
 .range-control-focus .range-control-progress {
   background: #0275b8; }
+
+.graph-legend {
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; }

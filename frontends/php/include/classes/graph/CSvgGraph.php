@@ -48,6 +48,7 @@ class CSvgGraph extends CSvg {
 	//protected $min_clock;
 	protected $min_value_left;
 	protected $min_value_right;
+
 	protected $legend_type;
 
 	protected $left_y_max;
@@ -280,18 +281,94 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		// Define offsets.
+		// Define canvas dimensions and offsets, except canvas height and bottom offset.
 		$this->offset_left = ($this->left_y_show && $this->left_y_min) ? 50 : 20;
 		$this->offset_right = ($this->right_y_show && $this->right_y_min) ? 50 : 20;
-		$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 : 20;
-		$this->offset_top = 10;
-
-		// Define canvas size.
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
-		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
+		$this->offset_top = 10;
 		$this->canvas_x = $this->offset_left;
 		$this->canvas_y = $this->offset_top;
+
+		// Calculate dimensions of legend.
+		$legend_line = 1;
+
+		if ($this->metrics) {
+			$legend_offset_left = 0;
+			$total_width = 0;
+			$allowed_lines = 3;
+			foreach ($this->metrics as &$metric) {
+				$metric['legend']['text'] = sprintf('%s: %s', $metric['host']['name'], $metric['name']);
+				$metric['legend']['width'] = imageTextSize(13, 0, $metric['legend']['text'], 'arial')['width'];
+				$total_width += $metric['legend']['width'] + 10;
+			}
+
+			$shortening_rate = $allowed_lines / ($total_width / $this->canvas_width);
+
+			foreach ($this->metrics as &$metric) {
+				if ($shortening_rate < 1) {
+					$metric['legend']['width'] *= $shortening_rate;
+				}
+
+				if ($legend_offset_left + $metric['legend']['width'] > $this->canvas_width) {
+					$legend_offset_left = 0;
+					$legend_line++;
+				}
+
+				$metric['legend']['offset_left'] = floor($legend_offset_left);
+				$metric['legend']['offset_top'] = $legend_line * 20;
+				$legend_offset_left = $legend_offset_left + $metric['legend']['width'];
+			}
+		}
+
+		// Now, once the number of lines in legend is know, calculate also the bottom offsets and canvas height.
+		$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 * $legend_line : 20;
+		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
+
+		unset($metric, $legend_left_offset, $legend_line);
 	}
+
+	private function drawLegend() {
+		if ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) {
+			foreach ($this->metrics as $i => $metric) {
+				$this->drawMetricLegend($i);
+			}
+		}
+	}
+
+	private function drawMetricLegend($metric_num) {
+		$metric = $this->metrics[$metric_num];
+		$options = $metric['options'];
+
+		$x1 = $metric['legend']['offset_left'] + $this->canvas_x;
+		$y1 = $metric['legend']['offset_top'] + $this->canvas_y + $this->canvas_height + 10;
+		$x2 = $x1 + 10;
+		$y2 = $y1;
+
+		$this->addItem(
+			(new CSvgGroup())
+				->addItem([
+					(new CSvgLine($x1, $y1 + 1, $x2, $y2 + 1, $options['color']))
+						->setStrokeWidth(4),
+					(new CSvgTag('foreignObject'))
+						->setAttribute('x', $x2 + 6)
+						//->setAttribute('y', $y2 + 6)
+						->setAttribute('y', $y2 - 6)
+						->setAttribute('width', $metric['legend']['width'] - 20)
+						->setAttribute('height', 20)
+						->addItem(
+							(new CDiv($metric['legend']['text']))
+								->setAttribute('xmlns', 'http://www.w3.org/1999/xhtml')
+								->addClass('graph-legend')
+						)
+
+//					(new CSvgText($x2 + 6, $y2 + 6, $metric['legend']['text'], $this->color_legend))
+//						->setAttribute('text-anchor', 'start')
+//						->setAttribute('width', $metric['legend']['width'])
+//						->setFontSize(13)
+				])
+		);
+	}
+
 
 	private function addCanvasLeftYAxis() {
 		// Left Y must be enabled and at least one metric must be configured use left Y axis.
@@ -484,24 +561,6 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
-	private function drawMetricLegend($metric_num) {
-		$metric = $this->metrics[$metric_num];
-		$options = $metric['options'];
-
-		$text = sprintf('%s: %s', $metric['host']['name'], $metric['name']);
-
-		$x1 = $this->canvas_x + 300 * $metric_num;
-		$y1 = $this->canvas_y + $this->canvas_height + 30;
-		$x2 = $x1 + 10;
-		$y2 = $y1;
-		$this->addItem([
-			(new CSvgLine($x1, $y1, $x2, $y2, $options['color']))
-				->setStrokeWidth(4),
-			(new CSvgText($x2 + 5, $y2 + 5, $text, $this->color_legend))
-				->setAttribute('text-anchor', 'start'),
-		]);
-	}
-
 	private function drawPoints($points, $metric) {
 		/**
 		 * Item grouping is used for two reasons:
@@ -513,7 +572,7 @@ class CSvgGraph extends CSvg {
 			->setAttribute('data-metric', $metric['host']['name'] . ': ' . $metric['name'])
 			->setAttribute('data-color', $metric['options']['color'])
 			->setFillColor($metric['options']['color'])
-			->setStrokeOpacity($metric['options']['transparency'] * 0.1)
+			->setFillOpacity($metric['options']['transparency'] * 0.1)
 			->setAttribute('data-tolerance', $metric['options']['radius']);
 
 		foreach ($points as $point) {
@@ -715,14 +774,6 @@ class CSvgGraph extends CSvg {
 	private function drawMetrics() {
 		foreach ($this->metrics as $i => $metric) {
 			$this->drawMetricData($i);
-		}
-	}
-
-	private function drawLegend() {
-		if ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) {
-			foreach ($this->metrics as $i => $metric) {
-				$this->drawMetricLegend($i);
-			}
 		}
 	}
 

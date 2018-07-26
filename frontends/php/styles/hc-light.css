@@ -4271,6 +4271,12 @@ input[type=range]::-webkit-slider-runnable-track {
 .range-control-focus .range-control-progress {
   background: #555; }
 
+.graph-legend {
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; }
+
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {

@@ -29,16 +29,17 @@ class CSvgText extends CTag {
 		$this->y = $y;
 
 		/**
+		 * TODO
 		 * consider to create new CSvgTag class to extend and move svg tag specific attributes liek x,y there.
 		 *
 		 * consider set x and y right before stringify, e.g., define tostring function and add attributes right before
 		 * call parent::tostring. This allows change x & y more flexible.
 		 */
 		$this->setAttribute('font-family', 'Arial, Tahoma, Verdana, sans-serif');
-		$this->setAttribute('font-size', '13');
 		$this->setAttribute('x', $this->x);
 		$this->setAttribute('y', $this->y);
 		$this->setAttribute('fill', $color);
+		$this->setFontSize(13);
 		$this->addItem($text);
 
 		return $this;
@@ -46,6 +47,12 @@ class CSvgText extends CTag {
 
 	public function setAngle($angle) {
 		$this->setAttribute('transform', 'rotate('.$angle.','.$this->x.','.$this->y.')');
+
+		return $this;
+	}
+
+	public function setFontSize($font_size) {
+		$this->setAttribute('font-size', $font_size);
 
 		return $this;
 	}
