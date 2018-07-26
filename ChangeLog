@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha10
 
 New features:
+..F....... [ZBXNEXT-4587] added new column 'Value' and filter in Triggers list (Ivo, vasilijs)
 ..F....... [ZBXNEXT-4626] improved widget configuration constructor to create custom view for each widgets (ashubin)
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
