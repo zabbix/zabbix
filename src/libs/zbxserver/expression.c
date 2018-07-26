@@ -5363,7 +5363,8 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 			{
 				case ZBX_TOKEN_LLD_MACRO:
 				case ZBX_TOKEN_LLD_FUNC_MACRO:
-					ret = process_lld_macro_token(data, &token, flags, jp_row, error, max_error_len);
+					ret = process_lld_macro_token(data, &token, flags, jp_row, error,
+							max_error_len);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
