@@ -73,8 +73,8 @@ class CControllerAuthenticationEdit extends CController {
 		$config = select_config();
 
 		$data = [
-			'action_submit' => 'administration.auth.update',
-			'action_passw_change' => 'administration.auth.edit',
+			'action_submit' => 'authentication.update',
+			'action_passw_change' => 'authentication.edit',
 			'ldap_configured' => $config['ldap_configured'],
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'ldap_test_password' => '',

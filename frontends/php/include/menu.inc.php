@@ -258,8 +258,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'zabbix.php',
-					'action' => 'administration.auth.edit',
-					'active_if' => ['administration.auth.edit', 'administration.auth.update'],
+					'action' => 'authentication.edit',
+					'active_if' => ['authentication.edit', 'authentication.update'],
 					'label' => _('Authentication')
 				],
 				[
