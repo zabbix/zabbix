@@ -174,7 +174,7 @@ function get_icon($type, $params = []) {
 						->addClass(ZBX_STYLE_BTN_MIN);
 					break;
 
-				case ZBX_LAYOUT_FULLSREEN:
+				case ZBX_LAYOUT_FULLSCREEN:
 					$icon = (new CButton('&nbsp;'))
 						->setTitle(_('Kiosk mode'))
 						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
@@ -185,7 +185,7 @@ function get_icon($type, $params = []) {
 				default:
 					$icon = (new CButton('&nbsp;'))
 						->setTitle(_('Fullscreen'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSREEN)
+						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSCREEN)
 						->addClass(ZBX_LAYOUT_MODE)
 						->addClass(ZBX_STYLE_BTN_MAX);
 			}

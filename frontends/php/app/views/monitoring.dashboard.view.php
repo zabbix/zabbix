@@ -68,6 +68,7 @@ else {
 			->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
 			->setArgumentSID();
 	}
+	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
 	$widget = new CWidget();
 
@@ -151,7 +152,6 @@ else {
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
-		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 			$timeline = (new CDiv($timeline))->addStyle('display: none;');
 		}
@@ -200,6 +200,10 @@ else {
 			');'.
 			'timeControl.processObjects();'
 		);
+	}
+
+	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+		$dashboard_options['kioskmode'] = true;
 	}
 
 	// Initialize dashboard grid.

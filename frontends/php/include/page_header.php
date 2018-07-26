@@ -29,7 +29,7 @@ if (!isset($page['file'])) {
 }
 
 $web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-if ($web_layout_mode === ZBX_LAYOUT_FULLSREEN || $web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+if ($web_layout_mode === ZBX_LAYOUT_FULLSCREEN || $web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
@@ -164,7 +164,7 @@ if ($denied_page_requested) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
-	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSREEN
+	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSCREEN
 		|| $web_layout_mode === ZBX_LAYOUT_KIOSKMODE);
 
 	$theme = ZBX_DEFAULT_THEME;

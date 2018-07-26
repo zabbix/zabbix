@@ -135,8 +135,7 @@ $widget->addItem($filterForm);
 if ($data['pageFilter']->groupsSelected) {
 	global $page;
 
-	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style'], null,
-		false);
+	$dataTable = getTriggersOverview($data['hosts'], $data['triggers'], $page['file'], $data['view_style']);
 }
 else {
 	$dataTable = new CTableInfo();

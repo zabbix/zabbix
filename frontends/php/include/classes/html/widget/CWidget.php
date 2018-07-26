@@ -63,20 +63,6 @@ class CWidget {
 		return $this;
 	}
 
-	public function get() {
-		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-		$widget = [];
-
-		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$this->addItem(get_icon('fullscreen', [$web_layout_mode])
-				->setAttribute('aria-label', _('Content controls')));
-		} elseif ($this->title !== null || $this->controls !== null) {
-			$widget[] = $this->createTopHeader();
-		}
-
-		return [$widget, $this->body];
-	}
-
 	public function show() {
 		echo $this->toString();
 
@@ -84,8 +70,16 @@ class CWidget {
 	}
 
 	public function toString() {
-		$tab = $this->get();
+		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+		$widget = [];
 
+		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+			$this->addItem(get_icon('fullscreen')
+				->setAttribute('aria-label', _('Content controls')));
+		} elseif ($this->title !== null || $this->controls !== null) {
+			$widget[] = $this->createTopHeader();
+		}
+		$tab = [$widget, $this->body];
 		return unpack_object($tab);
 	}
 
