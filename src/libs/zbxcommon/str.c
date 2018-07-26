@@ -4583,7 +4583,7 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 		else
 			return zbx_token_parse_func_macro(expression, macro, ptr + 2, token, ZBX_TOKEN_FUNC_MACRO);
 	}
-	else if (':' == ptr[1])
+	else if ('#' != macro[2] && ':' == ptr[1])
 		return zbx_token_parse_simple_macro_key(expression, macro, ptr + 2, token);
 
 	return FAIL;
