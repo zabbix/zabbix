@@ -29,7 +29,8 @@ class CADNameAttributeParser extends CParser {
 	const ZBX_TYPE_UPN = 0x2;
 
 	/**
-	 * User name attribute type
+	 * User name attribute type.
+	 *
 	 * @var int
 	 */
 	private $name_type;
@@ -52,17 +53,17 @@ class CADNameAttributeParser extends CParser {
 	/**
 	 * Create instance of parser.
 	 *
-	 * @param array $options    Array of options.
+	 * @param array $options              Array of options.
 	 * @param int   $options['strict']    For sAMAccount name check length of parsed domain and user. Default false.
 	 * @param int   $options['nametype']  Bit mask what type of user name should be parsed.
 	 *                                    Default parse sAMAccountName and UserPrincipalName.
 	 */
 	public function __construct(array $options = []) {
-		$options += ['nametype' => self::ZBX_TYPE_SAMA|self::ZBX_TYPE_UPN];
+		$options += ['nametype' => self::ZBX_TYPE_SAMA | self::ZBX_TYPE_UPN];
 		$this->options = [
-			'strict' => array_key_exists('strict', $options) && (bool)$options['strict'],
-			'type_sama' => array_key_exists('nametype', $options) && ($options['nametype']&self::ZBX_TYPE_SAMA),
-			'type_upn' => array_key_exists('nametype', $options) && ($options['nametype']&self::ZBX_TYPE_UPN)
+			'strict' => array_key_exists('strict', $options) && (bool) $options['strict'],
+			'type_sama' => array_key_exists('nametype', $options) && ($options['nametype'] & self::ZBX_TYPE_SAMA),
+			'type_upn' => array_key_exists('nametype', $options) && ($options['nametype'] & self::ZBX_TYPE_UPN)
 		];
 	}
 

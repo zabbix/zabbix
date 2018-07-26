@@ -1095,7 +1095,7 @@ class CUser extends CApiService {
 
 		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {
 			// HTTP authentication.
-			foreach(['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+			foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
 				if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
 					$http_alias = $_SERVER[$key];
 					break;
@@ -1143,7 +1143,7 @@ class CUser extends CApiService {
 				$db_users = DBfetchArray(DBselect(
 					'SELECT '.implode(',', $fields).
 					' FROM users'.
-						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
+					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
 				));
 			}
 		}
@@ -1167,6 +1167,7 @@ class CUser extends CApiService {
 
 				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
 				$db_users = [];
+
 				foreach($db_users_rows as $db_user_row) {
 					$permissions = $this->getUserGroupsData($db_user_row['userid']);
 

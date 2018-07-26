@@ -71,7 +71,6 @@ class CControllerAuthenticationEdit extends CController {
 	protected function doAction() {
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$config = select_config();
-		$test_users = [];
 
 		$data = [
 			'action_submit' => 'administration.auth.update',
@@ -93,7 +92,7 @@ class CControllerAuthenticationEdit extends CController {
 			'http_auth_enabled' => $config['http_auth_enabled'],
 			'http_login_form' => $config['http_login_form'],
 			'http_strip_domains' => $config['http_strip_domains'],
-			'form_refresh' => 0,
+			'form_refresh' => 0
 		];
 
 		$this->getInputs($data, [
@@ -115,11 +114,12 @@ class CControllerAuthenticationEdit extends CController {
 		]);
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
-			&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if ($data['ldap_test_user'] === '') {
 			$data['ldap_test_user'] = CWebUser::$data['alias'];
 		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Authentication'));
 		$this->setResponse($response);

@@ -31,7 +31,7 @@ class CADNameAttributeParserTest extends PHPUnit_Framework_TestCase {
 		// Parse only UserPrincipalName.
 		$only_upn = ['nametype' => CADNameAttributeParser::ZBX_TYPE_UPN];
 		// Parse sAMAccountName and UserPrincipalName.
-		$sama_and_upn = ['nametype' => CADNameAttributeParser::ZBX_TYPE_SAMA|CADNameAttributeParser::ZBX_TYPE_UPN];
+		$sama_and_upn = ['nametype' => CADNameAttributeParser::ZBX_TYPE_SAMA | CADNameAttributeParser::ZBX_TYPE_UPN];
 
 		// Parsed name type should be sAMAccountName.
 		$should_be_sama = ['name_type' => CADNameAttributeParser::ZBX_TYPE_SAMA];

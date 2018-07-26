@@ -26,11 +26,13 @@ $config = select_config();
 
 if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED || CWebUser::isLoggedIn()) {
 	redirect((new CUrl('index.php'))->getUrl());
+
 	exit;
 }
 
 $http_user = '';
-foreach(['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+
+foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
 	if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
 		$http_user = $_SERVER[$key];
 		break;

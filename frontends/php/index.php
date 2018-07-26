@@ -113,7 +113,7 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 			}
 
 			$data = [
-				'http_auth_enabled' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED,
+				'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
 				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid')
 			];
 

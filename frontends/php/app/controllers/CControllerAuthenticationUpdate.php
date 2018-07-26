@@ -76,7 +76,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateLdap() {
-		$isvalid = true;
+		$is_valid = true;
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute',
 			'ldap_bind_password', 'ldap_configured'
@@ -86,30 +86,30 @@ class CControllerAuthenticationUpdate extends CController {
 		$ldap_settings_changed = array_diff_assoc($config, select_config());
 
 		if (!$ldap_settings_changed && !$this->hasInput('ldap_test')) {
-			return $isvalid;
+			return $is_valid;
 		}
 
 		foreach($ldap_fields as $field) {
 			if (trim($config[$field]) === '') {
 				$this->response->setMessageError(_s('Incorrect value for field "%1$s": cannot be empty.', $field));
-				$isvalid = false;
+				$is_valid = false;
 				break;
 			}
 		}
 
-		if($isvalid && ($config['ldap_port'] < 0 || $config['ldap_port'] > 65535)) {
+		if ($is_valid && ($config['ldap_port'] < 0 || $config['ldap_port'] > 65535)) {
 			$this->response->setMessageError(_s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
 				'ldap_port', 0, 65535
 			));
-			$isvalid = false;
+			$is_valid = false;
 		}
 
 		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
 			$this->response->setMessageError($ldap_status['error']);
-			$isvalid = false;
+			$is_valid = false;
 		}
-		else if ($isvalid) {
+		elseif ($is_valid) {
 			$ldap_validator = new CLdapAuthValidator([
 				'conf' => [
 					'host' => $config['ldap_host'],
@@ -131,11 +131,11 @@ class CControllerAuthenticationUpdate extends CController {
 					? _('LDAP login was not successful')
 					: _('Login name or password is incorrect!')
 				);
-				$isvalid = false;
+				$is_valid = false;
 			}
 		}
 
-		return $isvalid;
+		return $is_valid;
 	}
 
 	/**
