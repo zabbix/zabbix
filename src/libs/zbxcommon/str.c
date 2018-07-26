@@ -4578,10 +4578,8 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
 	/*               simple macros                        {{MACRO}:key.function()} */
 	if ('.' == ptr[1])
 	{
-		if ('#' == macro[2])
-			return zbx_token_parse_func_macro(expression, macro, ptr + 2, token, ZBX_TOKEN_LLD_FUNC_MACRO);
-		else
-			return zbx_token_parse_func_macro(expression, macro, ptr + 2, token, ZBX_TOKEN_FUNC_MACRO);
+		return zbx_token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
+				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
 	}
 	else if ('#' != macro[2] && ':' == ptr[1])
 		return zbx_token_parse_simple_macro_key(expression, macro, ptr + 2, token);
