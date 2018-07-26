@@ -5171,8 +5171,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + l, &replace_to, &replace_to_alloc))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
-				*data + l);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
 		if (0 != (flags & ZBX_TOKEN_NUMERIC))
 		{
@@ -5181,8 +5180,20 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		}
 
 		zbx_free(replace_to);
+		goto out;
 	}
-	else if (0 != (flags & ZBX_TOKEN_NUMERIC))
+
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
+	{
+		replace_to_alloc = 0;
+		if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
+		{
+			zbx_free(replace_to);
+			goto out;
+		}
+	}
+
+	if (0 != (flags & ZBX_TOKEN_NUMERIC))
 	{
 		if (SUCCEED == (ret = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
 		{
@@ -5215,14 +5226,8 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	{
 		xml_escape_xpath(&replace_to);
 	}
-
+out:
 	(*data)[r + 1] = c;
-
-	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type && NULL != replace_to)
-	{
-		if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
-			zbx_free(replace_to);
-	}
 
 	if (NULL != replace_to)
 	{
