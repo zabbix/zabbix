@@ -1772,7 +1772,7 @@ button {
       .time-selection-container .time-input li .icon-cal {
         position: relative;
         vertical-align: middle;
-        margin-left: -5px; }
+        margin-left: 2px; }
   .time-selection-container .time-quick-range {
     text-align: right;
     white-space: nowrap;

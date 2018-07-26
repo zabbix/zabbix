@@ -83,7 +83,7 @@ static int	get_function_parameter_int(zbx_uint64_t hostid, const char *parameter
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
@@ -143,7 +143,7 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
@@ -172,7 +172,7 @@ static int	get_function_parameter_float(zbx_uint64_t hostid, const char *paramet
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
+	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
@@ -203,7 +203,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
-	if (NULL == (*value = get_param_dyn(parameters, Nparam)))
+	if (NULL == (*value = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
 	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
@@ -341,13 +341,21 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
-			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-		else
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		zbx_history_record_clear(&vc_value, item->value_type);
+		switch(regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		{
+			case ZBX_REGEXP_MATCH:
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+				ret = SUCCEED;
+				break;
+			case ZBX_REGEXP_NO_MATCH:
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+				ret = SUCCEED;
+				break;
+			default:
+				*error = zbx_dsprintf(*error, "invalid regular expression");
+		}
 
-		ret = SUCCEED;
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");

@@ -82,8 +82,8 @@ dist-hook:
 TEST_COMMENT = "embedded unit tests - remove before commit"
 TEST_LIBDIR = libs/zbxcunit
 TEST_SUITESFILE = $(TEST_LIBDIR)/cu_modules.h
-TEST_SRCFILES = `grep $(TEST_COMMENT) * -rl | grep "\.c$$"`
-TEST_TESTFILES = `find -name *_test.c`
+TEST_SRCFILES = `find . -name "*.c" | while read fn; do if grep -q $(TEST_COMMENT) $${fn}; then echo $${fn}; fi; done`
+TEST_TESTFILES = `find . -name "*_test.c"`
 TEST_DECLARE = "ZBX_CU_DECLARE" 
 
 $(TEST_SUITESFILE):
@@ -104,8 +104,9 @@ test: $(TEST_SUITESFILE)
 
 clean-test:
 	rm -rf $(TEST_SUITESFILE)
-	for file in $(TEST_SRCFILES); do		\
-		sed -i /$(TEST_COMMENT)/d $$file;	\
+	for file in $(TEST_SRCFILES); do				\
+		cat $$file | sed /$(TEST_COMMENT)/d > $$file.new;	\
+		mv $$file.new $$file;					\
 	done
  
 clean-local: clean-test
