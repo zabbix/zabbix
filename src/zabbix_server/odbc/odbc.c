@@ -40,7 +40,6 @@ struct zbx_odbc_query_result
 {
 	SQLHSTMT	hstmt;
 	SQLSMALLINT	col_num;
-	SQLSMALLINT	*c_types;
 	char		**row;
 };
 
@@ -342,10 +341,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 			if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
 				SQLSMALLINT	i;
-				SQLLEN		col_type;
 
-				query_result->c_types = (SQLSMALLINT *)zbx_malloc(NULL,
-						sizeof(SQLSMALLINT) * (size_t)query_result->col_num);
 				query_result->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
 
 				for (i = 0; ; i++)
@@ -357,22 +353,6 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 						goto out;
 					}
 
-					rc = SQLColAttribute(query_result->hstmt, i + 1, SQL_DESC_TYPE, NULL, 0, NULL,
-							&col_type);
-
-					if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
-					{
-						*error = zbx_dsprintf(*error, "Cannot get column type: %s", diag);
-						zbx_free(query_result->c_types);
-						zbx_free(query_result->row);
-						break;
-					}
-
-					zabbix_log(LOG_LEVEL_DEBUG, "column #%d type:%d", (int)i + 1, (int)col_type);
-
-					/* force col_type to integer value for DB2 compatibility */
-					query_result->c_types[i] = (SQL_WLONGVARCHAR == (int)col_type ?
-							SQL_C_DEFAULT : SQL_C_CHAR);
 					query_result->row[i] = NULL;
 				}
 			}
@@ -413,7 +393,6 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
 	SQLSMALLINT	i;
 
 	SQLFreeHandle(SQL_HANDLE_STMT, query_result->hstmt);
-	zbx_free(query_result->c_types);
 
 	for (i = 0; i < query_result->col_num; i++)
 		zbx_free(query_result->row[i]);
@@ -473,7 +452,7 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		/* force len to integer value for DB2 compatibility */
 		do
 		{
-			rc = SQLGetData(query_result->hstmt, i + 1, query_result->c_types[i], buffer, MAX_STRING_LEN, &len);
+			rc = SQLGetData(query_result->hstmt, i + 1, SQL_C_CHAR, buffer, MAX_STRING_LEN, &len);
 
 			if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
@@ -483,8 +462,6 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 
 			if (SQL_NULL_DATA == (int)len)
 				break;
-
-			buffer[(int)len] = '\0';
 
 			zbx_strcpy_alloc(&query_result->row[i], &alloc, &offset, buffer);
 		}

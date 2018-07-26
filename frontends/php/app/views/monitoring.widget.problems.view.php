@@ -148,9 +148,14 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	$sortorder = ($show_timeline) ? $data['sortorder'] : ZBX_SORT_DOWN;
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen']), '', true)
+			->setHint(
+				make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen'], $show_timeline, $sortorder),
+				'',
+				true
+			)
 	]));
 
 	$description_style = getSeverityStyle($problem['severity']);

@@ -86,7 +86,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'fields' => [
 				'show' => $fields['show'],
 				'show_tags' => $fields['show_tags'],
-				'show_timeline' => $fields['show_timeline'],
+				'show_timeline' => $fields['show_timeline']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],

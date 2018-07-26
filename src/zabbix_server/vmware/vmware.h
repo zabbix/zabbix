@@ -81,9 +81,13 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char	*name;
-	char	*uuid;
-	char	*id;
+	char		*name;
+	char		*uuid;
+	char		*id;
+	zbx_uint64_t	capacity;
+	zbx_uint64_t	free_space;
+	zbx_uint64_t	uncommitted;
+
 }
 zbx_vmware_datastore_t;
 
@@ -354,6 +358,11 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 #define ZBX_VMWARE_VMPROP_UPTIME			15
 
 #define ZBX_VMWARE_VMPROPS_NUM				16
+
+/* vmware service types */
+#define ZBX_VMWARE_TYPE_UNKNOWN	0
+#define ZBX_VMWARE_TYPE_VSPHERE	1
+#define ZBX_VMWARE_TYPE_VCENTER	2
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

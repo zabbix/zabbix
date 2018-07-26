@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Plain text widget form.
+ */
 class CWidgetFormPlainText extends CWidgetForm {
 
 	public function __construct($data) {
@@ -32,7 +35,7 @@ class CWidgetFormPlainText extends CWidgetForm {
 			$field_items->setValue($this->data['itemids']);
 		}
 
-		$this->fields[] = $field_items;
+		$this->fields[$field_items->getName()] = $field_items;
 
 		// Location of the item names.
 		$field_style = (new CWidgetFieldRadioButtonList('style', _('Items location'), [
@@ -45,7 +48,8 @@ class CWidgetFormPlainText extends CWidgetForm {
 		if (array_key_exists('style', $this->data)) {
 			$field_style->setValue($this->data['style']);
 		}
-		$this->fields[] = $field_style;
+
+		$this->fields[$field_style->getName()] = $field_style;
 
 		// Number of records to display.
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
@@ -58,7 +62,7 @@ class CWidgetFormPlainText extends CWidgetForm {
 			$field_lines->setValue($this->data['show_lines']);
 		}
 
-		$this->fields[] = $field_lines;
+		$this->fields[$field_lines->getName()] = $field_lines;
 
 		// Show text as HTML.
 		$field_show_as_html = (new CWidgetFieldCheckBox('show_as_html', _('Show text as HTML')))->setDefault(0);
@@ -67,7 +71,7 @@ class CWidgetFormPlainText extends CWidgetForm {
 			$field_show_as_html->setValue($this->data['show_as_html']);
 		}
 
-		$this->fields[] = $field_show_as_html;
+		$this->fields[$field_show_as_html->getName()] = $field_show_as_html;
 
 		// Use dynamic items.
 		$dynamic_item = (new CWidgetFieldCheckBox('dynamic', _('Dynamic items')))->setDefault(WIDGET_SIMPLE_ITEM);
@@ -76,6 +80,6 @@ class CWidgetFormPlainText extends CWidgetForm {
 			$dynamic_item->setValue($this->data['dynamic']);
 		}
 
-		$this->fields[] = $dynamic_item;
+		$this->fields[$dynamic_item->getName()] = $dynamic_item;
 	}
 }

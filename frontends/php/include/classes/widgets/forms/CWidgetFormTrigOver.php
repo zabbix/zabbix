@@ -27,7 +27,7 @@ class CWidgetFormTrigOver extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_TRIG_OVER);
 
-		// show
+		// Output information option.
 		$field_show = (new CWidgetFieldRadioButtonList('show', _('Show'), [
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problems'),
 			TRIGGERS_OPTION_IN_PROBLEM => _('Problems'),
@@ -39,25 +39,28 @@ class CWidgetFormTrigOver extends CWidgetForm {
 		if (array_key_exists('show', $this->data)) {
 			$field_show->setValue($this->data['show']);
 		}
-		$this->fields[] = $field_show;
 
-		// host groups
+		$this->fields[$field_show->getName()] = $field_show;
+
+		// Host groups.
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
 		}
-		$this->fields[] = $field_groups;
 
-		// application
+		$this->fields[$field_groups->getName()] = $field_groups;
+
+		// Application field.
 		$field_application = new CWidgetFieldTextBox('application', _('Application'));
 
 		if (array_key_exists('application', $this->data)) {
 			$field_application->setValue($this->data['application']);
 		}
-		$this->fields[] = $field_application;
 
-		// hosts location
+		$this->fields[$field_application->getName()] = $field_application;
+
+		// Hosts names location.
 		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),
 			STYLE_TOP => _('Top')
@@ -68,6 +71,7 @@ class CWidgetFormTrigOver extends CWidgetForm {
 		if (array_key_exists('style', $this->data)) {
 			$field_style->setValue($this->data['style']);
 		}
-		$this->fields[] = $field_style;
+
+		$this->fields[$field_style->getName()] = $field_style;
 	}
 }
