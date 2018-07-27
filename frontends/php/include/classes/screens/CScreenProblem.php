@@ -253,7 +253,7 @@ class CScreenProblem extends CScreenBase {
 				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
-				'suppressed' => 0,
+				'suppressed' => false,
 				'limit' => $config['search_limit'] + 1
 			];
 

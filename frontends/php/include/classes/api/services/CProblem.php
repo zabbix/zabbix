@@ -269,7 +269,7 @@ class CProblem extends CApiService {
 
 		// suppressed
 		if ($options['suppressed'] !== null) {
-			$sqlParts['where'][] = ($options['suppressed'] == EVENT_NOT_SUPPRESSED ? 'NOT ' : '').
+			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
 					'EXISTS ('.
 						'SELECT NULL'.
 						' FROM event_suppress es'.
@@ -390,49 +390,12 @@ class CProblem extends CApiService {
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
 		}
-
-		if ($options['suppressed'] !== null) {
-			$suppressed_validator = new CLimitedSetValidator([
-				'values' => [EVENT_NOT_SUPPRESSED, EVENT_SUPPRESSED]
-			]);
-			if (!$suppressed_validator->validate($options['suppressed'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect suppressed value.'));
-			}
-		}
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$eventids = array_keys($result);
-
-		// Adding suppressed value.
-		if ($this->outputIsRequested('suppressed', $options['output'])) {
-			$suppressed_eventids = [];
-			foreach ($result as &$problem) {
-				if (array_key_exists('suppression_data', $problem)) {
-					$problem['suppressed'] = $problem['suppression_data'] ? EVENT_SUPPRESSED : EVENT_NOT_SUPPRESSED;
-				}
-				else {
-					$suppressed_eventids[] = $problem['eventid'];
-				}
-			}
-			unset($problem);
-
-			if ($suppressed_eventids) {
-				$suppressed_events = API::getApiService()->select('event_suppress', [
-					'output' => ['eventid'],
-					'filter' => ['eventid' => $suppressed_eventids]
-				]);
-				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
-				foreach ($result as &$problem) {
-					$problem['suppressed'] = array_key_exists($problem['eventid'], $suppressed_eventids)
-						? EVENT_SUPPRESSED
-						: EVENT_NOT_SUPPRESSED;
-				}
-				unset($problem);
-			}
-		}
 
 		// adding acknowledges
 		if ($options['selectAcknowledges'] !== null) {
@@ -471,16 +434,42 @@ class CProblem extends CApiService {
 
 		// Adding suppression data.
 		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
-			if ($options['selectSuppressionData'] === API_OUTPUT_EXTEND) {
-				$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
-			}
-			$relation_map = $this->createRelationMap($result, 'eventid', 'event_suppressid', 'event_suppress');
 			$suppression_data = API::getApiService()->select('event_suppress', [
-				'output' => $options['selectSuppressionData'],
-				'filter' => ['event_suppressid' => $relation_map->getRelatedIds()],
+				'output' => $this->outputExtend($options['selectSuppressionData'], ['eventid', 'maintenanceid']),
+				'filter' => ['eventid' => $eventids],
 				'preservekeys' => true
 			]);
+			$relation_map = $this->createRelationMap($suppression_data, 'eventid', 'event_suppressid');
+			$suppression_data = $this->unsetExtraFields($suppression_data, ['event_suppressid', 'eventid'], []);
 			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
+		}
+
+		// Adding suppressed value.
+		if ($this->outputIsRequested('suppressed', $options['output'])) {
+			$suppressed_eventids = [];
+			foreach ($result as &$problem) {
+				if (array_key_exists('suppression_data', $problem)) {
+					$problem['suppressed'] = $problem['suppression_data'] ? EVENT_SUPPRESSED : EVENT_NOT_SUPPRESSED;
+				}
+				else {
+					$suppressed_eventids[] = $problem['eventid'];
+				}
+			}
+			unset($problem);
+
+			if ($suppressed_eventids) {
+				$suppressed_events = API::getApiService()->select('event_suppress', [
+					'output' => ['eventid'],
+					'filter' => ['eventid' => $suppressed_eventids]
+				]);
+				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
+				foreach ($result as &$problem) {
+					$problem['suppressed'] = array_key_exists($problem['eventid'], $suppressed_eventids)
+						? EVENT_SUPPRESSED
+						: EVENT_NOT_SUPPRESSED;
+				}
+				unset($problem);
+			}
 		}
 
 		// Adding event tags.

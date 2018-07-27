@@ -125,7 +125,7 @@ function getSystemStatusData(array $filter) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'objectids' => $filter_triggerids,
-		'selectSuppressionData' => ['maintenanceid', 'suppress_until'],
+		'suppressed' => false,
 		'sortfield' => ['eventid'],
 		'sortorder' => ZBX_SORT_DOWN,
 		'preservekeys' => true
@@ -138,8 +138,9 @@ function getSystemStatusData(array $filter) {
 			$options['severities'] = $filter['severities'];
 		}
 	}
-	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed'] == 0) {
-		$options['suppressed'] = false;
+	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
+		unset($options['suppressed']);
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
 	}
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {
 		$options['acknowledged'] = false;
