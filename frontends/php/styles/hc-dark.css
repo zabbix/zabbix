@@ -1,10 +1,10 @@
 /*
 Error: $color: (#000000 "!important") is not a color for `rgba'
-        on line 4161 of sass/stylesheets/sass/screen.scss
+        on line 4156 of sass/stylesheets/sass/screen.scss
         from line 129 of sass/stylesheets/sass/hc-dark.scss
 
 Backtrace:
-sass/stylesheets/sass/screen.scss:4161
+sass/stylesheets/sass/screen.scss:4156
 sass/stylesheets/sass/hc-dark.scss:129
 /usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:303:in `reformat_argument_error'
 /usr/lib/ruby/vendor_ruby/sass/script/tree/funcall.rb:146:in `rescue in _perform'
@@ -64,4 +64,4 @@ sass/stylesheets/sass/hc-dark.scss:129
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: $color: (#000000 \"!important\") is not a color for `rgba'\A         on line 4161 of sass/stylesheets/sass/screen.scss\A         from line 129 of sass/stylesheets/sass/hc-dark.scss"; }
+  content: "Error: $color: (#000000 \"!important\") is not a color for `rgba'\A         on line 4156 of sass/stylesheets/sass/screen.scss\A         from line 129 of sass/stylesheets/sass/hc-dark.scss"; }

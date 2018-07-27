@@ -1593,7 +1593,6 @@ define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
-define('ZBX_STYLE_TABS_LEFT_PADDING_15_PERCENTS', 'tabs-left-padding-15-percents');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
@@ -1627,6 +1626,7 @@ define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 // html layout columns
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 define('ZBX_STYLE_COLUMNS_1', 'columns-1');
+define('ZBX_STYLE_COLUMNS_4', 'columns-4');
 define('ZBX_STYLE_COLUMNS_5', 'columns-5');
 define('ZBX_STYLE_COLUMNS_6', 'columns-6');
 define('ZBX_STYLE_COLUMNS_11', 'columns-11');

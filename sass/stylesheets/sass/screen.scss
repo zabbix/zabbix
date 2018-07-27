@@ -1509,6 +1509,7 @@ output {
 	}
 
 	div[aria-live] {
+		overflow: hidden;
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -1581,12 +1582,6 @@ output {
 
 	> .ui-tabs-nav {
 		margin: -10px -10px 10px -10px;
-	}
-
-	&.tabs-left-padding-15-percents { // TODO miks: this is ugly... should provide something better.
-		> .ui-tabs-nav {
-			padding-left: 15%;
-		}
 	}
 }
 
@@ -5518,6 +5513,7 @@ svg {
 	flex-wrap: wrap;
 
 	.columns-1,
+	.columns-4,
 	.columns-5,
 	.columns-6,
 	.columns-11 {
@@ -5527,6 +5523,11 @@ svg {
 		-ms-flex: 0 0 8.333333%;
 		flex: 0 0 8.333333%;
 		max-width: 8.333333%;
+	}
+	.columns-4 {
+		-ms-flex: 0 0 33.33333%;
+		flex: 0 0 33.33333%;
+		max-width: 33.33333%;
 	}
 	.columns-5 {
 		-ms-flex: 0 0 41.666667%;
