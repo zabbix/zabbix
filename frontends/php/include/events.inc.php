@@ -393,10 +393,13 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
  * @param bool   $fullscreen
+ * @param bool   $show_timeline						show time line flag.
+ * @param string $sortorder							ZBX_SORT_UP|ZBX_SORT_DOWN
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false, $show_timeline = true,
+	$sortorder = ZBX_SORT_DOWN) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -422,8 +425,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 				->addStyle('max-width: 500px')
 		);
 	}
-
-	$show_timeline = true;
 
 	// indicator of sort field
 	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
@@ -465,8 +466,8 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 		]);
 
 		CArrayHelper::sort($problems, [
-			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+			['field' => 'clock', 'order' => $sortorder],
+			['field' => 'ns', 'order' => $sortorder]
 		]);
 
 		$r_eventids = [];

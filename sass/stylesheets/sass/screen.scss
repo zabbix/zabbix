@@ -1519,6 +1519,7 @@ output {
 	}
 
 	div[aria-live] {
+		overflow: hidden;
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -2630,7 +2631,7 @@ $icon-widget-btn: (
 			.icon-cal {
 				position: relative;
 				vertical-align: middle;
-				margin-left: -5px;
+				margin-left: 2px;
 			}
 		}
 	}

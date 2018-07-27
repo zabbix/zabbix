@@ -26,13 +26,15 @@ $user_navigation = (new CList())
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
-					->addClass(ZBX_STYLE_SEARCH),
-				(new CSubmitButton(''))
-					->setEnabled(false)
+					->addClass(ZBX_STYLE_SEARCH)
+					->setAttribute('aria-label', _('type here to search')),
+				(new CSubmitButton('&nbsp;'))
 					->addClass(ZBX_STYLE_BTN_SEARCH)
+					->setTitle(_('Search'))
 			])
 			->setAttribute('role', 'search')
 	);
+
 $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
