@@ -96,7 +96,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "avg5"))
 		ret = EXECUTE_DBL("uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", result);
 	else if (0 == strcmp(tmp, "avg15"))
-		ret = EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", result);
+		ret = EXECUTE_DBL("uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

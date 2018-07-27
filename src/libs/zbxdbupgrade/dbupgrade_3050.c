@@ -1556,6 +1556,32 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3050123(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles where idx in ("
+			"'web.toptriggers.filter.from','web.toptriggers.filter.till','web.avail_report.0.timesince',"
+			"'web.avail_report.0.timetill','web.avail_report.1.timesince','web.avail_report.1.timetill'"
+		")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1681,5 +1707,7 @@ DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
+DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
 
 DBPATCH_END()
