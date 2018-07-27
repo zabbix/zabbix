@@ -24,7 +24,7 @@ CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 $config = select_config();
 
-if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED || CWebUser::isLoggedIn()) {
+if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED || (CWebUser::isLoggedIn() && !CWebUser::isGuest())) {
 	redirect((new CUrl('index.php'))->getUrl());
 
 	exit;
