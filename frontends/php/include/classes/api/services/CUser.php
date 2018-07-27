@@ -1184,7 +1184,7 @@ class CUser extends CApiService {
 		}
 		elseif (count($db_users) > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Authentication failed: %1$s', _('supplied credentials are not unique.'))
+				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
 			);
 		}
 
