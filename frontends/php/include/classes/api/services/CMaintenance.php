@@ -272,7 +272,7 @@ class CMaintenance extends CApiService {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 		}
 
 		// hosts permissions
@@ -614,7 +614,7 @@ class CMaintenance extends CApiService {
 			}
 
 			if (!$has_hosts && !$has_groups) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host group or host must be selected.'));
 			}
 
 			// Check if maintenance without data collection has no tags.
