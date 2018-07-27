@@ -105,10 +105,13 @@ define('ZBX_FONT_NAME', 'DejaVuSans');
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
 define('ZBX_AUTH_HTTP',		2);
-define('ZBX_AUTH_HTTP_ENABLED',	1);
-define('ZBX_AUTH_LDAP_ENABLED',	1);
+define('ZBX_AUTH_HTTP_DISABLED',	0);
+define('ZBX_AUTH_HTTP_ENABLED',		1);
+define('ZBX_AUTH_LDAP_DISABLED',	0);
+define('ZBX_AUTH_LDAP_ENABLED',		1);
 define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
+define('ZBX_AUTH_CASE_IGNORE',	0);
 define('ZBX_AUTH_CASE_MATCH',	1);
 
 define('ZBX_DB_DB2',		'IBM_DB2');

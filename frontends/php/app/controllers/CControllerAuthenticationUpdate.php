@@ -43,15 +43,15 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_test' => 'in 1',
 			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'login_case_sensitive' => 'in 0,'.ZBX_AUTH_CASE_MATCH,
-			'ldap_configured' => 'in 0,'.ZBX_AUTH_LDAP_ENABLED,
+			'login_case_sensitive' => 'in '.ZBX_AUTH_CASE_IGNORE.','.ZBX_AUTH_CASE_MATCH,
+			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_ENABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_host' => 'db config.ldap_host',
 			'ldap_port' => 'int32',
 			'ldap_base_dn' => 'db config.ldap_base_dn',
 			'ldap_bind_dn' => 'db config.ldap_bind_dn',
 			'ldap_search_attribute' => 'db config.ldap_search_attribute',
 			'ldap_bind_password' => 'db config.ldap_bind_password',
-			'http_auth_enabled' => 'in 0,'.ZBX_AUTH_HTTP_ENABLED,
+			'http_auth_enabled' => 'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' => 'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' => 'db config.http_strip_domains'
 		];
