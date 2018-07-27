@@ -11520,7 +11520,12 @@ zbx_data_session_t	*zbx_dc_manage_data_session(zbx_uint64_t hostid, const char *
 		session->lastaccess = now;
 
 		if (0 != replace_token)
+		{
+			/* Session exists, but token has changed. Proxy or agent could have been restarted. */
+			/* Proxy database could have been reinstalled. */
+			session->last_valueid = 0;
 			memcpy(session->token, token, ZBX_DATA_SESSION_TOKEN_SIZE - 1);	/* without terminating '\0' */
+		}
 	}
 	else			/* create new session in cache */
 	{
