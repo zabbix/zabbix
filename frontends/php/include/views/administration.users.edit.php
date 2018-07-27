@@ -118,7 +118,7 @@ if ($data['userid'] == 0 || (array_key_exists('change_password', $data) && $data
 			->setAriaRequired()
 	);
 
-	if ($data['change_password']) {
+	if ((array_key_exists('change_password', $data) && $data['change_password'])) {
 		$userForm->addVar('change_password', $data['change_password']);
 	}
 
