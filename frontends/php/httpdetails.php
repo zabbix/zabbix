@@ -194,17 +194,16 @@ $graph_time->insertFlickerfreeJs();
 // scroll
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
-// Create graphs widget.
-$filter = (new CFilter())
-	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1));
-
 $widget = new CWidget();
 
 $web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addTimeSelector($timeline['from'], $timeline['to']);
-	$widget->addItem($filter);
+	// Create graphs widget.
+	$widget->addItem((new CFilter())
+		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+		->addTimeSelector($timeline['from'], $timeline['to'])
+	);
 }
 
 $widget
