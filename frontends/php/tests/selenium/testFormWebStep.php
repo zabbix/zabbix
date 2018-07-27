@@ -873,6 +873,8 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $data['url']);
 		}
 
+		// Synthetic wait
+//		sleep(2);
 		$fields = [
 			'query'		=> 'query_fields',
 			'post'		=> 'post_fields',
@@ -881,6 +883,10 @@ class testFormWebStep extends CWebTest {
 		];
 		foreach ($fields as $field => $id) {
 			if (array_key_exists($field, $data)) {
+				if ($data[$field] === 'post') {
+					// Synthetic wait
+					sleep(2);
+				}
 				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$id.'"]', $data[$field]);
 			}
 		}
