@@ -5207,7 +5207,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 
 	if (0 != (flags & ZBX_TOKEN_NUMERIC))
 	{
-		if (SUCCEED == (ret = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+		if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 		{
 			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 		}
