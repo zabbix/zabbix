@@ -5214,7 +5214,9 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		else
 		{
 			zbx_free(replace_to);
-			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + l);
+			(*data)[r + 1] = c;
+			zbx_snprintf(error, error_len, "not numeric value in macro \"%.*s\"",
+					token->token.r - token->token.l + 1, *data + token->token.l);
 			ret = FAIL;
 		}
 	}
