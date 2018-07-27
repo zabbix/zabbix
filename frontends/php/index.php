@@ -47,14 +47,35 @@ if (isset($_REQUEST['reconnect'])) {
 }
 
 $config = select_config();
+$http_user = '';
+foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+	if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
+		$http_user = $_SERVER[$key];
+		break;
+	}
+}
 
 // login via form
-if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
+if (getRequest('enter') === _('Sign in') || ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+		&& $config['http_login_form'] == ZBX_AUTH_FORM_ZABBIX && $http_user)) {
 	// try to login
 	$autoLogin = getRequest('autologin', 0);
 
+	if ($http_user) {
+		$parser = new CADNameAttributeParser(['strict' => true]);
+
+		if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
+			$strip_domain = explode(',', $config['http_strip_domains']);
+			$strip_domain = array_map('trim', $strip_domain);
+
+			if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
+				$http_user = $parser->getUserName();
+			}
+		}
+	}
+
 	DBstart();
-	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
+	$loginSuccess = CWebUser::login(getRequest('name', $http_user), getRequest('password', ''));
 	DBend(true);
 
 	if ($loginSuccess) {
@@ -91,6 +112,11 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	// login failed, fall back to a guest account
 	else {
 		CWebUser::checkAuthentication(null);
+	}
+
+	if (getRequest('name', $http_user) === $http_user) {
+		// Remove error messages for invalid SSO login attempt.
+		clear_messages();
 	}
 }
 else {
