@@ -1575,6 +1575,13 @@ static int	DBpatch_3050123(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1701,5 +1708,6 @@ DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
 DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
 
 DBPATCH_END()

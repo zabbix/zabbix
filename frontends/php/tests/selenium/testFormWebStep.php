@@ -881,6 +881,10 @@ class testFormWebStep extends CWebTest {
 		];
 		foreach ($fields as $field => $id) {
 			if (array_key_exists($field, $data)) {
+				if ($data[$field] === 'post') {
+					// Synthetic wait
+					sleep(2);
+				}
 				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$id.'"]', $data[$field]);
 			}
 		}
