@@ -2162,7 +2162,10 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *parameters
 	}
 
 	if (ZBX_VALUE_SECONDS != arg1_type || ts->sec <= arg1)
+	{
+		*error = zbx_strdup(*error, "invalid argument type or value");
 		goto out;
+	}
 
 	if (SUCCEED != zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
