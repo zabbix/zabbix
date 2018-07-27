@@ -628,7 +628,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 4, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid fourth parameter");
 			goto out;
@@ -921,7 +922,8 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -1024,7 +1026,8 @@ static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type
+				|| 0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -1120,7 +1123,8 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -1209,7 +1213,8 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -1321,7 +1326,8 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -1558,7 +1564,8 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			goto out;
@@ -2048,7 +2055,8 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value,
+					arg1))
 				{
 					found = 1;
 					break;
