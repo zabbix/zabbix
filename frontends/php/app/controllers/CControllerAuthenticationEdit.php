@@ -87,7 +87,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_base_dn' => $config['ldap_base_dn'],
 			'ldap_bind_dn' => $config['ldap_bind_dn'],
 			'ldap_search_attribute' => $config['ldap_search_attribute'],
-			'ldap_bind_password' => $config['ldap_bind_password'],
+			'ldap_bind_password' => $this->getInput('change_bind_password', 0) ? '' : $config['ldap_bind_password'],
 			'ldap_test_user' => '',
 			'http_auth_enabled' => $config['http_auth_enabled'],
 			'http_login_form' => $config['http_login_form'],
