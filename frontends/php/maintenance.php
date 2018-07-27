@@ -416,7 +416,9 @@ if (!empty($data['form'])) {
 			'active_since' => getRequest('active_since', date(ZBX_DATE_TIME, strtotime('today'))),
 			'active_till' => getRequest('active_till', date(ZBX_DATE_TIME, strtotime('tomorrow'))),
 			'description' => getRequest('description', ''),
-			'timeperiods' => getRequest('timeperiods', [])
+			'timeperiods' => getRequest('timeperiods', []),
+			'tags_evaltype' => getRequest('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
+			'tags' => getRequest('tags', [])
 		];
 
 		$hostids = getRequest('hostids', []);
