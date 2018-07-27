@@ -67,6 +67,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['rows_per_page']		= $user['rows_per_page'];
 		$data['user_type']			= $user['type'];
 		$data['messages'] 			= getMessageSettings();
+		$data['change_password']	= 0;
 
 		$userGroups = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
@@ -93,7 +94,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['rows_per_page']		= getRequest('rows_per_page', 50);
 		$data['user_type']			= getRequest('user_type', USER_TYPE_ZABBIX_USER);
 		$data['user_groups']		= getRequest('user_groups', []);
-		$data['change_password']	= getRequest('change_password');
+		$data['change_password']	= getRequest('change_password', 0);
 		$data['user_medias']		= getRequest('user_medias', []);
 
 		// set messages

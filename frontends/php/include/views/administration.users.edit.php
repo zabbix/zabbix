@@ -97,7 +97,7 @@ if (!$data['is_profile']) {
 }
 
 // append password to form list
-if ($data['userid'] == 0 || (array_key_exists('change_password', $data) && $data['change_password'])) {
+if ($data['userid'] == 0 || $data['change_password']) {
 	$password_box = new CPassBox('password1', $data['password1']);
 
 	if (!$form_autofocus) {
@@ -118,7 +118,7 @@ if ($data['userid'] == 0 || (array_key_exists('change_password', $data) && $data
 			->setAriaRequired()
 	);
 
-	if ((array_key_exists('change_password', $data) && $data['change_password'])) {
+	if ($data['change_password']) {
 		$userForm->addVar('change_password', $data['change_password']);
 	}
 
