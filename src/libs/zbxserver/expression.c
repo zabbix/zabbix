@@ -5186,8 +5186,20 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
 		replace_to_alloc = 0;
-		if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
+		if (SUCCEED != (zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
 		{
+			size_t	len = token->data.lld_func_macro.func.r - token->data.lld_func_macro.func.l + 1;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot execute function \"%.*s\"", len,
+					*data + token->data.lld_func_macro.func.l);
+
+			if (0 != (flags & ZBX_TOKEN_NUMERIC))
+			{
+				zbx_snprintf(error, error_len, "unable to execute function \"%.*s\"", len,
+						*data + token->data.lld_func_macro.func.l);
+				ret = FAIL;
+			}
+
 			zbx_free(replace_to);
 			goto out;
 		}
