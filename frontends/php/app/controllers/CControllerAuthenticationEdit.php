@@ -38,7 +38,7 @@ class CControllerAuthenticationEdit extends CController {
 			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'login_case_sensitive' => 'in '.ZBX_AUTH_CASE_IGNORE.','.ZBX_AUTH_CASE_MATCH,
-			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_ENABLED.','.ZBX_AUTH_LDAP_ENABLED,
+			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_host' => 'db config.ldap_host',
 			'ldap_port' => 'int32',
 			'ldap_base_dn' => 'db config.ldap_base_dn',
