@@ -25,5 +25,16 @@ jQuery(function ($) {
 
 		submitFormWithParam("form_auth", "change_bind_password", "1");
 	});
+
+	form.find('#http_auth_enabled,#ldap_configured').change(function () {
+		var checkbox = $('#login_case_sensitive'),
+			was_disabled = checkbox.is(':disabled');
+
+		checkbox.attr('disabled', !$('#http_auth_enabled:checked,#ldap_configured:checked').length);
+
+		if (was_disabled && !checkbox.is(':disabled')) {
+			checkbox.prop('checked', true);
+		}
+	});
 });
 </script>

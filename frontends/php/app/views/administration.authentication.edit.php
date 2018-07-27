@@ -50,6 +50,9 @@ $auth_tab = (new CFormList('list_auth'))
 	->addRow(new CLabel(_('Case sensitive login'), 'login_case_sensitive'),
 		(new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
 			->setChecked($data['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED
+			)
 );
 
 // LDAP configuration fields.
