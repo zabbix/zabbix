@@ -1438,7 +1438,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$data = [
 		'form' => getRequest('form'),
 		'action' => 'item.massupdateform',
-		'hostid' => getRequest('hostid'),
+		'hostid' => getRequest('hostid', 0),
 		'itemids' => getRequest('group_itemid', []),
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
@@ -1526,14 +1526,16 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		if ($templateCount != 0) {
 			$data['displayInterfaces'] = false;
 
-			if ($templateCount == 1 && !$data['hostid']) {
-				// if selected from filter without 'hostid'
+			if ($templateCount == 1 && $data['hostid'] == 0) {
+				// If selected from filter without 'hostid'.
 				$templates = reset($templates);
 				$data['hostid'] = $templates['templateid'];
 			}
 
-			// if items belong to single template and some belong to single host, don't display application multiselect
-			// and don't display application multiselect for multiple templates
+			/*
+			 * If items belong to single template and some belong to single host, don't display application multiselect
+			 * and don't display application multiselect for multiple templates.
+			 */
 			if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
 				$data['displayApplications'] = false;
 				$data['displayMasteritems'] = false;
@@ -1548,8 +1550,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 				['field' => 'main', 'order' => ZBX_SORT_DOWN]
 			]);
 
-			// if selected from filter without 'hostid'
-			if (!$data['hostid']) {
+			// If selected from filter without 'hostid'.
+			if ($data['hostid'] == 0) {
 				$data['hostid'] = $data['hosts']['hostid'];
 			}
 

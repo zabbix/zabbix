@@ -21,7 +21,7 @@
 
 $itemWidget = (new CWidget())->setTitle(_('Items'));
 
-if (!empty($data['hostid'])) {
+if ($data['hostid'] != 0) {
 	$itemWidget->addItem(get_header_host_table('items', $data['hostid']));
 }
 
