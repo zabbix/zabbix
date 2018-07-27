@@ -873,8 +873,6 @@ class testFormWebStep extends CWebTest {
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $data['url']);
 		}
 
-		// Synthetic wait
-//		sleep(2);
 		$fields = [
 			'query'		=> 'query_fields',
 			'post'		=> 'post_fields',
