@@ -22,21 +22,22 @@ $widget = new CWidget();
 
 $web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-		$widget
+	$widget
 		->setTitle(_('Slide shows'))
 		->addItem((new CList())
-		->addClass(ZBX_STYLE_OBJECT_GROUP)
-		->addItem([
-			(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
-			'/',
-			(new CSpan())
-				->addClass(ZBX_STYLE_SELECTED)
-				->addItem(
-					new CLink($data['screen']['name'], (new CUrl('slides.php'))
-						->setArgument('elementid', $data['screen']['slideshowid'])
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addItem([
+				(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+				'/',
+				(new CSpan())
+					->addClass(ZBX_STYLE_SELECTED)
+					->addItem(
+						new CLink($data['screen']['name'], (new CUrl('slides.php'))
+							->setArgument('elementid', $data['screen']['slideshowid'])
+						)
 					)
-				)
-		]));
+			])
+		);
 }
 $controls = (new CList())
 	->addItem(
@@ -97,11 +98,11 @@ $widget->setControls((new CList([
 ])));
 
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-	$filter = (new CFilter())
+	$widget->addItem((new CFilter())
 		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-	$widget->addItem($filter);
+		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+	);
 }
 
 $widget->addItem(
