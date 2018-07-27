@@ -5179,9 +5179,13 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 			ret = FAIL;
 		}
 
+		(*data)[r + 1] = c;
 		zbx_free(replace_to);
-		goto out;
+
+		return ret;
 	}
+
+	(*data)[r + 1] = c;
 
 	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
@@ -5201,7 +5205,8 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 			}
 
 			zbx_free(replace_to);
-			goto out;
+
+			return ret;
 		}
 	}
 
@@ -5214,10 +5219,9 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 		else
 		{
 			zbx_free(replace_to);
-			(*data)[r + 1] = c;
 			zbx_snprintf(error, error_len, "not numeric value in macro \"%.*s\"",
 					token->token.r - token->token.l + 1, *data + token->token.l);
-			ret = FAIL;
+			return FAIL;
 		}
 	}
 	else if (0 != (flags & ZBX_TOKEN_JSON))
@@ -5240,8 +5244,6 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	{
 		xml_escape_xpath(&replace_to);
 	}
-out:
-	(*data)[r + 1] = c;
 
 	if (NULL != replace_to)
 	{
@@ -5253,7 +5255,7 @@ out:
 		zbx_free(replace_to);
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
