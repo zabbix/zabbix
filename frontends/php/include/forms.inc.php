@@ -957,7 +957,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
 		'interfaceid' => getRequest('interfaceid', 0),
@@ -1056,7 +1056,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// hostid
-	if (!empty($data['parent_discoveryid'])) {
+	if ($data['parent_discoveryid'] != 0) {
 		$discoveryRule = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'itemids' => $data['parent_discoveryid'],
@@ -1093,88 +1093,82 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 
-		// get templates
-		$itemid = $item['itemid'];
-		do {
-			$params = [
-				'itemids' => $itemid,
-				'output' => ['itemid', 'templateid'],
-				'selectHosts' => ['name']
-			];
-			if ($data['is_discovery_rule']) {
-				$item = API::DiscoveryRule()->get($params);
-			}
-			else {
-				$params['selectDiscoveryRule'] = ['itemid'];
-				$params['filter'] = ['flags' => null];
-				$item = API::Item()->get($params);
-			}
-			$item = reset($item);
-
-			if (!empty($item)) {
-				$host = reset($item['hosts']);
-				if (!empty($item['hosts'])) {
-					if (bccomp($data['itemid'], $itemid) != 0) {
-						$writable = API::Template()->get([
-							'output' => ['templateid'],
-							'templateids' => [$host['hostid']],
-							'editable' => true,
-							'preservekeys' => true
-						]);
-					}
-
-					$host['name'] = CHtml::encode($host['name']);
-					if (bccomp($data['itemid'], $itemid) == 0) {
-					}
-					// discovery rule
-					elseif ($data['is_discovery_rule']) {
-						if (array_key_exists($host['hostid'], $writable)) {
-							$data['templates'][] = new CLink($host['name'],
-								'host_discovery.php?form=update&itemid='.$item['itemid']
-							);
-						}
-						else {
-							$data['templates'][] = new CSpan($host['name']);
-						}
-
-						$data['templates'][] = SPACE.'&rArr;'.SPACE;
-					}
-					// item prototype
-					elseif ($item['discoveryRule']) {
-						if (array_key_exists($host['hostid'], $writable)) {
-							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
-								'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
-							);
-						}
-						else {
-							$data['templates'][] = new CSpan($host['name']);
-						}
-
-						$data['templates'][] = SPACE.'&rArr;'.SPACE;
-					}
-					// plain item
-					else {
-						if (array_key_exists($host['hostid'], $writable)) {
-							$data['templates'][] = new CLink($host['name'],
-								'items.php?form=update&itemid='.$item['itemid']
-							);
-						}
-						else {
-							$data['templates'][] = new CSpan($host['name']);
-						}
-
-						$data['templates'][] = SPACE.'&rArr;'.SPACE;
-					}
+		// discovery rule & item prototype
+		if ($data['is_discovery_rule'] || $data['parent_discoveryid'] != 0) {
+			// get templates
+			$itemid = $item['itemid'];
+			do {
+				$params = [
+					'itemids' => $itemid,
+					'output' => ['itemid', 'templateid'],
+					'selectHosts' => ['name']
+				];
+				if ($data['is_discovery_rule']) {
+					$item = API::DiscoveryRule()->get($params);
 				}
-				$itemid = $item['templateid'];
-			}
-			else {
-				break;
-			}
-		} while ($itemid != 0);
+				else {
+					$params['selectDiscoveryRule'] = ['itemid'];
+					$params['filter'] = ['flags' => null];
+					$item = API::Item()->get($params);
+				}
+				$item = reset($item);
 
-		$data['templates'] = array_reverse($data['templates']);
-		array_shift($data['templates']);
+				if (!empty($item)) {
+					$host = reset($item['hosts']);
+					if (!empty($item['hosts'])) {
+						if (bccomp($data['itemid'], $itemid) != 0) {
+							$writable = API::Template()->get([
+								'output' => ['templateid'],
+								'templateids' => [$host['hostid']],
+								'editable' => true,
+								'preservekeys' => true
+							]);
+						}
+
+						$host['name'] = CHtml::encode($host['name']);
+						if (bccomp($data['itemid'], $itemid) == 0) {
+						}
+						// discovery rule
+						elseif ($data['is_discovery_rule']) {
+							if (array_key_exists($host['hostid'], $writable)) {
+								$data['templates'][] = new CLink($host['name'],
+									'host_discovery.php?form=update&itemid='.$item['itemid']
+								);
+							}
+							else {
+								$data['templates'][] = new CSpan($host['name']);
+							}
+
+							$data['templates'][] = SPACE.'&rArr;'.SPACE;
+						}
+						// item prototype
+						elseif ($item['discoveryRule']) {
+							if (array_key_exists($host['hostid'], $writable)) {
+								$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
+									'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
+								);
+							}
+							else {
+								$data['templates'][] = new CSpan($host['name']);
+							}
+
+							$data['templates'][] = SPACE.'&rArr;'.SPACE;
+						}
+					}
+					$itemid = $item['templateid'];
+				}
+				else {
+					break;
+				}
+			} while ($itemid != 0);
+
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
+		}
+		// plain item
+		else {
+			$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item]));
+		}
 	}
 
 	// caption
