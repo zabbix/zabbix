@@ -2091,7 +2091,8 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	const char	*__function_name = "evaluate_STRLEN";
 	int		ret = FAIL;
@@ -2129,7 +2130,8 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
+static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+		char **error)
 {
 	const char		*__function_name = "evaluate_FUZZYTIME";
 
