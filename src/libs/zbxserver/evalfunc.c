@@ -277,7 +277,6 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
 				__function_name);
-			ret = FAIL;
 		}
 		else
 		{
