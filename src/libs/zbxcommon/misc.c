@@ -3519,7 +3519,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	int		i;
 	char		*token, *ptr;
 
-	ptr = token = (char *)zbx_malloc(NULL, ZBX_DATA_SESSION_TOKEN_SIZE);
+	ptr = token = (char *)zbx_malloc(NULL, ZBX_DATA_SESSION_TOKEN_SIZE + 1);
 
 	zbx_timespec(&ts);
 

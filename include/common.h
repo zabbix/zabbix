@@ -1478,7 +1478,7 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
 
-#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2 + 1)
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
 #endif

@@ -3098,7 +3098,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	{
 		size_t	token_len;
 
-		if (ZBX_DATA_SESSION_TOKEN_SIZE - 1 != (token_len = strlen(token)))
+		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
 		{
 			error = zbx_dsprintf(NULL, "invalid session token length %d", (int)token_len);
 			zbx_free(token);
@@ -3126,7 +3126,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 				last_hostid = items[i].host.hostid;
 
 				if (NULL != token)
-					session = zbx_dc_manage_data_session(last_hostid, token);
+					session = zbx_dc_get_or_create_data_session(last_hostid, token);
 			}
 
 			/* check and discard if duplicate data */
@@ -3905,14 +3905,14 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		{
 			size_t	token_len;
 
-			if (ZBX_DATA_SESSION_TOKEN_SIZE - 1 != (token_len = strlen(token)))
+			if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
 			{
 				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
 				ret = FAIL;
 				goto out;
 			}
 
-			session = zbx_dc_manage_data_session(proxy->hostid, token);
+			session = zbx_dc_get_or_create_data_session(proxy->hostid, token);
 		}
 
 		/* use modifiable copy of client_timediff to allow unique clock,ns value timestamps */
