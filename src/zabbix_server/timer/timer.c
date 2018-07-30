@@ -511,6 +511,10 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			query = (zbx_event_suppress_query_t *)event_queries.values[i];
 			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+			/* don't process recovered events as their suppress data will be removed anyway */
+			if (0 == query->r_eventid)
+				continue;
+
 			k = 0;
 
 			if (FAIL != (j = zbx_vector_ptr_bsearch(&event_data, &query->eventid,
@@ -535,13 +539,10 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 					if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 					{
-						/* insert suppress records only for non-recovered events */
-						if (0 == query->r_eventid)
-						{
-							zbx_db_insert_add_values(&db_insert, __UINT64_C(0),
-								query->eventid, query->maintenances.values[k].first,
+						zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+								query->maintenances.values[k].first,
 								(int)query->maintenances.values[k].second);
-						}
+
 						k++;
 						continue;
 					}
@@ -572,15 +573,11 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 				}
 			}
 
-			/* insert suppress records only for non-recovered events */
-			if (0 == query->r_eventid)
+			for (;k < query->maintenances.values_num; k++)
 			{
-				for (;k < query->maintenances.values_num; k++)
-				{
-					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-							query->maintenances.values[k].first,
-							(int)query->maintenances.values[k].second);
-				}
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+						query->maintenances.values[k].first,
+						(int)query->maintenances.values[k].second);
 			}
 		}
 
