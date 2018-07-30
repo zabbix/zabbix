@@ -5644,6 +5644,85 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_json_pairs                                  *
+ *                                                                            *
+ * Purpose: substitute LLD macros in JSON pairs                               *
+ *                                                                            *
+ * Parameters: data   -    [IN/OUT] pointer to a buffer that JSON pair        *
+ *             jp_row -    [IN] discovery data for LLD macro substitution     *
+ *             error  -    [OUT] reason for JSON pair parsing failure         *
+ *             maxerrlen - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if cannot parse JSON pair                    *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+	const char		*__function_name = "substitute_macros_in_json_pairs";
+	struct zbx_json_parse	jp_array, jp_object;
+	struct zbx_json		json;
+	const char		*member, *element = NULL;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *p_name = NULL, *p_value = NULL;
+	int			ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED != zbx_json_open(*data, &jp_array))
+	{
+		zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+		ret = FAIL;
+		goto exit;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zbx_strlcpy(error, "cannot parse query fields: array is empty", maxerrlen);
+		ret = FAIL;
+		goto exit;
+	}
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	do
+	{
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+			ret = FAIL;
+			goto clean;
+		}
+
+		p_name = zbx_strdup(NULL, name);
+		p_value = zbx_strdup(NULL, value);
+
+		substitute_lld_macros(&p_name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&p_value, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_json_escape(&p_name);
+		zbx_json_escape(&p_value);
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, p_name, p_value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+		zbx_free(p_name);
+		zbx_free(p_value);
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
+
+	zbx_free(*data);
+	*data = zbx_strdup(NULL, json.buffer);
+clean:
+	zbx_json_free(&json);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 #ifdef HAVE_LIBXML2
 /******************************************************************************
  *                                                                            *

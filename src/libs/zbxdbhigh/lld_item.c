@@ -1790,8 +1790,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
-	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/*zbx_lrtrim(item->query_fields, ZBX_WHITESPACE);*/
+
+	if (SUCCEED == ret && '\0' != *item->query_fields)
+		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
