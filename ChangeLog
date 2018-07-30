@@ -424,6 +424,7 @@ Changes for 3.4.13rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.12
