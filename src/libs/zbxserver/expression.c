@@ -2717,6 +2717,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			case ZBX_TOKEN_OBJECTID:
 			case ZBX_TOKEN_LLD_MACRO:
+			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld or {123123} macros are processed by this function, skip them */
 				pos = token.token.r + 1;
 				continue;
