@@ -63,9 +63,7 @@ class testMaintenance extends CZabbixTest {
 					'name' => 'M'.++$n,
 					'tags' => [
 						[
-							'tag' => 'tag',
-							'operator' => 0,
-							'value' => 'value'
+							'tag' => 'tag'
 						]
 					]
 				] + $def_options,
@@ -77,7 +75,22 @@ class testMaintenance extends CZabbixTest {
 					'name' => 'M'.++$n,
 					'tags' => [
 						[
-							'tag' => 'tag'
+							'tag' => 'tag',
+							'operator' => 0
+						]
+					]
+				] + $def_options,
+				'expected_error' => null
+			],
+			// Success. Created maintenance with one tag.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => 0,
+							'value' => 'value'
 						]
 					]
 				] + $def_options,
@@ -95,7 +108,7 @@ class testMaintenance extends CZabbixTest {
 						],
 						[
 							'tag' => 'tag2',
-							'operator' => 1,
+							'operator' => 2,
 							'value' => 'value2'
 						]
 					]
@@ -117,12 +130,44 @@ class testMaintenance extends CZabbixTest {
 						],
 						[
 							'tag' => 'tag',
-							'operator' => 1,
+							'operator' => 2,
 							'value' => 'value'
 						]
 					]
 				] + $def_options,
 				'expected_error' => null
+			],
+			// Fail. Duplicate tags are not allowed.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag'
+						],
+						[
+							'tag' => 'tag'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 2, ) already exists.'
+			],
+			// Fail. Duplicate tags are not allowed.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 'value'
+						],
+						[
+							'tag' => 'tag',
+							'value' => 'value'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 2, value) already exists.'
 			],
 			// Fail. Duplicate tags are not allowed.
 			[
@@ -141,7 +186,7 @@ class testMaintenance extends CZabbixTest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Duplicate tags are not allowed.'
+				'expected_error' => 'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
 			],
 			// Fail. Possible values for "tags_evaltype" are 0 (And/Or) and 2 (Or).
 			[
@@ -150,24 +195,6 @@ class testMaintenance extends CZabbixTest {
 					'tags_evaltype' => 1
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags_evaltype": value must be one of 0, 2.'
-			],
-			// Fail. Parameter "tags_evaltype" is not allowed for maintenance with no data collection.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'maintenance_type' => 1,
-					'tags_evaltype' => 0
-				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags_evaltype": not allowed for maintenance with no data collection.'
-			],
-			// Fail. Parameter "tags" is not allowed for maintenance with no data collection.
-			[
-				'request_data' => [
-					'name' => 'M'.++$n,
-					'maintenance_type' => 1,
-					'tags' => []
-				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags": not allowed for maintenance with no data collection.'
 			],
 			// Fail. Parameter "tag" is mandatory.
 			[
@@ -191,6 +218,54 @@ class testMaintenance extends CZabbixTest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/tag": cannot be empty.'
 			],
+			// Fail. Parameter "tag" must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => null
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+			],
+			// Fail. Parameter "tag" must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => true
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+			],
+			// Fail. Parameter "tag" must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 999
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/tag": a character string is expected.'
+			],
+			// Fail. Unexpected parameter.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							999 => 'aaa'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1": unexpected parameter "999".'
+			],
 			// Fail. Unexpected parameter.
 			[
 				'request_data' => [
@@ -202,7 +277,98 @@ class testMaintenance extends CZabbixTest {
 					]
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1": unexpected parameter "aaa".'
-			]
+			],
+			// Fail. Condition operator must be of type integer.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => null
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+			],
+			// Fail. Condition operator must be of type integer.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => true
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+			],
+			// Fail. Possible values for "operator" are 0 (Equal) and 2 (Like).
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => 999
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/operator": value must be one of 0, 2.'
+			],
+			// Fail. Condition operator must be of type integer.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'operator' => 'aaa'
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+			],
+			// Fail. Tag value must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => null
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+			],
+			// Fail. Tag value must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => true
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+			],
+			// Fail. Tag value must be of type string.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'tags' => [
+						[
+							'tag' => 'tag',
+							'value' => 999
+						]
+					]
+				] + $def_options,
+				'expected_error' => 'Invalid parameter "/tags/1/value": a character string is expected.'
+			],
 		];
 	}
 
