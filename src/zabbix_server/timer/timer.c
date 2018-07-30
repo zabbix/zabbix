@@ -207,21 +207,26 @@ void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
  *                                                                            *
  * Function: db_get_query_events                                              *
  *                                                                            *
- * Purpose: get open problems from database and prepare event query, event    *
- *          data structures                                                   *
+ * Purpose: get open, recently resolved and resolved problems with suppress   *
+ *          data from database and prepare event query, event data structures *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_uint64_t *triggerids)
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data,
+		zbx_vector_uint64_t *triggerids)
 {
 	DB_ROW				row;
 	DB_RESULT			result;
 	zbx_event_suppress_query_t	*query;
-	zbx_uint64_t			triggerid;
+	zbx_event_suppress_data_t	*data = NULL;
+	zbx_uint64_t			triggerid, eventid;
+	zbx_uint64_pair_t		pair;
+	zbx_vector_uint64_t		eventids;
 
-	result = DBselect("select eventid,objectid"
+	/* get open or recently closed problems */
+
+	result = DBselect("select eventid,objectid,r_eventid"
 			" from problem"
-			" where r_eventid is null"
-				" and source=%d"
+			" where source=%d"
 				" and object=%d"
 				" and " ZBX_SQL_MOD(eventid, %d) "=%d"
 			" order by eventid",
@@ -231,6 +236,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_uint
 	{
 		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 		ZBX_STR2UINT64(query->eventid, row[0]);
+		ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 		zbx_vector_uint64_create(&query->functionids);
 		zbx_vector_ptr_create(&query->tags);
 		zbx_vector_uint64_pair_create(&query->maintenances);
@@ -240,6 +246,78 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_uint
 		zbx_vector_uint64_append(triggerids, triggerid);
 	}
 	DBfree_result(result);
+
+	/* get event suppress data */
+
+	zbx_vector_uint64_create(&eventids);
+
+	result = DBselect("select eventid,maintenanceid,suppress_until"
+			" from event_suppress"
+			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
+			" order by eventid",
+			CONFIG_TIMER_FORKS, process_num - 1);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		if (FAIL == zbx_vector_ptr_bsearch(event_queries, &eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			zbx_vector_uint64_append(&eventids, eventid);
+
+		if (NULL == data || data->eventid != eventid)
+		{
+			data = (zbx_event_suppress_data_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_data_t));
+			data->eventid = eventid;
+			zbx_vector_uint64_pair_create(&data->maintenances);
+			zbx_vector_ptr_append(event_data, data);
+		}
+
+		ZBX_DBROW2UINT64(pair.first, row[1]);
+		pair.second = atoi(row[2]);
+		zbx_vector_uint64_pair_append(&data->maintenances, pair);
+	}
+
+	DBfree_result(result);
+
+	/* get missing event data */
+
+	if (0 != eventids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select e.eventid,e.objectid,er.r_eventid"
+				" from events e"
+				" left join event_recovery er"
+					" on e.eventid=er.eventid"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids.values, eventids.values_num);
+
+		result = DBselect("%s", sql);
+		zbx_free(sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_event_suppress_query_t	*query;
+
+			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
+			ZBX_STR2UINT64(query->eventid, row[0]);
+			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+			zbx_vector_uint64_create(&query->functionids);
+			zbx_vector_ptr_create(&query->tags);
+			zbx_vector_uint64_pair_create(&query->maintenances);
+			zbx_vector_ptr_append(event_queries, query);
+
+			ZBX_STR2UINT64(triggerid, row[1]);
+			zbx_vector_uint64_append(triggerids, triggerid);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&eventids);
 }
 
 /******************************************************************************
@@ -376,42 +454,6 @@ static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
 
 /******************************************************************************
  *                                                                            *
- * Function: db_get_suppress_data                                             *
- *                                                                            *
- * Purpose: get event query maintenance information from database             *
- *                                                                            *
- ******************************************************************************/
-static void	db_get_suppress_data(zbx_vector_ptr_t *event_data)
-{
-	DB_ROW				row;
-	DB_RESULT			result;
-	zbx_event_suppress_data_t	*data = NULL;
-	zbx_uint64_t			eventid;
-	zbx_uint64_pair_t		pair;
-
-	result = DBselect("select eventid,maintenanceid,suppress_until from event_suppress order by eventid");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(eventid, row[0]);
-
-		if (NULL == data || data->eventid != eventid)
-		{
-			data = (zbx_event_suppress_data_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_data_t));
-			data->eventid = eventid;
-			zbx_vector_uint64_pair_create(&data->maintenances);
-			zbx_vector_ptr_append(event_data, data);
-		}
-
-		ZBX_DBROW2UINT64(pair.first, row[1]);
-		pair.second = atoi(row[2]);
-		zbx_vector_uint64_pair_append(&data->maintenances, pair);
-	}
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: db_update_event_suppress_data                                    *
  *                                                                            *
  * Purpose: create/update event suppress data to reflect latest maintenance   *
@@ -441,7 +483,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 	zbx_dc_get_running_maintenanceids(&maintenanceids);
 
-	db_get_query_events(&event_queries, &triggerids);
+	db_get_query_events(&event_queries, &event_data, &triggerids);
 
 	if (0 != event_queries.values_num)
 	{
@@ -454,7 +496,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 		db_get_query_functions(&event_queries, &triggerids);
 		db_get_query_tags(&event_queries);
-		db_get_suppress_data(&event_data);
 
 		DBbegin();
 
@@ -494,9 +535,13 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 					if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 					{
-						zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-								query->maintenances.values[k].first,
+						/* insert suppress records only for non-recovered events */
+						if (0 == query->r_eventid)
+						{
+							zbx_db_insert_add_values(&db_insert, __UINT64_C(0),
+								query->eventid, query->maintenances.values[k].first,
 								(int)query->maintenances.values[k].second);
+						}
 						k++;
 						continue;
 					}
@@ -527,11 +572,15 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 				}
 			}
 
-			for (;k < query->maintenances.values_num; k++)
+			/* insert suppress records only for non-recovered events */
+			if (0 == query->r_eventid)
 			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-						query->maintenances.values[k].first,
-						(int)query->maintenances.values[k].second);
+				for (;k < query->maintenances.values_num; k++)
+				{
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+							query->maintenances.values[k].first,
+							(int)query->maintenances.values[k].second);
+				}
 			}
 		}
 
@@ -539,11 +588,16 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		{
 			data = (zbx_event_suppress_data_t *)event_data.values[i];
 
-			if (FAIL != zbx_vector_ptr_bsearch(&event_queries, &data->eventid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			if (FAIL == (j = zbx_vector_ptr_bsearch(&event_queries, &data->eventid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
+
+			query = (zbx_event_suppress_query_t *)event_queries.values[j];
+			if (0 == query->r_eventid)
+				continue;
 
 			for (j = 0; j < data->maintenances.values_num; j++)
 			{
