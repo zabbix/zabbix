@@ -150,7 +150,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			}
 
 			if (ZBX_REGEXP_NO_MATCH == (rret = regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE)))
+			{
 				goto next;
+			}
 			else if (FAIL == rret)
 			{
 				SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
