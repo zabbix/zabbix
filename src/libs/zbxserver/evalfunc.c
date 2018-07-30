@@ -1845,9 +1845,13 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			int rret = regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
 
 			if (ZBX_REGEXP_MATCH == rret)
+			{
 				return SUCCEED;
+			}
 			else if (ZBX_REGEXP_NO_MATCH == rret)
+			{
 				return FAIL;
+			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
@@ -1861,9 +1865,13 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			int rret = regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
 
 			if (ZBX_REGEXP_MATCH == rret)
+			{
 				return SUCCEED;
+			}
 			else if (ZBX_REGEXP_NO_MATCH == rret)
+			{
 				return FAIL;
+			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
