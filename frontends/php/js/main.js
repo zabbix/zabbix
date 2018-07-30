@@ -978,8 +978,9 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - tableupdate.dynamicRows 	- after adding or removing a row
-	 * - beforeadd.dynamicRows 	    - only after adding a new row
+	 * - tableupdate.dynamicRows 	- after adding or removing a row.
+	 * - beforeadd.dynamicRows 	    - only before adding a new row.
+	 * - afteradd.dynamicRows 	    - only after adding a new row.
 	 *
 	 * @param options
 	 */
@@ -1012,6 +1013,8 @@ function getConditionFormula(conditions, evalType) {
 					? $(options['beforeRow'], table)
 					:  $(this).closest('tr');
 				addRow(table, beforeRow, options);
+
+				table.trigger('afteradd.dynamicRows', options);
 			});
 
 			// remove buttons

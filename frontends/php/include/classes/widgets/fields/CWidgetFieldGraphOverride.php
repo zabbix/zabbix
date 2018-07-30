@@ -136,12 +136,15 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		$this->value = (array) $value;
 
 		// Sort data sets according order field.
-		CArrayHelper::sort($this->value, ['order' => ZBX_SORT_UP]);
+		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
 
 		foreach ($this->value as $index => $val) {
-			// At least host or item pattern must be specified.
-			if (!array_key_exists('hosts', $val) || $val['hosts'] === ''
-					|| !array_key_exists('items', $val) || $val['items'] === '') {
+			/**
+			 * At least host or item pattern must be specified. If both are missed, field is deleted. If one is missed,
+			 * it's left now, but later in validate function it generates error message.
+			 */
+			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
+					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
 				unset($this->value[$index]);
 			}
 		}
@@ -153,6 +156,18 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		$errors = parent::validate($strict);
 		$values = $this->getValue();
 		$color_validator = new CColorValidator();
+
+		// Validate host and item pattern fields.
+		if (!$errors && $strict) {
+			foreach ($values as $val) {
+				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Hosts pattern'), _('cannot be empty'));
+				}
+				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Items pattern'), _('cannot be empty'));
+				}
+			}
+		}
 
 		// Validate options.
 		if (!$errors && $strict) {
@@ -355,6 +370,10 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						'data.orderNum = data.rowNum + 1;'.
 						'return data;'.
 					'}'.
+				'})'.
+				'.bind("afteradd.dynamicRows", function(event, options) {'.
+					'var container = jQuery(".overlay-dialogue-body");'.
+					'container.scrollTop(container[0].scrollHeight);'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'initializeOverrides();'.

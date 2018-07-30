@@ -29,11 +29,11 @@ jQuery(function ($) {
 		 * Create CList based accordion.
 		 *
 		 * Supported options:
-		 * - handler		- selector of UI element to open/close accordion section;
-		 * - section		- selector of UI element for single accordion section;
-		 * - body			- selector of UI element that should be opened/closed;
-		 * - active_class	- CSS class that will be applied for active section;
-		 * - auto_close		- boolean; close or leave inactive section opened;
+		 * - handler		- selector of UI element to open/close accordion section.
+		 * - section		- selector of UI element for single accordion section.
+		 * - body			- selector of UI element that should be opened/closed.
+		 * - active_class	- CSS class that will be applied for active section.
+		 * - auto_close		- boolean; close or leave inactive section opened.
 		 *
 		 * @param options
 		 */
@@ -60,7 +60,7 @@ jQuery(function ($) {
 						}
 						else {
 							if (options['auto_close']) {
-								methods.collapseAll(accordion);
+								methods['collapseAll'].apply(accordion);
 							}
 							section.addClass(options['active_class']);
 						}
@@ -70,7 +70,6 @@ jQuery(function ($) {
 		collapseAll: function() {
 			var accordion = $(this),
 				active_class = accordion.data('options')['active_class'];
-
 			$('.'+active_class, accordion).removeClass(active_class);
 		}
 	};

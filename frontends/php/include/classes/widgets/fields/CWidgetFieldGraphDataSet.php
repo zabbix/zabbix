@@ -249,16 +249,20 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->value = (array) $value;
 
 		// Sort data sets according order field.
-		CArrayHelper::sort($this->value, ['order' => ZBX_SORT_UP]);
+		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
 
 		foreach ($this->value as $index => $val) {
 			/**
 			 * Host pattern, item pattern and color are all mandatory fields.
+			 *
+			 * Data sets with unspecified host pattern and item pattern are deleted. If at least one is specified, error
+			 * message tells that both fields are mandatory.
+			 *
 			 * Color is not validated here, because it makes wrong error message later (e.g., if color is not specified,
 			 * error message says that data set is empty).
 			 */
-			if (!array_key_exists('hosts', $val) || $val['hosts'] === ''
-					|| !array_key_exists('items', $val) || $val['items'] === '') {
+			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
+					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
 				unset($this->value[$index]);
 			}
 		}
@@ -273,6 +277,18 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		// At least on data set is mandatory.
 		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$values) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Data set'), _('cannot be empty'));
+		}
+
+		// Validate host and item pattern fields.
+		if (!$errors && $strict) {
+			foreach ($values as $val) {
+				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Hosts pattern'), _('cannot be empty'));
+				}
+				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Items pattern'), _('cannot be empty'));
+				}
+			}
 		}
 
 		// Validate timeshift values.
@@ -406,6 +422,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'})'.
 				'.bind("beforeadd.dynamicRows", function(event, options) {'.
 					'jQuery("#data_sets").zbx_vertical_accordion("collapseAll");'.
+				'})'.
+				'.bind("afteradd.dynamicRows", function(event, options) {'.
+					'var container = jQuery(".overlay-dialogue-body");'.
+					'container.scrollTop(container[0].scrollHeight);'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
