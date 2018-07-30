@@ -683,8 +683,8 @@ class CSvgGraph extends CSvg {
 		$paths = [];
 
 		/**
-		 * SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of graphs, so no need to calculate
-		 * anything. Points will be connected anyway.
+		 * SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything here.
+		 * Points will be connected anyway.
 		 */
 		if ($metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
 			$this->applyMissingDataFunc($this->points[$metric_num], $metric['options']['missingdatafunc']);

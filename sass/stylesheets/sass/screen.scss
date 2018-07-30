@@ -6054,6 +6054,10 @@ input[type=range]::-webkit-slider-runnable-track {
 	overflow: hidden;
 }
 
+.graph-widget-config-tabs > .tabs-nav {
+	padding-left: 15%;
+}
+
 @if $theme_name == 'dev' {
 
 /*doc

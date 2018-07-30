@@ -39,9 +39,12 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	/**
 	 * Return javascript necessary to initialize field.
 	 *
+	 * @param string $form_name   Form name in which control is located.
+	 * @param string $onselect    Callback script that is executed on date select.
+	 *
 	 * @return string
 	 */
-	public function getJavascript($form_name) {
+	public function getJavascript($form_name, $onselect = '') {
 		return
 			'var input = jQuery("[name=\"'.$this->getName().'\"]", jQuery("#'.$form_name.'")).get(0);'.
 			'jQuery("#'.$this->getName().'_dp")'.
@@ -53,6 +56,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 						't = parseInt(o.top + b.outerHeight(), 10),'.
 						'l = parseInt(o.left, 10);'.
 					'b.data("clndr").clndr.clndrshow(t, l, b.data("input"));'.
+					($onselect !== '' ? 'b.data("clndr").clndr.onselect = function() {'.$onselect.'};' : '').
 					'return false;'.
 				'})';
 	}

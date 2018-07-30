@@ -4293,3 +4293,6 @@ input[type=range]::-webkit-slider-runnable-track {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden; }
+
+.graph-widget-config-tabs > .tabs-nav {
+  padding-left: 15%; }

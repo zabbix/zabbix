@@ -4281,6 +4281,9 @@ input[type=range]::-webkit-slider-runnable-track {
   text-overflow: ellipsis;
   overflow: hidden; }
 
+.graph-widget-config-tabs > .tabs-nav {
+  padding-left: 15%; }
+
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {

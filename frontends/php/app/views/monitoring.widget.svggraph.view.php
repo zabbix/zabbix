@@ -20,17 +20,22 @@
 
 
 $output = [
-	'header' => $data['name'],
-	'body' => (new CDiv($data['svg']))->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
-	'script_inline' => $data['script_inline']
+	'body' => $data['svg']->toString()
 ];
 
-if (($messages = getMessages()) !== null) {
+if (!$data['edit_mode']) {
+	$output += [
+		'header' => $data['name'],
+		'script_inline' => $data['script_inline'],
+		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	];
+}
+
+if (!$data['edit_mode'] && ($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+if (!$data['edit_mode'] && $data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }

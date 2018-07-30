@@ -4318,6 +4318,9 @@ input[type=range]::-webkit-slider-runnable-track {
   text-overflow: ellipsis;
   overflow: hidden; }
 
+.graph-widget-config-tabs > .tabs-nav {
+  padding-left: 15%; }
+
 .list-table thead th {
   border-color: #404040; }
 

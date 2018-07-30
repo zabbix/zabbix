@@ -34,17 +34,18 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'initial_load' => 'in 0,1',
 			'content_width' => 'int32',
 			'content_height' => 'int32',
-			//'edit_mode' => 'in 0,1',
+			'edit_mode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
-		$initial_load = $this->getInput('initial_load', 1);
 		$uniqueid = $this->getInput('uniqueid');
 		$width = (int) $this->getInput('content_width', 100);
 		$height = (int) $this->getInput('content_height', 100);
+		$edit_mode = (bool) $this->getInput('edit_mode', 0); // Configuration preview is loaded in edit mode.
+		$initial_load = !$edit_mode && $this->getInput('initial_load', 1);
 		$script_inline = '';
 
 		// Sort fields by its natural order.
@@ -198,15 +199,18 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'values' => true
 		]);
 
-		$script_inline .=
-			'var widget = jQuery(".dashbrd-grid-widget-container")'.
-					'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
-			'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).');';
+		if (!$edit_mode) {
+			$script_inline .=
+				'var widget = jQuery(".dashbrd-grid-widget-container")'.
+						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
+				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).');';
+		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'svg' => $svg_data['svg'],
 			'script_inline' => $script_inline,
+			'edit_mode' => $edit_mode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

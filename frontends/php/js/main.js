@@ -1312,12 +1312,14 @@ jQuery(function ($) {
 	var methods = {
 		/**
 		 * Create control for override option configuration.
-		 * To prevent redundant code, all element building should be done by jQuery.overrides() only.
 		 *
 		 * Supported options:
 		 * - add		- UI element to create new overrides.
 		 * - options	- selector of UI elements for already specified overrides.
 		 * - menu		- JSon for override options that appears in context menu.
+		 * - makeName	- Function creates pattern matching name for input field that stores value of override option.
+		 * - makeOption	- Function extracts given string and returns override option from it.
+		 * - onChange	- Function called when override values changes.
 		 *
 		 * @param options
 		 */
@@ -1331,6 +1333,9 @@ jQuery(function ($) {
 				},
 				makeOption: function(name) {
 					return name;
+				},
+				onChange: function() {
+					return true;
 				}
 			}, options);
 
@@ -1392,6 +1397,9 @@ jQuery(function ($) {
 					.append(createOverrideElement($override, option, value))
 					.insertBefore($('li:last', $override));
 			}
+
+			// Call on-select callback.
+			$override.data('options')['onChange']();
 		},
 
 		/**
@@ -1424,6 +1432,7 @@ jQuery(function ($) {
 		 */
 		removeOverride: function($override, option) {
 			$('[name="'+$override.data('options')['makeName'](option)+'"]', $(this)).closest('li').remove();
+			$override.data('options')['onChange']();
 		}
 	};
 

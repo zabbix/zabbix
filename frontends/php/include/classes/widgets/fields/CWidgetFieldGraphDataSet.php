@@ -396,6 +396,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
+					'if (typeof updateGraphPreview === "function") {'.
+						'updateGraphPreview();'.
+					'}'.
 				'});',
 
 			// Intialize vertical accordion.

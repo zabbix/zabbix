@@ -338,6 +338,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'makeName: function(option) {return "'.$this->getName().'["+this.rowId+"]["+option+"]";},'.
 					'makeOption: function(name) {'.
 						'return name.match(/.*\[('.implode('|', $this->getOverrideOptions()).')\]/)[1];},'.
+					'onChange: updateGraphPreview,'.
 					'menu: '.CJs::encodeJson($this->getOverrideMenu()).
 				'});'.
 			'}',
@@ -357,6 +358,9 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'initializeOverrides();'.
+					'if (typeof updateGraphPreview === "function") {'.
+						'updateGraphPreview();'.
+					'}'.
 				'});',
 
 			// Initialize overrides UI control.

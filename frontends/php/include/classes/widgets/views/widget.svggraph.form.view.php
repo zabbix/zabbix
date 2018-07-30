@@ -36,13 +36,54 @@ $scripts = [];
 $jq_templates = [];
 $form_name = $form->getName();
 
-// Create graph preview.
+// Create graph preview box.
 $form->addItem(
-	(new CDiv())
-		->addStyle('border: 1px solid red; margin: 10px 0; height: 300px; width: 900px;')
-		->setId('svg-graph-container')
+	(new CDiv(
+		(new CDiv())
+			->addStyle('background: #ffffff; width: 1000px; height: 300px; z-index: 1000;')
+			->setId('svg-grapg-preview')
+	))
+		->addStyle('margin: 10px 0; height: 300px; width: 1000px;')
 );
-$scripts[] = '';
+
+// Stick preview to the top of the configuration window when scroll.
+$scripts[] =
+	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
+		'var elmnt = jQuery("#svg-grapg-preview"),'.
+			'fixed = (elmnt.css("position") === "absolute");'.
+		'if (jQuery(this).offset().top >= elmnt.offset().top && !fixed) {'.
+			'var top = jQuery(".overlay-dialogue-body").offset().top - jQuery("#overlay_dialogue").offset().top - 1;'.
+			'elmnt.css({"position": "absolute", "top": top});'.
+		'}'.
+		'else if (jQuery(this).offset().top < elmnt.parent().offset().top) {'.
+			'elmnt.css({"position": "", "top": ""});'.
+		'}'.
+	'})';
+
+$scripts[] =
+	'function updateGraphPreview() {'.
+		'var url = new Curl("zabbix.php"),'.
+			'data = {'.
+				'uniqueid: 0,'.
+				'edit_mode: 1,'.
+				'content_width: 1000,'.
+				'content_height: 300,'.
+				'fields: JSON.stringify(jQuery("#'.$form->getId().'").serializeJSON())'.
+			'};'.
+		'url.setArgument("action", "widget.svggraph.view");'.
+
+		'jQuery.ajax({'.
+			'url: url.getUrl(),'.
+			'method: "POST",'.
+			'data: data,'.
+			'dataType: "json",'.
+			'success: function(r) {'.
+				'jQuery("#svg-grapg-preview").html(jQuery(r.body));'.
+				'jQuery("#svg-grapg-preview > svg").attr("unselectable", "on").css("user-select", "none");'.
+			'}'.
+		'})'.
+	'}'.
+	'updateGraphPreview();';
 
 // Create 'Data set' tab.
 $tab_data_set = (new CFormList())
@@ -61,8 +102,8 @@ $tab_time_period = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_time']), CWidgetHelper::getCheckBox($fields['graph_time']))
 	->addRow(CWidgetHelper::getLabel($fields['time_from']), CWidgetHelper::getDatePicker($fields['time_from']))
 	->addRow(CWidgetHelper::getLabel($fields['time_to']), CWidgetHelper::getDatePicker($fields['time_to']));
-$scripts[] = $fields['time_from']->getJavascript($form_name);
-$scripts[] = $fields['time_to']->getJavascript($form_name);
+$scripts[] = $fields['time_from']->getJavascript($form_name, 'updateGraphPreview();');
+$scripts[] = $fields['time_to']->getJavascript($form_name, 'updateGraphPreview();');
 
 // Create 'Axes' tab.
 $tab_axes = (new CFormList())->addRow('',
@@ -131,11 +172,14 @@ $form_tabs = (new CTabView())
 	->addTab('legend',  _('Legend'), $tab_legend)
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
+	->addClass('graph-widget-config-tabs') // Adds left padding to tab header buttons.
 	->setSelected(0);
 
 // Add CTabView to form.
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
+
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input", updateGraphPreview);';
 
 return [
 	'form' => $form,
