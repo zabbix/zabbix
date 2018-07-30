@@ -4442,6 +4442,7 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 		zbx_hashset_remove_direct(&config->maintenances, maintenance);
 		config->maintenance_revision++;
+		config->maintenance_deleted_num++;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -6194,6 +6195,7 @@ int	init_configuration_cache(char **error)
 	config->maintenance_revision = 0;
 	config->maintenance_update_revision = 0;
 	config->maintenance_modified_num = 0;
+	config->maintenance_deleted_num = 0;
 	config->maintenance_event_updates_num = 0;
 	config->proxy_lastaccess_ts = time(NULL);
 
@@ -12209,7 +12211,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
-	int				i, running_num = 0, seconds, ret, started_num = 0, modified_num = 0,
+	int				i, running_num = 0, seconds, ret, started_num = 0, modified_num,
 					stopped_num = 0;
 	unsigned char			state;
 	struct tm			*tm;
@@ -12222,6 +12224,9 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	seconds = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 
 	WRLOCK_CACHE;
+
+	modified_num = config->maintenance_deleted_num;
+	config->maintenance_deleted_num = 0;
 
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
 	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
@@ -12304,10 +12309,17 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	if (NULL != pupdate_revision)
 	{
 		*pupdate_revision = config->maintenance_revision;
-		*pmodified_num = modified_num;
+		if (0 == config->maintenance_update_revision && 0 == config->maintenances.num_data)
+		{
+			/* Fake modified maintenances to trigger host, event update */
+			/* after server restart with no maintenance defined.        */
+			*pmodified_num = 1;
+		}
+		else
+			*pmodified_num = modified_num;
 
 		config->maintenance_update_revision = *pupdate_revision;
-		config->maintenance_modified_num = modified_num;
+		config->maintenance_modified_num = *pmodified_num;
 	}
 
 	/* If any maintenance has been modified then timers will have to        */
