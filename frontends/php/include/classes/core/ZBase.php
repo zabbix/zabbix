@@ -242,7 +242,8 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/include/classes/widgetfields',
+			$this->rootDir.'/include/classes/widgets/fields',
+			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'

@@ -47,54 +47,18 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 			->addValue(_('With data collection'), MAINTENANCE_TYPE_NORMAL)
 			->addValue(_('No data collection'), MAINTENANCE_TYPE_NODATA)
 			->setModern(true)
+	)
+	// Show date and time in shorter format without seconds.
+	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
+		(new CDateSelector('active_since', $data['active_since']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setAriaRequired()
+	)
+	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
+		(new CDateSelector('active_till', $data['active_till']))
+			->setDateFormat(ZBX_DATE_TIME)
+			->setAriaRequired()
 	);
-
-// active since
-if (isset($_REQUEST['active_since'])) {
-	$fromYear = getRequest('active_since_year');
-	$fromMonth = getRequest('active_since_month');
-	$fromDay = getRequest('active_since_day');
-	$fromHours = getRequest('active_since_hour');
-	$fromMinutes = getRequest('active_since_minute');
-	$fromDate = [
-		'y' => $fromYear,
-		'm' => $fromMonth,
-		'd' => $fromDay,
-		'h' => $fromHours,
-		'i' => $fromMinutes
-	];
-	$activeSince = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
-}
-else {
-	$fromDate = zbxDateToTime($this->data['active_since']);
-	$activeSince = $this->data['active_since'];
-}
-$maintenanceForm->addVar('active_since', $activeSince);
-
-// active till
-if (isset($_REQUEST['active_till'])) {
-	$toYear = getRequest('active_till_year');
-	$toMonth = getRequest('active_till_month');
-	$toDay = getRequest('active_till_day');
-	$toHours = getRequest('active_till_hour');
-	$toMinutes = getRequest('active_till_minute');
-	$toDate = [
-		'y' => $toYear,
-		'm' => $toMonth,
-		'd' => $toDay,
-		'h' => $toHours,
-		'i' => $toMinutes,
-	];
-	$activeTill = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
-}
-else {
-	$toDate = zbxDateToTime($this->data['active_till']);
-	$activeTill = $this->data['active_till'];
-}
-$maintenanceForm->addVar('active_till', $activeTill);
-
-$maintenanceFormList->addRow(_('Active since'), createDateSelector('active_since', $fromDate));
-$maintenanceFormList->addRow(_('Active till'), createDateSelector('active_till', $toDate));
 
 $maintenanceFormList->addRow(_('Description'),
 	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -110,10 +74,12 @@ $maintenance_period_table = (new CTable())
 	->setId('maintenance_periods')
 	->setAriaRequired();
 
-foreach ($this->data['timeperiods'] as $id => $timeperiod) {
+foreach ($data['timeperiods'] as $id => $timeperiod) {
 	$maintenance_period_table->addRow([
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
-		shedule2str($timeperiod),
+		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
+			? $timeperiod['start_date']
+			: shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol(
 			new CHorList([
@@ -159,19 +125,19 @@ $maintenancePeriodFormList->addRow(
 	(new CLabel(_('Periods'), $maintenance_period_table->getId()))->setAsteriskMark(), $periodsDiv
 );
 
-if (isset($_REQUEST['new_timeperiod'])) {
-	if (is_array($_REQUEST['new_timeperiod']) && isset($_REQUEST['new_timeperiod']['id'])) {
-		$saveLabel = _('Update');
+if ($data['new_timeperiod']) {
+	if (is_array($data['new_timeperiod']) && array_key_exists('id', $data['new_timeperiod'])) {
+		$save_label = _('Update');
 	}
 	else {
-		$saveLabel = _('Add');
+		$save_label = _('Add');
 	}
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
 		(new CDiv([
-			get_timeperiod_form(),
+			getTimeperiodForm($data),
 			new CHorList([
-				(new CSimpleButton($saveLabel))
+				(new CSimpleButton($save_label))
 					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "add_timeperiod", "1");')
 					->addClass(ZBX_STYLE_BTN_LINK),
 				(new CSimpleButton(_('Cancel')))
