@@ -2074,14 +2074,21 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
-	if (0 != strcmp(item->query_fields, buffer))
+
+	if ('\0' != *item->query_fields)
 	{
-		item->query_fields_orig = item->query_fields;
-		item->query_fields = buffer;
-		buffer = NULL;
-		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS;
+		if (SUCCEED == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
+		{
+			if (0 != strcmp(item->query_fields, buffer))
+			{
+				item->query_fields_orig = item->query_fields;
+				item->query_fields = buffer;
+				buffer = NULL;
+				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS;
+			}
+		}
+		else
+			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->posts);
