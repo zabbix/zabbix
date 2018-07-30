@@ -269,11 +269,11 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
 		char	logeventid[16];
+		int 	rret;
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
-		int rret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE);
 
-		if (FAIL == rret)
+		if (FAIL == (rret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
 				__function_name);
@@ -1842,43 +1842,31 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			break;
 		case ZBX_FUNC_REGEXP:
 		{
-			int rret = regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
-
-			if (ZBX_REGEXP_MATCH == rret)
+			switch(regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE))
 			{
+			case ZBX_REGEXP_MATCH:
 				return SUCCEED;
-			}
-			else if (ZBX_REGEXP_NO_MATCH == rret)
-			{
+			case ZBX_REGEXP_NO_MATCH:
 				return FAIL;
 			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
-						__function_name);
-				return FAIL;
-			}
-			break;
+
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
+					__function_name);
+			return FAIL;
 		}
 		case ZBX_FUNC_IREGEXP:
 		{
-			int rret = regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
-
-			if (ZBX_REGEXP_MATCH == rret)
+			switch(regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
 			{
+			case ZBX_REGEXP_MATCH:
 				return SUCCEED;
-			}
-			else if (ZBX_REGEXP_NO_MATCH == rret)
-			{
+			case ZBX_REGEXP_NO_MATCH:
 				return FAIL;
 			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
-						__function_name);
-				return FAIL;
-			}
-			break;
+
+			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
+					__function_name);
+			return FAIL;
 		}
 	}
 
