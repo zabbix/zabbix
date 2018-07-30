@@ -37,16 +37,19 @@ $jq_templates = [];
 $form_name = $form->getName();
 
 // Create graph preview box.
+$preview_width = 960;
+$preview_height = 300;
+
 $form->addItem(
 	(new CDiv(
 		(new CDiv())
-			->addStyle('background: #ffffff; width: 1000px; height: 300px; z-index: 1000;')
+			->addStyle('background: #ffffff; width: '.$preview_width.'px; height: '.$preview_height.'px; z-index: 999;')
 			->setId('svg-grapg-preview')
 	))
-		->addStyle('margin: 10px 0; height: 300px; width: 1000px;')
+		->addStyle('margin: 10px 0; height: 300px; width: '.$preview_width.'px;')
 );
 
-// Stick preview to the top of the configuration window when scroll.
+// Stick preview to the top of configuration window when scroll.
 $scripts[] =
 	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
 		'var elmnt = jQuery("#svg-grapg-preview"),'.
@@ -66,8 +69,8 @@ $scripts[] =
 			'data = {'.
 				'uniqueid: 0,'.
 				'edit_mode: 1,'.
-				'content_width: 1000,'.
-				'content_height: 300,'.
+				'content_width: '.$preview_width.','.
+				'content_height: '.$preview_height.','.
 				'fields: JSON.stringify(jQuery("#'.$form->getId().'").serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
@@ -117,7 +120,7 @@ $tab_axes = (new CFormList())->addRow('',
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['lefty_static_units'])
 			])
-			->addClass(ZBX_STYLE_COLUMNS_4),
+			->addClass(ZBX_STYLE_COLUMN_33),
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['righty']), CWidgetHelper::getCheckBox($fields['righty']))
 			->addRow(CWidgetHelper::getLabel($fields['righty_min']), CWidgetHelper::getTextBox($fields['righty_min']))
@@ -127,10 +130,10 @@ $tab_axes = (new CFormList())->addRow('',
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				CWidgetHelper::getTextBox($fields['righty_static_units'])
 			])
-			->addClass(ZBX_STYLE_COLUMNS_4),
+			->addClass(ZBX_STYLE_COLUMN_33),
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['axisx']), CWidgetHelper::getCheckBox($fields['axisx']))
-			->addClass(ZBX_STYLE_COLUMNS_4)
+			->addClass(ZBX_STYLE_COLUMN_33)
 	]))
 		->addClass(ZBX_STYLE_COLUMNS)
 );

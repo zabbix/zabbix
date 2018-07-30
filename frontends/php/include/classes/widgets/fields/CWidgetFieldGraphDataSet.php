@@ -92,7 +92,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';'),
 						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
-							->setAttribute('placeholder', _('(pattern)'))
+							->setAttribute('placeholder', _('(hosts pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -107,10 +107,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									'dstfld1' => $fn.'['.$options['row_num'].'][hosts]'
 								]).', null, this);'
 							)
-					]))->addClass(ZBX_STYLE_COLUMNS_6),
+					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
 						(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
-							->setAttribute('placeholder', _('(pattern)'))
+							->setAttribute('placeholder', _('(items pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -125,9 +125,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									'dstfld1' => $fn.'['.$options['row_num'].'][items]',
 								]).', null, this);'
 							)
-					]))->addClass(ZBX_STYLE_COLUMNS_6),
+					]))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
-					->addClass(ZBX_STYLE_COLUMNS_11)
+					->addClass(ZBX_STYLE_COLUMN_95)
 					->addClass(ZBX_STYLE_COLUMNS),
 				(new CDiv([
 					(new CButton())
@@ -136,7 +136,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					(new CButton())
 						->setAttribute('title', _('Delete'))
 						->addClass(ZBX_STYLE_BTN_TRASH)
-				]))->addClass(ZBX_STYLE_COLUMNS_1)
+				]))
+					->addStyle('margin-left: -15px;')
+					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass(ZBX_STYLE_COLUMNS),
@@ -178,7 +180,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Width'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][width]', (int) $value['width']))
 							->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->addClass('range-control')
+							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(0)
 							->setMax(10)
@@ -186,7 +190,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Radius'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][radius]', (int) $value['radius']))
 							->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->addClass('range-control')
+							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(1)
 							->setMax(10)
@@ -194,6 +200,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Transparency'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][transparency]', (int) $value['transparency']))
 							->addClass('range-control')
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(0)
 							->setMax(10)
@@ -201,11 +209,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Fill'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][fill]', (int) $value['fill']))
 							->addClass('range-control')
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(0)
 							->setMax(10)
 					)
-					->addClass(ZBX_STYLE_COLUMNS_6),
+					->addClass(ZBX_STYLE_COLUMN_50),
 
 				// Right column fields.
 				(new CFormList())
@@ -227,10 +237,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->setAttribute('placeholder', _('(none)'))
 							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					)
-					->addClass(ZBX_STYLE_COLUMNS_6)
+					->addClass(ZBX_STYLE_COLUMN_50)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
-				->addClass(ZBX_STYLE_COLUMNS_11)
+				->addClass(ZBX_STYLE_COLUMN_90)
 				->addClass(ZBX_STYLE_COLUMNS)
 		];
 	}
@@ -394,6 +404,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 						'return data;'.
 					'}'.
 				'})'.
+				'.bind("beforeadd.dynamicRows", function(event, options) {'.
+					'jQuery("#data_sets").zbx_vertical_accordion("collapseAll");'.
+				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
 					'if (typeof updateGraphPreview === "function") {'.
@@ -445,11 +458,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'order_num' => '#{orderNum}',
 					'letter_id' => '#{formulaId}',
 					'form_name' => $form_name,
-					'is_opened' => false
+					'is_opened' => true
 				]
 			)
 		))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
+			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED)
 			->toString();
 	}
 }

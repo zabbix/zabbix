@@ -3848,30 +3848,37 @@ svg {
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap; }
-  .columns-wrapper .columns-1,
-  .columns-wrapper .columns-4,
-  .columns-wrapper .columns-5,
-  .columns-wrapper .columns-6,
-  .columns-wrapper .columns-11 {
+  .columns-wrapper .column-5,
+  .columns-wrapper .column-10,
+  .columns-wrapper .column-33,
+  .columns-wrapper .column-50,
+  .columns-wrapper .column-90,
+  .columns-wrapper .column-95 {
     -webkit-box-flex: 0; }
-  .columns-wrapper .columns-1 {
-    -ms-flex: 0 0 8.333333%;
-    flex: 0 0 8.333333%;
-    max-width: 8.333333%; }
-  .columns-wrapper .columns-4 {
+  .columns-wrapper .column-5 {
+    -ms-flex: 0 0 5%;
+    flex: 0 0 5%;
+    max-width: 5%; }
+  .columns-wrapper .column-10 {
+    -ms-flex: 0 0 10%;
+    flex: 0 0 10%;
+    max-width: 10%; }
+  .columns-wrapper .column-33 {
     -ms-flex: 0 0 33.33333%;
     flex: 0 0 33.33333%;
     max-width: 33.33333%; }
-  .columns-wrapper .columns-5 {
-    -ms-flex: 0 0 41.666667%;
-    flex: 0 0 41.666667%;
-    max-width: 41.666667%; }
-  .columns-wrapper .columns-6 {
+  .columns-wrapper .column-50 {
+    -ms-flex: 0 0 50%;
     flex: 0 0 50%;
     max-width: 50%; }
-  .columns-wrapper .columns-11 {
-    flex: 0 0 91.6666666667%;
-    max-width: 91.6666666667%; }
+  .columns-wrapper .column-90 {
+    -ms-flex: 0 0 90%;
+    flex: 0 0 90%;
+    max-width: 90%; }
+  .columns-wrapper .column-95 {
+    -ms-flex: 0 0 95%;
+    flex: 0 0 95%;
+    max-width: 95%; }
 
 @keyframes fadein {
   from {

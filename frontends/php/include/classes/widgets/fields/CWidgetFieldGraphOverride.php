@@ -76,7 +76,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					->addStyle('position: absolute; margin-left: -25px;'),
 
 				(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
-					->setAttribute('placeholder', _('(pattern)'))
+					->setAttribute('placeholder', _('(hosts pattern)'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->addClass(ZBX_STYLE_PATTERNSELECT),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -95,7 +95,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 
 				(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
-					->setAttribute('placeholder', _('(pattern)'))
+					->setAttribute('placeholder', _('(items pattern)'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->addClass(ZBX_STYLE_PATTERNSELECT),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

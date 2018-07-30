@@ -1625,11 +1625,12 @@ define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // html layout columns
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
-define('ZBX_STYLE_COLUMNS_1', 'columns-1');
-define('ZBX_STYLE_COLUMNS_4', 'columns-4');
-define('ZBX_STYLE_COLUMNS_5', 'columns-5');
-define('ZBX_STYLE_COLUMNS_6', 'columns-6');
-define('ZBX_STYLE_COLUMNS_11', 'columns-11');
+define('ZBX_STYLE_COLUMN_5', 'column-5');	// column occupies 5% width of column wrapper.
+define('ZBX_STYLE_COLUMN_10', 'column-10');	// column occupies 10% width of column wrapper.
+define('ZBX_STYLE_COLUMN_33', 'column-33'); // column occupies 1/3 width of column wrapper.
+define('ZBX_STYLE_COLUMN_50', 'column-50'); // column occupies 50% width of column wrapper.
+define('ZBX_STYLE_COLUMN_90', 'column-90'); // column occupies 90% width of column wrapper.
+define('ZBX_STYLE_COLUMN_95', 'column-95'); // column occupies 95% width of column wrapper.
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

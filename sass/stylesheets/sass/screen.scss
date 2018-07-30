@@ -5512,35 +5512,43 @@ svg {
 	display: flex;
 	flex-wrap: wrap;
 
-	.columns-1,
-	.columns-4,
-	.columns-5,
-	.columns-6,
-	.columns-11 {
+	.column-5,
+	.column-10,
+	.column-33,
+	.column-50,
+	.column-90,
+	.column-95 {
 		-webkit-box-flex: 0;
 	}
-	.columns-1 {
-		-ms-flex: 0 0 8.333333%;
-		flex: 0 0 8.333333%;
-		max-width: 8.333333%;
+	.column-5 {
+		-ms-flex: 0 0 5%;
+		flex: 0 0 5%;
+		max-width: 5%;
 	}
-	.columns-4 {
+	.column-10 {
+		-ms-flex: 0 0 10%;
+		flex: 0 0 10%;
+		max-width: 10%;
+	}
+	.column-33 {
 		-ms-flex: 0 0 33.33333%;
 		flex: 0 0 33.33333%;
 		max-width: 33.33333%;
 	}
-	.columns-5 {
-		-ms-flex: 0 0 41.666667%;
-		flex: 0 0 41.666667%;
-		max-width: 41.666667%;
-	}
-	.columns-6 {
+	.column-50 {
+		-ms-flex: 0 0 50%;
 		flex: 0 0 50%;
 		max-width: 50%;
 	}
-	.columns-11 {
-		flex: 0 0 91.6666666667%;
-		max-width: 91.6666666667%;
+	.column-90 {
+		-ms-flex: 0 0 90%;
+		flex: 0 0 90%;
+		max-width: 90%;
+	}
+	.column-95 {
+		-ms-flex: 0 0 95%;
+		flex: 0 0 95%;
+		max-width: 95%;
 	}
 }
 

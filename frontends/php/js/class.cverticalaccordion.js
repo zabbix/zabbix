@@ -24,44 +24,63 @@
 jQuery(function ($) {
 	"use strict"
 
-	/**
-	 * Create CList based accordion.
-	 *
-	 * Supported options:
-	 * - handler		- selector of UI element to open/close accordion section;
-	 * - section		- selector of UI element for single accordion section;
-	 * - body			- selector of UI element that should be opened/closed;
-	 * - active_class	- CSS class that will be applied for active section;
-	 * - auto_close		- boolean; close or leave inactive section opened;
-	 *
-	 * @param options
-	 */
-	$.fn.zbx_vertical_accordion = function(options) {
-		options = $.extend({}, {
-			handler: '.list-accordion-item-head',
-			section: '.list-accordion-item',
-			active_class: 'list-accordion-item-opened',
-			body: '.list-accordion-item-body',
-			auto_close: true
-		}, options);
+	var methods = {
+		/**
+		 * Create CList based accordion.
+		 *
+		 * Supported options:
+		 * - handler		- selector of UI element to open/close accordion section;
+		 * - section		- selector of UI element for single accordion section;
+		 * - body			- selector of UI element that should be opened/closed;
+		 * - active_class	- CSS class that will be applied for active section;
+		 * - auto_close		- boolean; close or leave inactive section opened;
+		 *
+		 * @param options
+		 */
+		init: function(options) {
+			options = $.extend({}, {
+				handler: '.list-accordion-item-head',
+				section: '.list-accordion-item',
+				active_class: 'list-accordion-item-opened',
+				body: '.list-accordion-item-body',
+				auto_close: true
+			}, options);
 
-		this.each(function() {
-			var accordion = $(this);
+			this.each(function() {
+				var accordion = $(this);
 
-			// Bind collapse/expend.
-			accordion.on('click', options['handler'], function() {
-				var section = $(this).closest(options['section']);
+				// Bind collapse/expend.
+				accordion
+					.data('options', options)
+					.on('click', options['handler'], function() {
+						var section = $(this).closest(options['section']);
 
-				if (section.hasClass(options['active_class'])) {
-					section.removeClass(options['active_class']);
-				}
-				else {
-					if (options['auto_close']) {
-						$('.'+options['active_class'], accordion).removeClass(options['active_class']);
-					}
-					section.addClass(options['active_class']);
-				}
+						if (section.hasClass(options['active_class'])) {
+							section.removeClass(options['active_class']);
+						}
+						else {
+							if (options['auto_close']) {
+								methods.collapseAll(accordion);
+							}
+							section.addClass(options['active_class']);
+						}
+					});
 			});
-		});
+		},
+		collapseAll: function() {
+			var accordion = $(this),
+				active_class = accordion.data('options')['active_class'];
+
+			$('.'+active_class, accordion).removeClass(active_class);
+		}
+	};
+
+	$.fn.zbx_vertical_accordion = function(method) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
+		else {
+			return methods.init.apply(this, arguments);
+		}
 	};
 });

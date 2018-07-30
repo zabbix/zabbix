@@ -979,6 +979,7 @@ function getConditionFormula(conditions, evalType) {
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row
+	 * - beforeadd.dynamicRows 	    - only after adding a new row
 	 *
 	 * @param options
 	 */
@@ -1004,6 +1005,8 @@ function getConditionFormula(conditions, evalType) {
 
 			// add buttons
 			table.on('click', options.add, function() {
+				table.trigger('beforeadd.dynamicRows', options);
+
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
