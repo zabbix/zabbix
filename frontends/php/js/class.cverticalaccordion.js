@@ -1,0 +1,67 @@
+/*
+ ** Zabbix
+ ** Copyright (C) 2001-2018 Zabbix SIA
+ **
+ ** This program is free software; you can redistribute it and/or modify
+ ** it under the terms of the GNU General Public License as published by
+ ** the Free Software Foundation; either version 2 of the License, or
+ ** (at your option) any later version.
+ **
+ ** This program is distributed in the hope that it will be useful,
+ ** but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ ** GNU General Public License for more details.
+ **
+ ** You should have received a copy of the GNU General Public License
+ ** along with this program; if not, write to the Free Software
+ ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ **/
+
+
+/**
+ * JQuery class that adds interactivity of vertical accordion for CList element.
+ */
+jQuery(function ($) {
+	"use strict"
+
+	/**
+	 * Create CList based accordion.
+	 *
+	 * Supported options:
+	 * - handler		- selector of UI element to open/close accordion section;
+	 * - section		- selector of UI element for single accordion section;
+	 * - body			- selector of UI element that should be opened/closed;
+	 * - active_class	- CSS class that will be applied for active section;
+	 * - auto_close		- boolean; close or leave inactive section opened;
+	 *
+	 * @param options
+	 */
+	$.fn.zbx_vertical_accordion = function(options) {
+		options = $.extend({}, {
+			handler: '.list-accordion-item-head',
+			section: '.list-accordion-item',
+			active_class: 'list-accordion-item-opened',
+			body: '.list-accordion-item-body',
+			auto_close: true
+		}, options);
+
+		this.each(function() {
+			var accordion = $(this);
+
+			// Bind collapse/expend.
+			accordion.on('click', options['handler'], function() {
+				var section = $(this).closest(options['section']);
+
+				if (section.hasClass(options['active_class'])) {
+					section.removeClass(options['active_class']);
+				}
+				else {
+					if (options['auto_close']) {
+						$('.'+options['active_class'], accordion).removeClass(options['active_class']);
+					}
+					section.addClass(options['active_class']);
+				}
+			});
+		});
+	};
+});

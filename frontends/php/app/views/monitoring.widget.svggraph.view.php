@@ -31,6 +31,15 @@ if (!$data['edit_mode']) {
 	];
 }
 
+if ($data['initial_load']) {
+	$output['script_file'] = [
+		'js/class.coverride.js',
+		'js/class.csvggraph.js',
+		'js/class.cverticalaccordion.js',
+		'js/class.crangecontrol.js'
+	];
+}
+
 if (!$data['edit_mode'] && ($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
