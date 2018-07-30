@@ -1727,6 +1727,7 @@ Changes for 3.0.21rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.20
