@@ -1073,7 +1073,10 @@ static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, cons
 		ret = SUCCEED;
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1147,6 +1150,11 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 			zbx_history_value2str(value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value,
 					item->value_type);
 			ret = SUCCEED;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "not enough data");
+			goto out;
 		}
 	}
 	else
@@ -1266,7 +1274,10 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, cons
 		ret = SUCCEED;
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1379,7 +1390,10 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, cons
 		ret = SUCCEED;
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1504,7 +1518,10 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameter
 		ret = SUCCEED;
 	}
 	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "result for PERCENTILE is empty");
 		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1629,7 +1646,10 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 		ret = SUCCEED;
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for DELTA is empty");
+		*error = zbx_strdup(*error, "not enough data");
+	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1776,7 +1796,10 @@ static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
+		{
+			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
+		}
 	}
 	ret = SUCCEED;
 out:
@@ -1847,7 +1870,10 @@ static int	evaluate_CHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *ts,
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
+		{
+			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
+		}
 	}
 
 	ret = SUCCEED;
@@ -1917,7 +1943,10 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const zbx_timespec_t *ts, c
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
+		{
+			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
+		}
 	}
 
 	ret = SUCCEED;
@@ -2129,6 +2158,8 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, c
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
 		ret = SUCCEED;
 	}
+	else
+		*error = zbx_strdup(*error, "failed to evaluate LAST");
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2277,6 +2308,8 @@ static int	evaluate_BAND(char *value, DC_ITEM *item, const char *parameters, con
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
 		ret = SUCCEED;
 	}
+	else
+		*error = zbx_strdup(*error, "failed to evaluate LAST");
 
 	zbx_free(last_parameters);
 clean:
