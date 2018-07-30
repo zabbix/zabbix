@@ -71,15 +71,22 @@ $fields = [
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
-		IN([
-			-1, TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
-			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
-		]), null
-	],
-	'filter_state' =>							[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null],
+													IN([
+														-1, TRIGGER_SEVERITY_NOT_CLASSIFIED,
+														TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+														TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
+														TRIGGER_SEVERITY_DISASTER
+													]), null
+												],
+	'filter_state' =>							[T_ZBX_INT, O_OPT, null,
+													IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null
+												],
 	'filter_status' =>							[T_ZBX_INT, O_OPT, null,
-		IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
-	],
+													IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
+												],
+	'filter_value' =>							[T_ZBX_INT, O_OPT, null,
+													IN([-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), null
+												],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -595,58 +602,93 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && 
 	$triggersView->show();
 }
 else {
-	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description'));
-	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+	$data = [
+		'pageFilter' => new CPageFilter([
+			'groups' => [
+				'with_hosts_and_templates' => true,
+				'editable' => true
+			],
+			'hosts' => [
+				'templated_hosts' => true,
+				'editable' => true
+			],
+			'triggers' => ['editable' => true],
+			'groupid' => getRequest('groupid'),
+			'hostid' => getRequest('hostid')
+		])
+	];
 
-	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
-	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
+	$data += [
+		'config' => $config,
+		'hostid' => $data['pageFilter']->hostid,
+		'groupid' => $data['pageFilter']->groupid,
+		'triggers' => [],
+		'profileIdx' => 'web.triggers.filter',
+		'active_tab' => CProfile::get('web.triggers.filter.active', 1),
+		'sort' => getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'description')),
+		'sortorder' => getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP)),
+		'show_value_column' => false
+	];
+
+	if ($data['hostid'] == 0) {
+		foreach ($data['pageFilter']->hosts as $host) {
+			if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
+				$data['show_value_column'] = true;
+				break;
+			}
+		}
+	}
+	else {
+		$data['show_value_column'] = ($data['pageFilter']->hosts[$data['hostid']]['status'] == HOST_STATUS_MONITORED
+				|| $data['pageFilter']->hosts[$data['hostid']]['status'] == HOST_STATUS_NOT_MONITORED
+		);
+	}
+
+	CProfile::update('web.'.$page['file'].'.sort', $data['sort'], PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $data['sortorder'], PROFILE_TYPE_STR);
 
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.triggers.filter_priority', getRequest('filter_priority', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+
+		if ($data['show_value_column']) {
+			CProfile::update('web.triggers.filter_value', getRequest('filter_value', -1), PROFILE_TYPE_INT);
+		}
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.triggers.filter_priority');
 		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
+
+		if ($data['show_value_column']) {
+			CProfile::delete('web.triggers.filter_value');
+		}
 	}
 
-	$data = [
+	$data += [
 		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),
 		'filter_state' => CProfile::get('web.triggers.filter_state', -1),
-		'filter_status' => CProfile::get('web.triggers.filter_status', -1),
-		'triggers' => [],
-		'sort' => $sortField,
-		'sortorder' => $sortOrder,
-		'config' => $config,
-		'profileIdx' => 'web.triggers.filter',
-		'active_tab' => CProfile::get('web.triggers.filter.active', 1)
+		'filter_status' => CProfile::get('web.triggers.filter_status', -1)
 	];
 
-	$data['pageFilter'] = new CPageFilter([
-		'groups' => ['with_hosts_and_templates' => true, 'editable' => true],
-		'hosts' => ['templated_hosts' => true, 'editable' => true],
-		'triggers' => ['editable' => true],
-		'groupid' => getRequest('groupid'),
-		'hostid' => getRequest('hostid')
-	]);
-	$data['groupid'] = $data['pageFilter']->groupid;
-	$data['hostid'] = $data['pageFilter']->hostid;
+	if ($data['show_value_column']) {
+		$data['filter_value'] = CProfile::get('web.triggers.filter_value', -1);
+	}
 
 	// get triggers
 	if ($data['pageFilter']->hostsSelected) {
 		$options = [
 			'editable' => true,
-			'sortfield' => $sortField,
+			'sortfield' => $data['sort'],
 			'limit' => $config['search_limit'] + 1
 		];
 
-		if ($sortField === 'status') {
+		if ($data['sort'] === 'status') {
 			$options['output'] = ['triggerid', 'status', 'state'];
 		}
 		else {
-			$options['output'] = ['triggerid', $sortField];
+			$options['output'] = ['triggerid', $data['sort']];
 		}
 
 		if ($data['filter_priority'] != -1) {
@@ -676,17 +718,31 @@ else {
 		elseif ($data['pageFilter']->groupid > 0) {
 			$options['groupids'] = $data['pageFilter']->groupids;
 		}
+
+		if ($data['show_value_column'] && $data['filter_value'] != -1) {
+			$options['filter']['value'] = $data['filter_value'];
+
+			// Exclude templates when all hosts selected and filtered by specific values.
+			if ($data['hostid'] == 0) {
+				$hosts = API::Host()->get([
+					'output' => [],
+					'editable' => true,
+					'groupids' => ($data['pageFilter']->groupid > 0) ? $data['pageFilter']->groupid : null,
+					'preservekeys' => true
+				]);
+				$options['hostids'] = array_keys($hosts);
+			}
+		}
+
 		$data['triggers'] = API::Trigger()->get($options);
 	}
 
-	$_REQUEST['hostid'] = getRequest('hostid', $data['pageFilter']->hostid);
-
 	// sort for paging
-	if ($sortField === 'status') {
-		orderTriggersByStatus($data['triggers'], $sortOrder);
+	if ($data['sort'] === 'status') {
+		orderTriggersByStatus($data['triggers'], $data['sortorder']);
 	}
 	else {
-		order_result($data['triggers'], $sortField, $sortOrder);
+		order_result($data['triggers'], $data['sort'], $data['sortorder']);
 	}
 
 	// paging
@@ -694,24 +750,24 @@ else {
 		->setArgument('groupid', $data['groupid'])
 		->setArgument('hostid', $data['hostid']);
 
-	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
+	$data['paging'] = getPagingLine($data['triggers'], $data['sortorder'], $url);
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
-			'recovery_mode', 'recovery_expression'
+			'recovery_mode', 'recovery_expression', 'value'
 		],
-		'selectHosts' => ['hostid', 'host', 'name'],
+		'selectHosts' => ['hostid', 'host', 'name', 'status'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 
 	// sort for displaying full results
-	if ($sortField === 'status') {
-		orderTriggersByStatus($data['triggers'], $sortOrder);
+	if ($data['sort'] === 'status') {
+		orderTriggersByStatus($data['triggers'], $data['sortorder']);
 	}
 	else {
-		order_result($data['triggers'], $sortField, $sortOrder);
+		order_result($data['triggers'], $data['sort'], $data['sortorder']);
 	}
 
 	$depTriggerIds = [];

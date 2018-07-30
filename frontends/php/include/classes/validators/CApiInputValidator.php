@@ -161,7 +161,6 @@ class CApiInputValidator {
 			case API_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
-			case API_OBJECT:
 			case API_OUTPUT:
 			case API_HG_NAME:
 			case API_SCRIPT_NAME:
@@ -172,6 +171,17 @@ class CApiInputValidator {
 			case API_HTTP_POST:
 			case API_VARIABLE_NAME:
 			case API_URL:
+				return true;
+
+			case API_OBJECT:
+				foreach ($rule['fields'] as $field_name => $field_rule) {
+					if ($data !== null && array_key_exists($field_name, $data)) {
+						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
+						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
+							return false;
+						}
+					}
+				}
 				return true;
 
 			case API_IDS:
