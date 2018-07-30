@@ -1803,8 +1803,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err,
+					sizeof(err))))
+			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+			}
 			break;
 		default:
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
