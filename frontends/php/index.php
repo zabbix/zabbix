@@ -33,31 +33,31 @@ $fields = [
 	'name' =>		[T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')],
 	'password' =>	[T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'],
 	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
-	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
 	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null]
 ];
 check_fields($fields);
 
+$config = select_config();
+$http_user = '';
+
 // logout
 if (isset($_REQUEST['reconnect'])) {
 	CWebUser::logout();
-	redirect('index.php');
 }
-
-$config = select_config();
-$http_user = '';
-foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-	if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-		$http_user = $_SERVER[$key];
-		break;
+elseif ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $config['http_login_form'] == ZBX_AUTH_FORM_ZABBIX) {
+	foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+		if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
+			$http_user = $_SERVER[$key];
+			break;
+		}
 	}
 }
 
 // login via form
-if (getRequest('enter') === _('Sign in') || ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		&& $config['http_login_form'] == ZBX_AUTH_FORM_ZABBIX && $http_user)) {
+if (getRequest('enter') === _('Sign in') || $http_user) {
 	// try to login
 	$autoLogin = getRequest('autologin', 0);
 
@@ -119,13 +119,9 @@ if (getRequest('enter') === _('Sign in') || ($config['http_auth_enabled'] == ZBX
 		clear_messages();
 	}
 }
-else {
-	// login the user from the session, if the session id is empty - login as a guest
-	CWebUser::checkAuthentication(CWebUser::getSessionCookie());
-}
 
 // the user is not logged in, display the login form
-if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
+if (!CWebUser::isLoggedIn() || CWebUser::isGuest()) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_LDAP:
 		case ZBX_AUTH_INTERNAL:
@@ -140,7 +136,8 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 
 			$data = [
 				'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
-				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid')
+				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid'),
+				'guest_login' => (!CWebUser::isLoggedIn() || CWebUser::isGuest())
 			];
 
 			$loginForm = new CView('general.login', $data);

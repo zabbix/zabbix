@@ -29,7 +29,7 @@ $message = trim(preg_replace('/\[.*\]/', '', $message));
 require_once dirname(__FILE__).'/../page_header.php';
 
 $error = ($message !== '') ? (new CDiv($message))->addClass(ZBX_STYLE_RED) : null;
-$guest = (CWebUser::$data['userid'] > 0)
+$guest = $data['guest_login']
 	? (new CListItem(['or ', new CLink('sign in as guest', ZBX_DEFAULT_URL)]))
 		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
