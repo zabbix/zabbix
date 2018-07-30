@@ -86,7 +86,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, rret;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
@@ -149,9 +149,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				}
 			}
 
-			int rret = regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE);
-
-			if (ZBX_REGEXP_NO_MATCH == rret)
+			if (ZBX_REGEXP_NO_MATCH == (rret = regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE)))
 				goto next;
 			else if (FAIL == rret)
 			{
