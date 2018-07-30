@@ -155,9 +155,10 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 			else if (FAIL == rret)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", regex, __function_name);
+				SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
+						"Invalid regular expression \"%s\" in %s()", regex, __function_name));
 				errcodes[i] = NOTSUPPORTED;
-				ret = FAIL;
+				goto next;
 			}
 		}
 
