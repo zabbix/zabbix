@@ -3743,8 +3743,6 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 	return out;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: function_validate_parameters                                     *
