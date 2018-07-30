@@ -330,10 +330,6 @@ class CSvgGraphHelper {
 			$data_set = $data_sets[$data_set_num];
 			$data_set_num++;
 
-			/**
-			 * TODO miks: still not clear how valid data set looks like. Fix this if needed.
-			 * Currently, both fields must be filed.
-			 */
 			if ((!array_key_exists('hosts', $data_set) || $data_set['hosts'] === '')
 					|| (!array_key_exists('items', $data_set) || $data_set['items'] === '')) {
 				continue;
@@ -343,6 +339,7 @@ class CSvgGraphHelper {
 			$matching_hosts = API::Host()->get([
 				'output' => [],
 				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
 				'search' => [
 					'name' => self::processPattern($data_set['hosts'])
 				],
@@ -357,6 +354,7 @@ class CSvgGraphHelper {
 					'hostids' => array_keys($matching_hosts),
 					'selectHosts' => ['hostid', 'name'],
 					'searchWildcardsEnabled' => true,
+					'searchByAny' => true,
 					'search' => [
 						'name' => self::processPattern($data_set['items'])
 					],

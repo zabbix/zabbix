@@ -103,6 +103,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									'srctbl' => 'hosts',
 									'srcfld1' => 'host',
 									'reference' => 'name',
+									'multiselect' => 1,
 									'dstfrm' => $options['form_name'],
 									'dstfld1' => $fn.'['.$options['row_num'].'][hosts]'
 								]).', null, this);'
@@ -121,6 +122,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									'srctbl' => 'items',
 									'srcfld1' => 'name',
 									'reference' => 'name_expanded',
+									'multiselect' => 1,
 									'dstfrm' => $options['form_name'],
 									'dstfld1' => $fn.'['.$options['row_num'].'][items]',
 								]).', null, this);'
@@ -180,7 +182,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Width'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][width]', (int) $value['width']))
 							->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->addClass('range-control')
 							->setAttribute('maxlength', 2)
 							->setStep(1)
@@ -190,7 +191,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Radius'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][radius]', (int) $value['radius']))
 							->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->addClass('range-control')
 							->setAttribute('maxlength', 2)
 							->setStep(1)
@@ -200,7 +200,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Transparency'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][transparency]', (int) $value['transparency']))
 							->addClass('range-control')
-							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(0)
@@ -209,7 +208,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addRow(_('Fill'),
 						(new CRangeControl($fn.'['.$options['row_num'].'][fill]', (int) $value['fill']))
 							->addClass('range-control')
-							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							->setAttribute('maxlength', 2)
 							->setStep(1)
 							->setMin(0)

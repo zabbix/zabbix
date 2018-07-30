@@ -6044,6 +6044,13 @@ input[type=range]::-webkit-slider-runnable-track {
 	}
 }
 
+div.range-control {
+	width: 240px;
+}
+input[type=text].range-control {
+	width: 31px;
+}
+
 .range-control-focus {
 	.range-control-thumb {
 		background: $range-thumb-color-focus;

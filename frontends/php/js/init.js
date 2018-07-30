@@ -150,7 +150,26 @@ jQuery(function($) {
 			}
 		}
 		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
-			$('[name="'+data.parentId+'"]').val(data.values[0][data.object]);
+			/**
+			 * Pattern select allows enter multiple comma-separated values in same editable field. Values passed to
+			 * add.popup should be appended at the and of existing value string. Repeating values are skipped.
+			 */
+			var values = [];
+			$('[name="'+data.parentId+'"]').val().split(',').forEach(function(val) {
+				if (val.trim().length) {
+					values.push(val.trim());
+				}
+			});
+
+			data.values.forEach(function(val) {
+				if (values.indexOf(val[data.object]) === -1) {
+					values.push(val[data.object]);
+				}
+			});
+
+			$('[name="'+data.parentId+'"]')
+				.val(values.join(', '))
+				.trigger('change');
 		}
 		else if (typeof addPopupValues !== 'undefined') {
 			// execute function if they exist

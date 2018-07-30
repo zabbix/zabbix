@@ -4289,6 +4289,12 @@ input[type=range]::-webkit-slider-runnable-track {
       height: 2px;
       border-left: 1px solid white; }
 
+div.range-control {
+  width: 240px; }
+
+input[type=text].range-control {
+  width: 31px; }
+
 .range-control-focus .range-control-thumb {
   background: #0275b8;
   box-shadow: 0 0 1px black; }

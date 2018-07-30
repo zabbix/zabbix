@@ -46,7 +46,7 @@ $form->addItem(
 			->addStyle('background: #ffffff; width: '.$preview_width.'px; height: '.$preview_height.'px; z-index: 999;')
 			->setId('svg-grapg-preview')
 	))
-		->addStyle('margin: 10px 0; height: 300px; width: '.$preview_width.'px;')
+		->addStyle('margin: 10px 0; height: '.$preview_height.'px; width: '.$preview_width.'px;')
 );
 
 // Stick preview to the top of configuration window when scroll.
