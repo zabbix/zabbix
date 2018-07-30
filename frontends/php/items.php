@@ -1801,25 +1801,12 @@ else {
 		$data['items'] = [];
 	}
 
-	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if ($data['items']) {
-		// fill template host
-		fillItemsWithChildTemplates($data['items']);
+	$data['parent_templates'] = [];
 
-		$dbHostItems = DBselect(
-			'SELECT i.itemid,h.name,h.hostid'.
-			' FROM hosts h,items i'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
-		);
-		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as &$item) {
-				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$item['template_host'] = $dbHostItem;
-				}
-			}
-			unset($item);
-		}
+	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
+	if ($data['items']) {
+		// Get parent templates.
+		$data['parent_templates'] = getItemParentTemplates($data['items']);
 
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
@@ -1994,22 +1981,14 @@ else {
 		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
 	}
 
-	foreach ($data['items'] as $item) {
-		if (array_key_exists('template_host', $item)) {
-			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'hostid'));
-		}
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
+	$data['writable_templates'] = $hostids
+		? API::Template()->get([
 			'output' => ['templateid'],
 			'templateids' => array_keys(array_flip($hostids)),
 			'editable' => true,
 			'preservekeys' => true
-		]);
-	}
+		])
+		: [];
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

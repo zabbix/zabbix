@@ -7,6 +7,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+..F....... [ZBX-12217] removed links to templates with no permissions for templated applications and items (agriscenko, Sasha)
 ..F....... [ZBXNEXT-4607] removed column Recovery time in Problems mode (vasilijs)
 ........S. [ZBX-14615] fixed processing of JMX errors, now treated as distinct and separate from network errors (mindbound)
 
@@ -413,6 +414,11 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.12
+
+3.4.12rc1 was released as 3.4.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.12rc1
@@ -1704,6 +1710,11 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.20
+
+3.0.20rc1 was released as 3.0.20 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.20rc1
@@ -3677,6 +3688,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.23
+
+2.2.23rc1 was released as 2.2.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.23rc1
