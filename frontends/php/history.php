@@ -27,6 +27,7 @@ $page['file'] = 'history.php';
 $page['title'] = _('History');
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
 if (hasRequest('plaintext')) {
 	define('ZBX_PAGE_NO_MENU', 1);

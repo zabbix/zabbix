@@ -28,7 +28,8 @@ if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = (isset($page['web_layout_mode'])) ? $page['web_layout_mode'] : ZBX_LAYOUT_NORMAL;
+
 if ($web_layout_mode === ZBX_LAYOUT_FULLSCREEN || $web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 	if (!defined('ZBX_PAGE_NO_MENU')) {
 		define('ZBX_PAGE_NO_MENU', 1);

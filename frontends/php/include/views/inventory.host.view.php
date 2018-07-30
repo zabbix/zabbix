@@ -19,8 +19,11 @@
 **/
 
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList())
 		->addItem(get_icon('fullscreen'))
 	);

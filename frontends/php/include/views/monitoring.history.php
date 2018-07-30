@@ -19,7 +19,10 @@
 **/
 
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $historyWidget = new CWidget();
+$historyWidget->setWebLayoutMode($web_layout_mode);
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
@@ -206,8 +209,6 @@ else {
 		->setTitle($header['left'])
 		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
 	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
@@ -238,7 +239,7 @@ else {
 
 
 	if ($data['itemids']) {
-		if ($data['action'] !== HISTORY_LATEST) {
+		if ($data['action'] !== HISTORY_LATEST && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 			$historyWidget->addItem($filter_form);
 		}
 
@@ -249,7 +250,7 @@ else {
 		}
 	}
 	else {
-		if ($filter_tab) {
+		if ($filter_tab && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 			$historyWidget->addItem($filter_form);
 		}
 

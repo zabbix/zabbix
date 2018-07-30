@@ -71,9 +71,9 @@ else {
 	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
 	$widget = new CWidget();
-
 	$widget
 		->setTitle($data['dashboard']['name'])
+		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CList())
 			->setId('dashbrd-control')
 			->addItem($main_filter_form)

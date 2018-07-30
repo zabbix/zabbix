@@ -71,8 +71,11 @@ if ($blink_period > 0) {
 }
 
 // header right
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -107,29 +110,32 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	]));
 
-// filter
-$filter = $data['filter'];
-$filterFormView = new CView('common.filter.trigger', [
-	'filter' => [
-		'showTriggers' => $filter['showTriggers'],
-		'ackStatus' => $filter['ackStatus'],
-		'showSeverity' => $filter['showSeverity'],
-		'statusChange' => $filter['statusChange'],
-		'statusChangeDays' => $filter['statusChangeDays'],
-		'txtSelect' => $filter['txtSelect'],
-		'application' => $filter['application'],
-		'inventory' => $filter['inventory'],
-		'showMaintenance' => $filter['showMaintenance'],
-		'hostId' => $data['hostid'],
-		'groupId' => $data['groupid']
-	],
-	'config' => $data['config'],
-	'profileIdx' => $data['profileIdx'],
-	'active_tab' => $data['active_tab']
-]);
-$filterForm = $filterFormView->render();
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 
-$widget->addItem($filterForm);
+	// filter
+	$filter = $data['filter'];
+	$filterFormView = new CView('common.filter.trigger', [
+		'filter' => [
+			'showTriggers' => $filter['showTriggers'],
+			'ackStatus' => $filter['ackStatus'],
+			'showSeverity' => $filter['showSeverity'],
+			'statusChange' => $filter['statusChange'],
+			'statusChangeDays' => $filter['statusChangeDays'],
+			'txtSelect' => $filter['txtSelect'],
+			'application' => $filter['application'],
+			'inventory' => $filter['inventory'],
+			'showMaintenance' => $filter['showMaintenance'],
+			'hostId' => $data['hostid'],
+			'groupId' => $data['groupid']
+		],
+		'config' => $data['config'],
+		'profileIdx' => $data['profileIdx'],
+		'active_tab' => $data['active_tab']
+	]);
+	$filterForm = $filterFormView->render();
+
+	$widget->addItem($filterForm);
+}
 
 // data table
 if ($data['pageFilter']->groupsSelected) {

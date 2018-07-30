@@ -23,9 +23,12 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/services.inc.php';
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
 $page['scripts'] = ['layout.mode.js'];
+$page['web_layout_mode'] = $web_layout_mode;
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
@@ -156,6 +159,7 @@ else {
 
 		$srv_wdgt = (new CWidget())
 			->setTitle(_('Services'))
+			->setWebLayoutMode($web_layout_mode)
 			->setControls(new CList([
 				(new CForm('get'))
 					->cleanItems()

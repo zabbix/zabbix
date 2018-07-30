@@ -28,6 +28,7 @@ $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 

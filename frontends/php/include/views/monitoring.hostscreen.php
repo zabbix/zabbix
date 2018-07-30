@@ -19,9 +19,10 @@
 **/
 
 
-$screen_widget = new CWidget();
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
-$filter = new CFilter();
+$screen_widget = new CWidget();
+$screen_widget->setWebLayoutMode($web_layout_mode);
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget
@@ -75,20 +76,14 @@ else {
 		'to' => $data['to']
 	]);
 
-	$filter
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab']);
-
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 	if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-		$filter->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
-	}
-
-	$screen_widget
-		->addItem($filter)
-		->addItem(
-			(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+		$screen_widget->addItem((new CFilter())
+			->setProfile($data['profileIdx'], $data['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to'])
 		);
+	}
+	$screen_widget->addItem((new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }

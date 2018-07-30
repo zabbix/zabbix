@@ -24,10 +24,13 @@ require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'layout.mode.js'];
+$page['web_layout_mode'] = $web_layout_mode;
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -319,6 +322,7 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(get_icon('fullscreen'))
@@ -388,7 +392,9 @@ $filterColumn2 = (new CFormList())
 
 $filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
 
-$widget->addItem($filterForm);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	$widget->addItem($filterForm);
+}
 // End of Filter
 
 $form = (new CForm('GET', 'history.php'))

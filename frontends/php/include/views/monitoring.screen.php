@@ -19,9 +19,11 @@
 **/
 
 
-$widget = new CWidget();
-
 $web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
+$widget = new CWidget();
+$widget->setWebLayoutMode($web_layout_mode);
+
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 	$widget
 		->setTitle(_('Screens'))

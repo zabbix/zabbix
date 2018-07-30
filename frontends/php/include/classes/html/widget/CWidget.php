@@ -31,6 +31,12 @@ class CWidget {
 	 */
 	protected $body = [];
 
+	/**
+	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE).
+	 * @var integer
+	 */
+	protected $web_layout_mode = ZBX_LAYOUT_NORMAL;
+
 	public function setTitle($title) {
 		$this->title = $title;
 
@@ -44,11 +50,21 @@ class CWidget {
 		return $this;
 	}
 
-	public function setBreadcrumbs($breadcrumbs = null) {
-		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-		$show_breadcrumbs = ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE);
+	/**
+	 * Set layout mode.
+	 * @param integer $web_layout_mode
+	 * @return $this
+	 */
+	public function setWebLayoutMode($web_layout_mode) {
+		$this->web_layout_mode = $web_layout_mode;
 
-		if ($show_breadcrumbs && !is_null($breadcrumbs)) {
+		return $this;
+	}
+
+	public function setBreadcrumbs($breadcrumbs = null) {
+		$show_breadcrumbs = ($this->web_layout_mode !== ZBX_LAYOUT_KIOSKMODE);
+
+		if (($this->web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) && !is_null($breadcrumbs)) {
 			$this->body[] = $breadcrumbs;
 		}
 
@@ -70,10 +86,9 @@ class CWidget {
 	}
 
 	public function toString() {
-		$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 		$widget = [];
 
-		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
 			$this->addItem(get_icon('fullscreen')
 				->setAttribute('aria-label', _('Content controls')));
 		} elseif ($this->title !== null || $this->controls !== null) {

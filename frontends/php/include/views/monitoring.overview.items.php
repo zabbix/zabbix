@@ -34,8 +34,11 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList([
 		(new CForm('get'))
 			->cleanItems()
@@ -70,32 +73,35 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	])));
 
-// filter
-$filter = (new CFilter())
-	->setProfile($data['profileIdx'])
-	->setActiveTab($data['active_tab'])
-	->addFilterTab(_('Filter'), [
-		(new CFormList())->addRow(_('Application'), [
-			(new CTextBox('application', $data['filter']['application']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('application_name', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson([
-						'srctbl' => 'applications',
-						'srcfld1' => 'name',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'application',
-						'real_hosts' => '1',
-						'with_applications' => '1'
-					]).', null, this);'
-				)
-		])
-	]);
+if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 
-$widget->addItem($filter);
+	// filter
+	$widget->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Application'), [
+				(new CTextBox('application', $data['filter']['application']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('application_name', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('return PopUp("popup.generic",'.
+						CJs::encodeJson([
+							'srctbl' => 'applications',
+							'srcfld1' => 'name',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'application',
+							'real_hosts' => '1',
+							'with_applications' => '1'
+						]).', null, this);'
+					)
+			])
+		])
+	);
+
+}
 
 // data table
 if ($data['pageFilter']->groupsSelected) {

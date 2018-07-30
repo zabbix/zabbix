@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
 $page['scripts'] = ['layout.mode.js'];
+$page['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

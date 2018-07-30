@@ -24,10 +24,13 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
+$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['web_layout_mode'] = $web_layout_mode;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -194,11 +197,12 @@ $graph_time->insertFlickerfreeJs();
 // scroll
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
+// Create graphs widget.
 $widget = new CWidget();
+$widget->setWebLayoutMode($web_layout_mode);
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-	// Create graphs widget.
+	// Add filter.
 	$widget->addItem((new CFilter())
 		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
 		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
