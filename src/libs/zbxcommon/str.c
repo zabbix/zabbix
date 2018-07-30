@@ -3743,42 +3743,7 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 	return out;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_no_function                                                  *
- *                                                                            *
- * Purpose: count calculated item (prototype) formula characters that can be  *
- *          skipped without the risk of missing a function                    *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_no_function(const char *expr)
-{
-	const char	*ptr = expr;
-	int		len, c_l, c_r;
 
-	while ('\0' != *ptr)
-	{
-		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
-		{
-			ptr += len + 1;	/* skip to the position after user macro */
-		}
-		else if (SUCCEED != is_function_char(*ptr))
-		{
-			ptr++;	/* skip one character which cannot belong to function name */
-		}
-		else if ((0 == strncmp("and", ptr, len = ZBX_CONST_STRLEN("and")) ||
-				0 == strncmp("not", ptr, len = ZBX_CONST_STRLEN("not")) ||
-				0 == strncmp("or", ptr, len = ZBX_CONST_STRLEN("or"))) &&
-				NULL != strchr("()" ZBX_WHITESPACE, ptr[len]))
-		{
-			ptr += len;	/* skip to the position after and/or/not operator */
-		}
-		else
-			break;
-	}
-
-	return ptr - expr;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -3968,56 +3933,6 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 
 	if (NULL != error)
 		zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_function_find                                                *
- *                                                                            *
- * Purpose: find the location of the next function and its parameters in      *
- *          calculated item (prototype) formula                               *
- *                                                                            *
- * Parameters: expr          - [IN] string to parse                           *
- *             func_pos      - [OUT] function position in the string          *
- *             par_l         - [OUT] position of the opening parenthesis      *
- *             par_r         - [OUT] position of the closing parenthesis      *
- *             error         - [OUT] error message                            *
- *             max_error_len - [IN] error size                                *
- *                                                                            *
- *                                                                            *
- * Return value: SUCCEED - function was found at func_pos                     *
- *               FAIL    - there are no functions in the expression           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
-		int max_error_len)
-{
-	const char	*ptr;
-
-	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
-	{
-		/* skip the part of expression that is definitely not a function */
-		ptr += zbx_no_function(ptr);
-		*par_r = 0;
-
-		/* try to validate function candidate */
-		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, error, max_error_len))
-		{
-			if (*par_l > *par_r)
-				return FAIL;
-
-			continue;
-		}
-
-		*func_pos = ptr - expr;
-		*par_l += *func_pos;
-		*par_r += *func_pos;
-		return SUCCEED;
-	}
-
-	zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
 
 	return FAIL;
 }
@@ -4693,6 +4608,99 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_no_function                                                  *
+ *                                                                            *
+ * Purpose: count calculated item (prototype) formula characters that can be  *
+ *          skipped without the risk of missing a function                    *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	zbx_no_function(const char *expr)
+{
+	const char	*ptr = expr;
+	int		len, c_l, c_r;
+	zbx_token_t	token;
+
+	while ('\0' != *ptr)
+	{
+		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r))
+		{
+			ptr += len + 1;	/* skip to the position after user macro */
+		}
+		else if ('{' == *ptr && '{' == *(ptr + 1) && '#' == *(ptr + 2) &&
+				SUCCEED == zbx_token_parse_nested_macro(ptr, ptr, &token))
+		{
+			ptr += token.token.r - token.token.l + 1;
+		}
+		else if (SUCCEED != is_function_char(*ptr))
+		{
+			ptr++;	/* skip one character which cannot belong to function name */
+		}
+		else if ((0 == strncmp("and", ptr, len = ZBX_CONST_STRLEN("and")) ||
+				0 == strncmp("not", ptr, len = ZBX_CONST_STRLEN("not")) ||
+				0 == strncmp("or", ptr, len = ZBX_CONST_STRLEN("or"))) &&
+				NULL != strchr("()" ZBX_WHITESPACE, ptr[len]))
+		{
+			ptr += len;	/* skip to the position after and/or/not operator */
+		}
+		else
+			break;
+	}
+
+	return ptr - expr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_function_find                                                *
+ *                                                                            *
+ * Purpose: find the location of the next function and its parameters in      *
+ *          calculated item (prototype) formula                               *
+ *                                                                            *
+ * Parameters: expr          - [IN] string to parse                           *
+ *             func_pos      - [OUT] function position in the string          *
+ *             par_l         - [OUT] position of the opening parenthesis      *
+ *             par_r         - [OUT] position of the closing parenthesis      *
+ *             error         - [OUT] error message                            *
+ *             max_error_len - [IN] error size                                *
+ *                                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - function was found at func_pos                     *
+ *               FAIL    - there are no functions in the expression           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
+		int max_error_len)
+{
+	const char	*ptr;
+
+	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
+	{
+		/* skip the part of expression that is definitely not a function */
+		ptr += zbx_no_function(ptr);
+		*par_r = 0;
+
+		/* try to validate function candidate */
+		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, error, max_error_len))
+		{
+			if (*par_l > *par_r)
+				return FAIL;
+
+			continue;
+		}
+
+		*func_pos = ptr - expr;
+		*par_l += *func_pos;
+		*par_r += *func_pos;
+		return SUCCEED;
+	}
+
+	zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
+
+	return FAIL;
 }
 
 /******************************************************************************
