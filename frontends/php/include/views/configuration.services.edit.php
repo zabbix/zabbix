@@ -163,43 +163,45 @@ $servicesDependenciesFormList->addRow(
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-/*
- * Service times tab
- */
+// Service times tab.
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 
 $i = 0;
-foreach ($this->data['times'] as $serviceTime) {
-	switch ($serviceTime['type']) {
+
+foreach ($data['times'] as $service_time) {
+	switch ($service_time['type']) {
 		case SERVICE_TIME_TYPE_UPTIME:
 			$type = (new CSpan(_('Uptime')))->addClass('enabled');
-			$from = dowHrMinToStr($serviceTime['ts_from']);
-			$to = dowHrMinToStr($serviceTime['ts_to'], true);
+			$from = dowHrMinToStr($service_time['ts_from']);
+			$till = dowHrMinToStr($service_time['ts_to'], true);
 			break;
+
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = (new CSpan(_('Downtime')))->addClass('disabled');
-			$from = dowHrMinToStr($serviceTime['ts_from']);
-			$to = dowHrMinToStr($serviceTime['ts_to'], true);
+			$from = dowHrMinToStr($service_time['ts_from']);
+			$till = dowHrMinToStr($service_time['ts_to'], true);
 			break;
+
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = (new CSpan(_('One-time downtime')))->addClass('disabled');
-			$from = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_from']);
-			$to = zbx_date2str(DATE_TIME_FORMAT, $serviceTime['ts_to']);
+			$from = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_from']);
+			$till = zbx_date2str(DATE_TIME_FORMAT, $service_time['ts_to']);
 			break;
 	}
+
 	$row = new CRow([
 		[
 			$type,
-			new CVar('times['.$i.'][type]', $serviceTime['type']),
-			new CVar('times['.$i.'][ts_from]', $serviceTime['ts_from']),
-			new CVar('times['.$i.'][ts_to]', $serviceTime['ts_to']),
-			new CVar('times['.$i.'][note]', $serviceTime['note'])
+			new CVar('times['.$i.'][type]', $service_time['type']),
+			new CVar('times['.$i.'][ts_from]', $service_time['ts_from']),
+			new CVar('times['.$i.'][ts_to]', $service_time['ts_to']),
+			new CVar('times['.$i.'][note]', $service_time['note'])
 		],
-		$from.' - '.$to,
-		htmlspecialchars($serviceTime['note']),
+		$from.' - '.$till,
+		htmlspecialchars($service_time['note']),
 		(new CCol(
 			(new CButton('remove', _('Remove')))
 				->onClick('javascript: removeTime(\''.$i.'\');')
@@ -211,6 +213,7 @@ foreach ($this->data['times'] as $serviceTime) {
 	$servicesTimeTable->addRow($row);
 	$i++;
 }
+
 $servicesTimeFormList->addRow(_('Service times'),
 	(new CDiv($servicesTimeTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -228,53 +231,7 @@ $serviceTimeTable = (new CFormList())
 		]))
 	);
 
-if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-	// downtime since
-	if (isset($_REQUEST['new_service_time']['from'])) {
-		$fromYear = getRequest('new_service_time_from_year');
-		$fromMonth = getRequest('new_service_time_from_month');
-		$fromDay = getRequest('new_service_time_from_day');
-		$fromHours = getRequest('new_service_time_from_hour');
-		$fromMinutes = getRequest('new_service_time_from_minute');
-		$fromDate = [
-			'y' => $fromYear,
-			'm' => $fromMonth,
-			'd' => $fromDay,
-			'h' => $fromHours,
-			'i' => $fromMinutes
-		];
-		$serviceTimeFrom = $fromYear.$fromMonth.$fromDay.$fromHours.$fromMinutes;
-	}
-	else {
-		$downtimeSince = date(TIMESTAMP_FORMAT_ZERO_TIME);
-		$fromDate = zbxDateToTime($downtimeSince);
-		$serviceTimeFrom = $downtimeSince;
-	}
-	$servicesForm->addVar('new_service_time[from]', $serviceTimeFrom);
-
-	// downtime till
-	if (isset($_REQUEST['new_service_time']['to'])) {
-		$toYear = getRequest('new_service_time_to_year');
-		$toMonth = getRequest('new_service_time_to_month');
-		$toDay = getRequest('new_service_time_to_day');
-		$toHours = getRequest('new_service_time_to_hour');
-		$toMinutes = getRequest('new_service_time_to_minute');
-		$toDate = [
-			'y' => $toYear,
-			'm' => $toMonth,
-			'd' => $toDay,
-			'h' => $toHours,
-			'i' => $toMinutes
-		];
-		$serviceTimeTo = $toYear.$toMonth.$toDay.$toHours.$toMinutes;
-	}
-	else {
-		$downtimeTill = date(TIMESTAMP_FORMAT_ZERO_TIME, time() + SEC_PER_DAY);
-		$toDate = zbxDateToTime($downtimeTill);
-		$serviceTimeTo = $downtimeTill;
-	}
-	$servicesForm->addVar('new_service_time[to]', $serviceTimeTo);
-
+if ($data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	$serviceTimeTable
 		->addRow(
 			_('Note'),
@@ -284,11 +241,15 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		)
 		->addRow(
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_service_time_from', $fromDate)))
+			(new CDateSelector('new_service_time_from', $data['new_service_time_from']))
+				->setDateFormat(ZBX_DATE_TIME)
+				->setAriaRequired()
 		)
 		->addRow(
-			(new CLabel(_('Till'), 'new_service_time_to'))->setAsteriskMark(),
-			(new CDiv(createDateSelector('new_service_time_to', $toDate)))
+			(new CLabel(_('Till'), 'new_service_time_till'))->setAsteriskMark(),
+			(new CDateSelector('new_service_time_till', $data['new_service_time_till']))
+				->setDateFormat(ZBX_DATE_TIME)
+				->setAriaRequired()
 		);
 }
 else {

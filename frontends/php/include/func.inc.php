@@ -1894,8 +1894,7 @@ function filter_messages(array $messages = []) {
  *
  * @return CDiv|null
  */
-function getMessages($good = false, $title = null)
-{
+function getMessages($good = false, $title = null) {
 	global $ZBX_MESSAGES;
 
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
@@ -2545,7 +2544,7 @@ function makeUpdateIntervalFilter($field_name, $values) {
  * @param string|null $options['from']
  * @param string|null $options['to']
  */
-function updateTimeSelectorPeriod($options) {
+function updateTimeSelectorPeriod(array $options) {
 	if ($options['from'] !== null && $options['to'] !== null) {
 		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
 		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);
