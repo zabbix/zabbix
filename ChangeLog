@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha10
 
 New features:
+..F....... [ZBXNEXT-4049] added option to hide timeline in Problems widget (vasilijs)
 ..F....... [ZBXNEXT-4611] changed default method for http agent items from "post" to "get" (gcalenko)
 ..F....... [ZBXNEXT-4587] added new column 'Value' and filter in Triggers list (Ivo, vasilijs)
 ..F....... [ZBXNEXT-4626] improved widget configuration constructor to create custom view for each widgets (ashubin)
