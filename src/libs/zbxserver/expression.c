@@ -5284,7 +5284,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
 	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
-	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
