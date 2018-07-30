@@ -180,7 +180,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickLinkTextWait($data['host_group']);
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 			$this->zbxTestMultiselectAssertSelected('groupids_', $data['host_group']);
 		}
 
@@ -192,13 +192,13 @@ class testPageReportsTriggerTop extends CWebTest {
 			);
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 			$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="'.$data['host'].'"]');
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_dialogue']"));
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
 			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
 		}
 
 		if (array_key_exists('severities', $data)) {
 			foreach ($data['severities'] as $severity) {
-				$severity_id = $this->zbxTestGetAttributeValue('//label[text()=\''.$severity.'\']', 'for');
+				$severity_id = $this->zbxTestGetAttributeValue('//label[text()="'.$severity.'"]', 'for');
 				$this->zbxTestClick($severity_id);
 			}
 		}
@@ -220,7 +220,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->zbxTestTextPresent($data['result']);
 		}
 		else {
-			$this->zbxTestAssertElementText('//tr[@class=\'nothing-to-show\']/td', 'No data found.');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//tr[@class="nothing-to-show"]'));
+			$this->zbxTestAssertElementText('//tr[@class="nothing-to-show"]/td', 'No data found.');
 		}
 	}
 }
