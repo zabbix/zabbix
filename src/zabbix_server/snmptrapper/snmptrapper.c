@@ -81,7 +81,6 @@ static void	DBupdate_lastsize(void)
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
-	const char*		__function_name = "process_trap_for_interface";
 	DC_ITEM			*items = NULL;
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];

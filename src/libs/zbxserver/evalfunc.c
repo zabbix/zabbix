@@ -1831,8 +1831,6 @@ out:
 
 static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *value, const char *arg1)
 {
-	const char* __function_name = "evaluate_STR_one";
-
 	switch (func)
 	{
 		case ZBX_FUNC_STR:
