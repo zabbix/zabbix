@@ -207,8 +207,7 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveTriggerNames($triggers, [
-			'references_only' => $references_only,
-			'events' => false
+			'references_only' => $references_only
 		]);
 	}
 
@@ -324,26 +323,6 @@ class CMacrosResolverHelper {
 		$trigger = reset($triggers);
 
 		return $trigger['expression'];
-	}
-
-	/**
-	 * Resolve macros in event description.
-	 *
-	 * @static
-	 *
-	 * @param array $event
-	 *
-	 * @return string
-	 */
-	public static function resolveEventDescription(array $event) {
-		self::init();
-
-		$events = self::$macrosResolver->resolveTriggerNames([$event['triggerid'] => $event], [
-			'references_only' => false,
-			'events' => true
-		]);
-
-		return $events[$event['triggerid']]['description'];
 	}
 
 	/**

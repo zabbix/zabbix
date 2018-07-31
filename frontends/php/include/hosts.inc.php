@@ -478,7 +478,7 @@ function hostInterfaceTypeNumToName($type) {
 }
 
 function get_hostgroup_by_groupid($groupid) {
-	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.zbx_dbstr($groupid)));
+	$groups = DBfetch(DBselect('SELECT g.* FROM hstgrp g WHERE g.groupid='.zbx_dbstr($groupid)));
 
 	if ($groups) {
 		return $groups;
@@ -561,57 +561,170 @@ function updateHostStatus($hostids, $status) {
 }
 
 /**
- * Returns the farthest application ancestor for each given application.
+ * Get parent templates for each given application.
  *
- * @param array $applicationIds
- * @param array $templateApplicationIds		array with parent application IDs as keys and arrays of child application
- * 											IDs as values
+ * @param array  $applications                     An array of applications.
+ * @param string $applications[]['applicationid']  ID of an applications.
+ * @param array  $applications[]['templateids]     IDs of parent template applications.
  *
- * @return array	an array with child IDs as keys and arrays of ancestor IDs as values
+ * @return array
  */
-function getApplicationSourceParentIds(array $applicationIds, array $templateApplicationIds = []) {
-	$query = DBSelect(
-		'SELECT at.applicationid,at.templateid'.
-		' FROM application_template at'.
-		' WHERE '.dbConditionInt('at.applicationid', $applicationIds)
-	);
+function getApplicationParentTemplates(array $applications) {
+	$parent_applicationids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
-	$applicationIds = [];
-	$unsetApplicationIds = [];
-	while ($applicationTemplate = DBfetch($query)) {
-		// check if we already have an application inherited from the current application
-		// if we do - copy all of its child applications to the parent template
-		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
-			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
-			$unsetApplicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['applicationid'];
+	foreach ($applications as $application) {
+		foreach ($application['templateids'] as $parent_applicationid) {
+			$parent_applicationids[$parent_applicationid] = true;
+			$data['links'][$application['applicationid']][] = ['applicationid' => $parent_applicationid];
 		}
-		// if no - just add the application
-		else {
-			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
-		}
-		$applicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['templateid'];
 	}
 
-	// unset children of all applications that we found a new parent for
-	foreach ($unsetApplicationIds as $applicationId) {
-		unset($templateApplicationIds[$applicationId]);
+	if (!$parent_applicationids) {
+		return $data;
 	}
 
-	// continue while we still have new applications to check
-	if ($applicationIds) {
-		return getApplicationSourceParentIds($applicationIds, $templateApplicationIds);
-	}
-	else {
-		// return an inverse hash with application IDs as keys and arrays of parent application IDs as values
-		$result = [];
-		foreach ($templateApplicationIds as $templateId => $applicationIds) {
-			foreach ($applicationIds as $applicationId) {
-				$result[$applicationId][] = $templateId;
+	$all_parent_applicationids = [];
+	$hostids = [];
+
+	while ($parent_applicationids) {
+		$db_applications = API::Application()->get([
+			'output' => ['applicationid', 'hostid', 'templateids'],
+			'applicationids' => array_keys($parent_applicationids)
+		]);
+
+		$all_parent_applicationids += $parent_applicationids;
+		$parent_applicationids = [];
+
+		foreach ($db_applications as $db_application) {
+			$data['templates'][$db_application['hostid']] = [];
+			$hostids[$db_application['applicationid']] = $db_application['hostid'];
+
+			foreach ($db_application['templateids'] as $parent_applicationid) {
+				if (!array_key_exists($parent_applicationid, $all_parent_applicationids)) {
+					$parent_applicationids[$parent_applicationid] = true;
+				}
+			}
+
+			if (!array_key_exists($db_application['applicationid'], $data['links'])) {
+				foreach ($db_application['templateids'] as $parent_applicationid) {
+					$data['links'][$db_application['applicationid']][] = ['applicationid' => $parent_applicationid];
+				}
 			}
 		}
-
-		return $result;
 	}
+
+	foreach ($data['links'] as $applicationid => &$parent_applications) {
+		foreach ($parent_applications as &$parent_application) {
+			$parent_application['hostid'] = array_key_exists($parent_application['applicationid'], $hostids)
+				? $hostids[$parent_application['applicationid']]
+				: 0;
+		}
+		unset($parent_application);
+	}
+	unset($parent_applications);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Auxiliary function for makeApplicationTemplatePrefix().
+ *
+ * @param string $applicationid
+ * @param array  $parent_templates
+ *
+ * @return array
+ */
+function getTopLevelTemplates($applicationid, array $parent_templates) {
+	$templates = [];
+
+	foreach ($parent_templates['links'][$applicationid] as $parent_application) {
+		if (!array_key_exists($parent_application['applicationid'], $parent_templates['links'])) {
+			$templates[] = $parent_templates['templates'][$parent_application['hostid']];
+		}
+		else {
+			$templates = array_merge($templates,
+				getTopLevelTemplates($parent_application['applicationid'], $parent_templates)
+			);
+		}
+	}
+
+	return $templates;
+}
+
+/**
+ * Returns a template prefix for selected application.
+ *
+ * @param string $applicationid
+ * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
+ *
+ * @return array
+ */
+function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
+	if (!array_key_exists($applicationid, $parent_templates['links'])) {
+		return null;
+	}
+
+	$templates = getTopLevelTemplates($applicationid, $parent_templates);
+	CArrayHelper::sort($templates, ['name']);
+
+	$list = [];
+
+	foreach ($templates as $template) {
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = (new CLink(CHtml::encode($template['name']),
+				(new CUrl('applications.php'))->setArgument('hostid', $template['hostid'])
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$name = new CSpan(CHtml::encode($template['name']));
+		}
+
+		$list[] = $name->addClass(ZBX_STYLE_GREY);
+		$list[] = ', ';
+	}
+
+	array_pop($list);
+	$list[] = NAME_DELIMITER;
+
+	return $list;
 }
 
 /**
@@ -711,7 +824,7 @@ function getDeletableHostGroupIds(array $groupIds) {
 
 	$dbResult = DBselect(
 		'SELECT g.groupid'.
-		' FROM groups g'.
+		' FROM hstgrp g'.
 		' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
 			' AND '.dbConditionInt('g.groupid', $groupIds).
 			' AND NOT EXISTS ('.

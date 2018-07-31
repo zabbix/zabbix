@@ -452,6 +452,10 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				ovelay_properties['controls'] = resp.controls;
 				ovelay_properties['buttons'] = buttons;
 
+				if (typeof resp.debug !== 'undefined') {
+					ovelay_properties['debug'] = resp.debug;
+				}
+
 				if (typeof resp.script_inline !== 'undefined') {
 					ovelay_properties['script_inline'] = resp.script_inline;
 				}
@@ -530,7 +534,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay time picker.
 				case 'clndr':
-					CLNDR[dialog.dialogueid].clndr.clndrhide();
+					getCalendarByID(dialog.dialogueid.toString()).clndr.clndrhide();
 					break;
 
 				// Close overlay message.

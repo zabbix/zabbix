@@ -154,7 +154,7 @@ function granted2update_group($userGroupIds) {
 function getUserFullname($userData) {
 	if (!zbx_empty($userData['surname'])) {
 		if (!zbx_empty($userData['name'])) {
-			return $userData['alias'].' '._x('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
+			return $userData['alias'].' '._xs('(%1$s %2$s)', 'user fullname', $userData['name'], $userData['surname']);
 		}
 
 		$fullname = $userData['surname'];

@@ -273,7 +273,7 @@ class testFormAdministrationUserGroups extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Zabbix administrators',
-					'error' => 'User group "Zabbix administrators" is used in "Report problems to Zabbix administrators" action.'
+					'error' => 'User group "Zabbix administrators" is used in'
 				]
 			],
 			[

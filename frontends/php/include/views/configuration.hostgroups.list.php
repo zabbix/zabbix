@@ -23,22 +23,25 @@ $widget = (new CWidget())
 	->setTitle(_('Host groups'))
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
-				? new CRedirectButton(_('Create host group'), (new CUrl())
-						->setArgument('form', 'create')
-						->getUrl()
-					)
+				? new CRedirectButton(_('Create host group'), (new CUrl('hostgroups.php'))
+					->setArgument('form', 'create')
+					->getUrl()
+				)
 				: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
 					->setEnabled(false)
 			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
-	->addItem((new CFilter('web.groups.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name'),
-			(new CTextBox('filter_name', $data['filter']['name']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
-		))
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addFilterTab(_('Filter'), [
+			(new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+		])
 	);
 
 // create form

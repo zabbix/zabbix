@@ -55,6 +55,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
@@ -121,7 +122,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter-space');
+		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
 
 		switch ($result) {
 			case TEST_GOOD:

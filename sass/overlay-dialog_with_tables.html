@@ -1,22 +1,38 @@
 
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-   <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Zabbix | Hosts</title>
-        <link rel="stylesheet" href="stylesheets/screen.css">
-        <!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
-        <link rel="icon" href="favicon.ico">
-        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
-        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
-        <meta name="msapplication-TileColor" content="#d40000">
-   </head>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Zabbix</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
 <body>
 
    <div class="article">
@@ -34,34 +50,10 @@
       <li><a class="action-menu-item-disabled">Remove</a></li>
       <li><a class="action-menu-item-disabled">Remove all</a></li>
       </ul>
-<!--
-      <ul class="action-menu" style="top: 58px; left: 840px">
-      <li><a href="#">Zabbix server</a></li>
-      </ul>
--->
       <div class="overlay-dialogue" style="top: 20px; left: 20px; max-width: 500px">
-      <button type="button" class="overlay-close-btn"></button>
+      <button  class="overlay-close-btn"></button>
       <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</div><div class="overlay-descr-url"><a href="">A random link goes here</a></div>
-            <!--<table class="list-table">
-            <thead>
-            <tr>
-                  <th>Host</th>
-                  <th>Disaster</th>
-                  <th>High</th>
-                  <th>Average</th>
-                  <th>Warning</th>
-                  <th>Information</th>
-                  <th>Not classified</th>
-            </tr>
-            </thead>
-            <tbody>
-                  <tr><td><a href="#">vSphere 001</a></td><td class="disaster-bg">25</td><td class="high-bg">7</td><td class="average-bg">0</td><td class="warning-bg">2</td><td class="info-bg">0</td><td class="na-bg">0</td></tr>
-                  <tr><td><a href="#">vSphere 002</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-                  <tr><td><a href="#">vSphere 003</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-                  <tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-                  <tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
-            </tbody>
-            </table>-->
+
             <table class="list-table" id="t5603d1928c1e4">
    <thead>
       <tr>
@@ -218,7 +210,7 @@
       </div>
 
    <div class="overlay-dialogue" style="top: 300px; left: 10px">
-      <button type="button" class="overlay-close-btn"></button>
+      <button  class="overlay-close-btn"></button>
    <div class="dashbrd-widget-head cursor-move"><h4>Edit map element</h4></div>
    <ul class="table-forms">
             <li>
@@ -243,11 +235,11 @@
       </li>
       <li>
       <div class="table-forms-td-left"><label for="HostName">Host</label></div>
-      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button  class="btn-grey">Select</button></div>
       </li>
       <li>
       <div class="table-forms-td-left"><label for="HostName">Application</label></div>
-      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button  class="btn-grey">Select</button></div>
       </li>
       <li>
       <div class="table-forms-td-left">Icons</div>
@@ -307,17 +299,17 @@
       </li>
       <li>
       <div class="table-forms-td-left"><label>URLs</label></div>
-      <div class="table-forms-td-right"><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></div>
+      <div class="table-forms-td-right"><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button  class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button  class="btn-link">Remove</button></td></tr><tr><td><button  class="btn-link">Add</button></td><td></td></tr></tbody></table></div>
       </li>
-    <li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button type="button">Apply</button><button type="button" class="btn-alt">Remove</button><button type="button" class="btn-alt">Cancel</button></div>
+    <li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button >Apply</button><button  class="btn-alt">Remove</button><button  class="btn-alt">Cancel</button></div>
     </li>
       </ul>
    </div>
 
       <div class="overlay-dialogue calendar" style="top: 280px; left: 1210px; z-index: 10000">
       <div class="calendar-header">
-      <div class="calendar-year"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
-      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+      <div class="calendar-year"><button  class="btn-grey"><span class="arrow-left"></span></button>2015<button  class="btn-grey"><span class="arrow-right"></span></button></div>
+      <div class="calendar-month"><button  class="btn-grey"><span class="arrow-left"></span></button>March<button  class="btn-grey"><span class="arrow-right"></span></button></div>
       </div>
       <table>
       <thead>
@@ -333,18 +325,18 @@
       </tbody>
       </table>
       <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
-      <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Done</button></div>
+      <div class="calendar-footer"><button  class="btn-grey">Now</button><button >Done</button></div>
       </div>
 
       <div class="overlay-dialogue" style="top: 10px; left: 1050px">
-      <button type="button" class="overlay-close-btn"></button>
+      <button  class="overlay-close-btn"></button>
       <div class="dashbrd-widget-head cursor-move"><h4>Execution confirmation</h4></div>
       <div class="overlay-dialogue-body" style="margin-bottom: 50px">Some random confirmation text goes right here</div>
-      <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
+      <div class="overlay-dialogue-footer"><button  class="btn-alt">Cancel</button><button >Execute</button></div>
       </div>
 
        <div class="overlay-dialogue" style="top: 10px; left: 1350px">
-      <button type="button" class="overlay-close-btn"></button>
+      <button  class="overlay-close-btn"></button>
 <div class="color-picker">
 <div title="#000000" style="background: #000000" onclick="set_color(&quot;000000&quot;);"></div><div title="#111111" style="background: #111111" onclick="set_color(&quot;111111&quot;);"></div><div title="#222222" style="background: #222222" onclick="set_color(&quot;222222&quot;);"></div><div title="#333333" style="background: #333333" onclick="set_color(&quot;333333&quot;);"></div><div title="#444444" style="background: #444444" onclick="set_color(&quot;444444&quot;);"></div><div title="#555555" style="background: #555555" onclick="set_color(&quot;555555&quot;);"></div><div title="#666666" style="background: #666666" onclick="set_color(&quot;666666&quot;);"></div><div title="#777777" style="background: #777777" onclick="set_color(&quot;777777&quot;);"></div><div title="#888888" style="background: #888888" onclick="set_color(&quot;888888&quot;);"></div><div title="#999999" style="background: #999999" onclick="set_color(&quot;999999&quot;);"></div><div title="#AAAAAA" style="background: #AAAAAA" onclick="set_color(&quot;AAAAAA&quot;);"></div><div title="#BBBBBB" style="background: #BBBBBB" onclick="set_color(&quot;BBBBBB&quot;);"></div><div title="#CCCCCC" style="background: #CCCCCC" onclick="set_color(&quot;CCCCCC&quot;);"></div><div title="#DDDDDD" style="background: #DDDDDD" onclick="set_color(&quot;DDDDDD&quot;);"></div><div title="#EEEEEE" style="background: #EEEEEE" onclick="set_color(&quot;EEEEEE&quot;);"></div><div title="#FFFFFF" style="background: #FFFFFF" onclick="set_color(&quot;FFFFFF&quot;);"></div>
 </div>
@@ -374,7 +366,7 @@
       <tfoot>
       <tr>
       <td class="table-forms-td-left"></td>
-      <td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+      <td class="table-forms-td-right"><button  class="btn-alt">Cancel</button><button  class="btn-alt">Remove</button><button >Apply</button></td>
       </tr>
       </tfoot>
       <tbody>
@@ -428,44 +420,7 @@
       </div>
       </td>
       </tr>
-      <tr>
-      <td class="table-forms-td-left"><input type="checkbox" id="Label" class="checkbox-radio"><label for="Label"><span></span>Label</label></td>
-      <td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
-      </tr>
-            <tr>
-            <td class="table-forms-td-left"><input type="checkbox" id="LabelLoc" class="checkbox-radio"><label for="LabelLoc"><span></span>Label location</label></td>
-            <td class="table-forms-td-right"><input type="checkbox" id="Smth" class="checkbox-radio"><label for="Smth"><span></span></label><div class="form-input-margin"></div><select><option>Bottom</option></select></td>
-            </tr>
-      <tr>
-      <td class="table-forms-td-left"><input type="checkbox" id="AutoIconSel" class="checkbox-radio"><label for="AutoIconSel"><span></span>Automatic icon selection</label></td>
-      <td class="table-forms-td-right"><input type="checkbox" id="Smth2" class="checkbox-radio"><label for="Smth2"><span></span></label></td>
-      </tr>
-            <tr>
-            <td class="table-forms-td-left"><input type="checkbox" id="IconDef" class="checkbox-radio"><label for="IconDef"><span></span>Icon (default)</label></td>
-            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
-            </tr>
-            <tr>
-            <td class="table-forms-td-left"><input type="checkbox" id="IconProbl" class="checkbox-radio"><label for="IconProbl"><span></span>Icon (problem)</label></td>
-            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
-            </tr>
-            <tr>
-            <td class="table-forms-td-left"><input type="checkbox" id="IconMaint" class="checkbox-radio"><label for="IconMaint"><span></span>Icon (maintenance)</label></td>
-            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
-            </tr>
-            <tr>
-            <td class="table-forms-td-left"><input type="checkbox" id="IconDis" class="checkbox-radio"><label for="IconDis"><span></span>Icon (disabled)</label></td>
-            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
-            </tr>
-      </tbody>
-   </table>
-      <div class="dashbrd-widget-head"><h4>Links between the selected elements</h4></div>
-      <table class="table-forms">
-            <tfoot>
-            <tr>
-            <td class="table-forms-td-left"></td>
-            <td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
-            </tr>
-            </tfoot>
+      </tfoot>
             <tbody>
             <tr>
             <td class="table-forms-td-right" colspan="2">
@@ -500,7 +455,7 @@
             </tr>
             <tr>
             <td class="table-forms-td-right" colspan="2">
-            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
+            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button  class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button  class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
             </td>
             </tr>
 
@@ -688,10 +643,6 @@
    </table>
    <div class="table-paging"><div class="paging-btn-container"><div class="table-stats">Displaying 6 of 45</div></div></div>
 </div>
-   </div>
-   <div class="footer">
-   <!--<a href="http://www.zabbix.com" target="_blank" class="logo"></a>-->
-   Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
-   </div>
+</div>
 </body>
 </html>

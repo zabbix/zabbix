@@ -21,24 +21,10 @@
 
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
+/**
+ * @backup sysmaps
+ */
 class testMap extends CZabbixTest {
-	/**
-	 * Contains debug information for API calls.
-	 * @var string
-	 */
-	public $debug = '';
-
-	/**
-	 * Users credentials used by test scenarios.
-	 */
-	public static $testUsers = [
-		'zabbix-user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
-	];
-
-	public function testMap_backup() {
-		DBsave_tables('sysmaps');
-	}
-
 	/**
 	 * Create map tests data provider.
 	 *
@@ -239,9 +225,7 @@ class testMap extends CZabbixTest {
 						'selements' => []
 					]
 				],
-				'error' => [
-					'data' => 'Map "A1" already exists.'
-				]
+				'error' => 'Map "A1" already exists.'
 			],
 			// Fail. Cannot create map with submap with non existing sysmapid.
 			[
@@ -303,9 +287,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => [
-					'data' => 'No permissions to referred object or it does not exist!'
-				]
+				'expected_error' => 'No permissions to referred object or it does not exist!'
 			]
 		];
 	}
@@ -313,21 +295,8 @@ class testMap extends CZabbixTest {
 	/**
 	 * @dataProvider createMapDataProvider
 	 */
-	public function testMapCreate($request_data, $error_expected = null, $user = []) {
-		$user += ['user' => 'Admin', 'password' => 'zabbix'];
-		$response = $this->api_call_with_user('map.create', $user, $request_data, $this->debug);
-		// Remove debug information.
-		unset($response['error']['debug']);
-		$error_json = array_key_exists('error', $response) ? json_encode($response['error'], JSON_PRETTY_PRINT) : null;
-
-		if ($error_expected != null) {
-			$this->assertArrayHasKey('error', $response, json_encode($response, JSON_PRETTY_PRINT));
-			$same_key_values = array_merge($response['error'], $error_expected);
-			$this->assertSame($response['error'], $same_key_values);
-		}
-		else {
-			$this->assertArrayNotHasKey('error', $response, $error_json);
-		}
+	public function testMapCreate($request_data, $expected_error = null) {
+		$this->call('map.create', $request_data, $expected_error);
 	}
 
 	/**
@@ -352,9 +321,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => [
-					'data' => 'Cannot add "" element of the map "A" due to circular reference.'
-				]
+				'expected_error' => 'Cannot add "" element of the map "A" due to circular reference.'
 			],
 			// Fail. Can not add map with sub maps having circular reference.
 			[
@@ -403,9 +370,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => [
-					'data' => 'Cannot add "B map element" element of the map "A" due to circular reference.'
-				]
+				'expected_error' => 'Cannot add "B map element" element of the map "A" due to circular reference.'
 			],
 			// Success. Can add existing map as sub map. A > B > C.
 			[
@@ -456,7 +421,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => null
+				'expected_error' => null
 			],
 			// Fail. Can not update map and create circular reference.
 			[
@@ -493,9 +458,7 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => [
-					'data' => 'Cannot add "New element" element of the map "D" due to circular reference.'
-				]
+				'expected_error' => 'Cannot add "New element" element of the map "D" due to circular reference.'
 			],
 			// Fail. Circular validation message do not show private maps name.
 			[
@@ -517,10 +480,8 @@ class testMap extends CZabbixTest {
 						]
 					]
 				],
-				'error' => [
-					'data' => 'Cannot add "ups!" element of the map "C" due to circular reference.'
-				],
-				'user' => static::$testUsers['zabbix-user']
+				'expected_error' => 'Cannot add "ups!" element of the map "C" due to circular reference.',
+				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
 			]
 		];
 	}
@@ -528,24 +489,11 @@ class testMap extends CZabbixTest {
 	/**
 	 * @dataProvider updateMapDataProvider
 	 */
-	public function testMapUpdate($request_data, $error_expected = null, $user = []) {
-		$user += ['user' => 'Admin', 'password' => 'zabbix'];
-		$response = $this->api_call_with_user('map.update', $user, $request_data, $this->debug);
-		// Remove debug information.
-		unset($response['error']['debug']);
-		$error_json = array_key_exists('error', $response) ? json_encode($response['error'], JSON_PRETTY_PRINT) : null;
-
-		if ($error_expected != null) {
-			$this->assertArrayHasKey('error', $response, json_encode($response, JSON_PRETTY_PRINT));
-			$same_key_values = array_merge($response['error'], $error_expected);
-			$this->assertSame($response['error'], $same_key_values);
+	public function testMapUpdate($request_data, $expected_error = null, $user = null) {
+		if ($user !== null) {
+			$this->authorize($user['user'], $user['password']);
 		}
-		else {
-			$this->assertArrayNotHasKey('error', $response, $error_json);
-		}
-	}
 
-	public function testMap_restore() {
-		DBrestore_tables('sysmaps');
+		$this->call('map.update', $request_data, $expected_error);
 	}
 }

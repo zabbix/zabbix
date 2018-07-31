@@ -66,7 +66,7 @@ class CProblem extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND,
+			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'recent'					=> null,
 			'filter'					=> null,
@@ -251,77 +251,23 @@ class CProblem extends CApiService {
 
 		// severities
 		if ($options['severities'] !== null) {
-			zbx_value2array($options['severities']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$sqlParts['from']['t'] = 'triggers t';
-				$sqlParts['where']['p-t'] = 'p.objectid=t.triggerid';
-				$sqlParts['where']['t'] = dbConditionInt('t.priority', $options['severities']);
+				zbx_value2array($options['severities']);
+				$sqlParts['where'][] = dbConditionInt('p.severity', $options['severities']);
 			}
 			// ignore this filter for items and lld rules
 		}
 
 		// acknowledged
 		if ($options['acknowledged'] !== null) {
-			$sqlParts['where'][] = ($options['acknowledged'] ? '' : 'NOT ').'EXISTS ('.
-				'SELECT NULL'.
-				' FROM acknowledges a'.
-				' WHERE p.eventid=a.eventid'.
-			')';
+			$acknowledged = $options['acknowledged'] ? EVENT_ACKNOWLEDGED : EVENT_NOT_ACKNOWLEDGED;
+			$sqlParts['where'][] = 'p.acknowledged='.$acknowledged;
 		}
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$where = '';
-			$cnt = count($options['tags']);
-
-			foreach ($options['tags'] as $tag) {
-				if (!array_key_exists('value', $tag)) {
-					$tag['value'] = '';
-				}
-
-				if ($tag['value'] !== '') {
-					if (!array_key_exists('operator', $tag)) {
-						$tag['operator'] = TAG_OPERATOR_LIKE;
-					}
-
-					switch ($tag['operator']) {
-						case TAG_OPERATOR_EQUAL:
-							$tag['value'] = ' AND pt.value='.zbx_dbstr($tag['value']);
-							break;
-
-						case TAG_OPERATOR_LIKE:
-						default:
-							$tag['value'] = str_replace('!', '!!', $tag['value']);
-							$tag['value'] = str_replace('%', '!%', $tag['value']);
-							$tag['value'] = str_replace('_', '!_', $tag['value']);
-							$tag['value'] = '%'.mb_strtoupper($tag['value']).'%';
-							$tag['value'] = ' AND UPPER(pt.value) LIKE'.zbx_dbstr($tag['value'])." ESCAPE '!'";
-					}
-				}
-				elseif ($tag['operator'] == TAG_OPERATOR_EQUAL) {
-					$tag['value'] = ' AND pt.value='.zbx_dbstr($tag['value']);
-				}
-
-				if ($where !== '') {
-					$where .= ($options['evaltype'] == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ';
-				}
-
-				$where .= 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM problem_tag pt'.
-					' WHERE p.eventid=pt.eventid'.
-						' AND pt.tag='.zbx_dbstr($tag['tag']).$tag['value'].
-				')';
-			}
-
-			// Add closing parenthesis if there are more than one OR statements.
-			if ($options['evaltype'] == TAG_EVAL_TYPE_OR && $cnt > 1) {
-				$where = '('.$where.')';
-			}
-
-			$sqlParts['where'][] = $where;
+			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], false);
 		}
 
 		// recent
@@ -427,7 +373,7 @@ class CProblem extends CApiService {
 		}
 
 		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND, TAG_EVAL_TYPE_OR]
+			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 		]);
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));

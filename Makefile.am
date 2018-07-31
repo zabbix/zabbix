@@ -6,8 +6,7 @@ SUBDIRS = \
 	src \
 	database \
 	man \
-	misc \
-	upgrades
+	misc
 
 EXTRA_DIST = \
 	bin \
@@ -109,6 +108,7 @@ test:
 if ZBXCMOCKA
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
+	-Wl,--wrap=zbx_db_select_n \
 	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=__zbx_DBexecute \
 	-Wl,--wrap=DBbegin \

@@ -24,8 +24,9 @@ $widget = (new CWidget())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(new CRedirectButton(_('Create discovery rule'),
-				(new CUrl())
+				(new CUrl('host_discovery.php'))
 					->setArgument('form', 'create')
+					->setArgument('hostid', $data['hostid'])
 					->getUrl()
 			))
 		))->setAttribute('aria-label', _('Content controls'))

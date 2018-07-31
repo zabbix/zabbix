@@ -123,18 +123,20 @@ function getFontComboBox($name) {
 							MAP_LABEL_LOC_TOP => _('Top')
 						])
 					)
-					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup'))->setAsteriskMark(),
+					->addRow((new CLabel(_('Host group'), 'elementNameHostGroup_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHostGroup',
-							'objectName' => 'hostGroup'
+							'object_name' => 'hostGroup',
+							'multiple' => false
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
-					->addRow((new CLabel(_('Host'), 'elementNameHost'))->setAsteriskMark(),
+					->addRow((new CLabel(_('Host'), 'elementNameHost_ms'))->setAsteriskMark(),
 						(new CMultiSelect([
 							'name' => 'elementNameHost',
-							'objectName' => 'hosts'
+							'object_name' => 'hosts',
+							'multiple' => false
 						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostSelectRow'
@@ -150,26 +152,22 @@ function getFontComboBox($name) {
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 					], 'triggerListRow')
-					->addRow(_('New triggers'),
+					->addRow((new CLabel(_('New triggers'), 'elementNameTriggers_ms')),
 						(new CDiv([
 							new CVar('elementExpressionTrigger', ''),
 							(new CMultiSelect([
 								'name' => 'elementNameTriggers',
-								'objectName' => 'triggers',
-								'objectOptions' => [
-									'editable' => true,
-									'real_hosts' => true
-								],
+								'object_name' => 'triggers',
 								'popup' => [
 									'parameters' => [
-										'dstfrm' => 'selementForm',
-										'dstfld1' => 'elementNameTriggers',
 										'srctbl' => 'triggers',
 										'srcfld1' => 'triggerid',
-										'with_triggers' => '1',
-										'real_hosts' => '1',
-										'multiselect' => '1',
-										'noempty' => '1'
+										'dstfrm' => 'selementForm',
+										'dstfld1' => 'elementNameTriggers',
+										'with_triggers' => true,
+										'editable' => true,
+										'noempty' => true,
+										'real_hosts' => true
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
