@@ -5435,8 +5435,8 @@ svg {
 }
 
 .overrides-list {
-	padding: 0px 35px 10px 0px;
-	width: calc(100% - 35px);
+	display: flex;
+	flex-direction: column;
 
 	.overrides-list-item {
 		border-bottom: 1px solid $table-border-color;
@@ -5448,7 +5448,7 @@ svg {
 
 .overrides-options-list {
 	white-space: normal;
-	padding: 10px 0px;
+	padding: 0px 0px 10px;
 
 	> li {
 		display: inline-block;

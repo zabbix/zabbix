@@ -75,60 +75,71 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
 
-				(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
-					->setAttribute('placeholder', _('(hosts pattern)'))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->addClass(ZBX_STYLE_PATTERNSELECT),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton(null, _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('return PopUp("popup.generic", '.
-						CJs::encodeJson([
-							'srctbl' => 'hosts',
-							'srcfld1' => 'host',
-							'reference' => 'name',
-							'dstfrm' => $options['form_name'],
-							'dstfld1' => $fn.'['.$options['row_num'].'][hosts]'
-						]).', null, this);'
-					),
+				(new CDiv([
+					(new CDiv([
+						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
+							->setAttribute('placeholder', _('(hosts pattern)'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->addClass(ZBX_STYLE_PATTERNSELECT),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('return PopUp("popup.generic", '.
+								CJs::encodeJson([
+									'srctbl' => 'hosts',
+									'srcfld1' => 'host',
+									'reference' => 'name',
+									'multiselect' => 1,
+									'dstfrm' => $options['form_name'],
+									'dstfld1' => $fn.'['.$options['row_num'].'][hosts]'
+								]).', null, this);'
+							)
+					]))
+						->addClass(ZBX_STYLE_COLUMN_50),
 
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CDiv([
+						(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
+							->setAttribute('placeholder', _('(items pattern)'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->addClass(ZBX_STYLE_PATTERNSELECT),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('return PopUp("popup.generic", '.
+								CJs::encodeJson([
+									'srctbl' => 'items',
+									'srcfld1' => 'itemid',
+									'reference' => 'name_expanded',
+									'multiselect' => 1,
+									'dstfrm' => $options['form_name'],
+									'dstfld1' => $fn.'['.$options['row_num'].'][items]'
+								]).', null, this);'
+							)
+					]))
+						->addClass(ZBX_STYLE_COLUMN_50)
+				]))
+					->addClass(ZBX_STYLE_COLUMN_95)
+					->addClass(ZBX_STYLE_COLUMNS),
 
-				(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
-					->setAttribute('placeholder', _('(items pattern)'))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->addClass(ZBX_STYLE_PATTERNSELECT),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton(null, _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('return PopUp("popup.generic", '.
-						CJs::encodeJson([
-							'srctbl' => 'items',
-							'srcfld1' => 'itemid',
-							'reference' => 'name_expanded',
-							'dstfrm' => $options['form_name'],
-							'dstfld1' => $fn.'['.$options['row_num'].'][items]'
-						]).', null, this);'
-					),
-
-				(new CButton())
-					->setAttribute('title', _('Delete'))
-					->addClass(ZBX_STYLE_BTN_TRASH)
-					->addStyle('position: absolute; right: -30px; margin-top: 1px;')
+				(new CDiv(
+					(new CButton())
+						->setAttribute('title', _('Delete'))
+						->addClass(ZBX_STYLE_BTN_TRASH)
+				))
+					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
-				->addStyle('position: relative;'),
+				->addClass(ZBX_STYLE_COLUMNS),
 
 			// Configuration configuration options.
-			(new CDiv([
-				(new CList($overrides_options_list))
-					->addItem((new CButton(null, (new CSpan())
-								->addClass(ZBX_STYLE_PLUS_ICON)
-								->addStyle('margin-right: 0px;')
-						))
-							->setAttribute('data-row', $options['row_num'])
-							->addClass(ZBX_STYLE_BTN_ALT))
-					->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
-			]))
+			(new CList($overrides_options_list))
+				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
+				->addItem((new CButton(null, (new CSpan())
+							->addClass(ZBX_STYLE_PLUS_ICON)
+							->addStyle('margin-right: 0px;')
+					))
+						->setAttribute('data-row', $options['row_num'])
+						->addClass(ZBX_STYLE_BTN_ALT)
+				)
 		];
 	}
 

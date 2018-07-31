@@ -3792,8 +3792,8 @@ svg {
     margin-left: 10px;
     left: -15px; } }
 .overrides-list {
-  padding: 0px 35px 10px 0px;
-  width: calc(100% - 35px); }
+  display: flex;
+  flex-direction: column; }
   .overrides-list .overrides-list-item {
     border-bottom: 1px solid #383838;
     margin-bottom: 10px;
@@ -3802,7 +3802,7 @@ svg {
 
 .overrides-options-list {
   white-space: normal;
-  padding: 10px 0px; }
+  padding: 0px 0px 10px; }
   .overrides-options-list > li {
     display: inline-block;
     margin: 2px 7px 2px 0;
