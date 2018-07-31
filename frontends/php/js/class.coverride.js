@@ -90,7 +90,7 @@ jQuery(function ($) {
 			}
 		};
 
-		var getMenuPopupItems = function($obj, tree, trigger_elm) {
+		var getMenuPopupItems = function($obj, tree, trigger_elmnt) {
 			var items = [],
 				data,
 				item;
@@ -103,14 +103,14 @@ jQuery(function ($) {
 						item = {label: name};
 
 						if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-							item.items = getMenuPopupItems($obj, data.items, trigger_elm);
+							item.items = getMenuPopupItems($obj, data.items, trigger_elmnt);
 						}
 
 						if (typeof data.data !== 'undefined') {
 							item.data = data.data;
 
 							item.clickCallback = function(e) {
-								$(this).closest('.action-menu-top').menuPopup('close', null, false);
+								$(this).closest('.action-menu-top').menuPopup('close', null, true);
 
 								var args = [$obj];
 								$(this).data('args').each(function(a) {args.push(a)});
