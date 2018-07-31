@@ -301,8 +301,6 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_event_suppress_query_t	*query;
-
 			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 			ZBX_STR2UINT64(query->eventid, row[0]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
