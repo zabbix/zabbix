@@ -191,5 +191,10 @@ $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input", updateGra
 return [
 	'form' => $form,
 	'scripts' => $scripts,
+	'js_includes' => [
+		'js/class.coverride.js',
+		'js/class.cverticalaccordion.js',
+		'js/class.crangecontrol.js'
+	],
 	'jq_templates' => $jq_templates
 ];
