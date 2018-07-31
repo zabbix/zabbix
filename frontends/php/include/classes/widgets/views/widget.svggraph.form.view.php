@@ -81,8 +81,10 @@ $scripts[] =
 			'data: data,'.
 			'dataType: "json",'.
 			'success: function(r) {'.
-				'jQuery("#svg-grapg-preview").html(jQuery(r.body));'.
-				'jQuery("#svg-grapg-preview > svg").attr("unselectable", "on").css("user-select", "none");'.
+				'if (typeof r.body !== "undefined" && typeof r.errors === "undefined") {'.
+					'jQuery("#svg-grapg-preview").html(jQuery(r.body));'.
+					'jQuery("#svg-grapg-preview > svg").attr("unselectable", "on").css("user-select", "none");'.
+				'}'.
 			'}'.
 		'})'.
 	'}'.
@@ -148,7 +150,9 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_item_problems']),
 		CWidgetHelper::getCheckBox($fields['graph_item_problems'])
 	)
-	->addRow(CWidgetHelper::getLabel($fields['problem_hosts']), CWidgetHelper::getTextBox($fields['problem_hosts']))
+	->addRow(CWidgetHelper::getLabel($fields['problem_hosts']),
+		CWidgetHelper::getHostsPatternTextBox($fields['problem_hosts'], $form_name)
+	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
 		CWidgetHelper::getSeverities($fields['severities'], $data['config'])
 	)

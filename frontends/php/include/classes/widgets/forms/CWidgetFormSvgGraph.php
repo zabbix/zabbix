@@ -259,7 +259,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setDefault(SVG_GRAPH_PROBLEMS_SHOW)
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
-				'jQuery("#graph_item_problems, #problem_hosts, #problem_name").prop("disabled", !on);'.
+				'jQuery("#graph_item_problems, #problem_hosts, #problem_name, #problem_hosts_select")'.
+					'.prop("disabled", !on);'.
 				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
 				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
 				'jQuery("input, button", jQuery("#tags_table_tags")).prop("disabled", !on);'
@@ -281,8 +282,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_problems->getName()] = $field_problems;
 
 		// Problem hosts.
-		$field_problem_hosts = (new CWidgetFieldTextBox('problem_hosts', _('Hosts')))
-			->setAttribute('placeholder', _('(pattern)'));
+		$field_problem_hosts = (new CWidgetFieldTextBox('problem_hosts', _('Hosts')));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -304,7 +304,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Problem name input-text field.
 		$field_problem_name = (new CWidgetFieldTextBox('problem_name', _('Problem')))
-			->setAttribute('placeholder', _('(pattern)'));
+			->setAttribute('placeholder', _('(problem pattern)'));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_name->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -349,5 +349,26 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 
 		$this->fields[$overrides->getName()] = $overrides;
+	}
+
+	/**
+	 * Validate form fields.
+	 *
+	 * @param bool $strict  Enables more strict validation of the form fields.
+	 *                      Must be enabled for validation of input parameters in the widget configuration form.
+	 *
+	 * @return bool
+	 */
+	public function validate($strict = false) {
+		$errors = parent::validate($strict);
+
+		// Test graph custom time period.
+		if ($this->fields['graph_time']->getValue() == SVG_GRAPH_CUSTOM_TIME) {
+			$from = $this->fields['time_from']->getValue();
+			$to = $this->fields['time_to']->getValue();
+			$errors = zbx_array_merge($errors, CWidgetFieldDatePicker::validateTimeSelectorPeriod($from, $to));
+		}
+
+		return $errors;
 	}
 }

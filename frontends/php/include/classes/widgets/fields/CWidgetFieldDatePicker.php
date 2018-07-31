@@ -60,4 +60,40 @@ class CWidgetFieldDatePicker extends CWidgetField {
 					'return false;'.
 				'})';
 	}
+
+	/**
+	 * Validate "from" and "to" parameters for allowed period.
+	 *
+	 * @param string|null from
+	 * @param string|null to
+	 */
+	static function validateTimeSelectorPeriod($from, $to) {
+		if ($from === null || $to == null) {
+			return;
+		}
+
+		$errors = [];
+		$ts = [];
+		$range_time_parser = new CRangeTimeParser();
+
+		foreach (['from' => $from, 'to' => $to] as $field => $value) {
+			$range_time_parser->parse($value);
+			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		}
+
+		$period = $ts['to'] - $ts['from'] + 1;
+
+		if ($period < ZBX_MIN_PERIOD) {
+			$errors[] = _n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+			);
+		}
+		elseif ($period > ZBX_MAX_PERIOD) {
+			$errors[] = _n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+			);
+		}
+
+		return $errors;
+	}
 }

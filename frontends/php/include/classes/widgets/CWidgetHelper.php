@@ -114,7 +114,6 @@ class CWidgetHelper {
 	 */
 	public static function getTextBox($field) {
 		$text_box = (new CTextBox($field->getName(), $field->getValue()))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
 
@@ -130,6 +129,36 @@ class CWidgetHelper {
 		}
 
 		return $text_box;
+	}
+
+	/**
+	 * @param CWidgetFieldTextBox
+	 *
+	 * @return CTextBox
+	 */
+	public static function getHostsPatternTextBox($field, $form_name) {
+		return [
+			(new CTextBox($field->getName(), $field->getValue()))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAriaRequired(self::isAriaRequired($field))
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+				->setAttribute('placeholder', _('(hosts pattern)'))
+				->addClass(ZBX_STYLE_PATTERNSELECT),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton($field->getName().'_select', _('Select')))
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic", '.
+					CJs::encodeJson([
+						'srctbl' => 'hosts',
+						'srcfld1' => 'host',
+						'reference' => 'name',
+						'multiselect' => 1,
+						'dstfrm' => $form_name,
+						'dstfld1' => $field->getName()
+					]).', null, this);'
+				)
+		];
 	}
 
 	/**
