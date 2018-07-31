@@ -538,6 +538,11 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
+	/**
+	 * Return array of horizontal labels with positions. Array key will be position, value will be label.
+	 *
+	 * @return array
+	 */
 	public function getTimeGridWithPosition() {
 		$formats = [
 			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
@@ -567,8 +572,9 @@ class CSvgGraph extends CSvg {
 		$grid_values = [];
 
 		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
-			$grid_values[date($time_fmt, $clock)] = $this->canvas_x + $this->canvas_width - $this->canvas_width
-				* ($this->time_till - $clock) / ($this->time_till - $this->time_from);
+			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock)
+				/ ($this->time_till - $this->time_from));
+			$grid_values[$relative_pos] = date($time_fmt, $clock);
 		}
 
 		return $grid_values;
