@@ -269,26 +269,26 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
 		char	logeventid[16];
-		int 	rret;
+		int	regexp_ret;
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
 
-		if (FAIL == (rret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
+		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
 				__function_name);
 		}
 		else
 		{
-			if (ZBX_REGEXP_MATCH == rret)
+			if (ZBX_REGEXP_MATCH == regexp_ret)
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-			else if (ZBX_REGEXP_NO_MATCH == rret)
+			else if (ZBX_REGEXP_NO_MATCH == regexp_ret)
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-
-			zbx_history_record_clear(&vc_value, item->value_type);
 
 			ret = SUCCEED;
 		}
+
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
@@ -1483,7 +1483,7 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 	if (0 < values.values_num)
 	{
 		history_value_t		result;
-		int 			index_min = 0, index_max = 0;
+		int			index_min = 0, index_max = 0;
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -1841,12 +1841,12 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			break;
 		case ZBX_FUNC_REGEXP:
 		{
-			switch(regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE))
+			switch (regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE))
 			{
-			case ZBX_REGEXP_MATCH:
-				return SUCCEED;
-			case ZBX_REGEXP_NO_MATCH:
-				return FAIL;
+				case ZBX_REGEXP_MATCH:
+					return SUCCEED;
+				case ZBX_REGEXP_NO_MATCH:
+					return FAIL;
 			}
 
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
@@ -1855,12 +1855,12 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 		}
 		case ZBX_FUNC_IREGEXP:
 		{
-			switch(regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
+			switch (regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
 			{
-			case ZBX_REGEXP_MATCH:
-				return SUCCEED;
-			case ZBX_REGEXP_NO_MATCH:
-				return FAIL;
+				case ZBX_REGEXP_MATCH:
+					return SUCCEED;
+				case ZBX_REGEXP_NO_MATCH:
+					return FAIL;
 			}
 
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
