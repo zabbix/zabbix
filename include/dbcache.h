@@ -788,7 +788,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	last_valueid;
 	const char	*token;
-	int		lastaccess;
+	time_t		lastaccess;
 }
 zbx_data_session_t;
 

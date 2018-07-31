@@ -11503,7 +11503,7 @@ const char	*zbx_dc_get_session_token(void)
 zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token)
 {
 	zbx_data_session_t	*session, session_local;
-	int			now;
+	time_t			now;
 
 	now = time(NULL);
 	session_local.hostid = hostid;
@@ -11540,7 +11540,7 @@ void	zbx_dc_cleanup_data_sessions(void)
 {
 	zbx_data_session_t	*session;
 	zbx_hashset_iter_t	iter;
-	int			now;
+	time_t			now;
 
 	now = time(NULL);
 
