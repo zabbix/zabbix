@@ -57,7 +57,7 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select maintenanceid from maintenances where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,
 			maintenanceids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid " ZBX_FOR_UPDATE);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid" ZBX_FOR_UPDATE);
 
 	result = DBselect("%s", sql);
 	zbx_free(sql);
