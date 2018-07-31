@@ -103,6 +103,7 @@ require_once dirname(__FILE__).'/testFormWebStep.php';
 require_once dirname(__FILE__).'/testFormApplication.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+require_once dirname(__FILE__).'/testInheritanceApplication.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
@@ -211,6 +212,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApplication');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
+		$suite->addTestSuite('testInheritanceApplication');
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceGraph');
