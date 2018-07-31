@@ -512,7 +512,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			/* don't process recovered events as their suppress data will be removed anyway */
-			if (0 == query->r_eventid)
+			if (0 != query->r_eventid)
 				continue;
 
 			k = 0;
