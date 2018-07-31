@@ -275,8 +275,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 
 		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
-				__function_name);
+			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
 		}
 		else
 		{
