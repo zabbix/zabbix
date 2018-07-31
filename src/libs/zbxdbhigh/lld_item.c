@@ -1248,8 +1248,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN], *err_dyn = NULL;
+	char		err[MAX_STRING_LEN];
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	const char*	regexp_err = NULL;
 
 	*err = '\0';
 
@@ -1274,10 +1275,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 
 			*output++ = '\0';
 
-			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &err_dyn)))
+			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &regexp_err)))
 			{
-				zbx_strlcpy(err, err_dyn, sizeof(err));
-				zbx_free(err_dyn);
+				zbx_strlcpy(err, regexp_err, sizeof(err));
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
