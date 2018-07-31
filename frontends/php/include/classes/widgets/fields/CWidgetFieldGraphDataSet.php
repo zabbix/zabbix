@@ -432,6 +432,14 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'if (typeof updateGraphPreview === "function") {'.
 						'updateGraphPreview();'.
 					'}'.
+					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
+						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
+						'jQuery("#data_sets").sortable("enable");'.
+					'}'.
+					'else {'.
+						'jQuery("#data_sets .drag-icon").addClass("disabled");'.
+						'jQuery("#data_sets").sortable("disable");'.
+					'}'.
 				'});',
 
 			// Intialize vertical accordion.
@@ -441,6 +449,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'jQuery(".range-control").rangeControl();',
 
 			// Initialize sortability.
+			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
+				'jQuery("#data_sets .drag-icon").addClass("disabled");'.
+			'}'.
 			'jQuery("#data_sets").sortable({'.
 				'items: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 				'containment: "parent",'.
@@ -449,6 +460,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
+				'disabled: function() {'.
+					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
+				'},'.
 				'update: function() {'.
 					'jQuery("input[type=hidden]", jQuery("#data_sets")).filter(function() {'.
 						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.

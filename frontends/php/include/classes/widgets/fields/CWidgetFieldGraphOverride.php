@@ -353,7 +353,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'makeName: function(option) {return "'.$this->getName().'["+this.rowId+"]["+option+"]";},'.
 					'makeOption: function(name) {'.
 						'return name.match(/.*\[('.implode('|', $this->getOverrideOptions()).')\]/)[1];},'.
-					'onChange: updateGraphPreview,'.
+					'onUpdate: updateGraphPreview,'.
 					'menu: '.CJs::encodeJson($this->getOverrideMenu()).
 				'});'.
 			'}',
@@ -380,12 +380,23 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'if (typeof updateGraphPreview === "function") {'.
 						'updateGraphPreview();'.
 					'}'.
+					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
+						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
+						'jQuery("#overrides").sortable("enable");'.
+					'}'.
+					'else {'.
+						'jQuery("#overrides .drag-icon").addClass("disabled");'.
+						'jQuery("#overrides").sortable("disable");'.
+					'}'.
 				'});',
 
 			// Initialize overrides UI control.
 			'initializeOverrides();',
 
 			// Make overrides sortable.
+			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.
+				'jQuery("#overrides .drag-icon").addClass("disabled");'.
+			'}'.
 			'jQuery("#overrides").sortable({'.
 				'items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 				'containment: "parent",'.
@@ -394,6 +405,9 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
+				'disabled: function() {'.
+					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
+				'},'.
 				'update: function() {'.
 					'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
 						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
@@ -415,8 +429,15 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	public function getTemplate($form_name) {
 		return (new CListItem(
 			$this->getFieldLayout(
-				['hosts' => '', 'items' => ''],
-				['row_num' => '#{rowNum}', 'order_num' => '#{orderNum}', 'form_name' => $form_name]
+				[
+					'hosts' => '',
+					'items' => ''
+				],
+				[
+					'row_num' => '#{rowNum}',
+					'order_num' => '#{orderNum}',
+					'form_name' => $form_name
+				]
 			)
 		))
 			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
