@@ -313,6 +313,8 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			zbx_vector_uint64_append(triggerids, triggerid);
 		}
 		DBfree_result(result);
+
+		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
 	zbx_vector_uint64_destroy(&eventids);
