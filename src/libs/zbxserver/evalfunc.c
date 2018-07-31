@@ -1820,8 +1820,9 @@ out:
  * Parameters: item - item (performance metric)                               *
  *             parameters - <string>[,seconds]                                *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
+ * Return value: SUCCEED - evaluated successfully, result stored in 'value'   *
+ *               FAIL - failed to match the regular expression                *
+ *               NOTSUPPORTED - invalid regular expression                    *
  *                                                                            *
  ******************************************************************************/
 
@@ -1846,9 +1847,9 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
-					return NOTSUPPORTED;
-				default:
 					return FAIL;
+				default:
+					return NOTSUPPORTED;
 			}
 		}
 		case ZBX_FUNC_IREGEXP:
@@ -1858,9 +1859,9 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
-					return NOTSUPPORTED;
-				default:
 					return FAIL;
+				default:
+					return NOTSUPPORTED;
 			}
 		}
 	}
@@ -1955,6 +1956,10 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 				}
 				else if (FAIL == str_one_ret)
 				{
+					continue;
+				}
+				else /* NOTSUPPORTED */
+				{
 					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
 					goto out;
 				}
@@ -1971,6 +1976,10 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 					break;
 				}
 				else if (FAIL == str_one_ret)
+				{
+					continue;
+				}
+				else /* NOTSUPPORTED */
 				{
 					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
 					goto out;
