@@ -464,6 +464,29 @@ class CSvgGraph extends CSvg {
 		return $res;
 	}
 
+	public function getValuesGridWithPosition($side = null) {
+		if ($side === 'right') {
+			$min_value = $this->right_y_min;
+			$max_value = $this->right_y_max;
+		}
+		elseif ($side !== 'left') {
+			$min_value = $this->left_y_min;
+			$max_value = $this->left_y_max;
+		}
+		else {
+			return false;
+		}
+
+		$grid = $this->getValueGrid($min_value, $max_value);
+		$grid_values = [];
+
+		foreach ($grid as $value) {
+			$grid_values[$value] = $this->canvas_height - $this->canvas_height * ($max_value - $value) / ($max_value - $min_value ? : 1);
+		}
+
+		return $grid_values;
+	}
+
 	private function drawValueGrid($side = null, $add_desc = true) {
 		if ($side !== 'right' && $side !== 'left') {
 			return;
@@ -513,6 +536,42 @@ class CSvgGraph extends CSvg {
 
 			$this->addItem($grid_line);
 		}
+	}
+
+	public function getTimeGridWithPosition() {
+		$formats = [
+			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
+			['sec' => 60,	'step' => 30,	'time_fmt' => 'H:i:s'],
+			['sec' => 180,	'step' => 120,	'time_fmt' => 'H:i'],
+			['sec' => 600,	'step' => 300,	'time_fmt' => 'H:i'],
+			['sec' => 1800,	'step' => 600,	'time_fmt' => 'H:i'],
+			['sec' => 3600,	'step' => 1200,	'time_fmt' => 'H:i'],
+			['sec' => 7200,	'step' => 3600,	'time_fmt' => 'H:i'],
+			['sec' => 14400,'step' => 7200,	'time_fmt' => 'H:i'],
+		];
+
+		$step = 6 * 30 * 24 * 3600;
+		$time_fmt = 'Y-n';
+
+		$sec_per_100pix = (int) (($this->time_till - $this->time_from) / $this->canvas_width * 100);
+
+		foreach ($formats as $f) {
+			if ($sec_per_100pix < $f['sec']) {
+				$step = $f['step'];
+				$time_fmt = $f['time_fmt'];
+				break;
+			}
+		}
+
+		$start = $this->time_from + $step - $this->time_from % $step;
+		$grid_values = [];
+
+		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
+			$grid_values[date($time_fmt, $clock)] = $this->canvas_x + $this->canvas_width - $this->canvas_width
+				* ($this->time_till - $clock) / ($this->time_till - $this->time_from);
+		}
+
+		return $grid_values;
 	}
 
 	private function drawTimeGrid($add_desc = true) {
