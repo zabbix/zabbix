@@ -21,16 +21,39 @@
 
 class CSvgPath extends CSvgTag {
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
+	protected $directions;
 
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
-		}
+	public function __construct($directions = '') {
+		parent::__construct('path');
 
-		$this->setAttribute('points', trim($p));
+		$this->setDirections($directions);
+	}
+
+	public function setDirections($directions) {
+		$this->directions = $directions;
+	}
+
+	public function moveTo($x, $y) {
+		$this->directions .= ' M'.round($x).','.round($y);
 
 		return $this;
+	}
+
+	public function lineTo($x, $y) {
+		$this->directions .= ' L'.round($x).','.round($y);
+
+		return $this;
+	}
+
+	public function closePath() {
+		$this->directions .= ' Z';
+
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->setAttribute('d', trim($this->directions));
+
+		return parent::toString($destroy);
 	}
 }
