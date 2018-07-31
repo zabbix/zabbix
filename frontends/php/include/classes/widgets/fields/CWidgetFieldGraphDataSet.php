@@ -146,101 +146,109 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				->addClass(ZBX_STYLE_COLUMNS),
 
 			// Accordion body - data set configuration options.
-			(new CDiv([
-				// Left column fields.
-				(new CFormList())
-					->addRow(_('Base color'),
-						// Replaced to simple input field, because we don't have usable color picker now.
-						(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 6))
-						//(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
-						//	->appendColorPickerJs(false)
-					)
-					->addRow(_('Draw'),
-						(new CRadioButtonList($fn.'['.$options['row_num'].'][type]', (int) $value['type']))
-							->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
-							->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
-							->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
-							->onChange(
-								'var row_num = this.id.replace("'.$fn.'_","").replace("_type","");'.
-								'switch (jQuery(":checked", jQuery(this)).val()) {'.
-									'case "'.SVG_GRAPH_TYPE_LINE.'":'.
-										'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").show();'.
-										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
-										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
-										'break;'.
-									'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-										//'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
-										'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").hide();'.
-										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("enable");'.
-										'break;'.
-									'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
-										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
-										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
-										'break;'.
-								'}'
+			(new CDiv(
+				(new CDiv([
+					// Left column fields.
+					(new CDiv(
+						(new CFormList())
+							->addRow(_('Base color'),
+								// Replaced to simple input field, because we don't have usable color picker now.
+								(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 6))
+								//(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
+								//	->appendColorPickerJs(false)
 							)
-							->setModern(true)
+							->addRow(_('Draw'),
+								(new CRadioButtonList($fn.'['.$options['row_num'].'][type]', (int) $value['type']))
+									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
+									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
+									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
+									->onChange(
+										'var row_num = this.id.replace("'.$fn.'_","").replace("_type","");'.
+										'switch (jQuery(":checked", jQuery(this)).val()) {'.
+											'case "'.SVG_GRAPH_TYPE_LINE.'":'.
+												'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").show();'.
+												'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
+												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
+												'break;'.
+											'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
+												//'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
+												'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").hide();'.
+												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("enable");'.
+												'break;'.
+											'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
+												'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
+												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
+												'break;'.
+										'}'
+									)
+									->setModern(true)
+							)
+							->addRow(_('Width'),
+								(new CRangeControl($fn.'['.$options['row_num'].'][width]', (int) $value['width']))
+									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->addClass('range-control')
+									->setAttribute('maxlength', 2)
+									->setStep(1)
+									->setMin(0)
+									->setMax(10)
+							)
+							->addRow(_('Radius'),
+								(new CRangeControl($fn.'['.$options['row_num'].'][radius]', (int) $value['radius']))
+									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
+									->addClass('range-control')
+									->setAttribute('maxlength', 2)
+									->setStep(1)
+									->setMin(1)
+									->setMax(10)
+							)
+							->addRow(_('Transparency'),
+								(new CRangeControl($fn.'['.$options['row_num'].'][transparency]', (int) $value['transparency']))
+									->addClass('range-control')
+									->setAttribute('maxlength', 2)
+									->setStep(1)
+									->setMin(0)
+									->setMax(10)
+							)
+							->addRow(_('Fill'),
+								(new CRangeControl($fn.'['.$options['row_num'].'][fill]', (int) $value['fill']))
+									->addClass('range-control')
+									->setAttribute('maxlength', 2)
+									->setStep(1)
+									->setMin(0)
+									->setMax(10)
+							)
+						)
 					)
-					->addRow(_('Width'),
-						(new CRangeControl($fn.'['.$options['row_num'].'][width]', (int) $value['width']))
-							->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-							->addClass('range-control')
-							->setAttribute('maxlength', 2)
-							->setStep(1)
-							->setMin(0)
-							->setMax(10)
-					)
-					->addRow(_('Radius'),
-						(new CRangeControl($fn.'['.$options['row_num'].'][radius]', (int) $value['radius']))
-							->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-							->addClass('range-control')
-							->setAttribute('maxlength', 2)
-							->setStep(1)
-							->setMin(1)
-							->setMax(10)
-					)
-					->addRow(_('Transparency'),
-						(new CRangeControl($fn.'['.$options['row_num'].'][transparency]', (int) $value['transparency']))
-							->addClass('range-control')
-							->setAttribute('maxlength', 2)
-							->setStep(1)
-							->setMin(0)
-							->setMax(10)
-					)
-					->addRow(_('Fill'),
-						(new CRangeControl($fn.'['.$options['row_num'].'][fill]', (int) $value['fill']))
-							->addClass('range-control')
-							->setAttribute('maxlength', 2)
-							->setStep(1)
-							->setMin(0)
-							->setMax(10)
-					)
-					->addClass(ZBX_STYLE_COLUMN_50),
+						->addClass(ZBX_STYLE_COLUMN_50),
 
-				// Right column fields.
-				(new CFormList())
-					->addRow(_('Missing data'),
-						(new CRadioButtonList($fn.'['.$options['row_num'].'][missingdatafunc]', (int) $value['missingdatafunc']))
-							->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
-							->addValue(_x('Connected', 'missing data function'), SVG_GRAPH_MISSING_DATA_CONNECTED)
-							->addValue(_x('Threat as 0', 'missing data function'), SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO)
-							->setModern(true)
-					)
-					->addRow(_('Y-axis'),
-						(new CRadioButtonList($fn.'['.$options['row_num'].'][axisy]', (int) $value['axisy']))
-							->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
-							->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
-							->setModern(true)
-					)
-					->addRow(_('Time shift'),
-						(new CTextBox($fn.'['.$options['row_num'].'][timeshift]', $value['timeshift']))
-							->setAttribute('placeholder', _('(none)'))
-							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					)
-					->addClass(ZBX_STYLE_COLUMN_50)
-			]))
+					// Right column fields.
+					(new CDiv(
+						(new CFormList())
+							->addRow(_('Missing data'),
+								(new CRadioButtonList($fn.'['.$options['row_num'].'][missingdatafunc]', (int) $value['missingdatafunc']))
+									->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
+									->addValue(_x('Connected', 'missing data function'), SVG_GRAPH_MISSING_DATA_CONNECTED)
+									->addValue(_x('Threat as 0', 'missing data function'), SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO)
+									->setModern(true)
+							)
+							->addRow(_('Y-axis'),
+								(new CRadioButtonList($fn.'['.$options['row_num'].'][axisy]', (int) $value['axisy']))
+									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
+									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
+									->setModern(true)
+							)
+							->addRow(_('Time shift'),
+								(new CTextBox($fn.'['.$options['row_num'].'][timeshift]', $value['timeshift']))
+									->setAttribute('placeholder', _('(none)'))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+					))
+						->addClass(ZBX_STYLE_COLUMN_50),
+				]))
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMN_95)
+			))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
-				->addClass(ZBX_STYLE_COLUMN_90)
 				->addClass(ZBX_STYLE_COLUMNS)
 		];
 	}
