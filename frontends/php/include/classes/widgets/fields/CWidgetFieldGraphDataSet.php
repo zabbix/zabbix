@@ -164,11 +164,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 								'var row_num = this.id.replace("'.$fn.'_","").replace("_type","");'.
 								'switch (jQuery(":checked", jQuery(this)).val()) {'.
 									'case "'.SVG_GRAPH_TYPE_LINE.'":'.
+										'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").show();'.
 										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
 										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
 										'break;'.
 									'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-										'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
+										//'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
+										'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").hide();'.
 										'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("enable");'.
 										'break;'.
 									'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
