@@ -1846,12 +1846,10 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
+					return NOTSUPPORTED;
+				default:
 					return FAIL;
 			}
-
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
-					__function_name);
-			return FAIL;
 		}
 		case ZBX_FUNC_IREGEXP:
 		{
@@ -1860,12 +1858,10 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
+					return NOTSUPPORTED;
+				default:
 					return FAIL;
 			}
-
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid regular expression \"%s\" in %s()", arg1,
-					__function_name);
-			return FAIL;
 		}
 	}
 
@@ -1878,6 +1874,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	const char			*__function_name = "evaluate_STR";
 	char				*arg1 = NULL;
 	int				arg2 = 1, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0, nparams;
+	int				str_one_ret;
 	zbx_value_type_t		arg2_type = ZBX_VALUE_NVALUES;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
@@ -1950,11 +1947,16 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value,
-						arg1))
+				if (SUCCEED == (str_one_ret = evaluate_STR_one(func, &regexps,
+						values.values[i].value.log->value, arg1)))
 				{
 					found = 1;
 					break;
+				}
+				else if (FAIL == str_one_ret)
+				{
+					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+					goto out;
 				}
 			}
 		}
@@ -1962,10 +1964,16 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+				if (SUCCEED == (str_one_ret = evaluate_STR_one(func, &regexps,
+						values.values[i].value.str, arg1)))
 				{
 					found = 1;
 					break;
+				}
+				else if (FAIL == str_one_ret)
+				{
+					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+					goto out;
 				}
 			}
 		}
