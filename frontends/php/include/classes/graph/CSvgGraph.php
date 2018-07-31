@@ -469,7 +469,7 @@ class CSvgGraph extends CSvg {
 			$min_value = $this->right_y_min;
 			$max_value = $this->right_y_max;
 		}
-		elseif ($side !== 'left') {
+		elseif ($side === 'left') {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
 		}
@@ -479,9 +479,11 @@ class CSvgGraph extends CSvg {
 
 		$grid = $this->getValueGrid($min_value, $max_value);
 		$grid_values = [];
+		$delta = ($max_value - $min_value ? : 1);
 
 		foreach ($grid as $value) {
-			$grid_values[$value] = $this->canvas_height - $this->canvas_height * ($max_value - $value) / ($max_value - $min_value ? : 1);
+			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
+			$grid_values[$relative_pos] = $value;
 		}
 
 		return $grid_values;
