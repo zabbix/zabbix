@@ -20,6 +20,7 @@
 
 
 $this->includeJSfile('app/views/administration.authentication.edit.js.php');
+
 // Authentication general fields and HTTP authentication fields.
 $auth_tab = (new CFormList('list_auth'))
 	->addRow(new CLabel(_('Default authentication'), 'authentication_type'),

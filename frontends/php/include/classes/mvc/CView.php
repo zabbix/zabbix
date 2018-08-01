@@ -209,16 +209,20 @@ class CView {
 	}
 
 	/**
-	 * Get content of all included Java Script files
-	 * @return string empty string or content of included JS files
+	 * Get content of all included Java Script files.
+	 *
+	 * @return string  Empty string or content of included JS files.
 	 */
 	public function getIncludedJS() {
+		$data = $this->data;
 		ob_start();
+
 		foreach ($this->jsIncludeFiles as $filename) {
-			if((include $filename) === false) {
+			if ((include $filename) === false) {
 				throw new Exception(_s('Cannot include JS file "%s".', $filename));
 			}
 		}
+
 		return ob_get_clean();
 	}
 
