@@ -39,12 +39,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
+			'pointsize'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'fill'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO])],
+			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
 			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED]
 		]]);
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
@@ -64,7 +64,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'color' => $this->color_palete[0],
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'width' => 1,
-			'radius' => 3,
+			'pointsize' => 3,
 			'transparency' => 5,
 			'fill' => 3,
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
@@ -166,18 +166,16 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 										'var row_num = this.id.replace("'.$fn.'_","").replace("_type","");'.
 										'switch (jQuery(":checked", jQuery(this)).val()) {'.
 											'case "'.SVG_GRAPH_TYPE_LINE.'":'.
-												'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").show();'.
 												'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
-												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
+												'jQuery("[name=\"ds["+row_num+"][pointsize]\"]").rangeControl("disable");'.
 												'break;'.
 											'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-												//'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
-												'jQuery("[name=\"ds["+row_num+"][width]\"]").closest("li").hide();'.
-												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("enable");'.
+												'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("disable");'.
+												'jQuery("[name=\"ds["+row_num+"][pointsize]\"]").rangeControl("enable");'.
 												'break;'.
 											'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
 												'jQuery("[name=\"ds["+row_num+"][width]\"]").rangeControl("enable");'.
-												'jQuery("[name=\"ds["+row_num+"][radius]\"]").rangeControl("disable");'.
+												'jQuery("[name=\"ds["+row_num+"][pointsize]\"]").rangeControl("disable");'.
 												'break;'.
 										'}'
 									)
@@ -192,8 +190,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Radius'),
-								(new CRangeControl($fn.'['.$options['row_num'].'][radius]', (int) $value['radius']))
+							->addRow(_('Point size'),
+								(new CRangeControl($fn.'['.$options['row_num'].'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
 									->addClass('range-control')
 									->setAttribute('maxlength', 2)
@@ -228,7 +226,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 								(new CRadioButtonList($fn.'['.$options['row_num'].'][missingdatafunc]', (int) $value['missingdatafunc']))
 									->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
 									->addValue(_x('Connected', 'missing data function'), SVG_GRAPH_MISSING_DATA_CONNECTED)
-									->addValue(_x('Threat as 0', 'missing data function'), SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO)
+									->addValue(_x('Treat as 0', 'missing data function'), SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO)
 									->setModern(true)
 							)
 							->addRow(_('Y-axis'),
@@ -393,11 +391,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'value' => $val['width']
 				];
 			}
-			if (array_key_exists('radius', $val)) {
+			if (array_key_exists('pointsize', $val)) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.radius.'.$index,
-					'value' => $val['radius']
+					'name' => $this->name.'.pointsize.'.$index,
+					'value' => $val['pointsize']
 				];
 			}
 		}

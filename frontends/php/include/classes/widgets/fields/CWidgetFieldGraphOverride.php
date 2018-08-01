@@ -38,18 +38,18 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'radius'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
+			'pointsize'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'fill'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 255],
-			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO])],
+			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
 			'order'				=> ['type' => API_INT32],
 		]]);
 		$this->setDefault([]);
 
 		$this->override_options =
-			['color', 'width', 'type', 'transparency', 'fill', 'radius', 'missingdatafunc', 'axisy', 'timeshift'];
+			['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
 	}
 
 	public function getFieldLayout($value, $options) {
@@ -259,11 +259,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'type'.SVG_GRAPH_TYPE_STAIRCASE => _('Staircase'),
 			'transparency' => _('Transparency'),
 			'fill' => _('Fill'),
-			'radius' => _('Radius'),
+			'pointsize' => _('Point size'),
 			'missingdatafunc' => _('Missing data'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_NONE => _('None'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_CONNECTED => _x('Connected', 'missing data function'),
-			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO => _x('Threat as 0', 'missing data function'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO => _x('Treat as 0', 'missing data function'),
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
@@ -323,20 +323,20 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						['name' => _('Fill').'/9', 'callback' => 'addOverride', 'args' => ['fill', 9]],
 						['name' => _('Fill').'/10', 'callback' => 'addOverride', 'args' => ['fill', 10]],
 
-						['name' => _('Radius').'/1', 'callback' => 'addOverride', 'args' => ['radius', 1]],
-						['name' => _('Radius').'/2', 'callback' => 'addOverride', 'args' => ['radius', 2]],
-						['name' => _('Radius').'/3', 'callback' => 'addOverride', 'args' => ['radius', 3]],
-						['name' => _('Radius').'/4', 'callback' => 'addOverride', 'args' => ['radius', 4]],
-						['name' => _('Radius').'/5', 'callback' => 'addOverride', 'args' => ['radius', 5]],
-						['name' => _('Radius').'/6', 'callback' => 'addOverride', 'args' => ['radius', 6]],
-						['name' => _('Radius').'/7', 'callback' => 'addOverride', 'args' => ['radius', 7]],
-						['name' => _('Radius').'/8', 'callback' => 'addOverride', 'args' => ['radius', 8]],
-						['name' => _('Radius').'/9', 'callback' => 'addOverride', 'args' => ['radius', 9]],
-						['name' => _('Radius').'/10', 'callback' => 'addOverride', 'args' => ['radius', 10]],
+						['name' => _('Point size').'/1', 'callback' => 'addOverride', 'args' => ['pointsize', 1]],
+						['name' => _('Point size').'/2', 'callback' => 'addOverride', 'args' => ['pointsize', 2]],
+						['name' => _('Point size').'/3', 'callback' => 'addOverride', 'args' => ['pointsize', 3]],
+						['name' => _('Point size').'/4', 'callback' => 'addOverride', 'args' => ['pointsize', 4]],
+						['name' => _('Point size').'/5', 'callback' => 'addOverride', 'args' => ['pointsize', 5]],
+						['name' => _('Point size').'/6', 'callback' => 'addOverride', 'args' => ['pointsize', 6]],
+						['name' => _('Point size').'/7', 'callback' => 'addOverride', 'args' => ['pointsize', 7]],
+						['name' => _('Point size').'/8', 'callback' => 'addOverride', 'args' => ['pointsize', 8]],
+						['name' => _('Point size').'/9', 'callback' => 'addOverride', 'args' => ['pointsize', 9]],
+						['name' => _('Point size').'/10', 'callback' => 'addOverride', 'args' => ['pointsize', 10]],
 
 						['name' => _('Missing data').'/'._('None'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_NONE]],
 						['name' => _('Missing data').'/'._x('Connected', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_CONNECTED]],
-						['name' => _('Missing data').'/'._x('Threat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO]],
+						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO]],
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],

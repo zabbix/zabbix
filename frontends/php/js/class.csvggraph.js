@@ -109,7 +109,7 @@ jQuery(function ($) {
 		 * Writen in native javascript to make it faster. Each data set can have only one value at specific time. That's
 		 * why we need only maximum 1 value from each [data-set] group.
 		 *
-		 * Use point radius and line width as a tolerance to make matching area wider.
+		 * Use point size and line width as a tolerance to make matching area wider.
 		 */
 		var matching_x = [],
 			matching_xy = [],

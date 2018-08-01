@@ -640,10 +640,10 @@ class CSvgGraph extends CSvg {
 			->setAttribute('data-color', $metric['options']['color'])
 			->setFillColor($metric['options']['color'])
 			->setFillOpacity($metric['options']['transparency'] * 0.1)
-			->setAttribute('data-tolerance', $metric['options']['radius']);
+			->setAttribute('data-tolerance', $metric['options']['pointsize']);
 
 		foreach ($points as $point) {
-			$group->addItem((new CSvgCircle($point[0], $point[1], $metric['options']['radius'])));
+			$group->addItem((new CSvgCircle($point[0], $point[1], $metric['options']['pointsize'])));
 		}
 		$this->addItem($group);
 
@@ -813,7 +813,7 @@ class CSvgGraph extends CSvg {
 		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
 		$threshold = $points_distance ? $average_distance * 3 : 0;
 		$added_value = [
-			SVG_GRAPH_MISSING_DATA_THREAT_AS_ZERRO => 0,
+			SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO => 0,
 			SVG_GRAPH_MISSING_DATA_NONE => null
 		][$missingdatafunc];
 
