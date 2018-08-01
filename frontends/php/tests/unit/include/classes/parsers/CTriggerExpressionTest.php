@@ -3352,7 +3352,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
 				'value' => ')',
 				'data' => null,
-				'pos' => 91,
+				'pos' => 137,
 				'length' => 1
 			],
 		];
