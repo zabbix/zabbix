@@ -50,6 +50,12 @@ class CTriggerExpressionReplaceHostTest extends PHPUnit_Framework_TestCase {
 					' {Zabbix server:item.func()} or {host2:item2.func()}'
 			],
 			[
+				'{host:item.func()} or {{#M}.regsub("{host:item.func()}", "\1")}',
+				'host',
+				'Zabbix server',
+				'{Zabbix server:item.func()} or {{#M}.regsub("{host:item.func()}", "\1")}'
+			],
+			[
 				'5 + {Zabbix server:item.func()} <> 0 or {Zabbix server:item.func()} or {host2:item2.func()}',
 				'Zabbix server',
 				'host',
