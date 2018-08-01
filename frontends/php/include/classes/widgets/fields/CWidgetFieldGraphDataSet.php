@@ -88,7 +88,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
-						(new CDiv($options['letter_id']))
+						(new CDiv())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';'),
 						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
@@ -428,7 +428,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
-						'data.formulaId = num2letter(data.rowNum);'.
 						'data.color= function(num) {'.
 							'var palete = '.CJs::encodeJson($this->color_palete).';'.
 							'return palete[num % palete.length];'.
@@ -460,7 +459,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'});',
 
 			// Intialize vertical accordion.
-			'jQuery("#data_sets").zbx_vertical_accordion({handler: ".'.ZBX_STYLE_BTN_GEAR.'"});',
+			'jQuery("#data_sets").zbx_vertical_accordion({'.
+				'handler: ".'.ZBX_STYLE_BTN_GEAR.', .'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
+			'});',
 
 			// Initialize rangeControl UI elements.
 			'jQuery(".range-control").rangeControl();',
@@ -507,7 +508,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				), [
 					'row_num' => '#{rowNum}',
 					'order_num' => '#{orderNum}',
-					'letter_id' => '#{formulaId}',
 					'form_name' => $form_name,
 					'is_opened' => true
 				]

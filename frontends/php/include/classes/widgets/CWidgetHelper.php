@@ -500,7 +500,6 @@ class CWidgetHelper {
 			$options = [
 				'row_num' => $i,
 				'order_num' => $i + 1,
-				'letter_id' => num2letter($i),
 				'form_name' => $form_name,
 				'is_opened' => ($i == 0)
 			];

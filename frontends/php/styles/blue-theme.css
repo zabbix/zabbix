@@ -3814,7 +3814,8 @@ svg {
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-weight: bold; }
+  font-weight: bold;
+  cursor: pointer; }
 
 .list-vertical-accordion {
   display: flex;
