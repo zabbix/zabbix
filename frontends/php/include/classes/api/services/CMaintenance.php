@@ -816,8 +816,7 @@ class CMaintenance extends CApiService {
 				continue;
 			}
 
-			if (!array_key_exists('tags', $maintenance)
-					|| (array_key_exists('tags', $maintenance) && !$maintenance['tags'])) {
+			if (!array_key_exists('tags', $maintenance)) {
 				unset($maintenances[$mnum], $db_maintenances[$maintenanceid]);
 				continue;
 			}
@@ -831,8 +830,9 @@ class CMaintenance extends CApiService {
 				foreach ($db_maintenances[$maintenanceid]['tags'] as $db_tag_num => $db_tag) {
 					if ($tag['tag'] === $db_tag['tag'] && $tag['operator'] == $db_tag['operator']
 							&& $tag['value'] === $db_tag['value']) {
-						unset($maintenance['tags'][$tag_num], $db_maintenances[$maintenanceid]['tags'][$db_tag_num]);
-						continue 2;
+						unset($maintenances[$mnum]['tags'][$tag_num],
+							$db_maintenances[$maintenanceid]['tags'][$db_tag_num]
+						);
 					}
 				}
 			}
