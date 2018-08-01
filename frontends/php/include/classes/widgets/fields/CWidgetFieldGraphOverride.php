@@ -149,13 +149,13 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		// Sort data sets according order field.
 		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
 
+		// If no values specified, field should be deleted.
 		foreach ($this->value as $index => $val) {
-			/**
-			 * At least host or item pattern must be specified. If both are missed, field is deleted. If one is missed,
-			 * it's left now, but later in validate function it generates error message.
-			 */
-			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
-					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
+			$is_hosts_specified = (array_key_exists('hosts', $val) && $val['hosts'] !== '');
+			$is_items_specified = (array_key_exists('items', $val) && $val['items'] !== '');
+			$is_options_specified = (bool) array_intersect(array_keys($val), $this->override_options);
+
+			if (!$is_hosts_specified && !$is_items_specified && !$is_options_specified) {
 				unset($this->value[$index]);
 			}
 		}
