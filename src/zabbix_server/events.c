@@ -1856,9 +1856,7 @@ static void	remove_event_suppress_data(void)
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
-	{
 		zbx_vector_uint64_append(&eventids, recovery->eventid);
-	}
 
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
