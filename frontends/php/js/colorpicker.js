@@ -93,7 +93,7 @@
 			show: function(id, target) {
 				input = $('#' + id);
 
-				if (input.is(':disabled')) {
+				if (input.is(':disabled,[readonly]')) {
 					return;
 				}
 
