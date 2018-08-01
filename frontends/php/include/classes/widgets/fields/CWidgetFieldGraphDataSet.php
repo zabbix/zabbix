@@ -293,11 +293,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Hosts pattern'), _('Data set'),
 						_('cannot be empty')
 					);
+					break;
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
 					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Items pattern'), _('Data set'),
 						_('cannot be empty')
 					);
+					break;
 				}
 			}
 		}
@@ -310,6 +312,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Time shift'), _('Data set'),
 						_('a time unit is expected')
 					);
+					break;
 				}
 			}
 		}
@@ -322,6 +325,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				if (!array_key_exists('color', $val) || !$color_validator->validate($val['color'])) {
 					$errors[] = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).',
 						$val['color']);
+					break;
 				}
 			}
 		}

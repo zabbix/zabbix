@@ -175,11 +175,13 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Hosts pattern'),
 						_('Overrides'), _('cannot be empty')
 					);
+					break;
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
 					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Items pattern'),
 						_('Overrides'), _('cannot be empty')
 					);
+					break;
 				}
 			}
 		}
@@ -206,6 +208,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 				if ($options_set == 0) {
 					$errors[] = _s('Override options are not specified.');
+					break;
 				}
 			}
 		}
