@@ -65,9 +65,10 @@ function sysmapElementLabel($label = null) {
  * Get actions (data for popup menu) for map elements.
  *
  * @param array $sysmap
- * @param array $options                  Options used to retrieve actions.
- * @param int   $options['severity_min']  Minimal severity used.
- * @param int   $options['fullscreen']    Fullscreen flag.
+ * @param int   $sysmap['show_suppressed'] Whether suppressed problems are shown.
+ * @param array $options                   Options used to retrieve actions.
+ * @param int   $options['severity_min']   Minimal severity used.
+ * @param int   $options['fullscreen']     Fullscreen flag.
  *
  * @return array
  */
@@ -182,6 +183,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 				$gotos['inventory'] = ['hostid' => $host['hostid']];
 
 				$gotos['latestData'] = ['hostids' => [$host['hostid']]];
+
+				if ($sysmap['show_suppressed']) {
+					$gotos['show_suppressed'] = true;
+				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_MAP:
@@ -210,6 +215,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 						}
 					}
 				}
+
+				if ($sysmap['show_suppressed']) {
+					$gotos['show_suppressed'] = true;
+				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -220,6 +229,10 @@ function getActionsBySysmap($sysmap, array $options = []) {
 
 				// always show active trigger link for host group map elements
 				$gotos['showTriggers'] = array_key_exists($elem['elements'][0]['groupid'], $host_groups);
+
+				if ($sysmap['show_suppressed']) {
+					$gotos['show_suppressed'] = true;
+				}
 				break;
 		}
 
