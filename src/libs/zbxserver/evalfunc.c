@@ -269,15 +269,25 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
 		char	logeventid[16];
+		int	regexp_ret;
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
-		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
-			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-		else
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		zbx_history_record_clear(&vc_value, item->value_type);
 
-		ret = SUCCEED;
+		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE)))
+		{
+			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+		}
+		else
+		{
+			if (ZBX_REGEXP_MATCH == regexp_ret)
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			else if (ZBX_REGEXP_NO_MATCH == regexp_ret)
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+
+			ret = SUCCEED;
+		}
+
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
@@ -341,7 +351,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 
 	if (SUCCEED == zbx_vc_get_value(item->itemid, item->value_type, ts, &vc_value))
 	{
-		switch(regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
+		switch (regexp_match_ex(&regexps, vc_value.value.log->source, arg1, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -583,7 +593,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 4, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -866,7 +877,8 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -957,7 +969,8 @@ static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -1047,7 +1060,8 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -1117,7 +1131,8 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -1217,7 +1232,8 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, cons
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -1439,7 +1455,8 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 		zbx_value_type_t	time_shift_type = ZBX_VALUE_SECONDS;
 
 		if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+				&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type ||
+				0 > time_shift)
 		{
 			goto out;
 		}
@@ -1465,7 +1482,7 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 	if (0 < values.values_num)
 	{
 		history_value_t		result;
-		int 			index_min = 0, index_max = 0;
+		int			index_min = 0, index_max = 0;
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -1802,8 +1819,9 @@ out:
  * Parameters: item - item (performance metric)                               *
  *             parameters - <string>[,seconds]                                *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
+ * Return value: SUCCEED - evaluated successfully, result stored in 'value'   *
+ *               FAIL - failed to match the regular expression                *
+ *               NOTSUPPORTED - invalid regular expression                    *
  *                                                                            *
  ******************************************************************************/
 
@@ -1820,11 +1838,29 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE) ?
-					SUCCEED : FAIL);
+		{
+			switch (regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE))
+			{
+				case ZBX_REGEXP_MATCH:
+					return SUCCEED;
+				case ZBX_REGEXP_NO_MATCH:
+					return FAIL;
+				default:
+					return NOTSUPPORTED;
+			}
+		}
 		case ZBX_FUNC_IREGEXP:
-			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE) ?
-					SUCCEED : FAIL);
+		{
+			switch (regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
+			{
+				case ZBX_REGEXP_MATCH:
+					return SUCCEED;
+				case ZBX_REGEXP_NO_MATCH:
+					return FAIL;
+				default:
+					return NOTSUPPORTED;
+			}
+		}
 	}
 
 	return FAIL;
@@ -1836,6 +1872,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	const char			*__function_name = "evaluate_STR";
 	char				*arg1 = NULL;
 	int				arg2 = 1, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0, nparams;
+	int				str_one_ret;
 	zbx_value_type_t		arg2_type = ZBX_VALUE_NVALUES;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
@@ -1908,10 +1945,20 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+				if (SUCCEED == (str_one_ret = evaluate_STR_one(func, &regexps,
+						values.values[i].value.log->value, arg1)))
 				{
 					found = 1;
 					break;
+				}
+				else if (FAIL == str_one_ret)
+				{
+					continue;
+				}
+				else /* NOTSUPPORTED */
+				{
+					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+					goto out;
 				}
 			}
 		}
@@ -1919,10 +1966,20 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+				if (SUCCEED == (str_one_ret = evaluate_STR_one(func, &regexps,
+						values.values[i].value.str, arg1)))
 				{
 					found = 1;
 					break;
+				}
+				else if (FAIL == str_one_ret)
+				{
+					continue;
+				}
+				else /* NOTSUPPORTED */
+				{
+					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
+					goto out;
 				}
 			}
 		}
@@ -3040,7 +3097,8 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 		{
 			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
 		}
-		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function, ','))
+		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
+				','))
 		{
 			switch (item.value_type)
 			{

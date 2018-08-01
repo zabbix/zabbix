@@ -27,13 +27,14 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_PROBLEM_HOSTS);
 
-		// host groups
+		// Host groups.
 		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
 		}
-		$this->fields[] = $field_groups;
+
+		$this->fields[$field_groups->getName()] = $field_groups;
 
 		// Exclude host groups.
 		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
@@ -41,31 +42,35 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		if (array_key_exists('exclude_groupids', $this->data)) {
 			$field_exclude_groups->setValue($this->data['exclude_groupids']);
 		}
-		$this->fields[] = $field_exclude_groups;
 
-		// hosts
+		$this->fields[$field_exclude_groups->getName()] = $field_exclude_groups;
+
+		// Hosts field.
 		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
 
 		if (array_key_exists('hostids', $this->data)) {
 			$field_hosts->setValue($this->data['hostids']);
 		}
-		$this->fields[] = $field_hosts;
 
-		// problem
+		$this->fields[$field_hosts->getName()] = $field_hosts;
+
+		// Problem field.
 		$field_problem = new CWidgetFieldTextBox('problem', _('Problem'));
 
 		if (array_key_exists('problem', $this->data)) {
 			$field_problem->setValue($this->data['problem']);
 		}
-		$this->fields[] = $field_problem;
 
-		// severity
+		$this->fields[$field_problem->getName()] = $field_problem;
+
+		// Severity field.
 		$field_severities = new CWidgetFieldSeverities('severities', _('Severity'));
 
 		if (array_key_exists('severities', $this->data)) {
 			$field_severities->setValue($this->data['severities']);
 		}
-		$this->fields[] = $field_severities;
+
+		$this->fields[$field_severities->getName()] = $field_severities;
 
 		// Show hosts in maintenance.
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
@@ -73,7 +78,8 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		if (array_key_exists('maintenance', $this->data)) {
 			$field_maintenance->setValue($this->data['maintenance']);
 		}
-		$this->fields[] = $field_maintenance;
+
+		$this->fields[$field_maintenance->getName()] = $field_maintenance;
 
 		// Hide groups without problems.
 		$field_hide_empty_groups = new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'));
@@ -81,9 +87,10 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		if (array_key_exists('hide_empty_groups', $this->data)) {
 			$field_hide_empty_groups->setValue($this->data['hide_empty_groups']);
 		}
-		$this->fields[] = $field_hide_empty_groups;
 
-		// problem display
+		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
+
+		// Problem display.
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
 			EXTACK_OPTION_ALL => _('All'),
 			EXTACK_OPTION_BOTH => _('Separated'),
@@ -96,6 +103,7 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 		if (array_key_exists('ext_ack', $this->data)) {
 			$field_ext_ack->setValue($this->data['ext_ack']);
 		}
-		$this->fields[] = $field_ext_ack;
+
+		$this->fields[$field_ext_ack->getName()] = $field_ext_ack;
 	}
 }
