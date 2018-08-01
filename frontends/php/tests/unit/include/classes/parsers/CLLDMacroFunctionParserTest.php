@@ -52,6 +52,30 @@ class CLLDMacroFunctionParserTest extends CParserTest {
 				'{{#M}.iregsub("^([0-9]+)", "{#M}: \1")}'
 			],
 			[
+				'',
+				0,
+				CParser::PARSE_FAIL,
+				''
+			],
+			[
+				'{',
+				0,
+				CParser::PARSE_FAIL,
+				''
+			],
+			[
+				'{{#M}',
+				0,
+				CParser::PARSE_FAIL,
+				''
+			],
+			[
+				'{{#M}.f()',
+				0,
+				CParser::PARSE_FAIL,
+				''
+			],
+			[
 				'{#M}',
 				0,
 				CParser::PARSE_FAIL,
