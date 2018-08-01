@@ -29,8 +29,6 @@ class CSvgLine extends CSvgTag {
 		$this->setAttribute('x2', $x2);
 		$this->setAttribute('y2', $y2);
 		$this->setAttribute('stroke', $color);
-
-		return $this;
 	}
 
 	public function setDashed() {

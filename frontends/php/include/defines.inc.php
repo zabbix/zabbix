@@ -1624,6 +1624,9 @@ define('ZBX_STYLE_BLINK_HIDDEN', 'blink-hidden');
 define('ZBX_STYLE_YELLOW', 'yellow');
 define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
+// svg graph elements
+define('ZBX_STYLE_SVG_GRAPH_GRID', 'svg-graph-grid');
+
 // html layout columns
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 define('ZBX_STYLE_COLUMN_5', 'column-5');	// column occupies 5% width of column wrapper.

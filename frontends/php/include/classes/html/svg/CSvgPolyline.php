@@ -30,7 +30,5 @@ class CSvgPolyline extends CSvgTag {
 		}
 
 		$this->setAttribute('points', trim($p));
-
-		return $this;
 	}
 }

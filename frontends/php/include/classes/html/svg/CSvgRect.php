@@ -28,7 +28,5 @@ class CSvgRect extends CSvgTag {
 		$this->setAttribute('y', $y);
 		$this->setAttribute('width', $width);
 		$this->setAttribute('height', $height);
-
-		return $this;
 	}
 }

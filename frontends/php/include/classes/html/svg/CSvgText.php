@@ -41,8 +41,6 @@ class CSvgText extends CTag {
 		$this->setAttribute('fill', $color);
 		$this->setFontSize(13);
 		$this->addItem($text);
-
-		return $this;
 	}
 
 	public function setAngle($angle) {

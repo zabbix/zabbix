@@ -23,8 +23,10 @@ class CSvgTag extends CTag {
 
 	public function __construct($tag) {
 		parent::__construct($tag, true);
+	}
 
-		return $this;
+	public function getStyles() {
+		return [];
 	}
 
 	public function setFillColor($color) {

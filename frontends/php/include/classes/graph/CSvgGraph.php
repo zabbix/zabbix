@@ -436,14 +436,6 @@ class CSvgGraph extends CSvg {
 			);
 	}
 
-//	private function addCanvas() {
-//		$this->addItem(
-//			(new CSvgRect($this->canvas_x, $this->canvas_y, $this->canvas_width, $this->canvas_height))
-//				->setFillColor($this->color_background)
-//				->setStrokeColor($this->color_background)
-//		);
-//	}
-
 	private function getValueGrid($min, $max) {
 		$mul = 1 / pow(10, floor(log10($max)));
 		$max10 = ceil($mul * $max) / $mul;
@@ -465,30 +457,49 @@ class CSvgGraph extends CSvg {
 	}
 
 	public function getValuesGridWithPosition($side = null) {
-		if ($side === 'right') {
+		if ($side === GRAPH_YAXIS_SIDE_RIGHT) {
 			$min_value = $this->right_y_min;
 			$max_value = $this->right_y_max;
 		}
-		elseif ($side === 'left') {
+		elseif ($side === GRAPH_YAXIS_SIDE_LEFT) {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
 		}
 		else {
-			return false;
+			return [];
 		}
 
 		$grid = $this->getValueGrid($min_value, $max_value);
+		$grid_min = reset($grid);
+		$grid_max = end($grid);
+		$delta = ($grid_max - $grid_min ? : 1);
 		$grid_values = [];
-		$delta = ($max_value - $min_value ? : 1);
 
 		foreach ($grid as $value) {
-			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
+			$relative_pos = $this->canvas_height - $this->canvas_height * ($grid_max - $value) / $delta;
 			$grid_values[$relative_pos] = $value;
 		}
 
 		return $grid_values;
 	}
 
+	private function drawGrid() {
+		if ($this->left_y_show && $this->left_y_min) {
+			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+		}
+		elseif ($this->right_y_show && $this->right_y_min) {
+			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+		}
+		else {
+			$points_value = [];
+		}
+
+		$this->addItem((new CSvgGraphGrid($points_value, $this->getTimeGridWithPosition()))
+			->setPosition($this->canvas_x, $this->canvas_y)
+			->setSize($this->canvas_width, $this->canvas_height)
+		);
+	}
+/*
 	private function drawValueGrid($side = null, $add_desc = true) {
 		if ($side !== 'right' && $side !== 'left') {
 			return;
@@ -533,13 +544,13 @@ class CSvgGraph extends CSvg {
 				]);
 
 				$grid_line[] = (new CSvgText($x1 + $text_x_offset, $y2 + 4, $descr, $this->color_legend))
-					->setAttribute('text-anchor', $side === 'right' ? 'start' : 'end');
+					->setAttribute('text-anchor', $side === GRAPH_YAXIS_SIDE_RIGHT ? 'start' : 'end');
 			}
 
 			$this->addItem($grid_line);
 		}
 	}
-
+*/
 	/**
 	 * Return array of horizontal labels with positions. Array key will be position, value will be label.
 	 *
@@ -581,7 +592,7 @@ class CSvgGraph extends CSvg {
 
 		return $grid_values;
 	}
-
+/*
 	private function drawTimeGrid($add_desc = true) {
 		$formats = [
 			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
@@ -627,7 +638,7 @@ class CSvgGraph extends CSvg {
 			$this->addItem($grid_line);
 		}
 	}
-
+*/
 	private function drawPoints($points, $metric) {
 		/**
 		 * Item grouping is used for two reasons:
@@ -1006,11 +1017,9 @@ class CSvgGraph extends CSvg {
 		$this->addCanvasRightYAxis();
 
 		// Add grid lines.
-		$this->drawValueGrid('left', ($this->left_y_show && $this->left_y_min));
-		$this->drawValueGrid('right', ($this->right_y_show && $this->right_y_min));
+		$this->drawGrid();
 
 		// Add X axis.
-		$this->drawTimeGrid($this->x_axis);
 		if ($this->x_axis) {
 			$this->addCanvasXAxis();
 		}

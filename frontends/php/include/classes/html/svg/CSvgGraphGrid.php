@@ -19,9 +19,67 @@
 **/
 
 
-class CSvgGraphGrid extends CTag {
+class CSvgGraphGrid extends CSvgTag {
 
-	public function __construct() {
+	protected $points_value = [];
+	protected $points_time = [];
 
+	protected $position_x = 0;
+	protected $position_y = 0;
+
+	protected $width = 0;
+	protected $height = 0;
+
+	public function __construct(array $points_value = [], array $points_time = []) {
+		parent::__construct('g', true);
+
+		$this->addClass(ZBX_STYLE_SVG_GRAPH_GRID);
+
+		$this->points_value = $points_value;
+		$this->points_time = $points_time;
+	}
+
+	public function getStyles() {
+		return [
+			'.'.ZBX_STYLE_SVG_GRAPH_GRID.' path' => 'stroke-dasharray:2,2; stroke:rgba(120,120,120,.5)'
+		];
+	}
+
+	public function setPosition($x, $y) {
+		$this->position_x = $x;
+		$this->position_y = $y;
+
+		return $this;
+	}
+
+	public function setSize($width, $height) {
+		$this->width = $width;
+		$this->height = $height;
+
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$path = (new CSvgPath());
+
+		foreach ($this->points_time as $pos => $time) {
+			if (($pos + $this->position_x) <= ($this->position_x + $this->width)) {
+				$path
+					->moveTo($pos + $this->position_x, $this->position_y)
+					->lineTo($pos + $this->position_x, $this->position_y + $this->height);
+			}
+		};
+
+		foreach ($this->points_value as $pos => $value) {
+			if (($this->position_y + $this->height - $pos) <= ($this->position_y + $this->height)) {
+				$path
+					->moveTo($this->position_x, $this->position_y + $this->height - $pos)
+					->lineTo($this->position_x + $this->width, $this->position_y + $this->height - $pos);
+			}
+		};
+
+		$this->addItem($path);
+
+		return parent::toString($destroy);
 	}
 }

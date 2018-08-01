@@ -27,7 +27,5 @@ class CSvgCircle extends CSvgTag {
 		$this->setAttribute('cx', $x);
 		$this->setAttribute('cy', $y);
 		$this->setAttribute('r', $pointsize / 2);
-
-		return $this;
 	}
 }
