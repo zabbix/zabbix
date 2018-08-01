@@ -5702,8 +5702,6 @@ int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp
 
 		substitute_lld_macros(&p_name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		substitute_lld_macros(&p_value, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_json_escape(&p_name);
-		zbx_json_escape(&p_value);
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, p_name, p_value, ZBX_JSON_TYPE_STRING);
