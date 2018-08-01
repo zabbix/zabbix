@@ -168,7 +168,7 @@ class CMacrosResolverGeneral {
 
 		if ($extract_lldmacros) {
 			$lld_macro_parser = new CLLDMacroParser();
-			$lld_macro_function_parser = new CLLDMacroParser();
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 
 		if ($extract_functionids) {
