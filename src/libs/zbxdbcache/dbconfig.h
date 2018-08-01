@@ -636,7 +636,6 @@ zbx_dc_preproc_op_t;
 typedef struct
 {
 	zbx_uint64_t		maintenanceid;
-	zbx_uint64_t		revision;
 	unsigned char		type;
 	unsigned char		tags_evaltype;
 	unsigned char		state;
@@ -690,14 +689,12 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
-	/* maintenance update statistics */
-	zbx_uint64_t		maintenance_revision;		/* global maintenance revision incremented by */
-								/* any changes to cached maintenance data     */
-	zbx_uint64_t		maintenance_update_revision;	/* last maintenance update revision */
-	int			maintenance_modified_num;	/* number of modified maintenances since last update */
-	int			maintenance_deleted_num;	/* number of deleted maintenances since last update */
-	int			maintenance_event_updates_num;	/* number of event updates done since last */
-								/* maintenance update                      */
+
+	/* maintenance processing management */
+	int			maintenance_deleted_num;	/* number of deleted maintenances since last update   */
+	zbx_uint64_t		*maintenance_update_flags;	/* Array of flags to manage timer maintenance updates.*/
+								/* Each array member contains 0/1 flag for 64 timers  */
+								/* indicating if the timer must process maintenance.  */
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */

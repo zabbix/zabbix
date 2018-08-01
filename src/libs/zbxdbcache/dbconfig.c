@@ -66,6 +66,10 @@ static int	sync_in_progress = 0;
 #define ZBX_QUEUE_PRIORITY_NORMAL	1
 #define ZBX_QUEUE_PRIORITY_LOW		2
 
+/* number of slots to store maintenance update flags */
+#define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
+		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+
 /* shorthand macro for calling in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
@@ -4425,7 +4429,6 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(maintenance->tags_evaltype, row[4]);
 		maintenance->active_since = atoi(row[2]);
 		maintenance->active_until = atoi(row[3]);
-		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	/* remove deleted maintenances */
@@ -4441,7 +4444,6 @@ static void	DCsync_maintenances(zbx_dbsync_t *sync)
 		zbx_vector_ptr_destroy(&maintenance->periods);
 
 		zbx_hashset_remove_direct(&config->maintenances, maintenance);
-		config->maintenance_revision++;
 		config->maintenance_deleted_num++;
 	}
 
@@ -4522,7 +4524,6 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&maintenance->tags, maintenance_tag);
 
 		zbx_vector_ptr_append(&maintenances, maintenance);
-		config->maintenance_revision++;
 	}
 
 	/* remove deleted maintenance tags */
@@ -4551,8 +4552,6 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 		zbx_strpool_release(maintenance_tag->value);
 
 		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
-
-		config->maintenance_revision++;
 	}
 
 	/* sort maintenance tags */
@@ -4564,7 +4563,6 @@ static void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 	{
 		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
 		zbx_vector_ptr_sort(&maintenance->tags, dc_compare_maintenance_tags);
-		maintenance->revision = config->maintenance_revision;
 	}
 
 	zbx_vector_ptr_destroy(&maintenances);
@@ -4634,8 +4632,6 @@ static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 		period->period = atoi(row[7]);
 		period->start_date = atoi(row[8]);
 
-		maintenance->revision = ++config->maintenance_revision;
-
 		if (0 == found)
 			zbx_vector_ptr_append(&maintenance->periods, period);
 	}
@@ -4658,8 +4654,6 @@ static void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 
 			if (FAIL != index)
 				zbx_vector_ptr_remove_noorder(&maintenance->periods, index);
-
-			maintenance->revision = ++config->maintenance_revision;
 		}
 
 		zbx_hashset_remove_direct(&config->maintenance_periods, period);
@@ -4715,7 +4709,6 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(groupid, row[1]);
 
 		zbx_vector_uint64_append(&maintenance->groupids, groupid);
-		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	/* remove deleted maintenance groupids from cache */
@@ -4737,7 +4730,6 @@ static void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		}
 
 		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
-		maintenance->revision = ++config->maintenance_revision;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4794,7 +4786,6 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 		zbx_vector_uint64_append(&maintenance->hostids, hostid);
 		zbx_vector_ptr_append(&maintenances, maintenance);
-		config->maintenance_revision++;
 	}
 
 	/* remove deleted maintenance hostids from cache */
@@ -4817,7 +4808,6 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 		zbx_vector_uint64_remove_noorder(&maintenance->hostids, index);
 		zbx_vector_ptr_append(&maintenances, maintenance);
-		config->maintenance_revision++;
 	}
 
 	zbx_vector_ptr_sort(&maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -4827,7 +4817,6 @@ static void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	{
 		maintenance = (zbx_dc_maintenance_t *)maintenances.values[i];
 		zbx_vector_uint64_sort(&maintenance->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		maintenance->revision = config->maintenance_revision;
 	}
 
 	zbx_vector_ptr_destroy(&maintenances);
@@ -6192,11 +6181,16 @@ int	init_configuration_cache(char **error)
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
-	config->maintenance_revision = 0;
-	config->maintenance_update_revision = 0;
-	config->maintenance_modified_num = 0;
-	config->maintenance_deleted_num = 0;
-	config->maintenance_event_updates_num = 0;
+
+	/* maintenance data are used only when timers are defined (server) */
+	if (0 != CONFIG_TIMER_FORKS)
+	{
+		config->maintenance_deleted_num = 0;
+		config->maintenance_update_flags = (zbx_uint64_t *)__config_mem_malloc_func(NULL, sizeof(zbx_uint64_t) *
+				ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
+		memset(config->maintenance_update_flags, 0, sizeof(zbx_uint64_t) * ZBX_MAINTENANCE_UPDATE_FLAGS_NUM());
+	}
+
 	config->proxy_lastaccess_ts = time(NULL);
 
 #undef CREATE_HASHSET
@@ -12187,24 +12181,138 @@ static int	dc_calculate_maintenance_period(const zbx_dc_maintenance_t *maintenan
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_maintenance_set_update_flags                                  *
+ *                                                                            *
+ * Purpose: sets maintenance update flags for all timers                      *
+ *                                                                            *
+ ******************************************************************************/
+void	dc_maintenance_set_update_flags(void)
+{
+	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
+
+	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
+
+	if (0 != (timers_left = (CONFIG_TIMER_FORKS % (sizeof(uint64_t) * 8))))
+		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_set_update_flags                              *
+ *                                                                            *
+ * Purpose: sets maintenance update flags for all timers                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_maintenance_set_update_flags(void)
+{
+	WRLOCK_CACHE;
+	dc_maintenance_set_update_flags();
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_reset_update_flag                             *
+ *                                                                            *
+ * Purpose: resets maintenance update flags for the specified timer           *
+ *                                                                            *
+ * Parameters: timer - [IN] the timer process number                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_maintenance_reset_update_flag(int timer)
+{
+	int		slot, bit;
+	zbx_uint64_t	mask;
+
+	timer--;
+	slot = timer / (sizeof(uint64_t) * 8);
+	bit = timer % (sizeof(uint64_t) * 8);
+
+	mask = ~(__UINT64_C(1) << bit);
+
+	WRLOCK_CACHE;
+
+	config->maintenance_update_flags[slot] &= mask;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_reset_update_flag                             *
+ *                                                                            *
+ * Purpose: checks if the maintenance update flag is set for the specified    *
+ *          timer                                                             *
+ *                                                                            *
+ * Parameters: timer - [IN] the timer process number                          *
+ *                                                                            *
+ * Return value: SUCCEED - maintenance update flag is set                     *
+ *               FAIL    - otherwise                                          *
+ ******************************************************************************/
+int	zbx_dc_maintenance_check_update_flag(int timer)
+{
+	int		slot, bit, ret;
+	zbx_uint64_t	mask;
+
+	timer--;
+	slot = timer / (sizeof(uint64_t) * 8);
+	bit = timer % (sizeof(uint64_t) * 8);
+
+	mask = __UINT64_C(1) << bit;
+
+	RDLOCK_CACHE;
+
+	ret = (0 == (config->maintenance_update_flags[slot] & mask) ? FAIL : SUCCEED);
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_maintenance_check_update_flags                            *
+ *                                                                            *
+ * Purpose: checks if at least one maintenance update flag is set             *
+ *                                                                            *
+ * Return value: SUCCEED - a maintenance update flag is set                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_maintenance_check_update_flags(void)
+{
+	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), ret = SUCCEED;
+
+	RDLOCK_CACHE;
+
+	if (0 != config->maintenance_update_flags[0])
+		goto out;
+
+	if (1 != slots_num)
+	{
+		if (0 != memcmp(config->maintenance_update_flags, config->maintenance_update_flags + 1, slots_num - 1))
+			goto out;
+	}
+
+	ret = FAIL;
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_update_maintenances                                       *
  *                                                                            *
  * Purpose: update maintenance state depending on maintenance periods         *
- *                                                                            *
- * Parameters: pupdate_revision - [OUT] maintenance revision for this update  *
- *                                      (optional, can be NULL)               *
- *             pmodified_num    - [OUT] the number of maintenances modified   *
- *                                      since last maintenance update.        *
- *                                      Note that started/stopped maintenances*
- *                                      also counts as modified.              *
- *                                      (ignored if pupdate_revision is null) *
  *                                                                            *
  * Comments: This function calculates if any maintenance period is running    *
  *           and based on that sets current maintenance state - running/idle  *
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_num)
+void	zbx_dc_update_maintenances(void)
 {
 	const char			*__function_name = "zbx_dc_update_maintenances";
 
@@ -12212,7 +12320,7 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 	zbx_dc_maintenance_period_t	*period;
 	zbx_hashset_iter_t		iter;
 	int				i, running_num = 0, seconds, ret, started_num = 0, modified_num,
-					stopped_num = 0;
+					stopped_num = 0, update = 0;
 	unsigned char			state;
 	struct tm			*tm;
 	time_t				now, period_start, period_end, running_since, running_until;
@@ -12225,8 +12333,11 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 
 	WRLOCK_CACHE;
 
-	modified_num = config->maintenance_deleted_num;
-	config->maintenance_deleted_num = 0;
+	if (0 != (modified_num = config->maintenance_deleted_num))
+	{
+		update = 1;
+		config->maintenance_deleted_num = 0;
+	}
 
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
 	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
@@ -12281,12 +12392,13 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 						dc_hostgroup_cache_nested_groupids(group);
 					}
 				}
+				update = 1;
 			}
 
 			if (maintenance->running_until != running_until)
 			{
 				maintenance->running_until = running_until;
-				maintenance->revision = ++config->maintenance_revision;
+				update = 1;
 			}
 			running_num++;
 		}
@@ -12297,36 +12409,14 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 				maintenance->running_since = 0;
 				maintenance->running_until = 0;
 				maintenance->state = ZBX_MAINTENANCE_IDLE;
-				maintenance->revision = ++config->maintenance_revision;
 				stopped_num++;
+				update = 1;
 			}
 		}
-
-		if (maintenance->revision > config->maintenance_update_revision)
-			modified_num++;
 	}
 
-	if (NULL != pupdate_revision)
-	{
-		*pupdate_revision = config->maintenance_revision;
-		if (0 == config->maintenance_update_revision && 0 == config->maintenances.num_data)
-		{
-			/* Fake modified maintenances to trigger host, event update */
-			/* after server restart with no maintenance defined.        */
-			*pmodified_num = 1;
-		}
-		else
-			*pmodified_num = modified_num;
-
-		config->maintenance_update_revision = *pupdate_revision;
-		config->maintenance_modified_num = *pmodified_num;
-
-		/* If any maintenance has been modified then timers will have to        */
-		/* perform maintenance updates for problem events. Reset event update   */
-		/* counter to track the event update progress by timers.                */
-		if (0 != *pmodified_num)
-			config->maintenance_event_updates_num = 0;
-	}
+	if (0 != update)
+		dc_maintenance_set_update_flags();
 
 	UNLOCK_CACHE;
 
@@ -12572,28 +12662,6 @@ void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenancei
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_maintenance_update_stats                              *
- *                                                                            *
- * Purpose: get maintenance update statistics                                 *
- *                                                                            *
- * Parameters: update_revision - [OUT] revision of the last maintenance update*
- *             modified_num    - [OUT] the number of maintenances modified    *
- *                                     since last maintenance update.         *
- *                                     Note that started/stopped maintenances *
- *                                     also counts as modified.               *
- *             stopped_num     - [OUT] the number of stopped maintenances     *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_get_maintenance_update_stats(zbx_uint64_t *update_revision, int *modified_num)
-{
-	RDLOCK_CACHE;
-	*update_revision = config->maintenance_update_revision;
-	*modified_num = config->maintenance_modified_num;
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: dc_maintenance_tag_match                                         *
  *                                                                            *
  * Purpose: perform maintenance tag comparison using maintenance tag operator *
@@ -12817,8 +12885,12 @@ static int	dc_compare_tags(const void *d1, const void *d2)
  *                                                                            *
  * Function: zbx_dc_get_event_maintenances                                    *
  *                                                                            *
- * Purpose: get running maintenances for each event modified after            *
- *          maintenance_revision revision                                     *
+ * Purpose: get maintenance data for events                                   *
+ *                                                                            *
+ * Parameters: event_queries -  [IN/OUT] in - event data                      *
+ *                                       out - running maintenances for each  *
+ *                                            event                           *
+ *             maintenanceids - [IN] the maintenances to process              *
  *                                                                            *
  * Return value: SUCCEED - at least one matching maintenance was found        *
  *                                                                            *
@@ -12959,47 +13031,3 @@ int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 
 	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_maintenance_finish_event_update                           *
- *                                                                            *
- * Purpose: registers finished event update                                   *
- *                                                                            *
- * Comments: Event update completion is used to delay maintenance update      *
- *           until all timers have finished event suppress updates,           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_maintenance_finish_event_update(void)
-{
-	WRLOCK_CACHE;
-	config->maintenance_event_updates_num++;
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_dc_maintenance_get_event_updates                             *
- *                                                                            *
- * Purpose: gets finished event updates                                       *
- *                                                                            *
- * Return value: the number of finished event updates since last maintenance  *
- *               update                                                       *
- *                                                                            *
- * Comments: Event update completion is used to delay maintenance update      *
- *           until all timers have finished event suppress updates,           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dc_maintenance_get_event_updates(void)
-{
-	int	updates_num;
-
-	RDLOCK_CACHE;
-	updates_num = config->maintenance_event_updates_num;
-	UNLOCK_CACHE;
-
-	return updates_num;
-}
-
-
-

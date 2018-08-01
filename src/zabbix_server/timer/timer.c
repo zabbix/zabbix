@@ -647,8 +647,6 @@ cleanup:
 	zbx_vector_ptr_destroy(&event_data);
 	zbx_vector_ptr_destroy(&event_queries);
 	zbx_vector_uint64_destroy(&maintenanceids);
-
-	zbx_dc_maintenance_finish_event_update();
 }
 
 /******************************************************************************
@@ -707,10 +705,9 @@ static int	update_host_maintenances(void)
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 	double		sec = 0.0;
-	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, modified_num;
+	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
 	char		*info = NULL;
 	size_t		info_alloc = 0, info_offset = 0;
-	zbx_uint64_t	update_revision, maintenance_revision = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -722,8 +719,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
-	zbx_dc_maintenance_finish_event_update();
-
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
@@ -732,26 +727,32 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
-			/* start update process only if the timer delay has been passed since the last update */
-			/* and all other timers have finished their event updates                             */
-			if (sec - maintenance_time >= ZBX_TIMER_DELAY &&
-					CONFIG_TIMER_FORKS == zbx_dc_maintenance_get_event_updates())
+			/* start update process only when all timers have finished their updates */
+			if (sec - maintenance_time >= ZBX_TIMER_DELAY && FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
-				zbx_dc_update_maintenances(&update_revision, &modified_num);
+				/* force maintenance updates at server startup */
+				if (0 == maintenance_time)
+					zbx_dc_maintenance_set_update_flags();
+
+				zbx_dc_update_maintenances();
+				update = zbx_dc_maintenance_check_update_flag(process_num);
 
 				/* update hosts if there are modified (stopped, started, changed) maintenances */
-				if (0 != modified_num)
+				if (SUCCEED == update)
 					hosts_num = update_host_maintenances();
 				else
 					hosts_num = 0;
 
 				db_remove_expired_event_suppress_data((int)sec);
 
-				if (0 != modified_num)
+				if (SUCCEED == update)
+				{
 					db_update_event_suppress_data(&events_num);
+					zbx_dc_maintenance_reset_update_flag(process_num);
+				}
 				else
 					events_num = 0;
 
@@ -761,36 +762,30 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						hosts_num, events_num, zbx_time() - sec);
 
 				update_time = (int)sec;
-
 			}
 		}
 		else
 		{
-			zbx_dc_get_maintenance_update_stats(&update_revision, &modified_num);
-
 			/* check if a maintenance was updated by the first timer */
-			if (maintenance_revision < update_revision)
+			if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
 			{
-				if (0 != modified_num)
-				{
-					zbx_setproctitle("%s #%d [%s, processing maintenances]",
-							get_process_type_string(process_type), process_num, info);
+				zbx_setproctitle("%s #%d [%s, processing maintenances]",
+						get_process_type_string(process_type), process_num, info);
 
-					db_update_event_suppress_data(&events_num);
+				db_update_event_suppress_data(&events_num);
 
-					info_offset = 0;
-					zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
-							"suppressed %d events in " ZBX_FS_DBL " sec",
-							events_num, zbx_time() - sec);
+				info_offset = 0;
+				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
+						"suppressed %d events in " ZBX_FS_DBL " sec",
+						events_num, zbx_time() - sec);
 
-				}
 				update_time = (int)sec;
+				zbx_dc_maintenance_reset_update_flag(process_num);
 			}
 		}
 
 		if (maintenance_time != update_time)
 		{
-			maintenance_revision = update_revision;
 			maintenance_time = (int)sec;
 
 			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - sec)))

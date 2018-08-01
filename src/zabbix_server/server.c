@@ -1050,7 +1050,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	/* update maintenance states */
-	zbx_dc_update_maintenances(NULL, NULL);
+	zbx_dc_update_maintenances();
 
 	DBclose();
 
