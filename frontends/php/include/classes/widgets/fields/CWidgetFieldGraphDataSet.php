@@ -290,10 +290,14 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
 				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Hosts pattern'), _('cannot be empty'));
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Hosts pattern'), _('Data set'),
+						_('cannot be empty')
+					);
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Items pattern'), _('cannot be empty'));
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Items pattern'), _('Data set'),
+						_('cannot be empty')
+					);
 				}
 			}
 		}
@@ -303,7 +307,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($values as $val) {
 				if (array_key_exists('timeshift', $val) && $val['timeshift'] !== ''
 						&& timeUnitToSeconds($val['timeshift'], true) === null) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Time shift'), _('Data set'),
+						_('a time unit is expected')
+					);
 				}
 			}
 		}

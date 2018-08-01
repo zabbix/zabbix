@@ -172,10 +172,14 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
 				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Hosts pattern'), _('cannot be empty'));
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Hosts pattern'),
+						_('Overrides'), _('cannot be empty')
+					);
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Items pattern'), _('cannot be empty'));
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Items pattern'),
+						_('Overrides'), _('cannot be empty')
+					);
 				}
 			}
 		}
