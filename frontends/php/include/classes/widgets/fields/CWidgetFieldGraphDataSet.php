@@ -140,7 +140,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 						->setAttribute('title', _('Delete'))
 						->addClass(ZBX_STYLE_BTN_TRASH)
 				]))
-					->addStyle('margin-left: -15px;')
+					->addStyle('margin-left: -25px;')
 					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)

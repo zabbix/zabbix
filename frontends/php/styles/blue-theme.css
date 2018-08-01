@@ -3769,7 +3769,8 @@ svg {
     left: -15px; } }
 .overrides-list {
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  padding-left: 15px; }
   .overrides-list .overrides-list-item {
     border-bottom: 1px solid #ebeef0;
     margin-bottom: 10px;
@@ -3817,7 +3818,8 @@ svg {
 
 .list-vertical-accordion {
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  padding-left: 15px; }
   .list-vertical-accordion :not(.list-accordion-item-opened) .list-accordion-item-body {
     display: none; }
 
@@ -4307,5 +4309,7 @@ input[type=text].range-control {
   text-overflow: ellipsis;
   overflow: hidden; }
 
-.graph-widget-config-tabs > .tabs-nav {
-  padding-left: 15%; }
+.graph-widget-config-tabs {
+  padding: 10px 0px; }
+  .graph-widget-config-tabs > .tabs-nav {
+    padding-left: calc(15% + 20px); }

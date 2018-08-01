@@ -5437,6 +5437,7 @@ svg {
 .overrides-list {
 	display: flex;
 	flex-direction: column;
+	padding-left: 15px;
 
 	.overrides-list-item {
 		border-bottom: 1px solid $table-border-color;
@@ -5502,6 +5503,7 @@ svg {
 .list-vertical-accordion {
 	display: flex;
 	flex-direction: column;
+	padding-left: 15px;
 
 	:not(.list-accordion-item-opened) .list-accordion-item-body {
 		display: none;
@@ -6069,8 +6071,12 @@ input[type=text].range-control {
 	overflow: hidden;
 }
 
-.graph-widget-config-tabs > .tabs-nav {
-	padding-left: 15%;
+.graph-widget-config-tabs {
+	padding: 10px 0px;
+
+	> .tabs-nav {
+		padding-left: calc(15% + 20px);
+	}
 }
 
 @if $theme_name == 'dev' {

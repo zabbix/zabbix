@@ -123,6 +123,7 @@ $tab_axes = (new CFormList())->addRow('',
 				CWidgetHelper::getTextBox($fields['lefty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
+
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['righty']), CWidgetHelper::getCheckBox($fields['righty']))
 			->addRow(CWidgetHelper::getLabel($fields['righty_min']), CWidgetHelper::getTextBox($fields['righty_min']))
@@ -133,6 +134,7 @@ $tab_axes = (new CFormList())->addRow('',
 				CWidgetHelper::getTextBox($fields['righty_static_units'])
 			])
 			->addClass(ZBX_STYLE_COLUMN_33),
+
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['axisx']), CWidgetHelper::getCheckBox($fields['axisx']))
 			->addClass(ZBX_STYLE_COLUMN_33)
