@@ -85,7 +85,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
@@ -148,8 +148,18 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				}
 			}
 
-			if (ZBX_REGEXP_MATCH != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
+			if (ZBX_REGEXP_NO_MATCH == (regexp_ret = regexp_match_ex(&regexps, trap, regex,
+					ZBX_CASE_SENSITIVE)))
+			{
 				goto next;
+			}
+			else if (FAIL == regexp_ret)
+			{
+				SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
+						"Invalid regular expression \"%s\"", regex));
+				errcodes[i] = NOTSUPPORTED;
+				goto next;
+			}
 		}
 
 		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);

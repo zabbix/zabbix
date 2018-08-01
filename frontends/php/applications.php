@@ -230,56 +230,23 @@ else {
 	if ($pageFilter->hostsSelected) {
 		$config = select_config();
 
-		// get application ids
-		$applications = API::Application()->get([
-			'output' => ['applicationid'],
-			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
-			'groupids' => $pageFilter->groupids,
-			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1
-		]);
-		$applicationids = zbx_objectValues($applications, 'applicationid');
-
-		// get applications
+		// Get applications.
 		$data['applications'] = API::Application()->get([
 			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
+			'groupids' => $pageFilter->groupids,
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
 			'selectApplicationDiscovery' => ['ts_delete'],
-			'applicationids' => $applicationids
+			'editable' => true,
+			'sortfield' => $sortField,
+			'limit' => $config['search_limit'] + 1
 		]);
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
-		// fetch template application source parents
-		$applicationSourceParentIds = getApplicationSourceParentIds($applicationids);
-		$parentAppIds = [];
-
-		foreach ($applicationSourceParentIds as $applicationParentIds) {
-			foreach ($applicationParentIds as $parentId) {
-				$parentAppIds[$parentId] = $parentId;
-			}
-		}
-
-		if ($parentAppIds) {
-			$parentTemplates = DBfetchArrayAssoc(DBselect(
-				'SELECT a.applicationid,h.hostid,h.name'.
-				' FROM applications a,hosts h'.
-				' WHERE a.hostid=h.hostid'.
-					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
-			), 'applicationid');
-
-			foreach ($data['applications'] as &$application) {
-				if ($application['templateids'] && isset($applicationSourceParentIds[$application['applicationid']])) {
-					foreach ($applicationSourceParentIds[$application['applicationid']] as $parentAppId) {
-						$application['sourceTemplates'][] = $parentTemplates[$parentAppId];
-					}
-				}
-			}
-			unset($application);
-		}
+		$data['parent_templates'] = getApplicationParentTemplates($data['applications']);
 
 		/*
 		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
@@ -336,28 +303,6 @@ else {
 		->setArgument('hostid', $data['hostid']);
 
 	$data['paging'] = getPagingLine($data['applications'], $sortOrder, $url);
-
-	// Select writable templates IDs.
-	$hostids = [];
-
-	foreach ($data['applications'] as $application) {
-		if (array_key_exists('sourceTemplates', $application)) {
-			$hostids = array_merge($hostids, zbx_objectValues($application['sourceTemplates'], 'hostid'));
-		}
-
-		$hostids[] = $application['host']['hostid'];
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($hostids)),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);

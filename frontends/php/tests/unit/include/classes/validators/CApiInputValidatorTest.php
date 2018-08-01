@@ -990,6 +990,54 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/1/mappings/7": value (value)=(1) already exists.'
 			],
 			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+						'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+						'operator'	=> ['type' => API_INT32, 'in' => implode(',', [0, 2]), 'default' => 2],
+						'value'		=> ['type' => API_STRING_UTF8, 'length' => 255, 'default' => '']
+					]]
+				]],
+				[
+					'tags' => [
+						['tag' => 'tag', 'operator' => 0, 'value' => ''],
+						['tag' => 'tag', 'operator' => 0, 'value' => '']
+					]
+				],
+				'/',
+				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+						'tag'	=> ['type' => API_STRING_UTF8],
+					]]
+				]],
+				[
+					'tags' => null
+				],
+				'/',
+				[
+					'tags' => null
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+						'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+						'operator'	=> ['type' => API_INT32, 'in' => implode(',', [0, 2]), 'default' => 2],
+						'value'		=> ['type' => API_STRING_UTF8, 'length' => 255, 'default' => '']
+					]]
+				]],
+				[
+					'tags' => [
+						['tag' => 'tag'],
+						['tag' => 'tag']
+					]
+				],
+				'/',
+				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 2, ) already exists.'
+			],
+			[
 				['type' => API_OBJECTS, 'uniq' => [['valuemapid'], ['name']], 'fields' => [
 					'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 64]
@@ -2162,6 +2210,24 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/',
 				false,
 				'Invalid parameter "/20": value (hostid, name)=(1, app1) already exists.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'tags' => ['type' => API_OBJECTS, 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+						'tag'		=> ['type' => API_STRING_UTF8],
+						'operator'	=> ['type' => API_INT32],
+						'value'		=> ['type' => API_STRING_UTF8]
+					]]
+				]],
+				[
+					'tags' => [
+						['tag' => 'tag', 'operator' => 0, 'value' => ''],
+						['tag' => 'tag', 'operator' => 0, 'value' => '']
+					]
+				],
+				'/',
+				false,
+				'Invalid parameter "/tags/2": value (tag, operator, value)=(tag, 0, ) already exists.'
 			]
 		];
 	}
