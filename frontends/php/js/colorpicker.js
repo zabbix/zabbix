@@ -180,7 +180,7 @@
 				 * input element.
 				 */
 				methods.show($(this).attr('id').substr(4), event);
-			}).insertBefore(element);
+			}).insertAfter(element);
 			$(element).change(function() {
 				/**
 				 * Id attribute value of input element can be changed dynamically, for example when row with colorpicker
