@@ -586,7 +586,9 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body'].prepend(resp.errors);
+					data.dialogue['body']
+						.prepend(resp.errors)
+						.scrollTop(0);
 				}
 				else {
 					// No errors, proceed with update.
