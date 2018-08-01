@@ -734,6 +734,18 @@ class testFormDiscoveryRule extends CWebTest {
 				]
 			],
 			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'discoveryRuleWithFilter1',
+					'key' => 'discovery-key-for-filter1',
+					'macro' => '{#TEST_MACRO}',
+					'operator' => 'matches',
+					'expression' => 'test expression',
+					'formCheck' =>true,
+					'dbCheck' => true
+				]
+			],
+			[
 				['expected' => TEST_BAD,
 					'name' => 'discoveryRuleNo1',
 					'key' => 'discovery-key-no1',
@@ -1682,6 +1694,13 @@ class testFormDiscoveryRule extends CWebTest {
 			}
 		}
 
+		if (array_key_exists('macro', $data)) {
+			$this->zbxTestTabSwitch('Filters');
+			$this->zbxTestInputType('conditions_0_macro', $data['macro']);
+			$this->zbxTestDropdownSelectWait('conditions_0_operator', $data['operator']);
+			$this->zbxTestInputType('conditions_0_value', $data['expression']);
+		}
+
 		if ($itemFlexFlag == true) {
 			$this->zbxTestClickWait('add');
 			$expected = $data['expected'];
@@ -1782,5 +1801,210 @@ class testFormDiscoveryRule extends CWebTest {
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
 		}
+	}
+
+		public static function getCreateFiltersData() {
+			return [
+				[
+					[
+						'name' => 'Rule with macro match',
+						'key' => 'macro-match-key',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'matches'],
+						]
+					]
+				],
+				[
+					[
+						'name' => 'Rule with macro does not match',
+						'key' => 'macro-doesnt-match-key',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match'],
+						]
+					]
+				],
+				[
+					[
+						'name' => 'Rule with two macros And/Or',
+						'key' => 'two-macros-and-or-key',
+						'calculation' => 'And/Or',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+						]
+					]
+				],
+				[
+					[
+						'name' => 'Rule with two macros And',
+						'key' => 'two-macros-and-key',
+						'calculation' => 'And',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+						]
+					]
+				],
+				[
+					[
+						'name' => 'Rule with two macros Or',
+						'key' => 'two-macros-or-key',
+						'calculation' => 'Or',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ]
+						]
+					]
+				],
+				[
+					[
+						'name' => 'Rule with two macros Custom expression',
+						'key' => 'two-macros-custom-expression-key',
+						'calculation' => 'Custom expression',
+						'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ]
+						],
+						'formula' => 'A or (B and C)'
+					]
+				]
+			];
+		}
+
+	/**
+	 * @dataProvider getCreateFiltersData
+	 */
+	public function testFormDiscoveryRule_CreateFiltersMacros($data) {
+		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
+
+		$this->zbxTestTabSwitch('Filters');
+
+		foreach ($data['macros'] as $i => $macro) {
+				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
+				$this->zbxTestClick('macro_add');
+			}
+
+		if (array_key_exists('calculation', $data)) {
+			$this->zbxTestDropdownSelectWait('evaltype', $data['calculation']);
+		}
+
+		if (array_key_exists('formula', $data)) {
+			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
+		}
+
+		$this->zbxTestClickWait('add');
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
+		$this->zbxTestCheckFatalErrors();
+		$this->zbxTestTextPresent($data['name']);
+
+		$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+	}
+
+	public static function getCreateFiltersMacrosValidationData() {
+		return [
+			[
+				[
+					'name' => 'Rule with wrong macro',
+					'key' => 'macro-wrong-key',
+					'macros'=> [
+							['macro' => '{TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match'],
+					],
+					'error_message' => 'Incorrect filter condition macro for discovery rule'
+				]
+			],
+			[
+				[
+					'name' => 'Rule with empty formula',
+					'key' => 'macro-empty-formula-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula' => '',
+					'error_message' => 'Incorrect custom expression "" for discovery rule "Rule with empty formula": expression is empty'
+				]
+			],
+			[
+				[
+					'name' => 'Rule with missing argument',
+					'key' => 'macro-missing-argument-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'A and B',
+					'error_message' => 'Condition "C" is not used in formula "A and B" for discovery rule "Rule with missing argument".'
+				]
+			],
+			[
+				[
+					'name' => 'Rule with extra rgument',
+					'key' => 'macro-extra-argument-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'A and B or C',
+					'error_message' => 'Condition "C" used in formula "A and B or C" for discovery rule "Rule with extra rgument" is not defined'
+				]
+			],
+			[
+				[
+					'name' => 'Rule with wrong formula',
+					'key' => 'macro-wrong-formula-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'Wrong formula',
+					'error_message' => 'Incorrect custom expression "Wrong formula" for discovery rule "Rule with wrong formula": check expression starting from "Wrong formula"'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateFiltersMacrosValidationData
+	 */
+	public function testFormDiscoveryRule_FiltersMacrosValidation($data) {
+		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
+
+		$this->zbxTestTabSwitch('Filters');
+
+		foreach ($data['macros'] as $i => $macro) {
+				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
+				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
+				$this->zbxTestClick('macro_add');
+			}
+
+		if (array_key_exists('calculation', $data)) {
+			$this->zbxTestDropdownSelectWait('evaltype', $data['calculation']);
+		}
+
+		if (array_key_exists('formula', $data)) {
+			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
+		}
+
+		$this->zbxTestClickWait('add');
+
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule');
+		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
+		$this->zbxTestCheckFatalErrors();
+
+		$this->assertEquals(0, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 }
