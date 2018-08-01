@@ -12320,13 +12320,13 @@ void	zbx_dc_update_maintenances(zbx_uint64_t *pupdate_revision, int *pmodified_n
 
 		config->maintenance_update_revision = *pupdate_revision;
 		config->maintenance_modified_num = *pmodified_num;
-	}
 
-	/* If any maintenance has been modified then timers will have to        */
-	/* perform maintenance updates for problem events. Reset event update   */
-	/* counter to track the event update progress by timers.                */
-	if (0 != modified_num)
-		config->maintenance_event_updates_num = 0;
+		/* If any maintenance has been modified then timers will have to        */
+		/* perform maintenance updates for problem events. Reset event update   */
+		/* counter to track the event update progress by timers.                */
+		if (0 != *pmodified_num)
+			config->maintenance_event_updates_num = 0;
+	}
 
 	UNLOCK_CACHE;
 

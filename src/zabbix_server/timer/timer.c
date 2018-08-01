@@ -762,6 +762,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						hosts_num, events_num, zbx_time() - sec);
 
 				update_time = (int)sec;
+
 			}
 		}
 		else
