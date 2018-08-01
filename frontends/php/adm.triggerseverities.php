@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of trigger severities');
 $page['file'] = 'adm.triggerseverities.php';
+$page['scripts'] = ['colorpicker.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
