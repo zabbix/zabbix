@@ -258,18 +258,16 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		// Sort data sets according order field.
 		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
 
+		// Data sets with unchanged default values are removed. Color is changed if matches none of predefined colors.
+		$defaults = $this->getDefault();
 		foreach ($this->value as $index => $val) {
-			/**
-			 * Host pattern, item pattern and color are all mandatory fields.
-			 *
-			 * Data sets with unspecified host pattern and item pattern are deleted. If at least one is specified, error
-			 * message tells that both fields are mandatory.
-			 *
-			 * Color is not validated here, because it makes wrong error message later (e.g., if color is not specified,
-			 * error message says that data set is empty).
-			 */
-			if ((!array_key_exists('hosts', $val) || $val['hosts'] === '')
-					&& (!array_key_exists('items', $val) || $val['items'] === '')) {
+			if ($val['hosts'] === '' && $val['items'] === '' && in_array($val['color'], $this->color_palete)
+				&& $defaults['type'] == $val['type'] && $defaults['transparency'] == $val['transparency']
+				&& $defaults['fill'] == $val['fill'] && $defaults['axisy'] == $val['axisy']
+				&& $defaults['timeshift'] == $val['timeshift']
+				&& $defaults['missingdatafunc'] == $val['missingdatafunc']
+				&& (($defaults['type'] != SVG_GRAPH_TYPE_POINTS && $defaults['width'] == $val['width'])
+					|| ($defaults['type'] == SVG_GRAPH_TYPE_POINTS && $defaults['pointsize'] == $val['pointsize']))) {
 				unset($this->value[$index]);
 			}
 		}
