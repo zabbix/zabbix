@@ -24,24 +24,15 @@
  */
 class CSvgGraphAxis extends CSvgTag {
 
-	const VERTICAL = 0x0;
-	const HORIZONTAL = 0x1;
-	const TOP = 0x02;
-	const LEFT = 0x02;
-
-	const AXIS_VERTICAL_RIGHT = 0;
-	const AXIS_VERTICAL_LEFT = 0x02;
-	const AXIS_HORIZONTAL_BOTTOM = 0x01;
-
 	/**
 	 * CSS class name for axis container.
 	 *
 	 * @var array
 	 */
 	public $css_class = [
-		self::AXIS_VERTICAL_RIGHT => 'axis axis-vertical-right',
-		self::AXIS_VERTICAL_LEFT => 'axis axis-vertical-left',
-		self::AXIS_HORIZONTAL_BOTTOM => 'axis axis-horizontal-bottom'
+		GRAPH_YAXIS_SIDE_RIGHT => 'axis axis-vertical-right',
+		GRAPH_YAXIS_SIDE_LEFT => 'axis axis-vertical-left',
+		GRAPH_YAXIS_SIDE_BOTTOM => 'axis axis-horizontal-bottom'
 	];
 
 	/**
@@ -64,7 +55,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @var int
 	 */
 	private $arrow_size = 5;
-	private $arrow_offset = 3;
+	private $arrow_offset = 5;
 
 	/**
 	 * Axis container.
@@ -119,11 +110,11 @@ class CSvgGraphAxis extends CSvgTag {
 		$size = $this->arrow_size;
 		$offset = ceil($size/2);
 
-		if ($this->type & self::HORIZONTAL) {
-			$y = $this->type & self::TOP ? $this->height + $this->y : $this->y;
-			$x = $this->width + $this->x;
+		if ($this->type === GRAPH_YAXIS_SIDE_BOTTOM) {
+			$y = $this->y;
+			$x = $this->width + $this->x + $this->arrow_offset;
 			$path->moveTo($this->x, $y)
-				->lineTo($x , $y);
+				->lineTo($x, $y);
 
 			if ($size) {
 				$path->moveTo($x + $size, $y)
@@ -133,10 +124,10 @@ class CSvgGraphAxis extends CSvgTag {
 			}
 		}
 		else {
-			$x = $this->type & self::LEFT ? $this->x : $this->width + $this->x;
+			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ? $this->x : $this->width + $this->x;
 			$y = $this->y - $this->arrow_offset;
 			$path->moveTo($x, $y)
-				->lineTo($x, $this->height + $y);
+				->lineTo($x, $this->height + $y + $this->arrow_offset);
 
 			if ($size) {
 				$path->moveTo($x, $y - $size)
@@ -162,18 +153,18 @@ class CSvgGraphAxis extends CSvgTag {
 		$x = 0;
 		$y = 0;
 		$labels = [];
-		$is_horizontal = (bool) ($this->type & self::HORIZONTAL);
+		$is_horizontal = $this->type === GRAPH_YAXIS_SIDE_BOTTOM;
 
 		if ($is_horizontal) {
 			$axis = 'x';
-			$y = $this->type & self::TOP ? 0 : $this->height;
+			$y = $this->height;
 			$align = 'middle';
 			$valign = 'before-edge';
 		}
 		else {
-			$x = $this->type & self::LEFT ? 0 : $this->width;
+			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ? 0 : $this->width;
 			$axis = 'y';
-			$align = $this->type & self::LEFT ? 'end' : 'start';
+			$align = $this->type === GRAPH_YAXIS_SIDE_LEFT ? 'end' : 'start';
 			$valign = 'middle';
 		}
 
