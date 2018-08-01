@@ -120,7 +120,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->onClick('return PopUp("popup.generic", '.
 								CJs::encodeJson([
 									'srctbl' => 'items',
-									'srcfld1' => 'name',
+									'srcfld1' => 'itemid',
+									'srcfld2' => 'name',
 									'reference' => 'name_expanded',
 									'multiselect' => 1,
 									'dstfrm' => $options['form_name'],
