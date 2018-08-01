@@ -3209,7 +3209,8 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testTokens() {
-		$exp = '((-12 + {host:item.str(ГУГЛ)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD} or 10m))';
+		$exp = '((-12 + {host:item.str(ГУГЛ)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD} or'.
+				' {{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")} or 10m))';
 		$tokens = [
 			[
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -3318,9 +3319,23 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'length' => 2
 			],
 			[
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
+				'value' => '{{#LLD}.regsub("^([0-9]+)", "{#LLD}: \1")}',
+				'data' => null,
+				'pos' => 87,
+				'length' => 42
+			],
+			[
+				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR,
+				'value' => 'or',
+				'data' => null,
+				'pos' => 130,
+				'length' => 2
+			],
+			[
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER,
 				'value' => '10m',
-				'pos' => 87,
+				'pos' => 133,
 				'length' => 3,
 				'data' => [
 					'suffix' => 'm'
@@ -3330,7 +3345,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 				'type' => CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE,
 				'value' => ')',
 				'data' => null,
-				'pos' => 90,
+				'pos' => 136,
 				'length' => 1
 			],
 			[

@@ -90,6 +90,13 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{#M}'
 				]
 			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
 			// partial success
 			[
 				'02', 0, [],
@@ -175,6 +182,13 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{#M}'
 				]
 			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")};', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
 			// fail
 			[
 				'', 0, [],
@@ -198,12 +212,21 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				' 10s', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			// User macros are not enabled.
+			[
 				'{$M}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
+			// LLD macros are not enabled.
 			[
 				'{#M}', 0, ['usermacros' => true],
 				[
@@ -212,7 +235,7 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				' 10s', 0, [],
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

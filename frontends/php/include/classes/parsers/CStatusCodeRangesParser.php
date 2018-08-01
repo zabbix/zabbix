@@ -20,19 +20,37 @@
 
 
 /**
- * A parser for simple intervals.
+ * A parser for stats code ranges separated by a comma.
  */
-class CSimpleIntervalParser extends CParser {
+class CStatusCodeRangesParser extends CParser {
 
+	/**
+	 * Status code range parser.
+	 *
+	 * @var CStatusCodeRangeParser
+	 */
+	private $status_code_range_parser;
+
+	/**
+	 * Array of status code ranges.
+	 *
+	 * @var array
+	 */
+	private $ranges = [];
+
+	/**
+	 * Options to initialize other parsers.
+	 *
+	 * @var array
+	 */
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false
 	];
 
-	private $user_macro_parser;
-	private $lld_macro_parser;
-	private $lld_macro_function_parser;
-
+	/**
+	 * @param array $options   An array of options to initialize other parsers.
+	 */
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
 			$this->options['usermacros'] = $options['usermacros'];
@@ -41,19 +59,14 @@ class CSimpleIntervalParser extends CParser {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 
-		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
-		}
-		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
-		}
+		$this->status_code_range_parser = new CStatusCodeRangeParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
 	}
 
 	/**
-	 * Parse the given source string.
-	 *
-	 * 0..N[smhdw]|{$M}|{#M}|{{#M}.func()}
+	 * Parse the given status codes separated by a comma.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -61,29 +74,45 @@ class CSimpleIntervalParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->ranges = [];
 
+		$ranges = [];
 		$p = $pos;
 
-		if (preg_match('/^((0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
-			$p += strlen($matches[0]);
+		while (isset($source[$p])) {
+			if ($this->status_code_range_parser->parse($source, $p) != self::PARSE_FAIL) {
+				$p += $this->status_code_range_parser->getLength();
+				$ranges[] = $this->status_code_range_parser->getStatusCodes();
+			}
+			elseif ($source[$p] === ',' && $p != $pos && isset($source[$p - 1]) && $source[$p - 1] !== ',') {
+				$p++;
+			}
+			else {
+				break;
+			}
 		}
-		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->user_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_function_parser->getLength();
-		}
-		else {
+
+		if ($p == $pos) {
 			return self::PARSE_FAIL;
+		}
+
+		if (isset($source[$p - 1]) && $source[$p - 1] === ',') {
+			$p--;
 		}
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
+		$this->ranges = $ranges;
 
-		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return (isset($source[$p])) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Retrieve the status code ranges.
+	 *
+	 * @return array
+	 */
+	public function getRanges() {
+		return $this->ranges;
 	}
 }

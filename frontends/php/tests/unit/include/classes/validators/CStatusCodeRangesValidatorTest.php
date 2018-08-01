@@ -25,59 +25,108 @@
 class CStatusCodeRangesValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return [
-			[['usermacros' => false]]
-		];
+		return [[[]]];
 	}
 
 	public function validValuesProvider() {
 		return [
 			[
-				['usermacros' => true], '{$MACRO}'
+				['usermacros' => true],
+				'{$MACRO}'
 			],
 			[
-				['usermacros' => true], '{$MACRO}-{$MACRO}'
+				['usermacros' => true],
+				'{$MACRO}-{$MACRO}'
 			],
 			[
-				['usermacros' => true], '200-{$MACRO}'
+				['usermacros' => true],
+				'200-{$MACRO}'
 			],
 			[
-				['usermacros' => true], '{$MACRO}-200'
+				['usermacros' => true],
+				'{$MACRO}-200'
 			],
 			[
-				['lldmacros' => true], '{#SCODE}'
+				['lldmacros' => true],
+				'{#SCODE}'
 			],
 			[
-				['lldmacros' => true], '{#SCODE_MIN}-{#SCODE_MAX}'
+				['lldmacros' => true],
+				'{#SCODE_MIN}-{#SCODE_MAX}'
 			],
 			[
-				['lldmacros' => true], '200-{#SCODE_MAX}'
+				['lldmacros' => true],
+				'200-{#SCODE_MAX}'
 			],
 			[
-				['lldmacros' => true], '{#SCODE_MIN}-200'
+				['lldmacros' => true],
+				'{#SCODE_MIN}-200'
 			],
 			[
-				[], '200-400'
+				['lldmacros' => true],
+				'{{#SCODE}.regsub("^([0-9]+)", "{#SCODE}: \1")}'
 			],
 			[
-				[], '200'
+				['lldmacros' => true],
+				'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-'.
+					'{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")}'
 			],
 			[
-				[], '200,301'
+				['lldmacros' => true],
+				'200-{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")}'
 			],
 			[
-				[], "200,\t301,\r\n100\t-\r\n    200\t"
+				['lldmacros' => true],
+				'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-200'
 			],
 			[
-				['usermacros' => true], '{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301'
+				[],
+				'200-400'
 			],
 			[
-				['lldmacros' => true], '{#SCODE_MIN}-{#SCODE_MAX},{#SCODE},{#SCODE_MIN}-200,200-{#SCODE_MAX},200-301'
+				[],
+				'200'
+			],
+			[
+				[],
+				'200,301'
+			],
+			[
+				[],
+				"200,\t301,\r\n100\t-\r\n    200\t"
+			],
+			[
+				['usermacros' => true],
+				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301'
+			],
+			[
+				['lldmacros' => true],
+				'{#SCODE_MIN}-{#SCODE_MAX},{#SCODE},{#SCODE_MIN}-200,200-{#SCODE_MAX},200-301'
+			],
+			[
+				['lldmacros' => true],
+				'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-'.
+						'{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")},'.
+					'{{#SCODE}.regsub("^([0-9]+)", "{#SCODE}: \1")},'.
+					'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-200,'.
+					'200-{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")},'.
+					'200-301'
 			],
 			[
 				['usermacros' => true, 'lldmacros' => true],
 				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301,{#SCODE_MIN}-{#SCODE_MAX},{#SCODE},'.
 					'{#SCODE_MIN}-200,200-{#SCODE_MAX},200-301,{#SCODE}-{$MACRO}'
+			],
+			[
+				['usermacros' => true, 'lldmacros' => true],
+				'{$MACRO}-{$MACRO},{$MACRO},{$MACRO}-200,200-{$MACRO},200-301,'.
+					'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-'.
+						'{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")},'.
+					'{{#SCODE}.regsub("^([0-9]+)", "{#SCODE}: \1")},'.
+					'{{#SCODE_MIN}.regsub("^([0-9]+)", "{#SCODE_MIN}: \1")}-200,'.
+					'200-{{#SCODE_MAX}.regsub("^([0-9]+)", "{#SCODE_MAX}: \1")},'.
+					'200-301,'.
+					'{{#SCODE}.regsub("^([0-9]+)", "{#SCODE}: \1")}-{$MACRO}'
 			]
 		];
 	}
@@ -163,7 +212,7 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 				['messageInvalid' => 'Invalid value "%2$s" for %1$s'],
 				null,
 				'Invalid value "null" for object'
-			],
+			]
 		];
 	}
 

@@ -32,13 +32,27 @@ class CTriggerExpressionReplaceHostTest extends PHPUnit_Framework_TestCase {
 				'{Zabbix server:item.func()}'
 			],
 			[
-				'5 + {host:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or {host:item.func()} or {host2:item2.func()}',
-				'host', 'Zabbix server',
-				'5 + {Zabbix server:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or {Zabbix server:item.func()} or {host2:item2.func()}'
+				'5 + {host:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
+					' {host:item.func()} or {host2:item2.func()}',
+				'host',
+				'Zabbix server',
+				'5 + {Zabbix server:item.func()} <> 0 or {$MACRO: "context"} or {#MACRO} or {TRIGGER.VALUE} or'.
+					' {Zabbix server:item.func()} or {host2:item2.func()}'
+			],
+			[
+				'5 + {host:item.func()} <> 0 or {$MACRO: "context"} or'.
+					' {{#MACRO}.regsub("^([0-9]+)", "{#MACRO}: \1")} or {TRIGGER.VALUE} or'.
+					' {host:item.func()} or {host2:item2.func()}',
+				'host',
+				'Zabbix server',
+				'5 + {Zabbix server:item.func()} <> 0 or {$MACRO: "context"} or'.
+					' {{#MACRO}.regsub("^([0-9]+)", "{#MACRO}: \1")} or {TRIGGER.VALUE} or'.
+					' {Zabbix server:item.func()} or {host2:item2.func()}'
 			],
 			[
 				'5 + {Zabbix server:item.func()} <> 0 or {Zabbix server:item.func()} or {host2:item2.func()}',
-				'Zabbix server', 'host',
+				'Zabbix server',
+				'host',
 				'5 + {host:item.func()} <> 0 or {host:item.func()} or {host2:item2.func()}'
 			]
 		];

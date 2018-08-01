@@ -28,28 +28,19 @@
 class CStatusCodeRangesValidator extends CValidator {
 
 	/**
-	 * @var CUserMacroParser
+	 * @var CStatusCodeRangesParser
 	 */
-	private $user_macro_parser;
+	private $status_code_ranges_parser;
 
 	/**
-	 * If set to true, user macros can be used as part or value in status code ranges.
+	 * Options to initialize other parsers.
 	 *
-	 * @var bool
+	 * @var array
 	 */
-	public $usermacros = false;
-
-	/**
-	 * @var CLLDMacroParser
-	 */
-	private $lld_macro_parser;
-
-	/**
-	 * If set to true, lld macros can be used as part or value in status code ranges.
-	 *
-	 * @var bool
-	 */
-	public $lldmacros = false;
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false
+	];
 
 	/**
 	 * Error message if the status codes range string is invalid.
@@ -60,16 +51,18 @@ class CStatusCodeRangesValidator extends CValidator {
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('usermacros', $options)) {
-			$this->usermacros = $options['usermacros'];
-			$this->user_macro_parser = new CUserMacroParser();
+			$this->options['usermacros'] = $options['usermacros'];
 			unset($options['usermacros']);
 		}
-
 		if (array_key_exists('lldmacros', $options)) {
-			$this->lldmacros = $options['lldmacros'];
-			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->options['lldmacros'] = $options['lldmacros'];
 			unset($options['lldmacros']);
 		}
+
+		$this->status_code_ranges_parser = new CStatusCodeRangesParser([
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros']
+		]);
 
 		parent::__construct($options);
 	}
@@ -88,32 +81,25 @@ class CStatusCodeRangesValidator extends CValidator {
 			return false;
 		}
 
-		foreach (explode(',', $value) as $range) {
-			$range_parts = explode('-', $range);
+		// Because trim(" \t\r\n") doesn't work.
+		$value = str_replace([' ', "\t", "\r", "\n"], '', $value);
 
-			if (count($range_parts) != 2 && strpos($range, '-')) {
-				$this->error($this->messageInvalid, $value);
+		if ($this->status_code_ranges_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$ranges = $this->status_code_ranges_parser->getRanges();
 
-				return false;
-			}
-
-			foreach ($range_parts as $index => $part) {
-				$part = trim($part, " \t\r\n");
-
-				if (!ctype_digit($part)) {
-					if (!($this->usermacros && $this->user_macro_parser->parse($part) == CParser::PARSE_SUCCESS)
-							&& !($this->lldmacros && $this->lld_macro_parser->parse($part) == CParser::PARSE_SUCCESS)) {
-						$this->error($this->messageInvalid, $value);
-
-						return false;
-					}
-				}
-				elseif ($index > 0 && ctype_digit($range_parts[$index - 1]) && $range_parts[$index - 1] > $part) {
+			// If status codes are not macros, make sure the first status code is smaller than second one.
+			foreach ($ranges as $range) {
+				if (count($range) > 1 && ctype_digit($range[0]) && ctype_digit($range[1]) && $range[0] > $range[1]) {
 					$this->error($this->messageInvalid, $value);
 
 					return false;
 				}
 			}
+		}
+		else {
+			$this->error($this->messageInvalid, $value);
+
+			return false;
 		}
 
 		return true;
