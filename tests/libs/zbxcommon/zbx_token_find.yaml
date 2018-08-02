@@ -180,7 +180,7 @@ out:
   name: 'VALUE'
   return: 'SUCCEED'
 ---
-test case: "Ordinary LLD functionb macro"
+test case: "Ordinary LLD function macro"
 in:
   expression: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
 out:
@@ -189,5 +189,16 @@ out:
   macro: '{#VALUE}'
   func: 'regsub(^[0-9]+, Problem)'
   param: '(^[0-9]+, Problem)'
+  return: 'SUCCEED'
+---
+test case: "Ordinary LLD function macro 2"
+in:
+  expression: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+out:
+  token: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub("^([0-9]+)", Problem ID: \1)'
+  param: '("^([0-9]+)", Problem ID: \1)'
   return: 'SUCCEED'
 ...
