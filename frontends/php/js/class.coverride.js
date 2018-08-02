@@ -49,7 +49,7 @@ jQuery(function ($) {
 		}
 		else if (option === 'timeshift') {
 			return $('<div></div>')
-				.append($('<input>', {'name': field_name, 'type': 'text'}).val(value))
+				.append($('<input>', {'name': field_name, 'maxlength': 10, 'type': 'text'}).val(value))
 				.append(close);
 		}
 		else {

@@ -201,9 +201,12 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						$errors[]
 							= _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $val);
 					}
-					elseif ($option === 'timeshift' && timeUnitToSeconds($val, true) === null) {
-						$errors[]
-							= _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
+					elseif ($option === 'timeshift') {
+						$timeshift = timeUnitToSeconds($val, true);
+						if ($timeshift === null || abs($timeshift) > ZBX_MAX_PERIOD) {
+							$errors[]
+								= _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
+						}
 					}
 					$options_set++;
 				}

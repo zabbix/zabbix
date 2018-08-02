@@ -239,6 +239,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addRow(_('Time shift'),
 								(new CTextBox($fn.'['.$options['row_num'].'][timeshift]', $value['timeshift']))
 									->setAttribute('placeholder', _('(none)'))
+									->setAttribute('maxlength', 10)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
 					))
@@ -305,11 +306,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		// Validate timeshift values.
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
-				if (array_key_exists('timeshift', $val) && $val['timeshift'] !== ''
-						&& timeUnitToSeconds($val['timeshift'], true) === null) {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Time shift'), _('Data set'),
-						_('a time unit is expected')
-					);
+				if (array_key_exists('timeshift', $val) && $val['timeshift'] !== '') {
+					$timeshift = timeUnitToSeconds($val['timeshift'], true);
+					if ($timeshift === null || abs($timeshift) > ZBX_MAX_PERIOD) {
+						$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Time shift'),
+							_('Data set'), _('a time unit is expected')
+						);
+					}
 					break;
 				}
 			}
