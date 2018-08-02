@@ -2302,8 +2302,6 @@ static int	evaluate_BAND(char *value, DC_ITEM *item, const char *parameters, con
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
 		ret = SUCCEED;
 	}
-	else
-		*error = zbx_strdup(*error, "failed to evaluate LAST");
 
 	zbx_free(last_parameters);
 clean:
