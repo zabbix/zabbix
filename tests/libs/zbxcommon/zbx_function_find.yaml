@@ -196,10 +196,10 @@ out:
 ---
 test case: "function with LLD function in macro context"
 in:
-  param: 'avg("Zabbix server:trap[\"{{#VALUE}.regsub(\"[0-9]+\", \0)}\"]",600)'
+  param: avg("Zabbix server:trap[\"{{#VALUE}.regsub(\\"[0-9]+\\", \0)}\"]",600)'
 out:
   return: 'SUCCEED'
   func_pos: 0
   par_l: 3
-  par_r: 67
+  par_r: 69
 ...
