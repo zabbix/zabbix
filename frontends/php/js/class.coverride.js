@@ -36,35 +36,42 @@ jQuery(function ($) {
 			opt = $override.data('options'),
 			field_name = opt.makeName(option);
 
-		switch (option) {
-			case 'timeshift':
-			case 'color':
-				var content = $('<input>')
-					.attr({'name': field_name, 'type': 'text'})
+		if (option === 'color') {
+			var id = field_name.replace(/\]/g, '_').replace(/\[/g, '_'),
+				input = $('<input>')
+					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id})
 					.val(value);
-				break;
 
-			default:
-				var visible_name = option;
-				var visible_value = value;
-
-				if (typeof opt.captions[option] !== 'undefined') {
-					visible_name = opt.captions[option];
-				}
-				if (typeof opt.captions[option + value] !== 'undefined') {
-					visible_value = opt.captions[option + value];
-				}
-
-				var content = [
-					$('<span></span>', {'data-option': option}).text(visible_name + ': ' + visible_value),
-					$('<input>').attr({'name': field_name, 'type': 'hidden'}).val(value)
-				];
-				break;
+			return $('<div></div>')
+				.addClass('input-color-picker')
+				.append(input)
+				.append(close);
 		}
+		else if (option === 'timeshift') {
+			return $('<div></div>')
+				.append($('<input>', {'name': field_name, 'type': 'text'}).val(value))
+				.append(close);
+		}
+		else {
+			var visible_name = option,
+				visible_value = value;
 
-		return $('<div></div>')
-			.append(content)
-			.append(close);
+			if (typeof opt.captions[option] !== 'undefined') {
+				visible_name = opt.captions[option];
+			}
+			if (typeof opt.captions[option + value] !== 'undefined') {
+				visible_value = opt.captions[option + value];
+			}
+
+			var content = [
+				$('<span></span>', {'data-option': option}).text(visible_name + ': ' + visible_value),
+				$('<input>').attr({'name': field_name, 'type': 'hidden'}).val(value)
+			];
+
+			return $('<div></div>')
+				.append(content)
+				.append(close);
+		}
 	};
 
 	function getMenu($obj, options, option_to_edit, trigger_elmnt) {
@@ -196,9 +203,14 @@ jQuery(function ($) {
 				override.data('options', $.extend({}, {rowId: row_id}, options));
 
 				$(options.options, override).each(function() {
-					var elmnt = createOverrideElement(override, options.makeOption($(this).attr('name')), $(this).val());
+					var opt = options.makeOption($(this).attr('name')),
+						elmnt = createOverrideElement(override, opt, $(this).val());
 					$(elmnt).insertBefore($(this));
 					$(this).remove();
+
+					if (opt === 'color') {
+						$(elmnt).find('input').colorpicker();
+					}
 				});
 
 				$(override).on('click', '[data-option]', function(e) {
@@ -240,9 +252,14 @@ jQuery(function ($) {
 				methods.updateOverride($override, option, value);
 			}
 			else {
+				var elmnt = createOverrideElement($override, option, value);
 				$('<li></li>')
-					.append(createOverrideElement($override, option, value))
+					.append(elmnt)
 					.insertBefore($('li:last', $override));
+
+				if (option === 'color') {
+					$(elmnt).find('input').colorpicker();
+				}
 			}
 
 			// Call on-select callback.

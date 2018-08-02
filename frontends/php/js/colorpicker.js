@@ -46,6 +46,7 @@
 		 */
 		setColorHandler = function() {
 			methods.set_color($(this).attr('title').substr(1));
+			input.trigger('change');
 			methods.hide();
 		},
 		methods = {
@@ -81,8 +82,8 @@
 					'display': 'none',
 					'left': '-' + (overlay.width() ? overlay.width() : 100) + 'px'
 				});
-				selected_label = null;
-				selected_text = null;
+				colorbox = null;
+				input = null;
 			},
 			/**
 			 * Show colorpicker for specific element.
@@ -125,7 +126,6 @@
 					'title': background
 				});
 				input.val(color);
-				methods.hide();
 			},
 			/**
 			 * Set desired color to input element and colorbox associated with input element.
@@ -165,7 +165,8 @@
 		}
 
 		return this.each(function(_, element) {
-			var id = $(element).attr('id');
+			var id = $(element).attr('id'),
+				callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
 			if ($('#lbl_' + id).length) {
 				// Prevent multiple initialization on same element.
 				return;
@@ -187,6 +188,7 @@
 				 * is sorted in graph configuration form.
 				 */
 				methods.set_color_by_id($(element).attr('id'), this.value);
+				callback && callback.call(element, this.value);
 			});
 
 			methods.set_color_by_id(id, element.value);

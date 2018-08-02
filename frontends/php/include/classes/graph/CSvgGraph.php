@@ -980,20 +980,6 @@ class CSvgGraph extends CSvg {
 		return $this;
 	}
 
-//	private function addToolTip() {
-//		$this->addItem([
-//			(new CSvgTag('switch', true))
-//				->addItem(
-//					(new CSvgTag('foreignObject', true))
-//						->setAttribute('x', 0)
-//						->setAttribute('y', 0)
-//						->setAttribute('width', 0)
-//						->setAttribute('height', 0)
-//						->addClass('svg-tool-tip')
-//				)
-//		]);
-//	}
-
 	private function addValueBox() {
 		$this->addItem([
 			(new CSvgRect(-5, $this->canvas_y, 3, $this->canvas_height))

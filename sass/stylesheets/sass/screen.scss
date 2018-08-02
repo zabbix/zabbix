@@ -4152,13 +4152,6 @@ $form-icon-btn: (
 	stroke-color: rgba($dark-yellow,0.6);
 	stroke-width: 1px;
 }
-.svg-tool-tip > * {
-	background: rgba($white,0.75);
-	border: 1px solid rgba(black, 0.3);
-	white-space: nowrap;
-	padding: 7px 10px;
-	display: table;
-}
 
 .ui-selectable-helper {
 	position: absolute;
@@ -5469,13 +5462,13 @@ svg {
 			> span {
 				color: lighten($ui-bg-selected-color, 100%);
 				padding-left: 8px;
-				line-height: 20px;
+				line-height: 22px;
 			}
 
 			> input[type=text] {
 				border-style: none;
-				line-height: 20px;
-				min-height: 20px;
+				line-height: 22px;
+				min-height: 22px;
 				width: 85px;
 			}
 

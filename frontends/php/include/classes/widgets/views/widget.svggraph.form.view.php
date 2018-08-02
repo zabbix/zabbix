@@ -196,7 +196,8 @@ return [
 	'js_includes' => [
 		'js/class.coverride.js',
 		'js/class.cverticalaccordion.js',
-		'js/class.crangecontrol.js'
+		'js/class.crangecontrol.js',
+		'js/colorpicker.js'
 	],
 	'jq_templates' => $jq_templates
 ];

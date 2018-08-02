@@ -2885,13 +2885,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-color: rgba(233, 144, 3, 0.6);
   stroke-width: 1px; }
 
-.svg-tool-tip > * {
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-  padding: 7px 10px;
-  display: table; }
-
 .ui-selectable-helper {
   position: absolute;
   z-index: 100;
@@ -3818,11 +3811,11 @@ svg {
       .overrides-options-list > li > div > span {
         color: white;
         padding-left: 8px;
-        line-height: 20px; }
+        line-height: 22px; }
       .overrides-options-list > li > div > input[type=text] {
         border-style: none;
-        line-height: 20px;
-        min-height: 20px;
+        line-height: 22px;
+        min-height: 22px;
         width: 85px; }
       .overrides-options-list > li > div > .remove-btn {
         color: #ffffff;

@@ -153,10 +153,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					(new CDiv(
 						(new CFormList())
 							->addRow(_('Base color'),
-								// Replaced to simple input field, because we don't have usable color picker now.
-								(new CTextBox($fn.'['.$options['row_num'].'][color]', $value['color'], false, 6))
-								//(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
-								//	->appendColorPickerJs(false)
+								(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
+									->appendColorPickerJs(false)
 							)
 							->addRow(_('Draw'),
 								(new CRadioButtonList($fn.'['.$options['row_num'].'][type]', (int) $value['type']))
@@ -463,6 +461,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 			// Initialize rangeControl UI elements.
 			'jQuery(".range-control").rangeControl();',
+
+			// Initialize color-picker UI elements.
+			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
+				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
+				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
+			'}});',
 
 			// Initialize sortability.
 			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
