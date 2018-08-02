@@ -21,7 +21,7 @@
 
 class CSvgText extends CTag {
 
-	public function __construct($x, $y, $text, $color) {
+	public function __construct($x, $y, $text) {
 		parent::__construct('text', true);
 
 		// should define x, y
@@ -35,11 +35,9 @@ class CSvgText extends CTag {
 		 * consider set x and y right before stringify, e.g., define tostring function and add attributes right before
 		 * call parent::tostring. This allows change x & y more flexible.
 		 */
-		$this->setAttribute('font-family', 'Arial, Tahoma, Verdana, sans-serif');
+		// $this->setAttribute('font-family', 'Arial, Tahoma, Verdana, sans-serif');
 		$this->setAttribute('x', $this->x);
 		$this->setAttribute('y', $this->y);
-		$this->setAttribute('fill', $color);
-		$this->setFontSize(13);
 		$this->addItem($text);
 	}
 
