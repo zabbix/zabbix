@@ -202,7 +202,7 @@ out:
   param: '("^([0-9]+)", Problem ID: \1)'
   return: 'SUCCEED'
 ---
-test case: "Ordinary LLD function macro 2"
+test case: "User macro with LLD function macro context"
 in:
   expression: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
 out:
