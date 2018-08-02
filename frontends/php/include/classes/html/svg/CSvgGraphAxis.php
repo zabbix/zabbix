@@ -101,6 +101,21 @@ class CSvgGraphAxis extends CSvgTag {
 	}
 
 	/**
+	 * Return CSS style definitions for axis as array.
+	 *
+	 * @return array
+	 */
+	public function getStyles() {
+		return [
+			'.axis path' => 'stroke: silver; fill: white;',
+			'.axis text' => 'fill: silver; text-length: '.$this->width,
+			'.axis-vertical-right text' => 'text-anchor: start; alignment-baseline: middle;',
+			'.axis-vertical-left text' => 'text-anchor: end; alignment-baseline: middle;',
+			'.axis-horizontal-bottom text' => 'text-anchor: middle; alignment-baseline: middle; dominant-baseline: middle;'
+		];
+	}
+
+	/**
 	 * Get axis line with arrow.
 	 *
 	 * @return CSvgPath
@@ -137,10 +152,6 @@ class CSvgGraphAxis extends CSvgTag {
 			}
 		}
 
-		/* TODO: move to global style */
-		$path->setStrokeColor('silver')
-			->setFillColor('white');
-
 		return $path;
 	}
 
@@ -157,16 +168,17 @@ class CSvgGraphAxis extends CSvgTag {
 
 		if ($is_horizontal) {
 			$axis = 'x';
-			$y = $this->height;
-			$align = 'middle';
-			$valign = 'before-edge';
+			// Label margin from axis.
+			$margin = 7;
+			$y = $this->height - $margin;
 		}
 		else {
-			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ? 0 : $this->width;
+			// Label margin from axis.
+			$margin = 5;
 			$axis = 'y';
-			$align = $this->type === GRAPH_YAXIS_SIDE_LEFT ? 'end' : 'start';
-			$valign = 'middle';
+			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ?  -$margin : $this->width + $margin;
 		}
+
 
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
@@ -176,9 +188,7 @@ class CSvgGraphAxis extends CSvgTag {
 				$y = $this->height - $y;
 			}
 
-			$labels[] = (new CSvgText($x + $this->x, $y + $this->y, $label, /* TODO: remove param */'silver'))
-				/* TODO: move to global style */->setAttribute('text-anchor', $align)
-				/* TODO: move to global style */->setAttribute('dominant-baseline', $valign);
+			$labels[] = (new CSvgText($x + $this->x, $y + $this->y, $label));
 		}
 
 		return $labels;
@@ -186,7 +196,7 @@ class CSvgGraphAxis extends CSvgTag {
 
 	public function toString($destroy = true) {
 		$this->container->additem([
-			$this->getAxis(),
+			$this->type !== GRAPH_YAXIS_SIDE_RIGHT ? $this->getAxis() : null,
 			$this->getLabels()
 		])
 			->addClass($this->css_class[$this->type]);
