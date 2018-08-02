@@ -2078,11 +2078,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
-	if (ITEM_TYPE_HTTPAGENT == item_prototype->type)
-	{
-		if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
-			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
-	}
+	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
+		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
 
 	if (0 != strcmp(item->query_fields, buffer))
 	{
