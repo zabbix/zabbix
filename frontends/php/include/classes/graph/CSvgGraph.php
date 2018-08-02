@@ -369,71 +369,53 @@ class CSvgGraph extends CSvg {
 		);
 	}
 
-
-	private function addCanvasLeftYAxis() {
-		// Left Y must be enabled and at least one metric must be configured use left Y axis.
+	/**
+	 * Render Y axis with labels for left side of graph.
+	 */
+	protected function addCanvasLeftYaxis() {
 		if ($this->left_y_show && $this->min_value_left !== null) {
-			$this->addItem([
-				new CSvgLine(
-					$this->canvas_x,
-					$this->canvas_y - 3,
-					$this->canvas_x,
-					$this->canvas_y + $this->canvas_height + 3,
-					$this->color_axis
-				),
-				(new CSvgPolygon([
-						[$this->canvas_x, $this->canvas_y - 7],
-						[$this->canvas_x - 3, $this->canvas_y - 3],
-						[$this->canvas_x + 3, $this->canvas_y - 3],
-				]))
-					->setStrokeWidth(1)
-					->setStrokeColor($this->color_axis)
-					->setFillColor($this->color_background)//???
-			]);
-		}
-	}
-
-	private function addCanvasRightYAxis() {
-		// Right Y must be enabled and at least one metric must be configured use right Y axis.
-		if ($this->right_y_show && $this->min_value_right !== null) {
-			$this->addItem([
-				new CSvgLine(
-					$this->canvas_x + $this->canvas_width,
-					$this->canvas_y - 3,
-					$this->canvas_x + $this->canvas_width,
-					$this->canvas_y + $this->canvas_height + 3,
-					$this->color_axis
-				),
-				(new CSvgPolygon([
-						[$this->canvas_x + $this->canvas_width, $this->canvas_y - 7],
-						[$this->canvas_x + $this->canvas_width - 3, $this->canvas_y - 3],
-						[$this->canvas_x + $this->canvas_width + 3, $this->canvas_y - 3],
-				]))
-					->setStrokeWidth(1)
-					->setStrokeColor($this->color_axis)
-					->setFillColor($this->color_background)
-			]);
-		}
-	}
-
-	private function addCanvasXAxis() {
-		$this->addItem([
-			new CSvgLine(
-				$this->canvas_x - 3,
-				$this->canvas_y + $this->canvas_height,
-				$this->canvas_x + $this->canvas_width + 3,
-				$this->canvas_y + $this->canvas_height,
-				$this->color_axis
-			),
-			(new CSvgPolygon([
-					[$this->canvas_x + $this->canvas_width + 7, $this->canvas_y + $this->canvas_height],
-					[$this->canvas_x + $this->canvas_width + 3, $this->canvas_y + $this->canvas_height - 3],
-					[$this->canvas_x + $this->canvas_width + 3, $this->canvas_y + $this->canvas_height + 3],
-				]))
-				->setStrokeWidth(1)
-				->setStrokeColor($this->color_axis)
-				->setFillColor('white')]
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+			$this->addItem(
+				(new CSvgGraphAxis($values,GRAPH_YAXIS_SIDE_LEFT))
+					->setSize($this->offset_left, $this->canvas_height)
+					->setPosition($this->canvas_x, $this->canvas_y)
 			);
+		}
+	}
+
+	/**
+	 * Render Y axis with labels for right side of graph.
+	 */
+	protected function addCanvasRightYAxis() {
+		if ($this->right_y_show && $this->min_value_right !== null) {
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+
+			if (count($values) > 1) {
+				// Do not render value for y=0.
+				reset($values);
+				unset($values[key($values)]);
+			}
+
+			$this->addItem(
+				(new CSvgGraphAxis($values, GRAPH_YAXIS_SIDE_RIGHT))
+					->setSize($this->offset_right, $this->canvas_height)
+					->setPosition($this->canvas_width, $this->canvas_y)
+			);
+		}
+	}
+
+	/**
+	 * Render X axis with labels of graph.
+	 */
+	protected function addCanvasXAxis() {
+		if ($this->x_axis) {
+			// Horizontal axis container height. TODO: should be calculated by calculateDimensions.
+			$container_height = 20;
+			$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+				->setSize($this->canvas_width, $container_height)
+				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+			);
+		}
 	}
 
 	private function getValueGrid($min, $max) {
@@ -460,10 +442,12 @@ class CSvgGraph extends CSvg {
 		if ($side === GRAPH_YAXIS_SIDE_RIGHT) {
 			$min_value = $this->right_y_min;
 			$max_value = $this->right_y_max;
+			$units = $this->right_y_units;
 		}
 		elseif ($side === GRAPH_YAXIS_SIDE_LEFT) {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
+			$units = $this->left_y_units;
 		}
 		else {
 			return [];
@@ -477,7 +461,10 @@ class CSvgGraph extends CSvg {
 
 		foreach ($grid as $value) {
 			$relative_pos = $this->canvas_height - $this->canvas_height * ($grid_max - $value) / $delta;
-			$grid_values[$relative_pos] = $value;
+			$grid_values[$relative_pos] = convert_units([
+				'value' => $value,
+				'units' => $units
+			]);
 		}
 
 		return $grid_values;
@@ -998,17 +985,14 @@ class CSvgGraph extends CSvg {
 		// Draw problem zones.
 		$this->drawProblems();
 
-		// Add Y axes.
+		// Add Y axis.
 		$this->addCanvasLeftYAxis();
 		$this->addCanvasRightYAxis();
+		// Add X axis.
+		$this->addCanvasXAxis();
 
 		// Add grid lines.
 		$this->drawGrid();
-
-		// Add X axis.
-		if ($this->x_axis) {
-			$this->addCanvasXAxis();
-		}
 
 		// Add vertical highlihtinh line that follows mouse.
 		$this->addValueBox();

@@ -108,7 +108,7 @@ class CSvgGraphAxis extends CSvgTag {
 	public function getStyles() {
 		return [
 			'.axis path' => 'stroke: silver; fill: white;',
-			'.axis text' => 'fill: silver; text-length: '.$this->width,
+			'.axis text' => 'fill: silver; font-size: 11px;',
 			'.axis-vertical-right text' => 'text-anchor: start; alignment-baseline: middle;',
 			'.axis-vertical-left text' => 'text-anchor: end; alignment-baseline: middle;',
 			'.axis-horizontal-bottom text' => 'text-anchor: middle; alignment-baseline: middle; dominant-baseline: middle;'
