@@ -179,6 +179,26 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 				'Invalid value "500-100"'
 			],
 			[
+				['usermacros' => true, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'{$MAC RO}',
+				'Invalid value "{$MAC RO}"'
+			],
+			[
+				['lldmacros' => true, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'{#MAC RO}',
+				'Invalid value "{#MAC RO}"'
+			],
+			[
+				['lldmacros' => true, 'messageInvalid' => 'Invalid value "%1$s"'],
+				'{{#MAC RO}.func()}',
+				'Invalid value "{{#MAC RO}.func()}"'
+			],
+			[
+				['messageInvalid' => 'Invalid value "%1$s"'],
+				'5 55',
+				'Invalid value "5 55"'
+			],
+			[
 				['messageInvalid' => 'Invalid value "%1$s"'],
 				'',
 				'Invalid value ""'
