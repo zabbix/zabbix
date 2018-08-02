@@ -1128,6 +1128,15 @@ class CEvent extends CApiService {
 			}
 		}
 
+		// Remove "maintenanceid" field if it's not requested.
+		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT
+				&& !$this->outputIsRequested('maintenanceid', $options['selectSuppressionData'])) {
+			foreach ($result as &$row) {
+				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
+			}
+			unset($row);
+		}
+
 		// Adding event tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
