@@ -510,10 +510,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			query = (zbx_event_suppress_query_t *)event_queries.values[i];
 			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-			/* don't process recovered events as their suppress data will be removed anyway */
-			if (0 != query->r_eventid)
-				continue;
-
 			k = 0;
 
 			if (FAIL != (j = zbx_vector_ptr_bsearch(&event_data, &query->eventid,
@@ -538,9 +534,15 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 					if (data->maintenances.values[j].first > query->maintenances.values[k].first)
 					{
-						zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-								query->maintenances.values[k].first,
-								(int)query->maintenances.values[k].second);
+						if (0 == query->r_eventid)
+						{
+							zbx_db_insert_add_values(&db_insert, __UINT64_C(0),
+									query->eventid,
+									query->maintenances.values[k].first,
+									(int)query->maintenances.values[k].second);
+
+							(*suppressed_num)++;
+						}
 
 						k++;
 						continue;
@@ -572,34 +574,16 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 				}
 			}
 
-			for (;k < query->maintenances.values_num; k++)
-			{
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
-						query->maintenances.values[k].first,
-						(int)query->maintenances.values[k].second);
-			}
-		}
-
-		for (i = 0; i < event_data.values_num; i++)
-		{
-			data = (zbx_event_suppress_data_t *)event_data.values[i];
-
-			if (FAIL == (j = zbx_vector_ptr_bsearch(&event_queries, &data->eventid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			query = (zbx_event_suppress_query_t *)event_queries.values[j];
 			if (0 == query->r_eventid)
-				continue;
-
-			for (j = 0; j < data->maintenances.values_num; j++)
 			{
-				pair.first = query->eventid;
-				pair.second = data->maintenances.values[j].first;
-				zbx_vector_uint64_pair_append(&del_event_maintenances, pair);
+				for (;k < query->maintenances.values_num; k++)
+				{
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+							query->maintenances.values[k].first,
+							(int)query->maintenances.values[k].second);
+
+					(*suppressed_num)++;
+				}
 			}
 		}
 
@@ -733,12 +717,11 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
+				update = zbx_dc_update_maintenances();
+
 				/* force maintenance updates at server startup */
 				if (0 == maintenance_time)
-					zbx_dc_maintenance_set_update_flags();
-
-				zbx_dc_update_maintenances();
-				update = zbx_dc_maintenance_check_update_flag(process_num);
+					update = SUCCEED;
 
 				/* update hosts if there are modified (stopped, started, changed) maintenances */
 				if (SUCCEED == update)
@@ -750,6 +733,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 				if (SUCCEED == update)
 				{
+					zbx_dc_maintenance_set_update_flags();
 					db_update_event_suppress_data(&events_num);
 					zbx_dc_maintenance_reset_update_flag(process_num);
 				}
@@ -766,7 +750,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		}
 		else
 		{
-			/* check if a maintenance was updated by the first timer */
+			/* check if event suppress update must be performed */
 			if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",

@@ -832,8 +832,11 @@ typedef struct
 }
 zbx_event_suppress_query_t;
 
+#define ZBX_MAINTENANCE_MODIFIED_TRUE	1
+#define ZBX_MAINTENANCE_MODIFIED_FALSE	0
+
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
-void	zbx_dc_update_maintenances(void);
+int	zbx_dc_update_maintenances(void);
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates);
 void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates);
 int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids);

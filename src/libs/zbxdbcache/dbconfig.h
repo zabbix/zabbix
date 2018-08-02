@@ -691,7 +691,7 @@ typedef struct
 	int			item_sync_ts;
 
 	/* maintenance processing management */
-	int			maintenance_deleted_num;	/* number of deleted maintenances since last update   */
+	int			maintenances_modified;	/* number of modified maintenances since last update  */
 	zbx_uint64_t		*maintenance_update_flags;	/* Array of flags to manage timer maintenance updates.*/
 								/* Each array member contains 0/1 flag for 64 timers  */
 								/* indicating if the timer must process maintenance.  */

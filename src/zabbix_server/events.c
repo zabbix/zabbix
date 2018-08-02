@@ -1839,39 +1839,6 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 /******************************************************************************
  *                                                                            *
- * Function: remove_event_suppress_data                                       *
- *                                                                            *
- * Purpose: remove event suppress data for recovered events                   *
- *                                                                            *
- ******************************************************************************/
-static void	remove_event_suppress_data(void)
-{
-	zbx_event_recovery_t	*recovery;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_hashset_iter_t	iter;
-	zbx_vector_uint64_t	eventids;
-
-	zbx_vector_uint64_create(&eventids);
-
-	zbx_hashset_iter_reset(&event_recovery, &iter);
-	while (NULL != (recovery = (zbx_event_recovery_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_append(&eventids, recovery->eventid);
-
-	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from event_suppress where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
-	zbx_vector_uint64_destroy(&eventids);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: save_event_suppress_data                                         *
  *                                                                            *
  * Purpose: retrieve running maintenances for each event and saves it in      *
@@ -1901,7 +1868,7 @@ static void	update_event_suppress_data(void)
 			zbx_vector_ptr_append(&event_refs, &events[i]);
 	}
 
-	if (0 == event_refs.values_num && 0 == event_recovery.num_data)
+	if (0 == event_refs.values_num)
 		goto out;
 
 	if (SUCCEED != zbx_dc_get_running_maintenanceids(&maintenanceids))
@@ -1909,9 +1876,6 @@ static void	update_event_suppress_data(void)
 
 	if (0 != event_refs.values_num)
 		add_event_suppress_data(&event_refs, &maintenanceids);
-
-	if (0 != event_recovery.num_data)
-		remove_event_suppress_data();
 out:
 	zbx_vector_ptr_destroy(&event_refs);
 	zbx_vector_uint64_destroy(&maintenanceids);
