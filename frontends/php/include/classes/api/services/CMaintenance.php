@@ -454,7 +454,7 @@ class CMaintenance extends CApiService {
 	private function validateTags(array $maintenance) {
 		if (array_key_exists('maintenance_type', $maintenance)
 				&& $maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA
-				&& array_key_exists('tags', $maintenance) && $maintenance['tags'] !== []) {
+				&& array_key_exists('tags', $maintenance) && $maintenance['tags']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', 'tags', _('should be empty'))
 			);
