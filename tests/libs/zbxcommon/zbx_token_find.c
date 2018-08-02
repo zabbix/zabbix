@@ -24,14 +24,14 @@
 
 #include "common.h"
 
-static void	compare_token(const char *prefix, const char *path, const char *expression, size_t l, size_t r)
+static void	compare_token(const char *prefix, const char *path, const char *expression, zbx_strloc_t strloc)
 {
 	char	*end, c;
 
-	end = (char *)&expression[r + 1];
+	end = (char *)&expression[strloc.r + 1];
 	c = *end;
 	*end = '\0';
-	zbx_mock_assert_str_eq(prefix, zbx_mock_get_parameter_string(path), expression + l);
+	zbx_mock_assert_str_eq(prefix, zbx_mock_get_parameter_string(path), expression + strloc.l);
 	*end = c;
 }
 
@@ -59,13 +59,11 @@ static void	compare_token_user_macro(const char *expression, zbx_token_t *token)
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
 				ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
 	{
-		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+		compare_token("Invalid token", "out.token", expression, token->token);
 
-		compare_token("Invalid name", "out.name", expression, token->data.user_macro.name.l,
-				token->data.user_macro.name.r);
+		compare_token("Invalid name", "out.name", expression, token->data.user_macro.name);
 
-		compare_token("Invalid context", "out.context", expression, token->data.user_macro.context.l,
-				token->data.user_macro.context.r);
+		compare_token("Invalid context", "out.context", expression, token->data.user_macro.context);
 
 	}
 	else
@@ -89,16 +87,13 @@ static void	compare_token_func_macro_values(const char *expression, zbx_token_t 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
 			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
 	{
-		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+		compare_token("Invalid token", "out.token", expression, token->token);
 
-		compare_token("Invalid macro", "out.macro", expression, token->data.func_macro.macro.l,
-				token->data.lld_func_macro.macro.r);
+		compare_token("Invalid macro", "out.macro", expression, token->data.func_macro.macro);
 
-		compare_token("Invalid func", "out.func", expression, token->data.func_macro.func.l,
-				token->data.lld_func_macro.func.r);
+		compare_token("Invalid func", "out.func", expression, token->data.func_macro.func);
 
-		compare_token("Invalid param", "out.param", expression, token->data.func_macro.func_param.l,
-				token->data.lld_func_macro.func_param.r);
+		compare_token("Invalid param", "out.param", expression, token->data.func_macro.func_param);
 	}
 	else
 	{
@@ -124,10 +119,9 @@ static void	compare_token_lld_macro_values(const char *expression, zbx_token_t *
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
 			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
 	{
-		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+		compare_token("Invalid token", "out.token", expression, token->token);
 
-		compare_token("Invalid macro", "out.name", expression, token->data.lld_macro.name.l,
-				token->data.lld_macro.name.r);
+		compare_token("Invalid macro", "out.name", expression, token->data.lld_macro.name);
 	}
 	else
 	{
@@ -147,16 +141,13 @@ static void	compare_token_lld_func_macro_values(const char *expression, zbx_toke
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
 			ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
 	{
-		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
+		compare_token("Invalid token", "out.token", expression, token->token);
 
-		compare_token("Invalid macro", "out.macro", expression, token->data.lld_func_macro.macro.l,
-				token->data.lld_func_macro.macro.r);
+		compare_token("Invalid macro", "out.macro", expression, token->data.lld_func_macro.macro);
 
-		compare_token("Invalid func", "out.func", expression, token->data.lld_func_macro.func.l,
-				token->data.lld_func_macro.func.r);
+		compare_token("Invalid func", "out.func", expression, token->data.lld_func_macro.func);
 
-		compare_token("Invalid param", "out.param", expression, token->data.lld_func_macro.func_param.l,
-				token->data.lld_func_macro.func_param.r);
+		compare_token("Invalid param", "out.param", expression, token->data.lld_func_macro.func_param);
 	}
 	else
 	{
