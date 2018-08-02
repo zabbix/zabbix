@@ -432,6 +432,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'}).each(function(i) {'.
 						'jQuery(this).val(i + 1);'.
 					'});'.
+					'updateGraphPreview();'.
 				'}'.
 			'});'
 		];
