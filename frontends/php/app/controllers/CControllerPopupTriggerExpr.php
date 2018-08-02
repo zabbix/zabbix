@@ -273,7 +273,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'str' => [
 				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
 				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
 			'strlen' => [
@@ -306,19 +306,19 @@ class CControllerPopupTriggerExpr extends CController {
 			'fuzzytime' => [
 				'description' => _('fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)'),
 				'params' => $this->param1Sec,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesNumeric,
 				'operators' => ['=', '<>']
 			],
 			'regexp' => [
 				'description' => _('regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)'),
 				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
 			'iregexp' => [
 				'description' => _('iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)'),
 				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesAny,
+				'allowed_types' => $this->allowedTypesStr,
 				'operators' => ['=', '<>']
 			],
 			'logeventid' => [
