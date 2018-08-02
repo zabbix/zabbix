@@ -845,8 +845,8 @@ function makeMaintenanceIcon($type, $name, $description) {
  * Renders an icon for suppressed problem.
  *
  * @param array  $icon_data
- * @param string $icon_data[]['suppress_until']   Time until the problem is suppressed.
- * @param string $icon_data[]['maintenance_name'] Name of the maintenance.
+ * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
+ * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
  *
  * @return CSpan
  */
