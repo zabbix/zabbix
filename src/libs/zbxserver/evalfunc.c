@@ -1137,11 +1137,6 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 
 		ts_end.sec -= time_shift;
 	}
-	else
-	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
-		goto out;
-	}
 
 	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
 	{
