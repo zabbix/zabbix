@@ -201,4 +201,14 @@ out:
   func: 'regsub("^([0-9]+)", Problem ID: \1)'
   param: '("^([0-9]+)", Problem ID: \1)'
   return: 'SUCCEED'
+---
+test case: "Ordinary LLD function macro 2"
+in:
+  expression: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+out:
+  token_type: ZBX_TOKEN_USER_MACRO
+  token: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+  name: 'MACRO'
+  context: '"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"'
+  return: 'SUCCEED'
 ...

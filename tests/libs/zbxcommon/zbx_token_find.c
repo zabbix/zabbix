@@ -51,16 +51,34 @@ static void	get_exp_value_and_compare(const char *param, size_t found_value)
 	}
 }
 
-static void	compare_token_user_macro(zbx_token_t *token)
+static void	compare_token_user_macro(const char *expression, zbx_token_t *token)
 {
-	get_exp_value_and_compare("out.token_l", token->token.l);
-	get_exp_value_and_compare("out.token_r", token->token.r);
+	zbx_mock_handle_t	handle;
+	const char		*parameter;
 
-	get_exp_value_and_compare("out.name_l", token->data.user_macro.name.l);
-	get_exp_value_and_compare("out.name_r", token->data.user_macro.name.r);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.token", &handle) &&
+				ZBX_MOCK_SUCCESS == zbx_mock_string(handle, &parameter))
+	{
+		compare_token("Invalid token", "out.token", expression, token->token.l, token->token.r);
 
-	get_exp_value_and_compare("out.context_l", token->data.user_macro.context.l);
-	get_exp_value_and_compare("out.context_r", token->data.user_macro.context.r);
+		compare_token("Invalid name", "out.name", expression, token->data.user_macro.name.l,
+				token->data.user_macro.name.r);
+
+		compare_token("Invalid context", "out.context", expression, token->data.user_macro.context.l,
+				token->data.user_macro.context.r);
+
+	}
+	else
+	{
+		get_exp_value_and_compare("out.token_l", token->token.l);
+		get_exp_value_and_compare("out.token_r", token->token.r);
+
+		get_exp_value_and_compare("out.name_l", token->data.user_macro.name.l);
+		get_exp_value_and_compare("out.name_r", token->data.user_macro.name.r);
+
+		get_exp_value_and_compare("out.context_l", token->data.user_macro.context.l);
+		get_exp_value_and_compare("out.context_r", token->data.user_macro.context.r);
+	}
 }
 
 static void	compare_token_func_macro_values(const char *expression, zbx_token_t *token)
@@ -189,7 +207,7 @@ void	zbx_mock_test_entry(void **state)
 				compare_token_func_macro_values(expression, &token);
 				break;
 			case ZBX_TOKEN_USER_MACRO:
-				compare_token_user_macro(&token);
+				compare_token_user_macro(expression, &token);
 				break;
 			case ZBX_TOKEN_LLD_MACRO:
 				compare_token_lld_macro_values(expression, &token);
