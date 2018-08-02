@@ -2008,7 +2008,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid value value");
+		*error = zbx_strdup(*error, "not a valid value");
 		goto out;
 	}
 
