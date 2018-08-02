@@ -77,21 +77,30 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$range_time_parser = new CRangeTimeParser();
 
 		foreach (['from' => $from, 'to' => $to] as $field => $value) {
-			$range_time_parser->parse($value);
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			if ($range_time_parser->parse($value) !== CParser::PARSE_SUCCESS) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field === 'from' ? _('From') : _('To'),
+					_('a time unit is expected')
+				);
+				break;
+			}
+			else {
+				$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			}
 		}
 
-		$period = $ts['to'] - $ts['from'] + 1;
+		if (!$errors) {
+			$period = $ts['to'] - $ts['from'] + 1;
 
-		if ($period < ZBX_MIN_PERIOD) {
-			$errors[] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
-			);
-		}
-		elseif ($period > ZBX_MAX_PERIOD) {
-			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
-			);
+			if ($period < ZBX_MIN_PERIOD) {
+				$errors[] = _n('Minimum time period to display is %1$s minute.',
+					'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				);
+			}
+			elseif ($period > ZBX_MAX_PERIOD) {
+				$errors[] = _n('Maximum time period to display is %1$s day.',
+					'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				);
+			}
 		}
 
 		return $errors;
