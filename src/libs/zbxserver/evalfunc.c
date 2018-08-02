@@ -1110,6 +1110,8 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 1, ZBX_PARAM_OPTIONAL, &arg1,
 			&arg1_type))
 	{
@@ -1140,8 +1142,6 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
-
-	zbx_history_record_vector_create(&values);
 
 	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, 0, arg1, &ts_end))
 	{
