@@ -2144,7 +2144,7 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, c
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid value value");
+		*error = zbx_strdup(*error, "not a valid value");
 		goto clean;
 	}
 
@@ -2153,8 +2153,7 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, c
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
 		ret = SUCCEED;
 	}
-	else
-		*error = zbx_strdup(*error, "failed to evaluate LAST");
+
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
