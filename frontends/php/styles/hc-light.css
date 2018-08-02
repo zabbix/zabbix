@@ -4213,8 +4213,7 @@ svg {
   /* Hides the slider so that custom slider can be made */
   width: 100%;
   /* Specific width is required for Firefox. */
-  background: transparent;
-  /* Otherwise white in Chrome */
+  opacity: 0;
   vertical-align: middle;
   height: 24px; }
 
@@ -4261,6 +4260,13 @@ input[type=range]::-webkit-slider-runnable-track {
     background: silver; }
   .range-control .range-control-progress {
     background: #555; }
+  .range-control.disabled {
+    opacity: 1; }
+    .range-control.disabled [type=range] {
+      cursor: default; }
+    .range-control.disabled .range-control-progress,
+    .range-control.disabled .range-control-thumb {
+      background: silver; }
   .range-control datalist {
     position: absolute;
     display: flex;

@@ -5967,7 +5967,7 @@ $range-track-height: 2px;
 	cursor: pointer;
 	-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
 	width: 100%; /* Specific width is required for Firefox. */
-	background: transparent; /* Otherwise white in Chrome */
+	opacity: 0;
 	vertical-align: middle;
 	height: 24px;
 }
@@ -6025,6 +6025,18 @@ input[type=range]::-webkit-slider-runnable-track {
 
 	.range-control-progress {
 		background: $range-progress-color;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		[type=range] {
+			cursor: default;
+		}
+		.range-control-progress,
+		.range-control-thumb {
+			background: silver;
+		}
 	}
 
 	datalist {

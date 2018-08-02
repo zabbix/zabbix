@@ -104,6 +104,10 @@ jQuery(function ($) {
 					})
 					.change();
 
+				if ($input.prop('disabled')) {
+					$control.addClass('disabled');
+				}
+
 				$input
 					.change(function() {$range.val(this.value); updateHandler();})
 					.before($control);
@@ -113,6 +117,7 @@ jQuery(function ($) {
 			var $input = $(this),
 				$range = $input.prev('.range-control').find('[type=range]');
 
+			$input.prev('.range-control').addClass('disabled');
 			$input.prop('disabled', true);
 			$range.prop('disabled', true);
 		},
@@ -120,6 +125,7 @@ jQuery(function ($) {
 			var $input = $(this),
 				$range = $input.prev('.range-control').find('[type=range]');
 
+			$input.prev('.range-control').removeClass('disabled');
 			$input.prop('disabled', false);
 			$range.prop('disabled', false);
 		}
