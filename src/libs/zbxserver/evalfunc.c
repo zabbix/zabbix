@@ -2153,7 +2153,6 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, c
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
 		ret = SUCCEED;
 	}
-
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
