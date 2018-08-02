@@ -194,7 +194,7 @@ out:
   par_l: 44
   par_r: 104
 ---
-test case: "function with LLD function in macro context"
+test case: "function with LLD function double escaped"
 in:
   param: avg("Zabbix server:trap[\"{{#VALUE}.regsub(\\"[0-9]+\\", \0)}\"]",600)'
 out:
@@ -202,4 +202,49 @@ out:
   func_pos: 0
   par_l: 3
   par_r: 69
+---
+test case: "Check that openning of LLD function macro is skipped if no macro"
+in:
+  param: '{{#avg("Zabbix server:trap[{#VALUE}]",600)'
+out:
+  return: 'SUCCEED'
+  func_pos: 3
+  par_l: 6
+  par_r: 41
+---
+test case: "Check that emptynested LLD function macro is skipped if no macro"
+in:
+  param: '{{#}avg("Zabbix server:trap[{#VALUE}]",600)'
+out:
+  return: 'SUCCEED'
+  func_pos: 4
+  par_l: 7
+  par_r: 42
+---
+test case: "Only openning of LLD macro function must fail 1"
+in:
+  param: '{{#'
+out:
+  error: 'Incorrect function expression: {{#'
+  return: 'FAIL'
+---
+test case: "Only openning of LLD macro function must fail 2"
+in:
+  param: '{{'
+out:
+  error: 'Incorrect function expression: {{'
+  return: 'FAIL'
+---
+test case: "Only openning of LLD macro function must fail 3"
+in:
+  param: '{'
+out:
+  error: 'Incorrect function expression: {'
+  return: 'FAIL'
+test case: "Only openning of LLD macro function must fail 4"
+in:
+  param: '{{#}'
+out:
+  error: 'Incorrect function expression: {{#}'
+  return: 'FAIL'
 ...
