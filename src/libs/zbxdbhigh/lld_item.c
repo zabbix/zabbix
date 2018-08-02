@@ -1791,7 +1791,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
 
-	if (SUCCEED == ret && '\0' != *item->query_fields)
+	if (SUCCEED == ret)
 		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
@@ -2078,20 +2078,18 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
 
-	if ('\0' != *item->query_fields)
+	if (ITEM_TYPE_HTTPAGENT == item_prototype->type)
 	{
-		if (SUCCEED == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
-		{
-			if (0 != strcmp(item->query_fields, buffer))
-			{
-				item->query_fields_orig = item->query_fields;
-				item->query_fields = buffer;
-				buffer = NULL;
-				item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS;
-			}
-		}
-		else
+		if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
 			*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+	}
+
+	if (0 != strcmp(item->query_fields, buffer))
+	{
+		item->query_fields_orig = item->query_fields;
+		item->query_fields = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_QUERY_FIELDS;
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->posts);

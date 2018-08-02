@@ -5670,6 +5670,9 @@ int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if ('\0' == **data)
+		goto exit;
+
 	if (SUCCEED != zbx_json_open(*data, &jp_array))
 	{
 		zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
