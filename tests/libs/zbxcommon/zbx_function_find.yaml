@@ -175,4 +175,13 @@ out:
   func_pos: 0
   par_l: 4
   par_r: 48
+---
+test case: "function with LLD function"
+in:
+  param: '{{#VALUE}.regsub([0-9]+, \0)}+avg("Zabbix server:trap[\"{{#VALUE}.regsub([0-9]+, \0)}\"]",600) + {{#VALUE}.regsub([0-9], \0)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 30
+  par_l: 33
+  par_r: 93
 ...
