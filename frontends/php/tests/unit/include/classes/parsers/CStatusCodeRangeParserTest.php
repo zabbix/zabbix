@@ -425,6 +425,46 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 					'status_codes' => ['{$M}', '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}']
 				]
 			],
+			[
+				'100{$M}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '100',
+					'status_codes' => ['100']
+				]
+			],
+			[
+				'100{#M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '100',
+					'status_codes' => ['100']
+				]
+			],
+			[
+				'{$M}100', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$M}',
+					'status_codes' => ['{$M}']
+				]
+			],
+			[
+				'{#M}100', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#M}',
+					'status_codes' => ['{#M}']
+				]
+			],
+			[
+				'100{$M}{#M}', 0, ['usermacros' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '100',
+					'status_codes' => ['100']
+				]
+			],
 			// fail
 			[
 				'', 0, [],
