@@ -476,7 +476,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
-				'disabled: function() {'.
+				'disable: function() {'.
 					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
 				'},'.
 				'update: function() {'.

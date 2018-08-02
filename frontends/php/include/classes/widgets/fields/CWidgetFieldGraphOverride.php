@@ -423,7 +423,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
-				'disabled: function() {'.
+				'disable: function() {'.
 					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
 				'},'.
 				'update: function() {'.
