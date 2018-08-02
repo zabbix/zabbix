@@ -382,6 +382,11 @@ class CSvgGraphHelper {
 					$data_set['color'] = '#'.$data_set['color'];
 				}
 
+				if (array_key_exists('transparency', $data_set)) {
+					// The bigger transparency level, the less visibile the metric is.
+					$data_set['transparency'] = 10 - (int) $data_set['transparency'];
+				}
+
 				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
 					? (int) timeUnitToSeconds($data_set['timeshift'], true)
 					: 0;
@@ -477,6 +482,11 @@ class CSvgGraphHelper {
 				}
 				else {
 					$colors = null;
+				}
+
+				if (array_key_exists('transparency', $override)) {
+					// The bigger transparency level, the less visibile the metric is.
+					$override['transparency'] = 10 - $override['transparency'];
 				}
 
 				foreach ($metrics_matched as $i => $metric_num) {
