@@ -145,4 +145,49 @@ out:
   macro: '{#VALUE}'
   name: 'VALUE'
   return: 'SUCCEED'
+---
+test case: "Macro not started"
+in:
+  expression: '{{#'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro"
+in:
+  expression: '{{#}'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro full"
+in:
+  expression: '{{#}}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid macro char"
+in:
+  expression: '{{##VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid function delimiter"
+in:
+  expression: '{{#VALUE}#regsub(^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "Ordinary LLD functionb macro"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  token: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub(^[0-9]+, Problem)'
+  param: '(^[0-9]+, Problem)'
+  return: 'SUCCEED'
 ...
