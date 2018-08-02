@@ -1162,9 +1162,9 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
 	}
-
-	zbx_history_record_vector_destroy(&values, item->value_type);
 out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
