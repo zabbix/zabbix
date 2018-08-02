@@ -111,6 +111,8 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 									'srcfld1' => 'itemid',
 									'reference' => 'name_expanded',
 									'multiselect' => 1,
+									'real_hosts' => 1,
+									'numeric' => 1,
 									'dstfrm' => $options['form_name'],
 									'dstfld1' => $fn.'['.$options['row_num'].'][items]'
 								]).', null, this);'

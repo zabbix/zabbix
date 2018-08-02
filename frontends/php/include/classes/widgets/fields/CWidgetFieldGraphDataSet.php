@@ -124,6 +124,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									'srcfld2' => 'name',
 									'reference' => 'name_expanded',
 									'multiselect' => 1,
+									'real_hosts' => 1,
+									'numeric' => 1,
 									'dstfrm' => $options['form_name'],
 									'dstfld1' => $fn.'['.$options['row_num'].'][items]',
 								]).', null, this);'
