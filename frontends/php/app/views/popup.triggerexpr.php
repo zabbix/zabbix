@@ -100,7 +100,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
 
-			if ($paramid == 0 || ($paramId == 1 && in_array($data['function'], ['regexp', 'iregexp', 'str']))) {
+			if ($paramid == 0 || ($paramid == 1 && in_array($data['function'], ['regexp', 'iregexp', 'str']))) {
 				if (array_key_exists('M', $param_function)) {
 					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
 				}
@@ -110,7 +110,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 				}
 			}
 
-			if ($paramId == 1 && !in_array($data['function'], ['regexp', 'iregexp', 'str'])) {
+			if ($paramid == 1 && !in_array($data['function'], ['regexp', 'iregexp', 'str'])) {
 				$param_type_element = _('Time');
 				$param_field = (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
