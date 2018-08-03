@@ -467,7 +467,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 	zbx_event_suppress_query_t	*query;
 	zbx_event_suppress_data_t	*data;
 	int				i, j, k;
-	zbx_vector_ptr_t		inserts, updates;
 	zbx_vector_uint64_t		maintenanceids, triggerids;
 	zbx_vector_uint64_pair_t	del_event_maintenances;
 	zbx_uint64_pair_t		pair;
@@ -489,9 +488,6 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		zbx_db_insert_t	db_insert;
 		char		*sql = NULL;
 		size_t		sql_alloc = 0, sql_offset = 0;
-
-		zbx_vector_ptr_create(&inserts);
-		zbx_vector_ptr_create(&updates);
 
 		db_get_query_functions(&event_queries, &triggerids);
 		db_get_query_tags(&event_queries);
@@ -615,9 +611,6 @@ cleanup:
 
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
-
-		zbx_vector_ptr_destroy(&updates);
-		zbx_vector_ptr_destroy(&inserts);
 
 		zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
