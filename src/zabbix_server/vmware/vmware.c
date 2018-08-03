@@ -321,14 +321,14 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  * Purpose: abstracts the curl_easy_setopt/curl_easy_perform call pair        *
  *                                                                            *
  ******************************************************************************/
-int zbx_http_post(CURL* handle, char* error, char* val)
+int zbx_http_post(CURL *handle, char *val, const char **error)
 {
-	CURLoption opt;
-	CURLcode err;
+	CURLoption	opt;
+	CURLcode	err;
 
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_POSTFIELDS, val)))
 	{
-		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
 
 		return FAIL;
 	}
@@ -337,10 +337,12 @@ int zbx_http_post(CURL* handle, char* error, char* val)
 
 	if (CURLE_OK != (err = curl_easy_perform(handle)))
 	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 
 		return FAIL;
 	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
 	return SUCCEED;
 }
@@ -1452,7 +1454,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
 				username_esc, password_esc);
 
-		if (SUCCEED != zbx_http_post(easyhandle, *error, xml))
+		if (SUCCEED != zbx_http_post(easyhandle, xml, error))
 			goto out;
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -1649,7 +1651,7 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char *
 	const char	*__function_name = "vmware_service_get_contents";
 	int		ret = FAIL;
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, ZBX_POST_VMWARE_CONTENTS))
+	if (SUCCEED != zbx_http_post(easyhandle, ZBX_POST_VMWARE_CONTENTS, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -1710,7 +1712,7 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 
 	zbx_free(id_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -1793,7 +1795,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].performance_manager);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
@@ -2188,7 +2190,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	zbx_free(vmid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -2415,7 +2417,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -2510,7 +2512,7 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
 			vmware_service_objects[service->type].property_collector, hv->id);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -2827,7 +2829,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
 			vmware_service_objects[service->type].event_manager);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -2885,7 +2887,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
@@ -2937,7 +2939,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
@@ -2988,7 +2990,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
@@ -3301,7 +3303,7 @@ static int	vmware_service_get_clusters(CURL *easyhandle, char **clusters, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, ZBX_POST_VCENTER_CLUSTER))
+	if (SUCCEED != zbx_http_post(easyhandle, ZBX_POST_VCENTER_CLUSTER, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
@@ -3368,7 +3370,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zbx_free(clusterid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, tmp))
+	if (SUCCEED != zbx_http_post(easyhandle, tmp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
