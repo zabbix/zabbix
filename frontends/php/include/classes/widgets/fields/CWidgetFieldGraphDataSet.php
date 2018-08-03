@@ -443,6 +443,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(container[0].scrollHeight);'.
+
+					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
+						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
+						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
+					'}});',
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
