@@ -156,7 +156,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			else if (FAIL == regexp_ret)
 			{
 				SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-						"Invalid regular expression \"%s\"", regex));
+						"Invalid regular expression \"%s\".", regex));
 				errcodes[i] = NOTSUPPORTED;
 				goto next;
 			}
