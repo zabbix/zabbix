@@ -19,9 +19,7 @@
 **/
 
 
-class CSvg extends CTag {
-
-	protected $styles = [];
+class CSvg extends CSvgTag {
 
 	public function __construct() {
 		parent::__construct('svg', true);
@@ -29,14 +27,6 @@ class CSvg extends CTag {
 		$this->setAttribute('version', '1.1');
 		$this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 		$this->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-	}
-
-	public function addItem($value) {
-		if ($value instanceof CSvgTag) {
-			$this->styles = $value->getStyles() + $this->styles;
-		}
-
-		return parent::addItem($value);
 	}
 
 	protected function startToString() {

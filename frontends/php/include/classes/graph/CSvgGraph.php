@@ -907,8 +907,9 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function drawProblems() {
-		$config = select_config();
+		// TODO: move calculation related logic out of graph class. Only time presentation logic should be left.
 		$today = strtotime('today');
+		$container = new CSvgGroup();
 
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
@@ -942,26 +943,41 @@ class CSvgGraph extends CSvg {
 				'clock' => ($problem['clock'] >= $today)
 					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				'r_clock' => $problem['r_clock'],
+				'r_clock' => ($problem['r_clock'] >= $today)
+					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']),
 				'severity' => getSeverityStyle($problem['severity']),
 				'status' => $status_str,
 				'status_color' => $status_color,
-				'r_clock' => ''
+				'r_clock' => '',
 			];
 
-			if ($problem['r_clock']) {
-				$info['r_clock'] = ($problem['r_clock'] >= $today)
-					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
-					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
-			}
+			$draw_type = ($x2 - $x1) > 2 ? CSvgGraphAnnotation::TYPE_RANGE : CSvgGraphAnnotation::TYPE_SIMPLE;
+			//$anotation = (new CSvgGraphAnnotation($draw_type|CSvgGraphAnnotation::DASH_LINE_END));
+			//$this->style = array_merge($this->style, $anotation->getStyles());
+			$container->addItem(
+				(new CSvgGraphAnnotation($draw_type|CSvgGraphAnnotation::DASH_LINE_END))
+				//$anotation
+					->setInformation(CJs::encodeJson($info))
+					->setSize($x2 - $x1, $this->canvas_height)
+					->setPosition($x1, $this->canvas_y)
+			);
 
-			if ($x2 - $x1 > 2) {
-				$this->drawAnnotationRange($problem['clock'], $time_to, $info);
-			}
-			else {
-				$this->drawAnnotationSimple($problem['clock'], $info);
-			}
+			// if ($problem['r_clock']) {
+			// 	$info['r_clock'] = ($problem['r_clock'] >= $today)
+			// 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+			// 		: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+			// }
+
+			// if ($x2 - $x1 > 2) {
+			// 	$this->drawAnnotationRange($problem['clock'], $time_to, $info);
+			// }
+			// else {
+			// 	$this->drawAnnotationSimple($problem['clock'], $info);
+			// }
 		}
+
+		$this->addItem($container);
 	}
 
 	public function addSBox() {

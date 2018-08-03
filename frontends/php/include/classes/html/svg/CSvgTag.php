@@ -21,12 +21,22 @@
 
 class CSvgTag extends CTag {
 
+	protected $styles = [];
+
 	public function __construct($tag) {
 		parent::__construct($tag, true);
 	}
 
 	public function getStyles() {
-		return [];
+		return $this->styles;
+	}
+
+	public function addItem($value) {
+		if ($value instanceof CSvgTag) {
+			$this->styles = $value->getStyles() + $this->styles;
+		}
+
+		return parent::addItem($value);
 	}
 
 	public function setFillColor($color) {
