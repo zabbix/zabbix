@@ -909,7 +909,7 @@ class CSvgGraph extends CSvg {
 	private function drawProblems() {
 		// TODO: move calculation related logic out of graph class. Only time presentation logic should be left.
 		$today = strtotime('today');
-		$container = new CSvgGroup();
+		$container = (new CSvgGroup())->addClass('problems');
 
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
@@ -953,14 +953,20 @@ class CSvgGraph extends CSvg {
 			];
 
 			$draw_type = ($x2 - $x1) > 2 ? CSvgGraphAnnotation::TYPE_RANGE : CSvgGraphAnnotation::TYPE_SIMPLE;
-			//$anotation = (new CSvgGraphAnnotation($draw_type|CSvgGraphAnnotation::DASH_LINE_END));
-			//$this->style = array_merge($this->style, $anotation->getStyles());
+
+			if ($problem['clock'] >= $this->time_from) {
+				$draw_type |= CSvgGraphAnnotation::DASH_LINE_START;
+			}
+
+			if ($this->time_till >= $time_to) {
+				$draw_type |= CSvgGraphAnnotation::DASH_LINE_END;
+			}
+
 			$container->addItem(
-				(new CSvgGraphAnnotation($draw_type|CSvgGraphAnnotation::DASH_LINE_END))
-				//$anotation
+				(new CSvgGraphAnnotation($draw_type))
 					->setInformation(CJs::encodeJson($info))
-					->setSize($x2 - $x1, $this->canvas_height)
-					->setPosition($x1, $this->canvas_y)
+					->setSize(min($x2 - $x1, $this->canvas_width), $this->canvas_height)
+					->setPosition($problem['clock'] > $this->time_from ? $x1 : $this->canvas_x, $this->canvas_y)
 			);
 
 			// if ($problem['r_clock']) {
