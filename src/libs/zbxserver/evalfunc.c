@@ -1990,7 +1990,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
-					return FAIL;
+					break;
 				case FAIL:
 					return NOTSUPPORTED;
 			}
@@ -2000,7 +2000,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
-					return FAIL;
+					break;
 				case FAIL:
 					return NOTSUPPORTED;
 			}
