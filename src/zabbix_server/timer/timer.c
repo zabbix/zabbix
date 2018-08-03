@@ -587,20 +587,17 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 			}
 		}
 
-		if (0 != del_event_maintenances.values_num)
+		for (i = 0; i < del_event_maintenances.values_num; i++)
 		{
-			for (i = 0; i < del_event_maintenances.values_num; i++)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"delete from event_suppress"
-						" where eventid=" ZBX_FS_UI64
-							" and maintenanceid=" ZBX_FS_UI64 ";\n",
-							del_event_maintenances.values[i].first,
-							del_event_maintenances.values[i].second);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"delete from event_suppress"
+					" where eventid=" ZBX_FS_UI64
+						" and maintenanceid=" ZBX_FS_UI64 ";\n",
+						del_event_maintenances.values[i].first,
+						del_event_maintenances.values[i].second);
 
-				if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-					goto cleanup;
-			}
+			if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto cleanup;
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
