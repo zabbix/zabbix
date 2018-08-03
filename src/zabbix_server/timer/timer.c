@@ -463,20 +463,16 @@ static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
  ******************************************************************************/
 static void	db_update_event_suppress_data(int *suppressed_num)
 {
-	zbx_vector_ptr_t		event_queries, event_data;
-	zbx_event_suppress_query_t	*query;
-	zbx_event_suppress_data_t	*data;
-	int				i, j, k;
-	zbx_vector_uint64_t		maintenanceids, triggerids;
-	zbx_vector_uint64_pair_t	del_event_maintenances;
-	zbx_uint64_pair_t		pair;
+	zbx_vector_ptr_t	event_queries, event_data;
+	int			i, j, k;
+	zbx_vector_uint64_t	maintenanceids, triggerids;
 
 	*suppressed_num = 0;
 
 	zbx_vector_uint64_create(&maintenanceids);
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
-	zbx_vector_uint64_pair_create(&del_event_maintenances);
+
 	zbx_vector_uint64_create(&triggerids);
 
 	zbx_dc_get_running_maintenanceids(&maintenanceids);
@@ -485,9 +481,15 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 	if (0 != event_queries.values_num)
 	{
-		zbx_db_insert_t	db_insert;
-		char		*sql = NULL;
-		size_t		sql_alloc = 0, sql_offset = 0;
+		zbx_db_insert_t			db_insert;
+		char				*sql = NULL;
+		size_t				sql_alloc = 0, sql_offset = 0;
+		zbx_event_suppress_query_t	*query;
+		zbx_event_suppress_data_t	*data;
+		zbx_vector_uint64_pair_t	del_event_maintenances;
+		zbx_uint64_pair_t		pair;
+
+		zbx_vector_uint64_pair_create(&del_event_maintenances);
 
 		db_get_query_functions(&event_queries, &triggerids);
 		db_get_query_tags(&event_queries);
@@ -614,10 +616,10 @@ cleanup:
 
 		zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
 		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
+		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);
-	zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 	zbx_vector_ptr_destroy(&event_data);
 	zbx_vector_ptr_destroy(&event_queries);
 	zbx_vector_uint64_destroy(&maintenanceids);
