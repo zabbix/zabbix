@@ -234,35 +234,49 @@ class CSvgGraphHelper {
 		 * - Seconds request is made using problem.get API method. This returns final response for getProblems.
 		 */
 		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_clock'],
-			'selectAcknowledges' => ['action'],
-			'recent' => true,
+			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'select_acknowledges' => ['action'],
 			'preservekeys' => true
 		];
+		$config = select_config();
 
 		/**
-		 * Select problem eventids in given time period. Raw SQL written as temporary solution because API doesn't allow
-		 * make such request.
+		 * Select problem eventids in given time period. First, find problem events that are started during the graph
+		 * visible period.
 		 */
-		$query =
-		'SELECT p.eventid FROM (
-			(
-				SELECT eventid
-				FROM problem
-				WHERE source = '.EVENT_SOURCE_TRIGGERS.' AND object = '.EVENT_OBJECT_TRIGGER.' AND
-					('.$time_period['time_from'].' > clock AND (r_clock > '.$time_period['time_from'].' OR r_clock = 0))
-			) UNION ALL (
-				SELECT eventid
-				FROM problem
-				WHERE source = '.EVENT_SOURCE_TRIGGERS.' AND object = '.EVENT_OBJECT_TRIGGER.' AND
-					(clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].')
-			)
-		) p';
+		$query = '
+		SELECT e.eventid FROM events e WHERE
+			e.clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].' AND
+			e.value = '.TRIGGER_VALUE_TRUE.' AND
+			e.source = '.EVENT_SOURCE_TRIGGERS.' AND
+			e.object = '.EVENT_OBJECT_TRIGGER;
 
-		$config = select_config();
-		$problem_data = DBselect($query, $config['search_limit']);
-		while ($problem = DBfetch($problem_data)) {
-			$options['eventids'][] = $problem['eventid'];
+		$events_data = DBselect($query, $config['search_limit']);
+		while ($event = DBfetch($events_data)) {
+			$options['eventids'][] = $event['eventid'];
+		}
+
+		/**
+		 * Select eventids for problem events that was started before the graph visible period, but was recovered later
+		 * than the grapg beginning time or was never recovered.
+		 */
+		$query = '
+		SELECT e.eventid, er1.r_eventid
+		FROM events e
+		LEFT JOIN event_recovery er1
+		ON er1.eventid = e.eventid
+		WHERE
+			'.$time_period['time_from'].' > e.clock AND
+			e.value = '.TRIGGER_VALUE_TRUE.' AND
+			e.source = '.EVENT_SOURCE_TRIGGERS.' AND
+			e.object = '.EVENT_OBJECT_TRIGGER.'
+		HAVING
+			EXISTS (SELECT NULL FROM events WHERE eventid = er1.r_eventid AND clock > '.$time_period['time_from'].') OR
+			er1.r_eventid IS NULL';
+
+		$events_data = DBselect($query, $config['search_limit']);
+		while ($event = DBfetch($events_data)) {
+			$options['eventids'][] = $event['eventid'];
 		}
 
 		// No events, no problems.
@@ -323,7 +337,26 @@ class CSvgGraphHelper {
 			$options['tags'] = $problem_options['tags'];
 		}
 
-		return API::Problem()->get($options);
+		$problem_events = API::Event()->get($options);
+
+		// Find end time for each problem.
+		if ($problem_events) {
+			$recovery_events = API::Event()->get([
+				'output' => ['clock'],
+				'eventids' => zbx_objectValues($problem_events, 'r_eventid'),
+				'preservekeys' => true
+			]);
+		}
+
+		// Add recovery times for each problem event.
+		foreach ($problem_events as &$problem_event) {
+			$problem_event['r_clock'] = array_key_exists($problem_event['r_eventid'], $recovery_events)
+				? $recovery_events[$problem_event['r_eventid']]['clock']
+				: 0;
+		}
+		unset($problem_event);
+
+		return $problem_events;
 	}
 
 	protected static function getMetrics(array &$metrics = [], array $data_sets = []) {
