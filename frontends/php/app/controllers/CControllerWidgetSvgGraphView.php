@@ -77,9 +77,10 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$range_time_parser = new CRangeTimeParser();
 
 			foreach (['time_from', 'time_to'] as $field) {
-				if (array_key_exists($field, $fields) && $fields[$field] !== '') {
-					$range_time_parser->parse($fields[$field]);
-					$graph_data['time_period'][$field] = $range_time_parser->getDateTime($field === 'time_from')->getTimestamp();
+				if (array_key_exists($field, $fields) && $fields[$field] !== ''
+						&& $range_time_parser->parse($fields[$field]) === CParser::PARSE_SUCCESS) {
+					$graph_data['time_period'][$field]
+						= $range_time_parser->getDateTime($field === 'time_from')->getTimestamp();
 				}
 			}
 		}

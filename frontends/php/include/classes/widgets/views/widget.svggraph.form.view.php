@@ -71,6 +71,7 @@ $scripts[] =
 				'edit_mode: 1,'.
 				'content_width: '.$preview_width.','.
 				'content_height: '.$preview_height.','.
+				'dashboardid: '.$data['dashboardid'].','.
 				'fields: JSON.stringify(jQuery("#'.$form->getId().'").serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
