@@ -8,6 +8,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-9913] fixed inconsistencies in behaviour and error messaging of trigger functions (mindbound)
 ..F....... [ZBX-14448] fixed undefined index when updating item and switching type to dependent (Ivo)
 ........S. [ZBX-14670] fixed failed query error in LLD when updating function name in trigger prototype expression (vso)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
