@@ -290,7 +290,10 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	/*
 	 * list and host (template) name
 	 */
-	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
+	$list = (new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB);
+
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'));
@@ -531,6 +534,7 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 		->setAttribute('role', 'navigation')
 		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
 			(new CSpan())->addItem(new CLink(_('All maps'), new CUrl('sysmaps.php'))),
 			'/',
@@ -746,82 +750,6 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 }
 
 /**
- * Create array with all inputs required for date selection and calendar.
- *
- * @param string      $name
- * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
- *
- * @return array
- */
-function createDateSelector($name, $date) {
-	$onClick = 'dateSelectorOnClick(event, this, "'.$name.'_calendar");';
-
-	if (is_array($date)) {
-		$y = $date['y'];
-		$m = $date['m'];
-		$d = $date['d'];
-		$h = $date['h'];
-		$i = $date['i'];
-	}
-	else {
-		$y = date('Y', $date);
-		$m = date('m', $date);
-		$d = date('d', $date);
-		$h = date('H', $date);
-		$i = date('i', $date);
-	}
-
-	$fields = [
-		(new CNumericBox($name.'_year', $y, 4))
-			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
-			->setAttribute('placeholder', _('yyyy')),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		'-',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_month', $m, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('mm'))
-			->onChange('validateDatePartBox(this, 1, 12, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		'-',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_day', $d, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('dd'))
-			->onChange('validateDatePartBox(this, 1, 31, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_hour', $h, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('hh'))
-			->onChange('validateDatePartBox(this, 0, 23, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		':',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_minute', $i, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('mm'))
-			->onChange('validateDatePartBox(this, 0, 59, 2);'),
-		(new CButton())
-			->addClass(ZBX_STYLE_ICON_CAL)
-			->onClick($onClick)
-			->removeId()
-	];
-
-	zbx_add_post_js('create_calendar(null,'.
-		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
-		'"'.$name.'_calendar",'.
-		'"'.$name.'");'
-	);
-
-	return $fields;
-}
-
-/**
  * Renders a page footer.
  *
  * @param bool $with_logo
@@ -829,8 +757,7 @@ function createDateSelector($name, $date) {
  *
  * @return CDiv
  */
-function makePageFooter($with_version = true)
-{
+function makePageFooter($with_version = true) {
 	return (new CTag('footer', true, [
 		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
@@ -849,8 +776,7 @@ function makePageFooter($with_version = true)
  *
  * @return CComboBox
  */
-function makeAdministrationGeneralMenu($selected)
-{
+function makeAdministrationGeneralMenu($selected) {
 	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
 		'adm.gui.php' => _('GUI'),
 		'adm.housekeeper.php' => _('Housekeeping'),
@@ -867,30 +793,58 @@ function makeAdministrationGeneralMenu($selected)
 }
 
 /**
- * Renders an icon list
+ * Renders an icon list.
  *
- * @param array $info_icons  The list of information icons
+ * @param array $info_icons  The list of information icons.
  *
- * @return CSpan
+ * @return CDiv|string
  */
-function makeInformationList($info_icons)
-{
+function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
 }
 
 /**
- * Renders an information icon like green [i] with message
+ * Renders an information icon like green [i] with message.
  *
  * @param string $message
  *
  * @return CSpan
  */
-function makeInformationIcon($message)
-{
+function makeInformationIcon($message) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message);
+}
+
+/**
+ * Renders an action icon.
+ *
+ * @param array  $icon_data
+ * @param string $icon_data[icon]  Icon style.
+ * @param array  $icon_data[hint]  Hintbox content (optional).
+ * @param int    $icon_data[num]   Number displayed over the icon (optional).
+ *
+ * @return CSpan
+ */
+function makeActionIcon(array $icon_data) {
+	$icon = (new CSpan())->addClass($icon_data['icon']);
+
+	if (array_key_exists('num', $icon_data)) {
+		if ($icon_data['num'] > 99) {
+			$icon_data['num'] = '99+';
+		}
+		$icon->setAttribute('data-count', $icon_data['num']);
+	}
+
+	if (array_key_exists('hint', $icon_data)) {
+		$icon->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+	}
+	elseif (array_key_exists('title', $icon_data)) {
+		$icon->setTitle($icon_data['title']);
+	}
+
+	return $icon;
 }
 
 /**
@@ -900,8 +854,7 @@ function makeInformationIcon($message)
  *
  * @return CSpan
  */
-function makeErrorIcon($error)
-{
+function makeErrorIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_RED)
@@ -915,8 +868,7 @@ function makeErrorIcon($error)
  *
  * @return CSpan
  */
-function makeUnknownIcon($error)
-{
+function makeUnknownIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_DARK_GREY)
@@ -930,8 +882,7 @@ function makeUnknownIcon($error)
  *
  * @return CSpan
  */
-function makeWarningIcon($error)
-{
+function makeWarningIcon($error) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
@@ -943,8 +894,7 @@ function makeWarningIcon($error)
  *
  * @return CButton
  */
-function makeDebugButton()
-{
+function makeDebugButton() {
 	return (new CDiv(
 		(new CLink(_('Debug'), '#debug'))
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
@@ -970,8 +920,7 @@ function makeDebugButton()
  *
  * @return string
  */
-function getTriggerSeverityCss($config)
-{
+function getTriggerSeverityCss($config) {
 	$css = '';
 
 	$severities = [
@@ -1003,8 +952,7 @@ function getTriggerSeverityCss($config)
  *
  * @return string
  */
-function getTriggerStatusCss($config)
-{
+function getTriggerStatusCss($config) {
 	$css = '';
 
 	if ($config['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED) {

@@ -1204,13 +1204,16 @@ class CUser extends CApiService {
 	/**
 	 * Check if session id is authenticated.
 	 *
-	 * @param array $session
+	 * @param array  $session
+	 * @param string $session[]['sessionid']  (required) session id to be checked
+	 * @param bool   $session[]['extend']     (optional) extend session (update lastaccess time)
 	 *
 	 * @return array
 	 */
 	public function checkAuthentication(array $session) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
+			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1274,7 +1277,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
-		if ($time != $db_session['lastaccess']) {
+		if ($session['extend'] && $time != $db_session['lastaccess']) {
 			DB::update('sessions', [
 				'values' => ['lastaccess' => $time],
 				'where' => ['sessionid' => $sessionid]

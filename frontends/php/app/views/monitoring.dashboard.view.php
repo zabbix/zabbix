@@ -146,7 +146,7 @@ else {
 				->setAttribute('aria-label', _('Breadcrumbs'))
 				->addItem($breadcrumbs)
 				->addClass(ZBX_STYLE_OBJECT_GROUP)
-				->addClass($data['show_timeselector'] ? ZBX_STYLE_FILTER_BREADCRUMB : null)
+				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 			);
 	}
 	else {

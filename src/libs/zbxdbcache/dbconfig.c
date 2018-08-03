@@ -57,6 +57,10 @@ static int	sync_in_progress = 0;
 #define TRIGGER_FUNCTIONAL_TRUE		0
 #define TRIGGER_FUNCTIONAL_FALSE	1
 
+/* trigger contains time functions and is also scheduled by timer queue */
+#define ZBX_TRIGGER_TIMER_UNKNOWN	0
+#define ZBX_TRIGGER_TIMER_QUEUE		1
+
 /* item priority in poller queue */
 #define ZBX_QUEUE_PRIORITY_HIGH		0
 #define ZBX_QUEUE_PRIORITY_NORMAL	1
@@ -316,10 +320,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
-		int flags, int now)
+static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now)
 {
-	ZBX_DC_PROXY	*proxy = NULL;
 	zbx_uint64_t	seed;
 
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
@@ -330,9 +332,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	{
 		return;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
-
-	if (0 != host->proxy_hostid && NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
-		now -= proxy->timediff;
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
@@ -390,9 +389,6 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, 
 	}
 
 	item->schedulable = 1;
-
-	if (NULL != proxy)
-		item->nextcheck += proxy->timediff + 1;
 }
 
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
@@ -1383,7 +1379,6 @@ done:
 
 			if (0 == found)
 			{
-				proxy->timediff = 0;
 				proxy->location = ZBX_LOC_NOWHERE;
 				proxy->version = 0;
 				proxy->lastaccess = atoi(row[24]);
@@ -2775,7 +2770,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			DCitem_poller_type_update(item, host, flags);
 
 			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
-				DCitem_nextcheck_update(item, host, item->state, flags, now);
+				DCitem_nextcheck_update(item, item->state, flags, now);
 		}
 		else
 		{
@@ -4410,6 +4405,28 @@ static int	zbx_default_ptr_pair_ptr_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+#define ZBX_TIMER_DELAY		30
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_timer_calculate_nextcheck                                     *
+ *                                                                            *
+ * Purpose: calculates next check for timer queue item                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_timer_calculate_nextcheck(time_t now, zbx_uint64_t seed)
+{
+	int	nextcheck;
+
+	nextcheck = ZBX_TIMER_DELAY * (int)(now / (time_t)ZBX_TIMER_DELAY) +
+			(int)(seed % (zbx_uint64_t)ZBX_TIMER_DELAY);
+
+	while (nextcheck <= now)
+		nextcheck += ZBX_TIMER_DELAY;
+
+	return nextcheck;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: dc_trigger_update_cache                                          *
@@ -4427,17 +4444,17 @@ static void	dc_trigger_update_cache(void)
 	ZBX_DC_TRIGGER		*trigger;
 	ZBX_DC_FUNCTION		*function;
 	ZBX_DC_ITEM		*item;
-	int			i, j, k;
+	int			i, j, k, now;
 	zbx_ptr_pair_t		itemtrig;
 	zbx_vector_ptr_pair_t	itemtrigs;
 	ZBX_DC_HOST		*host;
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
+	{
 		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
-
-	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
-		zbx_vector_ptr_clear(&config->time_triggers[i]);
+		trigger->timer = ZBX_TRIGGER_TIMER_UNKNOWN;
+	}
 
 	zbx_vector_ptr_pair_create(&itemtrigs);
 	zbx_hashset_iter_reset(&config->functions, &iter);
@@ -4458,13 +4475,6 @@ static void	dc_trigger_update_cache(void)
 			zbx_vector_ptr_pair_append(&itemtrigs, itemtrig);
 		}
 
-		/* spread triggers with time-based functions between timer processes (load balancing) */
-		if (1 == function->timer)
-		{
-			i = function->triggerid % CONFIG_TIMER_FORKS;
-			zbx_vector_ptr_append(&config->time_triggers[i], trigger);
-		}
-
 		/* disable functionality for triggers with expression containing */
 		/* disabled or not monitored items                               */
 
@@ -4477,12 +4487,9 @@ static void	dc_trigger_update_cache(void)
 		{
 			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 		}
-	}
 
-	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
-	{
-		zbx_vector_ptr_sort(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		if (1 == function->timer)
+			trigger->timer = ZBX_TRIGGER_TIMER_QUEUE;
 	}
 
 	zbx_vector_ptr_pair_sort(&itemtrigs, zbx_default_ptr_pair_ptr_compare_func);
@@ -4510,6 +4517,29 @@ static void	dc_trigger_update_cache(void)
 	}
 
 	zbx_vector_ptr_pair_destroy(&itemtrigs);
+
+	/* add triggers to timer queue */
+	now = time(NULL);
+	zbx_binary_heap_clear(&config->timer_queue);
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_binary_heap_elem_t	elem;
+
+		if (TRIGGER_STATUS_DISABLED == trigger->status)
+			continue;
+
+		if (TRIGGER_FUNCTIONAL_FALSE == trigger->functional)
+			continue;
+
+		if (ZBX_TRIGGER_TIMER_QUEUE != trigger->timer)
+			continue;
+
+		trigger->nextcheck = dc_timer_calculate_nextcheck(now, trigger->triggerid);
+		elem.key = trigger->triggerid;
+		elem.data = (void *)trigger;
+		zbx_binary_heap_insert(&config->timer_queue, &elem);
+	}
 }
 
 /******************************************************************************
@@ -5014,11 +5044,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->trigdeps.num_data, config->trigdeps.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __function_name,
 				config->trigger_tags.num_data, config->trigger_tags.num_slots);
-		for (i = 0; i < CONFIG_TIMER_FORKS; i++)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
-					i, config->time_triggers[i].values_num, config->time_triggers[i].values_alloc);
-		}
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
 				config->expressions.num_data, config->expressions.num_slots);
 
@@ -5046,6 +5071,9 @@ void	DCsync_configuration(unsigned char mode)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __function_name,
 				config->pqueue.elems_num, config->pqueue.elems_alloc);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() timer queue: %d (%d allocated)", __function_name,
+				config->timer_queue.elems_num, config->timer_queue.elems_alloc);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
@@ -5373,6 +5401,19 @@ static int	__config_psk_compare(const void *d1, const void *d2)
 }
 #endif
 
+static int	__config_timer_compare(const void *d1, const void *d2)
+{
+	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
+	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
+
+	const ZBX_DC_TRIGGER		*t1 = (const ZBX_DC_TRIGGER *)e1->data;
+	const ZBX_DC_TRIGGER		*t2 = (const ZBX_DC_TRIGGER *)e2->data;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->nextcheck, t2->nextcheck);
+
+	return 0;
+}
+
 static zbx_hash_t	__config_data_session_hash(const void *data)
 {
 	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
@@ -5419,8 +5460,6 @@ int	init_configuration_cache(char **error)
 
 	config = (ZBX_DC_CONFIG *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
-
-	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
 														\
@@ -5492,13 +5531,6 @@ int	init_configuration_cache(char **error)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, 0, __config_psk_hash, __config_psk_compare);
 #endif
-	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
-	{
-		zbx_vector_ptr_create_ext(&config->time_triggers[i],
-				__config_mem_malloc_func,
-				__config_mem_realloc_func,
-				__config_mem_free_func);
-	}
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{
@@ -5533,6 +5565,13 @@ int	init_configuration_cache(char **error)
 
 	zbx_binary_heap_create_ext(&config->pqueue,
 					__config_proxy_compare,
+					ZBX_BINARY_HEAP_OPTION_DIRECT,
+					__config_mem_malloc_func,
+					__config_mem_realloc_func,
+					__config_mem_free_func);
+
+	zbx_binary_heap_create_ext(&config->timer_queue,
+					__config_timer_compare,
 					ZBX_BINARY_HEAP_OPTION_DIRECT,
 					__config_mem_malloc_func,
 					__config_mem_realloc_func,
@@ -6673,9 +6712,6 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *           case configuration changes. On a stable configuration, it should *
  *           work without any problems.                                       *
  *                                                                            *
- *           Also see function DCconfig_get_time_based_triggers(), which      *
- *           timer processes use to lock and unlock triggers.                 *
- *                                                                            *
  * Return value: the number of items available for processing (unlocked).     *
  *                                                                            *
  ******************************************************************************/
@@ -6691,6 +6727,9 @@ int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx
 	for (i = 0; i < history_items->values_num; i++)
 	{
 		history_item = (zbx_hc_item_t *)history_items->values[i];
+
+		if (0 != (ZBX_DC_FLAG_NOVALUE & history_item->tail->flags))
+			continue;
 
 		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &history_item->itemid)))
 			continue;
@@ -6908,7 +6947,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 				zbx_vector_ptr_append(trigger_order, trigger);
 			}
 
-			/* copy latest change timestamp and error message */
+			/* copy latest change timestamp */
 
 			if (trigger->timespec.sec < timespecs[i].sec ||
 					(trigger->timespec.sec == timespecs[i].sec &&
@@ -6920,46 +6959,38 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	}
 
 	UNLOCK_CACHE;
-
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for DCconfig_get_time_based_triggers()           *
+ * Function: DCconfig_find_active_time_function                               *
+ *                                                                            *
+ * Purpose: checks if the expression contains time based functions            *
  *                                                                            *
  ******************************************************************************/
 static int	DCconfig_find_active_time_function(const char *expression)
 {
 	zbx_uint64_t		functionid;
 	const ZBX_DC_FUNCTION	*dc_function;
-	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_ITEM	*dc_item;
 
 	while (SUCCEED == get_N_functionid(expression, 1, &functionid, &expression))
 	{
 		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
 			continue;
 
-		if (SUCCEED != is_time_function(dc_function->function))
-			continue;
+		if (1 == dc_function->timer)
+		{
+			if (NULL == (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)))
+				continue;
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
-			continue;
+			if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+				continue;
 
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
-			continue;
-
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			continue;
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			continue;
-
-		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
-			continue;
-
-		return SUCCEED;
+			if (SUCCEED != DCin_maintenance_without_data_collection(dc_host, dc_item))
+				return SUCCEED;
+		}
 	}
 
 	return FAIL;
@@ -6967,83 +6998,104 @@ static int	DCconfig_find_active_time_function(const char *expression)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_time_based_triggers                                 *
+ * Function: zbx_dc_get_timer_triggers_by_triggerids                          *
  *                                                                            *
- * Purpose: get triggers that have time-based functions (sorted by triggerid) *
+ * Purpose: gets timer triggers from cache                                    *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: A trigger should have at least one function that is time-based   *
- *           and which does not have its host in no-data maintenance.         *
- *                                                                            *
- *           This function is meant to be called multiple times, each time    *
- *           yielding up to max_triggers in return. When called the function  *
- *           starts where it left off to yield the next bunch of triggers.    *
- *                                                                            *
- *           Also see function DCconfig_lock_triggers_by_history_items(),     *
- *           which history syncer processes use to lock triggers.             *
- *                                                                            *
- *           Note that the caller must unlock all returned triggers by        *
- *           DCconfig_unlock_triggers() function                              *
+ * Parameters: trigger_info  - [IN/OUT] triggers                              *
+ *             trigger_order - [IN/OUT] triggers in processing order          *
+ *             triggerids    - [IN] identifiers of the triggers to retrieve   *
+ *             ts            - [IN] current timestamp                         *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_time_based_triggers(DC_TRIGGER *trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
-		zbx_uint64_t start_triggerid, int process_num)
+void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts)
 {
-	int			i, start;
-	unsigned char		flags;
-	ZBX_DC_TRIGGER		*dc_trigger;
-	DC_TRIGGER		*trigger;
+	int		i;
+	ZBX_DC_TRIGGER	*dc_trigger;
 
-	WRLOCK_CACHE;
+	RDLOCK_CACHE;
 
-	start = zbx_vector_ptr_nearestindex(&config->time_triggers[process_num - 1], &start_triggerid,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = start; i < config->time_triggers[process_num - 1].values_num; i++)
+	for (i = 0; i < triggerids->values_num; i++)
 	{
-		flags = 0;
-
-		dc_trigger = (ZBX_DC_TRIGGER *)config->time_triggers[process_num - 1].values[i];
-
-		if (TRIGGER_STATUS_DISABLED == dc_trigger->status || 1 == dc_trigger->locked)
-			continue;
-
-		if (SUCCEED != DCconfig_find_active_time_function(dc_trigger->expression))
+		if (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+				&triggerids->values[i])))
 		{
-			/* We trigger the evaluation of the recovery expression only if the trigger have a value of */
-			/* TRIGGER_VALUE_PROBLEM and if the recovery mode use the recovery expression */
-			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode ||
-					TRIGGER_VALUE_PROBLEM != dc_trigger->value ||
-					SUCCEED != DCconfig_find_active_time_function(dc_trigger->recovery_expression))
+			DC_TRIGGER	*trigger, trigger_local;
+			unsigned char	flags;
+
+			if (SUCCEED == DCconfig_find_active_time_function(dc_trigger->expression))
 			{
-				continue;
+				flags = ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
 			}
+			else
+			{
+				if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode)
+					continue;
+
+				if (TRIGGER_VALUE_PROBLEM != dc_trigger->value)
+					continue;
+
+				if (SUCCEED != DCconfig_find_active_time_function(dc_trigger->recovery_expression))
+					continue;
+
+				flags = 0;
+			}
+
+			trigger_local.triggerid = dc_trigger->triggerid;
+			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
+			DCget_trigger(trigger, dc_trigger);
+			trigger->timespec = *ts;
+			trigger->flags = flags;
+
+			zbx_vector_ptr_append(trigger_order, trigger);
 		}
-		else
-		{
-			/* Remember that trigger is chosen for evaluation because of time-based function in problem */
-			/* expression. This information is later used in evaluate_expressions() to avoid generation */
-			/* of duplicate PROBLEM events if recovery expression remains to be false. */
-			flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
-		}
-
-		dc_trigger->locked = 1;
-		trigger = &trigger_info[trigger_order->values_num];
-
-		DCget_trigger(trigger, dc_trigger);
-		zbx_timespec(&trigger->timespec);
-		trigger->flags = flags;
-
-		zbx_vector_ptr_append(trigger_order, trigger);
-
-		if (trigger_order->values_num == max_triggers)
-			break;
 	}
 
 	UNLOCK_CACHE;
+}
 
-	return trigger_order->values_num;
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_timer_triggerids                                      *
+ *                                                                            *
+ * Purpose: gets triggerids from timer queue                                  *
+ *                                                                            *
+ * Parameters: triggerids - [OUT] timer tirggerids to process                 *
+ *             now        - [IN] current time                                 *
+ *             limit      - [IN] the maximum number of triggerids to return   *
+ *                                                                            *
+ * Comments: This function locks returned triggerids in configuration cache.  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit)
+{
+	WRLOCK_CACHE;
+
+	while (SUCCEED != zbx_binary_heap_empty(&config->timer_queue) && 0 != limit)
+	{
+		zbx_binary_heap_elem_t	*elem;
+		ZBX_DC_TRIGGER		*dc_trigger;
+
+		elem = zbx_binary_heap_find_min(&config->timer_queue);
+		dc_trigger = (ZBX_DC_TRIGGER *)elem->data;
+
+		if (dc_trigger->nextcheck > now)
+			break;
+
+		/* locked triggers are already being processed by other processes, we can skip them */
+		if (0 == dc_trigger->locked)
+		{
+			zbx_vector_uint64_append(triggerids, dc_trigger->triggerid);
+			dc_trigger->locked = 1;
+			limit--;
+		}
+
+		dc_trigger->nextcheck = dc_timer_calculate_nextcheck(now, dc_trigger->triggerid);
+		zbx_binary_heap_update_direct(&config->timer_queue, elem);
+	}
+
+	UNLOCK_CACHE;
 }
 
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
@@ -7297,7 +7349,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock);
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -8849,78 +8901,6 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_set_proxy_timediff                                      *
- *                                                                            *
- * Purpose: set rounded time difference between server clock and proxy clock  *
- *                                                                            *
- * Comments: When we calculate "nextcheck" for items on proxied hosts, we     *
- *           take the time difference between server and proxy into account.  *
- *                                                                            *
- *           For instance, suppose an item was processed on the proxy at 10   *
- *           seconds and there is a time difference between server and proxy  *
- *           of -2 seconds (that is, proxy's time is 2 seconds in front). In  *
- *           the server's database, we will store the timestamp of 8 seconds. *
- *           However, when we calculate "nextcheck" on the server side, we    *
- *           should calculate it from 10 seconds. Otherwise, if we calculate  *
- *           it from 8 seconds, we will probably get those 10 seconds as the  *
- *           "nextcheck". Finally, after calculating "nextcheck", we should   *
- *           utilize the time difference again to get Zabbix server's time.   *
- *                                                                            *
- *           Now, suppose we have a non-integer time difference, say, of -1.5 *
- *           seconds. Suppose also that one item on the proxy was checked at  *
- *           4.7 seconds, whereas a second item was checked at 5.2 seconds,   *
- *           which corresponds to server times of 3.2 and 3.7 seconds. Since  *
- *           "nextcheck" calculation only uses the integer part, server will  *
- *           use 3 seconds as the basis, before using the time difference.    *
- *           However, it is very likely that the first item was scheduled for *
- *           4 seconds on the proxy and the second item for 5 seconds, so in  *
- *           order to be precise we would need to store time differences for  *
- *           each individual item. That would lead to a significant increase  *
- *           in memory consumption, which we rather avoid. For this reason    *
- *           we only store a single time difference between server and proxy, *
- *           and use it for all items. However, the way time difference is    *
- *           used is different before and after "nextcheck" calculation.      *
- *                                                                            *
- *           Consider the example above. Server uses 3 seconds as the basis,  *
- *           and subtracts a unified difference of -2 (rounded down) to both  *
- *           items, yielding 5. It then calculates "nextcheck" for these two  *
- *           items, yielding 4 and 5 (assuming a one-minute delay). It then   *
- *           adds a unified difference of -1 (rounded up), to get Zabbix      *
- *           server's time of 3 and 4.                                        *
- *                                                                            *
- *           This has the effect that items will get into the delayed item    *
- *           queue at most one second later, but this is feasible: in proxy   *
- *           to server communication there is a communication latency, which  *
- *           also has the effect of putting items into the delayed item queue *
- *           a bit later, and we do not account for that anyway.              *
- *                                                                            *
- *           As described above, we subtract a rounded down difference before *
- *           "nextcheck" calculation and a rounded up difference after. Since *
- *           we have a 1/10^9 chance of hitting an integer "timediff" value,  *
- *           which would yield the same value rounded down and rounded up, in *
- *           the proxy structure we only store the difference rounded down to *
- *           save space. This is achieved by discarding the "ns" part of the  *
- *           "timediff" structure. We then assume that the rounded down value *
- *           and the rounded up values are different.                         *
- *                                                                            *
- *           Calculations of "nextchecks" themselves are done in functions    *
- *           DCget_reachable_nextcheck() and DCsync_items() functions.        *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff)
-{
-	ZBX_DC_PROXY	*dc_proxy;
-
-	WRLOCK_CACHE;
-
-	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &hostid)))
-		dc_proxy->timediff = timediff->sec;
-
-	UNLOCK_CACHE;
-}
-
 static void	dc_get_host_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
@@ -9171,7 +9151,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
  * Comments: The returned expression must be freed by the caller.             *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expression_expand_user_macros(const char *expression, char **error)
+static char	*dc_expression_expand_user_macros(const char *expression)
 {
 	zbx_vector_uint64_t	functionids, hostids;
 	char			*out;
@@ -9187,7 +9167,7 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
 
 	if (NULL != strstr(out, "{$"))
 	{
-		*error = zbx_strdup(*error, "cannot evaluate expression: invalid macro value");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate expression: invalid macro value");
 		zbx_free(out);
 	}
 
@@ -9204,7 +9184,6 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
  * Purpose: expand user macros in trigger expression                          *
  *                                                                            *
  * Parameters: expression - [IN] the expression to expand                     *
- *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: The expanded expression or NULL in the case of error.        *
  *               If NULL is returned the error message is set.                *
@@ -9214,13 +9193,13 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
  *           dc_expression_expand_user_macros() function for external usage.  *
  *                                                                            *
  ******************************************************************************/
-char	*DCexpression_expand_user_macros(const char *expression, char **error)
+char	*DCexpression_expand_user_macros(const char *expression)
 {
 	char	*expression_ex;
 
 	RDLOCK_CACHE;
 
-	expression_ex = dc_expression_expand_user_macros(expression, error);
+	expression_ex = dc_expression_expand_user_macros(expression);
 
 	UNLOCK_CACHE;
 
@@ -11067,7 +11046,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec);
 	}
 
 	UNLOCK_CACHE;

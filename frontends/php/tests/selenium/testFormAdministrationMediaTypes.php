@@ -516,6 +516,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Jabber',
+					'passwd' => 'Secret password',
 					'name' => 'Jabber with custom concurrent sessions and default options',
 					'sessions' => 'Custom',
 					'maxsessions' => 0
@@ -549,6 +550,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'name' => 'Ez Texting media type',
 					'type' => 'Ez Texting',
 					'username' => 'test',
+					'passwd' => 'Secret password',
 					'sessions' => 'Custom',
 					'maxsessions' => 10,
 					'attempts' => 5,
@@ -575,6 +577,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		elseif ($data['type'] == 'Ez Texting') {
 			$this->zbxTestInputType('eztext_username', $data['username']);
 		}
+
+		if (array_key_exists('passwd', $data)){
+			$this->zbxTestInputType('passwd', $data['passwd']);
+		}
+
 		$this->zbxTestTabSwitch('Options');
 
 		if (array_key_exists('attempts', $data)){
@@ -587,9 +594,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$this->zbxTestClickXpath("//label[text()='".$data['sessions']."']");
 			if ($data['sessions'] == 'Custom' && array_key_exists('maxsessions', $data)) {
 				$this->zbxTestInputTypeOverwrite('maxsessions', $data['maxsessions']);
-				sleep(2);
-				$this->webDriver->findElement(WebDriverBy::id('search'))->click();
-				sleep(2);
+				// Fire onchange event.
+				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+					'event.initEvent("change", false, true);'.
+					'document.getElementById("maxsessions").dispatchEvent(event);'
+				);
 			}
 		}
 

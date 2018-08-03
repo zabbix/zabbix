@@ -78,6 +78,7 @@ frontends/php/locale/ka/LC_MESSAGES/frontend.mo
 frontends/php/locale/ko/LC_MESSAGES/frontend.mo
 frontends/php/locale/lt/LC_MESSAGES/frontend.mo
 frontends/php/locale/lv/LC_MESSAGES/frontend.mo
+frontends/php/locale/nb/LC_MESSAGES/frontend.mo
 frontends/php/locale/nl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.mo
@@ -391,6 +392,7 @@ tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/parse_key
 tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
+tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in

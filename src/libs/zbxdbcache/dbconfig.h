@@ -33,6 +33,8 @@ typedef struct
 	const char		*error;
 	const char		*correlation_tag;
 	int			lastchange;
+	int			nextcheck;		/* time of next trigger recalculation,    */
+							/* valid for triggers with time functions */
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -40,9 +42,10 @@ typedef struct
 	unsigned char		state;
 	unsigned char		locked;
 	unsigned char		status;
-	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines */
-	unsigned char		recovery_mode;		/* TRIGGER_RECOVERY_MODE_* defines  */
-	unsigned char		correlation_mode;	/* ZBX_TRIGGER_CORRELATION_* defines */
+	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines      */
+	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
+	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
+	unsigned char		timer;			/* see ZBX_TRIGGER_TIMER_* defines       */
 
 	zbx_vector_ptr_t	tags;
 }
@@ -359,7 +362,6 @@ typedef struct
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
 	int		nextcheck;
-	int		timediff;
 	int		lastaccess;
 	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
 						/* or 0 if no error */
@@ -630,6 +632,13 @@ zbx_dc_preproc_op_t;
 
 typedef struct
 {
+	zbx_uint64_t	triggerid;
+	int		nextcheck;
+}
+zbx_dc_timer_trigger_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -658,7 +667,6 @@ typedef struct
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
-	zbx_vector_ptr_t	*time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
@@ -693,6 +701,7 @@ typedef struct
 	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
+	zbx_binary_heap_t	timer_queue;
 	zbx_vector_uint64_t	locked_lld_ruleids;	/* for keeping track of lld rules being processed */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;

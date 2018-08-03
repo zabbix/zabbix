@@ -1086,24 +1086,6 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 	return ret;
 }
 
-static int	global_regexp_exists(const char *name)
-{
-	int	i;
-
-	if (0 == regexps.values_num)
-		return FAIL;
-
-	for (i = 0; i < regexps.values_num; i++)
-	{
-		zbx_expression_t	*regexp = (zbx_expression_t *)regexps.values[i];
-
-		if (0 == strcmp(regexp->name, name))
-			break;
-	}
-
-	return (i == regexps.values_num ? FAIL : SUCCEED);
-}
-
 static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *request, char **error)
 {
 	int	parameter_num, max_parameter_num;
@@ -1268,7 +1250,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		regexp = "";
 	}
-	else if ('@' == *regexp && SUCCEED != global_regexp_exists(regexp + 1))
+	else if ('@' == *regexp && SUCCEED != zbx_global_regexp_exists(regexp + 1, &regexps))
 	{
 		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", regexp + 1);
 		goto out;
@@ -1496,7 +1478,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	{
 		pattern = "";
 	}
-	else if ('@' == *pattern && SUCCEED != global_regexp_exists(pattern + 1))
+	else if ('@' == *pattern && SUCCEED != zbx_global_regexp_exists(pattern + 1, &regexps))
 	{
 		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", pattern + 1);
 		goto out;
@@ -1506,7 +1488,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	{
 		key_severity = "";
 	}
-	else if ('@' == *key_severity && SUCCEED != global_regexp_exists(key_severity + 1))
+	else if ('@' == *key_severity && SUCCEED != zbx_global_regexp_exists(key_severity + 1, &regexps))
 	{
 		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", key_severity + 1);
 		goto out;
@@ -1516,7 +1498,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	{
 		key_source = "";
 	}
-	else if ('@' == *key_source && SUCCEED != global_regexp_exists(key_source + 1))
+	else if ('@' == *key_source && SUCCEED != zbx_global_regexp_exists(key_source + 1, &regexps))
 	{
 		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", key_source + 1);
 		goto out;
@@ -1526,7 +1508,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 	{
 		key_logeventid = "";
 	}
-	else if ('@' == *key_logeventid && SUCCEED != global_regexp_exists(key_logeventid + 1))
+	else if ('@' == *key_logeventid && SUCCEED != zbx_global_regexp_exists(key_logeventid + 1, &regexps))
 	{
 		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", key_logeventid + 1);
 		goto out;
