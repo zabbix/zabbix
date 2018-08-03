@@ -22,6 +22,7 @@
 class CSvgPath extends CSvgTag {
 
 	protected $directions;
+	protected $last_value = 0;
 
 	public function __construct($directions = '') {
 		parent::__construct('path');

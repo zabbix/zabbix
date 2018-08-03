@@ -19,9 +19,44 @@
 **/
 
 
-class CSvgGraphArea extends CTag {
+class CSvgGraphArea extends CSvgGraphLine {
 
-	public function __construct() {
+	public function __construct($path, $metric) {
+		parent::__construct($path, $metric);
 
+		$this->options = $metric['options'] + [
+			'fill' => 5
+		];
+	}
+
+	public function getStyles() {
+		$this
+			->addClass(ZBX_STYLE_SVG_GRAPH_AREA)
+			->addClass(ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
+
+		return [
+			'.'.ZBX_STYLE_SVG_GRAPH_AREA => [
+				'stroke-width' => 0
+			],
+			'.'.ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
+				'fill-opacity' => $this->options['fill']  * 0.1,
+				'fill' => $this->options['color']
+			]
+		];
+	}
+
+	protected function draw() {
+		$path = parent::draw();
+
+		if ($this->path) {
+			$first_point = reset($this->path);
+			$last_point = end($this->path);
+			$this
+				->lineTo($last_point[0], $this->position_y + $this->height)
+				->lineTo($first_point[0], $this->position_y + $this->height)
+				->closePath();
+		}
+
+		return $path;
 	}
 }

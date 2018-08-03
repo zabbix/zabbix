@@ -652,7 +652,7 @@ class CSvgGraph extends CSvg {
 			);
 		}
 	}
-
+/*
 	private function drawLines($points, $metric) {
 		// Item grouping is used to increase client side performance.
 		$this->addItem(
@@ -727,7 +727,7 @@ class CSvgGraph extends CSvg {
 			);
 		}
 	}
-
+*/
 	private function drawMetricData($metric_num) {
 		$metric = $this->metrics[$metric_num];
 		$max_value = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
@@ -767,16 +767,27 @@ class CSvgGraph extends CSvg {
 		foreach ($paths as $path) {
 			switch ($metric['options']['type']) {
 				case SVG_GRAPH_TYPE_LINE:
-					$this->drawLines($path, $metric);
+				case SVG_GRAPH_TYPE_STAIRCASE:
+					if ($metric['options']['fill'] > 0) {
+						$this->addItem((new CSvgGraphArea($path, $metric))
+							->setPosition($this->canvas_x, $this->canvas_y)
+							->setSize($this->canvas_width, $this->canvas_height)
+						);
+					}
+					$this->addItem((new CSvgGraphLine($path, $metric))
+						->setPosition($this->canvas_x, $this->canvas_y)
+						->setSize($this->canvas_width, $this->canvas_height)
+					);
+//					$this->drawLines($path, $metric);
 					break;
 
 				case SVG_GRAPH_TYPE_POINTS:
 					$this->drawPoints($path, $metric);
 					break;
 
-				case SVG_GRAPH_TYPE_STAIRCASE:
-					$this->drawLinesStaircase($path, $metric);
-					break;
+//				case SVG_GRAPH_TYPE_STAIRCASE:
+//					$this->drawLinesStaircase($path, $metric);
+//					break;
 			}
 		}
 	}

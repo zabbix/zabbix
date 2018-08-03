@@ -19,9 +19,95 @@
 **/
 
 
-class CSvgGraphLine extends CTag {
+class CSvgGraphLine extends CSvgPath {
 
-	public function __construct() {
+	protected $path;
 
+	protected $itemid;
+	protected $item_name;
+	protected $units;
+	protected $host;
+	protected $options;
+
+	protected $position_x = 0;
+	protected $position_y = 0;
+
+	protected $width = 0;
+	protected $height = 0;
+
+	public function __construct($path, $metric) {
+		parent::__construct();
+
+		$this->path = $path;
+
+		$this->itemid = $metric['itemid'];
+		$this->item_name = $metric['name'];
+		$this->units = $metric['units'];
+		$this->host = $metric['host'];
+
+		$this->options = $metric['options'] + [
+			'transparency' => 5,
+			'type' => SVG_GRAPH_TYPE_LINE,
+			'width' => 1,
+			'color' => '#b0af07',
+			'order' => 1
+		];
+	}
+
+	public function getStyles() {
+		$this
+			->addClass(ZBX_STYLE_SVG_GRAPH_LINE)
+			->addClass(ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
+
+		return [
+			'.'.ZBX_STYLE_SVG_GRAPH_LINE => [
+				'fill' => 'none'
+			],
+			'.'.ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
+				'opacity' => $this->options['transparency'] * 0.1,
+				'stroke' => $this->options['color'],
+				'stroke-width' => $this->options['width']
+			]
+		];
+	}
+
+	public function setPosition($x, $y) {
+		$this->position_x = $x;
+		$this->position_y = $y;
+
+		return $this;
+	}
+
+	public function setSize($width, $height) {
+		$this->width = $width;
+		$this->height = $height;
+
+		return $this;
+	}
+
+	protected function draw() {
+		$last_point = [0, 0];
+		foreach ($this->path as $i => $point) {
+			if ($i == 0) {
+				$this->moveTo($point[0], $point[1]);
+			}
+			else {
+				if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+					$this->lineTo($point[0], $last_point[1]);
+				}
+				$this->lineTo($point[0], $point[1]);
+			}
+			$last_point = $point;
+		}
+		if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+			$this->lineTo($last_point[0] + $this->options['width'] * 2, $last_point[1]);
+			$this->lineTo($last_point[0] + $this->options['width'] * 2, $this->position_y + $this->height);
+		}
+	}
+
+	public function toString($destroy = true) {
+		$this->draw();
+
+		return parent::toString($destroy);
 	}
 }

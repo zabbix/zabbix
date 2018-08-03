@@ -1626,6 +1626,8 @@ define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // svg graph elements
 define('ZBX_STYLE_SVG_GRAPH_GRID', 'svg-graph-grid');
+define('ZBX_STYLE_SVG_GRAPH_LINE', 'svg-graph-line');
+define('ZBX_STYLE_SVG_GRAPH_AREA', 'svg-graph-area');
 
 // html layout columns
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');

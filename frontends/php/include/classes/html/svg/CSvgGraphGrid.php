@@ -41,7 +41,10 @@ class CSvgGraphGrid extends CSvgTag {
 
 	public function getStyles() {
 		return [
-			'.'.ZBX_STYLE_SVG_GRAPH_GRID.' path' => 'stroke-dasharray:2,2; stroke:rgba(120,120,120,.5)'
+			'.'.ZBX_STYLE_SVG_GRAPH_GRID.' path' => [
+				'stroke-dasharray' => '2,2',
+				'stroke' => 'rgba(120,120,120,.5)'
+			]
 		];
 	}
 
@@ -60,6 +63,12 @@ class CSvgGraphGrid extends CSvgTag {
 	}
 
 	public function toString($destroy = true) {
+		parent::addItem($this->draw());
+
+		return parent::toString($destroy);
+	}
+
+	protected function draw() {
 		$path = (new CSvgPath());
 
 		foreach ($this->points_time as $pos => $time) {
@@ -78,8 +87,6 @@ class CSvgGraphGrid extends CSvgTag {
 			}
 		};
 
-		$this->addItem($path);
-
-		return parent::toString($destroy);
+		return $path;
 	}
 }

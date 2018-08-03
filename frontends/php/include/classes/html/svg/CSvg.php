@@ -33,20 +33,25 @@ class CSvg extends CTag {
 
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
-			$this->styles = array_merge($this->styles, $value->getStyles());
+			$this->styles = $value->getStyles() + $this->styles;
 		}
 
 		return parent::addItem($value);
 	}
 
-	public function toString($destroy = true) {
-		$styles = '';
-		foreach ($this->styles as $selector => $property) {
-			$styles .= $selector.'{'.$property.'}';
+	protected function startToString() {
+		$styles = "\n";
+
+		foreach ($this->styles as $selector => $properties) {
+			if ($properties) {
+				$styles .= $selector.'{';
+				foreach ($properties as $property => $value) {
+					$styles .= $property.':'.$value.';';
+				}
+				$styles .= '}'."\n";
+			}
 		}
 
-		parent::addItem(new CTag('style', true, $styles));
-
-		return parent::toString();
+		return parent::startToString().(new CTag('style', true, $styles));
 	}
 }
