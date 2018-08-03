@@ -2034,7 +2034,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zbx_free(args);
 
-	session_token = zbx_strdup(NULL, zbx_create_token(0));
+	session_token = zbx_create_token(0);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child();
