@@ -66,13 +66,11 @@ class CSvgGraphAnnotation extends CSvgTag {
 		return $this;
 	}
 
-	private function drawTypeSimple($clock, $info) {
+	private function drawTypeSimple() {
 		$x1 = $this->x;
-		$x2 = $this->x + $this->width;
-		$y1_1 = $this->y;
-		$y1_2 = $this->y + $this->height;
-		$y2_1 = $this->y;
-		$y2_2 = $this->y + $this->height;
+		$y1 = $this->y;
+		$x2 = $x1;
+		$y2 = $this->y + $this->height;
 		$color_annotation = 'red';
 
 		$problem = [
