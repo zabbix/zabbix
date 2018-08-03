@@ -383,7 +383,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 				ret = SUCCEED;
 				break;
-			default:
+			case FAIL:
 				*error = zbx_dsprintf(*error, "invalid regular expression");
 		}
 
@@ -1991,7 +1991,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
 					return FAIL;
-				default:
+				case FAIL:
 					return NOTSUPPORTED;
 			}
 		case ZBX_FUNC_IREGEXP:
@@ -2001,7 +2001,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 					return SUCCEED;
 				case ZBX_REGEXP_NO_MATCH:
 					return FAIL;
-				default:
+				case FAIL:
 					return NOTSUPPORTED;
 			}
 	}
