@@ -1801,10 +1801,8 @@ static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-		{
 			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
-		}
 	}
 	ret = SUCCEED;
 out:
@@ -1875,10 +1873,8 @@ static int	evaluate_CHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *ts,
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-		{
 			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
-		}
 	}
 
 	ret = SUCCEED;
@@ -1948,10 +1944,8 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const zbx_timespec_t *ts, c
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-		{
 			*error = zbx_strdup(*error, "not a valid value");
 			goto out;
-		}
 	}
 
 	ret = SUCCEED;
@@ -1991,7 +1985,6 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-		{
 			switch (regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE))
 			{
 				case ZBX_REGEXP_MATCH:
@@ -2001,9 +1994,7 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				default:
 					return NOTSUPPORTED;
 			}
-		}
 		case ZBX_FUNC_IREGEXP:
-		{
 			switch (regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
 			{
 				case ZBX_REGEXP_MATCH:
@@ -2013,7 +2004,6 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				default:
 					return NOTSUPPORTED;
 			}
-		}
 	}
 
 	return FAIL;
