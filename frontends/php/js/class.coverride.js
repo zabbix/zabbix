@@ -26,7 +26,7 @@ jQuery(function ($) {
 	"use strict"
 
 	function createOverrideElement($override, option, value) {
-		var close = $('<button></button>')
+		var close = $('<button></button>', {'type': 'button'})
 				.on('click', function(e) {
 					$override.overrides('removeOverride', $override, option);
 					e.stopPropagation();
