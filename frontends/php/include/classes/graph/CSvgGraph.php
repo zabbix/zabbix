@@ -954,6 +954,7 @@ class CSvgGraph extends CSvg {
 
 			$draw_type = ($x2 - $x1) > 2 ? CSvgGraphAnnotation::TYPE_RANGE : CSvgGraphAnnotation::TYPE_SIMPLE;
 
+			// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
 			if ($problem['clock'] >= $this->time_from) {
 				$draw_type |= CSvgGraphAnnotation::DASH_LINE_START;
 			}
@@ -966,7 +967,7 @@ class CSvgGraph extends CSvg {
 				(new CSvgGraphAnnotation($draw_type))
 					->setInformation(CJs::encodeJson($info))
 					->setSize(min($x2 - $x1, $this->canvas_width), $this->canvas_height)
-					->setPosition($problem['clock'] > $this->time_from ? $x1 : $this->canvas_x, $this->canvas_y)
+					->setPosition(max($x1, $this->canvas_x), $this->canvas_y)
 			);
 
 			// if ($problem['r_clock']) {
