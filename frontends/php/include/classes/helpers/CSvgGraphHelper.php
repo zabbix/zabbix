@@ -258,7 +258,7 @@ class CSvgGraphHelper {
 
 		/**
 		 * Select eventids for problem events that was started before the graph visible period, but was recovered later
-		 * than the grapg beginning time or was never recovered.
+		 * than the graph beginning time or was never recovered.
 		 */
 		$query = '
 		SELECT e.eventid, er1.r_eventid
