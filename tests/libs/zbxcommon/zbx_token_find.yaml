@@ -211,4 +211,24 @@ out:
   name: 'MACRO'
   context: '"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"'
   return: 'SUCCEED'
+---
+test case: "LLD function macro missing closing bracket"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "LLD function macro missing openning bracket"
+in:
+  expression: '{{#VALUE}.regsub^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
 ...
