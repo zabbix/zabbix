@@ -374,9 +374,8 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function addCanvasLeftYaxis() {
 		if ($this->left_y_show && $this->min_value_left !== null) {
-			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
 			$this->addItem(
-				(new CSvgGraphAxis($values,GRAPH_YAXIS_SIDE_LEFT))
+				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
 					->setSize($this->offset_left, $this->canvas_height)
 					->setPosition($this->canvas_x, $this->canvas_y)
 			);
@@ -389,12 +388,8 @@ class CSvgGraph extends CSvg {
 	protected function addCanvasRightYAxis() {
 		if ($this->right_y_show && $this->min_value_right !== null) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
-
-			if (count($values) > 1) {
-				// Do not render value for y=0.
-				reset($values);
-				unset($values[key($values)]);
-			}
+			// Do not render axis value for bottom-right position.
+			unset($values[0]);
 
 			$this->addItem(
 				(new CSvgGraphAxis($values, GRAPH_YAXIS_SIDE_RIGHT))
