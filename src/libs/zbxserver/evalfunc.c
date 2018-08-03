@@ -1989,21 +1989,19 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			{
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
-				case ZBX_REGEXP_NO_MATCH:
-					break;
 				case FAIL:
 					return NOTSUPPORTED;
 			}
+			break;
 		case ZBX_FUNC_IREGEXP:
 			switch (regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
 			{
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
-				case ZBX_REGEXP_NO_MATCH:
-					break;
 				case FAIL:
 					return NOTSUPPORTED;
 			}
+			break;
 	}
 
 	return FAIL;
