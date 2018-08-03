@@ -63,41 +63,11 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @var CSvgGroup
 	 */
 	private $container;
-	private $width = 0;
-	private $height = 0;
-	private $x = 0;
-	private $y = 0;
 
 	public function __construct(array $labels, $type) {
 		$this->labels = $labels;
 		$this->type = $type;
 		$this->container = new CSvgGroup();
-	}
-
-	/**
-	 * Set axis container size.
-	 *
-	 * @param int $width    Axis container width.
-	 * @param int $height   Axis container height.
-	 */
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
-
-		return $this;
-	}
-
-	/**
-	 * Set axis container position.
-	 *
-	 * @param int $x        Horizontal position of container element.
-	 * @param int $y        Veritical position of container element.
-	 */
-	public function setPosition($x, $y) {
-		$this->x = $x;
-		$this->y = $y;
-
-		return $this;
 	}
 
 	/**

@@ -21,7 +21,19 @@
 
 class CSvgTag extends CTag {
 
+	const CSS_DASHED = 'dashed';
+	const CSS_PROBLEMS = 'problems';
+	const CSS_PROBLEM_BOX = 'box';
+
+	/**
+	 * SVG styles array.
+	 */
 	protected $styles = [];
+
+	protected $width = 0;
+	protected $height = 0;
+	protected $x = 0;
+	protected $y = 0;
 
 	public function __construct($tag) {
 		parent::__construct($tag, true);
@@ -31,12 +43,44 @@ class CSvgTag extends CTag {
 		return $this->styles;
 	}
 
+	/**
+	 * Add child item with styles.
+	 *
+	 * @param string|array|CSvgTag    Child item.
+	 */
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
 			$this->styles = $value->getStyles() + $this->styles;
 		}
 
 		return parent::addItem($value);
+	}
+
+
+	/**
+	 * Set axis container size.
+	 *
+	 * @param int $width    Axis container width.
+	 * @param int $height   Axis container height.
+	 */
+	public function setSize($width, $height) {
+		$this->width = $width;
+		$this->height = $height;
+
+		return $this;
+	}
+
+	/**
+	 * Set axis container position.
+	 *
+	 * @param int $x        Horizontal position of container element.
+	 * @param int $y        Veritical position of container element.
+	 */
+	public function setPosition($x, $y) {
+		$this->x = $x;
+		$this->y = $y;
+
+		return $this;
 	}
 
 	public function setFillColor($color) {

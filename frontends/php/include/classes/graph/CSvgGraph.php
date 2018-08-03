@@ -909,7 +909,7 @@ class CSvgGraph extends CSvg {
 	private function drawProblems() {
 		// TODO: move calculation related logic out of graph class. Only time presentation logic should be left.
 		$today = strtotime('today');
-		$container = (new CSvgGroup())->addClass('problems');
+		$container = (new CSvgGroup())->addClass(CSvgTag::CSS_PROBLEMS);
 
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
@@ -926,16 +926,15 @@ class CSvgGraph extends CSvg {
 				$status_color = ZBX_STYLE_OK_UNACK_FG;
 			}
 			else {
-				$in_closing = false;
+				$status_str = _('PROBLEM');
+				$status_color = ZBX_STYLE_PROBLEM_UNACK_FG;
+
 				foreach ($problem['acknowledges'] as $acknowledge) {
-					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-						$in_closing = true;
-						break;
+					if ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) {
+						$status_str = _('CLOSING');
+						$status_color = ZBX_STYLE_OK_UNACK_FG;
 					}
 				}
-
-				$status_str = $in_closing ? _('CLOSING') : _('PROBLEM');
-				$status_color = $in_closing ? ZBX_STYLE_OK_UNACK_FG : ZBX_STYLE_PROBLEM_UNACK_FG;
 			}
 
 			$info = [
