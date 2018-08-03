@@ -42,8 +42,16 @@ class CSvgGraphAnnotation extends CSvgTag {
 	 */
 	private $data_info;
 
+	/**
+	 * Color value.
+	 *
+	 * @var string
+	 */
+	private $color;
+
 	public function __construct($type) {
 		$this->data_info = null;
+		$this->color = '';
 		$this->type = $type;
 	}
 
@@ -51,6 +59,22 @@ class CSvgGraphAnnotation extends CSvgTag {
 		return [
 			'.' . CSvgTag::CSS_DASHED => [
 				'stroke-dasharray' => '2, 2'
+			],
+			'.' . CSvgTag::CSS_PROBLEM_HANDLE => [
+				'fill' => $this->color,
+				'stroke' => $this->color
+			],
+			'.' . CSvgTag::CSS_PROBLEM_BOX => [
+				'fill' => $this->color,
+				'opacity' => '0.1'
+			],
+			'.' . CSvgTag::CSS_PROBLEMS . ' line' => [
+				'stroke' => $this->color
+			],
+			'.' . CSvgTag::CSS_PROBLEM_ARROW => [
+				'stroke' => $this->color,
+				'fill' => $this->color,
+				'stroke-width' => 3
 			]
 		];
 	}
@@ -58,7 +82,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 	/**
 	 * Set array of problem information
 	 *
-	 * @param string $info  Single problem information.
+	 * @param string $info    Single problem information.
 	 */
 	public function setInformation($info) {
 		$this->data_info = $info;
@@ -66,27 +90,35 @@ class CSvgGraphAnnotation extends CSvgTag {
 		return $this;
 	}
 
-	private function drawTypeSimple() {
-		$x1 = $this->x;
-		$y1 = $this->y;
-		$x2 = $x1;
-		$y2 = $this->y + $this->height;
-		$color_annotation = 'red';
+	/**
+	 * Set color.
+	 *
+	 * @param string $color   Color value.
+	 */
+	public function setColor($color) {
+		$this->color = $color;
 
-		$problem = [
-			(new CSvgLine($x1, $y1, $x2, $y2, $color_annotation))->setDashed(),
+		return $this;
+	}
+
+	/**
+	 * Return markup for problem of type simple as array.
+	 *
+	 * @return array
+	 */
+	private function drawTypeSimple() {
+		$y = $this->y + $this->height;
+
+		return [
+			(new CSvgLine($this->x, $this->y, $this->x, $this->y + $this->height))->addClass(CSvgTag::CSS_DASHED),
 			(new CSvgPolygon([
-					[$x2, $y2 + 1],
-					[$x2 - 3, $y2 + 5],
-					[$x2 + 3, $y2 + 5],
-				]))
-				->setStrokeWidth(3)
-				->setStrokeColor($color_annotation)
-				->setFillColor($color_annotation)
+				[$this->x, $y + 1],
+				[$this->x - 3, $y + 5],
+				[$this->x + 3, $y + 5],
+			]))
+				->addClass(CSvgTag::CSS_PROBLEM_ARROW)
 				->setAttribute('data-info', $this->data_info)
 		];
-
-		return $problem;
 	}
 
 	/**
@@ -95,16 +127,8 @@ class CSvgGraphAnnotation extends CSvgTag {
 	 * @return array
 	 */
 	private function drawTypeRange() {
-		$x1 = $this->x;
-		$x2 = $this->x + $this->width;
-		//$y1_1 = $this->y;
-		$y1_2 = $this->y + $this->height;
-		$y2_1 = $this->y;
-		$y2_2 = $this->y + $this->height;
-		$color_annotation = 'red';
-
-		$start_line = new CSvgLine($this->x, $this->y, $this->x, $this->y + $this->height, $color_annotation);
-		$end_line = new CSvgLine($this->x + $this->width, $this->y, $this->x + $this->width, $this->y + $this->height, $color_annotation);
+		$start_line = new CSvgLine($this->x, $this->y, $this->x, $this->y + $this->height);
+		$end_line = new CSvgLine($this->x + $this->width, $this->y, $this->x + $this->width, $this->y + $this->height);
 
 		if ($this->type & self::DASH_LINE_START) {
 			$start_line->addClass(CSvgTag::CSS_DASHED);
@@ -114,19 +138,14 @@ class CSvgGraphAnnotation extends CSvgTag {
 			$end_line->addClass(CSvgTag::CSS_DASHED);
 		}
 
-		$problem = [
+		return [
 			$start_line,
-			(new CSvgRect($x1, $this->y, $this->width, $y1_2  - $this->y))
-				->setFillColor($color_annotation)// .problems rect
-				->setFillOpacity('0.1'),
+			(new CSvgRect($this->x, $this->y, $this->width, $this->height))->addClass(CSvgTag::CSS_PROBLEM_BOX),
 			$end_line,
 			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width , 4))
-				->setFillColor($color_annotation)//	.problems line.handle
-				->setStrokeColor($color_annotation)
+				->addClass(CSvgTag::CSS_PROBLEM_HANDLE)
 				->setAttribute('data-info', $this->data_info)
 		];
-
-		return $problem;
 	}
 
 	public function toString($destroy = true) {

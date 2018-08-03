@@ -21,9 +21,12 @@
 
 class CSvgTag extends CTag {
 
-	const CSS_DASHED = 'dashed';
-	const CSS_PROBLEMS = 'problems';
-	const CSS_PROBLEM_BOX = 'box';
+	const CSS_DASHED = 'svg-dashed';
+
+	const CSS_PROBLEMS = 'svg-problems';
+	const CSS_PROBLEM_BOX = 'svg-problem-box';
+	const CSS_PROBLEM_HANDLE = 'svg-problem-handle';
+	const CSS_PROBLEM_ARROW = 'svg-problem-arrow';
 
 	/**
 	 * SVG styles array.
@@ -77,8 +80,8 @@ class CSvgTag extends CTag {
 	 * @param int $y        Veritical position of container element.
 	 */
 	public function setPosition($x, $y) {
-		$this->x = $x;
-		$this->y = $y;
+		$this->x = (int) $x;
+		$this->y = (int) $y;
 
 		return $this;
 	}
