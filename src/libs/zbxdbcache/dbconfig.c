@@ -12372,7 +12372,6 @@ int	zbx_dc_update_maintenances(void)
 					}
 				}
 			}
-
 		}
 
 		if (state == ZBX_MAINTENANCE_RUNNING)
