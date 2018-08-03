@@ -30,9 +30,9 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @var array
 	 */
 	public $css_class = [
-		GRAPH_YAXIS_SIDE_RIGHT => 'axis axis-vertical-right',
-		GRAPH_YAXIS_SIDE_LEFT => 'axis axis-vertical-left',
-		GRAPH_YAXIS_SIDE_BOTTOM => 'axis axis-horizontal-bottom'
+		GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::CSS_AXIS .' '. CSvgTag::CSS_AXIS_RIGHT,
+		GRAPH_YAXIS_SIDE_LEFT => CSvgTag::CSS_AXIS .' '. CSvgTag::CSS_AXIS_LEFT,
+		GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::CSS_AXIS .' '. CSvgTag::CSS_AXIS_BOTTOM,
 	];
 
 	/**
@@ -77,25 +77,23 @@ class CSvgGraphAxis extends CSvgTag {
 	 */
 	public function getStyles() {
 		return [
-			'.axis path' => [
+			'.' . CSvgTag::CSS_AXIS . ' path' => [
 				'stroke' => 'silver',
 				'fill' => 'white'
 			],
-			'.axis text' => [
+			'.' . CSvgTag::CSS_AXIS . ' text' => [
 				'fill' => 'silver',
-				'font-size' => '11px'
-			],
-			'.axis-vertical-right text' => [
-				'text-anchor' => 'start',
+				'font-size' => '11px',
 				'alignment-baseline' => 'middle'
 			],
-			'.axis-vertical-left text' => [
-				'text-anchor' => 'end',
-				'alignment-baseline' => 'middle'
+			'.' . CSvgTag::CSS_AXIS_RIGHT . ' text' => [
+				'text-anchor' => 'start'
 			],
-			'.axis-horizontal-bottom text' => [
+			'.' . CSvgTag::CSS_AXIS_LEFT . ' text' => [
+				'text-anchor' => 'end'
+			],
+			'.' . CSvgTag::CSS_AXIS_BOTTOM . ' text' => [
 				'text-anchor' => 'middle',
-				'alignment-baseline' => 'middle',
 				'dominant-baseline' => 'middle'
 			]
 		];

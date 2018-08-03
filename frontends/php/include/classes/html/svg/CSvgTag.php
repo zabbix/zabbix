@@ -28,6 +28,11 @@ class CSvgTag extends CTag {
 	const CSS_PROBLEM_HANDLE = 'svg-problem-handle';
 	const CSS_PROBLEM_ARROW = 'svg-problem-arrow';
 
+	const CSS_AXIS = 'svg-axis';
+	const CSS_AXIS_LEFT = 'svg-axis-left';
+	const CSS_AXIS_RIGHT = 'svg-axis-right';
+	const CSS_AXIS_BOTTOM = 'svg-axis-bottom';
+
 	/**
 	 * SVG styles array.
 	 */
