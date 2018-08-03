@@ -40,6 +40,7 @@
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
+					'title': t('Adjust widget refresh interval'),
 					'data-menu-popup': JSON.stringify({
 						'type': 'refresh',
 						'widgetName': widget['widgetid'],
@@ -47,7 +48,6 @@
 						'multiplier': false
 					}),
 					'attr': {
-						'title': t('Adjust widget refresh interval'),
 						'aria-haspopup': true
 					}
 				}))
