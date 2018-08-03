@@ -47,7 +47,7 @@
 						'multiplier': false
 					}),
 					'attr': {
-						'aria-label': t('Adjust widget refresh interval'),
+						'title': t('Adjust widget refresh interval'),
 						'aria-haspopup': true
 					}
 				}))

@@ -108,7 +108,7 @@ $tranStrings = [
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Add a new widget' => _('Add a new widget'),
-		'Adjust widget refresh interval' => _x('Adjust widget refresh interval', 'screen reader'),
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
 		'%1$s, selected' => _x('%1$s, selected', 'screen reader')
 	],
 	'functions.js' => [
