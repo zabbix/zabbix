@@ -226,92 +226,100 @@ class CSvgGraphHelper {
 	protected static function getProblems(array $problem_options = [], array $time_period) {
 		/**
 		 * There can be 2 problem groups in graph.
-		 *  - problems that begun before the graph start time and ended later than graph start time or never;
+		 *  - problems that has started before the graph start time and ended later than graph start time or never;
 		 *  - problems that has started between graph start time and end time.
 		 *
 		 * This is solved making 2 separate requests:
-		 * - First is made with raw SQL, requesting all eventids in calculated time period. This query also involves
-		 *   filtering by severity and triggerid (based on $problem_options[itemids_only] and
-		 *   $problem_options[problem_hosts]). This is done to make response smaller.
-		 * - Seconds request is made using problem.get API method. This involves checks for permissions as well as
-		 *   search by problem name and selected problem tags.
+		 * - First is made with raw SQL, requesting all eventids in calculated time period;
+		 * - Seconds request is made using problem.get API method. This returns final response for getProblems.
 		 */
-
-		$sql_parts = [
-			dbConditionInt('p.severity', $problem_options['severities']),
-			'p.source = '.EVENT_SOURCE_TRIGGERS,
-			'p.object = '.EVENT_OBJECT_TRIGGER
-		];
-
-		if (array_key_exists('problem_hosts', $problem_options) || array_key_exists('itemids_only', $problem_options)) {
-			$options = [
-				'output' => [],
-				'selectTriggers' => ['triggerid'],
-				'preservekeys' => true
-			];
-
-			if (array_key_exists('problem_hosts', $problem_options)) {
-				$options += [
-					'searchWildcardsEnabled' => true,
-					'searchByAny' => true,
-					'search' => [
-						'name' => self::processPattern($problem_options['problem_hosts'])
-					]
-				];
-			}
-
-			if (array_key_exists('itemids_only', $problem_options)) {
-				$options += [
-					'itemids' => $problem_options['itemids_only']
-				];
-			}
-
-			$triggerids = [];
-			$problem_hosts = API::Host()->get($options);
-			foreach ($problem_hosts as $problem_host) {
-				$triggerids = zbx_array_merge($triggerids, zbx_objectValues($problem_host['triggers'], 'triggerid'));
-			}
-			$sql_parts[] = dbConditionInt('p.objectid', $triggerids);
-		}
-
-		// Raw SQL written as temporary solution because API doesn't allow make such request.
-		$query =
-		'SELECT problems.eventid FROM (
-			(
-				SELECT eventid
-				FROM problem p
-				WHERE '.implode(' AND ', $sql_parts).' AND
-					('.$time_period['time_from'].' > clock AND (r_clock > '.$time_period['time_from'].' OR r_clock = 0))
-			) UNION ALL (
-				SELECT eventid
-				FROM problem p
-				WHERE '.implode(' AND ', $sql_parts).' AND
-					(clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].')
-			)
-		) problems';
-
-		$eventids = [];
-		$config = select_config();
-		$problem_data = DBselect($query, $config['search_limit']);
-		while ($problem = DBfetch($problem_data)) {
-			$eventids[] = $problem['eventid'];
-		}
-
-		// Prepare API request to select problems.
 		$options = [
 			'output' => ['objectid', 'name', 'severity', 'clock', 'r_clock'],
 			'selectAcknowledges' => ['action'],
-			'eventids' => $eventids,
 			'recent' => true,
 			'preservekeys' => true
 		];
+
+		/**
+		 * Select problem eventids in given time period. Raw SQL written as temporary solution because API doesn't allow
+		 * make such request.
+		 */
+		$query =
+		'SELECT p.eventid FROM (
+			(
+				SELECT eventid
+				FROM problem
+				WHERE source = '.EVENT_SOURCE_TRIGGERS.' AND object = '.EVENT_OBJECT_TRIGGER.' AND
+					('.$time_period['time_from'].' > clock AND (r_clock > '.$time_period['time_from'].' OR r_clock = 0))
+			) UNION ALL (
+				SELECT eventid
+				FROM problem
+				WHERE source = '.EVENT_SOURCE_TRIGGERS.' AND object = '.EVENT_OBJECT_TRIGGER.' AND
+					(clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].')
+			)
+		) p';
+
+		$config = select_config();
+		$problem_data = DBselect($query, $config['search_limit']);
+		while ($problem = DBfetch($problem_data)) {
+			$options['eventids'][] = $problem['eventid'];
+		}
+
+		// No events, no problems.
+		if (!$options['eventids']) {
+			return [];
+		}
+
+		// Find triggers involved.
+		if (array_key_exists('problem_hosts', $problem_options)) {
+			$problem_hosts = API::Host()->get([
+				'output' => [],
+				'selectTriggers' => ['triggerid'],
+				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
+				'search' => [
+					'name' => self::processPattern($problem_options['problem_hosts'])
+				],
+				'preservekeys' => true
+			]);
+
+			$options['objectids'] = [];
+			foreach ($problem_hosts as $problem_host) {
+				$options['objectids']
+					= zbx_array_merge($options['objectids'], zbx_objectValues($problem_host['triggers'], 'triggerid'));
+			}
+
+			// If searched by hosts but no trieggers found, return no preblems.
+			if (!$options['objectids']) {
+				return [];
+			}
+		}
+
+		// Filter out only items of selected metrics.
+		if (array_key_exists('itemids_only', $problem_options)) {
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'itemids' => $problem_options['itemids_only'],
+				'preservekeys' => true
+			]);
+
+			$options['objectids'] = array_key_exists('objectids', $options)
+				? array_intersect($options['objectids'], array_keys($triggers))
+				: array_keys($triggers);
+		}
+
+		// Add other filters.
+		if (array_key_exists('severities', $problem_options)) {
+			$options['severities'] = $problem_options['severities'];
+		}
 		if (array_key_exists('problem_name', $problem_options)) {
+			$options['searchWildcardsEnabled'] = true;
 			$options['search']['name'] = $problem_options['problem_name'];
 		}
-		if (array_key_exists('evaltype', $problem_options)) {
-			$options['evaltype'] = $problem_options['evaltype'];
-		}
 		if (array_key_exists('tags', $problem_options)) {
+			if (array_key_exists('evaltype', $problem_options)) {
+				$options['evaltype'] = $problem_options['evaltype'];
+			}
 			$options['tags'] = $problem_options['tags'];
 		}
 
