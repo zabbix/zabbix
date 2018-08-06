@@ -433,7 +433,7 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList
 		->addRow(_('Trigger severity'), $triggersTable, 'triggers_row')
 		->addRow(_('Show suppressed problems'),
-			(new CCheckBox('messages[show_suppressed]'))->setChecked($this->data['messages']['show_suppressed'] == 1)
+			(new CCheckBox('messages[show_suppressed]'))->setChecked($data['messages']['show_suppressed'] == 1)
 	);
 }
 

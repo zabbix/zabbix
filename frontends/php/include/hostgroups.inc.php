@@ -265,8 +265,8 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 
 	$db_maintenances = $maintenanceids
 		? API::Maintenance()->get([
-			'maintenanceids' => array_keys($maintenanceids),
 			'output' => ['name', 'description'],
+			'maintenanceids' => array_keys($maintenanceids),
 			'preservekeys' => true
 		])
 		: [];

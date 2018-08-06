@@ -357,16 +357,16 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			$allTriggersNum = $stat['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CLinkAction($allTriggersNum))
-					->setHint(makeProblemsPopup(
-							$stat['problems'], $data['triggers'], $backurl, $data['actions'], $config, $filter
+					->setHint(makeProblemsPopup($stat['problems'], $data['triggers'], $backurl, $data['actions'],
+						$config, $filter
 					));
 			}
 
 			$unackTriggersNum = $stat['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CLinkAction($unackTriggersNum))
-					->setHint(makeProblemsPopup(
-							$stat['problems_unack'], $data['triggers'], $backurl, $data['actions'], $config, $filter
+					->setHint(makeProblemsPopup($stat['problems_unack'], $data['triggers'], $backurl, $data['actions'],
+						$config, $filter
 					));
 			}
 
