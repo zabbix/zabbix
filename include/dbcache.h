@@ -833,8 +833,8 @@ typedef struct
 }
 zbx_event_suppress_query_t;
 
-#define ZBX_MAINTENANCE_MODIFIED_TRUE	1
-#define ZBX_MAINTENANCE_MODIFIED_FALSE	0
+#define ZBX_MAINTENANCE_UPDATE_TRUE	1
+#define ZBX_MAINTENANCE_UPDATE_FALSE	0
 
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
 int	zbx_dc_update_maintenances(void);
