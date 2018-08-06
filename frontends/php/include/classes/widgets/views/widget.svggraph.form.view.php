@@ -163,6 +163,7 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
 	->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 
+$scripts[] = 'jQuery("#problem_hosts").autoGrowTextarea({maxHeight: 100});';
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 

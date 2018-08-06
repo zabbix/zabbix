@@ -77,9 +77,10 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 				(new CDiv([
 					(new CDiv([
-						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
+						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(hosts pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('maxlength', 255)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
@@ -98,9 +99,10 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						->addClass(ZBX_STYLE_COLUMN_50),
 
 					(new CDiv([
-						(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
+						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(items pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->setAttribute('maxlength', 255)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
@@ -397,6 +399,16 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(container[0].scrollHeight);'.
+
+					// Initialize textarea autogrow.
+					'jQuery("textarea", jQuery("#overrides"))'.
+						'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
+						'.each(function() {'.
+							'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+								'hostsId = jQuery(this).attr("id");'.
+							'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+						'});'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'initializeOverrides();'.
@@ -415,6 +427,16 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 			// Initialize overrides UI control.
 			'initializeOverrides();',
+
+			// Initialize textarea autogrow.
+			'jQuery("textarea", jQuery("#overrides"))'.
+				'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
+				'.each(function() {'.
+					'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+						'hostsId = jQuery(this).attr("id");'.
+					'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+					'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+				'});',
 
 			// Make overrides sortable.
 			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.

@@ -91,8 +91,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 						(new CDiv())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';'),
-						(new CTextBox($fn.'['.$options['row_num'].'][hosts]', $value['hosts']))
+						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(hosts pattern)'))
+							->setAttribute('maxlength', 255)
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -110,8 +111,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextBox($fn.'['.$options['row_num'].'][items]', $value['items']))
+						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(items pattern)'))
+							->setAttribute('maxlength', 255)
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -447,7 +449,16 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
 						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
 						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-					'}});',
+					'}});'.
+
+					'jQuery("textarea", jQuery("#data_sets"))'.
+						'.filter(function() {return this.id.match(/ds_\d+_hosts/);})'.
+						'.each(function() {'.
+							'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+								'hostsId = jQuery(this).attr("id");'.
+							'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+						'});'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
@@ -470,7 +481,17 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'});',
 
 			// Initialize rangeControl UI elements.
-			'jQuery(".range-control").rangeControl();',
+			'jQuery(".range-control", jQuery("#data_sets")).rangeControl();',
+
+			// Initialize textarea autogrow.
+			'jQuery("textarea", jQuery("#data_sets"))'.
+				'.filter(function() {return this.id.match(/ds_\d+_hosts/);})'.
+				'.each(function() {'.
+					'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+						'hostsId = jQuery(this).attr("id");'.
+					'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+					'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+				'});',
 
 			// Initialize color-picker UI elements.
 			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.

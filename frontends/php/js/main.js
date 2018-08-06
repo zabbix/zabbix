@@ -1061,3 +1061,55 @@ jQuery(function ($) {
 		$(window).scrollTop(sessionStorage.scrollTop);
 	}
 });
+
+
+jQuery(function ($) {
+	"use strict";
+
+	$.fn.autoGrowTextarea = function(options) {
+		this.each(function() {
+			// Prevent repeating initialization.
+			if (typeof $(this).data('autogrow') !== 'undefined') {
+				return false;
+			}
+			else {
+				$(this).data('autogrow', true);
+			}
+
+			var maxHeight = (options && 'maxHeight' in options) ? options.maxHeight : null;
+			// Autogrow on content change.
+			$(this)
+				.css({'resize': 'none', 'overflow': 'hidden'})
+				.on('paste change keyup', function() {
+					var bw = parseFloat($(this).css('borderTopWidth')) + parseFloat($(this).css('borderBottomWidth'));
+					while ($(this).outerHeight() < $(this)[0].scrollHeight + bw) {
+						if (maxHeight === null || maxHeight > $(this).height() + 1) {
+							$(this).height($(this).height() + 1);
+						}
+						else {
+							break;
+						}
+					}
+
+					if (options && 'pair' in options) {
+						if ($(this).outerHeight() > $(options.pair).outerHeight()) {
+							$(options.pair).height($(this).height());
+						}
+					}
+				})
+				.trigger('change');
+
+			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+					if ($(this).val().length > $(this).attr('maxlength')) {
+						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
+					}
+				});
+			}
+
+			if (options && 'pair' in options) {
+				$(options.pair).css({'resize': 'none', 'overflow': 'hidden'});
+			}
+		});
+	};
+});
