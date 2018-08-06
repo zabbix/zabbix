@@ -81,6 +81,10 @@ class CStatusCodeRangesParser extends CParser {
 
 		while (isset($source[$p])) {
 			if ($this->status_code_range_parser->parse($source, $p) != self::PARSE_FAIL) {
+				if ($ranges && $source[$p - 1] !== ',') {
+					break;
+				}
+
 				$p += $this->status_code_range_parser->getLength();
 				$ranges[] = $this->status_code_range_parser->getStatusCodes();
 			}

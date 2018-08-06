@@ -81,9 +81,6 @@ class CStatusCodeRangesValidator extends CValidator {
 			return false;
 		}
 
-		// Because trim(" \t\r\n") doesn't work.
-		$value = str_replace([' ', "\t", "\r", "\n"], '', $value);
-
 		if ($this->status_code_ranges_parser->parse($value) == CParser::PARSE_SUCCESS) {
 			$ranges = $this->status_code_ranges_parser->getRanges();
 
