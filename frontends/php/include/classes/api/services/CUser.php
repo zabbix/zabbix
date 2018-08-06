@@ -1130,7 +1130,7 @@ class CUser extends CApiService {
 					}
 				}
 
-				$is_requested_user = ($config['http_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+				$is_requested_user = ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 					? ($user['user'] === $http_alias)
 					: (strtolower($user['user']) === strtolower($http_alias));
 
@@ -1149,7 +1149,7 @@ class CUser extends CApiService {
 		if ($http_alias !== '') {
 			$http_authenticated = true;
 
-			if ($config['http_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
+			if ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
 				$db_users = DB::select('users', [
 					'output' => $fields,
 					'filter' => ['alias' => $http_alias]
@@ -1168,7 +1168,7 @@ class CUser extends CApiService {
 		if (!$db_users) {
 			$http_authenticated = false;
 
-			if ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_MATCH) {
+			if ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
 				$db_users = DB::select('users', [
 					'output' => $fields,
 					'filter' => ['alias' => $user['user']]

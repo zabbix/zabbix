@@ -50,8 +50,8 @@ $http_tab = (new CFormList('list_http'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Case sensitive login'), 'http_case_sensitive'),
-		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_MATCH))
-			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 );
 
@@ -103,8 +103,8 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Case sensitive login'), 'ldap_case_sensitive'),
-		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_MATCH))
-			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
 	)
 	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
