@@ -8,6 +8,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
 ........S. [ZBX-14410] fixed use of uninitialized variable (MVekslers)
 ...G...PS. [ZBX-14341] fixed duplicate value generation in environments with poor connectivity (wiper)
 ........S. [ZBX-9913] fixed inconsistencies in behaviour and error messaging of trigger functions (mindbound)
