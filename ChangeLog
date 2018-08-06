@@ -8,6 +8,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-14410] fixed use of uninitialized variable (MVekslers)
 ...G...PS. [ZBX-14341] fixed duplicate value generation in environments with poor connectivity (wiper)
 ........S. [ZBX-9913] fixed inconsistencies in behaviour and error messaging of trigger functions (mindbound)
 ..F....... [ZBX-14448] fixed undefined index when updating item and switching type to dependent (Ivo)
@@ -430,6 +431,7 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+........S. [ZBX-14410] fixed use of uninitialized variable (MVekslers)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
@@ -1734,6 +1736,7 @@ Changes for 3.0.21rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14410] fixed use of uninitialized variable (MVekslers)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
