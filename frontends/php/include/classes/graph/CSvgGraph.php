@@ -372,7 +372,7 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Render Y axis with labels for left side of graph.
 	 */
-	protected function addCanvasLeftYaxis() {
+	protected function drawCanvasLeftYaxis() {
 		if ($this->left_y_show && $this->min_value_left !== null) {
 			$this->addItem(
 				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
@@ -385,7 +385,7 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Render Y axis with labels for right side of graph.
 	 */
-	protected function addCanvasRightYAxis() {
+	protected function drawCanvasRightYAxis() {
 		if ($this->right_y_show && $this->min_value_right !== null) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
 			// Do not render axis value for bottom-right position.
@@ -402,7 +402,7 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Render X axis with labels of graph.
 	 */
-	protected function addCanvasXAxis() {
+	protected function drawCanvasXAxis() {
 		if ($this->x_axis) {
 			// Horizontal axis container height. TODO: should be calculated by calculateDimensions.
 			$container_height = 20;
@@ -841,70 +841,79 @@ class CSvgGraph extends CSvg {
 		ksort($points);
 	}
 
-	private function drawMetrics() {
+	/**
+	 * Generate metric elements.
+	 *
+	 * @param array $metric_types    Array with metric types to render.
+	 */
+	private function drawMetrics(array $metric_types) {
 		foreach ($this->metrics as $i => $metric) {
-			$this->drawMetricData($i);
+			if (in_array($metric['options']['type'], $metric_types)) {
+				$this->drawMetricData($i);
+			}
 		}
 	}
 
-	// private function drawAnnotationSimple($clock, $info) {
-	// 	$time_range = $this->time_till - $this->time_from;
-	// 	$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $time_range;
-	// 	$y1 = $this->canvas_y;
-	// 	$x2 = $x1;
-	// 	$y2 = $this->canvas_y + $this->canvas_height;
 
-	// 	$this->addItem([
-	// 		(new CSvgLine($x1, $y1, $x2, $y2, $this->color_annotation))->setDashed(),
-	// 		(new CSvgPolygon([
-	// 				[$x2, $y2 + 1],
-	// 				[$x2 - 3, $y2 + 5],
-	// 				[$x2 + 3, $y2 + 5],
-	// 			]))
-	// 			->setStrokeWidth(3)
-	// 			->setStrokeColor($this->color_annotation)
-	// 			->setFillColor($this->color_annotation)
-	// 			->setAttribute('data-info', CJs::encodeJson($info))
-	// 	]);
-	// }
+/*
+	private function drawAnnotationSimple($clock, $info) {
+		$time_range = $this->time_till - $this->time_from;
+		$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $time_range;
+		$y1 = $this->canvas_y;
+		$x2 = $x1;
+		$y2 = $this->canvas_y + $this->canvas_height;
 
-	// private function drawAnnotationRange($time_from, $time_to, $info) {
-	// 	$time_range = $this->time_till - $this->time_from ? : 1;
+		$this->addItem([
+			(new CSvgLine($x1, $y1, $x2, $y2, $this->color_annotation))->setDashed(),
+			(new CSvgPolygon([
+					[$x2, $y2 + 1],
+					[$x2 - 3, $y2 + 5],
+					[$x2 + 3, $y2 + 5],
+				]))
+				->setStrokeWidth(3)
+				->setStrokeColor($this->color_annotation)
+				->setFillColor($this->color_annotation)
+				->setAttribute('data-info', CJs::encodeJson($info))
+		]);
+	}
 
-	// 	// If highligted zone has started before $this->time_from, use the most left point of canvas.
-	// 	$x1 = ($time_from > $this->time_from)
-	// 		? $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_from) / $time_range
-	// 		: $this->canvas_x;
-	// 	$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
-	// 	$y1_1 = $this->canvas_y;
-	// 	$y1_2 = $this->canvas_y + $this->canvas_height;
-	// 	$y2_1 = $this->canvas_y;
-	// 	$y2_2 = $this->canvas_y + $this->canvas_height;
+	private function drawAnnotationRange($time_from, $time_to, $info) {
+		$time_range = $this->time_till - $this->time_from ? : 1;
 
-	// 	// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
-	// 	$start_line = new CSvgLine($x1, $y1_1, $x1, $y1_2, $this->color_annotation);
-	// 	if ($time_from >= $this->time_from) {
-	// 		$start_line->setDashed();
-	// 	}
-	// 	$end_line = new CSvgLine($x2, $y2_1, $x2, $y2_2, $this->color_annotation);
-	// 	if ($this->time_till >= $time_to) {
-	// 		$end_line->setDashed();
-	// 	}
+		// If highligted zone has started before $this->time_from, use the most left point of canvas.
+		$x1 = ($time_from > $this->time_from)
+			? $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_from) / $time_range
+			: $this->canvas_x;
+		$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
+		$y1_1 = $this->canvas_y;
+		$y1_2 = $this->canvas_y + $this->canvas_height;
+		$y2_1 = $this->canvas_y;
+		$y2_2 = $this->canvas_y + $this->canvas_height;
 
-	// 	// Add to the canvas.
-	// 	$this->addItem([
-	// 		$start_line,
-	// 		(new CSvgRect($x1, $y1_1, $x2 - $x1, $y1_2  - $y1_1))
-	// 			->setFillColor($this->color_annotation)
-	// 			->setFillOpacity('0.1'),
-	// 		$end_line,
-	// 		(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
-	// 			->setFillColor($this->color_annotation)
-	// 			->setStrokeColor($this->color_annotation)
-	// 			->setAttribute('data-info', CJs::encodeJson($info))
-	// 	]);
-	// }
+		// Draw border lines. Make them dashed if beginning or ending of highligted zone is visible in graph.
+		$start_line = new CSvgLine($x1, $y1_1, $x1, $y1_2, $this->color_annotation);
+		if ($time_from >= $this->time_from) {
+			$start_line->setDashed();
+		}
+		$end_line = new CSvgLine($x2, $y2_1, $x2, $y2_2, $this->color_annotation);
+		if ($this->time_till >= $time_to) {
+			$end_line->setDashed();
+		}
 
+		// Add to the canvas.
+		$this->addItem([
+			$start_line,
+			(new CSvgRect($x1, $y1_1, $x2 - $x1, $y1_2  - $y1_1))
+				->setFillColor($this->color_annotation)
+				->setFillOpacity('0.1'),
+			$end_line,
+			(new CSvgRect($x1, $y1_2 + 1, $x2 - $x1, 4))
+				->setFillColor($this->color_annotation)
+				->setStrokeColor($this->color_annotation)
+				->setAttribute('data-info', CJs::encodeJson($info))
+		]);
+	}
+*/
 	private function drawProblems() {
 		// TODO: move calculation related logic out of graph class. Only time presentation logic should be left.
 		$today = strtotime('today');
@@ -1007,25 +1016,19 @@ class CSvgGraph extends CSvg {
 
 	public function draw() {
 		$this->calculateDimensions();
-		//$this->addCanvas();
 
-		// Draw problem zones.
-		$this->drawProblems();
-
-		// Add Y axis.
-		$this->addCanvasLeftYAxis();
-		$this->addCanvasRightYAxis();
-		// Add X axis.
-		$this->addCanvasXAxis();
-
-		// Add grid lines.
 		$this->drawGrid();
 
-		// Add vertical highlihtinh line that follows mouse.
-		$this->addValueBox();
+		$this->drawMetrics([SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE]);
 
-		// Draw metrics & legend.
-		$this->drawMetrics();
+		$this->drawCanvasLeftYAxis();
+		$this->drawCanvasRightYAxis();
+
+		$this->drawMetrics([SVG_GRAPH_TYPE_POINTS]);
+
+		$this->drawCanvasXAxis();
+
+		$this->drawProblems();
 		$this->drawLegend();
 
 		// Add UI components.
