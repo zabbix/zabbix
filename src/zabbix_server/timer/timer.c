@@ -365,13 +365,10 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries)
 
 		if (NULL == trigger || trigger->triggerid != triggerid)
 		{
-			if (NULL == (trigger = (zbx_trigger_functions_t *)zbx_hashset_search(&triggers, &triggerid)))
-			{
-				trigger_local.triggerid = triggerid;
-				trigger = (zbx_trigger_functions_t *)zbx_hashset_insert(&triggers, &trigger_local,
-						sizeof(trigger_local));
-				zbx_vector_uint64_create(&trigger->functionids);
-			}
+			trigger_local.triggerid = triggerid;
+			trigger = (zbx_trigger_functions_t *)zbx_hashset_insert(&triggers, &trigger_local,
+					sizeof(trigger_local));
+			zbx_vector_uint64_create(&trigger->functionids);
 		}
 		zbx_vector_uint64_append(&trigger->functionids, functionid);
 	}
@@ -465,7 +462,6 @@ static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
 static void	db_update_event_suppress_data(int *suppressed_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
-	int			i, j, k;
 
 	*suppressed_num = 0;
 
@@ -479,6 +475,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		zbx_db_insert_t			db_insert;
 		char				*sql = NULL;
 		size_t				sql_alloc = 0, sql_offset = 0;
+		int				i, j, k;
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
 		zbx_vector_uint64_pair_t	del_event_maintenances;
