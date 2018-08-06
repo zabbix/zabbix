@@ -432,6 +432,7 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
 ........S. [ZBX-14410] fixed use of uninitialized variable (MVekslers)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
