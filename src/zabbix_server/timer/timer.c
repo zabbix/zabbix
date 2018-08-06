@@ -211,14 +211,13 @@ void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
  *          data from database and prepare event query, event data structures *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data,
-		zbx_vector_uint64_t *triggerids)
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
 {
 	DB_ROW				row;
 	DB_RESULT			result;
 	zbx_event_suppress_query_t	*query;
 	zbx_event_suppress_data_t	*data = NULL;
-	zbx_uint64_t			triggerid, eventid;
+	zbx_uint64_t			eventid;
 	zbx_uint64_pair_t		pair;
 	zbx_vector_uint64_t		eventids;
 
@@ -236,14 +235,12 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	{
 		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 		ZBX_STR2UINT64(query->eventid, row[0]);
+		ZBX_STR2UINT64(query->triggerid, row[1]);
 		ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 		zbx_vector_uint64_create(&query->functionids);
 		zbx_vector_ptr_create(&query->tags);
 		zbx_vector_uint64_pair_create(&query->maintenances);
 		zbx_vector_ptr_append(event_queries, query);
-
-		ZBX_STR2UINT64(triggerid, row[1]);
-		zbx_vector_uint64_append(triggerids, triggerid);
 	}
 	DBfree_result(result);
 
@@ -302,14 +299,12 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		{
 			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 			ZBX_STR2UINT64(query->eventid, row[0]);
+			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 			zbx_vector_uint64_create(&query->functionids);
 			zbx_vector_ptr_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);
 			zbx_vector_ptr_append(event_queries, query);
-
-			ZBX_STR2UINT64(triggerid, row[1]);
-			zbx_vector_uint64_append(triggerids, triggerid);
 		}
 		DBfree_result(result);
 
@@ -326,12 +321,12 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
  * Purpose: get event query functionids from database                         *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *triggerids)
+static void	db_get_query_functions(zbx_vector_ptr_t *event_queries)
 {
 	DB_ROW				row;
 	DB_RESULT			result;
 	int				i;
-	zbx_vector_uint64_t		triggerids_sorted;
+	zbx_vector_uint64_t		triggerids;
 	zbx_hashset_t			triggers;
 	zbx_hashset_iter_t		iter;
 	char				*sql = NULL;
@@ -344,14 +339,20 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
 
 	zbx_hashset_create(&triggers, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_create(&triggerids_sorted);
-	zbx_vector_uint64_append_array(&triggerids_sorted, triggerids->values, triggerids->values_num);
-	zbx_vector_uint64_sort(&triggerids_sorted, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&triggerids_sorted, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&triggerids);
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		zbx_vector_uint64_append(&triggerids, query->triggerid);
+	}
+
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select functionid,triggerid from functions where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids_sorted.values,
-			triggerids_sorted.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
+			triggerids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by triggerid");
 
 	result = DBselect("%s", sql);
@@ -382,7 +383,7 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
 	{
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 
-		if (NULL == (trigger = (zbx_trigger_functions_t *)zbx_hashset_search(&triggers, &triggerids->values[i])))
+		if (NULL == (trigger = (zbx_trigger_functions_t *)zbx_hashset_search(&triggers, &query->triggerid)))
 			continue;
 
 		zbx_vector_uint64_append_array(&query->functionids, trigger->functionids.values,
@@ -394,7 +395,7 @@ static void	db_get_query_functions(zbx_vector_ptr_t *event_queries, const zbx_ve
 		zbx_vector_uint64_destroy(&trigger->functionids);
 	zbx_hashset_destroy(&triggers);
 
-	zbx_vector_uint64_destroy(&triggerids_sorted);
+	zbx_vector_uint64_destroy(&triggerids);
 }
 
 /******************************************************************************
@@ -465,16 +466,13 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
 	int			i, j, k;
-	zbx_vector_uint64_t	triggerids;
 
 	*suppressed_num = 0;
 
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
 
-	zbx_vector_uint64_create(&triggerids);
-
-	db_get_query_events(&event_queries, &event_data, &triggerids);
+	db_get_query_events(&event_queries, &event_data);
 
 	if (0 != event_queries.values_num)
 	{
@@ -490,7 +488,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		zbx_vector_uint64_create(&maintenanceids);
 		zbx_vector_uint64_pair_create(&del_event_maintenances);
 
-		db_get_query_functions(&event_queries, &triggerids);
+		db_get_query_functions(&event_queries);
 		db_get_query_tags(&event_queries);
 
 		zbx_dc_get_running_maintenanceids(&maintenanceids);
@@ -618,8 +616,6 @@ cleanup:
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 		zbx_vector_uint64_destroy(&maintenanceids);
 	}
-
-	zbx_vector_uint64_destroy(&triggerids);
 
 	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
 	zbx_vector_ptr_destroy(&event_data);

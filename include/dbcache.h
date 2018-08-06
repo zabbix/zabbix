@@ -824,7 +824,8 @@ zbx_host_maintenance_diff_t;
 typedef struct
 {
 	zbx_uint64_t			eventid;		/* [IN] eventid */
-	zbx_uint64_t			r_eventid;		/* [IN] recovery eventid */
+	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
+	zbx_uint64_t			triggerid;		/* [-] triggerid */
 	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
 	zbx_vector_ptr_t		tags;			/* [IN] event tags */
 	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
