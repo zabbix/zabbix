@@ -742,7 +742,7 @@ class CScreenProblem extends CScreenBase {
 			$show_timeline = ($this->data['sort'] === 'clock' && !$this->data['filter']['compact_view']
 				&& $this->data['filter']['show_timeline']);
 
-			$show_recovery_data = in_array((int) $this->data['filter']['show'], [
+			$show_recovery_data = in_array($this->data['filter']['show'], [
 				TRIGGERS_OPTION_RECENT_PROBLEM,
 				TRIGGERS_OPTION_ALL
 			]);
