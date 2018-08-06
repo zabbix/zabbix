@@ -42,14 +42,12 @@ $http_tab = (new CFormList('list_http'))
 		(new CComboBox('http_login_form', $data['http_login_form'], null, [
 			ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
 			ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-		]))->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
-		null
+		]))->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 	)
 	->addRow(new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		(new CTextBox('http_strip_domains', $data['http_strip_domains']))
 			->setEnabled($data['http_auth_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		null
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Case sensitive login'), 'http_case_sensitive'),
 		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_MATCH))

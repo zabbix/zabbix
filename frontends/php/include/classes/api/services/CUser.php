@@ -266,7 +266,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -293,7 +293,7 @@ class CUser extends CApiService {
 		foreach ($users as &$user) {
 			$user = $this->checkLoginOptions($user);
 
-			$user['passwd'] = md5($user['passwd']);
+			$user['passwd'] = ($user['passwd'] === '' && $user['alias'] !== ZBX_GUEST_USER) ? '' : md5($user['passwd']);
 		}
 		unset($user);
 
@@ -367,7 +367,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'length' => 255],
+			'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -433,7 +433,7 @@ class CUser extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
 
-				$user['passwd'] = md5($user['passwd']);
+				$user['passwd'] = $user['passwd'] === '' ? '' : md5($user['passwd']);
 			}
 		}
 		unset($user);
@@ -494,7 +494,7 @@ class CUser extends CApiService {
 		$usrgrpids = array_keys($usrgrpids);
 
 		$db_usrgrps = DB::select('usrgrp', [
-			'output' => [],
+			'output' => ['gui_access'],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
 		]);
@@ -502,6 +502,22 @@ class CUser extends CApiService {
 		foreach ($usrgrpids as $usrgrpid) {
 			if (!array_key_exists($usrgrpid, $db_usrgrps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
+			}
+		}
+
+		foreach ($users as $user) {
+			if (array_key_exists('passwd', $user) && $user['passwd'] === '') {
+				$groups = array_intersect_key($db_usrgrps,
+					array_fill_keys(zbx_objectValues($user['usrgrps'], 'usrgrpid'), '')
+				);
+				$gui_access = zbx_objectValues($groups, 'gui_access');
+
+				//  Do not allow empty password for users with ZBX_AUTH_INTERNAL.
+				if (max($gui_access) == GROUP_GUI_ACCESS_INTERNAL) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
+					);
+				}
 			}
 		}
 	}
