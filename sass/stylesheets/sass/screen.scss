@@ -853,12 +853,15 @@ output {
 
 			.icon-maint {
 				position: relative;
-				top: -2px;
-				left: 0;
 				display: inline-block;
 				height: 12px;
-				width: 14px;
+				width: 12px;
+				margin: 0 1px 0 2px !important;
 				vertical-align: bottom;
+
+				&::before {
+					background-position: -48px -804px;
+				}
 			}
 
 			.icon-wzrd-action {
