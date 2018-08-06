@@ -483,6 +483,14 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			// Initialize rangeControl UI elements.
 			'jQuery(".range-control", jQuery("#data_sets")).rangeControl();',
 
+			// Expand dataset when click in pattern fields.
+			'jQuery("#data_sets").on("click", ".'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .patternselect", function() {'.
+				'var num = jQuery(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'")'.
+					'.index(jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'"));'.
+				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", num);'.
+				'return false;'.
+			'});',
+
 			// Initialize textarea autogrow.
 			'jQuery("textarea", jQuery("#data_sets"))'.
 				'.filter(function() {return this.id.match(/ds_\d+_hosts/);})'.

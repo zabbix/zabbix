@@ -494,9 +494,9 @@ class CWidgetHelper {
 		$i = 0;
 		foreach ($data_sets as $data_set) {
 			$class = ZBX_STYLE_LIST_ACCORDION_ITEM;
-			if ($i == 0) {
-				$class .= ' '.ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED;
-			}
+			$class .= ($i > 0)
+				? ' '.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED
+				: ' '.ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED;
 
 			$options = [
 				'row_num' => $i,

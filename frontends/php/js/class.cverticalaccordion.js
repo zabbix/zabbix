@@ -33,6 +33,7 @@ jQuery(function ($) {
 		 * - section		- selector of UI element for single accordion section.
 		 * - body			- selector of UI element that should be opened/closed.
 		 * - active_class	- CSS class that will be applied for active section.
+		 * - closed_class	- CSS class that will be applied for closed section.
 		 * - auto_close		- boolean; close or leave inactive section opened.
 		 *
 		 * @param options
@@ -42,6 +43,7 @@ jQuery(function ($) {
 				handler: '.list-accordion-item-head',
 				section: '.list-accordion-item',
 				active_class: 'list-accordion-item-opened',
+				closed_class: 'list-accordion-item-closed',
 				body: '.list-accordion-item-body',
 				auto_close: true
 			}, options);
@@ -56,21 +58,38 @@ jQuery(function ($) {
 						var section = $(this).closest(options['section']);
 
 						if (section.hasClass(options['active_class'])) {
-							section.removeClass(options['active_class']);
+							section
+								.removeClass(options['active_class'])
+								.addClass(options['closed_class']);
 						}
 						else {
 							if (options['auto_close']) {
 								methods['collapseAll'].apply(accordion);
 							}
-							section.addClass(options['active_class']);
+							section
+								.removeClass(options['closed_class'])
+								.addClass(options['active_class']);
 						}
 					});
 			});
 		},
 		collapseAll: function() {
 			var accordion = $(this),
-				active_class = accordion.data('options')['active_class'];
-			$('.'+active_class, accordion).removeClass(active_class);
+				active_class = accordion.data('options')['active_class'],
+				closed_class = accordion.data('options')['closed_class'];
+			$('.'+active_class, accordion)
+				.removeClass(active_class)
+				.addClass(closed_class);
+		},
+		expandNth: function(n) {
+			var accordion = $(this),
+				options = accordion.data('options');
+			$('.'+options['active_class'], accordion)
+				.removeClass(options['active_class'])
+				.addClass(options['closed_class']);
+			$(options['section']+':nth('+n+')', accordion)
+				.removeClass(options['closed_class'])
+				.addClass(options['active_class']);
 		}
 	};
 

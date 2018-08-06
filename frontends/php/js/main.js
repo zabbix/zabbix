@@ -1064,40 +1064,58 @@ jQuery(function ($) {
 
 
 jQuery(function ($) {
-	"use strict";
+	"use strict"
+
+	function calcRows($obj, options) {
+		var line_height = options['line_height'],
+			max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,
+			rows = 0;
+
+		var clone = $obj
+			.clone(false)
+			.css({'position': 'absolute', 'z-index': '-1'})
+			.insertAfter($obj);
+
+		do {
+			rows++;
+			clone.height(rows * line_height);
+		}
+		while (clone[0].scrollHeight - options['padding'] >= clone.innerHeight()
+			&& (max_height === null || rows * line_height + options['padding'] <= max_height));
+		clone.remove();
+
+		return rows;
+	}
 
 	$.fn.autoGrowTextarea = function(options) {
 		this.each(function() {
-			// Prevent repeating initialization.
-			if (typeof $(this).data('autogrow') !== 'undefined') {
-				return false;
-			}
-			else {
-				$(this).data('autogrow', true);
-			}
+			if (typeof $(this).data('autogrow') === 'undefined') {
+				var obj = $(this),
+					padding = parseInt(obj.css('padding-top'), 10) + parseInt(obj.css('padding-bottom'), 10);
 
-			var maxHeight = (options && 'maxHeight' in options) ? options.maxHeight : null;
-			// Autogrow on content change.
-			$(this)
-				.css({'resize': 'none', 'overflow': 'hidden'})
-				.on('paste change keyup', function() {
-					var bw = parseFloat($(this).css('borderTopWidth')) + parseFloat($(this).css('borderBottomWidth'));
-					while ($(this).outerHeight() < $(this)[0].scrollHeight + bw) {
-						if (maxHeight === null || maxHeight > $(this).height() + 1) {
-							$(this).height($(this).height() + 1);
-						}
-						else {
-							break;
-						}
-					}
+				options = $.extend({}, {
+					line_height: parseInt(obj.innerHeight(), 10) - padding,
+					padding: padding
+				}, options);
 
-					if (options && 'pair' in options) {
-						if ($(this).outerHeight() > $(options.pair).outerHeight()) {
-							$(options.pair).height($(this).height());
+				$(this)
+					.css({'resize': 'none'})
+					.on('paste change keyup', function() {
+						var rows = calcRows($(this), options);
+
+						if (options && 'pair' in options) {
+							var pair_rows = calcRows($(options.pair), options);
+							if (pair_rows > rows) {
+								rows = pair_rows;
+							}
+							$(options.pair).attr('rows', rows);
 						}
-					}
-				})
-				.trigger('change');
+
+						$(this).attr('rows', rows);
+					})
+					.data('autogrow', options)
+					.trigger('change');
+			}
 
 			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
 				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
@@ -1108,7 +1126,7 @@ jQuery(function ($) {
 			}
 
 			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none', 'overflow': 'hidden'});
+				$(options.pair).css({'resize': 'none'});
 			}
 		});
 	};

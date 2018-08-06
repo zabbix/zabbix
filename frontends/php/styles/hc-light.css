@@ -3803,8 +3803,13 @@ svg {
   display: flex;
   flex-direction: column;
   padding-left: 15px; }
-  .list-vertical-accordion :not(.list-accordion-item-opened) .list-accordion-item-body {
+  .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
+  .list-vertical-accordion .list-accordion-item-closed .patternselect {
+    overflow: hidden;
+    max-height: 24px;
+    line-height: 24px;
+    padding: 0px 5px; }
 
 .columns-wrapper {
   display: flex;
