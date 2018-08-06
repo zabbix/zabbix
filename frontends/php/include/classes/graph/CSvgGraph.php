@@ -908,7 +908,7 @@ class CSvgGraph extends CSvg {
 	private function drawProblems() {
 		// TODO: move calculation related logic out of graph class. Only time presentation logic should be left.
 		$today = strtotime('today');
-		$container = (new CSvgGroup())->addClass(CSvgTag::CSS_PROBLEMS);
+		$container = (new CSvgGroup())->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEMS);
 
 		foreach ($this->problems as $problem) {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.

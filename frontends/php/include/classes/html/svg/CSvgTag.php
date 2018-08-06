@@ -21,17 +21,17 @@
 
 class CSvgTag extends CTag {
 
-	const CSS_DASHED = 'svg-dashed';
+	const ZBX_STYLE_GRAPH_DASHED = 'svg-graph-dashed';
 
-	const CSS_PROBLEMS = 'svg-problems';
-	const CSS_PROBLEM_BOX = 'svg-problem-box';
-	const CSS_PROBLEM_HANDLE = 'svg-problem-handle';
-	const CSS_PROBLEM_ARROW = 'svg-problem-arrow';
+	const ZBX_STYLE_GRAPH_PROBLEMS = 'svg-graph-problems';
+	const ZBX_STYLE_GRAPH_PROBLEM_BOX = 'svg-graph-problem-box';
+	const ZBX_STYLE_GRAPH_PROBLEM_HANDLE = 'svg-graph-problem-handle';
+	const ZBX_STYLE_GRAPH_PROBLEM_ARROW = 'svg-graph-problem-arrow';
 
-	const CSS_AXIS = 'svg-axis';
-	const CSS_AXIS_LEFT = 'svg-axis-left';
-	const CSS_AXIS_RIGHT = 'svg-axis-right';
-	const CSS_AXIS_BOTTOM = 'svg-axis-bottom';
+	const ZBX_STYLE_GRAPH_AXIS = 'svg-graph-axis';
+	const ZBX_STYLE_GRAPH_AXIS_LEFT = 'svg-graph-axis-left';
+	const ZBX_STYLE_GRAPH_AXIS_RIGHT = 'svg-graph-axis-right';
+	const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
 
 	/**
 	 * SVG styles array.
