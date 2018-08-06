@@ -20,16 +20,16 @@
 
 
 /**
- * A parser for stats code ranges separated by a comma.
+ * A parser for ranges separated by a comma.
  */
-class CStatusCodeRangesParser extends CParser {
+class CRangesParser extends CParser {
 
 	/**
 	 * Status code range parser.
 	 *
-	 * @var CStatusCodeRangeParser
+	 * @var CRangeParser
 	 */
-	private $status_code_range_parser;
+	private $range_parser;
 
 	/**
 	 * Array of status code ranges.
@@ -59,7 +59,7 @@ class CStatusCodeRangesParser extends CParser {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 
-		$this->status_code_range_parser = new CStatusCodeRangeParser([
+		$this->range_parser = new CRangeParser([
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
@@ -80,13 +80,13 @@ class CStatusCodeRangesParser extends CParser {
 		$p = $pos;
 
 		while (isset($source[$p])) {
-			if ($this->status_code_range_parser->parse($source, $p) != self::PARSE_FAIL) {
+			if ($this->range_parser->parse($source, $p) != self::PARSE_FAIL) {
 				if ($ranges && $source[$p - 1] !== ',') {
 					break;
 				}
 
-				$p += $this->status_code_range_parser->getLength();
-				$ranges[] = $this->status_code_range_parser->getStatusCodes();
+				$p += $this->range_parser->getLength();
+				$ranges[] = $this->range_parser->getRanges();
 			}
 			elseif ($source[$p] === ',' && $p != $pos && isset($source[$p - 1]) && $source[$p - 1] !== ',') {
 				$p++;

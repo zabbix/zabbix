@@ -19,7 +19,7 @@
 **/
 
 
-class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
+class CRangeParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * An array of time periods and parsed results.
@@ -32,7 +32,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0',
-					'status_codes' => ['0']
+					'ranges' => ['0']
 				]
 			],
 			[
@@ -40,7 +40,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -48,7 +48,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '123456789',
-					'status_codes' => ['123456789']
+					'ranges' => ['123456789']
 				]
 			],
 			[
@@ -56,7 +56,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '200-300',
-					'status_codes' => ['200', '300']
+					'ranges' => ['200', '300']
 				]
 			],
 			[
@@ -64,7 +64,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    123   ',
-					'status_codes' => ['123']
+					'ranges' => ['123']
 				]
 			],
 			[
@@ -72,7 +72,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    234',
-					'status_codes' => ['234']
+					'ranges' => ['234']
 				]
 			],
 			[
@@ -80,7 +80,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '345  ',
-					'status_codes' => ['345']
+					'ranges' => ['345']
 				]
 			],
 			[
@@ -88,7 +88,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '456-457  ',
-					'status_codes' => ['456', '457']
+					'ranges' => ['456', '457']
 				]
 			],
 			[
@@ -96,7 +96,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  567-568  ',
-					'status_codes' => ['567', '568']
+					'ranges' => ['567', '568']
 				]
 			],
 			[
@@ -104,7 +104,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    678-679',
-					'status_codes' => ['678', '679']
+					'ranges' => ['678', '679']
 				]
 			],
 			[
@@ -112,7 +112,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    789  -  800  ',
-					'status_codes' => ['789', '800']
+					'ranges' => ['789', '800']
 				]
 			],
 			[
@@ -120,7 +120,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    800-   850  ',
-					'status_codes' => ['800', '850']
+					'ranges' => ['800', '850']
 				]
 			],
 			[
@@ -128,7 +128,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    850   -900  ',
-					'status_codes' => ['850', '900']
+					'ranges' => ['850', '900']
 				]
 			],
 			[
@@ -136,7 +136,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -144,7 +144,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}  -100  ',
-					'status_codes' => ['{$M}', '100']
+					'ranges' => ['{$M}', '100']
 				]
 			],
 			[
@@ -152,7 +152,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  100-{$M}  ',
-					'status_codes' => ['100', '{$M}']
+					'ranges' => ['100', '{$M}']
 				]
 			],
 			[
@@ -160,7 +160,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   100   -   {$M}   ',
-					'status_codes' => ['100', '{$M}']
+					'ranges' => ['100', '{$M}']
 				]
 			],
 			[
@@ -168,7 +168,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M.A}-  {$M.B}',
-					'status_codes' => ['{$M.A}', '{$M.B}']
+					'ranges' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -176,7 +176,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {$M.A}   -   {$M.B}   ',
-					'status_codes' => ['{$M.A}', '{$M.B}']
+					'ranges' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -184,7 +184,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M}',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -192,7 +192,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M}   ',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -200,7 +200,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {#M}-100  ',
-					'status_codes' => ['{#M}', '100']
+					'ranges' => ['{#M}', '100']
 				]
 			],
 			[
@@ -208,7 +208,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100-   {#M}',
-					'status_codes' => ['100', '{#M}']
+					'ranges' => ['100', '{#M}']
 				]
 			],
 			[
@@ -216,7 +216,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M.A}   -   {#M.B}',
-					'status_codes' => ['{#M.A}', '{#M.B}']
+					'ranges' => ['{#M.A}', '{#M.B}']
 				]
 			],
 			[
@@ -224,7 +224,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M.A}   -   {#M.B}   ',
-					'status_codes' => ['{#M.A}', '{#M.B}']
+					'ranges' => ['{#M.A}', '{#M.B}']
 				]
 			],
 			[
@@ -232,7 +232,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {$M}  -{#M}',
-					'status_codes' => ['{$M}', '{#M}']
+					'ranges' => ['{$M}', '{#M}']
 				]
 			],
 			[
@@ -240,7 +240,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M}-  {$M}  ',
-					'status_codes' => ['{#M}', '{$M}']
+					'ranges' => ['{#M}', '{$M}']
 				]
 			],
 			[
@@ -248,7 +248,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M}   -   {$M}   ',
-					'status_codes' => ['{#M}', '{$M}']
+					'ranges' => ['{#M}', '{$M}']
 				]
 			],
 			[
@@ -256,7 +256,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -264,7 +264,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}-100',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '100']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '100']
 				]
 			],
 			[
@@ -272,7 +272,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'status_codes' => ['100', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['100', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -281,7 +281,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => ' {{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}',
-					'status_codes' => [
+					'ranges' => [
 						'{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}',
 						'{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}'
 					]
@@ -292,7 +292,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}-   {{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'status_codes' => ['{$M}', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['{$M}', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -300,7 +300,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {{#M}.regsub("^([0-9]+)", "{#M}: \1")}  -  {$M}  ',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
 				]
 			],
 			// partial success
@@ -309,7 +309,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0',
-					'status_codes' => ['0']
+					'ranges' => ['0']
 				]
 			],
 			[
@@ -317,7 +317,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '200   ',
-					'status_codes' => ['200']
+					'ranges' => ['200']
 				]
 			],
 			[
@@ -325,7 +325,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '300',
-					'status_codes' => ['300']
+					'ranges' => ['300']
 				]
 			],
 			[
@@ -333,7 +333,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '400',
-					'status_codes' => ['400']
+					'ranges' => ['400']
 				]
 			],
 			[
@@ -341,7 +341,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '500',
-					'status_codes' => ['500']
+					'ranges' => ['500']
 				]
 			],
 			[
@@ -349,7 +349,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '600',
-					'status_codes' => ['600']
+					'ranges' => ['600']
 				]
 			],
 			[
@@ -357,7 +357,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '700- 800  ',
-					'status_codes' => ['700', '800']
+					'ranges' => ['700', '800']
 				]
 			],
 			[
@@ -365,7 +365,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '800 ',
-					'status_codes' => ['800']
+					'ranges' => ['800']
 				]
 			],
 			[
@@ -373,7 +373,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  100  -  200  ',
-					'status_codes' => ['100', '200']
+					'ranges' => ['100', '200']
 				]
 			],
 			[
@@ -381,7 +381,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  100  -  200  ',
-					'status_codes' => ['100', '200']
+					'ranges' => ['100', '200']
 				]
 			],
 			[
@@ -389,7 +389,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -397,7 +397,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '123-456',
-					'status_codes' => ['123', '456']
+					'ranges' => ['123', '456']
 				]
 			],
 			[
@@ -405,7 +405,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '123',
-					'status_codes' => ['123']
+					'ranges' => ['123']
 				]
 			],
 			[
@@ -413,7 +413,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0',
-					'status_codes' => ['0']
+					'ranges' => ['0']
 				]
 			],
 			[
@@ -421,7 +421,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100  ',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -429,7 +429,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -437,7 +437,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -445,7 +445,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M} ',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -453,7 +453,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M} ',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -461,7 +461,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -469,7 +469,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M.A}  - {$M.B}     ',
-					'status_codes' => ['{$M.A}', '{$M.B}']
+					'ranges' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -477,7 +477,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -485,7 +485,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -493,7 +493,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M} ',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -501,7 +501,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  {$M}  -{#M.A}',
-					'status_codes' => ['{$M}', '{#M.A}']
+					'ranges' => ['{$M}', '{#M.A}']
 				]
 			],
 			[
@@ -509,7 +509,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -517,7 +517,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -525,7 +525,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")} ',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -533,7 +533,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -542,7 +542,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}-{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}',
-					'status_codes' => ['{$M}', '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}']
+					'ranges' => ['{$M}', '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}']
 				]
 			],
 			[
@@ -550,7 +550,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -558,7 +558,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			[
@@ -566,7 +566,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'status_codes' => ['{$M}']
+					'ranges' => ['{$M}']
 				]
 			],
 			[
@@ -574,7 +574,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'status_codes' => ['{#M}']
+					'ranges' => ['{#M}']
 				]
 			],
 			[
@@ -582,7 +582,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'status_codes' => ['100']
+					'ranges' => ['100']
 				]
 			],
 			// fail
@@ -591,7 +591,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -599,7 +599,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -607,7 +607,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -615,7 +615,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -623,7 +623,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -631,7 +631,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -639,7 +639,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -647,7 +647,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -655,7 +655,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -663,7 +663,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -671,7 +671,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -679,7 +679,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			// User macros are not enabled.
@@ -688,7 +688,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -696,7 +696,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			// LLD macros are not enabled.
@@ -705,7 +705,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -713,7 +713,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -721,7 +721,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			],
 			[
@@ -729,7 +729,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'status_codes' => []
+					'ranges' => []
 				]
 			]
 		];
@@ -744,12 +744,12 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 	 * @param array  $expected
 	 */
 	public function testParse($source, $pos, $options, $expected) {
-		$parser = new CStatusCodeRangeParser($options);
+		$parser = new CRangeParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'status_codes' => $parser->getStatusCodes(),
+			'ranges' => $parser->getRanges(),
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}

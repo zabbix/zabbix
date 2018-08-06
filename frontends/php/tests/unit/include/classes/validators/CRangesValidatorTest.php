@@ -20,9 +20,9 @@
 
 
 /**
- * PHPUnit test for status code ranges validator.
+ * PHPUnit test for ranges validator.
  */
-class CStatusCodeRangesValidatorTest extends CValidatorTest {
+class CRangesValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
 		return [[[]]];
@@ -237,6 +237,6 @@ class CStatusCodeRangesValidatorTest extends CValidatorTest {
 	}
 
 	public function createValidator(array $params = []) {
-		return new CStatusCodeRangesValidator($params);
+		return new CRangesValidator($params);
 	}
 }

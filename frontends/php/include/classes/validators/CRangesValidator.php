@@ -20,17 +20,17 @@
 
 
 /**
- * Class to validate status code ranges.
+ * Class to validate ranges.
  * Comma separated list of numeric strings, user macroses, lld macroses.
  *
  * Example: '100-199, 301, 404, 500-550, {$MACRO}-200, {$MACRO}-{$MACRO}, {#SCODE}-{$MACRO}'
  */
-class CStatusCodeRangesValidator extends CValidator {
+class CRangesValidator extends CValidator {
 
 	/**
-	 * @var CStatusCodeRangesParser
+	 * @var CRangesParser
 	 */
-	private $status_code_ranges_parser;
+	private $ranges_parser;
 
 	/**
 	 * Options to initialize other parsers.
@@ -59,7 +59,7 @@ class CStatusCodeRangesValidator extends CValidator {
 			unset($options['lldmacros']);
 		}
 
-		$this->status_code_ranges_parser = new CStatusCodeRangesParser([
+		$this->ranges_parser = new CRangesParser([
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
@@ -81,8 +81,8 @@ class CStatusCodeRangesValidator extends CValidator {
 			return false;
 		}
 
-		if ($this->status_code_ranges_parser->parse($value) == CParser::PARSE_SUCCESS) {
-			$ranges = $this->status_code_ranges_parser->getRanges();
+		if ($this->ranges_parser->parse($value) == CParser::PARSE_SUCCESS) {
+			$ranges = $this->ranges_parser->getRanges();
 
 			// If status codes are not macros, make sure the first status code is smaller than second one.
 			foreach ($ranges as $range) {

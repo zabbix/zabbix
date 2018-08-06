@@ -2074,7 +2074,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
-			$validator = new CStatusCodeRangesValidator([
+			$validator = new CRangesValidator([
 				'usermacros' => true,
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);

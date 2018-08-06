@@ -777,7 +777,7 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the status code range is invalid.
 	 */
 	private function checkStatusCodes(array $httptests) {
-		$validator = new CStatusCodeRangesValidator([
+		$validator = new CRangesValidator([
 			'usermacros' => true,
 			'messageInvalid' => _('Invalid response code "%1$s".')
 		]);

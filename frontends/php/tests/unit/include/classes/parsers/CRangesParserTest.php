@@ -19,7 +19,7 @@
 **/
 
 
-class CStatusCodeRangesParserTest extends PHPUnit_Framework_TestCase {
+class CRangesParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * An array of time periods and parsed results.
@@ -310,7 +310,7 @@ class CStatusCodeRangesParserTest extends PHPUnit_Framework_TestCase {
 	 * @param array  $expected
 	 */
 	public function testParse($source, $pos, $options, $expected) {
-		$parser = new CStatusCodeRangesParser($options);
+		$parser = new CRangesParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
