@@ -1591,12 +1591,32 @@ static int	DBpatch_3050126(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	const ZBX_FIELD	field = {"login_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"http_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_3050127(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050128(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"ldap_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050129(void)
 {
 	int	res;
 
@@ -1616,7 +1636,7 @@ static int	DBpatch_3050127(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050130(void)
 {
 	int	res;
 
@@ -1634,17 +1654,7 @@ static int	DBpatch_3050128(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050129(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("config", &field);
-}
-
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050131(void)
 {
 	int	res;
 
@@ -1652,9 +1662,10 @@ static int	DBpatch_3050130(void)
 		return SUCCEED;
 
 	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
+	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_MATCH. */
 	res = DBexecute(
 		"update config"
-		" set ldap_configured=1"
+		" set ldap_configured=1, ldap_case_sensitive=1"
 		" where authentication_type=1");
 
 	if (ZBX_DB_OK > res)
@@ -1796,5 +1807,6 @@ DBPATCH_ADD(3050127, 0, 1)
 DBPATCH_ADD(3050128, 0, 1)
 DBPATCH_ADD(3050129, 0, 1)
 DBPATCH_ADD(3050130, 0, 1)
+DBPATCH_ADD(3050131, 0, 1)
 
 DBPATCH_END()

@@ -30,7 +30,10 @@ $auth_tab = (new CFormList('list_auth'))
 			->addValue(_('LDAP'), ZBX_AUTH_LDAP)
 			->setModern(true)
 			->removeId()
-	)
+	);
+
+// HTTP Authentication fields.
+$http_tab = (new CFormList('list_http'))
 	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
@@ -39,21 +42,19 @@ $auth_tab = (new CFormList('list_auth'))
 		(new CComboBox('http_login_form', $data['http_login_form'], null, [
 			ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
 			ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-		]))->setEnabled($data['http_auth_enabled']),
-		null, 'http_auth'
+		]))->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
+		null
 	)
 	->addRow(new CLabel(_('Remove domain name'), 'http_strip_domains'),
 		(new CTextBox('http_strip_domains', $data['http_strip_domains']))
 			->setEnabled($data['http_auth_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		null, 'http_auth'
+		null
 	)
-	->addRow(new CLabel(_('Case sensitive login'), 'login_case_sensitive'),
-		(new CCheckBox('login_case_sensitive', ZBX_AUTH_CASE_MATCH))
-			->setChecked($data['login_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
-			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED
-			)
+	->addRow(new CLabel(_('Case sensitive login'), 'http_case_sensitive'),
+		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_MATCH))
+			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
 );
 
 // LDAP configuration fields.
@@ -72,7 +73,7 @@ else {
 }
 
 $ldap_tab = (new CFormList('list_ldap'))
-	->addRow(new CLabel(_('Configure LDAP authentication'), 'ldap_configured'),
+	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
 		$data['ldap_error']
 		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
 		: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
@@ -103,6 +104,11 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
+	->addRow(new CLabel(_('Case sensitive login'), 'ldap_case_sensitive'),
+		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_MATCH))
+			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_MATCH)
+			->setEnabled($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+	)
 	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
 	->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']')
 	->addRow(new CLabel(_('Login'), 'ldap_test_user'),
@@ -125,6 +131,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 		->addItem((new CTabView())
 			->setSelected($data['form_refresh'] ? null : 0)
 			->addTab('auth', _('Authentication'), $auth_tab)
+			->addTab('http', _('HTTP settings'), $http_tab)
 			->addTab('ldap', _('LDAP settings'), $ldap_tab)
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),

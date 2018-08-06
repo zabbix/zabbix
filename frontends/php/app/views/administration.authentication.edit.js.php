@@ -9,14 +9,16 @@
 					) ?>);
 		});
 
-		form.find('#http_auth_enabled').change(function () {
-			$('input,select', '.http_auth').attr('disabled', !this.checked);
-		});
+		form.find('#http_auth_enabled,#ldap_configured').change(function () {
+			var fields = $(this).is('#http_auth_enabled')
+				? form.find('[name^=http_]')
+				: form.find('[name^=ldap_],button[name=change_bind_password]');
 
-		form.find('#ldap_configured').change(function () {
-			$('[name^=ldap_],button[name=change_bind_password]')
+			fields
 				.not(this)
-				.attr('disabled', !this.checked);
+				.attr('disabled', !this.checked)
+				.filter('[name$=_case_sensitive]:not(:disabled)')
+				.prop('checked', true);
 		});
 
 		form.find('button#change_bind_password').click(function () {
@@ -24,17 +26,6 @@
 				.val('<?= $data['action_passw_change'] ?>');
 
 			submitFormWithParam('form_auth', 'change_bind_password', '1');
-		});
-
-		form.find('#http_auth_enabled,#ldap_configured').change(function () {
-			var checkbox = $('#login_case_sensitive'),
-				was_disabled = checkbox.is(':disabled');
-
-			checkbox.attr('disabled', !$('#http_auth_enabled:checked,#ldap_configured:checked').length);
-
-			if (was_disabled && !checkbox.is(':disabled')) {
-				checkbox.prop('checked', true);
-			}
 		});
 	});
 </script>

@@ -43,7 +43,8 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_test' => 'in 1',
 			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'login_case_sensitive' => 'in '.ZBX_AUTH_CASE_IGNORE.','.ZBX_AUTH_CASE_MATCH,
+			'http_case_sensitive' => 'in '.ZBX_AUTH_CASE_IGNORE.','.ZBX_AUTH_CASE_MATCH,
+			'ldap_case_sensitive' => 'in '.ZBX_AUTH_CASE_IGNORE.','.ZBX_AUTH_CASE_MATCH,
 			'ldap_configured' => 'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_host' => 'db config.ldap_host',
 			'ldap_port' => 'int32',
@@ -149,14 +150,16 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function doAction() {
 		$data = [
-			'login_case_sensitive' => 0,
+			'http_case_sensitive' => 0,
 			'http_auth_enabled' => 0,
-			'ldap_configured' => 0
+			'ldap_configured' => 0,
+			'ldap_case_sensitive' => 0,
 		];
 
 		$this->getInputs($data, [
 			'authentication_type',
-			'login_case_sensitive',
+			'http_case_sensitive',
+			'ldap_case_sensitive',
 			'ldap_configured',
 			'ldap_host',
 			'ldap_port',
