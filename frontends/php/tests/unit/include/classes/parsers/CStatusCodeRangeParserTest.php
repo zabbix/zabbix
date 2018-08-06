@@ -60,6 +60,78 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'    123   ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    123   ',
+					'status_codes' => ['123']
+				]
+			],
+			[
+				'    234', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    234',
+					'status_codes' => ['234']
+				]
+			],
+			[
+				'345  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '345  ',
+					'status_codes' => ['345']
+				]
+			],
+			[
+				'456-457  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '456-457  ',
+					'status_codes' => ['456', '457']
+				]
+			],
+			[
+				'  567-568  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '  567-568  ',
+					'status_codes' => ['567', '568']
+				]
+			],
+			[
+				'    678-679', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    678-679',
+					'status_codes' => ['678', '679']
+				]
+			],
+			[
+				'    789  -  800  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    789  -  800  ',
+					'status_codes' => ['789', '800']
+				]
+			],
+			[
+				'    800-   850  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    800-   850  ',
+					'status_codes' => ['800', '850']
+				]
+			],
+			[
+				'    850   -900  ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '    850   -900  ',
+					'status_codes' => ['850', '900']
+				]
+			],
+			[
 				'{$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -68,26 +140,42 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$M}-100', 0, ['usermacros' => true],
+				'{$M}  -100  ', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M}-100',
+					'match' => '{$M}  -100  ',
 					'status_codes' => ['{$M}', '100']
 				]
 			],
 			[
-				'100-{$M}', 0, ['usermacros' => true],
+				'  100-{$M}  ', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '100-{$M}',
+					'match' => '  100-{$M}  ',
 					'status_codes' => ['100', '{$M}']
 				]
 			],
 			[
-				'{$M.A}-{$M.B}', 0, ['usermacros' => true],
+				'   100   -   {$M}   ', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M.A}-{$M.B}',
+					'match' => '   100   -   {$M}   ',
+					'status_codes' => ['100', '{$M}']
+				]
+			],
+			[
+				'{$M.A}-  {$M.B}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M.A}-  {$M.B}',
+					'status_codes' => ['{$M.A}', '{$M.B}']
+				]
+			],
+			[
+				'   {$M.A}   -   {$M.B}   ', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '   {$M.A}   -   {$M.B}   ',
 					'status_codes' => ['{$M.A}', '{$M.B}']
 				]
 			],
@@ -100,42 +188,66 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{#M}-100', 0, ['lldmacros' => true],
+				'   {#M}   ', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#M}-100',
+					'match' => '   {#M}   ',
+					'status_codes' => ['{#M}']
+				]
+			],
+			[
+				'  {#M}-100  ', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '  {#M}-100  ',
 					'status_codes' => ['{#M}', '100']
 				]
 			],
 			[
-				'100-{#M}', 0, ['lldmacros' => true],
+				'100-   {#M}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '100-{#M}',
+					'match' => '100-   {#M}',
 					'status_codes' => ['100', '{#M}']
 				]
 			],
 			[
-				'{#M.A}-{#M.B}', 0, ['lldmacros' => true],
+				'{#M.A}   -   {#M.B}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#M.A}-{#M.B}',
+					'match' => '{#M.A}   -   {#M.B}',
 					'status_codes' => ['{#M.A}', '{#M.B}']
 				]
 			],
 			[
-				'{$M}-{#M}', 0, ['usermacros' => true, 'lldmacros' => true],
+				'   {#M.A}   -   {#M.B}   ', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M}-{#M}',
+					'match' => '   {#M.A}   -   {#M.B}   ',
+					'status_codes' => ['{#M.A}', '{#M.B}']
+				]
+			],
+			[
+				'  {$M}  -{#M}', 0, ['usermacros' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '  {$M}  -{#M}',
 					'status_codes' => ['{$M}', '{#M}']
 				]
 			],
 			[
-				'{#M}-{$M}', 0, ['usermacros' => true, 'lldmacros' => true],
+				'{#M}-  {$M}  ', 0, ['usermacros' => true, 'lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#M}-{$M}',
+					'match' => '{#M}-  {$M}  ',
+					'status_codes' => ['{#M}', '{$M}']
+				]
+			],
+			[
+				'   {#M}   -   {$M}   ', 0, ['usermacros' => true, 'lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '   {#M}   -   {$M}   ',
 					'status_codes' => ['{#M}', '{$M}']
 				]
 			],
@@ -164,11 +276,11 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}', 0,
+				' {{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}', 0,
 				['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}',
+					'match' => ' {{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}',
 					'status_codes' => [
 						'{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}',
 						'{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}'
@@ -176,18 +288,18 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$M}-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['usermacros' => true, 'lldmacros' => true],
+				'{$M}-   {{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['usermacros' => true, 'lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M}-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
+					'match' => '{$M}-   {{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
 					'status_codes' => ['{$M}', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
-				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}-{$M}', 0, ['usermacros' => true, 'lldmacros' => true],
+				'  {{#M}.regsub("^([0-9]+)", "{#M}: \1")}  -  {$M}  ', 0, ['usermacros' => true, 'lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}-{$M}',
+					'match' => '  {{#M}.regsub("^([0-9]+)", "{#M}: \1")}  -  {$M}  ',
 					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
 				]
 			],
@@ -201,10 +313,10 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'200 ', 0, [],
+				'200   -', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '200',
+					'match' => '200   ',
 					'status_codes' => ['200']
 				]
 			],
@@ -241,26 +353,34 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'700- ', 0, [],
+				'700- 800  -', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '700',
-					'status_codes' => ['700']
+					'match' => '700- 800  ',
+					'status_codes' => ['700', '800']
 				]
 			],
 			[
 				'800 -', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '800',
+					'match' => '800 ',
 					'status_codes' => ['800']
 				]
 			],
 			[
-				'100-200-300', 0, [],
+				'  100  -  200  -  300  ', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '100-200',
+					'match' => '  100  -  200  ',
+					'status_codes' => ['100', '200']
+				]
+			],
+			[
+				'  100  -  200  abc', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '  100  -  200  ',
 					'status_codes' => ['100', '200']
 				]
 			],
@@ -297,10 +417,10 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'100,200,', 0, [],
+				'100  ,   200  ,  ', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '100',
+					'match' => '100  ',
 					'status_codes' => ['100']
 				]
 			],
@@ -324,7 +444,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				'{$M} -', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M}',
+					'match' => '{$M} ',
 					'status_codes' => ['{$M}']
 				]
 			],
@@ -332,7 +452,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				'{$M} -', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M}',
+					'match' => '{$M} ',
 					'status_codes' => ['{$M}']
 				]
 			],
@@ -345,10 +465,10 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$M.A}-{$M.B}-{$M.C}', 0, ['usermacros' => true],
+				'{$M.A}  - {$M.B}     -    {$M.C}      ', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M.A}-{$M.B}',
+					'match' => '{$M.A}  - {$M.B}     ',
 					'status_codes' => ['{$M.A}', '{$M.B}']
 				]
 			],
@@ -372,15 +492,15 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				'{#M} -', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{#M}',
+					'match' => '{#M} ',
 					'status_codes' => ['{#M}']
 				]
 			],
 			[
-				'{$M}-{#M.A}-{#M.C}', 0, ['usermacros' => true, 'lldmacros' => true],
+				'  {$M}  -{#M.A}-{#M.C}', 0, ['usermacros' => true, 'lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{$M}-{#M.A}',
+					'match' => '  {$M}  -{#M.A}',
 					'status_codes' => ['{$M}', '{#M.A}']
 				]
 			],
@@ -404,7 +524,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")} -', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")} ',
 					'status_codes' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
@@ -499,15 +619,7 @@ class CStatusCodeRangeParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'-300-', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'status_codes' => []
-				]
-			],
-			[
-				' 400', 0, [],
+				'   -300-', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',

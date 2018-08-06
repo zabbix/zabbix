@@ -63,6 +63,20 @@ class CStatusCodeRangeParser extends CParser {
 	];
 
 	/**
+	 * Source string to parse.
+	 *
+	 * @var string
+	 */
+	private $source;
+
+	/**
+	 * Position in source string.
+	 *
+	 * @var string
+	 */
+	private $pos;
+
+	/**
 	 * @param array $options   An array of options to initialize other parsers.
 	 */
 	public function __construct($options = []) {
@@ -96,56 +110,53 @@ class CStatusCodeRangeParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
+		$this->source = $source;
+		$this->pos = $pos;
 		$this->length = 0;
 		$this->match = '';
 		$this->status_codes = [];
 
-		$status_codes = [];
-		$p = $pos;
+		// Skip spaces, tabs and new lines.
+		$trim = [' ', "\t", "\n", "\r"];
 
-		while (isset($source[$p])) {
-			if ($this->options['usermacros']
-					&& $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-				$p += $this->user_macro_parser->getLength();
-				$status_codes[] = $this->user_macro_parser->getMatch();
+		while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
+			$this->pos++;
+		}
+
+		if ($this->parseConstant() === false) {
+			return CParser::PARSE_FAIL;
+		}
+
+		while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
+			$this->pos++;
+		}
+
+		if (isset($this->source[$this->pos]) && $this->source[$this->pos] === '-') {
+			$p = $this->pos;
+			$this->pos++;
+
+			while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
+				$this->pos++;
 			}
-			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-				$p += $this->lld_macro_parser->getLength();
-				$status_codes[] = $this->lld_macro_parser->getMatch();
-			}
-			elseif ($this->options['lldmacros']
-					&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
-				$p += $this->lld_macro_function_parser->getLength();
-				$status_codes[] = $this->lld_macro_function_parser->getMatch();
-			}
-			elseif (($digits = self::parseDigits($source, $p)) !== false) {
-				$p += $digits['pos'];
-				$status_codes[] = $digits['match'];
-			}
-			elseif ($source[$p] === '-' && $p != $pos && isset($source[$p - 1]) && $source[$p - 1] !== '-'
-					&& count($status_codes) < 2) {
-				$p++;
+
+			if ($this->parseConstant() === false) {
+				$this->pos = $p;
 			}
 			else {
-				break;
+				while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
+					$this->pos++;
+				}
 			}
 		}
 
-		if ($p == $pos) {
+		if ($pos == $this->pos) {
 			return self::PARSE_FAIL;
 		}
 
-		if (isset($source[$p - 1]) && $source[$p - 1] === '-') {
-			$p--;
-		}
+		$this->length = $this->pos - $pos;
+		$this->match = substr($this->source, $pos, $this->length);
 
-		$this->length = $p - $pos;
-
-		$this->match = substr($source, $pos, $this->length);
-		$this->status_codes = $status_codes;
-
-		return (isset($source[$p]) || count($status_codes) > 2) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return isset($this->source[$this->pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
 	/**
@@ -155,6 +166,43 @@ class CStatusCodeRangeParser extends CParser {
 	 */
 	public function getStatusCodes() {
 		return $this->status_codes;
+	}
+
+	/**
+	 * Parse user macro, or LLD macro or digits.
+	 *
+	 * @return bool
+	 */
+	private function parseConstant() {
+		if ($this->options['usermacros']
+				&& $this->user_macro_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
+			$this->pos += $this->user_macro_parser->getLength();
+			$this->status_codes[] = $this->user_macro_parser->getMatch();
+
+			return true;
+		}
+		elseif ($this->options['lldmacros']
+				&& $this->lld_macro_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
+			$this->pos += $this->lld_macro_parser->getLength();
+			$this->status_codes[] = $this->lld_macro_parser->getMatch();
+
+			return true;
+		}
+		elseif ($this->options['lldmacros']
+				&& $this->lld_macro_function_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
+			$this->pos += $this->lld_macro_function_parser->getLength();
+			$this->status_codes[] = $this->lld_macro_function_parser->getMatch();
+
+			return true;
+		}
+		elseif (($digits = self::parseDigits($this->source, $this->pos)) !== false) {
+			$this->pos += $digits['pos'];
+			$this->status_codes[] = $digits['match'];
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

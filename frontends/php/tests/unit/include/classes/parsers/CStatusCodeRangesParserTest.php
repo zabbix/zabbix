@@ -180,7 +180,7 @@ class CStatusCodeRangesParserTest extends PHPUnit_Framework_TestCase {
 				'100,200 ,', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '100,200',
+					'match' => '100,200 ',
 					'ranges' => [['100'], ['200']]
 				]
 			],
