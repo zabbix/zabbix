@@ -55,6 +55,8 @@ class CSvgTag extends CTag {
 	 * Add child item with styles.
 	 *
 	 * @param string|array|CSvgTag    Child item.
+	 *
+	 * @return CSvgTag
 	 */
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
@@ -70,6 +72,8 @@ class CSvgTag extends CTag {
 	 *
 	 * @param int $width    Axis container width.
 	 * @param int $height   Axis container height.
+	 *
+	 * @return CSvgTag
 	 */
 	public function setSize($width, $height) {
 		$this->width = $width;
@@ -83,6 +87,8 @@ class CSvgTag extends CTag {
 	 *
 	 * @param int $x        Horizontal position of container element.
 	 * @param int $y        Veritical position of container element.
+	 *
+	 * @return CSvgTag
 	 */
 	public function setPosition($x, $y) {
 		$this->x = (int) $x;

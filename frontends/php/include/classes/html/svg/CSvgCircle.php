@@ -24,8 +24,8 @@ class CSvgCircle extends CSvgTag {
 	public function __construct($x, $y, $pointsize) {
 		parent::__construct('circle', true);
 
-		$this->setAttribute('cx', $x);
-		$this->setAttribute('cy', $y);
-		$this->setAttribute('r', $pointsize / 2);
+		$this->setAttribute('cx', round($x));
+		$this->setAttribute('cy', round($y));
+		$this->setAttribute('r', round($pointsize / 2, 1));
 	}
 }

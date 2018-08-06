@@ -620,13 +620,8 @@ class CSvgGraph extends CSvg {
 			$this->addItem($grid_line);
 		}
 	}
-*/
+
 	private function drawPoints($points, $metric) {
-		/**
-		 * Item grouping is used for two reasons:
-		 * - to increase client side performance;
-		 * - to decrease amount of CSV code, using property inheritance.
-		 */
 		$group = (new CSvgGroup())
 			->setAttribute('data-set', 'points')
 			->setAttribute('data-metric', $metric['host']['name'] . ': ' . $metric['name'])
@@ -652,7 +647,7 @@ class CSvgGraph extends CSvg {
 			);
 		}
 	}
-/*
+
 	private function drawLines($points, $metric) {
 		// Item grouping is used to increase client side performance.
 		$this->addItem(
@@ -782,7 +777,11 @@ class CSvgGraph extends CSvg {
 					break;
 
 				case SVG_GRAPH_TYPE_POINTS:
-					$this->drawPoints($path, $metric);
+					$this->addItem((new CSvgGraphPoints($path, $metric))
+						->setPosition($this->canvas_x, $this->canvas_y)
+						->setSize($this->canvas_width, $this->canvas_height)
+					);
+//					$this->drawPoints($path, $metric);
 					break;
 
 //				case SVG_GRAPH_TYPE_STAIRCASE:
