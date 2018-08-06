@@ -1262,7 +1262,8 @@ abstract class CItemGeneral extends CApiService {
 						if (!is_numeric($params)
 								&& (new CUserMacroParser())->parse($params) != CParser::PARSE_SUCCESS
 								&& (!($this instanceof CItemPrototype)
-									|| (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS)) {
+									|| ((new CLLDMacroFunctionParser())->parse($params) != CParser::PARSE_SUCCESS
+										&& (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS))) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
