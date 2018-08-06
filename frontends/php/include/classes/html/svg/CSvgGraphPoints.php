@@ -56,11 +56,11 @@ class CSvgGraphPoints extends CSvgGroup {
 
 	public function getStyles() {
 		$this
-			->addClass(ZBX_STYLE_SVG_GRAPH_POINTS)
-			->addClass(ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS)
+			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color']
 			]

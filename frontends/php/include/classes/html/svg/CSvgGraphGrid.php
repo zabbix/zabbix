@@ -33,7 +33,7 @@ class CSvgGraphGrid extends CSvgTag {
 	public function __construct(array $points_value = [], array $points_time = []) {
 		parent::__construct('g', true);
 
-		$this->addClass(ZBX_STYLE_SVG_GRAPH_GRID);
+		$this->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_GRID);
 
 		$this->points_value = $points_value;
 		$this->points_time = $points_time;
@@ -41,7 +41,7 @@ class CSvgGraphGrid extends CSvgTag {
 
 	public function getStyles() {
 		return [
-			'.'.ZBX_STYLE_SVG_GRAPH_GRID.' path' => [
+			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_GRID.' path' => [
 				'stroke-dasharray' => '2,2',
 				'stroke' => 'rgba(120,120,120,.5)'
 			]

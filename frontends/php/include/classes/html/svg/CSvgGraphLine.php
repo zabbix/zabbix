@@ -56,14 +56,14 @@ class CSvgGraphLine extends CSvgPath {
 
 	public function getStyles() {
 		$this
-			->addClass(ZBX_STYLE_SVG_GRAPH_LINE)
-			->addClass(ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE)
+			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.ZBX_STYLE_SVG_GRAPH_LINE => [
+			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE => [
 				'fill' => 'none'
 			],
-			'.'.ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width']
