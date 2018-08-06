@@ -758,15 +758,17 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, [
-		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
-		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
-			->addClass(ZBX_STYLE_GREY)
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->setAttribute('target', '_blank')
-	]))
-	->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, CBrand::isBrand()
+		? [CBrand::getBrandFooter()]
+		: [
+			$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
+			'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
+			(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
+				->addClass(ZBX_STYLE_GREY)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->setAttribute('target', '_blank')
+		]))
+			->setAttribute('role', 'contentinfo');
 }
 
 /**

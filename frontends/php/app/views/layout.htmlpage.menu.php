@@ -38,14 +38,18 @@ $user_navigation = (new CList())
 $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
-	->addItem((new CListItem(
+	->addItem(CBrand::isBrand()
+		? null
+		: (new CListItem(
 			(new CLink('Support', 'https://www.zabbix.com/support/'))
 				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
 				->setAttribute('target', '_blank')
 				->setTitle(_('Zabbix Technical Support'))
 		))->addStyle('padding-left:0')
 	)
-	->addItem((new CListItem(
+	->addItem(CBrand::isBrand()
+		? null
+		: (new CListItem(
 			(new CLink('Share', 'https://share.zabbix.com/'))
 				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 				->setAttribute('target', '_blank')
@@ -53,7 +57,10 @@ $user_menu = (new CList())
 		))
 	)
 	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/4.0/'))
+		(new CLink(
+			SPACE,
+			CBrand::isBrand() ? CBrand::getHelpUrl() : 'http://www.zabbix.com/documentation/4.0/'
+		))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
 			->setTitle(_('Help'))
@@ -79,7 +86,12 @@ $user_navigation->addItem($user_menu);
 // 1st level menu
 $top_menu = (new CDiv())
 	->addItem(
-		(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+		(new CLink(
+			(new CDiv())
+				->addClass(ZBX_STYLE_LOGO)
+				->addClass(CBrand::isBrand() ? ZBX_STYLE_BRAND_LOGO : null),
+			'zabbix.php?action=dashboard.view'
+		))
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(
