@@ -614,14 +614,17 @@ cleanup:
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
 
-		zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
-		zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 	}
 
 	zbx_vector_uint64_destroy(&triggerids);
+
+	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
 	zbx_vector_ptr_destroy(&event_data);
+
+	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	zbx_vector_ptr_destroy(&event_queries);
+
 	zbx_vector_uint64_destroy(&maintenanceids);
 }
 
