@@ -283,11 +283,6 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_cl
 														\
 		vector->values_num = 0;										\
 	}													\
-}														\
-														\
-void	zbx_  ## __id ## _free(__type data)									\
-{														\
-	zbx_free(data);												\
 }
 
 #endif	/* ZABBIX_VECTORIMPL_H */
