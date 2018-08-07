@@ -19,10 +19,9 @@
 **/
 
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = CView::getLayoutMode();
 
-$screen_widget = new CWidget();
-$screen_widget->setWebLayoutMode($web_layout_mode);
+$screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget
@@ -76,7 +75,7 @@ else {
 		'to' => $data['to']
 	]);
 
-	if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		$screen_widget->addItem((new CFilter())
 			->setProfile($data['profileIdx'], $data['profileIdx2'])
 			->setActiveTab($data['active_tab'])

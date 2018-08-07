@@ -309,10 +309,9 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	$web_layout_mode = CView::getLayoutMode();
 
-	$widget = new CWidget();
-	$widget
+	$widget = (new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CTag('nav', true,
@@ -332,9 +331,10 @@ if ($data['action'] == 'problem.view') {
 				->setAttribute('aria-label', _('Content controls'))
 		);
 
-	if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		$widget->addItem($filter);
 	}
+
 	$widget
 		->addItem($screen->get())
 		->show();

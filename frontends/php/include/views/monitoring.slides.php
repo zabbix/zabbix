@@ -19,12 +19,11 @@
 **/
 
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = CView::getLayoutMode();
 
-$widget = new CWidget();
-$widget->setWebLayoutMode($web_layout_mode);
+$widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget
 		->setTitle(_('Slide shows'))
 		->addItem((new CList())
@@ -42,6 +41,7 @@ if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
 			])
 		);
 }
+
 $controls = (new CList())
 	->addItem(
 		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
@@ -100,7 +100,7 @@ $widget->setControls((new CList([
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget->addItem((new CFilter())
 		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 		->setActiveTab($data['active_tab'])

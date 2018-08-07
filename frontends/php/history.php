@@ -27,10 +27,10 @@ $page['file'] = 'history.php';
 $page['title'] = _('History');
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 if (hasRequest('plaintext')) {
-	define('ZBX_PAGE_NO_MENU', 1);
+	define('ZBX_PAGE_NO_MENU', true);
 }
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 

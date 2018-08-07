@@ -33,6 +33,7 @@ class CWidget {
 
 	/**
 	 * Layout mode (ZBX_LAYOUT_NORMAL|ZBX_LAYOUT_FULLSCREEN|ZBX_LAYOUT_KIOSKMODE).
+	 *
 	 * @var integer
 	 */
 	protected $web_layout_mode = ZBX_LAYOUT_NORMAL;
@@ -52,8 +53,10 @@ class CWidget {
 
 	/**
 	 * Set layout mode.
+	 *
 	 * @param integer $web_layout_mode
-	 * @return $this
+	 *
+	 * @return CWidget
 	 */
 	public function setWebLayoutMode($web_layout_mode) {
 		$this->web_layout_mode = $web_layout_mode;
@@ -62,9 +65,7 @@ class CWidget {
 	}
 
 	public function setBreadcrumbs($breadcrumbs = null) {
-		$show_breadcrumbs = ($this->web_layout_mode !== ZBX_LAYOUT_KIOSKMODE);
-
-		if (($this->web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) && !is_null($breadcrumbs)) {
+		if ($breadcrumbs !== null && in_array($this->web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			$this->body[] = $breadcrumbs;
 		}
 
@@ -89,7 +90,8 @@ class CWidget {
 		$widget = [];
 
 		if ($this->web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$this->addItem(get_icon('fullscreen')
+			$this
+				->addItem(get_icon('fullscreen')
 				->setAttribute('aria-label', _('Content controls')));
 		} elseif ($this->title !== null || $this->controls !== null) {
 			$widget[] = $this->createTopHeader();

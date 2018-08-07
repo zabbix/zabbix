@@ -79,8 +79,7 @@ function local_generateHeader($data) {
 	]);
 	echo $pageHeader->getOutput();
 
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-	if ($web_layout_mode === ZBX_LAYOUT_NORMAL) {
+	if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 		global $ZBX_SERVER_NAME;
 
 		$pageMenu = new CView('layout.htmlpage.menu', [
@@ -157,7 +156,7 @@ function local_showMessage() {
 	}
 }
 
-$data['web_layout_mode'] = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$data['web_layout_mode'] = CView::getLayoutMode();
 
 local_generateHeader($data);
 local_showMessage();

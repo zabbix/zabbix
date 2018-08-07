@@ -34,7 +34,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 // header right
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = CView::getLayoutMode();
 
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
@@ -73,8 +73,7 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	])));
 
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
 	$widget->addItem((new CFilter())
 		->setProfile($data['profileIdx'])

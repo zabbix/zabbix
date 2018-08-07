@@ -68,10 +68,10 @@ else {
 			->setArgument('dashboardids', [$data['dashboard']['dashboardid']])
 			->setArgumentSID();
 	}
-	$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
 
-	$widget = new CWidget();
-	$widget
+	$web_layout_mode = CView::getLayoutMode();
+
+	$widget = (new CWidget())
 		->setTitle($data['dashboard']['name'])
 		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CList())
@@ -142,8 +142,6 @@ else {
 				->addClass(ZBX_STYLE_OBJECT_GROUP)
 				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 			);
-
-
 
 	$timeline = null;
 	if ($data['show_timeselector']) {

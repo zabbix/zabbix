@@ -19,10 +19,9 @@
 **/
 
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = CView::getLayoutMode();
 
-$historyWidget = new CWidget();
-$historyWidget->setWebLayoutMode($web_layout_mode);
+$historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
@@ -209,8 +208,9 @@ else {
 		->setTitle($header['left'])
 		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
 
-	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST
+		&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+			$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {
@@ -239,8 +239,9 @@ else {
 
 
 	if ($data['itemids']) {
-		if ($data['action'] !== HISTORY_LATEST && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-			$historyWidget->addItem($filter_form);
+		if ($data['action'] !== HISTORY_LATEST
+			&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+				$historyWidget->addItem($filter_form);
 		}
 
 		$historyWidget->addItem($screen->get());
@@ -250,7 +251,7 @@ else {
 		}
 	}
 	else {
-		if ($filter_tab && $web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+		if ($filter_tab && in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			$historyWidget->addItem($filter_form);
 		}
 

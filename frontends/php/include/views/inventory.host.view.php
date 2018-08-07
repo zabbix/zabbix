@@ -19,18 +19,7 @@
 **/
 
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
-$hostInventoryWidget = (new CWidget())
-	->setTitle(_('Host inventory'))
-	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())
-		->addItem(get_icon('fullscreen'))
-	);
-
-/*
- * Overview tab
- */
+// Overview tab.
 $overviewFormList = new CFormList();
 
 $host_name = (new CLinkAction($data['host']['host']))
@@ -231,9 +220,11 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-$hostInventoryWidget->addItem((new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addItem($hostInventoriesTab)
-);
-
-return $hostInventoryWidget;
+return (new CWidget())
+	->setTitle(_('Host inventory'))
+	->setWebLayoutMode(CView::getLayoutMode())
+	->setControls((new CList())->addItem(get_icon('fullscreen')))
+	->addItem((new CForm())
+		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->addItem($hostInventoriesTab)
+	);

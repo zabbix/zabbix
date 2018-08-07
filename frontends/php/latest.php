@@ -24,13 +24,11 @@ require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['multiselect.js', 'layout.mode.js'];
-$page['web_layout_mode'] = $web_layout_mode;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -322,7 +320,7 @@ if ($filter['hostids']) {
  */
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
-	->setWebLayoutMode($web_layout_mode)
+	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(get_icon('fullscreen'))
@@ -330,72 +328,68 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-// Filter
-$filterForm = (new CFilter())
-	->setProfile('web.latest.filter')
-	->setActiveTab(CProfile::get('web.latest.filter.active', 1));
-
-$filterColumn1 = (new CFormList())
-	->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
-		(new CMultiSelect([
-			'name' => 'groupids[]',
-			'object_name' => 'hostGroup',
-			'data' => $multiselect_hostgroup_data,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'groupids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
-		(new CMultiSelect([
-			'name' => 'hostids[]',
-			'object_name' => 'hosts',
-			'data' => $multiselect_host_data,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'hostids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	)
-	->addRow(_('Application'), [
-		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('application_name', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'applications',
-					'srcfld1' => 'name',
-					'dstfrm' => 'zbx_filter',
-					'dstfld1' => 'application',
-					'real_hosts' => '1',
-					'with_applications' => '1'
-				]).', null, this);'
-			)
-	]);
-
-$filterColumn2 = (new CFormList())
-	->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
-	->addRow(_('Show items without data'),
-		(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
-	)
-	->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
-
-$filterForm->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2]);
-
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
-	$widget->addItem($filterForm);
+if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+	// Filter
+	$widget->addItem((new CFilter())
+		->setProfile('web.latest.filter')
+		->setActiveTab(CProfile::get('web.latest.filter.active', 1))
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow((new CLabel(_('Host groups'), 'groupids__ms')),
+					(new CMultiSelect([
+						'name' => 'groupids[]',
+						'object_name' => 'hostGroup',
+						'data' => $multiselect_hostgroup_data,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'groupids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow((new CLabel(_('Hosts'), 'hostids__ms')),
+					(new CMultiSelect([
+						'name' => 'hostids[]',
+						'object_name' => 'hosts',
+						'data' => $multiselect_host_data,
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'hostids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
+				->addRow(_('Application'), [
+					(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('application_name', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('return PopUp("popup.generic",'.
+							CJs::encodeJson([
+								'srctbl' => 'applications',
+								'srcfld1' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'application',
+								'real_hosts' => '1',
+								'with_applications' => '1'
+							]).', null, this);'
+						)
+				]),
+			(new CFormList())
+				->addRow(_('Name'), (new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
+				->addRow(_('Show items without data'),
+					(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
+				)
+				->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1))
+		])
+	);
 }
-// End of Filter
 
 $form = (new CForm('GET', 'history.php'))
 	->setName('items')

@@ -229,4 +229,13 @@ class CView {
 	public function getAddedJS() {
 		return $this->jsFiles;
 	}
+
+	/**
+	 * Return layout mode setting.
+	 *
+	 * @return int
+	 */
+	public static function getLayoutMode() {
+		return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+	}
 }

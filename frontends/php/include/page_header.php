@@ -28,12 +28,12 @@ if (!isset($page['file'])) {
 	$page['file'] = basename($_SERVER['PHP_SELF']);
 }
 
-$web_layout_mode = (isset($page['web_layout_mode'])) ? $page['web_layout_mode'] : ZBX_LAYOUT_NORMAL;
+if (!array_key_exists('web_layout_mode', $page)) {
+	$page['web_layout_mode'] = ZBX_LAYOUT_NORMAL;
+}
 
-if ($web_layout_mode === ZBX_LAYOUT_FULLSCREEN || $web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-	if (!defined('ZBX_PAGE_NO_MENU')) {
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
+if (!defined('ZBX_PAGE_NO_MENU') && in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) {
+	define('ZBX_PAGE_NO_MENU', true);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -46,38 +46,38 @@ switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
 		if(!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_TEXT:
@@ -85,21 +85,21 @@ switch ($page['type']) {
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_TEXT_FILE:
 		header('Content-Type: text/plain; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_CSV:
 		header('Content-Type: text/csv; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
+			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_HTML:
@@ -165,8 +165,8 @@ if ($denied_page_requested) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
-	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $web_layout_mode === ZBX_LAYOUT_FULLSCREEN
-		|| $web_layout_mode === ZBX_LAYOUT_KIOSKMODE);
+	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU')
+		|| in_array($page['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]));
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
@@ -242,7 +242,7 @@ if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
 	CSession::unsetValue(['messageOk', 'messageError']);
 }
 
-if (!defined('ZBX_PAGE_NO_MENU') && $web_layout_mode === ZBX_LAYOUT_NORMAL) {
+if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [

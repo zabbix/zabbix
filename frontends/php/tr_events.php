@@ -26,13 +26,11 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
-
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['layout.mode.js'];
-$page['web_layout_mode'] = $web_layout_mode;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -160,7 +158,7 @@ $eventTab = (new CTable())
 
 $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
-	->setWebLayoutMode($web_layout_mode)
+	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(get_icon('fullscreen'))

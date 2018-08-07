@@ -46,7 +46,8 @@ $pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
 
 // show GUI messages in pages with menus and in fullscreen and kiosk mode
-$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] > ZBX_LAYOUT_NORMAL) ? 1 : 0;
+$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU')
+	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) ? 1 : 0;
 
 $pageHeader->addJsFile('js/browsers.js');
 $path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&showGuiMessaging='.$showGuiMessaging;

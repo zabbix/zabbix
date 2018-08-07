@@ -19,12 +19,11 @@
 **/
 
 
-$web_layout_mode = (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+$web_layout_mode = CView::getLayoutMode();
 
-$widget = new CWidget();
-$widget->setWebLayoutMode($web_layout_mode);
+$widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
 
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget
 		->setTitle(_('Screens'))
 		->addItem((new CList())
@@ -116,7 +115,7 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-if ($web_layout_mode !== ZBX_LAYOUT_KIOSKMODE) {
+if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	$widget->addItem((new CFilter())
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
