@@ -354,6 +354,7 @@ tests/libs/zbxcommon/calculate_item_nextcheck.yaml -text
 tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml -text
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib.yaml -text
+tests/libs/zbxdbcache/dc_maintenance_match_tags.yaml -text
 tests/libs/zbxdbcache/zbx_vc_add_values.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_value.yaml -text
 tests/libs/zbxdbcache/zbx_vc_get_values.yaml -text
