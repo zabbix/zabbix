@@ -139,6 +139,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		zbx_free(ovector);
 
 	return result;
+#undef MAX_REQUESTED_MATCHES
+#undef MATCHES_BUFF_SIZE
 }
 
 /******************************************************************************
@@ -344,7 +346,7 @@ out:
  *********************************************************************************/
 static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
 {
-	const int	MATCH_SIZE = 10;
+#define MATCH_SIZE 10
 	const char	*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
 	zbx_regmatch_t	 match[MATCH_SIZE];
@@ -368,6 +370,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		*out = regexp_sub_replace(string, output_template, match, MATCH_SIZE);
 
 	return SUCCEED;
+#undef MATCH_SIZE
 }
 
 /*********************************************************************************
