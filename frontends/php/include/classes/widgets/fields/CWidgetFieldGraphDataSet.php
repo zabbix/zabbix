@@ -330,7 +330,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($values as $val) {
 				if (array_key_exists('timeshift', $val) && $val['timeshift'] !== '') {
 					$timeshift = timeUnitToSeconds($val['timeshift'], true);
-					if ($timeshift === null || abs($timeshift) > ZBX_MAX_PERIOD) {
+					if ($timeshift === null // invalid
+						|| bccomp(ZBX_MIN_TIMESHIFT, $timeshift) == 1 // exceeds min timeshift
+						|| bccomp(ZBX_MAX_TIMESHIFT, $timeshift) == -1 // exceeds max timeshift
+					) {
 						$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Time shift'),
 							_('Data set'), _('a time unit is expected')
 						);

@@ -42,7 +42,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'fill'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
-			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 255],
+			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 10],
 			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
 			'order'				=> ['type' => API_INT32],
 		]]);
@@ -214,7 +214,10 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					}
 					elseif ($option === 'timeshift') {
 						$timeshift = timeUnitToSeconds($val, true);
-						if ($timeshift === null || abs($timeshift) > ZBX_MAX_PERIOD) {
+						if ($timeshift === null // invalid
+							|| bccomp(ZBX_MIN_TIMESHIFT, $timeshift) == 1 // exceeds min timeshift
+							|| bccomp(ZBX_MAX_TIMESHIFT, $timeshift) == -1 // exceeds max timeshift
+						) {
 							$errors[]
 								= _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
 						}
