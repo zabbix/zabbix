@@ -108,15 +108,19 @@ class CSvgGraphAnnotation extends CSvgTag {
 	 */
 	private function drawTypeSimple() {
 		$y = $this->y + $this->height;
+		$arrow_width = 6;
+		$offset = (int) $arrow_width / 2;
 
 		return [
 			(new CSvgLine($this->x, $this->y, $this->x, $this->y + $this->height))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_DASHED),
 			(new CSvgPolygon([
 				[$this->x, $y + 1],
-				[$this->x - 3, $y + 5],
-				[$this->x + 3, $y + 5],
+				[$this->x - $offset, $y + 5],
+				[$this->x + $offset, $y + 5],
 			]))
+				->setAttribute('x', $this->x - $offset)
+				->setAttribute('width', $arrow_width)
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW)
 				->setAttribute('data-info', $this->data_info)
 		];
