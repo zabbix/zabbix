@@ -164,7 +164,6 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 
 $scripts[] = 'jQuery("#problemhosts").autoGrowTextarea({maxHeight: 100});';
-$scripts[] = 'jQuery("#problemhosts").on("change", updateGraphPreview);';
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
@@ -191,7 +190,7 @@ $form_tabs = (new CTabView())
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input", updateGraphPreview);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea", updateGraphPreview);';
 
 return [
 	'form' => $form,
