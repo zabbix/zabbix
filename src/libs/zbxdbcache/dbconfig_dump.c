@@ -1069,7 +1069,7 @@ static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
 
 	zbx_vector_ptr_create(&index);
 
-	if (0 != maintenance->tags.values)
+	if (0 != maintenance->tags.values_num)
 	{
 		zbx_vector_ptr_append_array(&index, maintenance->tags.values, maintenance->tags.values_num);
 		zbx_vector_ptr_sort(&index, maintenance_tag_compare);
