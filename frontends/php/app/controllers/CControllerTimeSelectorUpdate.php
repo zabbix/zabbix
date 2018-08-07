@@ -38,7 +38,7 @@ class CControllerTimeSelectorUpdate extends CController {
 	protected function checkInput() {
 		$profiles = ['web.dashbrd.filter', 'web.screens.filter', 'web.graphs.filter', 'web.httpdetails.filter',
 			'web.problem.filter', 'web.auditlogs.filter', 'web.slides.filter', 'web.auditacts.filter',
-			'web.item.graph.filter'
+			'web.item.graph.filter', 'web.toptriggers.filter', 'web.avail_report.filter'
 		];
 
 		$fields = [
@@ -51,7 +51,24 @@ class CControllerTimeSelectorUpdate extends CController {
 			'to_offset' => 'int32|ge 0'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateInputDateRange();
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			/*
+			 * This block executes if, for example, a missing profile is given. Since this is an AJAX request, it should
+			 * throw a JS alert() with current message in timeSelectorEventHandler() in gtlc.js.
+			 */
+
+			global $ZBX_MESSAGES;
+
+			$this->setResponse(new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['error' => $ZBX_MESSAGES[0]['message']])
+			]));
+
+			return $ret;
+		}
+
+		$ret = $this->validateInputDateRange();
 
 		if ($this->getInput('method') === 'rangeoffset' && (!$this->hasInput('from_offset')
 				|| !$this->hasInput('to_offset'))) {
@@ -95,8 +112,8 @@ class CControllerTimeSelectorUpdate extends CController {
 				$ts['from'] -= $offset;
 				$ts['to'] -= $offset;
 
-				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
-				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
 				break;
 
 			case 'increment':
@@ -109,8 +126,8 @@ class CControllerTimeSelectorUpdate extends CController {
 				$ts['from'] += $offset;
 				$ts['to'] += $offset;
 
-				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
-				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
 				break;
 
 			case 'zoomout':
@@ -130,8 +147,8 @@ class CControllerTimeSelectorUpdate extends CController {
 					$ts['from'] = $ts['to'] - ZBX_MAX_PERIOD + 1;
 				}
 
-				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
-				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+				$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
+				$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
 				break;
 
 			case 'rangeoffset':
@@ -140,12 +157,12 @@ class CControllerTimeSelectorUpdate extends CController {
 
 				if ($from_offset > 0) {
 					$ts['from'] += $from_offset;
-					$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME);
+					$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
 				}
 
 				if ($to_offset > 0) {
 					$ts['to'] -= $to_offset;
-					$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME);
+					$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
 				}
 				break;
 		}
@@ -161,10 +178,10 @@ class CControllerTimeSelectorUpdate extends CController {
 			'label' => relativeDateToText($value['from'], $value['to']),
 			'from' => $value['from'],
 			'from_ts' => $ts['from'],
-			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_DATE_TIME),
+			'from_date' => $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME),
 			'to' => $value['to'],
 			'to_ts' => $ts['to'],
-			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_DATE_TIME),
+			'to_date' => $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME),
 			'can_zoomout' => ($ts['to'] - $ts['from'] + 1 < ZBX_MAX_PERIOD),
 			'can_decrement' => ($ts['from'] > 0),
 			'can_increment' => ($ts['to'] < $ts['now'])

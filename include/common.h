@@ -23,6 +23,7 @@
 #include "sysinc.h"
 #include "zbxtypes.h"
 #include "version.h"
+#include "md5.h"
 
 #ifndef va_copy
 #	if defined(__va_copy)
@@ -1484,6 +1485,9 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
+
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
+char	*zbx_create_token(zbx_uint64_t seed);
 
 #endif
 
