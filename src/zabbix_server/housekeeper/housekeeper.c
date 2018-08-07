@@ -1107,6 +1107,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
+		zbx_dc_cleanup_data_sessions();
+
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
 				" %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,

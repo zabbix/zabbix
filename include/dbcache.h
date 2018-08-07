@@ -771,12 +771,13 @@ typedef struct
 	char		*value;	/* NULL in case of meta record (see "meta" field below) */
 	char		*source;
 	zbx_uint64_t	lastlogsize;
+	zbx_uint64_t	id;
 	int		mtime;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
 	unsigned char	state;
-	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
+	unsigned char	meta;	/* non-zero if contains meta information (lastlogsize and mtime) */
 }
 zbx_agent_value_t;
 
@@ -802,7 +803,22 @@ void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int l
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
 
-/* maintenance data */
+/* data session support */
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	last_valueid;
+	const char	*token;
+	time_t		lastaccess;
+}
+zbx_data_session_t;
+
+const char	*zbx_dc_get_session_token(void);
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
+void	zbx_dc_cleanup_data_sessions(void);
+
+/* maintenance support */
 
 typedef struct
 {
@@ -847,6 +863,5 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
-
 
 #endif

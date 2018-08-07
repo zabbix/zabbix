@@ -696,6 +696,8 @@ typedef struct
 								/* Each array member contains 0/1 flag for 64 timers  */
 								/* indicating if the timer must process maintenance.  */
 
+	char			*session_token;
+
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		numitems;
@@ -750,6 +752,7 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
+	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	timer_queue;
