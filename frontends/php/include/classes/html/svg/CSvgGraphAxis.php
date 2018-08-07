@@ -123,7 +123,7 @@ class CSvgGraphAxis extends CSvgTag {
 			}
 		}
 		else {
-			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ? $this->x : $this->width + $this->x;
+			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ? $this->x : $this->width + $this->x;
 			$y = $this->y - $this->arrow_offset;
 			$path->moveTo($x, $y)
 				->lineTo($x, $this->height + $y + $this->arrow_offset);
@@ -160,12 +160,16 @@ class CSvgGraphAxis extends CSvgTag {
 			// Label margin from axis.
 			$margin = 5;
 			$axis = 'y';
-			$x = $this->type === GRAPH_YAXIS_SIDE_LEFT ?  -$margin : $this->width + $margin;
+			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ?  $margin : $this->width - $margin;
 		}
 
 
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
+
+			if ($this->type === GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
+				continue;
+			}
 
 			if (!$is_horizontal) {
 				// Flip upside down.

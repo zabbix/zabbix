@@ -58,8 +58,9 @@ class CSvgGraph extends CSvg {
 	protected $left_y_units;
 
 	protected $offset_bottom;
-	protected $offset_left;
-	protected $offset_right;
+	protected $offset_left = 20;
+	protected $offset_right = 20;
+	protected $max_yaxis_width = 120;
 	protected $offset_top;
 	protected $problems;
 	protected $time_from;
@@ -284,8 +285,20 @@ class CSvgGraph extends CSvg {
 		}
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
-		$this->offset_left = ($this->left_y_show && $this->left_y_min) ? 50 : 20;
-		$this->offset_right = ($this->right_y_show && $this->right_y_min) ? 50 : 20;
+		$char_delta = 8;
+
+		if ($this->left_y_show && $this->left_y_min) {
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+			$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $char_delta);
+			$this->offset_left = (int) min($offset_left, $this->max_yaxis_width);
+		}
+
+		if ($this->right_y_show && $this->right_y_min) {
+			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+			$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $char_delta);
+			$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
+		}
+
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
 		$this->offset_top = 10;
 		$this->canvas_x = $this->offset_left;
@@ -379,7 +392,7 @@ class CSvgGraph extends CSvg {
 			$this->addItem(
 				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
 					->setSize($this->offset_left, $this->canvas_height)
-					->setPosition($this->canvas_x, $this->canvas_y)
+					->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
 			);
 		}
 	}
@@ -389,14 +402,10 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawCanvasRightYAxis() {
 		if ($this->right_y_show && $this->min_value_right !== null) {
-			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
-			// Do not render axis value for bottom-right position.
-			unset($values[0]);
-
 			$this->addItem(
-				(new CSvgGraphAxis($values, GRAPH_YAXIS_SIDE_RIGHT))
+				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
 					->setSize($this->offset_right, $this->canvas_height)
-					->setPosition($this->canvas_width, $this->canvas_y)
+					->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
 			);
 		}
 	}
