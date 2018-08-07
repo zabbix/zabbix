@@ -3956,7 +3956,7 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 		if (SUCCEED == function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
 			return SUCCEED;
 
-		if (*par_l > *par_r && NULL != error)
+		if (NULL != error && *par_l > *par_r)
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
 				"Check expression part starting from: %.*s",

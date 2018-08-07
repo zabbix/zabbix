@@ -92,24 +92,18 @@ class CColor extends CDiv {
 	public function toString($destroy = true) {
 		$this->cleanItems();
 
-		$this->addItem([
-			(new CColorCell('lbl_'.$this->name, $this->value))
-				->setTitle('#'.$this->value)
-				->onClick('javascript: show_color_picker("'.zbx_formatDomId($this->name).'", this)'),
+		$this->addItem(
 			(new CTextBox($this->name, $this->value))
 				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
 				->setAttribute('maxlength', self::MAX_LENGTH)
 				->setEnabled($this->is_enabled)
 				->setAriaRequired($this->is_required)
-				->onChange('set_color_by_name("'.zbx_formatDomId($this->name).'", this.value)')
-		]);
+		);
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		if ($this->append_color_picker_js) {
-			insert_show_color_picker_javascript();
-		}
+		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
 
-		return parent::toString($destroy);
+		return parent::toString($destroy).$init_script;
 	}
 }
