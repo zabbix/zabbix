@@ -211,30 +211,30 @@ class CControllerPopupTriggerExpr extends CController {
 			'abschange' => [
 				'description' => _('abschange() - Absolute difference between last and previous value'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'avg' => [
 				'description' => _('avg() - Average value of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'delta' => [
 				'description' => _('delta() - Difference between MAX and MIN value of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'change' => [
 				'description' => _('change() - Difference between last and previous value'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'count' => [
 				'description' => _('count() - Number of successfully retrieved values V (which fulfill operator O) for period T'),
 				'params' => $this->param3SecVal,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'diff' => [
 				'description' => _('diff() - Difference between last and preceding values (1 - true, 0 - false)'),
@@ -245,30 +245,30 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('last() - Last (most recent) T value'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'max' => [
 				'description' => _('max() - Maximum value for period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'min' => [
 				'description' => _('min() - Minimum value for period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'percentile' => [
 				'description' => _('percentile() - Percentile P of a period T'),
 				'params' => $this->param3SecPercent,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'prev' => [
 				'description' => _('prev() - Previous value'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'str' => [
 				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
@@ -280,28 +280,28 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('strlen() - Length of last (most recent) T value in characters'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'sum' => [
 				'description' => _('sum() - Sum of values of a period T'),
 				'params' => $this->param1SecCount,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'date' => [
 				'description' => _('date() - Current date'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'dayofweek' => [
 				'description' => _('dayofweek() - Day of week'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'dayofmonth' => [
 				'description' => _('dayofmonth() - Day of month'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'fuzzytime' => [
 				'description' => _('fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)'),
@@ -330,7 +330,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'logseverity' => [
 				'description' => _('logseverity() - Log severity of the last log entry'),
 				'allowed_types' => $this->allowedTypesLog,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'logsource' => [
 				'description' => _('logsource() - Log source of the last log entry matching parameter T (1 - match, 0 - no match)'),
@@ -341,12 +341,12 @@ class CControllerPopupTriggerExpr extends CController {
 			'now' => [
 				'description' => _('now() - Number of seconds since the Epoch'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'time' => [
 				'description' => _('time() - Current time'),
 				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'nodata' => [
 				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false)'),
@@ -364,13 +364,13 @@ class CControllerPopupTriggerExpr extends CController {
 				'description' => _('forecast() - Forecast for next t seconds based on period T'),
 				'params' => $this->paramForecast,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			],
 			'timeleft' => [
 				'description' => _('timeleft() - Time to reach threshold estimated based on period T'),
 				'params' => $this->paramTimeleft,
 				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['<', '<=', '>', '>=', '=', '<>']
+				'operators' => ['=', '<>', '>', '<', '>=', '<=']
 			]
 		];
 
