@@ -1,27 +1,27 @@
 ---
-test case: No maintenance and event tags (1) 
+test case: No maintenance and event tags (1)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags: []  
+    tags: []
   tags: []
 out:
   return: SUCCEED
 ---
-test case: No maintenance and event tags (2) 
+test case: No maintenance and event tags (2)
 in:
   maintenance:
     tags_evaltype: or
-    tags: []  
+    tags: []
   tags: []
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with no event tags (1) 
+test case: Maintenance tags with no event tags (1)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: like
@@ -29,11 +29,11 @@ in:
 out:
   return: FAIL
 ---
-test case: Maintenance tags with matching event tags (1) 
+test case: Maintenance tags with matching event tags (1)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value:
         operator: like
@@ -43,11 +43,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (2) 
+test case: Maintenance tags with matching event tags (2)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value:
         operator: like
@@ -57,11 +57,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (3) 
+test case: Maintenance tags with matching event tags (3)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value:
         operator: equal
@@ -71,11 +71,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (4) 
+test case: Maintenance tags with matching event tags (4)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value:
         operator: equal
@@ -85,11 +85,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (5) 
+test case: Maintenance tags with matching event tags (5)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 123
         operator: equal
@@ -99,11 +99,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (6) 
+test case: Maintenance tags with matching event tags (6)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 12
         operator: like
@@ -113,11 +113,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (7) 
+test case: Maintenance tags with matching event tags (7)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 2
         operator: like
@@ -127,11 +127,11 @@ in:
 out:
   return: SUCCEED
 ---
-test case: Maintenance tags with matching event tags (8) 
+test case: Maintenance tags with matching event tags (8)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 23
         operator: like
@@ -145,7 +145,7 @@ test case: Maintenance tags with matching event tags (9)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -165,7 +165,7 @@ test case: Maintenance tags with matching event tags (10)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: b
         value: 2
         operator: equal
@@ -183,7 +183,7 @@ test case: Maintenance tags with matching event tags (11)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: b
         value: 2
         operator: equal
@@ -201,7 +201,7 @@ test case: Maintenance tags with matching event tags (12)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: b
         value: 1
         operator: equal
@@ -218,7 +218,7 @@ test case: Maintenance tags with matching event tags (13)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -237,7 +237,7 @@ test case: Maintenance tags with matching event tags (14)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: b
         value: 2
         operator: equal
@@ -251,7 +251,7 @@ test case: Maintenance tags with matching event tags (15)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: b
         value: 1
         operator: equal
@@ -270,7 +270,7 @@ test case: Maintenance tags with matching event tags (16)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: b
         value: 1
         operator: equal
@@ -293,7 +293,7 @@ test case: Maintenance tags with matching event tags (17)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -318,7 +318,7 @@ test case: Maintenance tags with matching event tags (18)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -365,7 +365,7 @@ test case: Maintenance tags with matching event tags (17)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -397,7 +397,7 @@ test case: Maintenance tags with not matching event tags (1)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 123
         operator: equal
@@ -411,7 +411,7 @@ test case: Maintenance tags with not matching event tags (2)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: a
         value: 123
         operator: equal
@@ -425,7 +425,7 @@ test case: Maintenance tags with not matching event tags (3)
 in:
   maintenance:
     tags_evaltype: or
-    tags:  
+    tags:
       - tag: b
         value: 2
         operator: equal
@@ -444,7 +444,7 @@ test case: Maintenance tags with not matching event tags (4)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -463,7 +463,7 @@ test case: Maintenance tags with not matching event tags (5)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -502,7 +502,7 @@ test case: Maintenance tags with not matching event tags (6)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -537,7 +537,7 @@ test case: Maintenance tags with not matching event tags (7)
 in:
   maintenance:
     tags_evaltype: and/or
-    tags:  
+    tags:
       - tag: a
         value: 1
         operator: equal
@@ -549,6 +549,27 @@ in:
         value: 1
 out:
   return: FAIL
+---
+test case: Maintenance tags with matching event tags (8)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: b
+        value: 2
+      - tag: c
+        value: 3
+out:
+  return: SUCCEED
 ...
 
 
