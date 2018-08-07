@@ -383,7 +383,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 				ret = SUCCEED;
 				break;
-			default:
+			case FAIL:
 				*error = zbx_dsprintf(*error, "invalid regular expression");
 		}
 
@@ -1989,21 +1989,19 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 			{
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
-				case ZBX_REGEXP_NO_MATCH:
-					return FAIL;
-				default:
+				case FAIL:
 					return NOTSUPPORTED;
 			}
+			break;
 		case ZBX_FUNC_IREGEXP:
 			switch (regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE))
 			{
 				case ZBX_REGEXP_MATCH:
 					return SUCCEED;
-				case ZBX_REGEXP_NO_MATCH:
-					return FAIL;
-				default:
+				case FAIL:
 					return NOTSUPPORTED;
 			}
+			break;
 	}
 
 	return FAIL;
@@ -2105,11 +2103,8 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 					found = 1;
 					break;
 				}
-				else if (FAIL == str_one_ret)
-				{
-					continue;
-				}
-				else /* NOTSUPPORTED */
+
+				if (NOTSUPPORTED == str_one_ret)
 				{
 					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
 					goto out;
@@ -2126,11 +2121,8 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 					found = 1;
 					break;
 				}
-				else if (FAIL == str_one_ret)
-				{
-					continue;
-				}
-				else /* NOTSUPPORTED */
+
+				if (NOTSUPPORTED == str_one_ret)
 				{
 					*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", arg1);
 					goto out;
