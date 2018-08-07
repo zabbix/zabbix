@@ -559,7 +559,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Check if submitted function is usable with selected item.
 		foreach ($data['functions'] as $id => $f) {
-			if ((!$data['itemValueType'] || array_key_exists($item_value_type, $f['allowed_types']))
+			if (($data['itemValueType'] === null || array_key_exists($item_value_type, $f['allowed_types']))
 					&& $id === $function) {
 				$data['selectedFunction'] = $id;
 				break;
