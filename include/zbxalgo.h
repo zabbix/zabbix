@@ -314,8 +314,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 									zbx_compare_func_t compare_func);	\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
-void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);					\
-void	zbx_vector_ ## __id ## _clear_type(zbx_vector_ ## __id ## _t *vector, zbx_clean_type_ ## __id ## _func_t clean_func);
+void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 #define ZBX_PTR_VECTOR_DECL(__id, __type)									\
 														\
@@ -327,7 +326,6 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_cl
 /* this function is only for use with zbx_vector_XXX_clear_ext() */						\
 /* and only if the vector does not contain nested allocations */						\
 void	zbx_  ## __id ## _free(__type data);
-
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
 ZBX_PTR_VECTOR_DECL(str, char *);
