@@ -1355,6 +1355,13 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
+						if (data.dialogue['widget_type'] === 'svggraph') {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+						else {
+							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+						}
+
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});

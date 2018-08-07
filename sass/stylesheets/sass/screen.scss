@@ -3744,6 +3744,10 @@ $form-icon-btn: (
 		}
 	}
 
+	&.sticked-to-top {
+		top: 50px;
+	}
+
 	&.modal-popup {
 		max-width: 1024px;
 		min-width: 650px;
