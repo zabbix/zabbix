@@ -132,15 +132,14 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldTextBox
+	 * @param CWidgetFieldTextArea $field
 	 *
-	 * @return CTextBox
+	 * @return Array
 	 */
 	public static function getHostsPatternTextBox($field, $form_name) {
 		return [
 			(new CTextArea($field->getName(), $field->getValue(), ['rows' => 1]))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 255)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 				->setAttribute('placeholder', _('(hosts pattern)'))
@@ -528,4 +527,24 @@ class CWidgetHelper {
 	public static function isAriaRequired($field) {
 		return ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
 	}
+
+	/**
+	 * Make array of patterns from given comma separated patterns string.
+	 *
+	 * @param string   $patterns		String containing comma separated patterns.
+	 *
+	 * @return array   Returns array of patterns or NULL if '*' used, thus all database records are valid.
+	 */
+	public static function splitPatternIntoParts($patterns) {
+		$patterns = explode(',', $patterns);
+		$patterns = array_keys(array_flip($patterns));
+
+		foreach ($patterns as &$pattern) {
+			$pattern = trim($pattern);
+		}
+		unset($pattern);
+
+		return $patterns;
+	}
+
 }

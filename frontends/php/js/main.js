@@ -1090,16 +1090,13 @@ jQuery(function ($) {
 	$.fn.autoGrowTextarea = function(options) {
 		this.each(function() {
 			if (typeof $(this).data('autogrow') === 'undefined') {
-				var obj = $(this),
-					padding = parseInt(obj.css('padding-top'), 10) + parseInt(obj.css('padding-bottom'), 10);
-
 				options = $.extend({}, {
-					line_height: parseInt(obj.innerHeight(), 10) - padding,
-					padding: padding
+					line_height: parseInt($(this).css('font-size'), 10) * 1.14,
+					padding: parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10)
 				}, options);
 
 				$(this)
-					.css({'resize': 'none'})
+					.css({'resize':'none'})
 					.on('paste change keyup', function() {
 						var rows = calcRows($(this), options);
 

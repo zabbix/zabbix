@@ -24,7 +24,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_SVG_GRAPH);
 
-		$this->data = self::convertDottedKeys($this->data);
+		$this->data = self::convertDottedKeys($this->data, true);
 
 		/**
 		 * Data set tab.
@@ -259,7 +259,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setDefault(SVG_GRAPH_PROBLEMS_SHOW)
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
-				'jQuery("#graph_item_problems, #problem_hosts, #problem_name, #problem_hosts_select")'.
+				'jQuery("#graph_item_problems, #problemhosts, #problem_name, #problemhosts_select")'.
 					'.prop("disabled", !on);'.
 				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
 				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
@@ -282,12 +282,15 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_problems->getName()] = $field_problems;
 
 		// Problem hosts.
-		$field_problem_hosts = (new CWidgetFieldTextBox('problem_hosts', _('Hosts')));
+		$field_problem_hosts = (new CWidgetFieldTextArea('problemhosts', _('Problem hosts')));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}
-		elseif (array_key_exists('problem_hosts', $this->data)) {
-			$field_problem_hosts->setValue($this->data['problem_hosts']);
+		elseif (array_key_exists('problemhosts', $this->data)) {
+			$problem_hosts = is_array($this->data['problemhosts'])
+				? implode(', ', $this->data['problemhosts'])
+				: $this->data['problemhosts'];
+			$field_problem_hosts->setValue($problem_hosts);
 		}
 		$this->fields[$field_problem_hosts->getName()] = $field_problem_hosts;
 

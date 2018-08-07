@@ -33,8 +33,8 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 6],
 			'type'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
@@ -80,7 +80,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(hosts pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('maxlength', 255)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
@@ -102,7 +101,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
 							->setAttribute('placeholder', _('(items pattern)'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setAttribute('maxlength', 255)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
@@ -155,12 +153,23 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		// If no values specified, field should be deleted.
 		foreach ($this->value as $index => $val) {
-			$is_hosts_specified = (array_key_exists('hosts', $val) && $val['hosts'] !== '');
-			$is_items_specified = (array_key_exists('items', $val) && $val['items'] !== '');
+			$hosts = array_key_exists('hosts', $val)
+				? (is_array($val['hosts']) ? implode(', ', $val['hosts']) : $val['hosts'])
+				: '';
+			$items = array_key_exists('items', $val)
+				? (is_array($val['items']) ? implode(', ', $val['items']) : $val['items'])
+				: '';
+
+			$is_hosts_specified = ($hosts !== '');
+			$is_items_specified = ($items !== '');
 			$is_options_specified = (bool) array_intersect(array_keys($val), $this->override_options);
 
 			if (!$is_hosts_specified && !$is_items_specified && !$is_options_specified) {
 				unset($this->value[$index]);
+			}
+			else {
+				$this->value[$index]['hosts'] = $hosts;
+				$this->value[$index]['items'] = $items;
 			}
 		}
 
@@ -234,16 +243,21 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		$value = $this->getValue();
 
 		foreach ($value as $index => $val) {
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'.hosts.'.$index,
-				'value' => $val['hosts']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'.items.'.$index,
-				'value' => $val['items']
-			];
+			// Hosts and items fields are stored as arrays to bypass length limit.
+			foreach (CWidgetHelper::splitPatternIntoParts($val['hosts']) as $num => $pattern_item) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.hosts.'.$index.'.'.$num,
+					'value' => $pattern_item
+				];
+			}
+			foreach (CWidgetHelper::splitPatternIntoParts($val['items']) as $num => $pattern_item) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.items.'.$index.'.'.$num,
+					'value' => $pattern_item
+				];
+			}
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 				'name' => $this->name.'.order.'.$index,

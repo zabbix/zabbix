@@ -154,28 +154,17 @@ jQuery(function($) {
 			 * Pattern select allows enter multiple comma-separated values in same editable field. Values passed to
 			 * add.popup should be appended at the and of existing value string. Repeating values are skipped.
 			 */
-			var maxlen = +$('[name="'+data.parentId+'"]').attr('maxlength'),
-				values = [],
-				strlen = 0;
+			var values = [];
 			$('[name="'+data.parentId+'"]').val().split(',').forEach(function(val) {
 				var val = val.trim();
-				if (val.length && maxlen >= strlen + val.length) {
-					strlen += strlen ? 2 : 0; // ', ' takes 2 characters
-					strlen += val.length;
+				if (val.length) {
 					values.push(val);
 				}
 			});
 
 			data.values.forEach(function(val) {
 				if (values.indexOf(val[data.object]) === -1) {
-					strlen += strlen ? 2 : 0;
-					if (maxlen >= strlen + val[data.object].length) {
-						values.push(val[data.object]);
-						strlen += val[data.object].length;
-					}
-					else {
-						return;
-					}
+					values.push(val[data.object]);
 				}
 			});
 

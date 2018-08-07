@@ -159,8 +159,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			}
 
 			// Problem hosts.
-			if (array_key_exists('problem_hosts', $fields) && $fields['problem_hosts'] !== '') {
-				$graph_data['problems']['problem_hosts'] = $fields['problem_hosts'];
+			if (array_key_exists('problemhosts', $fields) && $fields['problemhosts'] !== '') {
+				$graph_data['problems']['problemhosts'] = $fields['problemhosts'];
 			}
 
 			// Problem severities.

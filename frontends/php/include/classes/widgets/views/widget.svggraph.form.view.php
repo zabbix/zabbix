@@ -153,8 +153,8 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_item_problems']),
 		CWidgetHelper::getCheckBox($fields['graph_item_problems'])
 	)
-	->addRow(CWidgetHelper::getLabel($fields['problem_hosts']),
-		CWidgetHelper::getHostsPatternTextBox($fields['problem_hosts'], $form_name)
+	->addRow(CWidgetHelper::getLabel($fields['problemhosts']),
+		CWidgetHelper::getHostsPatternTextBox($fields['problemhosts'], $form_name)
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
 		CWidgetHelper::getSeverities($fields['severities'], $data['config'])
@@ -163,7 +163,8 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
 	->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 
-$scripts[] = 'jQuery("#problem_hosts").autoGrowTextarea({maxHeight: 100});';
+$scripts[] = 'jQuery("#problemhosts").autoGrowTextarea({maxHeight: 100});';
+$scripts[] = 'jQuery("#problemhosts").on("change", updateGraphPreview);';
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 

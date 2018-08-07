@@ -285,14 +285,14 @@ class CSvgGraphHelper {
 		}
 
 		// Find triggers involved.
-		if (array_key_exists('problem_hosts', $problem_options)) {
+		if (array_key_exists('problemhosts', $problem_options)) {
 			$problem_hosts = API::Host()->get([
 				'output' => [],
 				'selectTriggers' => ['triggerid'],
 				'searchWildcardsEnabled' => true,
 				'searchByAny' => true,
 				'search' => [
-					'name' => self::processPattern($problem_options['problem_hosts'])
+					'name' => self::processPattern($problem_options['problemhosts'])
 				],
 				'preservekeys' => true
 			]);
