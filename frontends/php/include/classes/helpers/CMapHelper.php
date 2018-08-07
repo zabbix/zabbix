@@ -118,13 +118,13 @@ class CMapHelper {
 	/**
 	 * Resolve map element (selements and links) state.
 	 *
-	 * @param array $sysmap				Map data.
-	 * @param array $options					Options used to retrieve actions.
-	 * @param int   $options['severity_min']	Minimum severity.
-	 * @param int   $options['fullscreen']		Fullscreen flag.
-	 * @param int   $theme				Theme used to create missing elements (like hostgroup frame).
+	 * @param array $sysmap                   Map data.
+	 * @param array $options                  Options used to retrieve actions.
+	 * @param int   $options['severity_min']  Minimum severity.
+	 * @param int   $options['fullscreen']    Fullscreen flag.
+	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
 	 */
-	protected static function resolveMapState(&$sysmap, $options, $theme) {
+	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {
 		$map_info_options = [
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
@@ -142,7 +142,7 @@ class CMapHelper {
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		// Adding element names and removing inaccessible triggers from readable elements.
-		add_elementNames($sysmap['selements']);
+		addElementNames($sysmap['selements']);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			if ($element['permission'] < PERM_READ) {
