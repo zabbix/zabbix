@@ -302,7 +302,6 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
 		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
 	}
 out:
 	zbx_free(arg1);
@@ -393,7 +392,6 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
 		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
 	}
 out:
 	zbx_free(arg1);
@@ -444,7 +442,6 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const zbx_timespec_t
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
 		*error = zbx_strdup(*error, "cannot get value from value cache");
-		goto out;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1162,7 +1159,6 @@ static int	evaluate_LAST(char *value, DC_ITEM *item, const char *parameters, con
 	else
 	{
 		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
 	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
