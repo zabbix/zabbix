@@ -566,7 +566,7 @@ class CControllerPopupTriggerExpr extends CController {
 			}
 		}
 
-		if ($data['selectedFunction'] === null) {
+		if (!$this->getInput('add', false) && $data['selectedFunction'] === null) {
 			error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
 				$data['functions'][$function]['description'],
 				$data['description']
