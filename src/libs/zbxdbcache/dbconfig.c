@@ -4768,6 +4768,19 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	hgroups_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_maintenances(&maintenance_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_periods(&maintenance_period_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_groups(&maintenance_group_sync))
+		goto out;
+	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
+		goto out;
+	maintenance_sec = zbx_time() - sec;
+
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_hosts(&hosts_sync);
@@ -4781,6 +4794,29 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_hostgroups(&hgroups_sync);
 	DCsync_hostgroup_hosts(&hgroup_host_sync);
 	hgroups_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_maintenances(&maintenance_sync);
+	DCsync_maintenance_tags(&maintenance_tag_sync);
+	DCsync_maintenance_groups(&maintenance_group_sync);
+	DCsync_maintenance_hosts(&maintenance_host_sync);
+	DCsync_maintenance_periods(&maintenance_period_sync);
+	maintenance_sec2 = zbx_time() - sec;
+
+	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_HOST_GROUPS;
+
+	if (0 != maintenance_group_sync.add_num + maintenance_group_sync.update_num + maintenance_group_sync.remove_num)
+		update_flags |= ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS;
+
+	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_HOST_GROUPS))
+		dc_hostgroups_update_cache();
+
+	/* pre-cache nested groups used in maintenances to allow read lock */
+	/* during host maintenance update calculations                     */
+	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
+		dc_maintenance_precache_nested_groups();
+
 	FINISH_SYNC;
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
@@ -4883,19 +4919,6 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	corr_operation_sec = zbx_time() - sec;
 
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_maintenances(&maintenance_sync))
-		goto out;
-	if (FAIL == zbx_dbsync_compare_maintenance_tags(&maintenance_tag_sync))
-		goto out;
-	if (FAIL == zbx_dbsync_compare_maintenance_periods(&maintenance_period_sync))
-		goto out;
-	if (FAIL == zbx_dbsync_compare_maintenance_groups(&maintenance_group_sync))
-		goto out;
-	if (FAIL == zbx_dbsync_compare_maintenance_hosts(&maintenance_host_sync))
-		goto out;
-	maintenance_sec = zbx_time() - sec;
-
 	START_SYNC;
 
 	sec = zbx_time();
@@ -4942,14 +4965,6 @@ void	DCsync_configuration(unsigned char mode)
 	corr_operation_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_maintenances(&maintenance_sync);
-	DCsync_maintenance_tags(&maintenance_tag_sync);
-	DCsync_maintenance_groups(&maintenance_group_sync);
-	DCsync_maintenance_hosts(&maintenance_host_sync);
-	DCsync_maintenance_periods(&maintenance_period_sync);
-	maintenance_sec2 = zbx_time() - sec;
-
-	sec = zbx_time();
 
 	if (0 != hosts_sync.add_num + hosts_sync.update_num + hosts_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOSTS;
@@ -4957,29 +4972,14 @@ void	DCsync_configuration(unsigned char mode)
 	if (0 != items_sync.add_num + items_sync.update_num + items_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_ITEMS;
 
-	if (0 != htmpl_sync.add_num + htmpl_sync.update_num + htmpl_sync.remove_num)
-		update_flags |= ZBX_DBSYNC_UPDATE_HOST_TEMPLATES;
-
 	if (0 != func_sync.add_num + func_sync.update_num + func_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_FUNCTIONS;
-
-	if (0 != gmacro_sync.add_num + gmacro_sync.update_num + gmacro_sync.remove_num)
-		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
-
-	if (0 != hmacro_sync.add_num + hmacro_sync.update_num + hmacro_sync.remove_num)
-		update_flags |= ZBX_DBSYNC_UPDATE_MACROS;
 
 	if (0 != triggers_sync.add_num + triggers_sync.update_num + triggers_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_TRIGGERS;
 
 	if (0 != tdep_sync.add_num + tdep_sync.update_num + tdep_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY;
-
-	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
-		update_flags |= ZBX_DBSYNC_UPDATE_HOST_GROUPS;
-
-	if (0 != maintenance_group_sync.add_num + maintenance_group_sync.update_num + maintenance_group_sync.remove_num)
-		update_flags |= ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS;
 
 	/* update trigger topology if trigger dependency was changed */
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY))
@@ -4991,12 +4991,6 @@ void	DCsync_configuration(unsigned char mode)
 	{
 		dc_trigger_update_cache();
 	}
-
-	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_HOST_GROUPS))
-		dc_hostgroups_update_cache();
-
-	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
-		dc_maintenance_precache_nested_groups();
 
 	update_sec = zbx_time() - sec;
 

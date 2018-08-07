@@ -813,7 +813,9 @@ int	zbx_dc_update_maintenances(void)
 				maintenance->state = ZBX_MAINTENANCE_RUNNING;
 				started_num++;
 
-				/* pre-cache nested host groups */
+				/* Precache nested host groups for started maintenances.   */
+				/* Nested host groups for running maintenances are already */
+				/* precached during configuration cache synchronization.   */
 				for (i = 0; i < maintenance->groupids.values_num; i++)
 				{
 					zbx_dc_hostgroup_t	*group;
@@ -1064,6 +1066,9 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
  *                                                                            *
  * Comments: This function must be called after zbx_dc_update_maintenances()  *
  *           function has updated maintenance state in configuration cache.   *
+ *           To be able to work with lazy nested group caching and read locks *
+ *           all nested groups used in maintenances must be already precached *
+ *           before calling this function.                                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates)
