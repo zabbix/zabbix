@@ -575,7 +575,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Remove functions that not correspond to chosen item.
 		foreach ($data['functions'] as $id => $f) {
-			if ($data['itemValueType'] && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
+			if ($data['itemValueType'] !== null && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
 				unset($data['functions'][$id]);
 
 				// Take first available function from list and change to first available operator for that function.
