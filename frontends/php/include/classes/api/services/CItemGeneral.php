@@ -2080,7 +2080,7 @@ abstract class CItemGeneral extends CApiService {
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);
 
-			if ($ranges_parser->parse($item['status_codes']) !== CParser::PARSE_SUCCESS) {
+			if ($ranges_parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
 				);
