@@ -529,8 +529,7 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	}
 }
 
-static void	count_one_str(int *count, int op, const char *value, const char *pattern,
-		zbx_vector_ptr_t *regexps)
+static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
 {
 	int	res;
 
@@ -604,8 +603,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
-	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type ||
-			ITEM_VALUE_TYPE_FLOAT == item->value_type);
+	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
 	if (4 < (nparams = num_param(parameters)))
 	{
@@ -790,8 +788,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 		goto out;
 	}
 
-	/* skip counting values one by one if both pattern and operator are empty
-		or "" is searched in text values */
+	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
 	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3 &&
 			OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op))
 	{
@@ -1482,8 +1479,8 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameter
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
-	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-			&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL, &time_shift,
+			&time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
@@ -1909,8 +1906,7 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const zbx_timespec_t *ts, c
 
 	zbx_history_record_vector_create(&values);
 
-	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, 0, 2, ts) ||
-			2 > values.values_num)
+	if (SUCCEED != zbx_vc_get_values(item->itemid, item->value_type, &values, 0, 2, ts) || 2 > values.values_num)
 	{
 		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
@@ -2397,8 +2393,8 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-			&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL, &time_shift,
+			&time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
@@ -2566,8 +2562,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 		goto out;
 	}
 
-	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL,
-			&time_shift, &time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
+	if (SUCCEED != get_function_parameter_int(item->host.hostid, parameters, 2, ZBX_PARAM_OPTIONAL, &time_shift,
+			&time_shift_type) || ZBX_VALUE_SECONDS != time_shift_type || 0 > time_shift)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
@@ -2781,8 +2777,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	{
 		ret = evaluate_DIFF(value, item, ts, error);
 	}
-	else if (0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") ||
-			0 == strcmp(function, "iregexp"))
+	else if (0 == strcmp(function, "str") || 0 == strcmp(function, "regexp") || 0 == strcmp(function, "iregexp"))
 	{
 		ret = evaluate_STR(value, item, function, parameter, ts, error);
 	}
@@ -3184,8 +3179,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	char		*value_esc, *value_tmp;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value,
-			valuemapid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value, valuemapid);
 
 	if (0 == valuemapid)
 		goto clean;
@@ -3284,8 +3278,7 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 	int		ret, errcode;
 	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function,
-			parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'", __function_name, host, key, function, parameter);
 
 	DCconfig_get_items_by_keys(&item, &host_key, &errcode, 1);
 
@@ -3303,8 +3296,8 @@ int	evaluate_macro_function(char **result, const char *host, const char *key, co
 		{
 			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
 		}
-		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast",
-				function, ','))
+		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function,
+				','))
 		{
 			switch (item.value_type)
 			{
@@ -3356,8 +3349,7 @@ int	evaluatable_for_notsupported(const char *fn)
 	if (('n' == *fn) && (0 == strcmp(fn, "nodata") || 0 == strcmp(fn, "now")))
 		return SUCCEED;
 
-	if (('d' == *fn) && (0 == strcmp(fn, "dayofweek") || 0 == strcmp(fn, "dayofmonth") ||
-			0 == strcmp(fn, "date")))
+	if (('d' == *fn) && (0 == strcmp(fn, "dayofweek") || 0 == strcmp(fn, "dayofmonth") || 0 == strcmp(fn, "date")))
 		return SUCCEED;
 
 	if (0 == strcmp(fn, "time"))
