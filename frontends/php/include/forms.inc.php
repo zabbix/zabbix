@@ -1176,7 +1176,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['caption'] = _('Discovery rule');
 	}
 	else {
-		$data['caption'] = !empty($data['parent_discoveryid']) ? _('Item prototype') : _('Item');
+		$data['caption'] = ($data['parent_discoveryid'] != 0) ? _('Item prototype') : _('Item');
 	}
 
 	// hostname
@@ -1274,7 +1274,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 			$update_interval_parser = new CUpdateIntervalParser([
 				'usermacros' => true,
-				'lldmacros' => (bool) $data['parent_discoveryid']
+				'lldmacros' => ($data['parent_discoveryid'] != 0)
 			]);
 
 			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
@@ -1349,7 +1349,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
 		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
-			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
+			($data['parent_discoveryid'] != 0 ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
 
@@ -1374,7 +1374,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] === null
+	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
@@ -1396,7 +1396,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// possible host inventories
-	if (empty($data['parent_discoveryid'])) {
+	if ($data['parent_discoveryid'] == 0) {
 		$data['possibleHostInventories'] = getHostInventories();
 
 		// get already populated fields by other items
