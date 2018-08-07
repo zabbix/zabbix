@@ -887,8 +887,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
 	const char			*__function_name = "evaluate_SUM";
 	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -992,8 +991,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
 	const char			*__function_name = "evaluate_AVG";
 	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0;
@@ -1181,8 +1179,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
 	const char			*__function_name = "evaluate_MIN";
 	int				nparams, arg1, i, ret = FAIL, seconds = 0, nvalues = 0;
@@ -1297,8 +1294,7 @@ out:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error)
+static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts, char **error)
 {
 	const char			*__function_name = "evaluate_MAX";
 	int				nparams, arg1, ret = FAIL, i, seconds = 0, nvalues = 0;
