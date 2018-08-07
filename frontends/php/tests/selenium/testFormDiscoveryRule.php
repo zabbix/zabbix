@@ -1696,7 +1696,7 @@ class testFormDiscoveryRule extends CWebTest {
 
 		if (array_key_exists('macro', $data)) {
 			$this->zbxTestTabSwitch('Filters');
-			$this->zbxTestInputType('conditions_0_macro', $data['macro']);
+			$this->zbxTestInputTypeWait('conditions_0_macro', $data['macro']);
 			$this->zbxTestDropdownSelectWait('conditions_0_operator', $data['operator']);
 			$this->zbxTestInputType('conditions_0_value', $data['expression']);
 		}
@@ -1807,15 +1807,6 @@ class testFormDiscoveryRule extends CWebTest {
 			return [
 				[
 					[
-						'name' => 'Rule with macro match',
-						'key' => 'macro-match-key',
-						'macros'=> [
-							['macro' => '{#TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'matches'],
-						]
-					]
-				],
-				[
-					[
 						'name' => 'Rule with macro does not match',
 						'key' => 'macro-doesnt-match-key',
 						'macros'=> [
@@ -1858,15 +1849,15 @@ class testFormDiscoveryRule extends CWebTest {
 				],
 				[
 					[
-						'name' => 'Rule with two macros Custom expression',
-						'key' => 'two-macros-custom-expression-key',
+						'name' => 'Rule with three macros Custom expression',
+						'key' => 'three-macros-custom-expression-key',
 						'calculation' => 'Custom expression',
 						'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
 							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
 							['macro' => '{#TEST_MACRO3}', 'expression' => 'Test expression 3', 'operator' => 'does not match' ]
 						],
-						'formula' => 'A or (B and C)'
+						'formula' => 'not A or not (B and C)'
 					]
 				]
 			];
@@ -1877,15 +1868,15 @@ class testFormDiscoveryRule extends CWebTest {
 	 */
 	public function testFormDiscoveryRule_CreateFiltersMacros($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestTabSwitch('Filters');
 
 		foreach ($data['macros'] as $i => $macro) {
-				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
 				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
-				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
+				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
 
@@ -1894,7 +1885,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if (array_key_exists('formula', $data)) {
-			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
+			$this->zbxTestInputTypeWait('formula', $data['formula']);
 		}
 
 		$this->zbxTestClickWait('add');
@@ -1947,7 +1938,7 @@ class testFormDiscoveryRule extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Rule with extra rgument',
+					'name' => 'Rule with extra argument',
 					'key' => 'macro-extra-argument-key',
 					'macros'=> [
 							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
@@ -1955,7 +1946,7 @@ class testFormDiscoveryRule extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B or C',
-					'error_message' => 'Condition "C" used in formula "A and B or C" for discovery rule "Rule with extra rgument" is not defined'
+					'error_message' => 'Condition "C" used in formula "A and B or C" for discovery rule "Rule with extra argument" is not defined'
 				]
 			],
 			[
@@ -1970,6 +1961,45 @@ class testFormDiscoveryRule extends CWebTest {
 					'formula' => 'Wrong formula',
 					'error_message' => 'Incorrect custom expression "Wrong formula" for discovery rule "Rule with wrong formula": check expression starting from "Wrong formula"'
 				]
+			],
+			[
+				[
+					'name' => 'Check case sensitive of operator in formula',
+					'key' => 'macro-not-in-formula-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula'=> 'A and Not B',
+					'error_message' => 'Incorrect custom expression "A and Not B" for discovery rule "Check case sensitive of operator in formula": check expression starting from "Not B".'
+				]
+			],
+			[
+				[
+					'name' => 'Check case sensitive of first operator in formula',
+					'key' => 'macro-wrong-operator-key',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula'=> 'NOT A and not B',
+					'error_message' => 'Incorrect custom expression "NOT A and not B" for discovery rule "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
+				]
+			],
+			[
+				[
+					'name' => 'Test create with only NOT in formula',
+					'key' => 'macro-not-formula',
+					'macros'=> [
+							['macro' => '{#TEST_MACRO1}', 'expression' => 'Test expression 1', 'operator' => 'matches'],
+							['macro' => '{#TEST_MACRO2}', 'expression' => 'Test expression 2', 'operator' => 'does not match' ],
+					],
+					'calculation' => 'Custom expression',
+					'formula'=> 'not A not B',
+					'error_message' => 'Incorrect custom expression "not A not B" for discovery rule "Test create with only NOT in formula": check expression starting from " not B".'
+				]
 			]
 		];
 	}
@@ -1979,15 +2009,15 @@ class testFormDiscoveryRule extends CWebTest {
 	 */
 	public function testFormDiscoveryRule_FiltersMacrosValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestTabSwitch('Filters');
 
 		foreach ($data['macros'] as $i => $macro) {
-				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
+				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_macro"]', $macro['macro']);
 				$this->zbxTestDropdownSelectWait('conditions_'.$i.'_operator', $macro['operator']);
-				$this->zbxTestInputClearAndTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
+				$this->zbxTestInputTypeByXpath('//*[@id="conditions_'.$i.'_value"]', $macro['expression']);
 				$this->zbxTestClick('macro_add');
 			}
 
@@ -1996,7 +2026,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if (array_key_exists('formula', $data)) {
-			$this->zbxTestInputTypeOverwrite('formula', $data['formula']);
+			$this->zbxTestInputTypeWait('formula', $data['formula']);
 		}
 
 		$this->zbxTestClickWait('add');
