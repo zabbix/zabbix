@@ -21,6 +21,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+#include "mutexs.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
