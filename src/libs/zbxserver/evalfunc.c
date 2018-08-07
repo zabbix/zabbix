@@ -1452,7 +1452,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameter
 
 	if (3 != (nparams = num_param(parameters)))
 	{
-		*error = zbx_strdup(*error, 3 < nparams ? "too many parameters" : "invalid number of parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
@@ -1683,7 +1683,7 @@ static int	evaluate_NODATA(char *value, DC_ITEM *item, const char *parameters, c
 
 	if (1 < num_param(parameters))
 	{
-		*error = zbx_strdup(*error, "too many parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
@@ -2372,13 +2372,13 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 
 	if (5 < (nparams = num_param(parameters)))
 	{
-		*error = zbx_strdup(*error, "too many parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
 	if (3 > nparams)
 	{
-		*error = zbx_strdup(*error, "not enough parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
@@ -2541,13 +2541,13 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 
 	if (4 < (nparams = num_param(parameters)))
 	{
-		*error = zbx_strdup(*error, "too many parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
 	if (3 > nparams)
 	{
-		*error = zbx_strdup(*error, "not enough parameters");
+		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
