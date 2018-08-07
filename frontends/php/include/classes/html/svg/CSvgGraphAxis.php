@@ -93,8 +93,7 @@ class CSvgGraphAxis extends CSvgTag {
 				'text-anchor' => 'end'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM.' text' => [
-				'text-anchor' => 'middle',
-				'dominant-baseline' => 'middle'
+				'text-anchor' => 'middle'
 			]
 		];
 	}
