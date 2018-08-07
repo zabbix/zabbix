@@ -46,11 +46,11 @@ class CRangeParser extends CParser {
 	private $lld_macro_function_parser;
 
 	/**
-	 * Array of ranges.
+	 * Range.
 	 *
 	 * @var array
 	 */
-	private $ranges = [];
+	private $range = [];
 
 	/**
 	 * Options to initialize other parsers.
@@ -61,20 +61,6 @@ class CRangeParser extends CParser {
 		'usermacros' => false,
 		'lldmacros' => false
 	];
-
-	/**
-	 * Source string to parse.
-	 *
-	 * @var string
-	 */
-	private $source;
-
-	/**
-	 * Position in source string.
-	 *
-	 * @var string
-	 */
-	private $pos;
 
 	/**
 	 * @param array $options   An array of options to initialize other parsers.
@@ -110,99 +96,95 @@ class CRangeParser extends CParser {
 	 * @param int    $pos     Position offset.
 	 */
 	public function parse($source, $pos = 0) {
-		$this->source = $source;
-		$this->pos = $pos;
 		$this->length = 0;
 		$this->match = '';
-		$this->ranges = [];
+		$this->range = [];
 
 		// Skip spaces, tabs and new lines.
-		$trim = [' ', "\t", "\n", "\r"];
+		$trim = " \t\n\r";
+		$p = $pos;
 
-		while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
-			$this->pos++;
+		while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
+			$p++;
 		}
 
-		if ($this->parseConstant() === false) {
+		if ($this->parseConstant($source, $p) === false) {
 			return CParser::PARSE_FAIL;
 		}
 
-		while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
-			$this->pos++;
+		while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
+			$p++;
 		}
 
-		if (isset($this->source[$this->pos]) && $this->source[$this->pos] === '-') {
-			$p = $this->pos;
-			$this->pos++;
+		if (isset($source[$p]) && $source[$p] === '-') {
+			$p_tmp = $p;
+			$p++;
 
-			while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
-				$this->pos++;
+			while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
+				$p++;
 			}
 
-			if ($this->parseConstant() === false) {
-				$this->pos = $p;
+			if ($this->parseConstant($source, $p) === false) {
+				$p = $p_tmp;
 			}
 			else {
-				while (isset($this->source[$this->pos]) && in_array($this->source[$this->pos], $trim, true)) {
-					$this->pos++;
+				while (isset($source[$p]) && strpos($trim, $source[$p]) !== false) {
+					$p++;
 				}
 			}
 		}
 
-		if ($pos == $this->pos) {
+		if ($pos == $p) {
 			return self::PARSE_FAIL;
 		}
 
-		$this->length = $this->pos - $pos;
-		$this->match = substr($this->source, $pos, $this->length);
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
 
-		return isset($this->source[$this->pos]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
 	/**
-	 * Retrieve the ranges.
+	 * Retrieve the range.
 	 *
 	 * @return array
 	 */
-	public function getRanges() {
-		return $this->ranges;
+	public function getRange() {
+		return $this->range;
 	}
 
 	/**
 	 * Parse user macro, or LLD macro or digits.
 	 *
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
+	 *
 	 * @return bool
 	 */
-	private function parseConstant() {
-		if ($this->options['usermacros']
-				&& $this->user_macro_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
-			$this->pos += $this->user_macro_parser->getLength();
-			$this->ranges[] = $this->user_macro_parser->getMatch();
-
-			return true;
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
-			$this->pos += $this->lld_macro_parser->getLength();
-			$this->ranges[] = $this->lld_macro_parser->getMatch();
-
-			return true;
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($this->source, $this->pos) != self::PARSE_FAIL) {
-			$this->pos += $this->lld_macro_function_parser->getLength();
-			$this->ranges[] = $this->lld_macro_function_parser->getMatch();
-
-			return true;
-		}
-		elseif (($digits = self::parseDigits($this->source, $this->pos)) !== false) {
-			$this->pos += $digits['pos'];
-			$this->ranges[] = $digits['match'];
+	private function parseConstant($source, &$pos) {
+		if ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->user_macro_parser->getLength();
+			$this->range[] = $this->user_macro_parser->getMatch();
 
 			return true;
 		}
 
-		return false;
+		if ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->lld_macro_parser->getLength();
+			$this->range[] = $this->lld_macro_parser->getMatch();
+
+			return true;
+		}
+
+		if ($this->options['lldmacros']
+				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
+			$pos += $this->lld_macro_function_parser->getLength();
+			$this->range[] = $this->lld_macro_function_parser->getMatch();
+
+			return true;
+		}
+
+		return $this->parseDigits($source, $pos);
 	}
 
 	/**
@@ -213,14 +195,23 @@ class CRangeParser extends CParser {
 	 *
 	 * @return bool|array     Returns false if non-numeric character found else returns array of position and match.
 	 */
-	private static function parseDigits($source, $pos) {
+	private function parseDigits($source, &$pos) {
 		if (!preg_match('/^([0-9]+)/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
-		return [
-			'pos' => strlen($matches[0]),
-			'match' => $matches[0]
-		];
+		if (bccomp($matches[0], ZBX_MAX_INT32) > 0) {
+			return false;
+		}
+
+		// Second value must be greater than or equal to first one.
+		if ($this->range && ctype_digit($this->range[0]) && $this->range[0] > $matches[0]) {
+			return false;
+		}
+
+		$pos += strlen($matches[0]);
+		$this->range[] = $matches[0];
+
+		return true;
 	}
 }

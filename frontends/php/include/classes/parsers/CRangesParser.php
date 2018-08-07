@@ -76,39 +76,35 @@ class CRangesParser extends CParser {
 		$this->match = '';
 		$this->ranges = [];
 
-		$ranges = [];
 		$p = $pos;
 
-		while (isset($source[$p])) {
-			if ($this->range_parser->parse($source, $p) != self::PARSE_FAIL) {
-				if ($ranges && $source[$p - 1] !== ',') {
-					break;
-				}
-
-				$p += $this->range_parser->getLength();
-				$ranges[] = $this->range_parser->getRanges();
-			}
-			elseif ($source[$p] === ',' && $p != $pos && isset($source[$p - 1]) && $source[$p - 1] !== ',') {
-				$p++;
-			}
-			else {
+		while (true) {
+			if ($this->range_parser->parse($source, $p) == self::PARSE_FAIL) {
 				break;
 			}
+
+			$p += $this->range_parser->getLength();
+			$this->ranges[] = $this->range_parser->getRange();
+
+			if (!isset($source[$p]) || $source[$p] !== ',') {
+				break;
+			}
+
+			$p++;
 		}
 
 		if ($p == $pos) {
 			return self::PARSE_FAIL;
 		}
 
-		if (isset($source[$p - 1]) && $source[$p - 1] === ',') {
+		if ($source[$p - 1] === ',') {
 			$p--;
 		}
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
-		$this->ranges = $ranges;
 
-		return (isset($source[$p])) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
 
 	/**

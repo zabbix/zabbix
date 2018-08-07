@@ -32,7 +32,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '0',
-					'ranges' => ['0']
+					'range' => ['0']
 				]
 			],
 			[
@@ -40,7 +40,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -48,7 +48,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '123456789',
-					'ranges' => ['123456789']
+					'range' => ['123456789']
 				]
 			],
 			[
@@ -56,7 +56,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '200-300',
-					'ranges' => ['200', '300']
+					'range' => ['200', '300']
 				]
 			],
 			[
@@ -64,7 +64,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    123   ',
-					'ranges' => ['123']
+					'range' => ['123']
 				]
 			],
 			[
@@ -72,7 +72,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    234',
-					'ranges' => ['234']
+					'range' => ['234']
 				]
 			],
 			[
@@ -80,7 +80,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '345  ',
-					'ranges' => ['345']
+					'range' => ['345']
 				]
 			],
 			[
@@ -88,7 +88,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '456-457  ',
-					'ranges' => ['456', '457']
+					'range' => ['456', '457']
 				]
 			],
 			[
@@ -96,7 +96,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  567-568  ',
-					'ranges' => ['567', '568']
+					'range' => ['567', '568']
 				]
 			],
 			[
@@ -104,7 +104,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    678-679',
-					'ranges' => ['678', '679']
+					'range' => ['678', '679']
 				]
 			],
 			[
@@ -112,7 +112,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    789  -  800  ',
-					'ranges' => ['789', '800']
+					'range' => ['789', '800']
 				]
 			],
 			[
@@ -120,7 +120,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    800-   850  ',
-					'ranges' => ['800', '850']
+					'range' => ['800', '850']
 				]
 			],
 			[
@@ -128,7 +128,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '    850   -900  ',
-					'ranges' => ['850', '900']
+					'range' => ['850', '900']
 				]
 			],
 			[
@@ -136,7 +136,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -144,7 +144,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}  -100  ',
-					'ranges' => ['{$M}', '100']
+					'range' => ['{$M}', '100']
 				]
 			],
 			[
@@ -152,7 +152,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  100-{$M}  ',
-					'ranges' => ['100', '{$M}']
+					'range' => ['100', '{$M}']
 				]
 			],
 			[
@@ -160,7 +160,15 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   100   -   {$M}   ',
-					'ranges' => ['100', '{$M}']
+					'range' => ['100', '{$M}']
+				]
+			],
+			[
+				"\r\n\t 100\r\n\t - \r\n\t 200 \r\n\t ", 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => "\r\n\t 100\r\n\t - \r\n\t 200 \r\n\t ",
+					'range' => ['100', '200']
 				]
 			],
 			[
@@ -168,7 +176,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M.A}-  {$M.B}',
-					'ranges' => ['{$M.A}', '{$M.B}']
+					'range' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -176,7 +184,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {$M.A}   -   {$M.B}   ',
-					'ranges' => ['{$M.A}', '{$M.B}']
+					'range' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -184,7 +192,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M}',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -192,7 +200,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M}   ',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -200,7 +208,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {#M}-100  ',
-					'ranges' => ['{#M}', '100']
+					'range' => ['{#M}', '100']
 				]
 			],
 			[
@@ -208,7 +216,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100-   {#M}',
-					'ranges' => ['100', '{#M}']
+					'range' => ['100', '{#M}']
 				]
 			],
 			[
@@ -216,7 +224,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M.A}   -   {#M.B}',
-					'ranges' => ['{#M.A}', '{#M.B}']
+					'range' => ['{#M.A}', '{#M.B}']
 				]
 			],
 			[
@@ -224,7 +232,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M.A}   -   {#M.B}   ',
-					'ranges' => ['{#M.A}', '{#M.B}']
+					'range' => ['{#M.A}', '{#M.B}']
 				]
 			],
 			[
@@ -232,7 +240,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {$M}  -{#M}',
-					'ranges' => ['{$M}', '{#M}']
+					'range' => ['{$M}', '{#M}']
 				]
 			],
 			[
@@ -240,7 +248,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#M}-  {$M}  ',
-					'ranges' => ['{#M}', '{$M}']
+					'range' => ['{#M}', '{$M}']
 				]
 			],
 			[
@@ -248,7 +256,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '   {#M}   -   {$M}   ',
-					'ranges' => ['{#M}', '{$M}']
+					'range' => ['{#M}', '{$M}']
 				]
 			],
 			[
@@ -256,7 +264,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -264,7 +272,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}-100',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '100']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '100']
 				]
 			],
 			[
@@ -272,7 +280,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '100-{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'ranges' => ['100', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['100', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -281,7 +289,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => ' {{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}-{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}',
-					'ranges' => [
+					'range' => [
 						'{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}',
 						'{{#M.B}.regsub("^([0-9]+)", "{#M.B}: \1")}'
 					]
@@ -292,7 +300,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}-   {{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'ranges' => ['{$M}', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['{$M}', '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -300,7 +308,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '  {{#M}.regsub("^([0-9]+)", "{#M}: \1")}  -  {$M}  ',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', '{$M}']
 				]
 			],
 			// partial success
@@ -309,7 +317,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0',
-					'ranges' => ['0']
+					'range' => ['0']
 				]
 			],
 			[
@@ -317,7 +325,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '200   ',
-					'ranges' => ['200']
+					'range' => ['200']
 				]
 			],
 			[
@@ -325,7 +333,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '300',
-					'ranges' => ['300']
+					'range' => ['300']
 				]
 			],
 			[
@@ -333,7 +341,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '400',
-					'ranges' => ['400']
+					'range' => ['400']
 				]
 			],
 			[
@@ -341,7 +349,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '500',
-					'ranges' => ['500']
+					'range' => ['500']
 				]
 			],
 			[
@@ -349,7 +357,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '600',
-					'ranges' => ['600']
+					'range' => ['600']
 				]
 			],
 			[
@@ -357,7 +365,15 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '700- 800  ',
-					'ranges' => ['700', '800']
+					'range' => ['700', '800']
+				]
+			],
+			[
+				'700-600', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '700',
+					'range' => ['700']
 				]
 			],
 			[
@@ -365,7 +381,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '800 ',
-					'ranges' => ['800']
+					'range' => ['800']
 				]
 			],
 			[
@@ -373,7 +389,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  100  -  200  ',
-					'ranges' => ['100', '200']
+					'range' => ['100', '200']
 				]
 			],
 			[
@@ -381,7 +397,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  100  -  200  ',
-					'ranges' => ['100', '200']
+					'range' => ['100', '200']
 				]
 			],
 			[
@@ -389,7 +405,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -397,7 +413,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '123-456',
-					'ranges' => ['123', '456']
+					'range' => ['123', '456']
 				]
 			],
 			[
@@ -405,7 +421,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '123',
-					'ranges' => ['123']
+					'range' => ['123']
 				]
 			],
 			[
@@ -413,7 +429,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0',
-					'ranges' => ['0']
+					'range' => ['0']
 				]
 			],
 			[
@@ -421,7 +437,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100  ',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -429,7 +445,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -437,7 +453,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -445,7 +461,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M} ',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -453,7 +469,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M} ',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -461,7 +477,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -469,7 +485,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M.A}  - {$M.B}     ',
-					'ranges' => ['{$M.A}', '{$M.B}']
+					'range' => ['{$M.A}', '{$M.B}']
 				]
 			],
 			[
@@ -477,7 +493,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -485,7 +501,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -493,7 +509,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M} ',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -501,7 +517,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '  {$M}  -{#M.A}',
-					'ranges' => ['{$M}', '{#M.A}']
+					'range' => ['{$M}', '{#M.A}']
 				]
 			],
 			[
@@ -509,7 +525,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -517,7 +533,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -525,7 +541,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")} ',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -533,7 +549,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}',
-					'ranges' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
+					'range' => ['{{#M}.regsub("^([0-9]+)", "{#M}: \1")}']
 				]
 			],
 			[
@@ -542,7 +558,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}-{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}',
-					'ranges' => ['{$M}', '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}']
+					'range' => ['{$M}', '{{#M.A}.regsub("^([0-9]+)", "{#M.A}: \1")}']
 				]
 			],
 			[
@@ -550,7 +566,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -558,7 +574,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			[
@@ -566,7 +582,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}',
-					'ranges' => ['{$M}']
+					'range' => ['{$M}']
 				]
 			],
 			[
@@ -574,7 +590,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{#M}',
-					'ranges' => ['{#M}']
+					'range' => ['{#M}']
 				]
 			],
 			[
@@ -582,7 +598,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '100',
-					'ranges' => ['100']
+					'range' => ['100']
 				]
 			],
 			// fail
@@ -591,7 +607,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -599,7 +615,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -607,7 +623,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -615,7 +631,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -623,7 +639,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -631,7 +647,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -639,7 +655,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -647,7 +663,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -655,7 +671,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -663,7 +679,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -671,7 +687,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -679,7 +695,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			// User macros are not enabled.
@@ -688,7 +704,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -696,7 +712,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			// LLD macros are not enabled.
@@ -705,7 +721,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -713,7 +729,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -721,7 +737,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			],
 			[
@@ -729,7 +745,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'ranges' => []
+					'range' => []
 				]
 			]
 		];
@@ -749,7 +765,7 @@ class CRangeParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'ranges' => $parser->getRanges(),
+			'range' => $parser->getRange(),
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}
