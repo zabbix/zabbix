@@ -140,7 +140,7 @@ else {
 }
 
 $expression_form_list->addRow(
-	(new CLabel(_('N'), 'value'))->setAsteriskMark(), [
+	(new CLabel(_('Result'), 'value'))->setAsteriskMark(), [
 		new CComboBox('operator', $data['operator'], null,
 			array_combine($data['functions'][$data['function']]['operators'],
 				$data['functions'][$data['function']]['operators']
