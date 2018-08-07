@@ -1280,7 +1280,7 @@
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashboard.widget.edit');
-				url.setArgument('dashboardid', data.dashboard['id']);
+				url.setArgument('dashboardid', data.dashboard['id'] || 0);
 
 				if (form.length) {
 					// Take values from form.
