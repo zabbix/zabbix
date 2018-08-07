@@ -111,7 +111,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Min value on left Y axis.
 		$field_left_y_min = (new CWidgetFieldTextBox('lefty_min', _('Min')))
-			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('placeholder', _('calculated'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_left_y_min->setFlags(CWidgetField::FLAG_DISABLED);
@@ -123,7 +123,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Max value on left Y axis.
 		$field_left_y_max = (new CWidgetFieldTextBox('lefty_max', _('Max')))
-			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('placeholder', _('calculated'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_left_y_max->setFlags(CWidgetField::FLAG_DISABLED);
@@ -152,7 +152,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Static units on left Y axis.
 		$field_left_y_static_units = (new CWidgetFieldTextBox('lefty_static_units', null))
-			->setAttribute('placeholder', _('(value)'))
+			->setAttribute('placeholder', _('value'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW
 				|| $field_left_y_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
@@ -179,7 +179,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Min value on right Y axis.
 		$field_right_y_min = (new CWidgetFieldTextBox('righty_min', _('Min')))
-			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('placeholder', _('calculated'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_right_y_min->setFlags(CWidgetField::FLAG_DISABLED);
@@ -191,7 +191,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Max value on right Y axis.
 		$field_right_y_max = (new CWidgetFieldTextBox('righty_max', _('Max')))
-			->setAttribute('placeholder', _('(calculated)'))
+			->setAttribute('placeholder', _('calculated'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
 			$field_right_y_max->setFlags(CWidgetField::FLAG_DISABLED);
@@ -220,7 +220,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Static units on right Y axis.
 		$field_right_y_static_units = (new CWidgetFieldTextBox('righty_static_units', null))
-			->setAttribute('placeholder', _('(value)'))
+			->setAttribute('placeholder', _('value'))
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW
 				|| $field_right_y_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
@@ -307,7 +307,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Problem name input-text field.
 		$field_problem_name = (new CWidgetFieldTextBox('problem_name', _('Problem')))
-			->setAttribute('placeholder', _('(problem pattern)'));
+			->setAttribute('placeholder', _('problem pattern'));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_name->setFlags(CWidgetField::FLAG_DISABLED);
 		}

@@ -92,7 +92,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';'),
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
-							->setAttribute('placeholder', _('(hosts pattern)'))
+							->setAttribute('placeholder', _('hosts pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -111,7 +111,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
-							->setAttribute('placeholder', _('(items pattern)'))
+							->setAttribute('placeholder', _('items pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -248,7 +248,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							)
 							->addRow(_('Time shift'),
 								(new CTextBox($fn.'['.$options['row_num'].'][timeshift]', $value['timeshift']))
-									->setAttribute('placeholder', _('(none)'))
+									->setAttribute('placeholder', _('none'))
 									->setAttribute('maxlength', 10)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -311,13 +311,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
 				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Hosts pattern'), _('Data set'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('hosts pattern'), _('Data set'),
 						_('cannot be empty')
 					);
 					break;
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Items pattern'), _('Data set'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('items pattern'), _('Data set'),
 						_('cannot be empty')
 					);
 					break;

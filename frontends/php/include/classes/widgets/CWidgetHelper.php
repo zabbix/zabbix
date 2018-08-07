@@ -142,7 +142,7 @@ class CWidgetHelper {
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->setAttribute('placeholder', _('(hosts pattern)'))
+				->setAttribute('placeholder', _('hosts pattern'))
 				->addClass(ZBX_STYLE_PATTERNSELECT),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton($field->getName().'_select', _('Select')))

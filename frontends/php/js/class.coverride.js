@@ -39,7 +39,7 @@ jQuery(function ($) {
 		if (option === 'color') {
 			var id = field_name.replace(/\]/g, '_').replace(/\[/g, '_'),
 				input = $('<input>')
-					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id})
+					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('color')})
 					.val(value);
 
 			return $('<div></div>')
@@ -49,7 +49,14 @@ jQuery(function ($) {
 		}
 		else if (option === 'timeshift') {
 			return $('<div></div>')
-				.append($('<input>', {'name': field_name, 'maxlength': 10, 'type': 'text'}).val(value))
+				.append($('<input>', {
+						'name': field_name,
+						'maxlength': 10,
+						'type': 'text',
+						'placeholder': t('time shift')
+					})
+					.val(value)
+				)
 				.append(close);
 		}
 		else {

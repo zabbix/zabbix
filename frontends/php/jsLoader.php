@@ -108,7 +108,9 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'Add a new widget' => _('Add a new widget')
+		'Add a new widget' => _('Add a new widget'),
+		'color' => _('color'),
+		'time shift' => _('time shift'),
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
