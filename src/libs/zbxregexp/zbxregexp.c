@@ -80,6 +80,46 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 	return regexp_compile(pattern, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, regexp, error);
 }
 
+/****************************************************************************************************
+ *                                                                                                  *
+ * Function: regexp_prepare                                                                         *
+ *                                                                                                  *
+ * Purpose: wrapper for zbx_regexp_compile. Caches and reuses the last used regexp.                 *
+ *                                                                                                  *
+ ****************************************************************************************************/
+static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, const char **error)
+{
+	ZBX_THREAD_LOCAL static zbx_regexp_t	*curr_regexp = NULL;
+	ZBX_THREAD_LOCAL static char		*curr_pattern = NULL;
+	ZBX_THREAD_LOCAL static int		curr_flags = 0;
+
+	int	ret = SUCCEED;
+
+	if (NULL == curr_regexp || 0 != strcmp(curr_pattern, pattern) || curr_flags != flags)
+	{
+		if(NULL != curr_regexp)
+		{
+			zbx_regexp_free(curr_regexp);
+			zbx_free(curr_pattern);
+		}
+
+		curr_regexp = NULL;
+		curr_pattern = NULL;
+		curr_flags = 0;
+
+		if (SUCCEED == regexp_compile(pattern, flags, &curr_regexp, error))
+		{
+			curr_pattern = zbx_strdup(curr_pattern, pattern);
+			curr_flags = flags;
+		}
+		else
+			ret = FAIL;
+	}
+
+	*regexp = curr_regexp;
+	return ret;
+}
+
 /***********************************************************************************
  *                                                                                 *
  * Function: regexp_exec                                                           *
@@ -207,7 +247,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	if (NULL != len)
 		*len = FAIL;
 
-	regexp_compile(pattern, flags, &regexp, &error);
+	regexp_prepare(pattern, flags, &regexp, &error);
 
 	if (NULL != regexp && NULL != string)
 	{
@@ -361,7 +401,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 	if (NULL == output_template || '\0' == *output_template)
 		flags |= PCRE_NO_AUTO_CAPTURE;
 
-	if (FAIL == regexp_compile(pattern, flags, &regexp, &error))
+	if (FAIL == regexp_prepare(pattern, flags, &regexp, &error))
 		return FAIL;
 
 	zbx_free(*out);
