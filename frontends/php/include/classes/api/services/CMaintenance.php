@@ -266,8 +266,12 @@ class CMaintenance extends CApiService {
 		$hostids = [];
 		$groupids = [];
 		foreach ($maintenances as $maintenance) {
-			$hostids = array_merge($hostids, $maintenance['hostids']);
-			$groupids = array_merge($groupids, $maintenance['groupids']);
+			if (array_key_exists('hostids', $maintenance)) {
+				$hostids = array_merge($hostids, $maintenance['hostids']);
+			}
+			if (array_key_exists('groupids', $maintenance)) {
+				$groupids = array_merge($groupids, $maintenance['groupids']);
+			}
 		}
 
 		// validate hosts & groups
@@ -403,17 +407,22 @@ class CMaintenance extends CApiService {
 		$insertGroups = [];
 		$ins_tags = [];
 		foreach ($maintenances as $mnum => $maintenance) {
-			foreach ($maintenance['hostids'] as $hostid) {
-				$insertHosts[] = [
-					'hostid' => $hostid,
-					'maintenanceid' => $maintenanceids[$mnum]
-				];
+			if (array_key_exists('hostids', $maintenance)) {
+				foreach ($maintenance['hostids'] as $hostid) {
+					$insertHosts[] = [
+						'hostid' => $hostid,
+						'maintenanceid' => $maintenanceids[$mnum]
+					];
+				}
 			}
-			foreach ($maintenance['groupids'] as $groupid) {
-				$insertGroups[] = [
-					'groupid' => $groupid,
-					'maintenanceid' => $maintenanceids[$mnum]
-				];
+
+			if (array_key_exists('groupids', $maintenance)) {
+				foreach ($maintenance['groupids'] as $groupid) {
+					$insertGroups[] = [
+						'groupid' => $groupid,
+						'maintenanceid' => $maintenanceids[$mnum]
+					];
+				}
 			}
 
 			if (array_key_exists('tags', $maintenance)) {
