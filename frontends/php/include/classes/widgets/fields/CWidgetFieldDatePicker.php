@@ -68,7 +68,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	 * @param string|null to
 	 */
 	static function validateTimeSelectorPeriod($from, $to) {
-		if ($from === null || $to == null) {
+		if ($from === null || $to === null) {
 			return;
 		}
 
