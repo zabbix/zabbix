@@ -1106,7 +1106,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
+			GROUP_GUI_ACCESS_DISABLED => null
 		];
 
 		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {

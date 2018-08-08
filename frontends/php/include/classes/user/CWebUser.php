@@ -224,6 +224,20 @@ class CWebUser {
 	}
 
 	/**
+	 * Return true if guest user has access to frontend.
+	 *
+	 * @return bool
+	 */
+	public static function isGuestAllowed() {
+		$guest = DB::select('users', [
+			'output' => ['userid'],
+			'filter' => ['alias' => ZBX_GUEST_USER]
+		]);
+
+		return getUserGuiAccess($guest[0]['userid']) != GROUP_GUI_ACCESS_DISABLED;
+	}
+
+	/**
 	 * Returns refresh rate in seconds.
 	 *
 	 * @return int

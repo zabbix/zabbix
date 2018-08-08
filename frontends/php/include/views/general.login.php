@@ -29,8 +29,8 @@ $message = trim(preg_replace('/\[.*\]/', '', $message));
 require_once dirname(__FILE__).'/../page_header.php';
 
 $error = ($message !== '') ? (new CDiv($message))->addClass(ZBX_STYLE_RED) : null;
-$guest = $data['guest_login']
-	? (new CListItem(['or ', new CLink('sign in as guest', ZBX_DEFAULT_URL)]))
+$guest = $data['guest_login_enabled']
+	? (new CListItem(['or ', new CLink('sign in as guest', $data['guest_login_url'])]))
 		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 $http_login_link = $data['http_auth_enabled']

@@ -36,15 +36,22 @@ $fields = [
 	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
-	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null]
+	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
+	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,			null]
 ];
 check_fields($fields);
 
 $config = select_config();
 $http_user = '';
 
+if (hasRequest('guest_login')) {
+	CWebUser::login(ZBX_GUEST_USER, '');
+	redirect(ZBX_DEFAULT_URL);
+	exit;
+}
+
 // logout
-if (isset($_REQUEST['reconnect'])) {
+if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
 }
 elseif ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $config['http_login_form'] == ZBX_AUTH_FORM_ZABBIX) {
@@ -74,9 +81,7 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 		}
 	}
 
-	DBstart();
 	$loginSuccess = CWebUser::login(getRequest('name', $http_user), getRequest('password', ''));
-	DBend(true);
 
 	if ($loginSuccess) {
 		// save remember login preference
@@ -109,10 +114,6 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 		redirect($url);
 		exit;
 	}
-	// login failed, fall back to a guest account
-	else {
-		CWebUser::checkAuthentication(null);
-	}
 
 	if (getRequest('name', $http_user) === $http_user) {
 		// Remove error messages for invalid SSO login attempt.
@@ -137,7 +138,8 @@ if (!CWebUser::isLoggedIn() || CWebUser::isGuest()) {
 			$data = [
 				'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
 				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid'),
-				'guest_login' => (!CWebUser::isLoggedIn() || CWebUser::isGuest())
+				'guest_login_url' => (new CUrl())->setArgument('guest_login', 1),
+				'guest_login_enabled' => !CWebUser::isLoggedIn() && CWebUser::isGuestAllowed()
 			];
 
 			$loginForm = new CView('general.login', $data);
