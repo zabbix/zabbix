@@ -918,7 +918,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = (new CLinkAction($host_name))
 				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
-			$columns = [(new CCol($name, true))->addClass(ZBX_STYLE_NOWRAP)];
+			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(

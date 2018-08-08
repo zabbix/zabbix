@@ -21,8 +21,10 @@
 
 class CCol extends CTag {
 
-	public function __construct($item = null, $is_heading = false) {
-		parent::__construct($is_heading ? 'th' : 'td', true);
+	protected $tag = 'td';
+
+	public function __construct($item = null) {
+		parent::__construct($this->tag, true);
 		$this->addItem($item);
 	}
 

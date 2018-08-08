@@ -1156,7 +1156,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 			$name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
 
-			$tableRow = [(new CCol($name, true))->addClass(ZBX_STYLE_NOWRAP)];
+			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
 					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
