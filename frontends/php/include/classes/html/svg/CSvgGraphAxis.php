@@ -58,6 +58,13 @@ class CSvgGraphAxis extends CSvgTag {
 	private $arrow_offset = 5;
 
 	/**
+	 * Color for axis and labels.
+	 *
+	 * @var string
+	 */
+	private $color = '#787878';
+
+	/**
 	 * Axis container.
 	 *
 	 * @var CSvgGroup
@@ -78,11 +85,11 @@ class CSvgGraphAxis extends CSvgTag {
 	public function getStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' path' => [
-				'stroke' => 'silver',
-				'fill' => 'white'
+				'stroke' => $this->color,
+				'fill' => 'transparent'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
-				'fill' => 'silver',
+				'fill' => $this->color,
 				'font-size' => '11px',
 				'alignment-baseline' => 'middle'
 			],

@@ -59,6 +59,20 @@ class CSvgGraph extends CSvg {
 
 	protected $legend_type;
 
+	/**
+	 * Count of lines used to show legend
+	 *
+	 * @var int
+	 */
+	protected $legend_lines = 2;
+
+	/**
+	 * Height of one line.
+	 *
+	 * @var int
+	 */
+	protected $legend_line_height = 20;
+
 	protected $left_y_max;
 	protected $left_y_min;
 	protected $left_y_show;
@@ -317,7 +331,7 @@ class CSvgGraph extends CSvg {
 		}
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
-		$approx_width = 8;
+		$approx_width = 10;
 
 		if ($this->left_y_show && $this->left_y_min) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
@@ -340,76 +354,86 @@ class CSvgGraph extends CSvg {
 		$legend_line = 1;
 
 		if ($this->metrics) {
-			$legend_offset_left = 0;
-			$total_width = 0;
-			$allowed_lines = 3;
+			// $legend_offset_left = 0;
+			// $total_width = 0;
+			// $allowed_lines = 3;
 			foreach ($this->metrics as &$metric) {
 				$metric['legend']['text'] = sprintf('%s: %s', $metric['host']['name'], $metric['name']);
-				$metric['legend']['width'] = imageTextSize(13, 0, $metric['legend']['text'], 'arial')['width'];
-				$total_width += $metric['legend']['width'] + 10;
+				// $metric['legend']['width'] = imageTextSize(13, 0, $metric['legend']['text'], 'arial')['width'];
+				// $total_width += $metric['legend']['width'] + 10;
 			}
 
-			$shortening_rate = $allowed_lines / ($total_width / $this->canvas_width);
+			// $shortening_rate = $allowed_lines / ($total_width / $this->canvas_width);
 
-			foreach ($this->metrics as &$metric) {
-				if ($shortening_rate < 1) {
-					$metric['legend']['width'] *= $shortening_rate;
-				}
+			// foreach ($this->metrics as &$metric) {
+			// 	if ($shortening_rate < 1) {
+			// 		$metric['legend']['width'] *= $shortening_rate;
+			// 	}
 
-				if ($legend_offset_left + $metric['legend']['width'] > $this->canvas_width) {
-					$legend_offset_left = 0;
-					$legend_line++;
-				}
+			// 	if ($legend_offset_left + $metric['legend']['width'] > $this->canvas_width) {
+			// 		$legend_offset_left = 0;
+			// 		$legend_line++;
+			// 	}
 
-				$metric['legend']['offset_left'] = floor($legend_offset_left);
-				$metric['legend']['offset_top'] = $legend_line * 20;
-				$legend_offset_left = $legend_offset_left + $metric['legend']['width'];
-			}
+			// 	$metric['legend']['offset_left'] = floor($legend_offset_left);
+			// 	$metric['legend']['offset_top'] = $legend_line * 20;
+			// 	$legend_offset_left = $legend_offset_left + $metric['legend']['width'];
+			// }
 		}
 
 		// Now, once the number of lines in legend is know, calculate also the bottom offsets and canvas height.
-		$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 * $legend_line : 20;
+		//$this->offset_bottom = ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) ? 40 * $legend_line : 20;
+		$this->offset_bottom = $this->legend_line_height * $this->legend_lines + 20 /* xaxis height */;
 		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
 
 		unset($metric, $legend_left_offset, $legend_line);
 	}
 
 	private function drawLegend() {
-		if ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) {
-			foreach ($this->metrics as $i => $metric) {
-				$this->drawMetricLegend($i);
-			}
+		$legend = (new CSvgGraphLegend())
+			->setSize($this->canvas_width, 40)
+			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height + 20/* X axis container height */);
+
+		foreach ($this->metrics as $metric) {
+			$legend->addLabel($metric['legend']['text'], $metric['options']['color']);
 		}
+
+		$this->addItem($legend);
+		// if ($this->legend_type == SVG_GRAPH_LEGEND_TYPE_SHORT) {
+		// 	foreach ($this->metrics as $i => $metric) {
+		// 		$this->drawMetricLegend($i);
+		// 	}
+		// }
 	}
 
-	private function drawMetricLegend($metric_num) {
-		$metric = $this->metrics[$metric_num];
-		$options = $metric['options'];
+	// private function drawMetricLegend($metric_num) {
+	// 	$metric = $this->metrics[$metric_num];
+	// 	$options = $metric['options'];
 
-		$x1 = $metric['legend']['offset_left'] + $this->canvas_x;
-		$y1 = $metric['legend']['offset_top'] + $this->canvas_y + $this->canvas_height + 10;
-		$x2 = $x1 + 10;
-		$y2 = $y1;
+	// 	$x1 = $metric['legend']['offset_left'] + $this->canvas_x;
+	// 	$y1 = $metric['legend']['offset_top'] + $this->canvas_y + $this->canvas_height + 10;
+	// 	$x2 = $x1 + 10;
+	// 	$y2 = $y1;
 
-		$this->addItem(
-			(new CSvgGroup())
-				->addItem([
-					(new CSvgLine($x1, $y1 + 1, $x2, $y2 + 1, $options['color']))
-						->setStrokeWidth(4),
-					(new CSvgTag('foreignObject'))
-						->setAttribute('x', $x2 + 6)
-						//->setAttribute('y', $y2 + 6)
-						->setAttribute('y', $y2 - 6)
-						->setAttribute('width', $metric['legend']['width'] - 20)
-						->setAttribute('height', 20)
-						->addItem(
-							(new CDiv($metric['legend']['text']))
-								->setAttribute('xmlns', 'http://www.w3.org/1999/xhtml')
-								->addClass('graph-legend')
-						)
-				])
-		);
-	}
+	// 	$this->addItem(
+	// 		(new CSvgGroup())
+	// 			->addItem([
+	// 				(new CSvgLine($x1, $y1 + 1, $x2, $y2 + 1, $options['color']))
+	// 					->setStrokeWidth(4),
+	// 				(new CSvgTag('foreignObject'))
+	// 					->setAttribute('x', $x2 + 6)
+	// 					//->setAttribute('y', $y2 + 6)
+	// 					->setAttribute('y', $y2 - 6)
+	// 					->setAttribute('width', $metric['legend']['width'] - 20)
+	// 					->setAttribute('height', 20)
+	// 					->addItem(
+	// 						(new CDiv($metric['legend']['text']))
+	// 							->setAttribute('xmlns', 'http://www.w3.org/1999/xhtml')
+	// 							->addClass('graph-legend')
+	// 					)
+	// 			])
+	// 	);
+	// }
 
 	/**
 	 * Render Y axis with labels for left side of graph.
@@ -524,6 +548,7 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	public function getTimeGridWithPosition() {
+		// TODO: copy/extend logic from CLineGraphDraw.
 		$formats = [
 			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
 			['sec' => 60,	'step' => 30,	'time_fmt' => 'H:i:s'],
@@ -533,6 +558,7 @@ class CSvgGraph extends CSvg {
 			['sec' => 3600,	'step' => 1200,	'time_fmt' => 'H:i'],
 			['sec' => 7200,	'step' => 3600,	'time_fmt' => 'H:i'],
 			['sec' => 14400,'step' => 7200,	'time_fmt' => 'H:i'],
+			['sec' => 86400,'step' => 43200,'time_fmt' => 'H:i']
 		];
 
 		$step = 6 * 30 * 24 * 3600;

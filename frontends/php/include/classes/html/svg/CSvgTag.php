@@ -38,6 +38,8 @@ class CSvgTag extends CTag {
 	const ZBX_STYLE_SVG_GRAPH_LINE = 'svg-graph-line';
 	const ZBX_STYLE_SVG_GRAPH_POINTS = 'svg-graph-points';
 
+	const ZBX_STYLE_GRAPH_LEGEND = 'svg-graph-legend';
+
 	/**
 	 * SVG styles array.
 	 */
