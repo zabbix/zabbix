@@ -272,8 +272,6 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 #define ZBX_VECTOR_DECL(__id, __type)										\
 														\
-typedef void (*zbx_clean_type_ ## __id ## _func_t)(__type *data);							\
-														\
 typedef struct													\
 {														\
 	__type			*values;									\
