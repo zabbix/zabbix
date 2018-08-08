@@ -30,6 +30,26 @@ jQuery(function ($) {
 
 	var min_period = 60; // Minimal period in seconds to zoom in.
 
+	function SBoxKeyboardInteraction(e) {
+		if (e.keyCode == 27) {
+			destroySBox(e);
+		}
+	}
+
+	function destroySBox(e, graph) {
+		var graph = graph || e.data.graph;
+		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
+		$('.svg-graph-selection-text', graph).text('');
+		graph.data('graph').boxing = false;
+	}
+
+	function destroyHintbox(graph) {
+		var hbox = graph.data('hintbox');
+		graph.removeData('hintbox');
+		$(hbox).remove();
+		hideHelper(graph)
+	}
+
 	function startSBoxDrag(e) {
 		var graph = $(this),
 			data = graph.data('graph'),
@@ -38,6 +58,9 @@ jQuery(function ($) {
 
 		if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
+			$(document).on('keydown', {graph: graph}, SBoxKeyboardInteraction);
+			$(document).on('mouseup', {graph: graph}, destroySBox);
+
 			e.stopPropagation();
 			data.start = e.offsetX - data.dimX;
 			data.boxing = true;
@@ -60,7 +83,7 @@ jQuery(function ($) {
 			sbox = $('.svg-graph-selection', $(this)),
 			stxt = $('.svg-graph-selection-text', $(this));
 
-		if (data.boxing && (e.offsetX - data.dimX) > 0 /*&& e.offsetX < data.dimW*/) {
+		if (data.boxing && (e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
 			e.stopPropagation();
 
 			data.end = e.offsetX - data.dimX;
@@ -84,21 +107,24 @@ jQuery(function ($) {
 	function endSBoxDrag(e) {
 		var data = $(this).data('graph');
 		e.stopPropagation();
-		data.end = e.offsetX - data.dimX;
-		data.boxing = false;
 
-		$('.svg-graph-selection', $(this)).attr({'width': 0, 'height': 0});
-		$('.svg-graph-selection-text', $(this)).text('');
+		if (data.boxing) {
+			data.end = e.offsetX - data.dimX;
 
-		var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
-			from_offset = Math.floor(data.start) * data.spp,
-			to_offset = Math.floor(data.end) * data.spp;
+			$(document).off('keydown', SBoxKeyboardInteraction);
+			$(document).off('mouseup',destroySBox);
+			destroySBox(null, $(this))
 
-		if (seconds > min_period && (from_offset > 0 || to_offset > 0)) {
-			$.publish('timeselector.rangeoffset', {
-				from_offset: Math.ceil(from_offset),
-				to_offset: Math.ceil(to_offset)
-			});
+			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
+				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
+				to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
+
+			if (seconds > min_period && (from_offset > 0 || to_offset > 0)) {
+				$.publish('timeselector.rangeoffset', {
+					from_offset: Math.ceil(from_offset),
+					to_offset: Math.ceil(to_offset)
+				});
+			}
 		}
 	}
 
@@ -359,9 +385,8 @@ jQuery(function ($) {
 
 			// TODO miks: remove this before going into production.
 			// ---<--- testing data:
-			options.values = true;
-			options.problems = true;
-			options.sbox = false;
+			options.values = false;
+			options.problems = false;
 			// --->--- testing data.
 
 			this.each(function() {
@@ -398,22 +423,9 @@ jQuery(function ($) {
 				if (options.values || options.problems || options.sbox) {
 					graph
 						.data('graph', graph_data)
-						.on('mouseout', function() {
-							var graph = $(this),
-								data = graph.data('graph'),
-								line = graph.find('.svg-value-box'),
-								hbox = (options.values || options.problems) ? graph.data('hintbox') : false;
-
-							if (hbox) {
-								graph.removeData('hintbox');
-								$(hbox).remove();
-								hideHelper(graph)
-							}
-
-							if (options.sbox) {
-								data.boxing = false;
-								$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
-								$('.svg-graph-selection-text', graph).text('');
+						.on('mouseleave', function() {
+							if (options.values || options.problems) {
+								destroyHintbox($(this));
 							}
 						});
 				}
