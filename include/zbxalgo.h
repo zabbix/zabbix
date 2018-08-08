@@ -318,9 +318,9 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 														\
 ZBX_VECTOR_DECL(__id, __type);											\
 														\
-typedef void (*zbx_clean_ ## __id ## _func_t)(__type data);							\
+typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
-void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_clean_  ## __id ## _func_t clean_func);
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
 ZBX_PTR_VECTOR_DECL(str, char *);
