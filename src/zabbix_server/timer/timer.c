@@ -736,24 +736,19 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				update_time = (int)sec;
 			}
 		}
-		else
+		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
 		{
-			/* check if event suppress update must be performed */
-			if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
-			{
-				zbx_setproctitle("%s #%d [%s, processing maintenances]",
-						get_process_type_string(process_type), process_num, info);
+			zbx_setproctitle("%s #%d [%s, processing maintenances]", get_process_type_string(process_type),
+					process_num, info);
 
-				db_update_event_suppress_data(&events_num);
+			db_update_event_suppress_data(&events_num);
 
-				info_offset = 0;
-				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
-						"suppressed %d events in " ZBX_FS_DBL " sec",
-						events_num, zbx_time() - sec);
+			info_offset = 0;
+			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL
+					" sec", events_num, zbx_time() - sec);
 
-				update_time = (int)sec;
-				zbx_dc_maintenance_reset_update_flag(process_num);
-			}
+			update_time = (int)sec;
+			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
 		if (maintenance_time != update_time)
