@@ -147,8 +147,18 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_data['x_axis'] = SVG_GRAPH_AXIS_X_SHOW;
 		}
 
-		// Legend type.
+		// Legend type and space to reserve (in terms of number of lines).
 		$graph_data['legend'] = array_key_exists('legend', $fields) ? $fields['legend'] : SVG_GRAPH_LEGEND_TYPE_NONE;
+		if ($graph_data['legend'] != SVG_GRAPH_LEGEND_TYPE_NONE) {
+			if (array_key_exists('legend_lines', $fields) && $fields['legend_lines'] >= SVG_GRAPH_LEGEND_LINES_MIN
+					&& $fields['legend_lines'] >= SVG_GRAPH_LEGEND_LINES_MIN
+					&& $fields['legend_lines'] <= SVG_GRAPH_LEGEND_LINES_MAX) {
+				$graph_data['legend_lines'] = $fields['legend_lines'];
+			}
+			else {
+				$graph_data['legend_lines'] = SVG_GRAPH_LEGEND_LINES_DEFAULT;
+			}
+		}
 
 		// Show problems.
 		if (array_key_exists('show_problems', $fields) && $fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
