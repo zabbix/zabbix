@@ -682,7 +682,6 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['fill'] > 0 && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
-
 				foreach ($this->paths[$index] as $path) {
 					$this->addItem((new CSvgGraphArea($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)
@@ -697,13 +696,20 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+				$group = (new CSvgGroup())
+					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
+					->setAttribute('data-metric', $metric['legend']['text'])
+					->setAttribute('data-color', $metric['options']['color'])
+					->setAttribute('data-tolerance', $metric['options']['width']);
 
 				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphLine($path, $metric))
+					$group->addItem((new CSvgGraphLine($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 					);
 				}
+
+				$this->addItem($group);
 			}
 		}
 	}
@@ -711,13 +717,20 @@ class CSvgGraph extends CSvg {
 	private function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
+				$group = (new CSvgGroup())
+					->setAttribute('data-set', 'points')
+					->setAttribute('data-metric', $metric['legend']['text'])
+					->setAttribute('data-color', $metric['options']['color'])
+					->setAttribute('data-tolerance', $metric['options']['pointsize']);
 
 				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphPoints($path, $metric))
+					$group->addItem((new CSvgGraphPoints($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 					);
 				}
+
+				$this->addItem($group);
 			}
 		}
 	}

@@ -130,8 +130,8 @@ jQuery(function ($) {
 				y_min = y - tolerance / 2;
 				y_max = y + tolerance / 2;
 
-				[...ds.querySelectorAll('polyline')].forEach(function(c) {
-					c.getAttribute('points').split(' ').forEach(function(p) {
+				[...ds.querySelectorAll('path')].forEach(function(c) {
+					c.getAttribute('d').match(/\d+,\d+/g).forEach(function(p) {
 						p = p.split(',');
 
 						if (+p[0] > x_min && +p[0] < x_max) {
@@ -163,9 +163,9 @@ jQuery(function ($) {
 				y_min = y - tolerance / 2;
 				y_max = y + tolerance / 2;
 
-				[...ds.querySelectorAll('polyline')].forEach(function(c) {
+				[...ds.querySelectorAll('path')].forEach(function(c) {
 					var value_catched = false;
-					c.getAttribute('points').split(' ').forEach(function(p) {
+					c.getAttribute('d').match(/\d+,\d+/g).forEach(function(p) {
 						// This is because in staircase graph each value is represented by 2 points.
 						if (value_catched) {
 							value_catched = false;
