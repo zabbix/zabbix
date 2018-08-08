@@ -1804,7 +1804,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 				for (i = 0; i < query->maintenances.values_num; i++)
 				{
 					/* when locking maintenances not-locked (deleted) maintenance ids */
-					/* are removeved from the maintenanceids vector                   */
+					/* are removed from the maintenanceids vector                   */
 					if (FAIL == zbx_vector_uint64_bsearch(maintenanceids,
 							query->maintenances.values[i].first,
 							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
