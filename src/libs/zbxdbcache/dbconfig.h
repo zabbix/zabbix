@@ -796,7 +796,7 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);
 
-void	DCdump_configuration(ZBX_DC_CONFIG *config);
+void	DCdump_configuration();
 
 /* utility functions */
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);

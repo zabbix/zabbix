@@ -5232,7 +5232,7 @@ out:
 	zbx_dbsync_free_env();
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
-		DCdump_configuration(config);
+		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
