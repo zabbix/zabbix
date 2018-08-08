@@ -68,9 +68,7 @@ const char	*zbx_socket_strerror(void)
 #	define zbx_set_socket_strerror __zbx_zbx_set_socket_strerror
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 1, 2)))
-#endif
+__zbx_attr_format_printf(1, 2)
 static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
 {
 	va_list args;

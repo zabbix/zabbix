@@ -1024,12 +1024,14 @@ void	zbx_strarr_free(char **arr);
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif
-void	__zbx_zbx_setproctitle(const char *fmt, ...)
+
 #if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 1, 2)));
+#	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #else
-	;
+#	define __zbx_attr_format_printf(idx1, idx2)
 #endif
+
+void	__zbx_zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -1068,21 +1070,12 @@ int	zbx_day_in_month(int year, int mon);
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif
 
-void	__zbx_zbx_error(const char *fmt, ...)
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 1, 2)));
-#else
-	;
-#endif
+void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
 
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 4, 5)));
-#else
-	;
-#endif
+		__zbx_attr_format_printf(4, 5);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
@@ -1107,21 +1100,9 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #	define zbx_dsprintf __zbx_zbx_dsprintf
 #	define zbx_strdcatf __zbx_zbx_strdcatf
 #endif
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 2, 3)));
-#else
-	;
-#endif
-
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
-
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 2, 3)));
-#else
-	;
-#endif
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);

@@ -292,9 +292,7 @@ static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
 #	define zbx_db_execute		__zbx_zbx_db_execute
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 1, 2)))
-#endif
+__zbx_attr_format_printf(1, 2)
 static int	__zbx_zbx_db_execute(const char *fmt, ...)
 {
 	va_list	args;
@@ -313,9 +311,7 @@ static int	__zbx_zbx_db_execute(const char *fmt, ...)
 #	define zbx_db_select		__zbx_zbx_db_select
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-	__attribute__((__format__(__printf__, 1, 2)))
-#endif
+__zbx_attr_format_printf(1, 2)
 static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 {
 	va_list		args;
