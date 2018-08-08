@@ -145,7 +145,9 @@ $tab_axes = (new CFormList())->addRow('',
 
 // Create 'Legend' tab.
 $tab_legend = (new CFormList())
-	->addRow(CWidgetHelper::getLabel($fields['legend']), CWidgetHelper::getCheckBox($fields['legend']));
+	->addRow(CWidgetHelper::getLabel($fields['legend']), CWidgetHelper::getCheckBox($fields['legend']))
+	->addRow(CWidgetHelper::getLabel($fields['legend_lines']), CWidgetHelper::getRangeControl($fields['legend_lines']));
+$scripts[] = 'jQuery("[name=legend_lines]").rangeControl();';
 
 // Add 'Problems' tab.
 $tab_problems = (new CFormList())

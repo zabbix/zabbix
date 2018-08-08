@@ -132,6 +132,21 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldRangeControl $field
+	 *
+	 * @return CRangeControl
+	 */
+	public static function getRangeControl($field) {
+		return (new CRangeControl($field->getName(), (int) $field->getValue()))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('maxlength', strlen($field->getMaxValue()))
+			->setStep($field->getStepValue())
+			->setMin($field->getMinValue())
+			->setMax($field->getMaxValue())
+			->addClass('range-control');
+	}
+
+	/**
 	 * @param CWidgetFieldTextArea $field
 	 *
 	 * @return Array
