@@ -182,7 +182,7 @@ class CWidgetHelper {
 	 * @return array
 	 */
 	public static function getCheckBox($field) {
-		return [new CVar($field->getName(), '0'), (new CCheckBox($field->getName()))
+		return [(new CVar($field->getName(), '0'))->removeId(), (new CCheckBox($field->getName()))
 			->setChecked((bool) $field->getValue())
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			->setLabel($field->getCaption())
