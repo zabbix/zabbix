@@ -1067,21 +1067,22 @@ jQuery(function ($) {
 	"use strict"
 
 	function calcRows($obj, options) {
-		var line_height = options['line_height'],
-			max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,
+		var max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,
+			clone = $obj
+				.clone(false)
+				.css({'position': 'absolute', 'z-index': '-1'})
+				.removeClass('patternselect')
+				.insertAfter($obj),
+			padding = parseInt(clone.css('padding-top'), 10) + parseInt(clone.css('padding-bottom'), 10),
+			line_height = parseInt(clone.css('font-size'), 10) * 1.14,
 			rows = 0;
-
-		var clone = $obj
-			.clone(false)
-			.css({'position': 'absolute', 'z-index': '-1'})
-			.insertAfter($obj);
 
 		do {
 			rows++;
 			clone.height(rows * line_height);
 		}
-		while (clone[0].scrollHeight - options['padding'] >= clone.innerHeight()
-			&& (max_height === null || rows * line_height + options['padding'] <= max_height));
+		while (clone[0].scrollHeight - padding >= clone.innerHeight()
+			&& (max_height === null || rows * line_height + padding <= max_height));
 		clone.remove();
 
 		return rows;
@@ -1090,10 +1091,7 @@ jQuery(function ($) {
 	$.fn.autoGrowTextarea = function(options) {
 		this.each(function() {
 			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, {
-					line_height: parseInt($(this).css('font-size'), 10) * 1.14,
-					padding: parseInt($(this).css('padding-top'), 10) + parseInt($(this).css('padding-bottom'), 10)
-				}, options);
+				options = $.extend({}, options);
 
 				$(this)
 					.css({'resize':'none'})
