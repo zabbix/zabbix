@@ -457,7 +457,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 						'height' => (int) $widget['height']
 					],
 					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
-					'fields' => $fields
+					'fields' => $fields,
+					'info' => CWidgetHelper::makeWidgetInfo($widget['type'], $fields)
 				];
 			}
 		}

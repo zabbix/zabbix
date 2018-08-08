@@ -35,8 +35,17 @@
 		 */
 		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
+		var info_btns = [];
+		if (widget['info'].length) {
+			widget['info'].each(function(i) {
+				info_btns.push($('<button>', {'type': 'button', 'class': i.icon, 'data-hintbox': 1}));
+				info_btns.push($('<div></div>').html(i.hint).addClass('hint-box').hide());
+			});
+		}
+
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
+				.append(info_btns.length ? info_btns : null)
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
@@ -1106,7 +1115,8 @@
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
-				'storage': {}
+				'storage': {},
+				'info': []
 			}, widget);
 
 			return this.each(function() {
