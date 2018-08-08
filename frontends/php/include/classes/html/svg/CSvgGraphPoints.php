@@ -69,7 +69,9 @@ class CSvgGraphPoints extends CSvgGroup {
 
 	protected function draw() {
 		foreach ($this->path as $point) {
-			$this->addItem((new CSvgCircle($point[0], $point[1], $this->options['pointsize'])));
+			$this->addItem((new CSvgCircle($point[0], $point[1], $this->options['pointsize']))
+				->setAttribute('label', $point[2])
+			);
 		}
 	}
 

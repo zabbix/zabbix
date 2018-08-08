@@ -591,12 +591,16 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function calculatePaths() {
 		foreach ($this->metrics as $index => $metric) {
-			$max_value = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
-				? $this->max_value_right
-				: $this->max_value_left;
-			$min_value = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
-				? $this->min_value_right
-				: $this->min_value_left;
+			if (($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)) {
+				$min_value = $this->right_y_min;
+				$max_value = $this->max_value_right;
+				$units = $this->right_y_units;
+			}
+			else {
+				$min_value = $this->left_y_min;
+				$max_value = $this->left_y_max;
+				$units = $this->left_y_units;
+			}
 
 			$time_range = $this->time_till - $this->time_from ? : 1;
 			$value_diff = $max_value - $min_value ? : 1;
@@ -621,7 +625,10 @@ class CSvgGraph extends CSvg {
 
 				$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 				$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-				$paths[$path_num][] = [$x, $y];
+				$paths[$path_num][] = [$x, $y, convert_units([
+					'value' => $point,
+					'units' => $units
+				])];
 			}
 
 			$this->paths[$index] = $paths;
@@ -717,20 +724,12 @@ class CSvgGraph extends CSvg {
 	private function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-				$group = (new CSvgGroup())
-					->setAttribute('data-set', 'points')
-					->setAttribute('data-metric', $metric['legend']['text'])
-					->setAttribute('data-color', $metric['options']['color'])
-					->setAttribute('data-tolerance', $metric['options']['pointsize']);
-
 				foreach ($this->paths[$index] as $path) {
-					$group->addItem((new CSvgGraphPoints($path, $metric))
+					$this->addItem((new CSvgGraphPoints($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 					);
 				}
-
-				$this->addItem($group);
 			}
 		}
 	}

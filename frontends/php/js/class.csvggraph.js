@@ -210,7 +210,7 @@ jQuery(function ($) {
 					if (cx > x_min && cx < x_max) {
 						if (cy > y_min && cy < y_max) {
 							matching_xy.push({
-								val: cy,
+								val: c.getAttribute('label'),
 								metric: ds.getAttribute('data-metric'),
 								color: ds.getAttribute('data-color')
 							});
