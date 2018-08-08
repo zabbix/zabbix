@@ -196,8 +196,20 @@ class CScreenHistory extends CScreenBase {
 						$options['excludeSearch'] = true;
 					}
 				}
+				$history_data = [];
+				$host_names = [];
 
-				$history_data = API::History()->get($options);
+				if (count($items) > 1) {
+					foreach ($items as $item) {
+						$host_names[$item['hostid']] = $item['hosts'][0]['name'];
+						$options['itemids'] = [$item['itemid']];
+						$options['history'] = $item['value_type'];
+						$item_data = API::History()->get($options);
+						$history_data = array_merge($history_data, $item_data);
+					}
+				} else {
+					$history_data = API::History()->get($options);
+				}
 
 				CArrayHelper::sort($history_data, [
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
@@ -210,12 +222,22 @@ class CScreenHistory extends CScreenBase {
 					if ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
 					}
-					else {
+					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 						$value = rtrim($value, " \t\r\n");
 					}
+					else {
+						$value = rtrim($value, " \t\r\n");
+						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
+					}
 
-					$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
-						' '.htmlspecialchars($value);
+					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
+						' '.$value;
+
+					if (count($items) > 1) {
+						$row .= ' "'.str_replace('"', '""', $host_names[$items[$history_row['itemid']]['hostid']].
+							': '.$items[$history_row['itemid']]['name_expanded']).'"';
+					}
+					$output[] = $row;
 				}
 
 				// Return values as array of formatted strings.
