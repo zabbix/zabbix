@@ -2478,8 +2478,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 				/* Also mark it for removal if the value adding failed. In this case we    */
 				/* won't have the latest data in cache - so the requests must go directly  */
 				/* to the database.                                                        */
-				if (item->value_type != h->value_type ||
-						item->last_accessed < expire_timestamp ||
+				if (item->value_type != h->value_type || item->last_accessed < expire_timestamp ||
 						FAIL == vch_item_add_value_at_head(item, &record))
 				{
 					item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
