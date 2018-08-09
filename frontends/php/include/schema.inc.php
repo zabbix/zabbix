@@ -7481,17 +7481,17 @@ return [
 				'ref_table' => 'maintenances',
 				'ref_field' => 'maintenanceid',
 			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '2',
-			],
 			'tag' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2',
 			],
 			'value' => [
 				'null' => false,
