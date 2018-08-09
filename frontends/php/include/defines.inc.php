@@ -39,8 +39,8 @@ define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
-define('ZBX_MIN_TIMESHIFT',	-788940000); // Min valid timeshift values is -25y: ((25 * 365 * 86400) + 25 / 4 * 86400) * -1.
-define('ZBX_MAX_TIMESHIFT',	788940000); // Max valid timeshift is 25y: (25 * 365 * 86400) + 25 / 4 * 86400.
+define('ZBX_MIN_TIMESHIFT',	-788400000); // Min valid timeshift value in seconds (25 years).
+define('ZBX_MAX_TIMESHIFT',	788400000); // Max valid timeshift value in seconds (25 years).
 
 // Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
 define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
