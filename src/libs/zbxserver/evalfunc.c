@@ -248,7 +248,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *parameter
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid log value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -343,7 +343,7 @@ static int	evaluate_LOGSOURCE(char *value, DC_ITEM *item, const char *parameters
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid log value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -427,7 +427,7 @@ static int	evaluate_LOGSEVERITY(char *value, DC_ITEM *item, const zbx_timespec_t
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid log value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -710,8 +710,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 				{
 					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
 						goto out;
 					}
 				}
@@ -719,8 +718,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 				{
 					if (SUCCEED != is_uint64(arg2, &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
 						goto out;
 					}
 
@@ -728,8 +726,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 					{
 						if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
 						{
-							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
-									" unsigned value", arg2_2);
+							*error = zbx_dsprintf(*error, "\"%s\" invalid value type",
+									arg2_2);
 							goto out;
 						}
 					}
@@ -741,8 +739,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 			{
 				if (SUCCEED != is_double_suffix(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
-					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
-							arg2);
+					*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
 					goto out;
 				}
 
@@ -902,7 +899,7 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *parameters, cons
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric float value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1005,7 +1002,7 @@ static int	evaluate_AVG(char *value, DC_ITEM *item, const char *parameters, cons
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1193,7 +1190,7 @@ static int	evaluate_MIN(char *value, DC_ITEM *item, const char *parameters, cons
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1308,7 +1305,7 @@ static int	evaluate_MAX(char *value, DC_ITEM *item, const char *parameters, cons
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1442,7 +1439,7 @@ static int	evaluate_PERCENTILE(char *value, DC_ITEM *item, const char *parameter
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1552,7 +1549,7 @@ static int	evaluate_DELTA(char *value, DC_ITEM *item, const char *parameters, co
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -1790,7 +1787,7 @@ static int	evaluate_ABSCHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-			*error = zbx_strdup(*error, "not a valid value");
+			*error = zbx_strdup(*error, "invalid value type");
 			goto out;
 	}
 	ret = SUCCEED;
@@ -1862,7 +1859,7 @@ static int	evaluate_CHANGE(char *value, DC_ITEM *item, const zbx_timespec_t *ts,
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-			*error = zbx_strdup(*error, "not a valid value");
+			*error = zbx_strdup(*error, "invalid value type");
 			goto out;
 	}
 
@@ -1932,7 +1929,7 @@ static int	evaluate_DIFF(char *value, DC_ITEM *item, const zbx_timespec_t *ts, c
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-			*error = zbx_strdup(*error, "not a valid value");
+			*error = zbx_strdup(*error, "invalid value type");
 			goto out;
 	}
 
@@ -2014,7 +2011,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -2163,7 +2160,7 @@ static int	evaluate_STRLEN(char *value, DC_ITEM *item, const char *parameters, c
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto clean;
 	}
 
@@ -2205,7 +2202,7 @@ static int	evaluate_FUZZYTIME(char *value, DC_ITEM *item, const char *parameters
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -2294,7 +2291,7 @@ static int	evaluate_BAND(char *value, DC_ITEM *item, const char *parameters, con
 
 	if (ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric unsigned value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto clean;
 	}
 
@@ -2362,7 +2359,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
@@ -2531,7 +2528,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		*error = zbx_strdup(*error, "not a valid numeric value");
+		*error = zbx_strdup(*error, "invalid value type");
 		goto out;
 	}
 
