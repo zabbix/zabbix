@@ -2363,13 +2363,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *parameters,
 		goto out;
 	}
 
-	if (5 < (nparams = num_param(parameters)))
-	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
-		goto out;
-	}
-
-	if (3 > nparams)
+	if (3 > (nparams = num_param(parameters)) || nparams > 5)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2532,13 +2526,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *parameters,
 		goto out;
 	}
 
-	if (4 < (nparams = num_param(parameters)))
-	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
-		goto out;
-	}
-
-	if (3 > nparams)
+	if (3 > (nparams = num_param(parameters)) || nparams > 4)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
