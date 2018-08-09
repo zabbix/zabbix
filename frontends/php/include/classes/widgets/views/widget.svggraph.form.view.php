@@ -53,8 +53,9 @@ $form->addItem(
 $scripts[] =
 	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
 		'var elmnt = jQuery("#svg-grapg-preview"),'.
-			'fixed = (elmnt.css("position") === "absolute");'.
-		'if (jQuery(this).offset().top >= elmnt.offset().top && !fixed) {'.
+			'fixed = (elmnt.css("position") === "absolute"),'.
+			'winh = jQuery(".overlay-dialogue-body").height();'.
+		'if (jQuery(this).offset().top >= elmnt.offset().top && !fixed && winh > 500) {'.
 			'var top = jQuery(".overlay-dialogue-body").offset().top - jQuery("#overlay_dialogue").offset().top - 1;'.
 			'elmnt.css({"position": "absolute", "top": top});'.
 		'}'.
