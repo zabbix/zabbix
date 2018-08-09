@@ -980,7 +980,6 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['maintenance_status', 'maintenanceid'],
-			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => ['state' => null],
 			'preservekeys' => true
@@ -1009,7 +1008,6 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	if ($subSysmapTriggerIdToSelementIds) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
-			'selectLastEvent' => ['acknowledged', 'severity'],
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => ['state' => null],
 			'skipDependent' => true,
@@ -1049,7 +1047,6 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
-			'selectLastEvent' => ['acknowledged', 'severity'],
 			'hostids' => array_keys($monitored_hostids),
 			'filter' => ['state' => null],
 			'monitored' => true,
@@ -1060,7 +1057,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 		foreach ($triggers as $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				if (isset($hostIdToSelementIds[$host['hostid']])) {
+				if (array_key_exists($host['hostid'], $hostIdToSelementIds)) {
 					foreach ($hostIdToSelementIds[$host['hostid']] as $belongs_to_sel) {
 						$selements[$belongs_to_sel]['triggers'][$trigger['triggerid']] = $trigger;
 					}
@@ -1074,6 +1071,30 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		$selements = filterSysmapTriggers($selements, $subSysmapHostApplicationFilters, $triggers,
 			$subSysmapTriggerIdToSelementIds
 		);
+	}
+
+	// Get problems by triggerids.
+	$triggerids = [];
+	foreach ($selements as $selement) {
+		foreach ($selement['triggers'] as $trigger) {
+			$triggerids[$trigger['triggerid']] = true;
+		}
+	}
+
+	$problems = API::Problem()->get([
+		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'severity'],
+		'objectids' => array_keys($triggerids),
+		'suppressed' => $sysmap['show_suppressed'] ? null : false
+	]);
+
+	foreach ($selements as $snum => $selement) {
+		foreach ($problems as $problem) {
+			if (array_key_exists($problem['objectid'], $selement['triggers'])
+					&& $selement['triggers'][$problem['objectid']]['status'] == TRIGGER_STATUS_ENABLED
+					&& $options['severity_min'] <= $problem['severity']) {
+				$selements[$snum]['triggers'][$problem['objectid']]['problems'][] = $problem;
+			}
+		}
 	}
 
 	$config = select_config();
@@ -1134,48 +1155,38 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 			}
 		}
 
-		$last_event = false;
-		$critical_triggerid = 0;
+		$critical_problem = [];
 
 		foreach ($selement['triggers'] as $trigger) {
-			$trigger_severity = array_key_exists('severity', $trigger['lastEvent'])
-					? $trigger['lastEvent']['severity']
-					: $trigger['priority'];
-			if ($options['severity_min'] <= $trigger_severity) {
-				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-					$i['trigger_disabled']++;
-				}
-				else {
-					if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-						$i['problem']++;
-						$lastProblemId = $trigger['triggerid'];
+			if ($trigger['status'] == TRIGGER_STATUS_DISABLED && $options['severity_min'] <= $trigger['priority']) {
+				$i['trigger_disabled']++;
+				continue;
+			}
 
-						if ($critical_triggerid == 0) {
-							$critical_triggerid = $trigger['triggerid'];
-						}
+			if (array_key_exists('problems', $trigger)) {
+				foreach ($trigger['problems'] as $problem) {
+					$i['problem']++;
 
-						if ($i['priority'] < $trigger_severity) {
-							$i['priority'] = $trigger_severity;
-							$critical_triggerid = $trigger['triggerid'];
-						}
-
-						if ($trigger['lastEvent']) {
-							if (!$trigger['lastEvent']['acknowledged']) {
-								$i['problem_unack']++;
-							}
-
-							$last_event = $last_event || true;
-						}
+					if (!$problem['acknowledged']) {
+						$i['problem_unack']++;
 					}
 
-					$i['latelyChanged'] |=
-							((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
+					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
+							&& $critical_problem['eventid'] < $problem['eventid'])) {
+						$critical_problem = $problem;
+					}
 				}
 			}
+
+			$i['latelyChanged'] |=
+					((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 		}
 
-		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
-		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
+		if ($critical_problem && $i['priority'] < $critical_problem['severity']) {
+			$i['priority'] = $critical_problem['severity'];
+		}
+
+		$i['ack'] = !$i['problem_unack'];
 
 		// Number of problems.
 		if ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER) {
@@ -1183,13 +1194,12 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		}
 		// Expand single problem.
 		elseif ($sysmap['expandproblem'] == SYSMAP_SINGLE_PROBLEM && $i['problem']) {
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+			$i['problem_title'] = $critical_problem['name'];
 			$i['expandproblem'] = SYSMAP_SINGLE_PROBLEM;
-			$critical_triggerid = $lastProblemId;
 		}
 		// Number of problems and expand most critical one.
 		elseif ($sysmap['expandproblem'] == SYSMAP_PROBLEMS_NUMBER_CRITICAL && $i['problem']) {
-			$i['problem_title'] = CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$critical_triggerid]);
+			$i['problem_title'] = $critical_problem['name'];
 			$i['expandproblem'] = SYSMAP_PROBLEMS_NUMBER_CRITICAL;
 		}
 
@@ -1239,7 +1249,6 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 				}
 
 				$info[$selementId] = getTriggersInfo($selement, $i, $sysmap['show_unack']);
-				$info[$selementId]['triggerid'] = $critical_triggerid;
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_IMAGE:
@@ -1250,7 +1259,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		if ($i['problem'] > 0) {
 			$info[$selementId]['aria_label'] = ($i['problem'] > 1)
 				? _n('%1$s problem', '%1$s problems', $i['problem'])
-				: CMacrosResolverHelper::resolveTriggerName($selement['triggers'][$lastProblemId]);
+				: $critical_problem['name'];
 		}
 
 		$info[$selementId]['problems_total'] = $i['problem'];
@@ -1614,15 +1623,14 @@ function populateFromMapAreas(array &$map, array $theme) {
 			$area = ['selementids' => []];
 			$origSelement = $selement;
 
-			$hosts = API::host()->get([
+			$hosts = API::Host()->get([
 				'output' => ['hostid'],
 				'groupids' => $selement['elements'][0]['groupid'],
 				'sortfield' => 'name',
 				'preservekeys' => true
 			]);
-			$hostsCount = count($hosts);
 
-			if ($hostsCount == 0) {
+			if (!$hosts) {
 				continue;
 			}
 
