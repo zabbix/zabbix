@@ -710,7 +710,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 				{
 					if (SUCCEED != str2uint64(arg2, ZBX_UNIT_SYMBOLS, &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", arg2);
 						goto out;
 					}
 				}
@@ -718,7 +719,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 				{
 					if (SUCCEED != is_uint64(arg2, &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", arg2);
 						goto out;
 					}
 
@@ -726,8 +728,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 					{
 						if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
 						{
-							*error = zbx_dsprintf(*error, "\"%s\" invalid value type",
-									arg2_2);
+							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
+									" unsigned value", arg2_2);
 							goto out;
 						}
 					}
@@ -739,7 +741,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 			{
 				if (SUCCEED != is_double_suffix(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
-					*error = zbx_dsprintf(*error, "\"%s\" invalid value type", arg2);
+					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
+							arg2);
 					goto out;
 				}
 
