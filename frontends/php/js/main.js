@@ -1083,7 +1083,7 @@ jQuery(function ($) {
 			rows++;
 			clone.height(rows * line_height);
 		}
-		while (clone[0].scrollHeight - padding >= clone.innerHeight()
+		while (clone[0].scrollHeight - padding > clone.innerHeight()
 			&& (max_height === null || rows * line_height + padding <= max_height));
 		clone.remove();
 

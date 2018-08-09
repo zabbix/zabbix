@@ -3818,16 +3818,19 @@ svg {
   cursor: pointer; }
 
 .list-vertical-accordion {
-  display: flex;
-  flex-direction: column;
-  padding-left: 15px; }
+  display: table;
+  padding-left: 15px;
+  width: 100%; }
+  .list-vertical-accordion .list-accordion-item {
+    display: table-row; }
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
   .list-vertical-accordion .list-accordion-item-closed .patternselect {
     overflow: hidden;
     max-height: 24px;
     line-height: 24px;
-    padding: 0px 5px; }
+    padding: 0px 5px;
+    height: 24px; }
 
 .columns-wrapper {
   display: flex;
@@ -4238,6 +4241,7 @@ svg {
   /* Specific width is required for Firefox. */
   opacity: 0;
   vertical-align: middle;
+  padding: 0px;
   height: 24px; }
 
 [type=range]:focus {
