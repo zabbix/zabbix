@@ -401,7 +401,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public static function getOverriteTime($fields, $unixtime = true) {
 		if (array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME) {
 			$range_time_parser = new CRangeTimeParser();
-			$date = $unixtime ? new DateTime() : null;
+			if (!$unixtime) {
+				$date = new DateTime();
+			}
 			$from = null;
 			$to = null;
 
