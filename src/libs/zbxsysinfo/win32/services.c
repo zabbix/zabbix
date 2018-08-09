@@ -407,7 +407,6 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
-	DWORD			sz = 0;
 	int			param_type;
 	char			*name, *param;
 	wchar_t			*wname, service_name[MAX_STRING_LEN];
