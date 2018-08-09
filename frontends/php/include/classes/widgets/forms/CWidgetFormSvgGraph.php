@@ -388,4 +388,49 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		return $errors;
 	}
+
+	/**
+	 * Check if widget configuration is set to use overwritten time and calculates start and end time for graph.
+	 *
+	 * @param array $fields    Widget configuration fields.
+	 * @param bool  $unixtime  Return start and end time as unix timestamps.
+	 *
+	 * @return array|bool    Returns start and end time of widget's custom time or false if relative time is not
+	 *	                     overwritten.
+	 */
+	public static function getOverriteTime($fields, $unixtime = true) {
+		if (array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME) {
+			$range_time_parser = new CRangeTimeParser();
+			$date = $unixtime ? new DateTime() : null;
+			$from = null;
+			$to = null;
+
+			if (array_key_exists('time_from', $fields) && $fields['time_from'] !== ''
+					&& $range_time_parser->parse($fields['time_from']) === CParser::PARSE_SUCCESS) {
+				$from = $unixtime
+					? $range_time_parser->getDateTime(true)->getTimestamp()
+					: $date
+						->setTimestamp($range_time_parser->getDateTime(true)->getTimestamp())
+						->format(ZBX_FULL_DATE_TIME);
+			}
+
+			if (array_key_exists('time_to', $fields) && $fields['time_to'] !== ''
+					&& $range_time_parser->parse($fields['time_to']) === CParser::PARSE_SUCCESS) {
+				$to = $unixtime
+					? $range_time_parser->getDateTime(false)->getTimestamp()
+					: $date
+						->setTimestamp($range_time_parser->getDateTime(false)->getTimestamp())
+						->format(ZBX_FULL_DATE_TIME);
+			}
+
+			if ($from && $to) {
+				return [
+					'from' => $from,
+					'to' => $to
+				];
+			}
+		}
+
+		return false;
+	}
 }

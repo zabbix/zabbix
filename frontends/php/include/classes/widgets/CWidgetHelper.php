@@ -573,31 +573,11 @@ class CWidgetHelper {
 	public static function makeWidgetInfo($type, $fields) {
 		$info = [];
 
-		if ($type === WIDGET_SVG_GRAPH
-				&& array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME) {
-			$range_time_parser = new CRangeTimeParser();
-			$date = new DateTime();
-			$from = null;
-			$to = null;
-
-			if (array_key_exists('time_from', $fields) && $fields['time_from'] !== ''
-					&& $range_time_parser->parse($fields['time_from']) === CParser::PARSE_SUCCESS) {
-				$from = $date
-					->setTimestamp($range_time_parser->getDateTime(true)->getTimestamp())
-					->format(ZBX_FULL_DATE_TIME);
-			}
-
-			if (array_key_exists('time_to', $fields) && $fields['time_to'] !== ''
-					&& $range_time_parser->parse($fields['time_to']) === CParser::PARSE_SUCCESS) {
-				$to = $date
-					->setTimestamp($range_time_parser->getDateTime(false)->getTimestamp())
-					->format(ZBX_FULL_DATE_TIME);
-			}
-
-			if ($from && $to) {
+		if ($type === WIDGET_SVG_GRAPH) {
+			if (($time = CWidgetFormSvgGraph::getOverriteTime($fields)) !== false) {
 				$info[] = [
 					'icon' => 'btn-info-clock',
-					'hint' => _s('Graph uses overwritten relative time: %1$s - %1$s', $from, $to)
+					'hint' => _s('Graph uses overwritten relative time: %1$s - %1$s', $time['from'], $time['to'])
 				];
 			}
 		}

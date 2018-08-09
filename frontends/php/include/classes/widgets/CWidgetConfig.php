@@ -160,15 +160,18 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Does this widget type use timeline
+	 * Detect if widget uses time selector.
 	 *
-	 * @param type $type  WIDGET_ constant
+	 * @param array $widget
+	 * @param array $widget[type]    WIDGET_ constant
+	 * @param array $widget[fields]  Widget fields
 	 *
 	 * @return boolean
 	 */
-	public static function usesTimeline($type) {
-		switch ($type) {
+	public static function usesTimeSelector(array $widget) {
+		switch ($widget['type']) {
 			case WIDGET_SVG_GRAPH:
+				return (CWidgetFormSvgGraph::getOverriteTime($widget['fields']) === false);
 			case WIDGET_GRAPH:
 				return true;
 			default:
