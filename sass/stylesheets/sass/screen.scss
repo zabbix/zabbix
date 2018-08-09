@@ -5549,6 +5549,8 @@ svg {
 	}
 
 	.list-accordion-item-closed {
+		height: 30px;
+
 		.list-accordion-item-body {
 			display: none;
 		}
