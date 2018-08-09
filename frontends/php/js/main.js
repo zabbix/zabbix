@@ -907,6 +907,7 @@ function getConditionFormula(conditions, evalType) {
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
 	 * - beforeadd.dynamicRows 	    - only before adding a new row.
 	 * - afteradd.dynamicRows 	    - only after adding a new row.
+	 * - afterremove.dynamicRows 	- only after removing a row.
 	 *
 	 * @param options
 	 */
@@ -982,6 +983,7 @@ function getConditionFormula(conditions, evalType) {
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
+		table.trigger('afterremove.dynamicRows', options);
 	}
 }(jQuery));
 

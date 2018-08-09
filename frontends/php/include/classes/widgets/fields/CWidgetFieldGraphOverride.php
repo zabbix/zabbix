@@ -423,11 +423,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
 						'});'.
 				'})'.
+				'.bind("afterremove.dynamicRows", function(event, options) {'.
+					'updateGraphPreview();'.
+				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'initializeOverrides();'.
-					'if (typeof updateGraphPreview === "function") {'.
-						'updateGraphPreview();'.
-					'}'.
 					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
 						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
 						'jQuery("#overrides").sortable("enable");'.
@@ -470,13 +470,15 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
+				'stop: function() {'.
+					'updateGraphPreview();'.
+				'},'.
 				'update: function() {'.
 					'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
 						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
 					'}).each(function(i) {'.
 						'jQuery(this).val(i + 1);'.
 					'});'.
-					'updateGraphPreview();'.
 				'}'.
 			'});'
 		];
