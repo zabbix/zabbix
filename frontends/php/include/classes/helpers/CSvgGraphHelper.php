@@ -70,6 +70,17 @@ class CSvgGraphHelper {
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = $options['legend'] ? $options['legend_lines'] * 18 : 0;
 
+		foreach ($metrics as &$metric) {
+			$resolved = CMacrosResolverHelper::resolveItemNames([[
+				'itemid' => $metric['itemid'],
+				'name' => $metric['name'],
+				'hostid' => $metric['hosts'][0]['hostid'],
+				'key_' => $metric['key_']
+			]]);
+			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$resolved[0]['name_expanded'];
+		}
+		unset($metric);
+
 		// Draw SVG graph.
 		$graph = (new CSvgGraph($width, $height - $legend_height, $options))
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
@@ -85,8 +96,7 @@ class CSvgGraphHelper {
 
 			foreach ($metrics as $metric) {
 				$labels[] = [
-					// TODO: resolve item name macro.
-					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
+					'name' => $metric['name'],
 					'color' => $metric['options']['color']
 				];
 			}
@@ -413,7 +423,7 @@ class CSvgGraphHelper {
 
 			if ($matching_hosts) {
 				$matching_items = API::Item()->get([
-					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid'],
+					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'],
 					'hostids' => array_keys($matching_hosts),
 					'selectHosts' => ['hostid', 'name'],
 					'searchWildcardsEnabled' => true,
