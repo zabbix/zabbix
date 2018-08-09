@@ -113,6 +113,7 @@ $tranStrings = [
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
+		'Close' => _('Close'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
 	],
@@ -190,6 +191,7 @@ $tranStrings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
+		'Close' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),

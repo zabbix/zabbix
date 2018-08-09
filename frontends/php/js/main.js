@@ -541,8 +541,10 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn'}
-				)
+					'class': 'overlay-close-btn',
+					'title': t('Close')
+				}
+			)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});

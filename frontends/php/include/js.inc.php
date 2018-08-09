@@ -132,7 +132,8 @@ function insert_show_color_picker_javascript() {
 
 	$cancel = (new CSimpleButton())
 		->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-		->onClick('javascript: hide_color_picker();');
+		->onClick('javascript: hide_color_picker();')
+		->setTitle(_('Close'));
 
 	$tmp = [$cancel, $table];
 	insert_js('var color_picker = null,'."\n".

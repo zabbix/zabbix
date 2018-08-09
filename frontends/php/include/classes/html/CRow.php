@@ -24,8 +24,8 @@ class CRow extends CTag {
 	protected $heading_column;
 
 	/**
-	 * @param CTag|array $item
-	 * @param int $heading_column  Column index for heading column. Starts from 0. 'null' if no heading column.
+	 * @param CTag|array|null $item
+	 * @param int|null $heading_column  Column index for heading column. Starts from 0. 'null' if no heading column.
 	 */
 	public function __construct($item = null, $heading_column = null) {
 		parent::__construct('tr', true);

@@ -30,16 +30,19 @@ class CCol extends CTag {
 
 	public function setRowSpan($value) {
 		$this->setAttribute('rowspan', $value);
+
 		return $this;
 	}
 
 	public function setColSpan($value) {
 		$this->setAttribute('colspan', $value);
+
 		return $this;
 	}
 
 	public function setWidth($value) {
 		$this->setAttribute('width', $value);
+
 		return $this;
 	}
 }

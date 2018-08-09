@@ -640,7 +640,8 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	jQuery(overlay_dialogue)
 		.append(
 			jQuery('<button>', {
-				class: 'overlay-close-btn'
+				class: 'overlay-close-btn',
+				title: t('Close')
 			})
 				.click(function() {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');

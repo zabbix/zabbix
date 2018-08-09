@@ -85,7 +85,7 @@ class CTable extends CTag {
 	/**
 	 * Format given column as row header.
 	 *
-	 * @param $heading_column  Column index for heading column. Starts from 0. 'null' if no heading column.
+	 * @param int|null $heading_column  Column index for heading column. Starts from 0. 'null' if no heading column.
 	 *
 	 * @return CTable
 	 */
