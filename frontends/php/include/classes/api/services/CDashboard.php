@@ -565,7 +565,7 @@ class CDashboard extends CApiService {
 					if ($widget['x'] + $widget['width'] - 1 > self::MAX_X
 							|| $widget['y'] + $widget['height'] - 1 > self::MAX_Y) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Dashboard "%1$s" widget in cell X - %2$s Y - %3$s is ouf of bounds.',
+							_s('Dashboard "%1$s" widget in cell X - %2$s Y - %3$s is out of bounds.',
 								$dashboard['name'], $widget['x'], $widget['y']
 							)
 						);

@@ -52,6 +52,17 @@ class CWidgetFieldTags extends CWidgetField {
 	}
 
 	/**
+	 * Add dynamic row script and fix the distance between AND/OR buttons and tag inputs below them.
+	 *
+	 * @return string
+	 */
+	public function getJavascript() {
+		return 'var tags_table = jQuery("#tags_table_'.$this->getName().'");'.
+			'tags_table.dynamicRows({template: "#tag-row"});'.
+			'tags_table.parent().addClass("has-before");';
+	}
+
+	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.

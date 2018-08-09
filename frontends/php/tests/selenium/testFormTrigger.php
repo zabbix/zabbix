@@ -882,7 +882,7 @@ class testFormTrigger extends CWebTest {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
 					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestAssertElementText("//tbody//a[text()='$description']", $description);
-					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[4]", $expression);
+					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[5]", $expression);
 					break;
 				case TEST_BAD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);

@@ -43,8 +43,12 @@ if (!empty($DB['DB'])) {
 		$scripts[] = 'servercheck.js';
 	}
 }
-$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
-$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
+$pageHeader
+	->addCssFile('styles/'.CHtml::encode($theme).'.css')
+	->addJsBeforeScripts(
+		'var PHP_TZ_OFFSET = '.date('Z').','.
+			'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
+);
 
 // show GUI messages in pages with menus and in fullscreen mode
 $showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;

@@ -1,3 +1,30 @@
+Changes for 4.0.0alpha10
+
+New features:
+..F....... [ZBXNEXT-4049] added option to hide timeline in Problems widget (vasilijs)
+..F....... [ZBXNEXT-4611] changed default method for http agent items from "post" to "get" (gcalenko)
+..F....... [ZBXNEXT-4587] added new column 'Value' and filter in Triggers list (Ivo, vasilijs)
+..F....... [ZBXNEXT-4626] improved widget configuration constructor to create custom view for each widget (ashubin)
+..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
+
+Bug fixes:
+........S. [ZBX-9731] changed value cache to drop unused items from cache when new values are added instead performing this cleanup only when cache runs out of free space (wiper)
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
+..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
+...G...PS. [ZBX-14341] fixed duplicate value generation in environments with poor connectivity (wiper)
+........S. [ZBX-9913] fixed inconsistencies in behaviour and error messaging of trigger functions (mindbound)
+..F....... [ZBX-14448] fixed undefined index when updating item and switching type to dependent (Ivo)
+........S. [ZBX-14670] fixed failed query error in LLD when updating function name in trigger prototype expression (vso)
+..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
+........S. [ZBX-14579] improved several functions to distinguish between 'failed to compile' and 'not matched' states in regexp processing (mindbound)
+..F....... [ZBX-14584] fixed mass update some options for items (vasilijs)
+..F....... [ZBX-12217] removed links to templates with no permissions for templated applications and items (agriscenko, Sasha)
+.......PS. [ZBX-14615] fixed processing of JMX errors, now treated as distinct and separate from network errors (mindbound)
+..F....... [ZBXNEXT-4607] removed column Recovery time in Problems mode (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0alpha9
 
 New features:
@@ -292,7 +319,7 @@ Changes for 4.0.0alpha3
 
 New features:
 A......... [ZBXNEXT-4357] added support of "selectTriggerDiscovery" option in trigger.get method (Sasha)
-A.F....... [ZBXNEXT-4152] replaced double box select fields with multiselect fields (Ivo, Sasha)
+A.F....... [ZBXNEXT-4152] replaced double box select fields with multiselect fields and added filtering by proxy and server only in host list (Ivo, Sasha)
 ..F.I..... [ZBXNEXT-4273] added default event status colors in themes with option to customize them (ashubin)
 ...G...... [ZBXNEXT-4216] added 'copytruncate' log file rotation support for logrt[], logrt.count[] (Andris)
 
@@ -400,6 +427,26 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.13rc1
+
+New features:
+...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
+
+Bug fixes:
+...G...PS. [ZBX-13730] fixed incorrect behavior of zbxregexp library when reusing latest regular expression (yurii)
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
+...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
+..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
+..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.12
+
+3.4.12rc1 was released as 3.4.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.12rc1
@@ -1691,6 +1738,23 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.21rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
+...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
+..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.20
+
+3.0.20rc1 was released as 3.0.20 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.20rc1
@@ -3664,6 +3728,18 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.23
+
+2.2.23rc1 was released as 2.2.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.23rc1

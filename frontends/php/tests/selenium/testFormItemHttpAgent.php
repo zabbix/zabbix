@@ -350,7 +350,7 @@ class testFormItemHttpAgent extends CWebTest {
 			$this->fillFields($data['fields']);
 		}
 		if (array_key_exists('request_type', $data)) {
-			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
+			$this->zbxTestClickXpathWait("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
 		if (array_key_exists('query', $data)) {
 			$this->processPairFields($data['query'], 'query_fields');
@@ -1063,7 +1063,7 @@ class testFormItemHttpAgent extends CWebTest {
 		if (array_key_exists('check_form', $data) && $data['check_form'] === true) {
 			$this->zbxTestCheckFatalErrors();
 			$defaults = [
-				'Request type' => 'POST',
+				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
 				'Follow redirects' => false,
