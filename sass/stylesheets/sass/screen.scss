@@ -4158,6 +4158,42 @@ $form-icon-btn: (
 	stroke-width: 1px;
 }
 
+.svg-graph-legend {
+	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
+	$svg-legend-line-height: 18px;
+	$svg-legend-handle-height: 4px;
+
+	overflow-y: hidden;
+	white-space: normal;
+	margin: 0 10px;
+
+	div {
+		display: inline-block;
+		margin: 0 4px;
+		font-size: 12px;
+		line-height: $svg-legend-line-height;
+		vertical-align: middle;
+		max-width: 160px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		border: 0 none transparent;
+	}
+
+	div:before {
+		content: ' ';
+		display: inline-block;
+		margin-right: 4px;
+		width: 10px;
+		height: 0;
+		vertical-align: middle;
+		margin-top: -$svg-legend-handle-height;
+		border-top-width: $svg-legend-handle-height;
+		border-top-style: solid;
+		border-top-color: inherit;
+	}
+}
+
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;

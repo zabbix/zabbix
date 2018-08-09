@@ -20,7 +20,7 @@
 
 
 $output = [
-	'body' => $data['svg']->toString()
+	'body' => $data['svg']
 ];
 
 if (!$data['edit_mode']) {

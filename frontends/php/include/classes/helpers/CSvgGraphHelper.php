@@ -67,19 +67,41 @@ class CSvgGraphHelper {
 		// Clear unneeded data.
 		unset($options['data_sets'], $options['overrides'], $options['problems']);
 
+		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
+		$legend_height = $options['legend'] ? $options['legend_lines'] * 18 : 0;
+
 		// Draw SVG graph.
-		$graph = (new CSvgGraph($width, $height, $options))
+		$graph = (new CSvgGraph($width, $height - $legend_height, $options))
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
 			->setYAxisLeft(array_key_exists('left_y_axis', $options) ? $options['left_y_axis'] : false)
 			->setYAxisRight(array_key_exists('right_y_axis', $options) ? $options['right_y_axis'] : false)
 			->setXAxis(array_key_exists('x_axis', $options) ? $options['x_axis'] : false)
-			->setLegendType($options['legend'])
 			->addProblems($problems)
 			->addMetrics($metrics)
 			->draw();
 
+		if ($legend_height > 0) {
+			$labels = [];
+
+			foreach ($metrics as $metric) {
+				$labels[] = [
+					// TODO: resolve item name macro.
+					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
+					'color' => $metric['options']['color']
+				];
+			}
+
+			$legend = (new CSvgGraphLegend($labels))
+				->setAttribute('style', 'height: '.$legend_height.'px')
+				->toString();
+		}
+		else {
+			$legend = '';
+		}
+
 		return [
 			'svg' => $graph,
+			'legend' => $legend,
 			'data' => [
 				'dims' => [
 					'x' => $graph->getCanvasX(),

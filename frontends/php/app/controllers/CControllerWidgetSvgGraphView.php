@@ -226,7 +226,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'svg' => $svg_data['svg'],
+			'svg' => $svg_data['svg'].$svg_data['legend'],
 			'script_inline' => $script_inline,
 			'edit_mode' => $edit_mode,
 			'initial_load' => $initial_load,
