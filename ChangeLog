@@ -8,8 +8,11 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-9731] changed value cache to drop unused items from cache when new values are added instead performing this cleanup only when cache runs out of free space (wiper)
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
-........S. [ZBX-14410] improved output of information about the error for expressions with functions (MVekslers)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
 ...G...PS. [ZBX-14341] fixed duplicate value generation in environments with poor connectivity (wiper)
 ........S. [ZBX-9913] fixed inconsistencies in behaviour and error messaging of trigger functions (mindbound)
 ..F....... [ZBX-14448] fixed undefined index when updating item and switching type to dependent (Ivo)
@@ -432,9 +435,12 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+...G...PS. [ZBX-13730] fixed incorrect behavior of zbxregexp library when reusing latest regular expression (yurii)
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
 ..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
-........S. [ZBX-14410] improved output of information about the error for expressions with functions (MVekslers)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
@@ -1739,8 +1745,10 @@ Changes for 3.0.21rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
+........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
-........S. [ZBX-14410] improved output of information about the error for expressions with functions (MVekslers)
+........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
 ..F....... [ZBX-14433] fixed several problems in displaying of X axis on the graphs (Sasha)
 
 --------------------------------------------------------------------------------
