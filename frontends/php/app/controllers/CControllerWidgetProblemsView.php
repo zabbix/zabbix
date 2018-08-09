@@ -43,8 +43,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$config = select_config();
 
-		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
-
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
 			'groupids' => getSubGroups($fields['groupids']),
@@ -55,10 +53,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
 			'maintenance' => $fields['maintenance'],
-			'unacknowledged' => $fields['unacknowledged'],
-			'show_timeline' => ($sortfield === 'clock') ? $fields['show_timeline'] : 0
+			'unacknowledged' => $fields['unacknowledged']
 		], $config);
-
+		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
 		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
@@ -87,7 +84,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'fields' => [
 				'show' => $fields['show'],
 				'show_tags' => $fields['show_tags'],
-				'show_timeline' => $fields['show_timeline'],
+				'show_timeline' => $fields['show_timeline']
 				'tags' => $fields['tags'],
 				'tag_name_format' => $fields['tag_name_format'],
 				'tag_priority' => $fields['tag_priority']

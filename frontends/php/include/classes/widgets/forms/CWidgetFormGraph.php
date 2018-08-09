@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Graph widget form.
+ */
 class CWidgetFormGraph extends CWidgetForm {
 
 	public function __construct($data) {
@@ -37,7 +40,7 @@ class CWidgetFormGraph extends CWidgetForm {
 			$field_source->setValue($this->data['source_type']);
 		}
 
-		$this->fields[] = $field_source;
+		$this->fields[$field_source->getName()] = $field_source;
 
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
@@ -52,7 +55,7 @@ class CWidgetFormGraph extends CWidgetForm {
 				$field_item->setValue($this->data['itemid']);
 			}
 
-			$this->fields[] = $field_item;
+			$this->fields[$field_item->getName()] = $field_item;
 		}
 		else {
 			// Select graph field.
@@ -63,7 +66,7 @@ class CWidgetFormGraph extends CWidgetForm {
 				$field_graph->setValue($this->data['graphid']);
 			}
 
-			$this->fields[] = $field_graph;
+			$this->fields[$field_graph->getName()] = $field_graph;
 		}
 
 		// Show legend checkbox.
@@ -73,13 +76,13 @@ class CWidgetFormGraph extends CWidgetForm {
 			$field_legend->setValue($this->data['show_legend']);
 		}
 
-		$this->fields[] = $field_legend;
+		$this->fields[$field_legend->getName()] = $field_legend;
 
-		// dynamic item
+		// Dynamic item.
 		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 
 		$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
 
-		$this->fields[] = $field_dynamic;
+		$this->fields[$field_dynamic->getName()] = $field_dynamic;
 	}
 }

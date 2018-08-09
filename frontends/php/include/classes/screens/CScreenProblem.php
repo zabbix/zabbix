@@ -742,6 +742,10 @@ class CScreenProblem extends CScreenBase {
 			$show_timeline = ($this->data['sort'] === 'clock' && !$this->data['filter']['compact_view']
 				&& $this->data['filter']['show_timeline']);
 
+			$show_recovery_data = in_array($this->data['filter']['show'], [
+				TRIGGERS_OPTION_RECENT_PROBLEM,
+				TRIGGERS_OPTION_ALL
+			]);
 			$header_clock =
 				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'], $link);
 
@@ -787,8 +791,8 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 							$link
 						)->addStyle('width: 120px;'),
-						(new CColHeader(_('Recovery time')))->addStyle('width: 115px;'),
-						(new CColHeader(_('Status')))->addStyle('width: 70px;'),
+						$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
+						$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
 						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 42%;'),
@@ -809,8 +813,10 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 							$link
 						),
-						(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
-						_('Status'),
+						$show_recovery_data
+							? (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH)
+							: null,
+						$show_recovery_data ? _('Status') : null,
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
@@ -978,8 +984,8 @@ class CScreenProblem extends CScreenBase {
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
 					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
-					$cell_r_clock,
-					$cell_status,
+					$show_recovery_data ? $cell_r_clock : null,
+					$show_recovery_data ? $cell_status : null,
 					makeInformationList($info_icons),
 					$triggers_hosts[$trigger['triggerid']],
 					$description,

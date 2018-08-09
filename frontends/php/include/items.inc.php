@@ -782,20 +782,173 @@ function get_realhost_by_itemid($itemid) {
 	return get_host_by_itemid($itemid);
 }
 
-function fillItemsWithChildTemplates(&$items) {
-	$processSecondLevel = false;
-	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.dbConditionInt('i.itemid', zbx_objectValues($items, 'templateid')));
-	while ($dbItem = DBfetch($dbItems)) {
-		foreach ($items as $itemid => $item) {
-			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
-				$items[$itemid]['templateid'] = $dbItem['templateid'];
-				$processSecondLevel = true;
+/**
+ * Get parent templates for each given item.
+ *
+ * @param array  $items                 An array of items.
+ * @param string $items[]['itemid']     ID of an item.
+ * @param string $items[]['templateid'] ID of parent template item.
+ *
+ * @return array
+ */
+function getItemParentTemplates(array $items) {
+	$parent_itemids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
+
+	foreach ($items as $item) {
+		if ($item['templateid'] != 0) {
+			$parent_itemids[$item['templateid']] = true;
+			$data['links'][$item['itemid']] = ['itemid' => $item['templateid']];
+		}
+	}
+
+	if (!$parent_itemids) {
+		return $data;
+	}
+
+	$all_parent_itemids = [];
+	$hostids = [];
+
+	do {
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'templateid'],
+			'itemids' => array_keys($parent_itemids),
+			'webitems' => true
+		]);
+
+		$all_parent_itemids += $parent_itemids;
+		$parent_itemids = [];
+
+		foreach ($db_items as $db_item) {
+			$data['templates'][$db_item['hostid']] = [];
+			$hostids[$db_item['itemid']] = $db_item['hostid'];
+
+			if ($db_item['templateid'] != 0) {
+				if (!array_key_exists($db_item['templateid'], $all_parent_itemids)) {
+					$parent_itemids[$db_item['templateid']] = true;
+				}
+
+				$data['links'][$db_item['itemid']] = ['itemid' => $db_item['templateid']];
 			}
 		}
 	}
-	if ($processSecondLevel) {
-		fillItemsWithChildTemplates($items); // attention recursion!
+	while ($parent_itemids);
+
+	foreach ($data['links'] as $itemid => &$parent_item) {
+		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
+			? $hostids[$parent_item['itemid']]
+			: 0;
 	}
+	unset($parent_item);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected item.
+ *
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ *
+ * @return CLink|CSpan|null
+ */
+function makeItemTemplatePrefix($itemid, array $parent_templates) {
+	if (!array_key_exists($itemid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$itemid]['itemid'], $parent_templates['links'])) {
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
+
+	if ($template['permission'] == PERM_READ_WRITE) {
+		$name = (new CLink(CHtml::encode($template['name']),
+			(new CUrl('items.php'))
+				->setArgument('hostid', $template['hostid'])
+				->setArgument('filter_set', 1)
+		))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(CHtml::encode($template['name']));
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of item templates.
+ *
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ *
+ * @return array
+ */
+function makeItemTemplatesHtml($itemid, array $parent_templates) {
+	$list = [];
+
+	while (array_key_exists($itemid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
+
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = new CLink(CHtml::encode($template['name']),
+				(new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+			);
+		}
+		else {
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 function get_realrule_by_itemid_and_hostid($itemid, $hostid) {

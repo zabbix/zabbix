@@ -393,7 +393,7 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
  * @param bool   $fullscreen
- * @param bool   $show_timeline
+ * @param bool   $show_timeline						show time line flag.
  * @param int    $show_tags       PROBLEMS_SHOW_TAGS_NONE|PROBLEMS_SHOW_TAGS_1|PROBLEMS_SHOW_TAGS_2|PROBLEMS_SHOW_TAGS_3
  * @param array  $filter_tags
  * @param string $filter_tags[]['tag']
