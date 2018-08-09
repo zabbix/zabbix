@@ -210,6 +210,20 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).');';
 		}
 
+		// Register widget auto-refresh when resizing widget.
+		if ($initial_load) {
+			$script_inline .=
+				'if (typeof(zbx_svggraph_widget_resize_end) !== typeof(Function)) {'.
+					'function zbx_svggraph_widget_resize_end() {'.
+						'jQuery(".dashbrd-grid-widget-container").dashboardGrid("refreshWidget", "'.$uniqueid.'");'.
+					'}'.
+				'}'.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.
+					'"zbx_svggraph_widget_resize_end", "'.$uniqueid.'", {'.
+						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
+					'});';
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'svg' => $svg_data['svg'],

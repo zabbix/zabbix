@@ -940,7 +940,7 @@
 	 * @param {object} data       Data from dashboard grid.
 	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @return int               Number of triggers, that were called.
+	 * @return int                Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
