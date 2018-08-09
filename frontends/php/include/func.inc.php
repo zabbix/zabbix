@@ -298,14 +298,13 @@ function zbx_date2str($format, $value = null) {
  *
  * @param int|string $start_date  Start date timestamp.
  * @param int|string $end_date    End date timestamp.
- * @param bool $short_units       Use short units labels or full.
  *
  * @return string
  */
-function zbx_date2age($start_date, $end_date = 0, $short_units = true) {
+function zbx_date2age($start_date, $end_date = 0) {
 	$end_date = ($end_date != 0) ? $end_date : time();
 
-	return convertUnitsS($end_date - $start_date, false, $short_units);
+	return convertUnitsS($end_date - $start_date);
 }
 
 function zbxDateToTime($strdate) {
@@ -483,13 +482,12 @@ function convertUnitsUptime($value) {
  * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
- * @param int $value time period in seconds
- * @param bool $ignore_millisec without ms (1s 200 ms = 1.2s)
- * @param bool $short_units use short units labels or full
+ * @param int  $value            Time period in seconds.
+ * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
  *
  * @return string
  */
-function convertUnitsS($value, $ignore_millisec = false, $short_units = true) {
+function convertUnitsS($value, $ignore_millisec = false) {
 	$secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000;
 	if ($secs < 0) {
 		$secs = -$secs;
@@ -577,17 +575,17 @@ function convertUnitsS($value, $ignore_millisec = false, $short_units = true) {
 	}
 
 	$units = [
-		'y' => [_x('y', 'year short'), _('year'), _('years')],
-		'm' => [_x('m', 'month short'), _('month'), _('months')],
-		'd' => [_x('d', 'day short'), _('day'), _('days')],
-		'h' => [_x('h', 'hour short'), _('hour'), _('hours')],
-		'mm' => [_x('m', 'minute short'), _('minute'), _('minutes')],
-		's' => [_x('s', 'second short'), _('second'), _('seconds')],
-		'ms' => [_x('ms', 'millisecond short'), _('millisecond'), _('milliseconds')]
+		'y' => _x('y', 'year short'),
+		'm' => _x('m', 'month short'),
+		'd' => _x('d', 'day short'),
+		'h' => _x('h', 'hour short'),
+		'mm' => _x('m', 'minute short'),
+		's' => _x('s', 'second short'),
+		'ms' => _x('ms', 'millisecond short')
 	];
 
 	foreach (array_filter($values) as $unit => $value) {
-		$str .= ' '.$value.($short_units ? $units[$unit][0] : ' '._n($units[$unit][1], $units[$unit][2], $value));
+		$str .= ' '.$value.$units[$unit];
 	}
 
 	return $str ? trim($str) : '0';

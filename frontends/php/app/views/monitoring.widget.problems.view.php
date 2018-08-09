@@ -207,15 +207,14 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		->setArgument('backurl', $backurl)
 		->getUrl();
 
-	$r_clock = ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0;
-
 	$table->addRow(array_merge($row, [
 		$show_recovery_data ? $cell_r_clock : null,
 		$show_recovery_data ? $cell_status : null,
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		(new CCol(zbx_date2age($problem['clock'], $r_clock)))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
+			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT),
