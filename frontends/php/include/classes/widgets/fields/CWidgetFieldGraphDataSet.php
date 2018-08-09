@@ -50,7 +50,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
 		$this->setDefault([]);
 
-		// Specify color palete for data-set colors.
+		// Predefined colors for data-sets.
 		$this->color_palete = [
 			'ff465c','b0af07','0ec9ac','524bbc','ed1248','d1e754','2ab5ff','385cc7','ec1594','bae37d',
 			'6ac8ff','ee2b29','3ca20d','6f4bbc','00a1ff','f3601b','1cae59','45cfdb','894bbc','6d6d6d'
@@ -546,11 +546,15 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'containment: "parent",'.
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
+				'scroll: false,'.
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disable: function() {'.
 					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
+				'},'.
+				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
+					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
 				'update: function() {'.
 					'jQuery("input[type=hidden]", jQuery("#data_sets")).filter(function() {'.

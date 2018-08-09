@@ -460,11 +460,15 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				'containment: "parent",'.
 				'handle: ".drag-icon",'.
 				'tolerance: "pointer",'.
+				'scroll: false,'.
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
 				'disable: function() {'.
 					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
+				'},'.
+				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
+					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
 				'update: function() {'.
 					'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
