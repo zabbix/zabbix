@@ -272,6 +272,7 @@ if ($data['action'] == 'problem.view') {
 				->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
 				->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
 				->setModern(true)
+				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		);
 
 	$filter_column2 = (new CFormList())
@@ -282,6 +283,7 @@ if ($data['action'] == 'problem.view') {
 			(new CTextBox('tag_priority', $data['filter']['tag_priority']))
 				->setCalcWidth(ZBX_TEXTAREA_CALC_MARGIN)
 				->setAttribute('placeholder', _('Comma separated list'))
+				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		)
 		->addRow(_('Show hosts in maintenance'), [
 			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),

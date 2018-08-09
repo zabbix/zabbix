@@ -61,6 +61,17 @@
 			}
 		});
 
+		$('#filter_show_tags').change(function() {
+			if ($(this).find('[value = "<?=PROBLEMS_SHOW_TAGS_NONE?>"]').is(':checked')) {
+				$('#tag_name_format input').attr('disabled', true);
+				$('#tag_priority').attr('disabled', true);
+			}
+			else {
+				$('#tag_name_format input').removeAttr('disabled');
+				$('#tag_priority').removeAttr('disabled');
+			}
+		});
+
 		$(document).on({
 			mouseenter: function() {
 				if ($(this).width() > $(this).parent('td').width()) {
