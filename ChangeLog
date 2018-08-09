@@ -8,6 +8,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-9731] changed value cache to drop unused items from cache when new values are added instead performing this cleanup only when cache runs out of free space (wiper)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
