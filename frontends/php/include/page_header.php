@@ -188,8 +188,12 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
 	}
-	$pageHeader->addJsFile('js/browsers.js');
-	$pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
+	$pageHeader
+		->addJsFile('js/browsers.js')
+		->addJsBeforeScripts(
+			'var PHP_TZ_OFFSET = '.date('Z').','.
+				'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
+	);
 
 	// show GUI messages in pages with menus and in fullscreen mode
 	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || $_REQUEST['fullscreen'] == 1) ? 1 : 0;

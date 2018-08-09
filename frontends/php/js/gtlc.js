@@ -115,18 +115,6 @@ jQuery(function ($){
 		}
 	});
 
-	// Calendar toggle visibility handlers initialization.
-	if (element.from_clndr.length && element.to_clndr.length) {
-		$([element.from_clndr, element.to_clndr]).each(function () {
-			var button = $(this),
-				input = element[button.is(element.from_clndr) ? 'from' : 'to'].get(0);
-
-			button.data('clndr', create_calendar(null, input, null, button.attr('id'), ''))
-				.data('input', input)
-				.click(toggleCalendarPickerHandler);
-		});
-	}
-
 	/**
 	 * Trigger timeselector.rangechange event on 'enter' key press in 'from' or 'to' input field.
 	 *
@@ -171,9 +159,6 @@ jQuery(function ($){
 			element[elm].removeClass('disabled');
 		});
 
-		element.from_clndr.data('clndr').clndr.clndrhide();
-		element.to_clndr.data('clndr').clndr.clndrhide();
-
 		element.quickranges.removeClass('selected');
 		element.quickranges.filter('[data-label="'+data.label+'"]').addClass('selected');
 
@@ -188,27 +173,8 @@ jQuery(function ($){
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
-		element.from_clndr.data('clndr').clndr.clndrhide();
-		element.to_clndr.data('clndr').clndr.clndrhide();
+
 		ui_disabled = true;
-	}
-
-	/**
-	 * Show or hide associated to button calendar picker.
-	 *
-	 * @param {object} e    jQuery event object.
-	 */
-	function toggleCalendarPickerHandler(e) {
-		var button = $(this),
-			offset = button.offset();
-
-		if (!ui_disabled) {
-			button.data('clndr').clndr.clndrshow(parseInt(offset.top + button.outerHeight(), 10),
-				parseInt(offset.left, 10), button.data('input')
-			);
-		}
-
-		return cancelEvent(e);
 	}
 
 	/**
@@ -264,6 +230,11 @@ jQuery(function ($){
 				updateTimeSelectorUI(request_data);
 
 				if (json.error) {
+					if (typeof json.error === 'string') {
+						// Error message originates from CControllerTimeSelectorUpdate::checkInput().
+						alert(json.error);
+					}
+
 					container.find('.time-input-error').each(function (i, elm) {
 						var node = $(elm),
 							field = node.attr('data-error-for');
@@ -276,6 +247,7 @@ jQuery(function ($){
 							node.hide();
 						}
 					});
+
 					delete request_data.error;
 				}
 				else {
@@ -286,14 +258,24 @@ jQuery(function ($){
 
 				xhr = null;
 			},
-			error: function () {
-				var request = this,
+			error: function (request, status, error) {
+				/*
+				 * In case there is something very wrong with the code like "echo '<br>'" in the middle where there is
+				 * supposed to be JSON, show error. Otherwise it could've been just a temporary connection issue
+				 * like 404, for example, so just retry.
+				 */
+				if (request.status != 200) {
+					var request = this,
 					retry = function() {
 						$.ajax(request);
 					};
 
-				// Retry with 2s interval.
-				setTimeout(retry, 2000);
+					// Retry with 2s interval.
+					setTimeout(retry, 2000);
+				}
+				else {
+					alert(error);
+				}
 			}
 		});
 	}

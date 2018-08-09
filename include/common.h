@@ -23,6 +23,7 @@
 #include "sysinc.h"
 #include "zbxtypes.h"
 #include "version.h"
+#include "md5.h"
 
 #ifndef va_copy
 #	if defined(__va_copy)
@@ -1299,6 +1300,7 @@ int	zbx_function_param_quote(char **param, int forced);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len);
+char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
@@ -1492,6 +1494,9 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
+
+#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
+char	*zbx_create_token(zbx_uint64_t seed);
 
 #endif
 

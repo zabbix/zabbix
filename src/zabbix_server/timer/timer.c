@@ -23,93 +23,17 @@
 #include "pid.h"
 #include "db.h"
 #include "log.h"
-#include "../events.h"
 #include "dbcache.h"
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "export.h"
 
 #include "timer.h"
 
 #define TIMER_DELAY	30
 
-#define ZBX_TRIGGERS_MAX	1000
-
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-
-/******************************************************************************
- *                                                                            *
- * Function: process_time_functions                                           *
- *                                                                            *
- * Purpose: re-calculate and update values of time-driven functions           *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-static void	process_time_functions(int *triggers_count, int *events_count)
-{
-	const char		*__function_name = "process_time_functions";
-	DC_TRIGGER		trigger_info[ZBX_TRIGGERS_MAX];
-	zbx_vector_ptr_t	trigger_order, trigger_diff;
-	zbx_vector_uint64_t	triggerids;
-	int			events_num, i;
-	zbx_uint64_t		next_triggerid = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_ptr_create(&trigger_order);
-	zbx_vector_ptr_reserve(&trigger_order, ZBX_TRIGGERS_MAX);
-	zbx_vector_ptr_create(&trigger_diff);
-	zbx_vector_uint64_create(&triggerids);
-
-	while (0 != DCconfig_get_time_based_triggers(trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, next_triggerid,
-			process_num))
-	{
-		for (i = 0; i < trigger_order.values_num; i++)
-			zbx_vector_uint64_append(&triggerids, trigger_info[i].triggerid);
-
-		next_triggerid = trigger_info[trigger_order.values_num - 1].triggerid + 1;
-
-		*triggers_count += trigger_order.values_num;
-
-		evaluate_expressions(&trigger_order);
-
-		DBbegin();
-
-		zbx_process_triggers(&trigger_order, &trigger_diff);
-
-		if (0 != (events_num = zbx_process_events(&trigger_diff, &triggerids)))
-		{
-			*events_count += events_num;
-
-			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_db_save_trigger_changes(&trigger_diff);
-		}
-
-		DBcommit();
-
-		DBupdate_itservices(&trigger_diff);
-
-		DCconfig_unlock_triggers(&triggerids);
-		zbx_vector_uint64_clear(&triggerids);
-
-		DCfree_triggers(&trigger_order);
-
-		if (SUCCEED == zbx_is_export_enabled())
-			zbx_export_events();
-
-		zbx_clean_events();
-	}
-
-	zbx_vector_uint64_destroy(&triggerids);
-	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-	zbx_vector_ptr_destroy(&trigger_diff);
-	zbx_vector_ptr_destroy(&trigger_order);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
 
 typedef struct
 {
@@ -630,13 +554,8 @@ static int	process_maintenance(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	int	now, nextcheck, sleeptime = -1,
-		triggers_count = 0, events_count = 0, hm_count = 0,
-		old_triggers_count = 0, old_events_count = 0, old_hm_count = 0,
-		tr_count, ev_count;
-	double	sec = 0.0, sec_maint = 0.0,
-		total_sec = 0.0, total_sec_maint = 0.0,
-		old_total_sec = 0.0, old_total_sec_maint = 0.0;
+	int	now, nextcheck, sleeptime = -1, hm_count = 0, old_hm_count = 0;
+	double	sec = 0.0, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -649,13 +568,20 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+	/* temporary block other timer processes until trigger based maintenance is merged in */
+	if (1 != process_num)
+	{
+		zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
+
+		for (;;)
+			zbx_sleep_loop(SEC_PER_DAY);
+	}
+
+
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	if (SUCCEED == zbx_is_export_enabled())
-		zbx_problems_export_init("timer", process_num);
 
 	for (;;)
 	{
@@ -663,64 +589,26 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
 
-		/* try flushing correlated event queue */
-		if (0 != zbx_flush_correlated_events())
-		{
-			/* force minimal sleep period if there are still some events left in queue */
-			if (1 < sleeptime)
-				sleeptime = 1;
-		}
-
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
 			if (0 == sleeptime)
 			{
-				if (1 != process_num)
-				{
-					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, processing time functions]",
-							get_process_type_string(process_type), process_num,
-							triggers_count, events_count, total_sec);
-				}
-				else
-				{
-					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, %d maintenances in " ZBX_FS_DBL " sec, processing time "
-							"functions]",
-							get_process_type_string(process_type),
-							triggers_count, events_count, total_sec, hm_count,
-							total_sec_maint);
-				}
+				zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, processing "
+						"maintenance periods]",
+						get_process_type_string(process_type),
+						hm_count, total_sec);
 			}
 			else
 			{
-				if (1 != process_num)
-				{
-					zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, idle %d sec]",
-							get_process_type_string(process_type), process_num,
-							triggers_count, events_count, total_sec, sleeptime);
-				}
-				else
-				{
-					zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-							" sec, %d maintenances in " ZBX_FS_DBL " sec, idle %d sec]",
-							get_process_type_string(process_type),
-							triggers_count, events_count, total_sec, hm_count,
-							total_sec_maint, sleeptime);
-					old_hm_count = hm_count;
-					old_total_sec_maint = total_sec_maint;
-				}
-				old_triggers_count = triggers_count;
-				old_events_count = events_count;
+				zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, idle %d sec]",
+						get_process_type_string(process_type),
+						hm_count, total_sec, sleeptime);
+				old_hm_count = hm_count;
 				old_total_sec = total_sec;
 			}
 
-			triggers_count = 0;
-			events_count = 0;
 			hm_count = 0;
 			total_sec = 0.0;
-			total_sec_maint = 0.0;
 			last_stat_time = time(NULL);
 		}
 
@@ -730,51 +618,25 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (0 != sleeptime)
 		{
-			if (1 != process_num)
-			{
-				zbx_setproctitle("%s #%d [processed %d triggers, %d events in " ZBX_FS_DBL
-						" sec, processing time functions]",
-						get_process_type_string(process_type), process_num,
-						old_triggers_count, old_events_count, old_total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-						" sec, %d maintenances in " ZBX_FS_DBL " sec, processing time "
-						"functions]",
-						get_process_type_string(process_type),
-						old_triggers_count, old_events_count, old_total_sec, old_hm_count,
-						old_total_sec_maint);
-			}
+			zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, processing time "
+					"functions]",
+					get_process_type_string(process_type),
+					old_hm_count, old_total_sec);
 		}
-
-		sec = zbx_time();
-		tr_count = 0;
-		ev_count = 0;
-		process_time_functions(&tr_count, &ev_count);
-		triggers_count += tr_count;
-		events_count += ev_count;
-		total_sec += zbx_time() - sec;
-
-		/* only the "timer #1" process evaluates the maintenance periods */
-		if (1 != process_num)
-			goto next;
 
 		/* we process maintenance at every 00 sec */
-		/* process time functions can take long time */
 		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
 		{
-			zbx_setproctitle("%s #1 [processed %d triggers, %d events in " ZBX_FS_DBL
-					" sec, %d maintenances in " ZBX_FS_DBL " sec, processing maintenance periods]",
+			zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL
+					" sec, processing maintenance periods]",
 					get_process_type_string(process_type),
-					triggers_count, events_count, total_sec, old_hm_count,
-					old_total_sec_maint);
+					old_hm_count, total_sec);
 
-			sec_maint = zbx_time();
+			sec = zbx_time();
 			hm_count += process_maintenance();
-			total_sec_maint += zbx_time() - sec_maint;
+			total_sec += zbx_time() - sec;
 		}
-next:
+
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
 #else

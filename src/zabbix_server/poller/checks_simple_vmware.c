@@ -1652,6 +1652,58 @@ out:
 	return ret;
 }
 
+static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
+		AGENT_RESULT *result)
+{
+	switch (mode)
+	{
+		case ZBX_VMWARE_DATASTORE_SIZE_TOTAL:
+			if (ZBX_MAX_UINT64 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
+				return SYSINFO_RET_FAIL;
+			}
+			SET_UI64_RESULT(result, datastore->capacity);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_FREE:
+			if (ZBX_MAX_UINT64 == datastore->free_space)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
+				return SYSINFO_RET_FAIL;
+			}
+			SET_UI64_RESULT(result, datastore->free_space);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED:
+			if (ZBX_MAX_UINT64 == datastore->uncommitted)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"uncommitted\" is not available."));
+				return SYSINFO_RET_FAIL;
+			}
+			SET_UI64_RESULT(result, datastore->uncommitted);
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
+			if (ZBX_MAX_UINT64 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is not available."));
+				return SYSINFO_RET_FAIL;
+			}
+			if (ZBX_MAX_UINT64 == datastore->free_space)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"free space\" is not available."));
+				return SYSINFO_RET_FAIL;
+			}
+			if (0 == datastore->capacity)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Datastore \"capacity\" is zero."));
+				return SYSINFO_RET_FAIL;
+			}
+			SET_DBL_RESULT(result, (double)datastore->free_space / datastore->capacity * 100);
+			break;
+	}
+
+	return SYSINFO_RET_OK;
+}
+
 int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1730,6 +1782,12 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 	if (NULL == datastore)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
+	{
+		ret = check_vcenter_hv_datastore_size_vsphere(mode, datastore, result);
 		goto unlock;
 	}
 

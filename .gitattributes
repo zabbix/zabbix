@@ -38,6 +38,7 @@ frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/locale/ca/LC_MESSAGES/frontend.po -text
 frontends/php/locale/he/LC_MESSAGES/frontend.po -text
+frontends/php/locale/nb/LC_MESSAGES/frontend.po -text
 frontends/php/tests/images/image.png -text svneol=unset#image/png
 include/zbxhistory.h -text
 include/zbxipcservice.h -text

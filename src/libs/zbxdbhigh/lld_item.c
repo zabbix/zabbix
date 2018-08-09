@@ -85,6 +85,17 @@ typedef struct
 }
 zbx_lld_item_prototype_t;
 
+#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	999
+#define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		master_itemid;
+	unsigned char		item_flags;
+}
+zbx_item_dependence_t;
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -798,24 +809,15 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	for (i = items->values_num - 1; i >= 0; i--)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
+		master_itemid = item->master_itemid;
 
-		if (0 != item->master_itemid)
-		{
-			if (FAIL == (index = zbx_vector_ptr_bsearch(items, &item->master_itemid,
+		if (0 != master_itemid && FAIL != (index = zbx_vector_ptr_bsearch(items, &master_itemid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				/* dependent item without master item should be removed */
-				THIS_SHOULD_NEVER_HAPPEN;
-				lld_item_free(item);
-				zbx_vector_ptr_remove(items, i);
-				continue;
-			}
-
+		{
+			/* dependent items based on prototypes should contain prototype itemid */
 			master = (zbx_lld_item_t *)items->values[index];
 			master_itemid = master->parent_itemid;
 		}
-		else
-			master_itemid = 0;
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -915,6 +917,320 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_item_dependence_add                                          *
+ *                                                                            *
+ * Purpose: add a new dependency                                              *
+ *                                                                            *
+ * Parameters: item_dependencies - [IN\OUT] list of dependencies              *
+ *             itemid            - [IN] item id                               *
+ *             master_itemid     - [IN] master item id                        *
+ *             item_flags        - [IN] item flags (ZBX_FLAG_DISCOVERY_*)     *
+ *                                                                            *
+ * Returns: item dependence                                                   *
+ *                                                                            *
+ * Comments: Memory is allocated to store item dependence. This memory must   *
+ *           be freed by the caller.                                          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_item_dependence_t	*lld_item_dependence_add(zbx_vector_ptr_t *item_dependencies, zbx_uint64_t itemid,
+		zbx_uint64_t master_itemid, unsigned int item_flags)
+{
+	zbx_item_dependence_t	*dependence = (zbx_item_dependence_t *)zbx_malloc(NULL, sizeof(zbx_item_dependence_t));
+
+	dependence->itemid = itemid;
+	dependence->master_itemid = master_itemid;
+	dependence->item_flags = item_flags;
+
+	zbx_vector_ptr_append(item_dependencies, dependence);
+
+	return dependence;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_dependencies_get                                        *
+ *                                                                            *
+ * Purpose: recursively get dependencies with dependent items taking into     *
+ *          account item prototypes                                           *
+ *                                                                            *
+ * Parameters: item_prototypes   - [IN] item prototypes                       *
+ *             item_dependencies - [OUT] list of dependencies                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *item_dependencies)
+{
+#define NEXT_CHECK_BY_ITEM_IDS		0
+#define NEXT_CHECK_BY_MASTERITEM_IDS	1
+
+	const char		*__function_name = "lld_item_dependencies_get";
+
+	int			i, check_type;
+	zbx_vector_uint64_t	processed_masterid, processed_itemid, next_check_itemids, next_check_masterids,
+				*check_ids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&processed_masterid);
+	zbx_vector_uint64_create(&processed_itemid);
+	zbx_vector_uint64_create(&next_check_itemids);
+	zbx_vector_uint64_create(&next_check_masterids);
+
+	/* collect the item id of prototypes for searching dependencies into database */
+	for (i = 0; i < item_prototypes->values_num; i++)
+	{
+		const zbx_lld_item_prototype_t	*item_prototype;
+
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
+
+		if (0 != item_prototype->master_itemid)
+		{
+			lld_item_dependence_add(item_dependencies, item_prototype->itemid,
+					item_prototype->master_itemid, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			zbx_vector_uint64_append(&next_check_itemids, item_prototype->master_itemid);
+			zbx_vector_uint64_append(&next_check_masterids, item_prototype->master_itemid);
+		}
+	}
+
+	/* search dependency in two directions (masteritem_id->itemid and itemid->masteritem_id) */
+	while (0 < next_check_itemids.values_num || 0 < next_check_masterids.values_num)
+	{
+		if (0 < next_check_itemids.values_num)
+		{
+			check_type = NEXT_CHECK_BY_ITEM_IDS;
+			check_ids = &next_check_itemids;
+		}
+		else
+		{
+			check_type = NEXT_CHECK_BY_MASTERITEM_IDS;
+			check_ids = &next_check_masterids;
+		}
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,master_itemid,flags from items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				NEXT_CHECK_BY_ITEM_IDS == check_type ? "itemid" : "master_itemid",
+				check_ids->values, check_ids->values_num);
+
+		if (NEXT_CHECK_BY_ITEM_IDS == check_type)
+			zbx_vector_uint64_append_array(&processed_itemid, check_ids->values, check_ids->values_num);
+		else
+			zbx_vector_uint64_append_array(&processed_masterid, check_ids->values, check_ids->values_num);
+
+		zbx_vector_uint64_clear(check_ids);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_item_dependence_t	*dependence = NULL;
+			zbx_uint64_t		itemid, master_itemid;
+			unsigned int		item_flags;
+
+			ZBX_STR2UINT64(itemid, row[0]);
+			ZBX_DBROW2UINT64(master_itemid, row[1]);
+			ZBX_STR2UCHAR(item_flags, row[2]);
+
+			for (i = 0; i < item_dependencies->values_num; i++)
+			{
+				dependence = (zbx_item_dependence_t *)item_dependencies->values[i];
+				if (dependence->itemid == itemid && dependence->master_itemid == master_itemid)
+					break;
+			}
+
+			if (i == item_dependencies->values_num)
+			{
+				dependence = lld_item_dependence_add(item_dependencies, itemid, master_itemid,
+						item_flags);
+			}
+
+			if (FAIL == zbx_vector_uint64_search(&processed_masterid, dependence->itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_append(&next_check_masterids, dependence->itemid);
+			}
+
+			if (NEXT_CHECK_BY_ITEM_IDS != check_type || 0 == dependence->master_itemid)
+				continue;
+
+			if (FAIL == zbx_vector_uint64_search(&processed_itemid, dependence->master_itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zbx_vector_uint64_append(&next_check_itemids, dependence->master_itemid);
+			}
+		}
+		DBfree_result(result);
+	}
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&processed_masterid);
+	zbx_vector_uint64_destroy(&processed_itemid);
+	zbx_vector_uint64_destroy(&next_check_itemids);
+	zbx_vector_uint64_destroy(&next_check_masterids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+#undef NEXT_CHECK_BY_ITEM_IDS
+#undef NEXT_CHECK_BY_MASTERITEM_IDS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_dependencies_count                                      *
+ *                                                                            *
+ * Purpose: recursively count the number of dependencies                      *
+ *                                                                            *
+ * Parameters: itemid            - [IN] item ID to be checked                 *
+ *             dependencies      - [IN] item dependencies                     *
+ *             processed_itemids - [IN\OUT] list of checked item ids          *
+ *             dependencies_num  - [IN\OUT] number of dependencies            *
+ *             depth_level       - [IN\OUT] depth level                       *
+ *                                                                            *
+ * Returns: SUCCEED - the number of dependencies was successfully counted     *
+ *          FAIL    - the limit of dependencies is reached                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_item_dependencies_count(const zbx_uint64_t itemid, const zbx_vector_ptr_t *dependencies,
+		zbx_vector_uint64_t *processed_itemids, int *dependencies_num, unsigned char *depth_level)
+{
+	int	ret = FAIL, i, curr_depth_calculated = 0;
+
+	for (i = 0; i < dependencies->values_num; i++)
+	{
+		zbx_item_dependence_t	*dep = (zbx_item_dependence_t *)dependencies->values[i];
+
+		/* check if item is a master for someone else */
+		if (dep->master_itemid != itemid)
+			continue;
+
+		/* check the limit of dependent items */
+		if (0 == (dep->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) &&
+				ZBX_DEPENDENT_ITEM_MAX_COUNT <= ++(*dependencies_num))
+		{
+			goto out;
+		}
+
+		/* check the depth level */
+		if (0 == curr_depth_calculated)
+		{
+			curr_depth_calculated = 1;
+
+			if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++(*depth_level))
+			{
+				/* API shouldn't allow to create dependencies deeper */
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+		}
+
+		/* check if item was calculated in previous iterations */
+		if (FAIL != zbx_vector_uint64_search(processed_itemids, dep->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		if (SUCCEED != lld_item_dependencies_count(dep->itemid, dependencies, processed_itemids,
+				dependencies_num, depth_level))
+		{
+			goto out;
+		}
+
+		/* add counted item id */
+		zbx_vector_uint64_append(processed_itemids, dep->itemid);
+	}
+
+	ret = SUCCEED;
+out:
+	if (1 == curr_depth_calculated)
+		(*depth_level)--;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_dependencies_check                                      *
+ *                                                                            *
+ * Purpose: check the limits of dependent items                               *
+ *                                                                            *
+ * Parameters: item             - [IN] discovered item                        *
+ *             item_prototype   - [IN] item prototype to be checked for limit *
+ *             dependencies     - [IN] item dependencies                      *
+ *                                                                            *
+ * Returns: SUCCEED - the check was successful                                *
+ *          FAIL    - the limit of dependencies is exceeded                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_item_dependencies_check(const zbx_lld_item_t *item, const zbx_lld_item_prototype_t *item_prototype,
+		zbx_vector_ptr_t *dependencies)
+{
+	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
+	int 			ret = FAIL, i, dependence_num = 0, item_in_deps = FAIL;
+	unsigned char		depth_level = 0;
+	zbx_vector_uint64_t	processed_itemids;
+
+	/* find the dependency of the item by item id */
+	for (i = 0; i < dependencies->values_num; i++)
+	{
+		dependence = (zbx_item_dependence_t *)dependencies->values[i];
+		if (item_prototype->itemid == dependence->itemid)
+			break;
+	}
+
+	if (NULL == dependence || i == dependencies->values_num)
+		return SUCCEED;
+
+	/* find the top dependency that doesn't have a master item id */
+	while (NULL == top_dependence)
+	{
+		for (i = 0; i < dependencies->values_num; i++)
+		{
+			tmp_dep = (zbx_item_dependence_t *)dependencies->values[i];
+
+			if (item->itemid == tmp_dep->itemid)
+				item_in_deps = SUCCEED;
+
+			if (dependence->master_itemid == tmp_dep->itemid)
+			{
+				dependence = tmp_dep;
+				break;
+			}
+		}
+
+		if (0 == dependence->master_itemid)
+		{
+			top_dependence = dependence;
+		}
+		else if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < ++depth_level)
+		{
+			/* API shouldn't allow to create dependencies deeper than ZBX_DEPENDENT_ITEM_MAX_LEVELS */
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+		}
+	}
+
+	depth_level = 0;
+	zbx_vector_uint64_create(&processed_itemids);
+
+	ret = lld_item_dependencies_count(top_dependence->itemid, dependencies, &processed_itemids, &dependence_num,
+			&depth_level);
+
+	zbx_vector_uint64_destroy(&processed_itemids);
+
+	if (SUCCEED == ret && SUCCEED != item_in_deps
+			&& 0 == (top_dependence->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		lld_item_dependence_add(dependencies, item_prototype->itemid, item->master_itemid,
+				ZBX_FLAG_DISCOVERY_CREATED);
+	}
+
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_items_preproc_step_validate                                  *
  *                                                                            *
  * Purpose: validation of a item preprocessing step expressions for discovery *
@@ -932,8 +1248,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN], *err_dyn = NULL;
+	char		err[MAX_STRING_LEN];
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	const char*	regexp_err = NULL;
 
 	*err = '\0';
 
@@ -958,11 +1275,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 
 			*output++ = '\0';
 
-			if (FAIL == (ret = zbx_regexp_compile(pattern, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, NULL,
-					&err_dyn)))
+			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &regexp_err)))
 			{
-				zbx_strlcpy(err, err_dyn, sizeof(err));
-				zbx_free(err_dyn);
+				zbx_strlcpy(err, regexp_err, sizeof(err));
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -990,21 +1305,25 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
  *                                                                            *
  * Function: lld_items_validate                                               *
  *                                                                            *
- * Parameters: items - [IN] list of items; must be sorted by itemid           *
- *             error - [IN/OUT] the lld error message                         *
+ * Parameters: hostid            - [IN] host id                               *
+ *             items             - [IN] list of items                         *
+ *             item_prototypes   - [IN] the item prototypes                   *
+ *             item_dependencies - [IN] list of dependencies                  *
+ *             error             - [IN/OUT] the lld error message             *
  *                                                                            *
- ******************************************************************************/
-static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
+ *****************************************************************************/
+static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx_vector_ptr_t *item_prototypes,
+		zbx_vector_ptr_t *item_dependencies, char **error)
 {
-	const char		*__function_name = "lld_items_validate";
+	const char			*__function_name = "lld_items_validate";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			i, j;
-	zbx_lld_item_t		*item;
-	zbx_vector_uint64_t	itemids;
-	zbx_vector_str_t	keys;
-	zbx_hashset_t		items_keys;
+	DB_RESULT			result;
+	DB_ROW				row;
+	int				i, j;
+	zbx_lld_item_t			*item;
+	zbx_vector_uint64_t		itemids;
+	zbx_vector_str_t		keys;
+	zbx_hashset_t			items_keys;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1135,7 +1454,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 
 
 	/* check duplicated keys in DB */
-
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
@@ -1212,6 +1530,59 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 
 	zbx_vector_str_destroy(&keys);
 	zbx_vector_uint64_destroy(&itemids);
+
+	/* check limit of dependent items in the dependency tree */
+	if (0 != item_dependencies->values_num)
+	{
+		for (i = 0; i < items->values_num; i++)
+		{
+			int				index;
+			const zbx_lld_item_prototype_t	*item_prototype;
+
+			item = (zbx_lld_item_t *)items->values[i];
+
+			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || 0 == item->master_itemid
+					|| (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE)))
+			{
+				continue;
+			}
+
+			if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &item->parent_itemid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+
+			if (SUCCEED != lld_item_dependencies_check(item, item_prototype, item_dependencies))
+			{
+				*error = zbx_strdcatf(*error,
+						"Cannot create %s item: maximum dependent items count reached.\n",
+						item->key);
+
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			}
+		}
+	}
+
+	/* check for broken dependent items */
+	for (i = 0; i < items->values_num; i++)
+	{
+		item = (zbx_lld_item_t *)items->values[i];
+
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
+			for (j = 0; j < item->dependent_items.values_num; j++)
+			{
+				zbx_lld_item_t	*dependent;
+
+				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
+				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			}
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2539,6 +2910,7 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
  * Parameters: hostid          - [IN] parent host id                          *
  *             item_prototypes - [IN] item prototypes                         *
  *             items           - [IN/OUT] items to save                       *
+ *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully saved or saving was not *
@@ -2547,14 +2919,15 @@ static void	lld_item_prepare_update(const zbx_vector_ptr_t *item_prototypes, con
  *                                                                            *
  ******************************************************************************/
 static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items,
-		int *host_locked)
+		zbx_hashset_t *items_index, int *host_locked)
 {
-	const char	*__function_name = "lld_items_save";
+	const char		*__function_name = "lld_items_save";
 
-	int		ret = SUCCEED, i, new_items = 0, upd_items = 0;
-	zbx_lld_item_t	*item;
-	zbx_uint64_t	itemid, itemdiscoveryid;
-	zbx_db_insert_t	db_insert, db_insert_idiscovery;
+	int			ret = SUCCEED, i, new_items = 0, upd_items = 0;
+	zbx_lld_item_t		*item;
+	zbx_uint64_t		itemid, itemdiscoveryid;
+	zbx_db_insert_t		db_insert, db_insert_idiscovery;
+	zbx_lld_item_index_t	item_index_local;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2614,12 +2987,26 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		/* dependent items are saved within recursive lld_item_save calls while saving master */
+		/* dependent items based on item prototypes are saved within recursive lld_item_save calls while */
+		/* saving master item */
 		if (0 == item->master_itemid)
 		{
-			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid,
-					&db_insert, &db_insert_idiscovery);
+			lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
+					&db_insert_idiscovery);
 		}
+		else
+		{
+			item_index_local.parent_itemid = item->master_itemid;
+			item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
+
+			/* dependent item based on host item should be saved */
+			if (NULL == zbx_hashset_search(items_index, &item_index_local))
+			{
+				lld_item_save(hostid, item_prototypes, item, &itemid, &itemdiscoveryid, &db_insert,
+						&db_insert_idiscovery);
+			}
+		}
+
 	}
 
 	if (0 != new_items)
@@ -3857,8 +4244,8 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 	{
 		for (j = 0; j < lld_rows->values_num; j++)
 		{
-			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i], (zbx_lld_row_t *)lld_rows->values[j], applications,
-					applications_index);
+			lld_application_make((zbx_lld_application_prototype_t *)application_prototypes->values[i],
+					(zbx_lld_row_t *)lld_rows->values[j], applications, applications_index);
 		}
 	}
 
@@ -4442,14 +4829,7 @@ static void	lld_link_dependent_items(zbx_vector_ptr_t *items, zbx_hashset_t *ite
 		item_index_local.parent_itemid = item->master_itemid;
 		item_index_local.lld_row = (zbx_lld_row_t *)item->lld_row;
 
-		if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
-		{
-			/* dependent item without master item should be removed */
-			THIS_SHOULD_NEVER_HAPPEN;
-			lld_item_free(item);
-			zbx_vector_ptr_remove(items, i);
-		}
-		else
+		if (NULL != (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 		{
 			master = item_index->item;
 			zbx_vector_ptr_append(&master->dependent_items, item);
@@ -4475,7 +4855,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 {
 	const char		*__function_name = "lld_update_items";
 
-	zbx_vector_ptr_t	applications, application_prototypes, items, item_prototypes;
+	zbx_vector_ptr_t	applications, application_prototypes, items, item_prototypes, item_dependencies;
 	zbx_hashset_t		applications_index, items_index, items_applications;
 	int			ret = SUCCEED, host_record_is_locked = 0;
 
@@ -4511,16 +4891,20 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 	lld_items_get(&item_prototypes, &items);
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, &items, error);
-	lld_items_validate(hostid, &items, error);
+
+	lld_link_dependent_items(&items, &items_index);
+
+	zbx_vector_ptr_create(&item_dependencies);
+	lld_item_dependencies_get(&item_prototypes, &item_dependencies);
+
+	lld_items_validate(hostid, &items, &item_prototypes, &item_dependencies, error);
 
 	lld_items_applications_get(lld_ruleid, &items_applications);
 	lld_items_applications_make(&item_prototypes, &items, &applications_index, &items_applications);
 
-	lld_link_dependent_items(&items, &items_index);
-
 	DBbegin();
 
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &host_record_is_locked) &&
+	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
 			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
 			SUCCEED == lld_applications_save(hostid, &applications, &application_prototypes,
 					&host_record_is_locked))
@@ -4541,6 +4925,9 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 clean:
 	zbx_hashset_destroy(&items_applications);
 	zbx_hashset_destroy(&items_index);
+
+	zbx_vector_ptr_clear_ext(&item_dependencies, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&item_dependencies);
 
 	zbx_vector_ptr_clear_ext(&items, (zbx_clean_func_t)lld_item_free);
 	zbx_vector_ptr_destroy(&items);

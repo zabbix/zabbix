@@ -29,11 +29,23 @@ class CWebUser {
 	static $set_cookie = true;
 
 	/**
+	 * Flag used to not to extend session lifetime in checkAuthentication.
+	 */
+	static $extend_session = true;
+
+	/**
 	 * Disable automatic cookie setting.
 	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
 	 */
 	public static function disableSessionCookie() {
 		self::$set_cookie = false;
+	}
+
+	/**
+	 * Disable automatic session extension.
+	 */
+	public static function disableSessionExtension() {
+		self::$extend_session = false;
 	}
 
 	/**
@@ -103,7 +115,10 @@ class CWebUser {
 	public static function checkAuthentication($sessionId) {
 		try {
 			if ($sessionId !== null) {
-				self::$data = API::User()->checkAuthentication(['sessionid' => $sessionId]);
+				self::$data = API::User()->checkAuthentication([
+					'sessionid' => $sessionId,
+					'extend' => self::$extend_session
+				]);
 			}
 
 			if ($sessionId === null || empty(self::$data)) {

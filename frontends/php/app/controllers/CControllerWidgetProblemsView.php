@@ -82,7 +82,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
 				'show' => $fields['show'],
-				'show_tags' => $fields['show_tags']
+				'show_tags' => $fields['show_tags'],
+				'show_timeline' => $fields['show_timeline']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],
@@ -127,10 +128,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_SEVERITY_ASC:
-				return ['priority', ZBX_SORT_UP];
+				return ['severity', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
-				return ['priority', ZBX_SORT_DOWN];
+				return ['severity', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
 				return ['host', ZBX_SORT_UP];

@@ -484,20 +484,23 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  max-width: calc(100% - 100px);
   position: relative;
   top: 0;
   z-index: 3;
   margin-bottom: 0; }
   .filter-breadcrumb > li:first-child {
     float: left;
-    max-width: 256px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap; }
     .filter-breadcrumb > li:first-child > span {
-      display: inline;
+      display: inline-block;
+      line-height: 1;
       padding: 4px 7px; }
+      .filter-breadcrumb > li:first-child > span a {
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: top; }
   .filter-breadcrumb + .filter-space {
     margin-top: -28px; }
 
@@ -1031,6 +1034,14 @@ output {
           background-color: dimgray;
           opacity: 1;
           filter: alpha(opacity=100); }
+  .multiselect div[aria-live] {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1; }
 
 .multiselect-button, .multiselect {
   display: inline-block;
@@ -1631,7 +1642,8 @@ button {
   .ui-tabs-nav .filter-trigger:hover {
     color: #f2f2f2;
     background-color: #5e737e;
-    border-color: #5e737e; }
+    border-color: #5e737e;
+    cursor: pointer; }
 .ui-tabs-nav .btn-time {
   padding: 0 34px 0 10px; }
   .ui-tabs-nav .btn-time:after {
@@ -1798,7 +1810,7 @@ button {
       .time-selection-container .time-input li .icon-cal {
         position: relative;
         vertical-align: middle;
-        margin-left: -5px; }
+        margin-left: 2px; }
   .time-selection-container .time-quick-range {
     text-align: right;
     white-space: nowrap;
@@ -3512,14 +3524,20 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px; }
+    width: 18px;
+    height: 18px;
+    border: 1px solid #4f4f4f;
+    background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
+    cursor: pointer; }
+  .input-color-picker input[readonly] + div, .input-color-picker input:disabled + div {
+    cursor: default; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
   .input-color-picker.disabled {
     opacity: 1; }
     .input-color-picker.disabled div {
-      background: #525252 !important; }
+      background: #525252 !important;
+      border: 1px solid #525252; }
 
 .in-progress {
   position: relative; }
