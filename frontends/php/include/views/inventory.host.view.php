@@ -38,7 +38,7 @@ $host_name = (new CLinkAction($data['host']['host']))
 	));
 
 if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-		&& array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+		&& array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
 	$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
 	$maintenance_icon = makeMaintenanceIcon($data['host']['maintenance_type'], $maintenance['name'],
 		$maintenance['description']
