@@ -434,6 +434,7 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+...G...PS. [ZBX-13730] fixed incorrect behavior of zbxregexp library when reusing latest regular expression (yurii)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
