@@ -1415,6 +1415,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
+		char	*xml_value = NULL;
+
 		/* try to detect the service type first using vCenter service manager object */
 		zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
 				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
@@ -1436,7 +1438,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
-		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+		if (FAIL == zbx_xml_try_read_value(page.data, ZBX_XPATH_FAULTSTRING(), &xml_value, error))
+			goto out;
+
+		if (NULL == xml_value)
 		{
 			/* Successfully authenticated with vcenter service manager. */
 			/* Set the service type and return with success.            */
@@ -1444,6 +1449,9 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			ret = SUCCEED;
 			goto out;
 		}
+
+		*error = zbx_strdup(*error, xml_value);
+		zbx_free(xml_value);
 
 		/* If the wrong service manager was used, set the service type as vsphere and */
 		/* try again with vsphere service manager. Otherwise return with failure.     */
@@ -4942,6 +4950,92 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 /*
  * XML support
  */
+/******************************************************************************
+ *                                                                            *
+ * Function: libxml_handle_error                                              *
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+{
+	ZBX_UNUSED(user_data);
+	ZBX_UNUSED(err);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_xml_try_read_value                                           *
+ *                                                                            *
+ * Purpose: retrieve a value from xml data and return status of operation     *
+ *                                                                            *
+ * Parameters: data   - [IN] XML data                                         *
+ *             xpath  - [IN] XML XPath                                        *
+ *             value  - [OUT] selected xml node value                         *
+ *             error  - [OUT] error of xml or xpath formats                   *
+ *                                                                            *
+ * Return: SUCCEED - select xpath successfully, result stored in 'value'      *
+ *         FAIL - failed select xpath expression                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_try_read_value(const char *data, const char *xpath, char **value, char **error)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	int		ret = FAIL;
+
+	if (NULL == data)
+		goto out;
+
+	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error);
+
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Received response has no valid XML data.");
+
+		xmlSetStructuredErrorFunc(NULL, NULL);
+		goto out;
+	}
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Invalid xpath expression: \"%s\".", xpath);
+
+		goto clean;
+	}
+
+	ret = SUCCEED;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		*value = zbx_strdup(NULL, (const char *)val);
+		xmlFree(val);
+	}
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlSetStructuredErrorFunc(NULL, NULL);
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+out:
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -4958,41 +5052,9 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  ******************************************************************************/
 char	*zbx_xml_read_value(const char *data, const char *xpath)
 {
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	char		*value = NULL;
+	char	*value = NULL;
 
-	if (NULL == data)
-		goto out;
-
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
-		goto out;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		value = zbx_strdup(NULL, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-out:
+	zbx_xml_try_read_value(data, xpath, &value, NULL);
 	return value;
 }
 
