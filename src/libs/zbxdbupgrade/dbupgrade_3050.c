@@ -1582,6 +1582,26 @@ static int	DBpatch_3050124(void)
 	return DBset_default("items", &field);
 }
 
+static int	DBpatch_3050125(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 1);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1709,5 +1729,9 @@ DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
 DBPATCH_ADD(3050123, 0, 1)
 DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
 
 DBPATCH_END()
