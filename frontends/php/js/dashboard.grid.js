@@ -486,12 +486,6 @@
 
 				$content_header.text(resp.header);
 
-				if ('period_string' in resp) {
-					$content_header.append(
-						$('<span class="dashbrd-grid-widget-head-period-string">').text(resp.period_string)
-					);
-				}
-
 				if (typeof resp.aria_label !== 'undefined') {
 					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
 				}
