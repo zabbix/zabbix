@@ -4599,10 +4599,15 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 	else
 	{
 		zbx_token_t	token;
+		int		len, c_l, c_r;
 
 		while ('\0' != (*data)[i])
 		{
-			if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
+			if ('{' == (*data)[i] && '$' == (*data)[i + 1] && SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r))
+			{
+				i += len + 1;	/* skip to the position after user macro */
+			}
+			else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
 					SUCCEED == zbx_token_parse_nested_macro(&(*data)[i], &(*data)[i], &token))
 			{
 				i += token.token.r - token.token.l + 1;
