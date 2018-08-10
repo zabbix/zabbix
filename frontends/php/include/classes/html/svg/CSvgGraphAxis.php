@@ -71,6 +71,13 @@ class CSvgGraphAxis extends CSvgTag {
 	 */
 	private $container;
 
+	/**
+	 * Visibility of axis line with arrow.
+	 *
+	 * @var bool
+	 */
+	private $axis_visible = true;
+
 	public function __construct(array $labels, $type) {
 		$this->labels = $labels;
 		$this->type = $type;
@@ -103,6 +110,18 @@ class CSvgGraphAxis extends CSvgTag {
 				'text-anchor' => 'middle'
 			]
 		];
+	}
+
+	/**
+	 * Set axis line visibility.
+	 *
+	 * @param bool $visible   True if should be visible.
+	 * @return CSvgGraphAxis
+	 */
+	public function setAxisVisibility($visible) {
+		$this->axis_visible = $visible;
+
+		return $this;
 	}
 
 	/**
@@ -190,7 +209,7 @@ class CSvgGraphAxis extends CSvgTag {
 
 	public function toString($destroy = true) {
 		$this->container->additem([
-			$this->type !== GRAPH_YAXIS_SIDE_RIGHT ? $this->getAxis() : null,
+			$this->axis_visible ? $this->getAxis() : null,
 			$this->getLabels()
 		])
 			->addClass($this->css_class[$this->type]);

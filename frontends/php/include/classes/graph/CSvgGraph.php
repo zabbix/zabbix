@@ -352,7 +352,28 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	public function getTimeGridWithPosition() {
-		// TODO: copy/extend logic from CLineGraphDraw.
+		$period = $this->time_till - $this->time_from;
+		$grid_values = [];
+
+		// $formats = [
+		// 	['sec' => 10,				'step' => 5,				'time_fmt' => 'H:i:s'],
+		// 	['sec' => SEC_PER_MIN,		'step' => SEC_PER_MIN * 0.5,'time_fmt' => 'H:i:s'],
+		// 	['sec' => SEC_PER_MIN * 3,	'step' => SEC_PER_MIN * 2,	'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_MIN * 10,	'step' => SEC_PER_MIN * 5,	'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_HOUR / 2,	'step' => SEC_PER_MIN * 10,	'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_HOUR,		'step' => SEC_PER_MIN * 20,	'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_HOUR * 2,	'step' => SEC_PER_HOUR,		'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_HOUR * 4,	'step' => SEC_PER_HOUR * 2,	'time_fmt' => 'H:i'],
+		// 	['sec' => SEC_PER_DAY,		'step' => SEC_PER_DAY * 0.5,'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_DAY * 2,	'step' => SEC_PER_DAY,		'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_DAY * 4,	'step' => SEC_PER_DAY * 2,	'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_WEEK / 2,	'step' => SEC_PER_DAY * 4,	'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_WEEK,		'step' => SEC_PER_WEEK * 0.5,'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_WEEK * 2,	'step' => SEC_PER_WEEK,		'time_fmt' => 'd H:i'],
+		// 	['sec' => SEC_PER_YEAR / 2,	'step' => SEC_PER_WEEK * 2,	'time_fmt' => 'n-d H:i'],
+		// 	['sec' => SEC_PER_YEAR,		'step' => SEC_PER_YEAR / 2,	'time_fmt' => 'n-d H:i'],
+		// 	['sec' => SEC_PER_YEAR * 2,	'step' => SEC_PER_YEAR,		'time_fmt' => 'n-d H:i']
+		// ];
 		$formats = [
 			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
 			['sec' => 60,	'step' => 30,	'time_fmt' => 'H:i:s'],
@@ -379,17 +400,14 @@ class CSvgGraph extends CSvg {
 		}
 
 		$start = $this->time_from + $step - $this->time_from % $step;
-		$grid_values = [];
 
 		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
-			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock)
-				/ ($this->time_till - $this->time_from));
-			$grid_values[$relative_pos] = date($time_fmt, $clock);
+			$relative_pos = round($this->canvas_width * ($this->time_till - $clock) / $period);
+			$grid_values[$relative_pos] = date($time_fmt, $this->canvas_width - $clock);
 		}
 
 		return $grid_values;
 	}
-
 
 	/**
 	 * Add UI selection box element to graph.
@@ -506,8 +524,11 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawCanvasRightYAxis() {
 		if ($this->right_y_show && $this->min_value_right !== null) {
+			$has_left_axis = ($this->left_y_show && $this->min_value_left !== null);
+
 			$this->addItem(
 				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
+					->setAxisVisibility(!$has_left_axis)
 					->setSize($this->offset_right, $this->canvas_height)
 					->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
 			);
@@ -595,7 +616,7 @@ class CSvgGraph extends CSvg {
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
 
-			$this->applyMissingDataFunc($this->points[$index], $metric['options']['missingdatafunc']);
+			$this->applyMissingDataFunc($this->points[$index], (int) $metric['options']['missingdatafunc']);
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
