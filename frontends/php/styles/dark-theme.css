@@ -2900,7 +2900,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     font-size: 12px;
     line-height: 18px;
     vertical-align: middle;
-    max-width: 160px;
+    max-width: 30%;
+    min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -3819,18 +3820,17 @@ svg {
     margin-left: 10px;
     left: -15px; } }
 .overrides-list {
-  display: flex;
-  flex-direction: column;
+  display: table;
+  width: 90%;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
-    border-bottom: 1px solid #383838;
-    margin-bottom: 10px;
-    display: table;
-    width: 100%; }
+    display: table-row; }
 
 .overrides-options-list {
   white-space: normal;
-  padding: 0px 0px 10px; }
+  padding: 0px 0px 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #383838; }
   .overrides-options-list > li {
     display: inline-block;
     margin: 2px 7px 2px 0;

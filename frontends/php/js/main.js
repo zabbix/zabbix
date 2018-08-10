@@ -1100,7 +1100,12 @@ jQuery(function ($) {
 				options = $.extend({}, options);
 
 				$(this)
-					.css({'resize':'none'})
+					.css({
+						'resize': 'none',
+						'overflow-x': 'hidden',
+						'overflow-y': 'auto',
+						'white-space': 'pre-line'
+					})
 					.on('paste change keyup', function() {
 						var rows = calcRows($(this), options);
 

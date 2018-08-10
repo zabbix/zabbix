@@ -5474,21 +5474,20 @@ svg {
 }
 
 .overrides-list {
-	display: flex;
-	flex-direction: column;
+	display: table;
+	width: 90%;
 	padding-left: 15px;
 
 	.overrides-list-item {
-		border-bottom: 1px solid $table-border-color;
-		margin-bottom: 10px;
-		display: table;
-		width: 100%;
+		display: table-row;
 	}
 }
 
 .overrides-options-list {
 	white-space: normal;
 	padding: 0px 0px 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid $table-border-color;
 
 	> li {
 		display: inline-block;
