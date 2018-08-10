@@ -386,6 +386,34 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$errors = zbx_array_merge($errors, CWidgetFieldDatePicker::validateTimeSelectorPeriod($from, $to));
 		}
 
+		// Validate Min/Max values in Axes tab.
+		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
+			$lefty_min = $this->fields['lefty_min']->getValue();
+			$lefty_max = $this->fields['lefty_max']->getValue();
+			if ($lefty_min !== '' && !is_numeric($lefty_min)) {
+				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Min'), _('Left Y'), _('a number is expected'));
+			}
+			elseif ($lefty_max !== '' && !is_numeric($lefty_max)) {
+				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Max'), _('Left Y'), _('a number is expected'));
+			}
+			elseif ($lefty_min !== '' && $lefty_max !== '' && (int)$lefty_min >= (int)$lefty_max) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), $lefty_min);
+			}
+		}
+
+		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
+			$righty_min = $this->fields['righty_min']->getValue();
+			$righty_max = $this->fields['righty_max']->getValue();
+			if ($righty_min !== '' && !is_numeric($righty_min)) {
+				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Min'), _('Right Y'), _('a number is expected'));
+			}
+			elseif ($righty_max !== '' && !is_numeric($righty_max)) {
+				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Max'), _('Right Y'), _('a number is expected'));
+			}
+			elseif ($righty_min !== '' && $righty_max !== '' && (int)$righty_min >= (int)$righty_max) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), $righty_min);
+			}
+		}
 		return $errors;
 	}
 

@@ -111,6 +111,11 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			if (array_key_exists('lefty_max', $fields) && is_numeric($fields['lefty_max'])) {
 				$graph_data['left_y_axis']['max'] = $fields['lefty_max'];
 			}
+			if (array_key_exists('min', $graph_data['left_y_axis'])
+					&& array_key_exists('max', $graph_data['left_y_axis'])
+					&& $graph_data['left_y_axis']['min'] >= $graph_data['left_y_axis']['max']) {
+				unset($graph_data['left_y_axis']['min'], $graph_data['left_y_axis']['max']); // Unset invalid.
+			}
 			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['left_y_axis']['units'] = array_key_exists('lefty_static_units', $fields)
 					? $fields['lefty_static_units']
@@ -127,6 +132,11 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			}
 			if (array_key_exists('righty_max', $fields) && is_numeric($fields['righty_max'])) {
 				$graph_data['right_y_axis']['max'] = $fields['righty_max'];
+			}
+			if (array_key_exists('min', $graph_data['right_y_axis'])
+					&& array_key_exists('max', $graph_data['right_y_axis'])
+					&& $graph_data['right_y_axis']['min'] >= $graph_data['right_y_axis']['max']) {
+				unset($graph_data['right_y_axis']['min'], $graph_data['right_y_axis']['max']); // Unset invalid.
 			}
 			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['right_y_axis']['units'] = array_key_exists('righty_static_units', $fields)
