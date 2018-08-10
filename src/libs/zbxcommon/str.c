@@ -4603,7 +4603,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 
 		while ('\0' != (*data)[i])
 		{
-			if ('{' == (*data)[i] && '$' == (*data)[i + 1] && SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r))
+			if ('{' == (*data)[i] && '$' == (*data)[i + 1] &&
+					SUCCEED == zbx_user_macro_parse(&(*data)[i], &len, &c_l, &c_r))
 			{
 				i += len + 1;	/* skip to the position after user macro */
 			}
