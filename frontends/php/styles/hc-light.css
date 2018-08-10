@@ -535,7 +535,8 @@ output {
     color: #000;
     height: 22px;
     line-height: 1;
-    vertical-align: middle; }
+    vertical-align: middle;
+    white-space: nowrap; }
     .list-table.compact-view td [class*='icon-'] {
       vertical-align: middle; }
       .list-table.compact-view td [class*='icon-']:after {
