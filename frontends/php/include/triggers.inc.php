@@ -694,7 +694,7 @@ function replace_template_dependencies($deps, $hostid) {
 }
 
 function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], $show_suppressed = null) {
+		array $trigger_options = [], $show_suppressed = 0) {
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
@@ -730,21 +730,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$options['applicationids'] = array_keys($applications);
 	}
 
-	$triggers = getTriggersWithActualSeverity($options);
-
-	if ($show_suppressed == 0) {
-		$suppressed_problems = API::Problem()->get([
-			'output' => ['objectid'],
-			'objectids' => array_keys($triggers),
-			'suppressed' => true
-		]);
-
-		foreach ($suppressed_problems as $suppressed_problem) {
-			if (array_key_exists($suppressed_problem['objectid'], $triggers)) {
-				unset($triggers[$suppressed_problem['objectid']]);
-			}
-		}
-	}
+	$triggers = getTriggersWithActualSeverity($options, $show_suppressed);
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
@@ -771,7 +757,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  *
  * @return array
  */
-function getTriggersWithActualSeverity($options) {
+function getTriggersWithActualSeverity($options, $show_suppressed = 0) {
 	$triggers = API::Trigger()->get($options);
 
 	$problem_triggerids = [];
@@ -786,9 +772,13 @@ function getTriggersWithActualSeverity($options) {
 
 	if ($problem_triggerids) {
 		$problems = API::Problem()->get([
-			'output' => ['severity', 'objectid'],
-			'objectids' => $problem_triggerids
+			'output' => ['objectid', 'severity'],
+			'objectids' => $problem_triggerids,
+			'suppressed' => $show_suppressed ? null : false
 		]);
+
+		$triggerids = zbx_objectValues($problems, 'objectid');
+		$triggers = array_intersect_key($triggers, array_fill_keys($triggerids, ''));
 
 		foreach ($problems as $problem) {
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
