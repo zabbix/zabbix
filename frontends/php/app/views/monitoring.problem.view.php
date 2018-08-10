@@ -265,9 +265,9 @@ if ($data['action'] == 'problem.view') {
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
 		)
-		->addItem((new CDiv())->setWidth(23))  // ENG-form right align
+		->addItem((new CDiv())->setWidth(ZBX_STYLE_FORM_INPUT_MARGIN))
 		->addItem(_('Tag name'))
-		->addItem((new CRadioButtonList('tag_name_format', (int) $data['filter']['tag_name_format']))
+		->addItem((new CRadioButtonList('filter_tag_name_format', (int) $data['filter']['tag_name_format']))
 				->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
 				->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
 				->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
@@ -280,9 +280,9 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Tags'), $filter_tags_table)
 		->addRow(_('Show tags'), $tag_format_line)
 		->addRow(_('Tag display priority'),
-			(new CTextBox('tag_priority', $data['filter']['tag_priority']))
-				->setCalcWidth(ZBX_TEXTAREA_CALC_MARGIN)
-				->setAttribute('placeholder', _('Comma separated list'))
+			(new CTextBox('filter_tag_priority', $data['filter']['tag_priority']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('placeholder', _('Comma-separated list'))
 				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		)
 		->addRow(_('Show hosts in maintenance'), [

@@ -61,8 +61,8 @@ class CControllerProblemView extends CController {
 			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'filter_highlight_row' =>	'in 1',
-			'tag_name_format' =>		'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
-			'tag_priority' =>			'string',
+			'filter_tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
+			'filter_tag_priority' =>	'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time'
 		];
@@ -175,10 +175,12 @@ class CControllerProblemView extends CController {
 			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
 				PROFILE_TYPE_INT
 			);
-			CProfile::update('web.problem.filter.tag_name_format', $this->getInput('tag_name_format', PROBLEMS_TAG_NAME_FULL),
-				PROFILE_TYPE_INT
+			CProfile::update('web.problem.filter.tag_name_format', $this->getInput('filter_tag_name_format',
+				PROBLEMS_TAG_NAME_FULL), PROFILE_TYPE_INT
 			);
-			CProfile::update('web.problem.filter.tag_priority', $this->getInput('tag_priority', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.problem.filter.tag_priority', $this->getInput('filter_tag_priority', ''),
+				PROFILE_TYPE_STR
+			);
 			CProfile::update('web.problem.filter.maintenance', $this->getInput('filter_maintenance', 0),
 				PROFILE_TYPE_INT
 			);
