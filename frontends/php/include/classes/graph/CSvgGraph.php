@@ -99,7 +99,7 @@ class CSvgGraph extends CSvg {
 
 	protected $offset_top;
 	protected $time_from;
-	protected $time_to;
+	protected $time_till;
 
 	protected $right_y_max;
 	protected $right_y_min;
@@ -353,57 +353,60 @@ class CSvgGraph extends CSvg {
 	 */
 	public function getTimeGridWithPosition() {
 		$period = $this->time_till - $this->time_from;
-		$grid_values = [];
-
-		// $formats = [
-		// 	['sec' => 10,				'step' => 5,				'time_fmt' => 'H:i:s'],
-		// 	['sec' => SEC_PER_MIN,		'step' => SEC_PER_MIN * 0.5,'time_fmt' => 'H:i:s'],
-		// 	['sec' => SEC_PER_MIN * 3,	'step' => SEC_PER_MIN * 2,	'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_MIN * 10,	'step' => SEC_PER_MIN * 5,	'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_HOUR / 2,	'step' => SEC_PER_MIN * 10,	'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_HOUR,		'step' => SEC_PER_MIN * 20,	'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_HOUR * 2,	'step' => SEC_PER_HOUR,		'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_HOUR * 4,	'step' => SEC_PER_HOUR * 2,	'time_fmt' => 'H:i'],
-		// 	['sec' => SEC_PER_DAY,		'step' => SEC_PER_DAY * 0.5,'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_DAY * 2,	'step' => SEC_PER_DAY,		'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_DAY * 4,	'step' => SEC_PER_DAY * 2,	'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_WEEK / 2,	'step' => SEC_PER_DAY * 4,	'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_WEEK,		'step' => SEC_PER_WEEK * 0.5,'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_WEEK * 2,	'step' => SEC_PER_WEEK,		'time_fmt' => 'd H:i'],
-		// 	['sec' => SEC_PER_YEAR / 2,	'step' => SEC_PER_WEEK * 2,	'time_fmt' => 'n-d H:i'],
-		// 	['sec' => SEC_PER_YEAR,		'step' => SEC_PER_YEAR / 2,	'time_fmt' => 'n-d H:i'],
-		// 	['sec' => SEC_PER_YEAR * 2,	'step' => SEC_PER_YEAR,		'time_fmt' => 'n-d H:i']
-		// ];
-		$formats = [
-			['sec' => 10,	'step' => 5,	'time_fmt' => 'H:i:s'],
-			['sec' => 60,	'step' => 30,	'time_fmt' => 'H:i:s'],
-			['sec' => 180,	'step' => 120,	'time_fmt' => 'H:i'],
-			['sec' => 600,	'step' => 300,	'time_fmt' => 'H:i'],
-			['sec' => 1800,	'step' => 600,	'time_fmt' => 'H:i'],
-			['sec' => 3600,	'step' => 1200,	'time_fmt' => 'H:i'],
-			['sec' => 7200,	'step' => 3600,	'time_fmt' => 'H:i'],
-			['sec' => 14400,'step' => 7200,	'time_fmt' => 'H:i'],
-			['sec' => 86400,'step' => 43200,'time_fmt' => 'H:i']
+		// 100px is grid cell desired size.
+		$time_interval = (100 * $period) / $this->canvas_width;
+		$intervals = [
+			SEC_PER_MIN / 60 => 'H:i:s',	// 1 second
+			SEC_PER_MIN / 12 => 'H:i:s',	// 5 seconds
+			SEC_PER_MIN / 6 => 'H:i:s',		// 10 seconds
+			SEC_PER_MIN / 2 => 'H:i:s',		// 30 seconds
+			SEC_PER_MIN => 'H:i',			// 1 minute
+			SEC_PER_MIN * 2 => 'H:i',		// 2 minutes
+			SEC_PER_MIN * 5 => 'H:i',		// 5 minutes
+			SEC_PER_MIN * 15 => 'H:i',		// 15 minutes
+			SEC_PER_MIN * 30 => 'H:i',		// 30 minutes
+			SEC_PER_HOUR => 'H:i',			// 1 hours
+			SEC_PER_HOUR * 3 => 'H:i',		// 3 hours
+			SEC_PER_HOUR * 6 => 'H:i',		// 6 hours
+			SEC_PER_HOUR * 12 => 'H:i',		// 12 hours
+			SEC_PER_DAY => 'd H:i',			// 1 day
+			SEC_PER_WEEK => 'd H:i',		// 1 week
+			SEC_PER_WEEK * 2 => 'd H:i',	// 2 weeks
+			SEC_PER_MONTH => 'd H:i',		// 30 days
+			SEC_PER_MONTH * 3 => 'Y-n-d',	// 90 days
+			SEC_PER_MONTH * 4 => 'Y-n-d',	// 120 days
+			SEC_PER_MONTH * 6 => 'Y-n-d',	// 180 days
+			SEC_PER_YEAR => 'Y-n-d',		// 1 year
+			SEC_PER_YEAR * 2 => 'Y-n-d',	// 2 years
+			SEC_PER_YEAR * 3 => 'Y-n-d',	// 3 years
+			SEC_PER_YEAR * 5 => 'Y-n-d',	// 5 years
+			SEC_PER_YEAR * 10 => 'Y-n-d',	// 10 years
+			SEC_PER_YEAR * 20 => 'Y-n-d',	// 20 years
+			SEC_PER_YEAR * 30 => 'Y-n-d',	// 30 years
+			SEC_PER_YEAR * 40 => 'Y-n-d'	// 40 years
 		];
 
-		$step = 6 * 30 * 24 * 3600;
-		$time_fmt = 'Y-n';
+		// Default inteval values.
+		$distance = SEC_PER_YEAR * 5;
+		$time_fmt = 'Y-n-d';
+		$step = 0;
 
-		$sec_per_100pix = (int) (($this->time_till - $this->time_from) / $this->canvas_width * 100);
+		foreach ($intervals as $interval => $format) {
+			$time = abs($interval - $time_interval);
 
-		foreach ($formats as $f) {
-			if ($sec_per_100pix < $f['sec']) {
-				$step = $f['step'];
-				$time_fmt = $f['time_fmt'];
-				break;
+			if ($time < $distance) {
+				$distance = $time;
+				$step = $interval;
+				$time_fmt = $format;
 			}
 		}
 
+		$grid_values = [];
 		$start = $this->time_from + $step - $this->time_from % $step;
 
 		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
-			$relative_pos = round($this->canvas_width * ($this->time_till - $clock) / $period);
-			$grid_values[$relative_pos] = date($time_fmt, $this->canvas_width - $clock);
+			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $period);
+			$grid_values[$relative_pos] = date($time_fmt, $clock);
 		}
 
 		return $grid_values;
