@@ -30,49 +30,40 @@ void	zbx_mock_test_entry(void **state)
 {
 	AGENT_REQUEST	request;
 	AGENT_RESULT	result;
-	int 		r;
-	char		*filename;
-	int 		extraparams;
-	char		*expected_msg;
-	char		*expected_retval;
+	char		*key;
+	char		*expected_error;
+	char		*expected_value;
 	int 		file_exists;
+	int 		ret;
 
-	filename	= (char *)zbx_mock_get_parameter_string("in.filename");
-	extraparams	= (int)zbx_mock_get_parameter_uint64("in.extraparams");
-	expected_retval	= (char *)zbx_mock_get_parameter_string("out.retval");
+	key = (char *)zbx_mock_get_parameter_string("in.key");
+	expected_value = (char *)zbx_mock_get_parameter_string("out.result");
 
-	request.key		= NULL;
-	request.nparam		= 1 + extraparams;
-	request.params		= (char **)zbx_malloc(NULL, request.nparam * sizeof(char *));
-	request.params[0]	= filename;
-	request.lastlogsize	= 0;
-	request.mtime		= 0;
+	init_request(&request);
+	init_result(&result);
 
-	result.msg		= NULL;
+	if (SUCCEED != parse_item_key(key, &request))
+		fail_msg("Cannot parse item key: %s", key);
 
-	r = VFS_FILE_EXISTS(&request, &result);
+	ret = VFS_FILE_EXISTS(&request, &result);
 
-	if (SYSINFO_RET_OK == r)
+	if (SYSINFO_RET_OK == ret)
 	{
-		zbx_mock_assert_str_eq(TEST_NAME, expected_retval, "ok");
-
 		file_exists = (int)zbx_mock_get_parameter_uint64("out.file_exists");
+
+		zbx_mock_assert_str_eq(TEST_NAME, expected_value, "ok");
 		zbx_mock_assert_int_eq(TEST_NAME, file_exists, result.ui64);
 	}
 	else
 	{
-		zbx_mock_assert_int_eq("Bad "TEST_NAME" return code!", SYSINFO_RET_FAIL, r);
+		expected_error = (char *)zbx_mock_get_parameter_string("out.error");
 
-		zbx_mock_assert_str_eq(TEST_NAME, expected_retval, "fail");
-
-		expected_msg = (char *)zbx_mock_get_parameter_string("out.msg");
+		zbx_mock_assert_str_eq(TEST_NAME, expected_value, "fail");
+		zbx_mock_assert_int_eq("Bad "TEST_NAME" return code!", SYSINFO_RET_FAIL, ret);
 		assert_non_null(result.msg);
-		zbx_mock_assert_str_eq("Bad "TEST_NAME" result message", expected_msg, result.msg);
+		zbx_mock_assert_str_eq("Bad "TEST_NAME" result message", expected_error, result.msg);
 	}
 
-	request.params[0] = NULL;
-	zbx_free(request.params);
-
-	if(result.msg)
-		zbx_free(result.msg);
+	free_result(&result);
+	free_request(&request);
 }
