@@ -1584,7 +1584,7 @@ static int	DBpatch_3050124(void)
 
 static int	DBpatch_3050125(void)
 {
-	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 1);
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
 }
 
 static int	DBpatch_3050126(void)
