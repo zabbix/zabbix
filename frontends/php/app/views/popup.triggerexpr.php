@@ -87,7 +87,7 @@ if ($data['parent_discoveryid'] !== '') {
 
 $expression_form_list->addRow((new CLabel(_('Item'), 'description'))->setAsteriskMark(), $item);
 
-$function_combo_box = new CComboBox('expr_type', $data['expr_type'], 'reloadPopup(this.form, "popup.triggerexpr")');
+$function_combo_box = new CComboBox('function', $data['function'], 'reloadPopup(this.form, "popup.triggerexpr")');
 foreach ($data['functions'] as $id => $f) {
 	$function_combo_box->addItem($id, $f['description']);
 }
@@ -100,11 +100,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
 
-			if ($paramid == 0
-				|| ($paramid == 1
-					&& (substr($data['expr_type'], 0, 6) === 'regexp'
-						|| substr($data['expr_type'], 0, 7) === 'iregexp'
-						|| (substr($data['expr_type'], 0, 3) === 'str' && substr($data['expr_type'], 0, 6) !== 'strlen')))) {
+			if ($paramid == 0 || ($paramid == 1 && in_array($data['function'], ['regexp', 'iregexp', 'str']))) {
 				if (array_key_exists('M', $param_function)) {
 					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
 				}
@@ -114,10 +110,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 				}
 			}
 
-			if ($paramid == 1
-					&& (substr($data['expr_type'], 0, 3) !== 'str' || substr($data['expr_type'], 0, 6) === 'strlen')
-					&& substr($data['expr_type'], 0, 6) !== 'regexp'
-					&& substr($data['expr_type'], 0, 7) !== 'iregexp') {
+			if ($paramid == 1 && !in_array($data['function'], ['regexp', 'iregexp', 'str'])) {
 				$param_type_element = _('Time');
 				$param_field = (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
@@ -147,10 +140,17 @@ else {
 }
 
 $expression_form_list->addRow(
-	(new CLabel(_('N'), 'value'))->setAsteriskMark(),
-	(new CTextBox('value', $data['value']))
-		->setAriaRequired()
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	(new CLabel(_('Result'), 'value'))->setAsteriskMark(), [
+		new CComboBox('operator', $data['operator'], null,
+			array_combine($data['functions'][$data['function']]['operators'],
+				$data['functions'][$data['function']]['operators']
+			)
+		),
+		' ',
+		(new CTextBox('value', $data['value']))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	]
 );
 
 $expression_form->addItem($expression_form_list);
@@ -169,33 +169,31 @@ $output = [
 		]
 	],
 	'script_inline' =>
-		'jQuery(document).ready(function() {'.
-			'\'use strict\';'.
-			''.
-			'jQuery("#paramtype").change(function() {'.
-				'if (jQuery("#expr_type option:selected").val().substr(0, 4) === "last"'.
-						'|| jQuery("#expr_type option:selected").val().substr(0, 6) === "strlen"'.
-						'|| jQuery("#expr_type option:selected").val().substr(0, 4) === "band") {'.
-					'if (jQuery("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
-						'jQuery("#params_0").removeAttr("readonly");'.
+		'jQuery(function($) {'.
+			'function setReadOnly() {'.
+				'var selected_fn = $("#function option:selected");'.
+
+				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
+					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
+						'$("#params_0").removeAttr("readonly");'.
 					'}'.
 					'else {'.
-						'jQuery("#params_0").attr("readonly", "readonly");'.
+						'$("#params_0").attr("readonly", "readonly");'.
 					'}'.
 				'}'.
-			'});'.
-
-			'if (jQuery("#expr_type option:selected").val().substr(0, 4) === "last"'.
-					'|| jQuery("#expr_type option:selected").val().substr(0, 6) === "strlen"'.
-					'|| jQuery("#expr_type option:selected").val().substr(0, 4) === "band") {'.
-				'if (jQuery("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
-					'jQuery("#params_0").removeAttr("readonly");'.
-				'}'.
-				'else {'.
-					'jQuery("#params_0").attr("readonly", "readonly");'.
-				'}'.
 			'}'.
+
+			'setReadOnly();'.
+
+			'$("#paramtype").change(function() {'.
+				'setReadOnly();'.
+			'});'.
 		'});'
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo (new CJson())->encode($output);

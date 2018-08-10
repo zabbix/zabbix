@@ -24,6 +24,8 @@
 #define ZBX_REGEXP_NO_MATCH	0
 #define ZBX_REGEXP_MATCH	1
 
+typedef struct zbx_regexp zbx_regexp_t;
+
 typedef struct
 {
 	char		*name;
@@ -35,13 +37,10 @@ typedef struct
 zbx_expression_t;
 
 /* regular expressions */
-int	zbx_regexp_compile(const char *regex_txt, int flags, regex_t *regex_compiled, char **error);
-int	zbx_regexp_exec(const char *string, const regex_t *regex_compiled, int flags, size_t count,
-		regmatch_t *matches);
-void	zbx_regexp_free(regex_t *regex_compiled);
-int	zbx_regexp_match_precompiled(const char *string, const regex_t *regex);
+int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **error);
+void	zbx_regexp_free(zbx_regexp_t *regexp);
+int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp);
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
-char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
@@ -53,5 +52,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive);
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
+int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
+void 	zbx_regexp_escape(char **string);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

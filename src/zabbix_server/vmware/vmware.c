@@ -77,20 +77,16 @@ extern char		*CONFIG_SOURCE_IP;
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
-#define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
+#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_DAY
+#define ZBX_XML_DATETIME		26
 
-static ZBX_MUTEX	vmware_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_mem_info_t	*vmware_mem = NULL;
 
 ZBX_MEM_FUNC_IMPL(__vm, vmware_mem)
 
 static zbx_vmware_t	*vmware = NULL;
-
-/* vmware service types */
-#define ZBX_VMWARE_TYPE_UNKNOWN	0
-#define ZBX_VMWARE_TYPE_VSPHERE	1
-#define ZBX_VMWARE_TYPE_VCENTER	2
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
@@ -148,7 +144,7 @@ zbx_vmware_perf_value_t;
 /* performance data for a performance collector entity */
 typedef struct
 {
-	/* entity type: HostSystem or VirtualMachine */
+	/* entity type: HostSystem, Datastore or VirtualMachine */
 	char			*type;
 
 	/* entity id */
@@ -252,7 +248,11 @@ int	vmware_vm_compare(const void *d1, const void *d2)
 	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
 
 #define ZBX_XPATH_REFRESHRATE()										\
-	"/*/*/*/*/*[local-name()='refreshRate']"
+	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
+
+#define ZBX_XPATH_ISAGGREGATE()										\
+	"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
+	"../*[local-name()='currentSupported']='false']"
 
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
@@ -293,6 +293,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 {
 	size_t	r_size = size * nmemb;
 
+	ZBX_UNUSED(ptr);
 	ZBX_UNUSED(userdata);
 
 	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, (char *)ptr, r_size);
@@ -585,6 +586,7 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 {
 	__vm_mem_free_func(datastore->name);
+	__vm_mem_free_func(datastore->id);
 
 	if (NULL != datastore->uuid)
 		__vm_mem_free_func(datastore->uuid);
@@ -933,6 +935,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore = (zbx_vmware_datastore_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
+	datastore->id = vmware_shared_strdup(src->id);
 
 	datastore->capacity = src->capacity;
 	datastore->free_space = src->free_space;
@@ -1146,6 +1149,7 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 {
 	zbx_free(datastore->name);
 	zbx_free(datastore->uuid);
+	zbx_free(datastore->id);
 	zbx_free(datastore);
 }
 
@@ -1411,6 +1415,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 	if (ZBX_VMWARE_TYPE_UNKNOWN == service->type)
 	{
+		char	*xml_value = NULL;
+
 		/* try to detect the service type first using vCenter service manager object */
 		zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
 				vmware_service_objects[ZBX_VMWARE_TYPE_VCENTER].session_manager,
@@ -1432,7 +1438,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
-		if (NULL == (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+		if (FAIL == zbx_xml_try_read_value(page.data, ZBX_XPATH_FAULTSTRING(), &xml_value, error))
+			goto out;
+
+		if (NULL == xml_value)
 		{
 			/* Successfully authenticated with vcenter service manager. */
 			/* Set the service type and return with success.            */
@@ -1440,6 +1449,9 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			ret = SUCCEED;
 			goto out;
 		}
+
+		*error = zbx_strdup(*error, xml_value);
+		zbx_free(xml_value);
 
 		/* If the wrong service manager was used, set the service type as vsphere and */
 		/* try again with vsphere service manager. Otherwise return with failure.     */
@@ -1573,7 +1585,8 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter)
 	if (NULL == iter->token)
 		return FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __function_name, iter->token);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() continue retrieving properties with token: '%s'", __function_name,
+			iter->token);
 
 	token_esc = xml_escape_dyn(iter->token);
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
@@ -1673,7 +1686,7 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             type         - [IN] the entity type (HostSystem or             *
+ *             type         - [IN] the entity type (HostSystem, Datastore or  *
  *                                 VirtualMachine)                            *
  *             id           - [IN] the entity id                              *
  *             refresh_rate - [OUT] a pointer to variable to store the        *
@@ -1684,7 +1697,7 @@ out:
  *               FAIL    - the authentication process has failed              *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_t *service, CURL *easyhandle,
+static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *type, const char *id, int *refresh_rate, char **error)
 {
 #	define ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE			\
@@ -1702,7 +1715,7 @@ static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_
 	CURLcode	err;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __function_name, type, id);
 
 	id_esc = xml_escape_dyn(id);
 
@@ -1730,7 +1743,16 @@ static int	vmware_service_get_perf_counter_refreshrate(const zbx_vmware_service_
 	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(page.data, ZBX_XPATH_REFRESHRATE())))
+	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_ISAGGREGATE())))
+	{
+		zbx_free(value);
+		*refresh_rate = ZBX_VMWARE_PERF_INTERVAL_NONE;
+		ret = SUCCEED;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() refresh_rate: unused", __function_name);
+		goto out;
+	}
+	else if (NULL == (value = zbx_xml_read_value(page.data, ZBX_XPATH_REFRESHRATE())))
 	{
 		*error = zbx_strdup(*error, "Cannot find refreshRate.");
 		goto out;
@@ -2299,6 +2321,45 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_refresh_datastore_info                            *
+ *                                                                            *
+ * Purpose: Refreshes all storage related information including free-space,   *
+ *          capacity, and detailed usage of virtual machines.                 *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             id           - [IN] the datastore id                           *
+ *                                                                            *
+ * Comments: This is required for ESX/ESXi hosts version < 6.0 only           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_refresh_datastore_info(CURL *easyhandle, const char *id)
+{
+#	define ZBX_POST_REFRESH_DATASTORE							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RefreshDatastoreStorageInfo>"						\
+			"<ns0:_this type=\"HostSystem\">%s</ns0:_this>"				\
+		"</ns0:RefreshDatastoreStorageInfo>"						\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_refresh_datastore_info";
+	char		tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_REFRESH_DATASTORE, id);
+	if (CURLE_OK != curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, tmp))
+		return FAIL;
+
+	page.offset = 0;
+
+	if (CURLE_OK != curl_easy_perform(easyhandle))
+		return FAIL;
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_create_datastore                                  *
  *                                                                            *
  * Purpose: create vmware hypervisor datastore object                         *
@@ -2332,13 +2393,20 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *value, *id_esc;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path, *id_esc, *value;
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_uint64_t		capacity = ZBX_MAX_UINT64, free_space = ZBX_MAX_UINT64, uncommitted = ZBX_MAX_UINT64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __function_name, id);
 
 	id_esc = xml_escape_dyn(id);
+
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type
+			&& SUCCEED != vmware_service_refresh_datastore_info(easyhandle, id_esc))
+	{
+		zbx_free(id_esc);
+		goto out;
+	}
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_DATASTORE_GET,
 			vmware_service_objects[service->type].property_collector, id_esc);
@@ -2377,27 +2445,31 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 		zbx_free(path);
 	}
 
-	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
+	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
 	{
-		is_uint64(value, &capacity);
-		zbx_free(value);
-	}
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
+		{
+			is_uint64(value, &capacity);
+			zbx_free(value);
+		}
 
-	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
-	{
-		is_uint64(value, &free_space);
-		zbx_free(value);
-	}
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
+		{
+			is_uint64(value, &free_space);
+			zbx_free(value);
+		}
 
-	if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
-	{
-		is_uint64(value, &uncommitted);
-		zbx_free(value);
+		if (NULL != (value = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
+		{
+			is_uint64(value, &uncommitted);
+			zbx_free(value);
+		}
 	}
 
 	datastore = (zbx_vmware_datastore_t *)zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
 	datastore->uuid = uuid;
+	datastore->id = zbx_strdup(NULL, id);
 	datastore->capacity = capacity;
 	datastore->free_space = free_space;
 	datastore->uncommitted = uncommitted;
@@ -3696,7 +3768,7 @@ out:
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
  *             type     - [IN] the performance entity type (HostSystem,       *
- *                             (VirtualMachine...)                            *
+ *                             (Datastore, VirtualMachine...)                 *
  *             id       - [IN] the performance entity id                      *
  *             counters - [IN] NULL terminated list of performance counters   *
  *                             to be monitored for this entity                *
@@ -3779,6 +3851,11 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 						"cpu/ready[summation]", NULL
 					};
 
+	const char			*ds_perfcounters[] = {
+						"disk/used[latest]", "disk/provisioned[latest]",
+						"disk/capacity[latest]", NULL
+					};
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	now = time(NULL);
@@ -3793,6 +3870,20 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 		{
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 			vmware_service_add_perf_entity(service, "VirtualMachine", vm->id, vm_perfcounters, now);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: VirtualMachine hv id: %s hv uuid: %s linked vm id:"
+					" %s vm uuid: %s", __function_name, hv->id, hv->uuid, vm->id, vm->uuid);
+		}
+
+		if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
+			continue;
+
+		for (i = 0; i < hv->datastores.values_num; i++)
+		{
+			zbx_vmware_datastore_t	*ds = hv->datastores.values[i];
+			vmware_service_add_perf_entity(service, "Datastore", ds->id, ds_perfcounters, now);
+			zabbix_log(LOG_LEVEL_TRACE, "%s() for type: Datastore hv id: %s hv uuid: %s linked ds id:"
+					" %s ds name: %s ds uuid: %s", __function_name, hv->id, hv->uuid, ds->id,
+					ds->name, ds->uuid);
 		}
 	}
 
@@ -3961,7 +4052,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='value']");
+		value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='value'][last()]");
 		instance = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='id']"
 				"/*[local-name()='instance']");
 		counter = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='id']"
@@ -4172,13 +4263,13 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_hashset_iter_reset(&service->entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 != entity->refresh)
+		if (ZBX_VMWARE_PERF_INTERVAL_UNKNOWN != entity->refresh)
 			continue;
 
 		local_entity = (zbx_vmware_perf_entity_t *)zbx_malloc(NULL, sizeof(zbx_vmware_perf_entity_t));
 		local_entity->type = zbx_strdup(NULL, entity->type);
 		local_entity->id = zbx_strdup(NULL, entity->id);
-		local_entity->refresh = 0;
+		local_entity->refresh = ZBX_VMWARE_PERF_INTERVAL_UNKNOWN;
 
 		zbx_vector_ptr_append(&entities, local_entity);
 	}
@@ -4220,7 +4311,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	{
 		char	*id_esc;
 
-		if (0 == entity->refresh)
+		if (ZBX_VMWARE_PERF_INTERVAL_UNKNOWN == entity->refresh)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "skipping performance entity with zero refresh rate "
 					"type:%s id:%d", entity->type, entity->id);
@@ -4231,24 +4322,44 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 		/* add entity performance counter request */
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:querySpec>"
-				"<ns0:entity type=\"%s\">%s</ns0:entity><ns0:maxSample>1</ns0:maxSample>",
-				entity->type, id_esc);
+				"<ns0:entity type=\"%s\">%s</ns0:entity>", entity->type, id_esc);
 
 		zbx_free(id_esc);
+
+		if (ZBX_VMWARE_PERF_INTERVAL_NONE == entity->refresh)
+		{
+			time_t st_raw;
+			struct tm st;
+			char st_str[ZBX_XML_DATETIME];
+
+			/* add startTime for entity performance counter request for decrease XML data load */
+			st_raw = zbx_time() - SEC_PER_HOUR;
+			st = *gmtime(&st_raw);
+			strftime(st_str, sizeof(st_str), "%Y-%m-%dT%XZ", &st);
+			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:startTime>%s</ns0:startTime>",st_str);
+		}
+
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:maxSample>1</ns0:maxSample>");
 
 		for (j = 0; j < entity->counters.values_num; j++)
 		{
 			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
 
 			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:metricId><ns0:counterId>" ZBX_FS_UI64
-					"</ns0:counterId><ns0:instance>*</ns0:instance></ns0:metricId>",
-					counter->counterid);
+					"</ns0:counterId><ns0:instance>%s</ns0:instance></ns0:metricId>",
+					counter->counterid, ZBX_VMWARE_PERF_INTERVAL_NONE == entity->refresh ?
+					"" : "*");
 
 			counter->state |= ZBX_VMWARE_COUNTER_UPDATING;
 		}
 
-		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId></ns0:querySpec>",
+		if (ZBX_VMWARE_PERF_INTERVAL_NONE != entity->refresh)
+		{
+			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId>",
 				entity->refresh);
+		}
+
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:querySpec>");
 	}
 
 	zbx_vmware_unlock();
@@ -4269,10 +4380,11 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
+		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
 		/* parse performance data into local memory */
 		zbx_vector_ptr_create(&perfdata);
 		vmware_service_parse_perf_data(&perfdata, page.data);
-
 		ret = SUCCEED;
 	}
 	else
@@ -4501,7 +4613,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 
 	if (NULL == (pentity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
-		entity.refresh = 0;
+		entity.refresh = ZBX_VMWARE_PERF_INTERVAL_UNKNOWN;
 		entity.last_seen = 0;
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
@@ -4791,7 +4903,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
  ******************************************************************************/
 void	zbx_vmware_lock(void)
 {
-	zbx_mutex_lock(&vmware_lock);
+	zbx_mutex_lock(vmware_lock);
 }
 
 /******************************************************************************
@@ -4803,7 +4915,7 @@ void	zbx_vmware_lock(void)
  ******************************************************************************/
 void	zbx_vmware_unlock(void)
 {
-	zbx_mutex_unlock(&vmware_lock);
+	zbx_mutex_unlock(vmware_lock);
 }
 
 /******************************************************************************
@@ -4838,6 +4950,92 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 /*
  * XML support
  */
+/******************************************************************************
+ *                                                                            *
+ * Function: libxml_handle_error                                              *
+ *                                                                            *
+ * Purpose: libxml2 callback function for error handle                        *
+ *                                                                            *
+ * Parameters: user_data - [IN/OUT] the user context                          *
+ *             err       - [IN] the libxml2 error message                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+{
+	ZBX_UNUSED(user_data);
+	ZBX_UNUSED(err);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_xml_try_read_value                                           *
+ *                                                                            *
+ * Purpose: retrieve a value from xml data and return status of operation     *
+ *                                                                            *
+ * Parameters: data   - [IN] XML data                                         *
+ *             xpath  - [IN] XML XPath                                        *
+ *             value  - [OUT] selected xml node value                         *
+ *             error  - [OUT] error of xml or xpath formats                   *
+ *                                                                            *
+ * Return: SUCCEED - select xpath successfully, result stored in 'value'      *
+ *         FAIL - failed select xpath expression                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_try_read_value(const char *data, const char *xpath, char **value, char **error)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	int		ret = FAIL;
+
+	if (NULL == data)
+		goto out;
+
+	xmlSetStructuredErrorFunc(NULL, &libxml_handle_error);
+
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Received response has no valid XML data.");
+
+		xmlSetStructuredErrorFunc(NULL, NULL);
+		goto out;
+	}
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Invalid xpath expression: \"%s\".", xpath);
+
+		goto clean;
+	}
+
+	ret = SUCCEED;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	{
+		*value = zbx_strdup(NULL, (const char *)val);
+		xmlFree(val);
+	}
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlSetStructuredErrorFunc(NULL, NULL);
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+out:
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -4854,41 +5052,9 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  ******************************************************************************/
 char	*zbx_xml_read_value(const char *data, const char *xpath)
 {
-	xmlDoc		*doc;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*val;
-	char		*value = NULL;
+	char	*value = NULL;
 
-	if (NULL == data)
-		goto out;
-
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
-		goto out;
-
-	xpathCtx = xmlXPathNewContext(doc);
-
-	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
-		goto clean;
-
-	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-		goto clean;
-
-	nodeset = xpathObj->nodesetval;
-
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
-	{
-		value = zbx_strdup(NULL, (const char *)val);
-		xmlFree(val);
-	}
-clean:
-	if (NULL != xpathObj)
-		xmlXPathFreeObject(xpathObj);
-
-	xmlXPathFreeContext(xpathCtx);
-	xmlFreeDoc(doc);
-out:
+	zbx_xml_try_read_value(data, xpath, &value, NULL);
 	return value;
 }
 

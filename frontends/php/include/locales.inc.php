@@ -70,6 +70,7 @@ function getLocales() {
 		'ja_JP' => ['name' => _('Japanese (ja_JP)'),	'display' => true],
 		'lv_LV' => ['name' => _('Latvian (lv_LV)'),	'display' => false],
 		'lt_LT' => ['name' => _('Lithuanian (lt_LT)'),	'display' => false],
+		'nb_NO' => ['name' => _('Norwegian (nb_NO)'),	'display' => true],
 		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],
 		'pl_PL' => ['name' => _('Polish (pl_PL)'),	'display' => true],
 		'pt_BR' => ['name' => _('Portuguese (pt_BR)'),	'display' => true],
@@ -151,6 +152,7 @@ function zbx_locale_variants_win($language) {
 	// For a list of supported languages see:
 	// http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	// http://docs.moodle.org/dev/Table_of_locales#Table
+	// This array should contain all array keys from getLocales() function, but in lowercase.
 	$win_language_names = [
 		'en_gb' => ['English_United Kingdom.1252', 'english-uk'],
 		'en_us' => ['English_United States.1252', 'english-usa'],
@@ -173,6 +175,7 @@ function zbx_locale_variants_win($language) {
 		'ja_jp' => ['Japanese_Japan.932', 'japanese'],
 		'lv_lv' => ['Latvian_Latvia.1257', 'latvian'],
 		'lt_lt' => ['Lithuanian_Lithuania.1257', 'lithuanian'],
+		'nb_no' => ['Norwegian_Norway.1252', 'norwegian'],
 		'fa_ir' => ['Farsi_Iran.1256', 'farsi'],
 		'pl_pl' => ['Polish_Poland.1250', 'polish'],
 		'pt_br' => ['Portuguese_Brazil.1252', 'portuguese-brazil'],

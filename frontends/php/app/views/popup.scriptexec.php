@@ -19,7 +19,7 @@
 **/
 
 
-echo (new CJson())->encode([
+$output = [
 	'header' => $data['title'],
 	'body' => (new CForm())
 		->addItem([
@@ -32,4 +32,11 @@ echo (new CJson())->encode([
 		])
 		->toString(),
 	'buttons' => null
-]);
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

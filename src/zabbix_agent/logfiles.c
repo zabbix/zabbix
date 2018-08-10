@@ -1402,19 +1402,19 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
  * Comments: This is a helper function for pick_logfiles()                    *
  *                                                                            *
  ******************************************************************************/
-static void	pick_logfile(const char *directory, const char *filename, int mtime, const regex_t *re,
+static void	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
-	char		*logfile_candidate = NULL;
+	char		*logfile_candidate;
 	zbx_stat_t	file_buf;
 
-	logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, filename);
+	logfile_candidate = zbx_dsprintf(NULL, "%s%s", directory, filename);
 
 	if (0 == zbx_stat(logfile_candidate, &file_buf))
 	{
 		if (S_ISREG(file_buf.st_mode) &&
 				mtime <= file_buf.st_mtime &&
-				0 == regexec(re, filename, (size_t)0, NULL, 0))
+				0 == zbx_regexp_match_precompiled(filename, re))
 		{
 			add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
 		}
@@ -1450,7 +1450,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  * Comments: This is a helper function for make_logfile_list()                *
  *                                                                            *
  ******************************************************************************/
-static int	pick_logfiles(const char *directory, int mtime, const regex_t *re, int *use_ino,
+static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *re, int *use_ino,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
 #ifdef _WINDOWS
@@ -1533,30 +1533,23 @@ clean:
  *                                                                            *
  * Parameters:                                                                *
  *     filename_regexp - [IN] regexp to be compiled                           *
- *     re              - [IN/OUT] compiled regexp                             *
- *     err_msg         - [IN/OUT] error message why regexp could not be       *
+ *     re              - [OUT] compiled regexp                             *
+ *     err_msg         - [OUT] error message why regexp could not be       *
  *                       compiled                                             *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	compile_filename_regexp(const char *filename_regexp, regex_t *re, char **err_msg)
+static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **re, char **err_msg)
 {
-	int	err_code;
+	const char	*regexp_err;
 
-	if (0 != (err_code = regcomp(re, filename_regexp, REG_EXTENDED | REG_NEWLINE | REG_NOSUB)))
+	if (SUCCEED != zbx_regexp_compile(filename_regexp, re, &regexp_err))
 	{
 		char	err_buf[MAX_STRING_LEN];
 
-		regerror(err_code, re, err_buf, sizeof(err_buf));
-
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
 				err_buf);
-#ifdef _WINDOWS
-		/* the Windows gnuregex implementation does not correctly clean up */
-		/* allocated memory after regcomp() failure                        */
-		regfree(re);
-#endif
 		return FAIL;
 	}
 
@@ -1672,7 +1665,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))	/* logrt[] or logrt.count[] item */
 	{
 		char	*directory = NULL, *filename_regexp = NULL;
-		regex_t	re;
+		zbx_regexp_t	*re;
 
 		/* split a filename into directory and file name regular expression parts */
 		if (SUCCEED != (ret = split_filename(filename, &directory, &filename_regexp, err_msg)))
@@ -1681,7 +1674,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 		if (SUCCEED != (ret = compile_filename_regexp(filename_regexp, &re, err_msg)))
 			goto clean1;
 
-		if (SUCCEED != (ret = pick_logfiles(directory, mtime, &re, use_ino, logfiles, logfiles_alloc,
+		if (SUCCEED != (ret = pick_logfiles(directory, mtime, re, use_ino, logfiles, logfiles_alloc,
 				logfiles_num, err_msg)))
 		{
 			goto clean2;
@@ -1692,8 +1685,9 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			/* do not make logrt[] and logrt.count[] items NOTSUPPORTED if there are no matching log */
 			/* files or they are not accessible (can happen during a rotation), just log the problem */
 #ifdef _WINDOWS
-			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
-					"access rights", filename_regexp, directory);
+			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", filename_regexp,
+					directory);
+
 			ret = ZBX_NO_FILE_ERROR;
 #else
 			if (0 != access(directory, X_OK))
@@ -1710,7 +1704,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 #endif
 		}
 clean2:
-		regfree(&re);
+		zbx_regexp_free(re);
 clean1:
 		zbx_free(directory);
 		zbx_free(filename_regexp);
@@ -2972,10 +2966,25 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (SUCCEED != (res = make_logfile_list(flags, filename, *mtime, &logfiles, &logfiles_alloc, &logfiles_num,
 			use_ino, err_msg)))
 	{
-		if (ZBX_NO_FILE_ERROR == res && 1 == *skip_old_data)
+		if (ZBX_NO_FILE_ERROR == res)
 		{
-			*skip_old_data = 0;
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __function_name);
+			if (1 == *skip_old_data)
+			{
+				*skip_old_data = 0;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0",
+						__function_name);
+			}
+
+			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == *logfiles_num_old)
+			{
+				/* Both the old and the new log file lists are empty. That means the agent has not */
+				/* seen any log files for this logrt[] item since started. If log files appear later */
+				/* then analyze them from start, do not apply the 'lastlogsize' received from server */
+				/* anymore. */
+
+				*lastlogsize = 0;
+			}
 		}
 
 		/* file was not accessible for a log[] or log.count[] item or an error occurred */

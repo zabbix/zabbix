@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../blocks.inc.php';
 
-class CScreenHostgroupTriggers extends CScreenBase {
+class CScreenHostgroupTriggers extends CScreenHostTriggers {
 
 	/**
 	 * Process screen.
@@ -45,7 +45,7 @@ class CScreenHostgroupTriggers extends CScreenBase {
 				$params['sortorder'] = ZBX_SORT_DOWN;
 				break;
 			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
-				$params['sortfield'] = 'priority';
+				$params['sortfield'] = 'severity';
 				$params['sortorder'] = ZBX_SORT_DOWN;
 				break;
 			case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
@@ -130,14 +130,18 @@ class CScreenHostgroupTriggers extends CScreenBase {
 				(new CForm('get', $this->pageFile))
 					->addItem(
 						(new CList())
-							->addItem([_('Group'), SPACE, $groups_cb])
-							->addItem(SPACE)
-							->addItem([_('Host'), SPACE, $hosts_cb])
+							->addItem([_('Group'), '&nbsp;', $groups_cb])
+							->addItem('&nbsp;')
+							->addItem([_('Host'), '&nbsp;', $hosts_cb])
 					)
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 		}
 
-		list($table, $info) = make_latest_issues($params, $this->pageFile.'?screenid='.$this->screenid);
+		list($table, $info) = $this->getProblemsListTable($params,
+			(new CUrl($this->pageFile))
+				->setArgument('screenid', $this->screenid)
+				->getUrl()
+		);
 
 		$footer = (new CList())
 			->addItem($info)

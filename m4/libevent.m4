@@ -1,12 +1,12 @@
-# LIBlibevent_CHECK_CONFIG ([DEFAULT-ACTION])
+# LIBEVENT_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Alexander Vladishev                      Feb-02-2007
+#    Andris Zeila                             Dec-13-2016
 #
-# Checks for ldap.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-ldap or --without-ldap.
+# Checks for libevent.  DEFAULT-ACTION is the string yes or no to
+# specify whether to default to --with-libevent or --without-libevent.
 # If not supplied, DEFAULT-ACTION is no.
 #
-# This macro #defines HAVE_libevent if a required header files is
+# This macro #defines HAVE_LIBEVENT if a required header files is
 # found, and sets @LIBEVENT_LDFLAGS@ and @LIBEVENT_CFLAGS@ to the necessary
 # values.
 #

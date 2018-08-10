@@ -142,8 +142,6 @@ class CScreenHistory extends CScreenBase {
 		}
 
 		$items = CMacrosResolverHelper::resolveItemNames($items);
-
-		$stime = zbxDateToTime($this->timeline['stime']);
 		$firstItem = reset($items);
 
 		$iv_string = [
@@ -169,10 +167,9 @@ class CScreenHistory extends CScreenBase {
 			else {
 				$config = select_config();
 
-				// Interval start value is non-inclusive, hence the + 1 second.
 				$options += [
-					'time_from' => $stime + 1,
-					'time_till' => $stime + $this->timeline['period'],
+					'time_from' => $this->timeline['from_ts'],
+					'time_till' => $this->timeline['to_ts'],
 					'limit' => $config['search_limit']
 				];
 			}
@@ -469,19 +466,9 @@ class CScreenHistory extends CScreenBase {
 		if (str_in_array($this->action, [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
 			$graphDims = getGraphDims();
 
-			/*
-			 * Interval start value is non-inclusive, therefore should subtract 1 second to be able to show row with
-			 * minimum clock value.
-			 */
-			$this->timeline['starttime']
-				= date(TIMESTAMP_FORMAT, Manager::History()->getMinClock([$firstItem]) - 1);
-
 			$this->dataId = 'historyGraph';
 
-			$timeControlData = [
-				'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
-				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-			];
+			$timeControlData = [];
 
 			if (($this->action == HISTORY_GRAPH || $this->action == HISTORY_BATCH_GRAPH) && !isset($iv_string[$firstItem['value_type']])) {
 				$containerId = 'graph_cont1';
@@ -545,9 +532,8 @@ class CScreenHistory extends CScreenBase {
 	 */
 	protected function getGraphUrl(array $itemIds) {
 		$url = new CUrl('chart.php');
-		$url->setArgument('period', $this->timeline['period']);
-		$url->setArgument('stime', $this->timeline['stime']);
-		$url->setArgument('isNow', $this->timeline['isNow']);
+		$url->setArgument('from', $this->timeline['from']);
+		$url->setArgument('to', $this->timeline['to']);
 		$url->setArgument('itemids', $itemIds);
 		$url->setArgument('type', $this->graphType);
 

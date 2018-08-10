@@ -184,7 +184,7 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestClickLinkTextWait($data['host']);
 		}
 
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -382,7 +382,7 @@ class testFormTrigger extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
 		$this->zbxTestClickLinkTextWait($data['description']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -767,7 +767,7 @@ class testFormTrigger extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Triggers']");
+		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Triggers']");
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -882,7 +882,7 @@ class testFormTrigger extends CWebTest {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
 					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestAssertElementText("//tbody//a[text()='$description']", $description);
-					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[4]", $expression);
+					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[5]", $expression);
 					break;
 				case TEST_BAD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);

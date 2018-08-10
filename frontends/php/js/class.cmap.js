@@ -357,27 +357,30 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				Object.keys(this.selements).forEach(function(key) {
-					var element = {};
+					var element = {},
+						data = this.selements[key].data;
 
 					['selementid', 'x', 'y', 'label_location'].forEach(function (name) {
-						element[name] = this.selements[key].data[name];
+						element[name] = data[name];
 					}, this);
 
 					element['label'] = this.selements[key].getLabel();
 
 					// host group elements
-					if (this.selements[key].data.elementtype == '3' && this.selements[key].data.elementsubtype == '1') {
-						if (this.selements[key].data.areatype == '0') {
-							element.width = this.data.width;
-							element.height = this.data.height;
-						}
-						else {
-							element.width = this.selements[key].data.width;
-							element.height = this.selements[key].data.height;
-						}
+					if (data.elementtype === '3' && data.elementsubtype === '1') {
+						element.width = (data.areatype === '0') ? this.data.width : data.width;
+						element.height = (data.areatype === '0') ? this.data.height : data.height;
 					}
 
-					element.icon = this.selements[key].data.iconid_off;
+					if ((data.use_iconmap === '1' && this.data.iconmapid !== '0')
+							&& (data.elementtype === '0'
+								|| (data.elementtype === '3' && data.elementsubtype === '1'))) {
+						element.icon = this.defaultAutoIconId;
+					}
+					else {
+						element.icon = data.iconid_off;
+					}
+
 					elements.push(element);
 				}, this);
 
@@ -568,7 +571,7 @@ ZABBIX.apps.map = (function($) {
 					var link;
 
 					if (that.selection.count.selements !== 2) {
-						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+						alert(locale['S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED']);
 
 						return false;
 					}
@@ -808,7 +811,7 @@ ZABBIX.apps.map = (function($) {
 
 					if (values) {
 						for (var selementid in this.selection.selements) {
-							this.selements[selementid].update(values);
+							this.selements[selementid].update(values, true);
 						}
 					}
 				}, this));
@@ -953,13 +956,6 @@ ZABBIX.apps.map = (function($) {
 							delete that.linkForm.triggerids[triggerid];
 						}
 					}
-				});
-
-				// changes for color inputs
-				$('.input-color-picker input').on('change', function() {
-					var id = $(this).attr('id');
-
-					set_color_by_name(id, this.value);
 				});
 
 				$('#border_type').on('change', function() {
@@ -2729,9 +2725,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hosts',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'hosts',
@@ -2748,7 +2741,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'triggers',
 				name: 'elementValue',
 				objectOptions: {
-					editable: true,
 					real_hosts: true
 				},
 				popup: {
@@ -2771,9 +2763,6 @@ ZABBIX.apps.map = (function($) {
 				objectName: 'hostGroup',
 				name: 'elementValue',
 				selectedLimit: 1,
-				objectOptions: {
-					editable: true
-				},
 				popup: {
 					parameters: {
 						srctbl: 'host_groups',
@@ -3353,6 +3342,8 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
+
+			this.domNode.find('.input-color-picker input').colorpicker();
 		}
 
 		ShapeForm.prototype = {
@@ -3469,6 +3460,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
+			this.domNode.find('.input-color-picker input').colorpicker();
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -3541,6 +3533,8 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 			this.triggerids = {};
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
+
+			this.domNode.find('.input-color-picker input').colorpicker();
 		}
 
 		LinkForm.prototype = {
@@ -3711,15 +3705,17 @@ ZABBIX.apps.map = (function($) {
 			 */
 			addLinkTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger;
+					linkTrigger,
+					table = $('#linkTriggerscontainer tbody');
 
 				for (linkTrigger in triggers) {
 					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer tbody');
+					$(tpl.evaluate(triggers[linkTrigger])).appendTo(table);
 					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype')
 						.val(triggers[linkTrigger].drawtype);
 				}
 
+				table.find('.input-color-picker input').colorpicker();
 				$('.input-color-picker input', this.domNode).change();
 			},
 
@@ -3735,7 +3731,8 @@ ZABBIX.apps.map = (function($) {
 					},
 					linktriggerid,
 					i,
-					ln;
+					ln,
+					table = $('#linkTriggerscontainer tbody');
 
 				for (i = 0, ln = triggers.length; i < ln; i++) {
 					if (typeof this.triggerids[triggers[i].triggerid] !== 'undefined') {
@@ -3752,9 +3749,10 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-					$(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer tbody');
+					$(tpl.evaluate(linkTrigger)).appendTo(table);
 				}
 
+				table.find('.input-color-picker input').colorpicker();
 				$('.input-color-picker input', this.domNode).change();
 			},
 
