@@ -54,18 +54,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $errors, $width);
 
-		// Get problems to display in graph.
-		if (array_key_exists('problems', $options)) {
-			$options['problems']['itemids_only'] = (array_key_exists('graph_item_problems_only', $options['problems'])
-					&& $options['problems']['graph_item_problems_only'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-				? zbx_objectValues($metrics, 'itemid')
-				: null;
-
-			$problems = self::getProblems($options['problems'], $options['time_period']);
-		}
-
-		// Clear unneeded data.
-		unset($options['data_sets'], $options['overrides'], $options['problems']);
+		$problems_options = array_key_exists('problems', $options) ? $options['problems'] : [];
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = $options['legend'] ? $options['legend_lines'] * 18 : 0;
@@ -81,15 +70,23 @@ class CSvgGraphHelper {
 		}
 		unset($metric);
 
+		// Clear unneeded data.
+		unset($options['data_sets'], $options['overrides'], $options['problems']);
+
 		// Draw SVG graph.
-		$graph = (new CSvgGraph($width, $height - $legend_height, $options))
-			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
-			->setYAxisLeft(array_key_exists('left_y_axis', $options) ? $options['left_y_axis'] : false)
-			->setYAxisRight(array_key_exists('right_y_axis', $options) ? $options['right_y_axis'] : false)
-			->setXAxis(array_key_exists('x_axis', $options) ? $options['x_axis'] : false)
-			->addProblems($problems)
-			->addMetrics($metrics)
-			->draw();
+		$graph = (new CSvgGraph($options))
+			->setSize($width, $height - $legend_height)
+			->addMetrics($metrics);
+
+		// Get problems to display in graph.
+		if ($problems_options) {
+			$problems_options['itemids_only'] = (array_key_exists('graph_item_problems_only', $problems_options)
+					&& $problems_options['graph_item_problems_only'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
+				? zbx_objectValues($metrics, 'itemid')
+				: null;
+
+			$graph->addProblems(self::getProblems($problems_options, $options['time_period']));
+		}
 
 		if ($legend_height > 0) {
 			$labels = [];
@@ -110,7 +107,7 @@ class CSvgGraphHelper {
 		}
 
 		return [
-			'svg' => $graph,
+			'svg' => $graph->draw(),
 			'legend' => $legend,
 			'data' => [
 				'dims' => [

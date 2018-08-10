@@ -46,4 +46,17 @@ class CSvg extends CSvgTag {
 
 		return parent::startToString().(new CTag('style', true, $styles));
 	}
+
+	/**
+	 * Set SVG element width and height.
+	 *
+	 * @param int $width     Width.
+	 * @param int $height    Height.
+	 */
+	public function setSize($width, $height) {
+		$this->setAttribute('width', $width.'px');
+		$this->setAttribute('height', $height.'px');
+
+		return parent::setSize($width, $height);
+	}
 }
