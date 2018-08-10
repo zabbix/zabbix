@@ -626,7 +626,7 @@ class CSvgGraph extends CSvg {
 	 *                                  SVG_GRAPH_MISSING_DATA_CONNECTED
 	 */
 	protected function applyMissingDataFunc(array &$points = [], $missingdatafunc) {
-		if (!$points || $missingdatafunc != SVG_GRAPH_MISSING_DATA_CONNECTED) {
+		if (!$points || $missingdatafunc == SVG_GRAPH_MISSING_DATA_CONNECTED) {
 			/**
 			 * SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
 			 * here. Points will be connected anyway.
