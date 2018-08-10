@@ -4173,7 +4173,8 @@ $form-icon-btn: (
 		font-size: 12px;
 		line-height: $svg-legend-line-height;
 		vertical-align: middle;
-		max-width: 160px;
+		max-width: 30%;
+		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
