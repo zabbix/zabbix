@@ -42,7 +42,8 @@ class CWidgetFormActionLog extends CWidgetForm {
 		if (array_key_exists('sort_triggers', $this->data)) {
 			$field_sort->setValue($this->data['sort_triggers']);
 		}
-		$this->fields[] = $field_sort;
+
+		$this->fields[$field_sort->getName()] = $field_sort;
 
 		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
@@ -53,6 +54,7 @@ class CWidgetFormActionLog extends CWidgetForm {
 		if (array_key_exists('show_lines', $this->data)) {
 			$field_lines->setValue($this->data['show_lines']);
 		}
-		$this->fields[] = $field_lines;
+
+		$this->fields[$field_lines->getName()] = $field_lines;
 	}
 }

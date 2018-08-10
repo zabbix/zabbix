@@ -356,7 +356,7 @@ class CItemPrototype extends CItemGeneral {
 			unset($item['itemid']);
 		}
 
-		$this->validateDependentItems($items, API::ItemPrototype());
+		$this->validateDependentItems($items, __METHOD__);
 
 		$json = new CJson();
 
@@ -721,7 +721,7 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items, true);
-		$this->validateDependentItems($items, API::ItemPrototype());
+		$this->validateDependentItems($items, __METHOD__);
 
 		$db_items = $this->get([
 			'output' => ['type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],

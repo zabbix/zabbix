@@ -55,7 +55,7 @@ $table = (new CTableInfo())
 		[
 			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
 			' &bullet; ',
-			($data['sortfield'] === 'priority') ? [_('Severity'), $sort_div] : _('Severity')
+			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		_('Duration'),
 		_('Ack'),
@@ -146,7 +146,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl), '', true)
+			->setHint(
+				make_popup_eventlist($trigger, $eventid, $backurl, $show_timeline),
+				'',
+				true
+			)
 	]));
 
 	$description_style = getSeverityStyle($problem['severity']);
@@ -168,7 +172,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	if ($show_timeline) {
 		if ($last_clock != 0) {
-			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $data['sortorder']);
 		}
 		$last_clock = $problem['clock'];
 

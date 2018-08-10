@@ -67,28 +67,12 @@ $applicationTable = (new CTableInfo())
 
 $current_time = time();
 
-foreach ($this->data['applications'] as $application) {
+foreach ($data['applications'] as $application) {
 	$info_icons = [];
 
 	// inherited app, display the template list
-	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
-		$name = [];
-
-		CArrayHelper::sort($application['sourceTemplates'], ['name']);
-
-		foreach ($application['sourceTemplates'] as $template) {
-			if (array_key_exists($template['hostid'], $data['writable_templates'])) {
-				$name[] = (new CLink($template['name'], 'applications.php?hostid='.$template['hostid']))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$name[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
-			}
-			$name[] = ', ';
-		}
-		array_pop($name);
-		$name[] = NAME_DELIMITER;
+	if ($application['templateids']) {
+		$name = makeApplicationTemplatePrefix($application['applicationid'], $data['parent_templates']);
 		$name[] = $application['name'];
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {

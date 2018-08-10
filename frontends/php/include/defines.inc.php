@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0alpha9');
+define('ZABBIX_VERSION',		'4.0.0alpha10');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050120);
+define('ZABBIX_DB_VERSION',		3050124);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -39,7 +39,10 @@ define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
-define('ZBX_DATE_TIME',			'Y-m-d H:i:s');// Time selector date and time presentation format.
+
+// Date and time format seperators must be synced with setSDateFromOuterObj() in class.calendar.js.
+define('ZBX_FULL_DATE_TIME',	'Y-m-d H:i:s'); // Time selector full date and time presentation format.
+define('ZBX_DATE_TIME',			'Y-m-d H:i'); // Time selector date and time without seconds presentation format.
 
 // the maximum period to display history data for the latest data and item overview pages in seconds
 // by default set to 86400 seconds (24 hours)
@@ -605,8 +608,8 @@ define('EZ_TEXTING_LIMIT_CANADA',	1);
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
 define('ACTION_DEFAULT_SUBJ_ACKNOWLEDGE', 'Updated problem: {EVENT.NAME}');
-define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {TRIGGER.NAME}');
-define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_PROBLEM', 'Problem: {EVENT.NAME}');
+define('ACTION_DEFAULT_SUBJ_RECOVERY', 'Resolved: {EVENT.NAME}');
 
 define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
 define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
@@ -620,10 +623,10 @@ define('ACTION_DEFAULT_MSG_ACKNOWLEDGE',
 		"{EVENT.UPDATE.MESSAGE}\n\n".
 		"Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}."
 );
-define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {TRIGGER.NAME}\n".
+define('ACTION_DEFAULT_MSG_PROBLEM', "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {EVENT.NAME}\n".
 		"Host: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 define('ACTION_DEFAULT_MSG_RECOVERY', "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
-		"Problem name: {TRIGGER.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\n".
+		"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n\n".
 		"Original problem ID: {EVENT.ID}\n{TRIGGER.URL}");
 
 define('ACTION_STATUS_ENABLED',		0);
@@ -1299,10 +1302,6 @@ define('THEME_DEFAULT', 'default');
 define('ZBX_DEFAULT_THEME', 'blue-theme');
 
 define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
-
-// non translatable date formats
-define('TIMESTAMP_FORMAT', 'YmdHis');
-define('TIMESTAMP_FORMAT_ZERO_TIME', 'Ymd0000');
 
 // date format context, usable for translators
 define('DATE_FORMAT_CONTEXT', 'Date format (see http://php.net/date)');

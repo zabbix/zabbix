@@ -95,7 +95,9 @@ abstract class CHostGeneral extends CHostBase {
 		if (!empty($data['templates_link'])) {
 			$this->checkHostPermissions($allHostIds);
 
-			$this->validateDependentItemsLinkage($allHostIds, zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'));
+			$this->validateDependentItemsLinkage($allHostIds,
+				zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid')
+			);
 
 			$this->link(zbx_objectValues(zbx_toArray($data['templates_link']), 'templateid'), $allHostIds);
 		}
@@ -181,20 +183,20 @@ abstract class CHostGeneral extends CHostBase {
 				'templateids' => $hostTplIds['templateid']
 			]);
 
+			// Fist link web items, so that later regular items can use web item as their master item.
+			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
+
+			API::Item()->syncTemplates([
+				'hostids' => $hostTplIds['hostid'],
+				'templateids' => $hostTplIds['templateid']
+			]);
+
 			API::ItemPrototype()->syncTemplates([
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
 			]);
 
 			API::HostPrototype()->syncTemplates([
-				'hostids' => $hostTplIds['hostid'],
-				'templateids' => $hostTplIds['templateid']
-			]);
-
-			// Fist link web items, so that later regular items can use web item as their master item.
-			Manager::HttpTest()->link($hostTplIds['templateid'], $hostTplIds['hostid']);
-
-			API::Item()->syncTemplates([
 				'hostids' => $hostTplIds['hostid'],
 				'templateids' => $hostTplIds['templateid']
 			]);
@@ -991,18 +993,19 @@ abstract class CHostGeneral extends CHostBase {
 	 * Return false if intersection of host dependent items and template dependent items create dependent items
 	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
 	 *
-	 * @param array $items
+	 * @param array $db_items
 	 * @param array $hostids
 	 *
 	 * @throws APIException if intersection of template items and host items creates dependent items tree with
 	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
 	 */
-	protected function validateDependentItemsIntersection($db_items, $hostids, $errorService = null) {
+	protected function validateDependentItemsIntersection(array $db_items, array $hostids) {
 		$hosts_items = [];
 		$tmpl_items = [];
 
 		foreach ($db_items as $db_item) {
-			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT)
+			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT
+					&& array_key_exists($db_item['master_itemid'], $db_items))
 				? $db_items[$db_item['master_itemid']]['key_']
 				: '';
 

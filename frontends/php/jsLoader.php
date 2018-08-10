@@ -59,6 +59,7 @@ $availableJScripts = [
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
+	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
 	// vendors

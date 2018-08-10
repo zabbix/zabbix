@@ -392,10 +392,11 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['url']					Trigger URL.
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
+ * @param bool   $show_timeline						show time line flag.
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline = true) {
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -421,8 +422,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl) {
 				->addStyle('max-width: 500px')
 		);
 	}
-
-	$show_timeline = true;
 
 	// indicator of sort field
 	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);

@@ -1015,7 +1015,7 @@ SVGMapShape.prototype.update = function(options) {
 		];
 
 	mapping.forEach(function(map) {
-		if (typeof options[map.key] !== 'undefined' && options[map.key].trim() !== '') {
+		if (typeof options[map.key] !== 'undefined' && /[0-9A-F]{6}/g.test(options[map.key].trim())) {
 			attributes[map.value] = '#' + options[map.key];
 		}
 		else {
@@ -1152,7 +1152,7 @@ SVGMapShape.prototype.update = function(options) {
 		element.add('textarea', {
 			'x': x,
 			'y': y,
-			fill: '#' + options['font_color'],
+			fill: '#' + (/[0-9A-F]{6}/g.test(options['font_color'].trim()) ? options['font_color'] : '000000'),
 			'font-family': SVGMap.FONTS[parseInt(options.font)],
 			'font-size': parseInt(options['font_size']) + 'px',
 			'anchor': anchor,
