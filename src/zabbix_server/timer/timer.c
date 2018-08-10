@@ -286,8 +286,8 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 			if (0 == hm[i].host_maintenance_from)
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=%ld",
-						(long int)hm[i].maintenance_from);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=" ZBX_FS_TIME_T_T,
+						(zbx_fs_time_t_t)hm[i].maintenance_from);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64,
@@ -396,9 +396,9 @@ static int	process_maintenance(void)
 			" from maintenances m,maintenances_windows mw,timeperiods tp"
 			" where m.maintenanceid=mw.maintenanceid"
 				" and mw.timeperiodid=tp.timeperiodid"
-				" and m.active_since<=%ld"
-				" and m.active_till>%ld",
-			(long int)now, (long int)now);
+				" and m.active_since<=" ZBX_FS_TIME_T_T
+				" and m.active_till>" ZBX_FS_TIME_T_T,
+			(zbx_fs_time_t_t)now, (zbx_fs_time_t_t)now);
 
 	while (NULL != (row = DBfetch(result)))
 	{
