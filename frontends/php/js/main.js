@@ -461,6 +461,9 @@ var hintBox = {
 	 * - content update using flickerfreeScreen.refreshHtml()
 	 * - widget update by updateWidgetContent()
 	 * - widget remove by deleteWidget().
+	 *
+	 * Triggered events:
+	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
@@ -675,6 +678,7 @@ var hintBox = {
 		}
 
 		if (target.hintBoxItem) {
+			target.hintBoxItem.trigger('onDeleteHint.hintBox');
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
 

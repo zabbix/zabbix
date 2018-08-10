@@ -43,11 +43,40 @@ jQuery(function ($) {
 		graph.data('graph').boxing = false;
 	}
 
-	function destroyHintbox(graph) {
-		var hbox = graph.data('hintbox');
-		graph.removeData('hintbox');
-		$(hbox).remove();
-		hideHelper(graph)
+	function destroyHintbox(e, graph) {
+		if (typeof graph.data('isHintBoxFrozen') === 'undefined' || graph.data('isHintBoxFrozen') === false) {
+			var hbox = graph.data('hintbox');
+			graph
+				.removeData('hintbox')
+				.removeData('isHintBoxFrozen')
+				.off('click', makeHintboxStatic);
+			$(hbox).remove();
+			hideHelper(graph)
+		}
+	}
+
+	function makeHintboxStatic(e) {
+		var graph = e.data.graph,
+			content = graph.data('hintbox').find('> div');
+
+		destroyHintbox(e, graph);
+
+		graph.hintBoxItem = hintBox.createBox(e, graph, null, '', true, false, graph.parent());
+		graph.hintBoxItem.append(content);
+
+		graph
+			.data('isHintBoxFrozen', true)
+			.data('hintbox', graph.hintBoxItem);
+
+		graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
+			graph.data('isHintBoxFrozen', false);
+			destroyHintbox(e, graph);
+		});
+
+		graph.hintBoxItem.css({
+			'left': e.offsetX + 20,
+			'top': e.offsetY + 20
+		});
 	}
 
 	function startSBoxDrag(e) {
@@ -289,11 +318,16 @@ jQuery(function ($) {
 			html = null,
 			inx = false;
 
+		if (typeof graph.data('isHintBoxFrozen') !== 'undefined' && graph.data('isHintBoxFrozen') === true) {
+			return false;
+		}
+
 		if (typeof data.boxing === 'undefined' || data.boxing === false) {
 			e.stopPropagation();
+			// Check if mouse in the horizontal area in which hintbox must be shown.
 			inx = (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW);
 
-			// Show problems when mouse is in the 15px high zone under the graph canvas.
+			// Show problems when mouse is in the 15px high area under the graph canvas.
 			if (inx && data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15) {
 				hideHelper(graph);
 
@@ -304,25 +338,20 @@ jQuery(function ($) {
 					values.forEach(function(val) {
 						tbody.append(
 							$('<tr>')
-								.append($('<td>').text(val.clock))
-								.append($('<td>').text(val.r_clock || ''))
-								.append($('<td>', {'class': val.status_color}).text(val.status))
+								.append($('<td>').append($('<a>', {'href': val.url}).text(val.clock)))
+								.append($('<td>').append(val.r_eventid
+									? $('<a>', {'href': val.url}).text(val.r_clock)
+									: val.r_clock)
+								)
+								.append($('<td>').append($('<span>', {'class': val.status_color}).text(val.status)))
 								.append($('<td>', {'class': val.severity}).text(val.name))
 						);
 					});
 
-					// TODO miks: replace with translation strings.
-					html = $('<table></table>')
-						.addClass('list-table')
-						.append(tbody)
-						.append(
-							$('<thead>').append(
-								$('<tr>')
-									.append($('<th>').text('Time').addClass('right'))
-									.append($('<th>').text('Recovery time'))
-									.append($('<th>').text('Status'))
-									.append($('<th>').text('Problem'))
-							)
+					html = $('<div>').append(
+							$('<table></table>')
+								.addClass('list-table compact-view')
+								.append(tbody)
 						);
 				}
 			}
@@ -350,6 +379,8 @@ jQuery(function ($) {
 							.append(val.metric + ': ' + val.val)
 							.appendTo(html);
 					});
+
+					html = $('<div>').append(html);
 				}
 			}
 			else {
@@ -359,10 +390,16 @@ jQuery(function ($) {
 			if (html !== null) {
 				if (typeof hbox === 'undefined') {
 					hbox = hintBox.createBox(e, graph, null, '', false, false, graph.parent());
-					graph.data('hintbox', hbox);
+					graph
+						.on('click', {graph: graph}, makeHintboxStatic)
+						.data('hintbox', hbox);
+					hbox.append(html);
+				}
+				else {
+					hbox.find('> div').replaceWith(html);
 				}
 
-				hbox.html(html).css({'left': e.offsetX + 20, 'top': e.offsetY + 20});
+				hbox.css({'left': e.offsetX + 20, 'top': e.offsetY + 20});
 			}
 		}
 		else {
@@ -370,8 +407,7 @@ jQuery(function ($) {
 		}
 
 		if (html === null) {
-			graph.removeData('hintbox');
-			$(hbox).remove();
+			destroyHintbox(e, graph);
 		}
 	}
 
@@ -380,14 +416,8 @@ jQuery(function ($) {
 			options = $.extend({}, {
 				sbox: false,
 				problems: true,
-				values: false
+				values: true
 			}, options);
-
-			// TODO miks: remove this before going into production.
-			// ---<--- testing data:
-			options.values = false;
-			options.problems = false;
-			// --->--- testing data.
 
 			this.each(function() {
 				var graph = $(this),
@@ -423,9 +453,9 @@ jQuery(function ($) {
 				if (options.values || options.problems || options.sbox) {
 					graph
 						.data('graph', graph_data)
-						.on('mouseleave', function() {
+						.on('mouseleave', function(e) {
 							if (options.values || options.problems) {
-								destroyHintbox($(this));
+								destroyHintbox(e, $(this));
 							}
 						});
 				}

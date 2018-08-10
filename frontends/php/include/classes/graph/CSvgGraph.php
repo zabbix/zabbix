@@ -777,6 +777,11 @@ class CSvgGraph extends CSvg {
 				'r_clock' => ($problem['r_clock'] >= $today)
 					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']),
+				'url' => (new CUrl('tr_events.php'))
+					->setArgument('triggerid', $problem['objectid'])
+					->setArgument('eventid', $problem['eventid'])
+					->getUrl(),
+				'r_eventid' => $problem['r_eventid'],
 				'severity' => getSeverityStyle($problem['severity']),
 				'status' => $status_str,
 				'status_color' => $status_color
