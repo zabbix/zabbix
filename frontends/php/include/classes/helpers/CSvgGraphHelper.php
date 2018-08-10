@@ -78,6 +78,11 @@ class CSvgGraphHelper {
 			->setSize($width, $height - $legend_height)
 			->addMetrics($metrics);
 
+		// SBox available only for graphs without overriten relative time.
+		if (array_key_exists('dashboard_time', $options) && $options['dashboard_time']) {
+			$graph->addSBox();
+		}
+
 		// Get problems to display in graph.
 		if ($problems_options) {
 			$problems_options['itemids_only'] = (array_key_exists('graph_item_problems_only', $problems_options)
