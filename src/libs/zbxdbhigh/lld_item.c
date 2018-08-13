@@ -1789,8 +1789,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
-	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/*zbx_lrtrim(item->query_fields, ZBX_WHITESPACE);*/
+
+	if (SUCCEED == ret)
+		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -1801,8 +1802,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err,
+					sizeof(err))))
+			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+			}
 			break;
 		default:
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -2072,8 +2076,10 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+
+	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
+		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+
 	if (0 != strcmp(item->query_fields, buffer))
 	{
 		item->query_fields_orig = item->query_fields;

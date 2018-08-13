@@ -2717,6 +2717,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			case ZBX_TOKEN_OBJECTID:
 			case ZBX_TOKEN_LLD_MACRO:
+			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld or {123123} macros are processed by this function, skip them */
 				pos = token.token.r + 1;
 				continue;
@@ -5148,40 +5149,80 @@ out:
  *               otherwise FAIL with an error message.                        *
  *                                                                            *
  ******************************************************************************/
-static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
-		const struct zbx_json_parse *jp_row, char *error, size_t error_len)
+static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
+		char *error, size_t error_len)
 {
 	char	c, *replace_to = NULL;
-	int	ret = SUCCEED;
+	int	ret = SUCCEED, l ,r;
 	size_t	replace_to_alloc = 0;
 
-	c = (*data)[token->token.r + 1];
-	(*data)[token->token.r + 1] = '\0';
-
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + token->token.l, &replace_to, &replace_to_alloc))
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
-				*data + token->token.l);
+		l = token->data.lld_func_macro.macro.l;
+		r = token->data.lld_func_macro.macro.r;
+	}
+	else
+	{
+		l = token->token.l;
+		r = token->token.r;
+	}
+
+	c = (*data)[r + 1];
+	(*data)[r + 1] = '\0';
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + l, &replace_to, &replace_to_alloc))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
 		if (0 != (flags & ZBX_TOKEN_NUMERIC))
 		{
-			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
+			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + l);
 			ret = FAIL;
 		}
 
+		(*data)[r + 1] = c;
 		zbx_free(replace_to);
+
+		return ret;
 	}
-	else if (0 != (flags & ZBX_TOKEN_NUMERIC))
+
+	(*data)[r + 1] = c;
+
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
-		if (SUCCEED == (ret = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+		replace_to_alloc = 0;
+		if (SUCCEED != (zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
+		{
+			size_t	len = token->data.lld_func_macro.func.r - token->data.lld_func_macro.func.l + 1;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot execute function \"%.*s\"", len,
+					*data + token->data.lld_func_macro.func.l);
+
+			if (0 != (flags & ZBX_TOKEN_NUMERIC))
+			{
+				zbx_snprintf(error, error_len, "unable to execute function \"%.*s\"", len,
+						*data + token->data.lld_func_macro.func.l);
+				ret = FAIL;
+			}
+
+			zbx_free(replace_to);
+
+			return ret;
+		}
+	}
+
+	if (0 != (flags & ZBX_TOKEN_NUMERIC))
+	{
+		if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 		{
 			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 		}
 		else
 		{
 			zbx_free(replace_to);
-			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
-			ret = FAIL;
+			zbx_snprintf(error, error_len, "not numeric value in macro \"%.*s\"",
+					token->token.r - token->token.l + 1, *data + token->token.l);
+			return FAIL;
 		}
 	}
 	else if (0 != (flags & ZBX_TOKEN_JSON))
@@ -5205,15 +5246,17 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 		xml_escape_xpath(&replace_to);
 	}
 
-	(*data)[token->token.r + 1] = c;
-
 	if (NULL != replace_to)
 	{
-		zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
+		size_t	data_alloc, data_len;
+
+		data_alloc = data_len = strlen(*data) + 1;
+		token->token.r += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token->token.l,
+				token->token.r - token->token.l + 1, replace_to, strlen(replace_to));
 		zbx_free(replace_to);
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -5241,8 +5284,8 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	force_quote = ('"' == (*data)[macro->context.l]);
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
-	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
-	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
+	/* substitute_lld_macros() can't fail with ZBX_TOKEN_LLD_MACRO or ZBX_TOKEN_LLD_FUNC_MACRO flags set */
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -5341,6 +5384,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
+				case ZBX_TOKEN_LLD_FUNC_MACRO:
 					ret = process_lld_macro_token(data, &token, flags, jp_row, error,
 							max_error_len);
 					pos = token.token.r;
@@ -5596,6 +5640,86 @@ out:
 	zbx_free(param);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_json_pairs                                  *
+ *                                                                            *
+ * Purpose: substitute LLD macros in JSON pairs                               *
+ *                                                                            *
+ * Parameters: data   -    [IN/OUT] pointer to a buffer that JSON pair        *
+ *             jp_row -    [IN] discovery data for LLD macro substitution     *
+ *             error  -    [OUT] reason for JSON pair parsing failure         *
+ *             maxerrlen - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if cannot parse JSON pair                    *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+	const char		*__function_name = "substitute_macros_in_json_pairs";
+	struct zbx_json_parse	jp_array, jp_object;
+	struct zbx_json		json;
+	const char		*member, *element = NULL;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *p_name = NULL, *p_value = NULL;
+	int			ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if ('\0' == **data)
+		goto exit;
+
+	if (SUCCEED != zbx_json_open(*data, &jp_array))
+	{
+		zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+		ret = FAIL;
+		goto exit;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zbx_strlcpy(error, "cannot parse query fields: array is empty", maxerrlen);
+		ret = FAIL;
+		goto exit;
+	}
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	do
+	{
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+			ret = FAIL;
+			goto clean;
+		}
+
+		p_name = zbx_strdup(NULL, name);
+		p_value = zbx_strdup(NULL, value);
+
+		substitute_lld_macros(&p_name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&p_value, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, p_name, p_value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+		zbx_free(p_name);
+		zbx_free(p_value);
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
+
+	zbx_free(*data);
+	*data = zbx_strdup(NULL, json.buffer);
+clean:
+	zbx_json_free(&json);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

@@ -81,6 +81,41 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_mock_str_to_token_type                                       *
+ *                                                                            *
+ * Purpose: converts token type from text format                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_str_to_token_type(const char *str, int *out)
+{
+	if (0 == strcmp(str, "ZBX_TOKEN_OBJECTID"))
+		*out = ZBX_TOKEN_OBJECTID;
+	else if (0 == strcmp(str, "ZBX_TOKEN_MACRO"))
+		*out = ZBX_TOKEN_MACRO;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_LLD_MACRO"))
+		*out = ZBX_TOKEN_LLD_MACRO;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_USER_MACRO"))
+		*out = ZBX_TOKEN_USER_MACRO;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_FUNC_MACRO"))
+		*out = ZBX_TOKEN_FUNC_MACRO;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_SIMPLE_MACRO"))
+		*out = ZBX_TOKEN_SIMPLE_MACRO;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_REFERENCE"))
+		*out = ZBX_TOKEN_REFERENCE;
+
+	else if (0 == strcmp(str, "ZBX_TOKEN_LLD_FUNC_MACRO"))
+		*out = ZBX_TOKEN_LLD_FUNC_MACRO;
+	else
+		fail_msg("Unknown token type \"%s\"", str);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_mock_str_to_value_type                                       *
  *                                                                            *
  * Purpose: converts item value type from text format                         *
