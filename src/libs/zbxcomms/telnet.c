@@ -68,8 +68,8 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
-				__function_name, rc, error, strerror_from_system(error));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
+				__function_name, (long int)rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -92,7 +92,7 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 	if (0 == rc)
 		rc = ZBX_PROTO_ERROR;
 ret:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __function_name, (long int)rc);
 
 	return rc;
 }
@@ -108,8 +108,8 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
-				__function_name, rc, error, strerror_from_system(error));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
+				__function_name, (long int)rc, error, strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -123,7 +123,7 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __function_name, (long int)rc);
 
 	return rc;
 }

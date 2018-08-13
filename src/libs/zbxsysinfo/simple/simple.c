@@ -174,7 +174,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
-				__function_name, opt, curl_easy_strerror(err));
+				__function_name, (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -183,7 +183,7 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set source interface option [%d]: %s",
-					__function_name, opt, curl_easy_strerror(err));
+					__function_name, (int)opt, curl_easy_strerror(err));
 			goto clean;
 		}
 	}
