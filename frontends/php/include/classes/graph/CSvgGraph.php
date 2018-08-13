@@ -513,7 +513,7 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to left side of graph.
 	 */
 	protected function drawCanvasLeftYaxis() {
-		if ($this->left_y_show && $this->min_value_left !== null) {
+		if ($this->left_y_show) {
 			$this->addItem(
 				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
 					->setSize($this->offset_left, $this->canvas_height)
@@ -526,7 +526,7 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to right side of graph.
 	 */
 	protected function drawCanvasRightYAxis() {
-		if ($this->right_y_show && $this->min_value_right !== null) {
+		if ($this->right_y_show) {
 			$has_left_axis = ($this->left_y_show && $this->min_value_left !== null);
 
 			$this->addItem(
@@ -581,17 +581,27 @@ class CSvgGraph extends CSvg {
 	 * Add grid to graph.
 	 */
 	protected function drawGrid() {
-		if ($this->left_y_show && $this->left_y_min) {
+		$time_points = $this->getTimeGridWithPosition();
+
+		if ($this->left_y_show) {
 			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+
+			unset($time_points[0]);
 		}
-		elseif ($this->right_y_show && $this->right_y_min) {
+		elseif ($this->right_y_show) {
 			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+
+			unset($time_points[$this->canvas_width]);
 		}
 		else {
 			$points_value = [];
 		}
 
-		$this->addItem((new CSvgGraphGrid($points_value, $this->getTimeGridWithPosition()))
+		if ($this->x_axis) {
+			unset($points_value[0]);
+		}
+
+		$this->addItem((new CSvgGraphGrid($points_value, $time_points))
 			->setPosition($this->canvas_x, $this->canvas_y)
 			->setSize($this->canvas_width, $this->canvas_height)
 		);
