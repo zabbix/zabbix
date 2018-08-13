@@ -449,7 +449,9 @@ class CProblem extends CApiService {
 			$suppressed_eventids = [];
 			foreach ($result as &$problem) {
 				if (array_key_exists('suppression_data', $problem)) {
-					$problem['suppressed'] = $problem['suppression_data'] ? EVENT_SUPPRESSED : EVENT_NOT_SUPPRESSED;
+					$problem['suppressed'] = $problem['suppression_data']
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
 				}
 				else {
 					$suppressed_eventids[] = $problem['eventid'];
@@ -465,8 +467,8 @@ class CProblem extends CApiService {
 				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
 				foreach ($result as &$problem) {
 					$problem['suppressed'] = array_key_exists($problem['eventid'], $suppressed_eventids)
-						? EVENT_SUPPRESSED
-						: EVENT_NOT_SUPPRESSED;
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
 				}
 				unset($problem);
 			}

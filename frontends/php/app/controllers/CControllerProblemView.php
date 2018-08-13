@@ -173,8 +173,8 @@ class CControllerProblemView extends CController {
 			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
 				PROFILE_TYPE_INT
 			);
-			CProfile::update('web.problem.filter.show_suppressed', $this->getInput('filter_show_suppressed', 0),
-				PROFILE_TYPE_INT
+			CProfile::update('web.problem.filter.show_suppressed',
+				$this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE), PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.unacknowledged', $this->getInput('filter_unacknowledged', 0),
 				PROFILE_TYPE_INT

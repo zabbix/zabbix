@@ -149,7 +149,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			],
 			'severities' => $filter_severities,
 			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
-			'suppressed' => ($filter_show_suppressed == 0) ? false : null
+			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);
 
 		$hosts_data = [];

@@ -266,7 +266,8 @@ if ($data['action'] == 'problem.view') {
 				->setModern(true)
 		)
 		->addRow(_('Show suppressed problems'), [
-			(new CCheckBox('filter_show_suppressed'))->setChecked($data['filter']['show_suppressed'] == 1),
+			(new CCheckBox('filter_show_suppressed'))
+				->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE),
 			(new CDiv([
 				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),

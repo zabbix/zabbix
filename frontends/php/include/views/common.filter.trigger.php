@@ -139,7 +139,7 @@ $column2->addRow(_('Host inventory'), $inventoryFilterTable);
 
 // suppressed problem filter
 $column2->addRow(_('Show suppressed problems'),
-	(new CCheckBox('show_suppressed'))->setChecked($filter['show_suppressed'] == 1)
+	(new CCheckBox('show_suppressed'))->setChecked($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 );
 
 $filterForm->addFilterTab(_('Filter'), [$column1, $column2]);

@@ -758,7 +758,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  *
  * @return array
  */
-function getTriggersWithActualSeverity($options, $show_suppressed = 0) {
+function getTriggersWithActualSeverity($options, $show_suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE) {
 	$triggers = API::Trigger()->get($options);
 
 	$problem_triggerids = [];

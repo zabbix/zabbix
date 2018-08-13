@@ -162,7 +162,7 @@ elseif (hasRequest('update')) {
 			$messages['triggers.severities'] = [];
 		}
 		if (!array_key_exists('show_suppressed', $messages)) {
-			$messages['show_suppressed'] = 0;
+			$messages['show_suppressed'] = ZBX_PROBLEM_SUPPRESSED_FALSE;
 		}
 
 		DBstart();

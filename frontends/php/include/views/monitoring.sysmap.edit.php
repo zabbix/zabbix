@@ -221,7 +221,7 @@ $map_tab->addRow(_('Minimum severity'),
 );
 
 $map_tab->addRow(_('Show suppressed problems'),
-	(new CCheckBox('show_suppressed'))->setChecked($data['sysmap']['show_suppressed'] == 1)
+	(new CCheckBox('show_suppressed'))->setChecked($data['sysmap']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 );
 
 // Create url table.

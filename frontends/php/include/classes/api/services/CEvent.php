@@ -1105,7 +1105,9 @@ class CEvent extends CApiService {
 			$suppressed_eventids = [];
 			foreach ($result as &$event) {
 				if (array_key_exists('suppression_data', $event)) {
-					$event['suppressed'] = $event['suppression_data'] ? EVENT_SUPPRESSED : EVENT_NOT_SUPPRESSED;
+					$event['suppressed'] = $event['suppression_data']
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
 				}
 				else {
 					$suppressed_eventids[] = $event['eventid'];
@@ -1121,8 +1123,8 @@ class CEvent extends CApiService {
 				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
 				foreach ($result as &$event) {
 					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
-						? EVENT_SUPPRESSED
-						: EVENT_NOT_SUPPRESSED;
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
 				}
 				unset($event);
 			}
