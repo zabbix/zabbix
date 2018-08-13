@@ -38,7 +38,7 @@ $user_navigation = (new CList())
 $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
-	->addItem(CBrand::isBrand()
+	->addItem(CBrandHelper::isActive()
 		? null
 		: (new CListItem(
 			(new CLink('Support', 'https://www.zabbix.com/support/'))
@@ -47,7 +47,7 @@ $user_menu = (new CList())
 				->setTitle(_('Zabbix Technical Support'))
 		))->addStyle('padding-left:0')
 	)
-	->addItem(CBrand::isBrand()
+	->addItem(CBrandHelper::isActive()
 		? null
 		: (new CListItem(
 			(new CLink('Share', 'https://share.zabbix.com/'))
@@ -56,14 +56,10 @@ $user_menu = (new CList())
 				->setTitle(_('Zabbix Share'))
 		))
 	)
-	->addItem(
-		(new CLink(
-			SPACE,
-			CBrand::isBrand() ? CBrand::getHelpUrl() : 'http://www.zabbix.com/documentation/4.0/'
-		))
-			->addClass(ZBX_STYLE_TOP_NAV_HELP)
-			->setAttribute('target', '_blank')
-			->setTitle(_('Help'))
+	->addItem((new CLink(SPACE, CBrandHelper::getHelpUrl()))
+		->addClass(ZBX_STYLE_TOP_NAV_HELP)
+		->setAttribute('target', '_blank')
+		->setTitle(_('Help'))
 	);
 
 if (!$data['user']['is_guest']) {
@@ -89,7 +85,7 @@ $top_menu = (new CDiv())
 		(new CLink(
 			(new CDiv())
 				->addClass(ZBX_STYLE_LOGO)
-				->addClass(CBrand::isBrand() ? ZBX_STYLE_BRAND_LOGO : null),
+				->addStyle(CBrandHelper::getLogoStyle()),
 			'zabbix.php?action=dashboard.view'
 		))
 			->addClass(ZBX_STYLE_HEADER_LOGO)

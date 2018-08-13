@@ -110,9 +110,6 @@ class ZBase {
 		require_once $this->getRootDir().'/include/sounds.inc.php';
 		require_once $this->getRootDir().'/include/triggers.inc.php';
 		require_once $this->getRootDir().'/include/valuemap.inc.php';
-
-		// set branding from config
-		CBrand::getInstance($this->rootDir);
 	}
 
 	/**

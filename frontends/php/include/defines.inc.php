@@ -1476,7 +1476,6 @@ define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
 define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
 define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
-define('ZBX_STYLE_BRAND_LOGO', 'brand');
 define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');

@@ -34,7 +34,6 @@ $guest = (CWebUser::$data['userid'] > 0)
 		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 
-CBrand::getInstance(realpath(dirname(__FILE__).'/../../..'));
 
 global $ZBX_SERVER_NAME;
 
@@ -45,7 +44,7 @@ global $ZBX_SERVER_NAME;
 	(new CDiv([
 		(new CDiv())
 			->addClass(ZBX_STYLE_SIGNIN_LOGO)
-			->addClass(CBrand::isBrand() ? ZBX_STYLE_BRAND_LOGO : null),
+			->addStyle(CBrandHelper::getLogoStyle()),
 		(new CForm())
 			->cleanItems()
 			->setAttribute('aria-label', _('Sign in'))
@@ -68,15 +67,12 @@ global $ZBX_SERVER_NAME;
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
-		(new CLink(_('Help'), CBrand::isBrand()
-			? CBrand::getHelpUrl()
-			:	'http://www.zabbix.com/documentation/4.0/'
-		))
+		(new CLink(_('Help'), CBrandHelper::getHelpUrl()))
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),
-		CBrand::isBrand() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
-		CBrand::isBrand()
+		CBrandHelper::isActive() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
+		CBrandHelper::isActive()
 			? null
 			: (new CLink(_('Support'), 'http://www.zabbix.com/support.php'))
 				->setTarget('_blank')
