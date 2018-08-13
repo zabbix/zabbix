@@ -98,7 +98,8 @@ class CSvgGraphAxis extends CSvgTag {
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
 				'fill' => $this->color,
 				'font-size' => '11px',
-				'alignment-baseline' => 'middle'
+				'alignment-baseline' => 'middle',
+				'dominant-baseline' => 'middle'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT.' text' => [
 				'text-anchor' => 'start'
