@@ -77,7 +77,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->ns = atoi(row[7]);
 		event->name = zbx_strdup(NULL, row[8]);
 		event->severity = atoi(row[9]);
-		event->suppressed = (SUCCEED == DBis_null(row[10]) ? EVENT_SUPPRESSED_FALSE : EVENT_SUPPRESSED_TRUE);
+		event->suppressed = (SUCCEED == DBis_null(row[10]) ? ZBX_PROBLEM_SUPPRESSED_FALSE :
+				ZBX_PROBLEM_SUPPRESSED_TRUE);
 
 		event->trigger.triggerid = 0;
 

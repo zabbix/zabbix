@@ -131,7 +131,7 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 	events[events_num].flags = ZBX_FLAGS_DB_EVENT_CREATE;
 	events[events_num].severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-	events[events_num].suppressed = EVENT_SUPPRESSED_FALSE;
+	events[events_num].suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -1816,7 +1816,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					((DB_EVENT *)event_refs->values[j])->suppressed = EVENT_SUPPRESSED_TRUE;
+					((DB_EVENT *)event_refs->values[j])->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 				}
 			}
 

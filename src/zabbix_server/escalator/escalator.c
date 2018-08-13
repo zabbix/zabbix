@@ -1883,7 +1883,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		if (SUCCEED != check_escalation_trigger(escalation->triggerid, event->source, &skip, error))
 			goto out;
 
-		maintenance = (EVENT_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
+		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
 				HOST_MAINTENANCE_STATUS_OFF);
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)

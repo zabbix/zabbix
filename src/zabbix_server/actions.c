@@ -386,11 +386,11 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_YES:
-				if (EVENT_SUPPRESSED_TRUE == event->suppressed)
+				if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NO:
-				if (EVENT_SUPPRESSED_FALSE == event->suppressed)
+				if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
 					ret = SUCCEED;
 				break;
 			default:
