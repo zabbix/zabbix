@@ -1077,7 +1077,9 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	$triggerids = [];
 	foreach ($selements as $selement) {
 		foreach ($selement['triggers'] as $trigger) {
-			$triggerids[$trigger['triggerid']] = true;
+			if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+				$triggerids[$trigger['triggerid']] = true;
+			}
 		}
 	}
 
@@ -1089,9 +1091,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 	foreach ($selements as $snum => $selement) {
 		foreach ($problems as $problem) {
-			if (array_key_exists($problem['objectid'], $selement['triggers'])
-					&& $selement['triggers'][$problem['objectid']]['status'] == TRIGGER_STATUS_ENABLED
-					&& $options['severity_min'] <= $problem['severity']) {
+			if ($options['severity_min'] <= $problem['severity']) {
 				$selements[$snum]['triggers'][$problem['objectid']]['problems'][] = $problem;
 			}
 		}
@@ -1182,7 +1182,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 					((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
 		}
 
-		if ($critical_problem && $i['priority'] < $critical_problem['severity']) {
+		if ($critical_problem) {
 			$i['priority'] = $critical_problem['severity'];
 		}
 
