@@ -356,10 +356,10 @@ class CSvgGraph extends CSvg {
 		// 100px is grid cell desired size.
 		$time_interval = (100 * $period) / $this->canvas_width;
 		$intervals = [
-			SEC_PER_MIN / 60 => 'H:i:s',	// 1 second
-			SEC_PER_MIN / 12 => 'H:i:s',	// 5 seconds
-			SEC_PER_MIN / 6 => 'H:i:s',		// 10 seconds
-			SEC_PER_MIN / 2 => 'H:i:s',		// 30 seconds
+			1 => 'H:i:s',					// 1 second
+			5 => 'H:i:s',					// 5 seconds
+			10 => 'H:i:s',					// 10 seconds
+			30 => 'H:i:s',					// 30 seconds
 			SEC_PER_MIN => 'H:i',			// 1 minute
 			SEC_PER_MIN * 2 => 'H:i',		// 2 minutes
 			SEC_PER_MIN * 5 => 'H:i',		// 5 minutes
@@ -377,13 +377,7 @@ class CSvgGraph extends CSvg {
 			SEC_PER_MONTH * 4 => 'Y-n-d',	// 120 days
 			SEC_PER_MONTH * 6 => 'Y-n-d',	// 180 days
 			SEC_PER_YEAR => 'Y-n-d',		// 1 year
-			SEC_PER_YEAR * 2 => 'Y-n-d',	// 2 years
-			SEC_PER_YEAR * 3 => 'Y-n-d',	// 3 years
-			SEC_PER_YEAR * 5 => 'Y-n-d',	// 5 years
-			SEC_PER_YEAR * 10 => 'Y-n-d',	// 10 years
-			SEC_PER_YEAR * 20 => 'Y-n-d',	// 20 years
-			SEC_PER_YEAR * 30 => 'Y-n-d',	// 30 years
-			SEC_PER_YEAR * 40 => 'Y-n-d'	// 40 years
+			SEC_PER_YEAR * 2 => 'Y-n-d'		// 2 years
 		];
 
 		// Default inteval values.
