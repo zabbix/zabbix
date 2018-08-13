@@ -738,7 +738,7 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($delGraphs) {
-			API::Graph()->delete($delGraphs, true);
+			CGraphManager::delete($delGraphs);
 		}
 
 		// check if any graphs are referencing this item

@@ -568,17 +568,20 @@ class CGraphPrototype extends CGraphGeneral {
 		} while (!empty($parentGraphids));
 
 		$graphids = array_unique($graphids);
-		$createdGraphs = [];
 
-		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids));
-		while ($graph = DBfetch($dbGraphs)) {
-			$createdGraphs[$graph['graphid']] = $graph['graphid'];
+		// Deleting discovered graphs.
+		$db_discovered_graphs = DBselect(
+			'SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids)
+		);
+
+		$discovered_graphids = [];
+
+		while ($db_discovered_graph = DBfetch($db_discovered_graphs)) {
+			$discovered_graphids[] = $db_discovered_graph['graphid'];
 		}
-		if (!empty($createdGraphs)) {
-			$result = API::Graph()->delete($createdGraphs, true);
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graphs created by low level discovery.'));
-			}
+
+		if ($discovered_graphids) {
+			CGraphManager::delete($discovered_graphids);
 		}
 
 		DB::delete('screens_items', [
