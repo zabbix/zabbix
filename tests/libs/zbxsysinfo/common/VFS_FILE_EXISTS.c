@@ -30,14 +30,13 @@ void	zbx_mock_test_entry(void **state)
 {
 	AGENT_REQUEST	request;
 	AGENT_RESULT	result;
-	char		*key;
-	char		*expected_error;
-	char		*expected_value;
-	int 		file_exists;
-	int 		ret;
+	const char	*key;
+	int 		expected_ret, ret;
 
-	key = (char *)zbx_mock_get_parameter_string("in.key");
-	expected_value = (char *)zbx_mock_get_parameter_string("out.result");
+	ZBX_UNUSED(state);
+
+	key = zbx_mock_get_parameter_string("in.key");
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
 	init_request(&request);
 	init_result(&result);
@@ -46,22 +45,17 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot parse item key: %s", key);
 
 	ret = VFS_FILE_EXISTS(&request, &result);
+	zbx_mock_assert_sysinfo_ret_eq("Invalid "TEST_NAME" return value", expected_ret, ret);
 
 	if (SYSINFO_RET_OK == ret)
 	{
-		file_exists = (int)zbx_mock_get_parameter_uint64("out.file_exists");
-
-		zbx_mock_assert_str_eq(TEST_NAME, expected_value, "ok");
-		zbx_mock_assert_int_eq(TEST_NAME, file_exists, result.ui64);
+		zbx_mock_assert_uint64_eq(TEST_NAME, zbx_mock_get_parameter_uint64("out.file_exists"), result.ui64);
 	}
 	else
 	{
-		expected_error = (char *)zbx_mock_get_parameter_string("out.error");
-
-		zbx_mock_assert_str_eq(TEST_NAME, expected_value, "fail");
-		zbx_mock_assert_int_eq("Bad "TEST_NAME" return code!", SYSINFO_RET_FAIL, ret);
-		assert_non_null(result.msg);
-		zbx_mock_assert_str_eq("Bad "TEST_NAME" result message", expected_error, result.msg);
+		zbx_mock_assert_ptr_ne("Invalid "TEST_NAME" error message", NULL, result.msg);
+		zbx_mock_assert_str_eq("Invalid "TEST_NAME" error message",
+			zbx_mock_get_parameter_string("out.error"), result.msg);
 	}
 
 	free_result(&result);
