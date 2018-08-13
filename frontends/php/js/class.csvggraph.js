@@ -115,7 +115,7 @@ jQuery(function ($) {
 		if (data.boxing && (e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
 			e.stopPropagation();
 
-			data.end = e.offsetX - data.dimX;
+			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
 			sbox.attr({
 				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
 				'width': Math.abs(data.end - data.start) + 'px'
@@ -138,7 +138,7 @@ jQuery(function ($) {
 		e.stopPropagation();
 
 		if (data.boxing) {
-			data.end = e.offsetX - data.dimX;
+			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
 
 			$(document).off('keydown', SBoxKeyboardInteraction);
 			$(document).off('mouseup',destroySBox);
