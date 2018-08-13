@@ -81,7 +81,9 @@ $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_tags']), CWidgetHelper::getRadioButtonList($fields['show_tags']));
 
 // Show suppressed problems.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']), CWidgetHelper::getCheckBox($fields['show_suppressed']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
+);
 
 // Show unacknowledged only.
 $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']), CWidgetHelper::getCheckBox($fields['unacknowledged']));

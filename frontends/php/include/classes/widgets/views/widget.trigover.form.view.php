@@ -45,7 +45,9 @@ $scripts = [$field_groupids->getPostJS()];
 $form_list->addRow(CWidgetHelper::getLabel($fields['application']), CWidgetHelper::getTextBox($fields['application']));
 
 // Show suppressed problems.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']), CWidgetHelper::getCheckBox($fields['show_suppressed']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
+);
 
 // Hosts location.
 $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));
