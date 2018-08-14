@@ -352,7 +352,6 @@ function addElementNames(array &$selements) {
 		? API::Trigger()->get([
 			'output' => ['description', 'expression', 'priority'],
 			'selectHosts' => ['name'],
-			'selectLastEvent' => ['severity'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		])
@@ -395,9 +394,7 @@ function addElementNames(array &$selements) {
 						$trigger = $triggers[$element['triggerid']];
 						$element['elementName'] = $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description'];
 						$element['elementExpressionTrigger'] = $trigger['expression'];
-						$element['priority'] = array_key_exists('severity', $trigger['lastEvent'])
-								? $trigger['lastEvent']['severity']
-								: $trigger['priority'];
+						$element['priority'] = $trigger['priority'];
 					}
 					else {
 						unset($selement['elements'][$enum]);
@@ -1091,7 +1088,8 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 	foreach ($selements as $snum => $selement) {
 		foreach ($problems as $problem) {
-			if ($options['severity_min'] <= $problem['severity']) {
+			if (array_key_exists($problem['objectid'], $selement['triggers'])
+					&& $options['severity_min'] <= $problem['severity']) {
 				$selements[$snum]['triggers'][$problem['objectid']]['problems'][] = $problem;
 			}
 		}
@@ -2152,8 +2150,9 @@ function getMapHighligts(array $map, array $map_info) {
  * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
- * @param array $options                  Options used to retrieve actions.
- * @param int   $options['severity_min']  Minimal severity used.
+ * @param array $sysmap['show_suppressed']  Whether to show suppressed problems.
+ * @param array $options                    Options used to retrieve actions.
+ * @param int   $options['severity_min']    Minimal severity used.
  *
  * @return array
  */
@@ -2170,13 +2169,13 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		}
 	}
 
-	return API::Trigger()->get([
+	$trigger_options = [
 		'output' => ['status', 'value', 'priority'],
-		'selectLastEvent' => ['severity'],
 		'triggerids' => $triggerids,
-		'min_severity' => $options['severity_min'],
 		'preservekeys' => true
-	]);
+	];
+
+	return getTriggersWithActualSeverity($trigger_options, $sysmap['show_suppressed']);
 }
 
 /**
