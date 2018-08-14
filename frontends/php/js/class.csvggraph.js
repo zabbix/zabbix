@@ -443,7 +443,8 @@ jQuery(function ($) {
 					dimW: options.dims.w,
 					dimH: options.dims.h,
 					showProblems: options.show_problems,
-					isHintBoxFrozen: false
+					isHintBoxFrozen: false,
+					boxing: false
 				};
 
 				graph = $(this);
@@ -460,7 +461,6 @@ jQuery(function ($) {
 
 				if (options.sbox) {
 					data = $.extend({}, {
-						boxing: false,
 						spp: options.spp
 					}, data);
 
