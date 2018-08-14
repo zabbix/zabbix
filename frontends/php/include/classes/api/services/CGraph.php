@@ -553,10 +553,8 @@ class CGraph extends CGraphGeneral {
 				);
 			}
 
-			$db_graph = $db_graphs[$graphid];
-
-			if ($db_graph['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated graphs.'));
+			if ($db_graphs[$graphid]['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated graph.'));
 			}
 		}
 	}

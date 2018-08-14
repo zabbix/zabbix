@@ -20,9 +20,9 @@
 
 
 /**
- * Class to perform low level graph related actions.
+ * Class to perform low level graph prototype related actions.
  */
-class CGraphManager {
+class CGraphPrototypeManager {
 
 	/**
 	 * @param array $graphids
@@ -49,24 +49,26 @@ class CGraphManager {
 
 		$del_graphids = array_keys($del_graphids);
 
+		// Deleting discovered graphs.
+		$db_discovered_graphs = DBselect(
+			'SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $del_graphids)
+		);
+
+		$del_discovered_graphids = [];
+
+		while ($db_discovered_graph = DBfetch($db_discovered_graphs)) {
+			$del_discovered_graphids[] = $db_discovered_graph['graphid'];
+		}
+
+		if ($del_discovered_graphids) {
+			CGraphManager::delete($del_discovered_graphids);
+		}
+
 		DB::delete('screens_items', [
 			'resourceid' => $del_graphids,
-			'resourcetype' => SCREEN_RESOURCE_GRAPH
+			'resourcetype' => SCREEN_RESOURCE_LLD_GRAPH
 		]);
 
-		DB::delete('profiles', [
-			'idx' => 'web.favorite.graphids',
-			'source' => 'graphid',
-			'value_id' => $del_graphids
-		]);
-
-		DB::delete('profiles', [
-			'idx' => 'web.latest.graphid',
-			'value_id' => $del_graphids
-		]);
-
-		DB::delete('widget_field', ['value_graphid' => $del_graphids]);
-		DB::delete('graph_discovery', ['graphid' => $del_graphids]);
 		DB::delete('graphs_items', ['graphid' => $del_graphids]);
 		DB::delete('graphs', ['graphid' => $del_graphids]);
 	}

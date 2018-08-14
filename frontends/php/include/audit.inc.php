@@ -27,6 +27,7 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_HOST => _('Host'),
 		AUDIT_RESOURCE_ACTION => _('Action'),
 		AUDIT_RESOURCE_GRAPH => _('Graph'),
+		AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 		AUDIT_RESOURCE_GRAPH_ELEMENT => _('Graph element'),
 		AUDIT_RESOURCE_USER_GROUP => _('User group'),
 		AUDIT_RESOURCE_APPLICATION => _('Application'),

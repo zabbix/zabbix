@@ -518,8 +518,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
+				CGraphPrototypeManager::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			}
 			else{
 				DB::update('graphs', [

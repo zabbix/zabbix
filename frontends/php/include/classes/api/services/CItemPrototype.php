@@ -909,7 +909,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		if ($del_graph_prototypes) {
-			API::GraphPrototype()->delete($del_graph_prototypes, true);
+			CGraphPrototypeManager::delete($del_graph_prototypes);
 		}
 
 		// check if any graphs are referencing this item

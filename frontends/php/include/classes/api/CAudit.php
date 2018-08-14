@@ -88,6 +88,7 @@ class CAudit {
 				break;
 
 			case AUDIT_RESOURCE_GRAPH:
+			case AUDIT_RESOURCE_GRAPH_PROTOTYPE:
 				$field_name_resourceid = 'graphid';
 				$field_name_resourcename = 'name';
 				$table_name = 'graphs';
