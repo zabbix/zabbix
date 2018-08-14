@@ -4517,10 +4517,6 @@ a.link-action {
 	}
 }
 
-.na-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.na-bg {
 	~ td.na-bg {
 		border-left: 1px dotted $table-border-color;
@@ -4541,10 +4537,6 @@ td.na-bg {
 	}
 }
 
-.normal-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -4556,10 +4548,6 @@ td.normal-bg {
 	input[type="radio"]:checked + label {
 		color: darken($alt-dark-blue, 45%);
 	}
-}
-
-.info-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
 }
 
 td.info-bg {
@@ -4580,10 +4568,6 @@ td.info-bg {
 	}
 }
 
-.average-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -4595,10 +4579,6 @@ td.average-bg {
 	input[type="radio"]:checked + label {
 		color: darken($alt-yellow, 45%);
 	}
-}
-
-.warning-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
 }
 
 td.warning-bg {
@@ -4619,10 +4599,6 @@ td.warning-bg {
 	}
 }
 
-.high-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.high-bg {
 	@extend td.na-bg;
 }
@@ -4641,8 +4617,25 @@ td.high-bg {
 	}
 }
 
-.disaster-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg {
+
+	a {
+		transition: none;
+	}
+
+	&.blink-hidden {
+		background-color: transparent;
+
+		a {
+			color: $font-color;
+		}
+	}
 }
 
 td.disaster-bg {

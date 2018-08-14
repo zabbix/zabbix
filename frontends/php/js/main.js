@@ -387,64 +387,40 @@ var AudioControl = {
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
-	secondsSinceInit: 0,
 
 	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		// Right after page refresh, all blinking elements should be visible.
-		if (this.secondsSinceInit > 0) {
-			var objects = jQuery('.blink');
+		var that = this;
 
-			// maybe some of the objects should not blink any more?
-			objects = this.filterOutNonBlinking(objects);
+		setInterval(function() {
+			var $collection = jQuery('.blink');
 
-			// changing visibility state
-			jQuery.each(objects, function() {
-				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
+			$collection.each(function() {
+				var $el = jQuery(this),
+					blink = true;
+
+				if (typeof $el.data('time-to-blink') !== 'undefined') {
+					blink = ($el.data('time-to-blink') > 0);
+					$el.data('time-to-blink', $el.data('time-to-blink') - 1);
 				}
-				else {
-					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
+
+				if (blink) {
+					if (typeof $el.data('toggle-class') !== 'undefined') {
+						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggle-class'));
+					}
+					else {
+						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+					}
+				}
+				else if (that.shown) {
+					$el.removeClass('blink').removeClass($el.data('toggle-class')).css('visibility', '');
 				}
 			});
 
-			// reversing the value of indicator attribute
-			this.shown = !this.shown;
-		}
-
-		// I close my eyes only for a moment, and a moment's gone
-		this.secondsSinceInit += this.blinkInterval / 1000;
-
-		// repeating this function with delay
-		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
-	},
-
-	/**
-	 * Check all currently found objects and exclude ones that should stop blinking by now
-	 */
-	filterOutNonBlinking: function(objects) {
-		var that = this;
-
-		return objects.filter(function() {
-			var obj = jQuery(this);
-			if (typeof obj.data('timeToBlink') !== 'undefined') {
-				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
-
-				if (shouldBlink || !that.shown) {
-					return true;
-				}
-				else {
-					obj.removeClass('blink');
-					return false;
-				}
-			}
-			else {
-				// no time-to-blink attribute, should blink forever
-				return true;
-			}
-		});
+			that.shown = !that.shown;
+		}, this.blinkInterval);
 	}
 };
 
