@@ -83,6 +83,9 @@ class CSvgGraphHelper {
 			$graph->addSBox();
 		}
 
+		// Add mouse following helper line.
+		$graph->addHelper();
+
 		// Get problems to display in graph.
 		if ($problems_options) {
 			$problems_options['itemids_only'] = (array_key_exists('graph_item_problems_only', $problems_options)

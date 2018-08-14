@@ -1103,7 +1103,6 @@ jQuery(function ($) {
 					.css({
 						'resize': 'none',
 						'overflow-x': 'hidden',
-						'overflow-y': 'auto',
 						'white-space': 'pre-line'
 					})
 					.on('paste change keyup', function() {

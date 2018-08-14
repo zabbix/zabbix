@@ -419,6 +419,17 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
+	 * Add UI helper line that follows mouse.
+	 *
+	 * @return CSvgGraph
+	 */
+	public function addHelper() {
+		$this->addItem((new CSvgLine(0, 0, 0, 0))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER));
+
+		return $this;
+	}
+
+	/**
 	 * Render graph.
 	 *
 	 * @return CSvgGraph
@@ -757,7 +768,9 @@ class CSvgGraph extends CSvg {
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 					->setAttribute('data-metric', $metric['name'])
 					->setAttribute('data-color', $metric['options']['color'])
-					->setAttribute('data-tolerance', $metric['options']['width']);
+					->addItem(
+						(new CSvgCircle(-10, -10, 20))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+					);
 
 				foreach ($this->paths[$index] as $path) {
 					$group->addItem((new CSvgGraphLine($path, $metric))
@@ -787,6 +800,9 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
+	function addHighlightPoint() {
+		return $this;
+	}
 	/**
 	 * Add problems tooltip data to graph.
 	 */

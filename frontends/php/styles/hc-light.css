@@ -2854,6 +2854,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-color: rgba(175, 107, 0, 0.6);
   stroke-width: 1px; }
 
+.svg-helper {
+  stroke-opacity: 0.35;
+  stroke: #990000;
+  stroke-width: 2px; }
+
+.svg-point-highlight {
+  fill: #009900; }
+
+.svg-graph-hintbox-item-color {
+  margin: 3px 10px 3px 3px;
+  width: 10px;
+  height: 10px;
+  float: left;
+  display: block; }
+
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;

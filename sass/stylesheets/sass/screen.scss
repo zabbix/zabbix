@@ -4158,6 +4158,21 @@ $form-icon-btn: (
 	stroke-color: rgba($dark-yellow,0.6);
 	stroke-width: 1px;
 }
+.svg-helper {
+	stroke-opacity: 0.35;
+	stroke: $red;
+	stroke-width: 2px;
+}
+.svg-point-highlight {
+	fill: $light-green;
+}
+.svg-graph-hintbox-item-color {
+	margin: 3px 10px 3px 3px;
+	width: 10px;
+	height: 10px;
+	float: left;
+	display: block;
+}
 
 .svg-graph-legend {
 	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.

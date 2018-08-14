@@ -24,6 +24,7 @@ class CSvgGraphArea extends CSvgGraphLine {
 	public function __construct($path, $metric) {
 		parent::__construct($path, $metric);
 
+		$this->add_label = false;
 		$this->options = $metric['options'] + [
 			'fill' => 5
 		];

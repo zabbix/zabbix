@@ -40,6 +40,9 @@ class CSvgTag extends CTag {
 
 	const ZBX_STYLE_GRAPH_LEGEND = 'svg-graph-legend';
 
+	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
+	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
+
 	/**
 	 * SVG styles array.
 	 */

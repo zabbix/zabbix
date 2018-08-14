@@ -28,6 +28,8 @@ class CSvgGraphLine extends CSvgPath {
 	protected $units;
 	protected $host;
 	protected $options;
+	protected $line_values;
+	protected $add_label;
 
 	protected $position_x = 0;
 	protected $position_y = 0;
@@ -38,12 +40,14 @@ class CSvgGraphLine extends CSvgPath {
 	public function __construct($path, $metric) {
 		parent::__construct();
 
+		$this->add_label = true;
 		$this->path = $path;
 
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->units = $metric['units'];
 		$this->host = $metric['host'];
+		$this->line_values = '';
 
 		$this->options = $metric['options'] + [
 			'transparency' => 5,
@@ -78,6 +82,10 @@ class CSvgGraphLine extends CSvgPath {
 		return $this;
 	}
 
+	public function addLineValue($value) {
+		$this->line_values .= ($this->line_values === '') ? $value : ','.$value;
+	}
+
 	public function setSize($width, $height) {
 		$this->width = $width;
 		$this->height = $height;
@@ -90,23 +98,26 @@ class CSvgGraphLine extends CSvgPath {
 		foreach ($this->path as $i => $point) {
 			if ($i == 0) {
 				$this->moveTo($point[0], $point[1]);
+				if ($this->add_label) {
+					$this->addLineValue($point[2]);
+				}
 			}
 			else {
 				if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
 					$this->lineTo($point[0], $last_point[1]);
 				}
 				$this->lineTo($point[0], $point[1]);
+				if ($this->add_label) {
+					$this->addLineValue($point[2]);
+				}
 			}
 			$last_point = $point;
-		}
-		if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
-			$this->lineTo($last_point[0] + $this->options['width'] * 2, $last_point[1]);
-			$this->lineTo($last_point[0] + $this->options['width'] * 2, $this->position_y + $this->height);
 		}
 	}
 
 	public function toString($destroy = true) {
 		$this->draw();
+		$this->setAttribute('data-label', $this->line_values !== '' ? $this->line_values : null);
 
 		return parent::toString($destroy);
 	}

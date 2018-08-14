@@ -21,111 +21,153 @@
 /**
  * JQuery class that initializes interactivity for SVG graph. Currently following features are supported:
  *  - SBox - time range selector;
- *  - problems - show problems in hintbox when mouse is moved over the problem zone;
- *  - values - show mouse overed value in hintbox or all values at particular moment (X axis) if no specific value is
- *    toucked.
+ *  - show_problems - show problems in hintbox when mouse is moved over the problem zone.
  */
 jQuery(function ($) {
 	"use strict"
 
-	var min_period = 60; // Minimal period in seconds to zoom in.
+	var min_period = 60,  // Minimal period in seconds to zoom in.
+		graph = null,     // Main graph object.
+		hbox = null,      // Hintbox object.
+		data = {},        // Graph options.
+		sbox = null,      // SBox SVG object.
+		stxt = null,      // SBox text SVG object.
+		line = null;      // Graph helper.
 
-	function SBoxKeyboardInteraction(e) {
+	/**
+	 * Makes SBox selection cancelable pressing Esc.
+	 */
+	function sBoxKeyboardInteraction(e) {
 		if (e.keyCode == 27) {
-			destroySBox(e);
+			destroySBox();
 		}
 	}
 
-	function destroySBox(e, graph) {
-		var graph = graph || e.data.graph;
+	/**
+	 * Cancel SBox and unset its variables.
+	 */
+	function destroySBox() {
 		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
 		$('.svg-graph-selection-text', graph).text('');
-		graph.data('graph').boxing = false;
+
+		$(document).off('keydown', sBoxKeyboardInteraction);
+
+		graph
+			.off('mousemove', moveSBoxMouse)
+			.off('mouseup', destroySBox);
+
+		data.boxing = false;
 	}
 
-	function destroyHintbox(e, graph) {
-		if (typeof graph.data('isHintBoxFrozen') === 'undefined' || graph.data('isHintBoxFrozen') === false) {
-			var hbox = graph.data('hintbox');
-			graph
-				.removeData('hintbox')
-				.removeData('isHintBoxFrozen')
-				.off('click', makeHintboxStatic);
-			$(hbox).remove();
-			hideHelper(graph)
+	/**
+	 * Destroy hintbox, unset its variables and event listeners.
+	 */
+	function destroyHintbox() {
+		if (hbox !== null && data.isHintBoxFrozen === false) {
+			graph.off('mouseup', makeHintboxStatic);
+			hbox.remove();
+			hbox = null;
 		}
 	}
 
+	/**
+	 * Hide vertical helper line and highlighted data points.
+	 */
+	function hideHelper() {
+		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
+		graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
+	}
+
+	/**
+	 * Create a new hintbox and stick it to certain position where user has clicked.
+	 */
 	function makeHintboxStatic(e) {
-		var graph = e.data.graph,
-			content = graph.data('hintbox').find('> div');
+		var content = hbox.find('> div');
 
-		destroyHintbox(e, graph);
+		// Destroy old hintbox to make new one with close button.
+		destroyHintbox();
 
-		graph.hintBoxItem = hintBox.createBox(e, graph, null, '', true, false, graph.parent());
-		graph.hintBoxItem.append(content);
-
-		graph
-			.data('isHintBoxFrozen', true)
-			.data('hintbox', graph.hintBoxItem);
+		// Should be put inside hintBoxItem to use functionality of hintBox.
+		graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
+		data.isHintBoxFrozen = true;
+		hbox = graph.hintBoxItem;
 
 		graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-			graph.data('isHintBoxFrozen', false);
-			destroyHintbox(e, graph);
+			data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
+			graph.off('mouseup', hintboxSilentMode);
+			destroyHintbox();
 		});
 
 		graph.hintBoxItem.css({
 			'left': e.offsetX + 20,
 			'top': e.offsetY + 20
 		});
+
+		graph.on('mouseup', hintboxSilentMode);
 	}
 
+	/**
+	 * Silent mode means that hintbox is waiting for click to be repositionated. Once user clicks on graph, existing
+	 * hintbox will be repositionated with a new values in the place where user clicked on.
+	 */
+	function hintboxSilentMode(e) {
+		data.isHintBoxFrozen = false;
+		showHintbox(e);
+		makeHintboxStatic(e);
+	}
+
+	/**
+	 * Method to start selection of some horizontal area in graph.
+	 */
 	function startSBoxDrag(e) {
-		var graph = $(this),
-			data = graph.data('graph'),
-			sbox = $('.svg-graph-selection', graph),
-			hbox = graph.data('hintbox');
+		e.stopPropagation();
 
 		if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
-			$(document).on('keydown', {graph: graph}, SBoxKeyboardInteraction);
-			$(document).on('mouseup', {graph: graph}, destroySBox);
+			$(document).on('keydown', sBoxKeyboardInteraction);
 
-			e.stopPropagation();
+			graph
+				.on('mousemove', moveSBoxMouse)
+				.on('mouseup', destroySBox);
+
 			data.start = e.offsetX - data.dimX;
-			data.boxing = true;
-
-			if (typeof hbox !== 'undefined') {
-				graph.removeData('hintbox');
-				hbox.remove();
-			}
-
-			sbox.attr({
-				'x': (data.start + data.dimX) + 'px',
-				'y': data.dimY + 'px',
-				'height': data.dimH
-			});
 		}
 	}
 
+	/**
+	 * Method to recalculate selected area during mouse move.
+	 */
 	function moveSBoxMouse(e) {
-		var data = $(this).data('graph'),
-			sbox = $('.svg-graph-selection', $(this)),
-			stxt = $('.svg-graph-selection-text', $(this));
+		e.stopPropagation();
 
-		if (data.boxing && (e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
-			e.stopPropagation();
+		if ((e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
+			data.end = e.offsetX - data.dimX;
+			if (data.start != data.end) {
+				data.isHintBoxFrozen = false;
+				data.boxing = true;
+				destroyHintbox();
+				hideHelper();
+			}
+			else {
+				destroySBox();
+				return false;
+			}
 
 			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
+
 			sbox.attr({
 				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
-				'width': Math.abs(data.end - data.start) + 'px'
+				'y': data.dimY + 'px',
+				'width': Math.abs(data.end - data.start) + 'px',
+				'height': data.dimH
 			});
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				label = formatTimestamp(seconds, false, true)
 					+ (seconds < min_period ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 
-			stxt.text(label)
+			stxt
+				.text(label)
 				.attr({
 					'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
 					'y': (data.dimY + 15) + 'px'
@@ -133,16 +175,16 @@ jQuery(function ($) {
 		}
 	}
 
+	/**
+	 * Method to end selection of horizontal area in graph.
+	 */
 	function endSBoxDrag(e) {
-		var data = $(this).data('graph');
 		e.stopPropagation();
 
 		if (data.boxing) {
 			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
 
-			$(document).off('keydown', SBoxKeyboardInteraction);
-			$(document).off('mouseup',destroySBox);
-			destroySBox(null, $(this))
+			destroySBox();
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
@@ -157,139 +199,63 @@ jQuery(function ($) {
 		}
 	}
 
-	function findValues(graph, x, y) {
-		/**
-		 * Find mouse-overed data points.
-		 *
-		 * Writen in native javascript to make it faster. Each data set can have only one value at specific time. That's
-		 * why we need only maximum 1 value from each [data-set] group.
-		 *
-		 * Use point size and line width as a tolerance to make matching area wider.
-		 */
-		var matching_x = [],
-			matching_xy = [],
-			xy_only = false,
-			values = [],
-			tolerance,
-			x_min,
-			x_max,
-			y_min,
-			y_max;
+	/**
+	 * Read SVG nodes and find closest past value to the given x in each data set.
+	 */
+	function findValues(x) {
+		var data_sets = [];
 
-		graph[0].querySelectorAll('[data-set]').forEach(function(ds) {
-			tolerance = +ds.getAttribute('data-tolerance');
+		[...graph[0].querySelectorAll('[data-set]')].forEach(function(ds) {
+			var px = -10,
+				py = -10,
+				pv = null;
 
-			if (ds.getAttribute('data-set') === 'line') {
-				x_min = x - tolerance / 2;
-				x_max = x + tolerance / 2;
-				y_min = y - tolerance / 2;
-				y_max = y + tolerance / 2;
+			// Find matching X points.
+			switch (ds.getAttribute('data-set')) {
+				case 'points':
+					var test_x = Math.min(x, +ds.lastChild.getAttribute('cx')),
+						points = [...ds.querySelectorAll('circle')].filter(function(c) {
+							return (test_x > parseInt(c.getAttribute('cx')));
+						}),
+						point = points.slice(-1)[0];
 
-				[...ds.querySelectorAll('path')].forEach(function(c) {
-					c.getAttribute('d').match(/\d+,\d+/g).forEach(function(p) {
-						p = p.split(',');
+					if (typeof point !== 'undefined') {
+						px = point.getAttribute('cx');
+						py = point.getAttribute('cy');
+						pv = point.getAttribute('label');
+					}
+					break;
 
-						if (+p[0] > x_min && +p[0] < x_max) {
-							if (+p[1] > y_min && +p[1] < y_max) {
-								matching_xy.push({
-									val: +[1],
-									metric: ds.getAttribute('data-metric'),
-									color: ds.getAttribute('data-color')
-								});
+				case 'staircase':
+				case 'line':
+					var direction = ds.querySelectorAll('.svg-graph-line')[0].getAttribute('d').split(' '),
+						label = ds.querySelectorAll('.svg-graph-line')[0].getAttribute('data-label').split(','),
+						index = direction.length,
+						point;
 
-								xy_only = true; // Stop collect X points, because we already know that XY point is found.
-								return;
-							}
-
-							if (!xy_only) {
-								matching_x.push({
-									val: +p[1],
-									metric: ds.getAttribute('data-metric'),
-									color: ds.getAttribute('data-color')
-								});
-							}
-						}
-					});
-				});
-			}
-			else if (ds.getAttribute('data-set') === 'staircase') {
-				x_min = x - tolerance / 2;
-				x_max = x + tolerance / 2;
-				y_min = y - tolerance / 2;
-				y_max = y + tolerance / 2;
-
-				[...ds.querySelectorAll('path')].forEach(function(c) {
-					var value_catched = false;
-					c.getAttribute('d').match(/\d+,\d+/g).forEach(function(p) {
-						// This is because in staircase graph each value is represented by 2 points.
-						if (value_catched) {
-							value_catched = false;
-							return;
-						}
-						p = p.split(',');
-
-						if (+p[0] > x_min && +p[0] < x_max) {
-							value_catched = true;
-							if (+p[1] > y_min && +p[1] < y_max) {
-								matching_xy.push({
-									val: +[1],
-									metric: ds.getAttribute('data-metric'),
-									color: ds.getAttribute('data-color')
-								});
-
-								xy_only = true; // Stop collect X points, because we already know that XY point is found.
-								return;
-							}
-
-							if (!xy_only) {
-								matching_x.push({
-									val: +p[1],
-									metric: ds.getAttribute('data-metric'),
-									color: ds.getAttribute('data-color')
-								});
-							}
-						}
-					});
-				});
-			}
-			else if (ds.getAttribute('data-set') === 'points') {
-				x_min = x - tolerance;
-				x_max = x + tolerance;
-				y_min = y - tolerance;
-				y_max = y + tolerance;
-
-				[...ds.querySelectorAll('circle')].forEach(function(c) {
-					var cx = +c.getAttribute('cx'),
-						cy = +c.getAttribute('cy');
-
-					if (cx > x_min && cx < x_max) {
-						if (cy > y_min && cy < y_max) {
-							matching_xy.push({
-								val: c.getAttribute('label'),
-								metric: ds.getAttribute('data-metric'),
-								color: ds.getAttribute('data-color')
-							});
-
-							xy_only = true; // Stop collect X points, because we already know that XY point is found.
-							return;
-						}
-
-						if (!xy_only) {
-							matching_x.push({
-								val: cy,
-								metric: ds.getAttribute('data-metric'),
-								color: ds.getAttribute('data-color')
-							});
+					while (index) {
+						index--;
+						point = direction[index].substr(1).split(',');
+						if (x > parseInt(point[0])) {
+							px = point[0];
+							py = point[1];
+							pv = label[ds.getAttribute('data-set') === 'line' ? index : index / 2];
+							break;
 						}
 					}
-				});
+					break;
 			}
+
+			data_sets.push({g: ds, x: px, y: py, v: pv});
 		});
 
-		return matching_xy.length ? matching_xy : matching_x;
+		return data_sets;
 	}
 
-	function findProblems(graph, x) {
+	/**
+	 * Find what problems matches in time to the given x.
+	 */
+	function findProblems(x) {
 		var problems = [],
 			problem_start,
 			problem_width;
@@ -306,32 +272,52 @@ jQuery(function ($) {
 		return problems;
 	}
 
-	function hideHelper(graph) {
-		graph.find('.svg-value-box').attr('x', -10);
+	/**
+	 * Set position of vertical helper line.
+	 */
+	function setHelperPosition(e) {
+		line.attr({
+			'x1': e.clientX - 12,
+			'y1': data.dimY,
+			'x2': e.clientX - 12,
+			'y2': data.dimY + data.dimH
+		});
 	}
 
+	/**
+	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
+	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
+	 * this function. Tolerance is used to find exacly macthed point only.
+	 */
+	function getDataPointTolerance(ds) {
+		if (ds.getAttribute('data-set') === 'points') {
+			// Take radius of first real data set point (the 0th is .svg-point-highlight).
+			return +ds.childNodes[1].getAttribute('r');
+		}
+		else {
+			return +window.getComputedStyle(ds.querySelectorAll('path')[0])['strokeWidth'];
+		}
+	}
+
+	/**
+	 * Show problem or value hintboxe.
+	 */
 	function showHintbox(e) {
-		var graph = $(this),
-			data = graph.data('graph'),
-			hbox = graph.data('hintbox'),
-			line = graph.find('.svg-value-box'),
-			html = null,
+		e.stopPropagation();
+
+		var html = null,
 			inx = false;
 
-		if (typeof graph.data('isHintBoxFrozen') !== 'undefined' && graph.data('isHintBoxFrozen') === true) {
-			return false;
-		}
-
-		if (typeof data.boxing === 'undefined' || data.boxing === false) {
-			e.stopPropagation();
+		if (data.boxing === false) {
 			// Check if mouse in the horizontal area in which hintbox must be shown.
 			inx = (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW);
 
 			// Show problems when mouse is in the 15px high area under the graph canvas.
-			if (inx && data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15) {
-				hideHelper(graph);
+			if (data.showProblems && data.isHintBoxFrozen === false && inx && data.dimY + data.dimH <= e.offsetY
+					&& e.offsetY <= data.dimY + data.dimH + 15) {
+				hideHelper();
 
-				var values = findProblems(graph, e.offsetX);
+				var values = findProblems(e.offsetX);
 				if (values.length) {
 					var tbody = $('<tbody>');
 
@@ -348,7 +334,7 @@ jQuery(function ($) {
 						);
 					});
 
-					html = $('<div>').append(
+					html = $('<div></div>').append(
 							$('<table></table>')
 								.addClass('list-table compact-view')
 								.append(tbody)
@@ -357,43 +343,75 @@ jQuery(function ($) {
 			}
 			// Show graph values if mouse is over the graph canvas.
 			else if (inx && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH) {
-				// Helper line should follow the mouse.
-				line.attr({x: e.clientX - 14});
+				// Set position of mouse following helper line.
+				setHelperPosition(e);
 
-				// Find values and draw HTML for value hintbox.
-				var values = findValues(graph, e.offsetX, e.offsetY);
-				if (values.length) {
-					html = $('<ul></ul>');
-					values.forEach(function(val) {
-						$('<li></li>')
-							.append(
-								$('<span></span>').css({
-									'background-color': val.color,
-									'margin': '3px 10px 3px 3px',
-									'width': '10px',
-									'height': '10px',
-									'float': 'left',
-									'display': 'block'
-								})
-							)
-							.append(val.metric + ': ' + val.val)
-							.appendTo(html);
+				// Find values.
+				var points = findValues(e.offsetX + 5),
+					show_hint = false,
+					xy_point = false,
+					tolerance;
+
+				/**
+				 * Decide if one specific value or list of all matching Xs should be highlighted and either to show or
+				 * hide hintbox.
+				 */
+				if (data.isHintBoxFrozen === false) {
+					points.forEach(function(point) {
+						if (!show_hint && point.v !== null) {
+							show_hint = true;
+						}
+
+						tolerance = getDataPointTolerance(point.g);
+						if (!xy_point && point.v !== null
+								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
+								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
+							xy_point = point;
+							return;
+						}
 					});
+				}
 
-					html = $('<div>').append(html);
+				// Make html for hintbox.
+				if (show_hint) {
+					html = $('<ul></ul>');
+				}
+				points.forEach(function(point) {
+					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
+					if (xy_point === false || xy_point === point) {
+						point_highlight.setAttribute('cx', point.x);
+						point_highlight.setAttribute('cy', point.y);
+
+						if (show_hint) {
+							$('<li></li>')
+								.append(
+									$('<span></span>')
+										.css('background-color', point.g.getAttribute('data-color'))
+										.addClass('svg-graph-hintbox-item-color')
+								)
+								.append(point.g.getAttribute('data-metric') + ': ' + point.v)
+								.appendTo(html);
+						}
+					}
+					else {
+						point_highlight.setAttribute('cx', -10);
+						point_highlight.setAttribute('cy', -10);
+					}
+
+				});
+
+				if (show_hint) {
+					html = $('<div></div>').append(html);
 				}
 			}
 			else {
-				hideHelper(graph);
+				hideHelper();
 			}
 
 			if (html !== null) {
-				if (typeof hbox === 'undefined') {
-					hbox = hintBox.createBox(e, graph, null, '', false, false, graph.parent());
-					graph
-						.on('click', {graph: graph}, makeHintboxStatic)
-						.data('hintbox', hbox);
-					hbox.append(html);
+				if (hbox === null) {
+					hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+					graph.on('mouseup', makeHintboxStatic);
 				}
 				else {
 					hbox.find('> div').replaceWith(html);
@@ -403,11 +421,11 @@ jQuery(function ($) {
 			}
 		}
 		else {
-			hideHelper(graph);
+			hideHelper();
 		}
 
 		if (html === null) {
-			destroyHintbox(e, graph);
+			destroyHintbox();
 		}
 	}
 
@@ -415,49 +433,40 @@ jQuery(function ($) {
 		init: function(options) {
 			options = $.extend({}, {
 				sbox: false,
-				problems: true,
-				values: true
+				showProblems: true
 			}, options);
 
 			this.each(function() {
-				var graph = $(this),
-					graph_data = {
-						dimX: options.dims.x,
-						dimY: options.dims.y,
-						dimW: options.dims.w,
-						dimH: options.dims.h
-					};
+				data = {
+					dimX: options.dims.x,
+					dimY: options.dims.y,
+					dimW: options.dims.w,
+					dimH: options.dims.h,
+					showProblems: options.show_problems,
+					isHintBoxFrozen: false
+				};
+
+				graph = $(this);
+				line = graph.find('.svg-helper');
+				sbox = options.sbox ? $('.svg-graph-selection', graph) : null;
+				stxt = options.sbox ? $('.svg-graph-selection-text', graph) : null;
+				hbox = null;
 
 				graph
+					.on('mousemove', showHintbox)
 					.attr('unselectable', 'on')
 					.css('user-select', 'none')
-					.on('selectstart', false)
-
-				if (options.values || options.problems) {
-					graph.on('mousemove', showHintbox);
-				}
+					.on('selectstart', false);
 
 				if (options.sbox) {
-					graph_data = $.extend({}, {
-						start: 0,
+					data = $.extend({}, {
 						boxing: false,
 						spp: options.spp
-					}, graph_data);
+					}, data);
 
 					graph
-						.on('mouseup', endSBoxDrag)
 						.on('mousedown', startSBoxDrag)
-						.on('mousemove', moveSBoxMouse);
-				}
-
-				if (options.values || options.problems || options.sbox) {
-					graph
-						.data('graph', graph_data)
-						.on('mouseleave', function(e) {
-							if (options.values || options.problems) {
-								destroyHintbox(e, $(this));
-							}
-						});
+						.on('mouseup', endSBoxDrag);
 				}
 			});
 		}
