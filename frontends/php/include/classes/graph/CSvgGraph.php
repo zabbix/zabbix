@@ -315,12 +315,12 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	public function getValuesGridWithPosition($side = null) {
-		if ($side === GRAPH_YAXIS_SIDE_RIGHT) {
+		if ($side === GRAPH_YAXIS_SIDE_RIGHT && $this->min_value_right !== null) {
 			$min_value = $this->right_y_min;
 			$max_value = $this->right_y_max;
 			$units = $this->right_y_units;
 		}
-		elseif ($side === GRAPH_YAXIS_SIDE_LEFT) {
+		elseif ($side === GRAPH_YAXIS_SIDE_LEFT && $this->min_value_left !== null) {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
 			$units = $this->left_y_units;
@@ -330,13 +330,11 @@ class CSvgGraph extends CSvg {
 		}
 
 		$grid = $this->getValueGrid($min_value, $max_value);
-		$grid_min = reset($grid);
-		$grid_max = end($grid);
-		$delta = ($grid_max - $grid_min ? : 1);
+		$delta = ($max_value - $min_value ? : 1);
 		$grid_values = [];
 
 		foreach ($grid as $value) {
-			$relative_pos = $this->canvas_height - $this->canvas_height * ($grid_max - $value) / $delta;
+			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
 			$grid_values[$relative_pos] = convert_units([
 				'value' => $value,
 				'units' => $units
@@ -428,6 +426,18 @@ class CSvgGraph extends CSvg {
 	public function draw() {
 		$this->calculateDimensions();
 		$this->calculatePaths();
+		$this->addItem(
+			(new CsvgTag('clipPath'))
+				->addItem(
+					(new CSvgPath(implode(' ', [
+						'M'.$this->canvas_x.','.$this->canvas_y,
+						'H'.($this->canvas_width + $this->canvas_x),
+						'V'.($this->canvas_height + $this->canvas_y),
+						'H'.$this->canvas_x
+					])))
+				)
+				->setAttribute('id', 'metric_clip_area')
+		);
 		$this->drawGrid();
 		$this->drawMetricsArea();
 		$this->drawMetricsLine();
@@ -711,17 +721,21 @@ class CSvgGraph extends CSvg {
 	 * Add fill area to graph for metric of type SVG_GRAPH_TYPE_LINE or SVG_GRAPH_TYPE_STAIRCASE.
 	 */
 	protected function drawMetricsArea() {
+		$group = (new CSvgGroup())->setAttribute('clip-path', 'url(#metric_clip_area)');
+
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['fill'] > 0 && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
 				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphArea($path, $metric))
+					$group->addItem((new CSvgGraphArea($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 					);
 				}
 			}
 		}
+
+		$this->addItem($group);
 	}
 
 	/**
@@ -732,6 +746,7 @@ class CSvgGraph extends CSvg {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
 				$group = (new CSvgGroup())
+					->setAttribute('clip-path', 'url(#metric_clip_area)')
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 					->setAttribute('data-metric', $metric['name'])
 					->setAttribute('data-color', $metric['options']['color'])
