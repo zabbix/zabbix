@@ -751,7 +751,7 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		]);
 		if ($triggers) {
-			API::Trigger()->delete(array_keys($triggers), true);
+			CTriggerManager::delete(array_keys($triggers));
 		}
 
 		$triggerPrototypes = API::TriggerPrototype()->get([

@@ -130,6 +130,12 @@ class CAudit {
 				$table_name = 'scripts';
 				break;
 
+			case AUDIT_RESOURCE_TRIGGER:
+				$field_name_resourceid = 'triggerid';
+				$field_name_resourcename = 'description';
+				$table_name = 'triggers';
+				break;
+
 			case AUDIT_RESOURCE_USER:
 				$field_name_resourceid = 'userid';
 				$field_name_resourcename = 'alias';

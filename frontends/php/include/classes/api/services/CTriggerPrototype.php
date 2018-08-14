@@ -550,7 +550,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			' WHERE '.dbConditionInt('parent_triggerid', $triggerPrototypeIds)
 		), 'triggerid');
 		if ($createdTriggerIds) {
-			API::Trigger()->delete($createdTriggerIds, true);
+			CTriggerManager::delete($createdTriggerIds);
 		}
 
 		// select all trigger prototypes which are deleted (include children)
