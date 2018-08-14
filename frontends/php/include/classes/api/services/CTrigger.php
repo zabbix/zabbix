@@ -584,12 +584,11 @@ class CTrigger extends CTriggerGeneral {
 	 * Delete triggers.
 	 *
 	 * @param array $triggerids
-	 * @param bool  $nopermissions
 	 *
 	 * @return array
 	 */
-	public function delete(array $triggerids, $nopermissions = false) {
-		$this->validateDelete($triggerids, $db_triggers, $nopermissions);
+	public function delete(array $triggerids) {
+		$this->validateDelete($triggerids, $db_triggers);
 
 		CTriggerManager::delete($triggerids);
 
@@ -601,11 +600,10 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * @param array $triggerids
 	 * @param array $db_graphs
-	 * @param bool  $nopermissions
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array &$triggerids, array &$db_triggers = null, $nopermissions) {
+	protected function validateDelete(array &$triggerids, array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $triggerids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -618,23 +616,21 @@ class CTrigger extends CTriggerGeneral {
 			'preservekeys' => true
 		]);
 
-		if (!$nopermissions) {
-			foreach ($triggerids as $triggerid) {
-				if (!array_key_exists($triggerid, $db_triggers)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
+		foreach ($triggerids as $triggerid) {
+			if (!array_key_exists($triggerid, $db_triggers)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 
-				$db_trigger = $db_triggers[$triggerid];
+			$db_trigger = $db_triggers[$triggerid];
 
-				if ($db_trigger['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger "%1$s:%2$s".', $db_trigger['description'],
-							CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
-						)
-					);
-				}
+			if ($db_trigger['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot delete templated trigger "%1$s:%2$s".', $db_trigger['description'],
+						CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
+					)
+				);
 			}
 		}
 	}
