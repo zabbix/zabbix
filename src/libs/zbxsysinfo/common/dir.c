@@ -819,7 +819,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < list.values_num)
 	{
-		char			*name, *error = NULL;
+		char			*name;
 		wchar_t			*wpath;
 		HANDLE			handle;
 		WIN32_FIND_DATA		data;

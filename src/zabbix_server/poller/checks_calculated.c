@@ -116,7 +116,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 		if (SUCCEED != parse_host_key(buf, &host, &key))
 		{
 			zbx_snprintf(error, max_error_len, "Invalid first parameter in function [%.*s].",
-					par_r - f_pos + 1, e + f_pos);
+					(int)(par_r - f_pos + 1), e + f_pos);
 			goto out;
 		}
 		if (NULL == host)

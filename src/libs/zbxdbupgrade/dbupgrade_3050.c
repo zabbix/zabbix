@@ -1521,7 +1521,7 @@ static int	DBpatch_3050122(void)
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;

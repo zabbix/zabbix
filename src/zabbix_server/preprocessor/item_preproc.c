@@ -748,7 +748,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	if (NULL == new_value)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match", pattern);
+		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match");
 		return FAIL;
 	}
 
