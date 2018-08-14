@@ -386,7 +386,7 @@ var AudioControl = {
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
-	blinkInterval: 1000, // how fast will they blink (ms)
+	interval: 1000, // how fast will they blink (ms)
 
 	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
@@ -401,26 +401,25 @@ var jqBlink = {
 				var $el = jQuery(this),
 					blink = true;
 
-				if (typeof $el.data('time-to-blink') !== 'undefined') {
-					blink = ($el.data('time-to-blink') > 0);
-					$el.data('time-to-blink', $el.data('time-to-blink') - 1);
+				if (typeof $el.data('timeToBlink') !== 'undefined') {
+					blink = (($el.data()['timeToBlink']--) > 0);
 				}
 
 				if (blink) {
-					if (typeof $el.data('toggle-class') !== 'undefined') {
-						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggle-class'));
+					if (typeof $el.data('toggleClass') !== 'undefined') {
+						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
 					}
 					else {
 						$el.css('visibility', that.shown ? 'visible' : 'hidden');
 					}
 				}
 				else if (that.shown) {
-					$el.removeClass('blink').removeClass($el.data('toggle-class')).css('visibility', '');
+					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
 				}
 			});
 
 			that.shown = !that.shown;
-		}, this.blinkInterval);
+		}, this.interval);
 	}
 };
 
