@@ -112,6 +112,9 @@ class CApiInputValidator {
 			case API_HG_NAME:
 				return self::validateHostGroupName($rule, $data, $path, $error);
 
+			case API_H_NAME:
+				return self::validateHostName($rule, $data, $path, $error);
+
 			case API_SCRIPT_NAME:
 				return self::validateScriptName($rule, $data, $path, $error);
 
@@ -163,6 +166,7 @@ class CApiInputValidator {
 			case API_FLAG:
 			case API_OUTPUT:
 			case API_HG_NAME:
+			case API_H_NAME:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
 			case API_TIME_PERIOD:
@@ -229,7 +233,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Myltiple data types validator.
+	 * Multiple data types validator.
 	 *
 	 * @param array  $rule
 	 * @param array  $rule['rules']
@@ -771,6 +775,7 @@ class CApiInputValidator {
 	 * Host group name validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -785,13 +790,77 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 
-		$host_group_name_validator = new CHostGroupNameValidator();
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+		$parser = new CHostGroupNameParser(['lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
 
-		if (!$host_group_name_validator->validate($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $host_group_name_validator->getError());
+		// For example, host prototype group name MUST contain macros.
+		if ($parser->parse($data) == CParser::PARSE_SUCCESS) {
+			if ($flags & API_ALLOW_LLD_MACRO) {
+				if (!$parser->getMacros()) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('must contain macros'));
+
+					return false;
+				}
+			}
+			else {
+				return true;
+			}
+		}
+		else {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('invalid group name "%1$s"', $data));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Host name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateHostName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+		$parser = new CHostNameParser(['lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+
+		// For example, host prototype name MUST contain macros.
+		if ($parser->parse($data) == CParser::PARSE_SUCCESS) {
+			if ($flags & API_ALLOW_LLD_MACRO) {
+				if (!$parser->getMacros()) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('must contain macros'));
+
+					return false;
+				}
+			}
+			else {
+				return true;
+			}
+		}
+		else {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('invalid host name "%1$s"', $data));
+
 			return false;
 		}
 

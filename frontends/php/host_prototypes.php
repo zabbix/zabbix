@@ -150,6 +150,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		]
 	];
 
+	// API requires 'templateid' property.
+	if ($newHostPrototype['templates']) {
+		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
+	}
+
 	// add custom group prototypes
 	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
 		if (!$groupPrototype['group_prototypeid']) {

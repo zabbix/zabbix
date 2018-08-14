@@ -1142,6 +1142,7 @@ define('API_VARIABLE_NAME',		17);
 define('API_OUTPUT',			18);
 define('API_TIME_UNIT',			19);
 define('API_URL',				20);
+define('API_H_NAME',			21);
 
 // flags
 define('API_REQUIRED',			0x01);

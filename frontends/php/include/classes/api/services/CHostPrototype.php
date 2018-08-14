@@ -97,155 +97,70 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 *
-	 * @param array $hostPrototypes
+	 * @param array $host_prototypes
 	 */
-	protected function validateCreate(array $hostPrototypes) {
-		// host prototype validator
-		$hostPrototypeValidator = new CSchemaValidator($this->getHostPrototypeSchema());
-		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator([
-			'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-			'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
-		]));
+	protected function validateCreate(array &$host_prototypes) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
+			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'name')],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
+			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			]],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
+			]],
+			'inventory' =>			['type' => API_OBJECT, 'fields' => [
+				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
+			]],
+			'templates' =>			['type' => API_OBJECTS, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
-		// group validators
-		$groupLinkValidator = new CSchemaValidator($this->getGroupLinkSchema());
-		$groupPrototypeValidator = new CSchemaValidator($this->getGroupPrototypeSchema());
-		$host_group_name_validator = new CHostGroupNameValidator();
-
-		$groupPrototypeGroupIds = [];
-		foreach ($hostPrototypes as $hostPrototype) {
-			// host prototype
-			$hostPrototypeValidator->setObjectName(isset($hostPrototype['host']) ? $hostPrototype['host'] : '');
-			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
-
-			// groups
-			foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
-				$this->checkValidator($groupPrototype, $groupLinkValidator);
-
-				$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+		foreach ($host_prototypes as &$host_prototype) {
+			// If visible name is not given or empty, it should be set to host prototype name. Required for duplicate checks.
+			if (!array_key_exists('name', $host_prototype) || trim($host_prototype['name']) === '') {
+				$host_prototype['name'] = $host_prototype['host'];
 			}
+		}
+		unset($host_prototype);
 
-			// group prototypes
-			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
-					$groupPrototypeValidator->setObjectName($name);
-					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+		$groupids = [];
 
-					if (!$host_group_name_validator->validate($name)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
-						));
-					}
-				}
+		foreach ($host_prototypes as $host_prototype) {
+			// Collect host group ID links for latter validation.
+			foreach ($host_prototype['groupLinks'] as $group_prototype) {
+				$groupids[$group_prototype['groupid']] = true;
 			}
 		}
 
-		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
-		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
+		$groupids = array_keys($groupids);
 
-		// check if the host is discovered
-		$discoveryRules = API::getApiService()->select('items', [
+		$this->checkDiscoveryRulePermissions(zbx_objectValues($host_prototypes, 'ruleid'));
+		$this->checkHostGroupsPermissions($groupids);
+
+		// Check if the host is discovered.
+		$discovery_rules = API::getApiService()->select('items', [
 			'output' => ['hostid'],
-			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
+			'itemids' => zbx_objectValues($host_prototypes, 'ruleid')
 		]);
-		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNormalValidator([
+		$this->checkValidator(zbx_objectValues($discovery_rules, 'hostid'), new CHostNormalValidator([
 			'message' => _('Cannot create a host prototype on a discovered host "%1$s".')
 		]));
 
-		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator([
+		// Check if group prototypes use discovered host groups.
+		$this->checkValidator($groupids, new CHostGroupNormalValidator([
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		]));
 
-		$this->checkDuplicates($hostPrototypes);
-	}
-
-	/**
-	 * Returns the parameters for creating a host prototype validator.
-	 *
-	 * @return array
-	 */
-	protected function getHostPrototypeSchema() {
-		return [
-			'validators' => [
-				'host' => new CLldMacroStringValidator([
-					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
-					'messageEmpty' => _('Empty host.'),
-					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
-					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-				]),
-				'name' => new CStringValidator([
-					// if an empty name is given, it should be replaced with the host name, but we'll validate it
-					// just in case
-					'messageEmpty' => _('Empty name for host prototype "%1$s".')
-				]),
-				'status' => new CLimitedSetValidator([
-					'values' => [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED],
-					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
-				]),
-				'groupLinks' => new CCollectionValidator([
-					'uniqueField' => 'groupid',
-					'messageEmpty' => _('Host prototype "%1$s" cannot be without host group.'),
-					'messageInvalid' => _('Incorrect host groups for host prototype "%1$s".'),
-					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
-				]),
-				'groupPrototypes' => new CCollectionValidator([
-					'empty' => true,
-					'uniqueField' => 'name',
-					'messageInvalid' => _('Incorrect group prototypes for host prototype "%1$s".'),
-					'messageDuplicate' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".')
-				]),
-				'inventory' => new CSchemaValidator([
-					'validators' => [
-						'inventory_mode' => null,
-					],
-					'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype %1$s host inventory.'),
-				]),
-				'templates' => null
-			],
-			'required' => ['host', 'ruleid', 'groupLinks'],
-			'messageRequired' => _('No "%2$s" given for host prototype "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype "%1$s".')
-		];
-	}
-
-	/**
-	 * Returns the parameters for creating a group prototype validator.
-	 *
-	 * @return array
-	 */
-	protected function getGroupPrototypeSchema() {
-		return [
-			'validators' => [
-				'name' => new CLldMacroStringValidator([
-					'messageEmpty' => _('Empty name for group prototype.'),
-					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
-				])
-			],
-			'required' => ['name'],
-			'messageUnsupported' => _('Unsupported parameter "%1$s" for group prototype.')
-		];
-	}
-
-	/**
-	 * Returns the parameters for creating a group link validator.
-	 *
-	 * @return array
-	 */
-	protected function getGroupLinkSchema() {
-		return [
-			'validators' => [
-				'groupid' => new CIdValidator([
-					'messageEmpty' => _('No host group ID for group prototype.'),
-					'messageInvalid' => _('Incorrect host group ID for group prototype.')
-				])
-			],
-			'required' => ['groupid'],
-			'messageUnsupported' => _('Unsupported parameter "%1$s" for group prototype.')
-		];
+		$this->checkDuplicates($host_prototypes);
 	}
 
 	/**
@@ -256,23 +171,10 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	public function create(array $hostPrototypes) {
-		$hostPrototypes = zbx_toArray($hostPrototypes);
-
-		foreach ($hostPrototypes as &$hostPrototype) {
-			// if the visible name is not set, use the technical name instead
-			if (!isset($hostPrototype['name']) || zbx_empty(trim($hostPrototype['name']))) {
-				$hostPrototype['name'] = $hostPrototype['host'];
-			}
-
-			if (isset($hostPrototype['templates'])) {
-				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
-			}
-		}
-		unset($hostPrototype);
-
+		// 'templateid' validation happens during linkage.
 		$this->validateCreate($hostPrototypes);
 
-		// merge groups into group prototypes
+		// Merge groups into group prototypes.
 		foreach ($hostPrototypes as &$hostPrototype) {
 			foreach ($hostPrototype['groupLinks'] as $group) {
 				$hostPrototype['groupPrototypes'][] = $group;
@@ -372,83 +274,114 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 *
-	 * @param array $hostPrototypes
-	 * @param array $dbHostPrototypes	array of existing host prototypes with hostids as keys
+	 * @param array $host_prototypes
+	 * @param array $db_host_prototypes  Array of existing host prototypes with hostids as keys.
 	 */
-	protected function validateUpdate(array $hostPrototypes, array $dbHostPrototypes) {
-		// TODO: permissions should be checked using the $dbHostPrototypes array
-		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
+	protected function validateUpdate(array $host_prototypes, array $db_host_prototypes) {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
+			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'host' =>				['type' => API_H_NAME, 'flags' => API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
+			'ruleid' =>				['type' => API_ID],
+			'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'name')],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
+			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['groupid'], ['group_prototypeid']], 'fields' => [
+				'groupid' =>			['type' => API_ID],
+				'group_prototypeid' =>	['type' => API_ID],
+			]],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
+				'group_prototypeid' =>	['type' => API_ID],
+			]],
+			'inventory' =>			['type' => API_OBJECT, 'fields' => [
+				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
+			]],
+			'templates' =>			['type' => API_OBJECTS, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			]]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
-		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, [
+		// TODO: permissions should be checked using the $dbHostPrototypes array
+		$this->checkHostPrototypePermissions(zbx_objectValues($host_prototypes, 'hostid'));
+
+		$host_prototypes = $this->extendFromObjects(zbx_toHash($host_prototypes, 'hostid'), $db_host_prototypes, [
 			'host', 'name'
 		]);
 
-		// host prototype validator
-		$hostPrototypeValidator = new CPartialSchemaValidator($this->getHostPrototypeSchema());
-		$hostPrototypeValidator->setValidator('hostid', null);
+		$groupids = [];
 
-		// group validator
-		$groupLinkValidator = new CPartialSchemaValidator($this->getGroupLinkSchema());
-		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator([
-			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageInvalid' => _('Incorrect group prototype ID.')
-		]));
+		foreach ($host_prototypes as $host_prototype) {
+			$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
 
-		// group prototype validator
-		$groupPrototypeValidator = new CPartialSchemaValidator($this->getGroupPrototypeSchema());
-		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator([
-			'messageEmpty' => _('Group prototype ID cannot be empty.'),
-			'messageInvalid' => _('Incorrect group prototype ID.')
-		]));
+			// Validate 'group_prototypeid' in 'groupLinks' property.
+			if (array_key_exists('groupLinks', $host_prototype)) {
+				foreach ($host_prototype['groupLinks'] as $group_link) {
+					if (!array_key_exists('group_prototypeid', $group_link)
+							&& !array_key_exists('groupid', $group_link)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+					}
 
-		$host_group_name_validator = new CHostGroupNameValidator();
+					// Don't allow invalid 'group_prototypeid' parameters which do not belong to this 'hostid'.
+					if (array_key_exists('group_prototypeid', $group_link)) {
+						$db_host_prototype['groupLinks'] = zbx_toHash($db_host_prototype['groupLinks'],
+							'group_prototypeid'
+						);
 
-		$groupPrototypeGroupIds = [];
-		foreach ($hostPrototypes as $hostPrototype) {
-			// host prototype
-			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
-			$this->checkPartialValidator($hostPrototype, $hostPrototypeValidator);
+						if (!array_key_exists($group_link['group_prototypeid'], $db_host_prototype['groupLinks'])) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
+					}
 
-			// groups
-			if (isset($hostPrototype['groupLinks'])) {
-				foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
-					$this->checkPartialValidator($groupPrototype, $groupLinkValidator);
+					$old_groupids = zbx_objectValues($db_host_prototype['groupLinks'], 'groupid');
 
-					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					// Collect only new given groupids for validation.
+					if (array_key_exists('groupid', $group_link) && !in_array($group_link['groupid'], $old_groupids)) {
+						$groupids[$group_link['groupid']] = true;
+					}
 				}
 			}
 
-			// group prototypes
-			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					$name = array_key_exists('name', $groupPrototype) ? $groupPrototype['name'] : '';
-					$groupPrototypeValidator->setObjectName($name);
-					$this->checkPartialValidator($groupPrototype, $groupPrototypeValidator);
+			// Validate 'group_prototypeid' in 'groupPrototypes' property.
+			if (array_key_exists('groupPrototypes', $host_prototype)) {
+				foreach ($host_prototype['groupPrototypes'] as $group_prototype) {
+					// Don't allow invalid 'group_prototypeid' parameters which do not belong to this 'hostid'.
+					if (array_key_exists('group_prototypeid', $group_prototype)) {
+						$db_host_prototype['groupPrototypes'] = zbx_toHash($db_host_prototype['groupPrototypes'],
+							'group_prototypeid'
+						);
 
-					if (!$host_group_name_validator->validate($name)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value for field "%1$s": %2$s.', 'name', $host_group_name_validator->getError()
-						));
+						if (!array_key_exists($group_prototype['group_prototypeid'],
+								$db_host_prototype['groupPrototypes'])) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_('No permissions to referred object or it does not exist!')
+							);
+						}
 					}
 				}
 			}
 		}
 
-		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
+		$groupids = array_keys($groupids);
 
-		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator([
+		$this->checkHostGroupsPermissions($groupids);
+
+		// Check if group prototypes use discovered host groups.
+		$this->checkValidator($groupids, new CHostGroupNormalValidator([
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		]));
 
-		// check for duplicates
-		foreach ($hostPrototypes as &$hostPrototype) {
-			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
+		foreach ($host_prototypes as &$host_prototype) {
+			$host_prototype['ruleid'] = $db_host_prototypes[$host_prototype['hostid']]['discoveryRule']['itemid'];
 		}
-		unset($hostPrototype);
-		$this->checkDuplicates($hostPrototypes);
+		unset($host_prototype);
+
+		$this->checkDuplicates($host_prototypes);
 	}
 
 	/**
