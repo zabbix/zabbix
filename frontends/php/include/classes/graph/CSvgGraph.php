@@ -335,10 +335,13 @@ class CSvgGraph extends CSvg {
 
 		foreach ($grid as $value) {
 			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
-			$grid_values[$relative_pos] = convert_units([
-				'value' => $value,
-				'units' => $units
-			]);
+
+			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
+				$grid_values[$relative_pos] = convert_units([
+					'value' => $value,
+					'units' => $units
+				]);
+			}
 		}
 
 		return $grid_values;
