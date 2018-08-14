@@ -34,7 +34,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'initial_load' => 'in 0,1',
 			'content_width' => 'int32',
 			'content_height' => 'int32',
-			'edit_mode' => 'in 0,1',
+			'preview' => 'in 1',
 			'fields' => 'json'
 		]);
 	}
@@ -44,8 +44,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$uniqueid = $this->getInput('uniqueid');
 		$width = (int) $this->getInput('content_width', 100);
 		$height = (int) $this->getInput('content_height', 100);
-		$edit_mode = (bool) $this->getInput('edit_mode', 0); // Configuration preview is loaded in edit mode.
-		$initial_load = !$edit_mode && $this->getInput('initial_load', 1);
+		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
+		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
 		// Sort fields by its natural order.
@@ -209,19 +209,19 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		}
 
 		$graph_options = zbx_array_merge($svg_data['data'], [
-			'sbox' => $graph_data['dashboard_time'], // SBox available only for graphs without overriten relative time.
+			'sbox' => $graph_data['dashboard_time'], // SBox available only for graphs without overwriten relative time.
 			'show_problems' => array_key_exists('problems', $graph_data)
 		]);
 
-		if (!$edit_mode) {
+		if (!$preview) {
 			$script_inline .=
 				'var widget = jQuery(".dashbrd-grid-widget-container")'.
 						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
 				'jQuery(\'svg\', widget[0]["content_body"]).svggraph('.CJs::encodeJson($graph_options).');';
 		}
 
-		// Register widget auto-refresh when resizing widget.
 		if ($initial_load) {
+			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
 				'if (typeof(zbx_svggraph_widget_resize_end) !== typeof(Function)) {'.
 					'function zbx_svggraph_widget_resize_end() {'.
@@ -232,14 +232,28 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 					'"zbx_svggraph_widget_resize_end", "'.$uniqueid.'", {'.
 						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
 					'});';
+
+			// Disable SBox when switch to edit mode.
+			$script_inline .=
+				'if (typeof(zbx_svggraph_widget_edit_start) !== typeof(Function)) {'.
+					'function zbx_svggraph_widget_edit_start() {'.
+						'var widget = jQuery(".dashbrd-grid-widget-container")'.
+								'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
+						'jQuery(\'svg\', widget[0]["content_body"]).svggraph("disableSBox");'.
+					'}'.
+				'}'.
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart",'.
+					'"zbx_svggraph_widget_edit_start", "'.$uniqueid.'", {'.
+						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
+					'});';
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'svg' => $svg_data['svg'].$svg_data['legend'],
 			'script_inline' => $script_inline,
-			'edit_mode' => $edit_mode,
 			'initial_load' => $initial_load,
+			'preview' => $preview,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

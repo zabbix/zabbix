@@ -23,7 +23,7 @@ $output = [
 	'body' => $data['svg']
 ];
 
-if (!$data['edit_mode']) {
+if (!$data['preview']) {
 	$output += [
 		'header' => $data['name'],
 		'script_inline' => $data['script_inline'],
@@ -37,11 +37,11 @@ if ($data['initial_load']) {
 	];
 }
 
-if (!$data['edit_mode'] && ($messages = getMessages()) !== null) {
+if (!$data['preview'] && ($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 
-if (!$data['edit_mode'] && $data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+if (!$data['preview'] && $data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }

@@ -69,7 +69,7 @@ $scripts[] =
 		'var url = new Curl("zabbix.php"),'.
 			'data = {'.
 				'uniqueid: 0,'.
-				'edit_mode: 1,'.
+				'preview: 1,'.
 				'content_width: '.$preview_width.','.
 				'content_height: '.$preview_height.','.
 				'dashboardid: '.$data['dashboardid'].','.

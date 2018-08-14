@@ -469,6 +469,14 @@ jQuery(function ($) {
 						.on('mouseup', endSBoxDrag);
 				}
 			});
+		},
+		disableSBox: function() {
+			destroySBox();
+			graph
+				.off('mousedown', startSBoxDrag)
+				.off('mouseup', endSBoxDrag);
+
+			delete data.spp;
 		}
 	};
 
