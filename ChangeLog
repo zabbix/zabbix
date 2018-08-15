@@ -9,6 +9,7 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-14628] fixed empty MAIL FROM in email alerts (mindbound)
 ....I..... [ZBX-14696] changed problem_tag index to optimize database queries (wiper)
 ..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 ........S. [ZBX-9731] changed value cache to drop unused items from cache when new values are added instead performing this cleanup only when cache runs out of free space (wiper)
