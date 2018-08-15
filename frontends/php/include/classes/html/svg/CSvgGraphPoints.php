@@ -26,7 +26,6 @@ class CSvgGraphPoints extends CSvgGroup {
 	protected $itemid;
 	protected $item_name;
 	protected $units;
-	protected $host;
 	protected $options;
 
 	protected $position_x = 0;
@@ -43,7 +42,6 @@ class CSvgGraphPoints extends CSvgGroup {
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->units = $metric['units'];
-		$this->host = $metric['host'];
 
 		$this->options = $metric['options'] + [
 			'color' => '#b0af07',
@@ -77,7 +75,7 @@ class CSvgGraphPoints extends CSvgGroup {
 
 	public function toString($destroy = true) {
 		$this->setAttribute('data-set', 'points')
-			->setAttribute('data-metric', $this->host['name'].NAME_DELIMITER.$this->item_name)
+			->setAttribute('data-metric', $this->item_name)
 			->setAttribute('data-color', $this->options['color'])
 			->addItem(
 				(new CSvgCircle(-10, -10, 20))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
