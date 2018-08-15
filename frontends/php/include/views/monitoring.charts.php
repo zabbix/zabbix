@@ -64,13 +64,15 @@ $chartsWidget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([$controls, $content_control]));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$chartsWidget->addItem((new CFilter())
-		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-	);
+$filter = (new CFilter())
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
+
+if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addClass('hidden');
 }
+$chartsWidget->addItem($filter);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget

@@ -36,6 +36,8 @@ $page['scripts'] = [
 	'layout.mode.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
+CView::$has_web_layout_mode = true;
 $page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);

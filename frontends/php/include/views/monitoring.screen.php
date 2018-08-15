@@ -115,13 +115,15 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget->addItem((new CFilter())
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
-	);
+$filter = (new CFilter())
+	->setProfile($data['profileIdx'], $data['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to']);
+
+if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addClass('hidden');
 }
+$widget->addItem($filter);
 
 $widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 

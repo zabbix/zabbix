@@ -26,11 +26,8 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 $page['title'] = _('Services');
 $page['file'] = 'srv_status.php';
 $page['scripts'] = ['layout.mode.js'];
-$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-
-require_once dirname(__FILE__).'/include/page_header.php';
 
 $periods = [
 	'today' => _('Today'),
@@ -52,6 +49,9 @@ $fields = [
 check_fields($fields);
 
 if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
+
+	require_once dirname(__FILE__).'/include/page_header.php';
+
 	$service = API::Service()->get([
 		'output' => ['serviceid'],
 		'serviceids' => getRequest('serviceid')
@@ -70,6 +70,11 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	}
 }
 else {
+	CView::$has_web_layout_mode = true;
+	$page['web_layout_mode'] = CView::getLayoutMode();
+
+	require_once dirname(__FILE__).'/include/page_header.php';
+
 	$period = getRequest('period', 7 * 24);
 	$period_end = time();
 

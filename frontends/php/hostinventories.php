@@ -27,9 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
 $page['scripts'] = ['layout.mode.js'];
-$page['web_layout_mode'] = CView::getLayoutMode();
-
-require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
@@ -50,6 +47,14 @@ $fields = [
 ];
 check_fields($fields);
 
+$hostId = getRequest('hostid', 0);
+
+if ($hostId > 0) {
+	CView::$has_web_layout_mode = true;
+	$page['web_layout_mode'] = CView::getLayoutMode();
+}
+require_once dirname(__FILE__).'/include/page_header.php';
+
 /*
  * Permissions
  */
@@ -65,8 +70,6 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-$hostId = getRequest('hostid', 0);
 
 /*
  * Display

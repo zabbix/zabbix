@@ -29,6 +29,8 @@ $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['scripts'] = ['layout.mode.js'];
+
+CView::$has_web_layout_mode = true;
 $page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);

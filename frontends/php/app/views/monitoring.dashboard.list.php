@@ -24,8 +24,11 @@ if ($data['uncheck']) {
 }
 $this->addJsFile('layout.mode.js');
 
+$web_layout_mode = CView::getLayoutMode();
+
 $widget = (new CWidget())
 	->setTitle(_('Dashboards'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create dashboard'),

@@ -330,6 +330,8 @@ class CControllerProblemView extends CController {
 			$data['profileIdx'] = 'web.problem.filter';
 		}
 
+		CView::$has_web_layout_mode = true;
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));
 		if ($data['action'] === 'problem.view.csv') {

@@ -28,6 +28,8 @@ $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
 $page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
+CView::$has_web_layout_mode = true;
 $page['web_layout_mode'] = CView::getLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -81,6 +83,7 @@ $details_screen = CScreenBuilder::getScreen([
 
 (new CWidget())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
+	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
@@ -198,14 +201,15 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 // Create graphs widget.
 $widget = (new CWidget())->setWebLayoutMode($page['web_layout_mode']);
 
-if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	// Add filter.
-	$widget->addItem((new CFilter())
-		->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-		->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-		->addTimeSelector($timeline['from'], $timeline['to'])
-	);
+$filter = (new CFilter())
+	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+	->addTimeSelector($timeline['from'], $timeline['to']);
+
+if ($page['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addClass('hidden');
 }
+$widget->addItem($filter);
 
 $widget
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))

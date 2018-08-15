@@ -99,6 +99,8 @@ class CControllerWebView extends CController {
 			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null
 		]);
 
+		CView::$has_web_layout_mode = true;
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Web monitoring'));
 		$this->setResponse($response);

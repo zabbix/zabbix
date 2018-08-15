@@ -65,6 +65,11 @@ class CView {
 	static $viewsDir = ['local/app/views', 'app/views', 'include/views'];
 
 	/**
+	 * @var boolean - Web layout mode enabled flag.
+	 */
+	static $has_web_layout_mode = false;
+
+	/**
 	 * Creates a new view based on provided template file.
 	 * @param string $view name of a view, located under include/views
 	 * @param array $data deprecated parameter, use set() and get() methods for passing variables to views
@@ -236,6 +241,11 @@ class CView {
 	 * @return int
 	 */
 	public static function getLayoutMode() {
-		return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+		if (self::$has_web_layout_mode) {
+			return (int) CProfile::get('web.layout.mode', ZBX_LAYOUT_NORMAL);
+		}
+		else {
+			return ZBX_LAYOUT_NORMAL;
+		}
 	}
 }

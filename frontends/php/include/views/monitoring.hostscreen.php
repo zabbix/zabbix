@@ -75,13 +75,16 @@ else {
 		'to' => $data['to']
 	]);
 
-	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-		$screen_widget->addItem((new CFilter())
-			->setProfile($data['profileIdx'], $data['profileIdx2'])
-			->setActiveTab($data['active_tab'])
-			->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to'])
-		);
+	$filter = (new CFilter())
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
+
+	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+		$filter->addClass('hidden');
 	}
+	$screen_widget->addItem($filter);
+
 	$screen_widget->addItem((new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);

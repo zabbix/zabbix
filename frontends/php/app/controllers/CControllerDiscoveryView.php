@@ -83,6 +83,8 @@ class CControllerDiscoveryView extends CController {
 			'druleid' => $data['druleid']
 		]);
 
+		CView::$has_web_layout_mode = true;
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Status of discovery'));
 		$this->setResponse($response);
