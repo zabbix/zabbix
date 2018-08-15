@@ -775,7 +775,7 @@ function getTriggersWithActualSeverity($options, $show_suppressed = ZBX_PROBLEM_
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
 			'objectids' => $problem_triggerids,
-			'suppressed' => $show_suppressed ? null : false
+			'suppressed' => ($show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);
 
 		$triggerids = zbx_objectValues($problems, 'objectid');

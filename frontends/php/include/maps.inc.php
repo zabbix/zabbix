@@ -1083,7 +1083,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	$problems = API::Problem()->get([
 		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'severity'],
 		'objectids' => array_keys($triggerids),
-		'suppressed' => $sysmap['show_suppressed'] ? null : false
+		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 	]);
 
 	foreach ($selements as $snum => $selement) {
