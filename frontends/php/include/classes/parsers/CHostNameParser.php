@@ -78,7 +78,7 @@ class CHostNameParser extends CParser {
 				continue;
 			}
 
-			if ($this->options['lldmacros'] && $this->parseLLDMacros($source, $p)) {
+			if ($this->options['lldmacros'] && $this->parseLLDMacro($source, $p)) {
 				continue;
 			}
 
@@ -129,7 +129,7 @@ class CHostNameParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private function parseLLDMacros($source, &$pos) {
+	private function parseLLDMacro($source, &$pos) {
 		if ($this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_parser->getLength();
 			$this->macros[] = $this->lld_macro_parser->getMatch();

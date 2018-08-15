@@ -91,6 +91,14 @@ class CHostGroupNameParserTest extends PHPUnit_Framework_TestCase {
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}', '{#D}']
 				]
 			],
+			[
+				'{#A}/{#B}/{#C}/{{#D}.regsub()}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#A}/{#B}/{#C}/{{#D}.regsub()}',
+					'macros' => ['{#A}', '{#B}', '{#C}', '{{#D}.regsub()}']
+				]
+			],
 			// partial success
 			[
 				'   /', 0, [],
@@ -162,6 +170,14 @@ class CHostGroupNameParserTest extends PHPUnit_Framework_TestCase {
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => ' a / {#B}{{#C}.regsub("^([0-9]+)", "{#C}: \1")} ~!@#$%^&*()[]{};:\'"|\\ \\',
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+)", "{#C}: \1")}']
+				]
+			],
+			[
+				'{#A}/{#B}/{#C}//{{#D}.regsub()}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#A}/{#B}/{#C}',
+					'macros' => ['{#A}', '{#B}', '{#C}']
 				]
 			],
 			// fail

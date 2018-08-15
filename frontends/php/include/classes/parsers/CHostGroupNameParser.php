@@ -72,20 +72,25 @@ class CHostGroupNameParser extends CParser {
 		$this->macros = [];
 
 		$p = $pos;
-
-		// Check first chacater. Cannot be /.
-		if (isset($source[$p]) && $source[$p] === '/') {
-			return self::PARSE_FAIL;
-		}
+		$is_slash = true;
 
 		while (isset($source[$p])) {
-			if ($this->parseConstant($source, $p) === false) {
+			if ($this->options['lldmacros'] && $this->parseLLDMacro($source, $p)) {
+				$is_slash = false;
+
+				continue;
+			}
+
+			if ($is_slash && $source[$p] === '/') {
 				break;
 			}
+
+			$is_slash = ($source[$p] === '/');
+			$p++;
 		}
 
 		// Check last character. Cannot be /.
-		if (isset($source[$p - 1]) && $source[$p - 1] === '/') {
+		if ($pos != $p && $is_slash) {
 			$p--;
 		}
 
@@ -109,15 +114,6 @@ class CHostGroupNameParser extends CParser {
 	}
 
 	/**
-	 * Retrieve matching group name.
-	 *
-	 * @return array
-	 */
-	public function getMatch() {
-		return $this->match;
-	}
-
-	/**
 	 * Parse LLD macro or any character.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
@@ -125,43 +121,21 @@ class CHostGroupNameParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private function parseConstant($source, &$pos) {
-		if ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+	private function parseLLDMacro($source, &$pos) {
+		if ($this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_parser->getLength();
 			$this->macros[] = $this->lld_macro_parser->getMatch();
 
 			return true;
 		}
 
-		if ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
+		if ($this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_function_parser->getLength();
 			$this->macros[] = $this->lld_macro_function_parser->getMatch();
 
 			return true;
 		}
 
-		return $this->parseCharacter($source, $pos);
-	}
-
-	/**
-	 * Parse group name characters.
-	 *
-	 * @param string $source  Source string that needs to be parsed.
-	 * @param int    $pos     Position offset.
-	 *
-	 * @return bool
-	 */
-	private function parseCharacter($source, &$pos) {
-		// Accept any chacater, but check previous character. Name cannot contain two slashes next to one another.
-		if ($source[$pos] === '/' && isset($source[$pos - 1]) && $source[$pos - 1] === '/') {
-			$pos--;
-
-			return false;
-		}
-
-		$pos++;
-
-		return true;
+		return false;
 	}
 }
