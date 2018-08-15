@@ -74,7 +74,7 @@ jQuery(function ($) {
 	 * Hide vertical helper line and highlighted data points.
 	 */
 	function hideHelper() {
-		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
+		line.attr({'x1': -10, 'x2': -10});
 		graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
 	}
 
@@ -98,11 +98,7 @@ jQuery(function ($) {
 			destroyHintbox();
 		});
 
-		graph.hintBoxItem.css({
-			'left': e.offsetX + 20,
-			'top': e.offsetY + 20
-		});
-
+		repositionHintBox(e);
 		graph.on('mouseup', hintboxSilentMode);
 	}
 
@@ -215,7 +211,7 @@ jQuery(function ($) {
 				case 'points':
 					var test_x = Math.min(x, +ds.lastChild.getAttribute('cx')),
 						points = [...ds.querySelectorAll('circle')].filter(function(c) {
-							return (test_x > parseInt(c.getAttribute('cx')));
+							return (test_x >= parseInt(c.getAttribute('cx')));
 						}),
 						point = points.slice(-1)[0];
 
@@ -277,9 +273,9 @@ jQuery(function ($) {
 	 */
 	function setHelperPosition(e) {
 		line.attr({
-			'x1': e.clientX - 12,
+			'x1': e.offsetX,
 			'y1': data.dimY,
-			'x2': e.clientX - 12,
+			'x2': e.offsetX,
 			'y2': data.dimY + data.dimH
 		});
 	}
@@ -297,6 +293,16 @@ jQuery(function ($) {
 		else {
 			return +window.getComputedStyle(ds.querySelectorAll('path')[0])['strokeWidth'];
 		}
+	}
+
+	/**
+	 * Position hintbox near current mouse position.
+	 */
+	function repositionHintBox(e) {
+		var l = (document.body.clientWidth >= e.screenX + hbox.width()) ? e.offsetX : e.offsetX - hbox.width(),
+			t = (window.screen.height >= e.screenY + hbox.height() + 60) ? e.offsetY + 60 : e.offsetY - hbox.height();
+
+		hbox.css({'left': l, 'top': t});
 	}
 
 	/**
@@ -347,7 +353,7 @@ jQuery(function ($) {
 				setHelperPosition(e);
 
 				// Find values.
-				var points = findValues(e.offsetX + 5),
+				var points = findValues(e.offsetX),
 					show_hint = false,
 					xy_point = false,
 					tolerance;
@@ -417,7 +423,7 @@ jQuery(function ($) {
 					hbox.find('> div').replaceWith(html);
 				}
 
-				hbox.css({'left': e.offsetX + 20, 'top': e.offsetY + 20});
+				repositionHintBox(e);
 			}
 		}
 		else {
