@@ -472,8 +472,8 @@ article, main {
     white-space: nowrap; }
     .filter-breadcrumb > li:first-child > span {
       display: inline-block;
-      line-height: 1;
-      padding: 4px 7px; }
+      line-height: 14px;
+      padding: 3px 7px; }
       .filter-breadcrumb > li:first-child > span a {
         display: inline-block;
         max-width: 200px;
