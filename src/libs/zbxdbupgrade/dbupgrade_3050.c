@@ -1521,7 +1521,7 @@ static int	DBpatch_3050122(void)
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
@@ -1580,6 +1580,26 @@ static int	DBpatch_3050124(void)
 	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("items", &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
 }
 
 #endif
@@ -1709,5 +1729,9 @@ DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
 DBPATCH_ADD(3050123, 0, 1)
 DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
 
 DBPATCH_END()

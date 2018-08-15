@@ -680,12 +680,15 @@ output {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #2b2b2b; }
+  .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
     position: relative;
     border-bottom: 1px solid #383838;
     line-height: 18px;
     vertical-align: top; }
+  .list-table tbody th {
+    text-align: inherit; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -4143,6 +4146,9 @@ svg {
   color: #f2f2f2; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.inline-sr-only {
+  font-size: 0; }
 
 .list-table thead th {
   border-color: #404040; }

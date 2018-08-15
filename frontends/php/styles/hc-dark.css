@@ -643,12 +643,15 @@ output {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #000; }
+  .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
     position: relative;
     border-bottom: 1px solid #333;
     line-height: 18px;
     vertical-align: top; }
+  .list-table tbody th {
+    text-align: inherit; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -4106,6 +4109,9 @@ svg {
   color: #fff; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.inline-sr-only {
+  font-size: 0; }
 
 .icon-maint {
   margin: 0 18px 0 0; }

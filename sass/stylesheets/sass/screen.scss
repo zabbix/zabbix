@@ -5093,6 +5093,10 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
+	input[readonly] + div, input:disabled + div {
+		cursor: default;
+	}
+
 	input[type="text"] {
 		padding-left: 25px;
 	}

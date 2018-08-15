@@ -59,6 +59,7 @@ $availableJScripts = [
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
+	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
@@ -266,6 +267,9 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Add child element' => _('Add child element'),
 		'Add multiple maps' => _('Add multiple maps')
+	],
+	'colorpicker.js' => [
+		'Close' => _('Close')
 	]
 ];
 
