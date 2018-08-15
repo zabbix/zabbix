@@ -1728,6 +1728,7 @@ button {
   border: 1px solid transparent;
   color: #1f2c33;
   height: 24px;
+  line-height: 22px;
   margin: 0 5px;
   vertical-align: top; }
   .btn-time-out:disabled {
