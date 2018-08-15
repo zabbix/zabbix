@@ -1509,6 +1509,7 @@ output {
 	}
 
 	div[aria-live] {
+		overflow: hidden;
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -2620,7 +2621,7 @@ $icon-widget-btn: (
 			.icon-cal {
 				position: relative;
 				vertical-align: middle;
-				margin-left: -5px;
+				margin-left: 2px;
 			}
 		}
 	}
@@ -5085,6 +5086,10 @@ a.overlay-close-btn {
 		border: 1px solid $form-border-color;
 		background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
 		cursor: pointer;
+	}
+
+	input[readonly] + div, input:disabled + div {
+		cursor: default;
 	}
 
 	input[type="text"] {

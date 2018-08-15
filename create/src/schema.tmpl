@@ -347,7 +347,7 @@ FIELD		|post_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|headers	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|retrieve_mode	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|request_method	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|request_method	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|output_format	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|ssl_cert_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
@@ -1423,8 +1423,7 @@ FIELD		|problemtagid	|t_id		|	|NOT NULL	|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|problem
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX		|1		|eventid
-INDEX		|2		|tag,value
+INDEX		|1		|eventid,tag,value
 
 TABLE|tag_filter|tag_filterid|0
 FIELD		|tag_filterid	|t_id		|	|NOT NULL	|0
@@ -1631,4 +1630,4 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050131	|3050131
+ROW		|3050137	|3050137

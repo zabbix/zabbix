@@ -910,7 +910,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 	$result = true;
 
-	if (isset($visible['update_interval'])) {
+	if (isset($visible['delay'])) {
 		$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
 		if (hasRequest('delay_flex')) {
@@ -1373,7 +1373,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'itemids' => getRequest('master_itemid', $item['master_itemid']),
@@ -1438,7 +1438,7 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	$data = [
 		'form' => getRequest('form'),
 		'action' => 'item.massupdateform',
-		'hostid' => getRequest('hostid'),
+		'hostid' => getRequest('hostid', 0),
 		'itemids' => getRequest('group_itemid', []),
 		'description' => getRequest('description', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
@@ -1526,14 +1526,16 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 		if ($templateCount != 0) {
 			$data['displayInterfaces'] = false;
 
-			if ($templateCount == 1 && !$data['hostid']) {
-				// if selected from filter without 'hostid'
+			if ($templateCount == 1 && $data['hostid'] == 0) {
+				// If selected from filter without 'hostid'.
 				$templates = reset($templates);
 				$data['hostid'] = $templates['templateid'];
 			}
 
-			// if items belong to single template and some belong to single host, don't display application multiselect
-			// and don't display application multiselect for multiple templates
+			/*
+			 * If items belong to single template and some belong to single host, don't display application multiselect
+			 * and don't display application multiselect for multiple templates.
+			 */
 			if ($hostCount == 1 && $templateCount == 1 || $templateCount > 1) {
 				$data['displayApplications'] = false;
 				$data['displayMasteritems'] = false;
@@ -1548,8 +1550,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 				['field' => 'main', 'order' => ZBX_SORT_DOWN]
 			]);
 
-			// if selected from filter without 'hostid'
-			if (!$data['hostid']) {
+			// If selected from filter without 'hostid'.
+			if ($data['hostid'] == 0) {
 				$data['hostid'] = $data['hosts']['hostid'];
 			}
 
@@ -1801,25 +1803,12 @@ else {
 		$data['items'] = [];
 	}
 
-	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
-	if ($data['items']) {
-		// fill template host
-		fillItemsWithChildTemplates($data['items']);
+	$data['parent_templates'] = [];
 
-		$dbHostItems = DBselect(
-			'SELECT i.itemid,h.name,h.hostid'.
-			' FROM hosts h,items i'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
-		);
-		while ($dbHostItem = DBfetch($dbHostItems)) {
-			foreach ($data['items'] as &$item) {
-				if ($item['templateid'] == $dbHostItem['itemid']) {
-					$item['template_host'] = $dbHostItem;
-				}
-			}
-			unset($item);
-		}
+	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
+	if ($data['items']) {
+		// Get parent templates.
+		$data['parent_templates'] = getItemParentTemplates($data['items']);
 
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
@@ -1994,22 +1983,14 @@ else {
 		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
 	}
 
-	foreach ($data['items'] as $item) {
-		if (array_key_exists('template_host', $item)) {
-			$hostids = array_merge($hostids, zbx_objectValues($item['template_host'], 'hostid'));
-		}
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
+	$data['writable_templates'] = $hostids
+		? API::Template()->get([
 			'output' => ['templateid'],
 			'templateids' => array_keys(array_flip($hostids)),
 			'editable' => true,
 			'preservekeys' => true
-		]);
-	}
+		])
+		: [];
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

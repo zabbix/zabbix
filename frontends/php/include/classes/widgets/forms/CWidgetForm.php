@@ -57,7 +57,7 @@ class CWidgetForm {
 			$rf_rate_field->setValue($this->data['rf_rate']);
 		}
 
-		$this->fields[] = $rf_rate_field;
+		$this->fields[$rf_rate_field->getName()] = $rf_rate_field;
 	}
 
 	/**

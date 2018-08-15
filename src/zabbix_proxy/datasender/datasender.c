@@ -27,6 +27,7 @@
 #include "zbxself.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
+#include "dbcache.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
@@ -78,6 +79,7 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
 	{

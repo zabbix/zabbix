@@ -1521,7 +1521,7 @@ static int	DBpatch_3050122(void)
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
@@ -1558,6 +1558,52 @@ out:
 
 static int	DBpatch_3050123(void)
 {
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles where idx in ("
+			"'web.toptriggers.filter.from','web.toptriggers.filter.till','web.avail_report.0.timesince',"
+			"'web.avail_report.0.timetill','web.avail_report.1.timesince','web.avail_report.1.timetill'"
+		")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050129(void)
+{
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -1566,7 +1612,7 @@ static int	DBpatch_3050123(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050124(void)
+static int	DBpatch_3050130(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1576,7 +1622,7 @@ static int	DBpatch_3050124(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050125(void)
+static int	DBpatch_3050131(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1586,7 +1632,7 @@ static int	DBpatch_3050125(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050126(void)
+static int	DBpatch_3050132(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1596,7 +1642,7 @@ static int	DBpatch_3050126(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050127(void)
+static int	DBpatch_3050133(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1606,7 +1652,7 @@ static int	DBpatch_3050127(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050134(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1616,7 +1662,7 @@ static int	DBpatch_3050128(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_3050129(void)
+static int	DBpatch_3050135(void)
 {
 	int	res;
 
@@ -1636,7 +1682,7 @@ static int	DBpatch_3050129(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050136(void)
 {
 	int	res;
 
@@ -1654,7 +1700,7 @@ static int	DBpatch_3050130(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050131(void)
+static int	DBpatch_3050137(void)
 {
 	int	res;
 
@@ -1808,5 +1854,11 @@ DBPATCH_ADD(3050128, 0, 1)
 DBPATCH_ADD(3050129, 0, 1)
 DBPATCH_ADD(3050130, 0, 1)
 DBPATCH_ADD(3050131, 0, 1)
+DBPATCH_ADD(3050132, 0, 1)
+DBPATCH_ADD(3050133, 0, 1)
+DBPATCH_ADD(3050134, 0, 1)
+DBPATCH_ADD(3050135, 0, 1)
+DBPATCH_ADD(3050136, 0, 1)
+DBPATCH_ADD(3050137, 0, 1)
 
 DBPATCH_END()
