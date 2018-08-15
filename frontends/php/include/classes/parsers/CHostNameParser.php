@@ -74,9 +74,15 @@ class CHostNameParser extends CParser {
 		$p = $pos;
 
 		while (isset($source[$p])) {
-			if ($this->parseConstant($source, $p) === false) {
-				break;
+			if (self::parseCharacters($source, $p)) {
+				continue;
 			}
+
+			if ($this->options['lldmacros'] && $this->parseLLDMacros($source, $p)) {
+				continue;
+			}
+
+			break;
 		}
 
 		if ($pos == $p) {
@@ -99,12 +105,20 @@ class CHostNameParser extends CParser {
 	}
 
 	/**
-	 * Retrieve matching group name.
+	 * Parse host name characters.
 	 *
-	 * @return array
+	 * @param string $source  Source string that needs to be parsed.
+	 * @param int    $pos     Position offset.
+	 * @return bool
 	 */
-	public function getMatch() {
-		return $this->match;
+	private static function parseCharacters($source, &$pos) {
+		if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'/', substr($source, $pos), $matches)) {
+			return false;
+		}
+
+		$pos += strlen($matches[0]);
+
+		return true;
 	}
 
 	/**
@@ -115,40 +129,21 @@ class CHostNameParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private function parseConstant($source, &$pos) {
-		if ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+	private function parseLLDMacros($source, &$pos) {
+		if ($this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_parser->getLength();
 			$this->macros[] = $this->lld_macro_parser->getMatch();
 
 			return true;
 		}
 
-		if ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
+		if ($this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
 			$pos += $this->lld_macro_function_parser->getLength();
 			$this->macros[] = $this->lld_macro_function_parser->getMatch();
 
 			return true;
 		}
 
-		return $this->parseCharacter($source, $pos);
-	}
-
-	/**
-	 * Parse host name characters.
-	 *
-	 * @param string $source  Source string that needs to be parsed.
-	 * @param int    $pos     Position offset.
-	 *
-	 * @return bool
-	 */
-	private function parseCharacter($source, &$pos) {
-		if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'/', $source[$pos])) {
-			return false;
-		}
-
-		$pos++;
-
-		return true;
+		return false;
 	}
 }

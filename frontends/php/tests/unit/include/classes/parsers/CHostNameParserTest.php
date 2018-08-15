@@ -93,6 +93,14 @@ class CHostNameParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'   a{#B}c  {#D}   ', 8, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'c  ',
+					'macros' => []
+				]
+			],
+			[
 				'abc{#DEF}ghi/  ', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
@@ -127,6 +135,22 @@ class CHostNameParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'/abc', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'macros' => []
+				]
+			],
+			[
+				'{#DEF', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'macros' => []
+				]
+			],
+			[
+				'host$@#', 4, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
