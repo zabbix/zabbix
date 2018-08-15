@@ -96,8 +96,10 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "originate timestamp in the response does not match"
 				" transmit timestamp in the request: 0x%04x%04x 0x%04x%04x",
-				*(int *)&response[NTP_OFFSET_ORIGINATE], *(int *)&response[NTP_OFFSET_ORIGINATE + 4],
-				*(int *)&request[NTP_OFFSET_TRANSMIT], *(int *)&request[NTP_OFFSET_TRANSMIT + 4]);
+				*(const unsigned int *)&response[NTP_OFFSET_ORIGINATE],
+				*(const unsigned int *)&response[NTP_OFFSET_ORIGINATE + 4],
+				*(const unsigned int *)&request[NTP_OFFSET_TRANSMIT],
+				*(const unsigned int *)&request[NTP_OFFSET_TRANSMIT + 4]);
 		goto out;
 	}
 
