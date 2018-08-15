@@ -775,7 +775,7 @@ class CApiInputValidator {
 	 * Host group name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -795,23 +795,18 @@ class CApiInputValidator {
 		}
 
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		$parser = new CHostGroupNameParser(['lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+		$host_group_name_parser = new CHostGroupNameParser(['lldmacros' => ($flags & API_REQUIRED_LLD_MACRO)]);
 
-		// For example, host prototype group name MUST contain macros.
-		if ($parser->parse($data) == CParser::PARSE_SUCCESS) {
-			if ($flags & API_ALLOW_LLD_MACRO) {
-				if (!$parser->getMacros()) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('must contain macros'));
+		if ($host_group_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid host group name'));
 
-					return false;
-				}
-			}
-			else {
-				return true;
-			}
+			return false;
 		}
-		else {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('invalid group name "%1$s"', $data));
+
+		if (($flags & API_REQUIRED_LLD_MACRO) && !$host_group_name_parser->getMacros()) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('must contain at least one low-level discovery macro')
+			);
 
 			return false;
 		}
@@ -823,7 +818,7 @@ class CApiInputValidator {
 	 * Host name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -843,23 +838,19 @@ class CApiInputValidator {
 		}
 
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		$parser = new CHostNameParser(['lldmacros' => ($flags & API_ALLOW_LLD_MACRO)]);
+		$host_name_parser = new CHostNameParser(['lldmacros' => ($flags & API_REQUIRED_LLD_MACRO)]);
 
 		// For example, host prototype name MUST contain macros.
-		if ($parser->parse($data) == CParser::PARSE_SUCCESS) {
-			if ($flags & API_ALLOW_LLD_MACRO) {
-				if (!$parser->getMacros()) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('must contain macros'));
+		if ($host_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid host name'));
 
-					return false;
-				}
-			}
-			else {
-				return true;
-			}
+			return false;
 		}
-		else {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('invalid host name "%1$s"', $data));
+
+		if (($flags & API_REQUIRED_LLD_MACRO) && !$host_name_parser->getMacros()) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('must contain at least one low-level discovery macro')
+			);
 
 			return false;
 		}

@@ -1145,14 +1145,15 @@ define('API_URL',				20);
 define('API_H_NAME',			21);
 
 // flags
-define('API_REQUIRED',			0x01);
-define('API_NOT_EMPTY',			0x02);
-define('API_ALLOW_NULL',		0x04);
-define('API_NORMALIZE',			0x08);
-define('API_DEPRECATED',		0x10);
-define('API_ALLOW_USER_MACRO',	0x20);
-define('API_ALLOW_COUNT',		0x40);
-define('API_ALLOW_LLD_MACRO',	0x80);
+define('API_REQUIRED',				0x0001);
+define('API_NOT_EMPTY',				0x0002);
+define('API_ALLOW_NULL',			0x0004);
+define('API_NORMALIZE',				0x0008);
+define('API_DEPRECATED',			0x0010);
+define('API_ALLOW_USER_MACRO',		0x0020);
+define('API_ALLOW_COUNT',			0x0040);
+define('API_ALLOW_LLD_MACRO',		0x0080);
+define('API_REQUIRED_LLD_MACRO',	0x0100);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

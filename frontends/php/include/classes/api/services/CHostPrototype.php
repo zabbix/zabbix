@@ -103,7 +103,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateCreate(array &$host_prototypes) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
+			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'name')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
@@ -111,7 +111,7 @@ class CHostPrototype extends CHostBase {
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			]],
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
+				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
 			]],
 			'inventory' =>			['type' => API_OBJECT, 'fields' => [
 				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
@@ -282,7 +282,7 @@ class CHostPrototype extends CHostBase {
 	protected function validateUpdate(array $host_prototypes, array $db_host_prototypes) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'host' =>				['type' => API_H_NAME, 'flags' => API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
+			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'ruleid' =>				['type' => API_ID],
 			'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'name')],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
@@ -291,7 +291,7 @@ class CHostPrototype extends CHostBase {
 				'group_prototypeid' =>	['type' => API_ID],
 			]],
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_ALLOW_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
+				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')],
 				'group_prototypeid' =>	['type' => API_ID],
 			]],
 			'inventory' =>			['type' => API_OBJECT, 'fields' => [
