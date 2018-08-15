@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha10
 
 New features:
+..F....... [ZBXNEXT-4455] added screen reader to the dashboard and widgets (ashubin)
 ........S. [ZBXNEXT-4627] added support of macro functions to LLD macros (viktors, vso)
 ..F....... [ZBXNEXT-4049] added option to hide timeline in Problems widget (vasilijs)
 ..F....... [ZBXNEXT-4611] changed default method for http agent items from "post" to "get" (gcalenko)

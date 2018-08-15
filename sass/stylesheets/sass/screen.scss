@@ -1011,12 +1011,17 @@ output {
 		}
 	}
 
+	tbody th,
 	td {
 		padding: 6px 5px;
 		position: relative;
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+	}
+
+	tbody th {
+		text-align: inherit;
 	}
 
 	.vertical_rotation_inner {
@@ -5825,6 +5830,11 @@ svg {
 	&::before {
 		background-position: -524px -245px;
 	}
+}
+
+// Screen reader
+.inline-sr-only {
+	font-size: 0;
 }
 
 @if $theme_name == 'dev' {

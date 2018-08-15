@@ -656,12 +656,15 @@ output {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #fff; }
+  .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
     position: relative;
     border-bottom: 1px solid #ebeef0;
     line-height: 18px;
     vertical-align: top; }
+  .list-table tbody th {
+    text-align: inherit; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -3505,8 +3508,6 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     border: 1px solid #acbbc2;
     background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
     cursor: pointer; }
-  .input-color-picker input[readonly] + div, .input-color-picker input:disabled + div {
-    cursor: default; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
   .input-color-picker.disabled {
@@ -4121,3 +4122,6 @@ svg {
   color: #1f2c33; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.inline-sr-only {
+  font-size: 0; }
