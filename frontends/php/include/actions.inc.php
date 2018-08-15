@@ -1792,7 +1792,8 @@ function makeEventMessagesIcon(array $data, array $users) {
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
 			],
-			'num' => $total
+			'num' => $total,
+			'aria-label' => _xn('%1$s message', '%1$s messages', $total, 'screen reader', $total)
 		])
 		: null;
 }
@@ -1838,12 +1839,15 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
+		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
 	return $total
@@ -1859,7 +1863,8 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
-			]
+			],
+			'aria-label' => $aria_label
 		])
 		: null;
 }
@@ -1950,7 +1955,8 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
 			],
-			'num' => $total
+			'num' => $total,
+			'aria-label' => _xn('%1$s action', '%1$s actions', $total, 'screen reader', $total)
 		])
 		: null;
 }
