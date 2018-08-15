@@ -25,7 +25,7 @@
  *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
  */
 jQuery(function ($) {
-	"use strict"
+	"use strict";
 
 	// Makes SBox selection cancelable pressing Esc.
 	function sBoxKeyboardInteraction(e) {
@@ -91,7 +91,7 @@ jQuery(function ($) {
 		graph
 			.off('mouseup', hintboxSilentMode)
 			.on('mouseup', {graph: graph}, hintboxSilentMode);
-		graph.data('hintbox', graph.hintBoxItem)
+		graph.data('hintbox', graph.hintBoxItem);
 	}
 
 	/**
@@ -197,22 +197,28 @@ jQuery(function ($) {
 
 	// Read SVG nodes and find closest past value to the given x in each data set.
 	function findValues(graph, x) {
-		var data_sets = [];
+		var data_sets = [],
+			nodes = graph.querySelectorAll('[data-set]');
 
-		[...graph.querySelectorAll('[data-set]')].forEach(function(ds) {
+		for (var i = 0, l = nodes.length; l > i; i++) {
 			var px = -10,
 				py = -10,
 				pv = null;
 
 			// Find matching X points.
-			switch (ds.getAttribute('data-set')) {
+			switch (nodes[i].getAttribute('data-set')) {
 				case 'points':
-					var test_x = Math.min(x, +ds.lastChild.getAttribute('cx')),
-						points = [...ds.querySelectorAll('circle')].filter(function(c) {
-							return (test_x >= parseInt(c.getAttribute('cx')));
-						}),
-						point = points.slice(-1)[0];
+					var test_x = Math.min(x, +nodes[i].lastChild.getAttribute('cx')),
+						circle_nodes = nodes[i].querySelectorAll('circle'),
+						points = [];
 
+					for (var c = 0, cl = circle_nodes.length; cl > c; c ++) {
+						if (test_x >= parseInt(circle_nodes[c].getAttribute('cx'))) {
+							points.push(circle_nodes[c]);
+						}
+					}
+
+					var point = points.slice(-1)[0];
 					if (typeof point !== 'undefined') {
 						px = point.getAttribute('cx');
 						py = point.getAttribute('cy');
@@ -222,8 +228,11 @@ jQuery(function ($) {
 
 				case 'staircase':
 				case 'line':
-					var direction = ds.querySelectorAll('.svg-graph-line')[0].getAttribute('d').split(' '),
-						label = ds.querySelectorAll('.svg-graph-line')[0].getAttribute('data-label').split(','),
+					var direction_string = nodes[i].querySelectorAll('.svg-graph-line')[0].getAttribute('d'),
+						direction = IE
+							? direction_string.replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
+							: direction_string.split(' '),
+						label = nodes[i].querySelectorAll('.svg-graph-line')[0].getAttribute('data-label').split(','),
 						index = direction.length,
 						point;
 
@@ -233,15 +242,15 @@ jQuery(function ($) {
 						if (x > parseInt(point[0])) {
 							px = point[0];
 							py = point[1];
-							pv = label[ds.getAttribute('data-set') === 'line' ? index : index / 2];
+							pv = label[nodes[i].getAttribute('data-set') === 'line' ? index : index / 2];
 							break;
 						}
 					}
 					break;
 			}
 
-			data_sets.push({g: ds, x: px, y: py, v: pv});
-		});
+			data_sets.push({g: nodes[i], x: px, y: py, v: pv});
+		}
 
 		return data_sets;
 	}
@@ -250,16 +259,17 @@ jQuery(function ($) {
 	function findProblems(graph, x) {
 		var problems = [],
 			problem_start,
-			problem_width;
+			problem_width,
+			nodes = graph.querySelectorAll('[data-info]');
 
-		graph.querySelectorAll('[data-info]').forEach(function(problem) {
-			problem_start = +problem.getAttribute('x');
-			problem_width = +problem.getAttribute('width');
+		for (var i = 0, l = nodes.length; l > i; i++) {
+			problem_start = +nodes[i].getAttribute('x');
+			problem_width = +nodes[i].getAttribute('width');
 
 			if (x > problem_start && problem_start + problem_width > x) {
-				problems.push(JSON.parse(problem.getAttribute('data-info')));
+				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
 			}
-		});
+		}
 
 		return problems;
 	}
