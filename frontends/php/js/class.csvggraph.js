@@ -21,85 +21,77 @@
 /**
  * JQuery class that initializes interactivity for SVG graph. Currently following features are supported:
  *  - SBox - time range selector;
- *  - show_problems - show problems in hintbox when mouse is moved over the problem zone.
+ *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
+ *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
  */
 jQuery(function ($) {
 	"use strict"
 
-	var min_period = 60,  // Minimal period in seconds to zoom in.
-		graph = null,     // Main graph object.
-		hbox = null,      // Hintbox object.
-		data = {},        // Graph options.
-		sbox = null,      // SBox SVG object.
-		stxt = null,      // SBox text SVG object.
-		line = null;      // Graph helper.
-
-	/**
-	 * Makes SBox selection cancelable pressing Esc.
-	 */
+	// Makes SBox selection cancelable pressing Esc.
 	function sBoxKeyboardInteraction(e) {
 		if (e.keyCode == 27) {
-			destroySBox();
+			destroySBox(e, e.data.graph);
 		}
 	}
 
-	/**
-	 * Cancel SBox and unset its variables.
-	 */
-	function destroySBox() {
+	// Cancel SBox and unset its variables.
+	function destroySBox(e, graph) {
+		var graph = graph || e.data.graph;
+
 		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
 		$('.svg-graph-selection-text', graph).text('');
 
-		$(document).off('keydown', sBoxKeyboardInteraction);
+		$(document).off('keydown', {graph: graph}, sBoxKeyboardInteraction);
 
 		graph
 			.off('mousemove', moveSBoxMouse)
 			.off('mouseup', destroySBox);
-
-		data.boxing = false;
+		graph.data('options').boxing = false;
 	}
 
-	/**
-	 * Destroy hintbox, unset its variables and event listeners.
-	 */
-	function destroyHintbox() {
+	// Destroy hintbox, unset its variables and event listeners.
+	function destroyHintbox(graph) {
+		var data = graph.data('options'),
+			hbox = graph.data('hintbox') || null;
+
 		if (hbox !== null && data.isHintBoxFrozen === false) {
 			graph.off('mouseup', makeHintboxStatic);
+			graph.removeData('hintbox');
 			hbox.remove();
-			hbox = null;
 		}
 	}
 
-	/**
-	 * Hide vertical helper line and highlighted data points.
-	 */
-	function hideHelper() {
-		line.attr({'x1': -10, 'x2': -10});
+	// Hide vertical helper line and highlighted data points.
+	function hideHelper(graph) {
+		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
 		graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
 	}
 
-	/**
-	 * Create a new hintbox and stick it to certain position where user has clicked.
-	 */
-	function makeHintboxStatic(e) {
-		var content = hbox.find('> div');
+	// Create a new hintbox and stick it to certain position where user has clicked.
+	function makeHintboxStatic(e, graph) {
+		var graph = graph || e.data.graph,
+			data = graph.data('options'),
+			hbox = graph.data('hintbox'),
+			content = hbox.find('> div');
 
 		// Destroy old hintbox to make new one with close button.
-		destroyHintbox();
+		destroyHintbox(graph);
 
 		// Should be put inside hintBoxItem to use functionality of hintBox.
 		graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 		data.isHintBoxFrozen = true;
-		hbox = graph.hintBoxItem;
 
 		graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 			data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
 			graph.off('mouseup', hintboxSilentMode);
-			destroyHintbox();
+			destroyHintbox(graph);
 		});
 
-		repositionHintBox(e);
-		graph.on('mouseup', hintboxSilentMode);
+		repositionHintBox(e, graph.hintBoxItem);
+		graph
+			.off('mouseup', hintboxSilentMode)
+			.on('mouseup', {graph: graph}, hintboxSilentMode);
+		graph.data('hintbox', graph.hintBoxItem)
 	}
 
 	/**
@@ -107,45 +99,52 @@ jQuery(function ($) {
 	 * hintbox will be repositionated with a new values in the place where user clicked on.
 	 */
 	function hintboxSilentMode(e) {
+		var graph = e.data.graph,
+			data = graph.data('options');
+
 		data.isHintBoxFrozen = false;
-		showHintbox(e);
-		makeHintboxStatic(e);
+		showHintbox(e, graph);
+		makeHintboxStatic(e, graph);
 	}
 
-	/**
-	 * Method to start selection of some horizontal area in graph.
-	 */
+	// Method to start selection of some horizontal area in graph.
 	function startSBoxDrag(e) {
 		e.stopPropagation();
 
+		var graph = e.data.graph,
+			data = graph.data('options');
+
 		if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
-			$(document).on('keydown', sBoxKeyboardInteraction);
+			$(document).on('keydown', {graph: graph}, sBoxKeyboardInteraction);
 
 			graph
-				.on('mousemove', moveSBoxMouse)
-				.on('mouseup', destroySBox);
+				.on('mousemove', {graph: graph}, moveSBoxMouse)
+				.on('mouseup', {graph: graph}, destroySBox);
 
 			data.start = e.offsetX - data.dimX;
 		}
 	}
 
-	/**
-	 * Method to recalculate selected area during mouse move.
-	 */
+	// Method to recalculate selected area during mouse move.
 	function moveSBoxMouse(e) {
 		e.stopPropagation();
+
+		var graph = e.data.graph,
+			data = graph.data('options'),
+			sbox = $('.svg-graph-selection', graph),
+			stxt = $('.svg-graph-selection-text', graph);
 
 		if ((e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
 			data.end = e.offsetX - data.dimX;
 			if (data.start != data.end) {
 				data.isHintBoxFrozen = false;
 				data.boxing = true;
-				destroyHintbox();
-				hideHelper();
+				destroyHintbox(graph);
+				hideHelper(graph);
 			}
 			else {
-				destroySBox();
+				destroySBox(e, graph);
 				return false;
 			}
 
@@ -160,7 +159,7 @@ jQuery(function ($) {
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				label = formatTimestamp(seconds, false, true)
-					+ (seconds < min_period ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 
 			stxt
 				.text(label)
@@ -171,22 +170,23 @@ jQuery(function ($) {
 		}
 	}
 
-	/**
-	 * Method to end selection of horizontal area in graph.
-	 */
+	// Method to end selection of horizontal area in graph.
 	function endSBoxDrag(e) {
 		e.stopPropagation();
+
+		var graph = e.data.graph,
+			data = graph.data('options');
 
 		if (data.boxing) {
 			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
 
-			destroySBox();
+			destroySBox(e, graph);
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
 				to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
 
-			if (seconds > min_period && (from_offset > 0 || to_offset > 0)) {
+			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
 				$.publish('timeselector.rangeoffset', {
 					from_offset: Math.ceil(from_offset),
 					to_offset: Math.ceil(to_offset)
@@ -195,13 +195,11 @@ jQuery(function ($) {
 		}
 	}
 
-	/**
-	 * Read SVG nodes and find closest past value to the given x in each data set.
-	 */
-	function findValues(x) {
+	// Read SVG nodes and find closest past value to the given x in each data set.
+	function findValues(graph, x) {
 		var data_sets = [];
 
-		[...graph[0].querySelectorAll('[data-set]')].forEach(function(ds) {
+		[...graph.querySelectorAll('[data-set]')].forEach(function(ds) {
 			var px = -10,
 				py = -10,
 				pv = null;
@@ -248,15 +246,13 @@ jQuery(function ($) {
 		return data_sets;
 	}
 
-	/**
-	 * Find what problems matches in time to the given x.
-	 */
-	function findProblems(x) {
+	// Find what problems matches in time to the given x.
+	function findProblems(graph, x) {
 		var problems = [],
 			problem_start,
 			problem_width;
 
-		graph[0].querySelectorAll('[data-info]').forEach(function(problem) {
+		graph.querySelectorAll('[data-info]').forEach(function(problem) {
 			problem_start = +problem.getAttribute('x');
 			problem_width = +problem.getAttribute('width');
 
@@ -268,11 +264,10 @@ jQuery(function ($) {
 		return problems;
 	}
 
-	/**
-	 * Set position of vertical helper line.
-	 */
-	function setHelperPosition(e) {
-		line.attr({
+	// Set position of vertical helper line.
+	function setHelperPosition(e, graph) {
+		var data = graph.data('options');
+		graph.find('.svg-helper').attr({
 			'x1': e.offsetX,
 			'y1': data.dimY,
 			'x2': e.offsetX,
@@ -295,23 +290,21 @@ jQuery(function ($) {
 		}
 	}
 
-	/**
-	 * Position hintbox near current mouse position.
-	 */
-	function repositionHintBox(e) {
+	// Position hintbox near current mouse position.
+	function repositionHintBox(e, hbox) {
 		var l = (document.body.clientWidth >= e.screenX + hbox.width()) ? e.offsetX : e.offsetX - hbox.width(),
 			t = (window.screen.height >= e.screenY + hbox.height() + 60) ? e.offsetY + 60 : e.offsetY - hbox.height();
-
 		hbox.css({'left': l, 'top': t});
 	}
 
-	/**
-	 * Show problem or value hintboxe.
-	 */
-	function showHintbox(e) {
+	// Show problem or value hintbox.
+	function showHintbox(e, graph) {
 		e.stopPropagation();
 
-		var html = null,
+		var graph = graph || e.data.graph,
+			data = graph.data('options'),
+			hbox = graph.data('hintbox') || null,
+			html = null,
 			inx = false;
 
 		if (data.boxing === false) {
@@ -321,9 +314,9 @@ jQuery(function ($) {
 			// Show problems when mouse is in the 15px high area under the graph canvas.
 			if (data.showProblems && data.isHintBoxFrozen === false && inx && data.dimY + data.dimH <= e.offsetY
 					&& e.offsetY <= data.dimY + data.dimH + 15) {
-				hideHelper();
+				hideHelper(graph);
 
-				var values = findProblems(e.offsetX);
+				var values = findProblems(graph[0], e.offsetX);
 				if (values.length) {
 					var tbody = $('<tbody>');
 
@@ -350,10 +343,10 @@ jQuery(function ($) {
 			// Show graph values if mouse is over the graph canvas.
 			else if (inx && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH) {
 				// Set position of mouse following helper line.
-				setHelperPosition(e);
+				setHelperPosition(e, graph);
 
 				// Find values.
-				var points = findValues(e.offsetX),
+				var points = findValues(graph[0], e.offsetX),
 					show_hint = false,
 					xy_point = false,
 					tolerance;
@@ -411,27 +404,28 @@ jQuery(function ($) {
 				}
 			}
 			else {
-				hideHelper();
+				hideHelper(graph);
 			}
 
 			if (html !== null) {
 				if (hbox === null) {
 					hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
-					graph.on('mouseup', makeHintboxStatic);
+					graph.on('mouseup', {graph: graph}, makeHintboxStatic);
+					graph.data('hintbox', hbox);
 				}
 				else {
 					hbox.find('> div').replaceWith(html);
 				}
 
-				repositionHintBox(e);
+				repositionHintBox(e, hbox);
 			}
 		}
 		else {
-			hideHelper();
+			hideHelper(graph);
 		}
 
 		if (html === null) {
-			destroyHintbox();
+			destroyHintbox(graph);
 		}
 	}
 
@@ -439,56 +433,52 @@ jQuery(function ($) {
 		init: function(options) {
 			options = $.extend({}, {
 				sbox: false,
-				showProblems: true
+				show_problems: true,
+				min_period: 60
 			}, options);
 
 			this.each(function() {
-				data = {
-					dimX: options.dims.x,
-					dimY: options.dims.y,
-					dimW: options.dims.w,
-					dimH: options.dims.h,
-					showProblems: options.show_problems,
-					isHintBoxFrozen: false,
-					boxing: false
-				};
-
-				graph = $(this);
-				line = graph.find('.svg-helper');
-				sbox = options.sbox ? $('.svg-graph-selection', graph) : null;
-				stxt = options.sbox ? $('.svg-graph-selection-text', graph) : null;
-				hbox = null;
+				var graph = $(this),
+					data = {
+						dimX: options.dims.x,
+						dimY: options.dims.y,
+						dimW: options.dims.w,
+						dimH: options.dims.h,
+						showProblems: options.show_problems,
+						isHintBoxFrozen: false,
+						spp: options.spp || null,
+						minPeriod: options.min_period,
+						boxing: false
+					};
 
 				graph
-					.on('mouseleave', function() {
-						destroyHintbox();
-						destroySBox();
-						hideHelper();
+					.on('mouseleave', function(e) {
+						var graph = $(this);
+						destroyHintbox(graph);
+						destroySBox(e, graph);
+						hideHelper(graph);
 						return false;
 					})
-					.on('mousemove', showHintbox)
+					.data('options', data)
+					.on('mousemove', {graph: graph}, showHintbox)
 					.attr('unselectable', 'on')
 					.css('user-select', 'none')
 					.on('selectstart', false);
 
 				if (options.sbox) {
-					data = $.extend({}, {
-						spp: options.spp
-					}, data);
-
 					graph
-						.on('mousedown', startSBoxDrag)
-						.on('mouseup', endSBoxDrag);
+						.on('mousedown', {graph: graph}, startSBoxDrag)
+						.on('mouseup', {graph: graph}, endSBoxDrag);
 				}
 			});
 		},
-		disableSBox: function() {
-			destroySBox();
+		disableSBox: function(e) {
+			var graph = $(this);
+
+			destroySBox(e, graph);
 			graph
 				.off('mousedown', startSBoxDrag)
 				.off('mouseup', endSBoxDrag);
-
-			delete data.spp;
 		}
 	};
 
