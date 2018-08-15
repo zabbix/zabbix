@@ -415,7 +415,7 @@ class CSvgGraph extends CSvg {
 	public function addSBox() {
 		$this->addItem([
 			(new CSvgRect(0, 0, 0, 0))->addClass('svg-graph-selection'),
-			(new CSvgText(0, 0, '', 'black'))->addClass('svg-graph-selection-text')
+			(new CSvgText(0, 0, ''))->addClass('svg-graph-selection-text')
 		]);
 
 		return $this;

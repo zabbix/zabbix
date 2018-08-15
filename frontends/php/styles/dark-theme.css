@@ -4374,7 +4374,7 @@ input[type=range]::-webkit-slider-runnable-track {
       font-size: 0;
       flex: 1 0 0px;
       height: 2px;
-      border-left: 1px solid white; }
+      border-left: 1px solid #0e1012; }
 
 div.range-control {
   width: 240px; }

@@ -19,22 +19,14 @@
 **/
 
 
-class CSvgText extends CTag {
+class CSvgText extends CSvgTag {
 
 	public function __construct($x, $y, $text) {
 		parent::__construct('text', true);
 
-		// should define x, y
 		$this->x = $x;
 		$this->y = $y;
 
-		/**
-		 * TODO
-		 * consider to create new CSvgTag class to extend and move svg tag specific attributes liek x,y there.
-		 *
-		 * consider set x and y right before stringify, e.g., define tostring function and add attributes right before
-		 * call parent::tostring. This allows change x & y more flexible.
-		 */
 		$this->setAttribute('x', $this->x);
 		$this->setAttribute('y', $this->y);
 		$this->addItem($text);

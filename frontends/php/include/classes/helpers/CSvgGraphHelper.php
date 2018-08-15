@@ -453,8 +453,7 @@ class CSvgGraphHelper {
 
 				// Add display options and append to $metrics list.
 				if (!array_key_exists('color', $data_set) && $data_set['color'] === '') {
-					// TODO miks: no workflow specified. Consult Andzs and fix it.
-					exit('No color specified');
+					$data_set['color'] = '000000';
 				}
 				if (substr($data_set['color'], 0, 1) !== '#') {
 					$data_set['color'] = '#'.$data_set['color'];
@@ -497,7 +496,6 @@ class CSvgGraphHelper {
 					: 0;
 			}
 
-			// TODO miks: still not clear how valid override looks like. Fix this if needed.
 			if ((!array_key_exists('hosts', $override) || $override['hosts'] === '')
 					|| (!array_key_exists('items', $override) || $override['items'] === '')) {
 				continue;

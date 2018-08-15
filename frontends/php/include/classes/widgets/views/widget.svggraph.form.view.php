@@ -188,7 +188,7 @@ $form_tabs = (new CTabView())
 	->addTab('legend',  _('Legend'), $tab_legend)
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
-	->addClass('graph-widget-config-tabs') // Adds left padding to tab header buttons.
+	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
 	->setSelected(0);
 
 // Add CTabView to form.
