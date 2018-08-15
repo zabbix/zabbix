@@ -460,6 +460,12 @@ jQuery(function ($) {
 				hbox = null;
 
 				graph
+					.on('mouseleave', function() {
+						destroyHintbox();
+						destroySBox();
+						hideHelper();
+						return false;
+					})
 					.on('mousemove', showHintbox)
 					.attr('unselectable', 'on')
 					.css('user-select', 'none')
