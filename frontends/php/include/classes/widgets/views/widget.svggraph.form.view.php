@@ -43,7 +43,9 @@ $preview_height = 300;
 $form->addItem(
 	(new CDiv(
 		(new CDiv())
-			->addStyle('background: #ffffff; width: '.$preview_width.'px; height: '.$preview_height.'px; z-index: 999;')
+			->addStyle('background: #'.$data['theme']['backgroundcolor'].'; width: '.$preview_width.'px;'.
+				'height: '.$preview_height.'px; z-index: 999;'
+			)
 			->setId('svg-grapg-preview')
 	))
 		->addStyle('margin: 10px 0; height: '.$preview_height.'px; width: '.$preview_width.'px;')
