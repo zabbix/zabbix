@@ -34,7 +34,6 @@ class CRangeControl extends CTextBox {
 
 		$this->options = [];
 		$this->setValue($value);
-		$this->setId(base_convert(rand(), 10, 36));
 		return $this;
 	}
 
