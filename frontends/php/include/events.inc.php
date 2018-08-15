@@ -386,21 +386,28 @@ function make_small_eventlist($startEvent, $backurl) {
 /**
  * Create table with trigger description and events.
  *
- * @param array  $trigger							An array of trigger data.
- * @param string $trigger['triggerid']				Trigger ID to select events.
- * @param string $trigger['description']			Trigger description.
- * @param string $trigger['url']					Trigger URL.
+ * @param array  $trigger                    An array of trigger data.
+ * @param string $trigger['triggerid']       Trigger ID to select events.
+ * @param string $trigger['description']     Trigger description.
+ * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
- * @param string $backurl							URL to return to.
- * @param bool   $fullscreen
- * @param bool   $show_timeline						Show time line flag.
- * @param int    $show_tags                         Show tags flag.
- * @param array  $filter_tags
- * @param string $filter_tags[]['tag']
- * @param int    $filter_tags[]['operator']
- * @param string $filter_tags[]['value']
- * @param int    $tag_name_format                   Tag name format.
- * @param string $tag_priority                      Comma-separated tag names list.
+ * @param string $backurl                    URL to return to.
+ * @param bool   $fullscreen                 Show object in fullscreen or no.
+ * @param bool   $show_timeline              Show time line flag.
+ * @param int    $show_tags                  Show tags flag. Possible values:
+ *                                             - PROBLEMS_SHOW_TAGS_NONE;
+ *                                             - PROBLEMS_SHOW_TAGS_1;
+ *                                             - PROBLEMS_SHOW_TAGS_2;
+ *                                             - PROBLEMS_SHOW_TAGS_3 (default).
+ * @param array  $filter_tags                An array of tag filtering data.
+ * @param string $filter_tags[]['tag']       Tag name.
+ * @param int    $filter_tags[]['operator']  Tag operator.
+ * @param string $filter_tags[]['value']     Tag value.
+ * @param int    $tag_name_format            Tag name format. Possible values:
+ *                                             - PROBLEMS_TAG_NAME_FULL (default);
+ *                                             - PROBLEMS_TAG_NAME_SHORTENED;
+ *                                             - PROBLEMS_TAG_NAME_NONE.
+ * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return CDiv
  */
@@ -653,10 +660,10 @@ function orderEventTags(array $event_tags, array $f_tags) {
 /**
  * Place priority tags at the beginning of tags array.
  *
- * @param array  $event_tags             An array of event_tags.
- * @param string $event_tags[]['tag']
- * @param string $event_tags[]['value']
- * @param array $priorities              An array of priority tag names.
+ * @param array  $event_tags             An array of event tags.
+ * @param string $event_tags[]['tag']    Tag name.
+ * @param string $event_tags[]['value']  Tag value.
+ * @param array  $priorities             An array of priority tag names.
  *
  * @return array
  */
@@ -684,13 +691,16 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * @param string $events[]['tags']['tag']
  * @param string $events[]['tags']['value']
  * @param bool   $html
- * @param int    $list_tags_count
- * @param array  $filter_tags
- * @param string $filter_tags[]['tag']
- * @param int    $filter_tags[]['operator']
- * @param string $filter_tags[]['value']
- * @param int    $tag_name_format           Tag name format.
- * @param string $tag_priority              Comma-separated tag names list.
+ * @param int    $list_tags_count            Maximum number of tags to display in events list.
+ * @param array  $filter_tags                An array of tag filtering data.
+ * @param string $filter_tags[]['tag']       Tag name.
+ * @param int    $filter_tags[]['operator']  Tag operator.
+ * @param string $filter_tags[]['value']     Tag value.
+ * @param int    $tag_name_format            Tag name format. Possible values:
+ *                                             - PROBLEMS_TAG_NAME_FULL (default);
+ *                                             - PROBLEMS_TAG_NAME_SHORTENED;
+ *                                             - PROBLEMS_TAG_NAME_NONE.
+ * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return array
  */
@@ -700,6 +710,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 
 	// Convert $filter_tags to a more usable format.
 	$f_tags = [];
+
 	foreach ($filter_tags as $filter_tag) {
 		$f_tags[$filter_tag['tag']][] = [
 			'operator' => $filter_tag['operator'],
@@ -722,6 +733,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 				$p_tags = array_map('trim', $p_tags);
 				$event_tags = orderEventTagsByPriority($event_tags, $p_tags);
 			}
+
 			$tags_shown = 0;
 
 			foreach ($event_tags as $tag) {
@@ -740,7 +752,9 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 					default:
 						$tagname = $tag['tag'];
 				}
+
 				$value = $tagname.(($tag['value'] === '') ? '' : $separator.$tag['value']);
+
 				if ($value !== '') {
 					$tags[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)

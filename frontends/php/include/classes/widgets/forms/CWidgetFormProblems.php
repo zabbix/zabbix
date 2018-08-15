@@ -121,9 +121,9 @@ class CWidgetFormProblems extends CWidgetForm {
 		]))
 			->setDefault(PROBLEMS_SHOW_TAGS_NONE)
 			->setModern(true)
-			->setAction('var disable = jQuery(this).filter("[value=\''.PROBLEMS_SHOW_TAGS_NONE.'\']").is(":checked");'.
-				'jQuery("#tag_priority").prop("disabled", disable);'.
-				'jQuery("#tag_name_format input").prop("disabled", disable)'
+			->setAction('var disabled = jQuery(this).filter("[value=\''.PROBLEMS_SHOW_TAGS_NONE.'\']").is(":checked");'.
+				'jQuery("#tag_priority").prop("disabled", disabled);'.
+				'jQuery("#tag_name_format input").prop("disabled", disabled)'
 			);
 
 		if (array_key_exists('show_tags', $this->data)) {
