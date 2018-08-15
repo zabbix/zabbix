@@ -30,25 +30,25 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'name' =>		[T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')],
-	'password' =>	[T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'],
-	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
-	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
-	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
-	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
-	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,			null]
+	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter})', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter})'],
+	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
+	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
+	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
-
-$config = select_config();
-$http_user = '';
 
 if (hasRequest('guest_login')) {
 	CWebUser::login(ZBX_GUEST_USER, '');
 	redirect(ZBX_DEFAULT_URL);
 	exit;
 }
+
+$config = select_config();
+$http_user = '';
 
 // logout
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
@@ -115,7 +115,8 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 		exit;
 	}
 
-	if (getRequest('name', $http_user) === $http_user) {
+	if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $http_user
+			&& getRequest('name', $http_user) === $http_user) {
 		// Remove error messages for invalid SSO login attempt.
 		clear_messages();
 	}

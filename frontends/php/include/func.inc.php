@@ -1737,7 +1737,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
-		if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
+		if (CWebUser::isLoggedIn()) {
 			$data = [
 				'header' => _('Access denied'),
 				'messages' => [
@@ -1757,19 +1757,6 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		}
 		// if the user is not logged in - offer to login
 		else {
-			$config = select_config();
-
-			if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-					&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
-				$redirect = (new CUrl('index_http.php'))
-					->setArgument('request', getRequest('request', (new CUrl())->getUrl()))
-					->removeArgument('sid')
-					->getUrl();
-
-				redirect($redirect);
-				exit;
-			}
-
 			$data = [
 				'header' => _('You are not logged in'),
 				'messages' => [
