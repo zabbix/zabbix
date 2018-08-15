@@ -520,14 +520,20 @@ class CSvgGraph extends CSvg {
 
 		if ($this->left_y_show && $this->left_y_min) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
-			$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $approx_width);
-			$this->offset_left = (int) min($offset_left, $this->max_yaxis_width);
+
+			if ($values) {
+				$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $approx_width);
+				$this->offset_left = (int) min($offset_left, $this->max_yaxis_width);
+			}
 		}
 
 		if ($this->right_y_show && $this->right_y_min) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
-			$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $approx_width);
-			$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
+
+			if ($values) {
+				$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $approx_width);
+				$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
+			}
 		}
 
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
@@ -803,9 +809,6 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
-	function addHighlightPoint() {
-		return $this;
-	}
 	/**
 	 * Add problems tooltip data to graph.
 	 */
