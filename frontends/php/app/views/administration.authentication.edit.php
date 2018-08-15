@@ -65,9 +65,12 @@ if ($data['change_bind_password'] || $data['ldap_bind_password'] === '') {
 	];
 }
 else {
-	$password_box = (new CButton('change_bind_password', _('Change password')))
-		->setEnabled($data['ldap_enabled'])
-		->addClass(ZBX_STYLE_BTN_GREY);
+	$password_box = [
+		new CVar('action_passw_change', $data['action_passw_change']),
+		(new CButton('change_bind_password', _('Change password')))
+			->setEnabled($data['ldap_enabled'])
+			->addClass(ZBX_STYLE_BTN_GREY)
+	];
 }
 
 $ldap_tab = (new CFormList('list_ldap'))

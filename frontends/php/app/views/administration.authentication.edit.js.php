@@ -1,9 +1,10 @@
 <script type="text/javascript">
 	jQuery(function ($) {
-		var form = $('[name=form_auth]');
+		var form = $('[name=form_auth]'),
+			auth_type = $('[name=authentication_type]:checked').val();
 
 		form.submit(function () {
-			return $('[name=authentication_type]:checked').val() == <?= $data['db_authentication_type'] ?>
+			return $('[name=authentication_type]:checked').val() == auth_type
 					|| confirm(<?= CJs::encodeJson(
 						_('Switching authentication method will reset all except this session! Continue?')
 					) ?>);
@@ -23,7 +24,7 @@
 
 		form.find('button#change_bind_password').click(function () {
 			form.find('[name=action]')
-				.val('<?= $data['action_passw_change'] ?>');
+				.val(form.find('[name=action_passw_change]').val());
 
 			submitFormWithParam('form_auth', 'change_bind_password', '1');
 		});
