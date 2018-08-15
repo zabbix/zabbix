@@ -694,7 +694,7 @@ function replace_template_dependencies($deps, $hostid) {
 }
 
 function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], $show_suppressed = 0) {
+		array $trigger_options = [], $show_suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE) {
 	// fetch hosts
 	$hosts = API::Host()->get([
 		'output' => ['hostid', 'status'],
@@ -758,7 +758,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  *
  * @return array
  */
-function getTriggersWithActualSeverity($options, $show_suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE) {
+function getTriggersWithActualSeverity($options, $show_suppressed) {
 	$triggers = API::Trigger()->get($options);
 
 	$problem_triggerids = [];
