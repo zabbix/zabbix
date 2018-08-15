@@ -107,7 +107,6 @@ define('ZBX_FONT_NAME', 'DejaVuSans');
 
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
-define('ZBX_AUTH_HTTP',		2);
 define('ZBX_AUTH_HTTP_DISABLED',	0);
 define('ZBX_AUTH_HTTP_ENABLED',		1);
 define('ZBX_AUTH_LDAP_DISABLED',	0);

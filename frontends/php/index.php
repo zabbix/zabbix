@@ -81,9 +81,9 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 		}
 	}
 
-	$loginSuccess = CWebUser::login(getRequest('name', $http_user), getRequest('password', ''));
+	$loggedin = CWebUser::login(getRequest('name', $http_user), getRequest('password', ''));
 
-	if ($loginSuccess) {
+	if ($loggedin) {
 		// save remember login preference
 		if (CWebUser::$data['autologin'] != $autoLogin) {
 			API::User()->update([
@@ -102,16 +102,9 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 				: '';
 		}
 
-		if (!zbx_empty($request)) {
-			$url = $request;
-		}
-		elseif (!zbx_empty(CWebUser::$data['url'])) {
-			$url = CWebUser::$data['url'];
-		}
-		else {
-			$url = ZBX_DEFAULT_URL;
-		}
-		redirect($url);
+		$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+		redirect(reset($redirect));
+
 		exit;
 	}
 
@@ -122,31 +115,18 @@ if (getRequest('enter') === _('Sign in') || $http_user) {
 	}
 }
 
-// the user is not logged in, display the login form
-if (!CWebUser::isLoggedIn() || CWebUser::isGuest()) {
-	switch ($config['authentication_type']) {
-		case ZBX_AUTH_LDAP:
-		case ZBX_AUTH_INTERNAL:
-			if (isset($_REQUEST['enter'])) {
-				$_REQUEST['autologin'] = getRequest('autologin', 0);
-			}
-
-			if ($messages = clear_messages()) {
-				$messages = array_pop($messages);
-				$_REQUEST['message'] = $messages['message'];
-			}
-
-			$data = [
-				'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
-				'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid'),
-				'guest_login_url' => (new CUrl())->setArgument('guest_login', 1),
-				'guest_login_enabled' => !CWebUser::isLoggedIn() && CWebUser::isGuestAllowed()
-			];
-
-			$loginForm = new CView('general.login', $data);
-			$loginForm->render();
-	}
+if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
+	redirect(CWebUser::$data['url'] ? CWebUser::$data['url'] : ZBX_DEFAULT_URL);
 }
-else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? ZBX_DEFAULT_URL : CWebUser::$data['url']);
-}
+
+$messages = clear_messages();
+$autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
+
+(new CView('general.login', [
+	'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
+	'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid'),
+	'guest_login_url' => (new CUrl())->setArgument('guest_login', 1),
+	'guest_login_enabled' => !CWebUser::isLoggedIn() && CWebUser::isGuestAllowed(),
+	'autologin' => $autologin == 1,
+	'error' => array_pop($messages)
+]))->render();
