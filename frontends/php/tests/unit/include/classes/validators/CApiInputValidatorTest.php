@@ -1128,6 +1128,27 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Incorrect validation rules.'
 			],
 			[
+				['type' => API_OBJECTS, 'fields' => [
+					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+				]],
+				[
+					['host' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2'],
+					['host' => 'host 3'],
+					['host' => 'host 4']
+				],
+				'/',
+				[
+					['host' => 'host 0', 'name' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2', 'name' => 'host 2'],
+					['host' => 'host 3', 'name' => 'host 3'],
+					['host' => 'host 4', 'name' => 'host 4']
+				]
+			],
+			[
 				['type' => API_HG_NAME, 'length' => 16],
 				'Zabbix servers',
 				'/1/name',

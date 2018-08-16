@@ -577,10 +577,11 @@ class CApiInputValidator {
 	 * Object validator.
 	 *
 	 * @param array  $rul
-	 * @param int    $rule['flags']                           (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED, API_DEPRECATED
-	 * @param mixed  $rule['fields'][<field_name>]['default'] (optional)
+	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
+	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
+	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -613,6 +614,10 @@ class CApiInputValidator {
 
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
+			}
+
+			if (array_key_exists('default_source', $field_rule) && !array_key_exists($field_name, $data)) {
+				$data[$field_name] = $data[$field_rule['default_source']];
 			}
 
 			if (array_key_exists($field_name, $data)) {

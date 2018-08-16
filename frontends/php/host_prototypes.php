@@ -139,8 +139,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	$newHostPrototype = [
-		'host' => getRequest('host'),
-		'name' => getRequest('name'),
+		'host' => getRequest('host', ''),
+		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
@@ -161,7 +161,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			unset($groupPrototype['group_prototypeid']);
 		}
 
-		if (!zbx_empty($groupPrototype['name'])) {
+		if ($groupPrototype['name'] !== '') {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
 		}
 	}
