@@ -71,8 +71,8 @@ global $ZBX_SERVER_NAME;
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),
-		CBrandHelper::isActive() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
-		CBrandHelper::isActive()
+		CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
+		CBrandHelper::isRebranded()
 			? null
 			: (new CLink(_('Support'), 'http://www.zabbix.com/support.php'))
 				->setTarget('_blank')

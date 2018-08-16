@@ -24,38 +24,61 @@
  */
 class CBrandHelper {
 
-	const BRAND_CONFIG = [
-		'HELP_URL' => 'https://www.zabbix.com/documentation/4.0/',
-	];
-
 	/**
 	 * Brand configuration array
 	 * @var array
 	 */
-	private static $config = null;
-
-	/**
-	 * Is branding active
-	 * @var boolean
-	 */
-	private static $is_active = false;
+	private static $config = [];
 
 	/**
 	 * Lazy loading configuration
 	 */
 	private static function loadConfig() {
-		if (is_null(self::$config)) {
+		if (!self::$config) {
 			$config_file_path = realpath(dirname(__FILE__).'/../../../local/conf/brand.conf.php');
 
 			if (file_exists($config_file_path)) {
-				$config = include $config_file_path;
-				self::$config = array_merge(self::BRAND_CONFIG, $config);
-				self::$is_active = true;
-			}
-			else {
-				self::$config = self::BRAND_CONFIG;
+				self::$config = include $config_file_path;
+				self::$config['IS_REBRANDED'] = true;
 			}
 		}
+	}
+
+	/**
+	 * Get value by key from configuration (load configuration if need).
+	 *
+	 * @param string $key
+	 * @param mixed $default	Default value
+	 * @param mixed $pattern	Pattern for extraction
+	 *
+	 * @return mixed
+	 */
+	private static function getValue($key, $default = false, $pattern = false) {
+		self::loadConfig();
+
+		return (array_key_exists($key, self::$config) ? self::extractValue($key, $pattern) : $default);
+	}
+
+	/**
+	 * Extracting value from configuration according to the type of the pattern.
+	 *
+	 * @param string $key
+	 * @param mixed $pattern
+	 *
+	 * @return mixed
+	 */
+	private static function extractValue($key, $pattern) {
+		if (is_string($pattern)) {
+			$value = sprintf($pattern, self::$config[$key]);
+		}
+		elseif (is_array($pattern)) {
+			$value = [self::$config[$key]];
+		}
+		else {
+			$value = self::$config[$key];
+		}
+
+		return $value;
 	}
 
 	/**
@@ -63,9 +86,8 @@ class CBrandHelper {
 	 *
 	 * @return boolean
 	 */
-	public static function isActive() {
-		self::loadConfig();
-		return self::$is_active;
+	public static function isRebranded() {
+		return self::getValue('IS_REBRANDED');
 	}
 
 	/**
@@ -74,8 +96,7 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getHelpUrl() {
-		self::loadConfig();
-		return self::$config['HELP_URL'];
+		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/4.0/', '%s');
 	}
 
 	/**
@@ -84,29 +105,30 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getLogoStyle() {
-		self::loadConfig();
-		return 	isset(self::$config['LOGO'])
-			? 'background: url('.self::$config['LOGO'].') no-repeat 0 0; background-size: contain;'
-			: null;
+		return self::getValue('BRAND_LOGO', null,
+			'background: url("%s") no-repeat center center; background-size: contain;');
 	}
 
 	/**
 	 * Get Footer Label.
 	 *
 	 * @param boolean $with_version
+	 *
 	 * @return string
 	 */
 	public static function getFooterLabel($with_version) {
 		self::loadConfig();
-		return (self::$is_active && array_key_exists('BRAND_FOOTER', self::$config))
-			? [self::$config['BRAND_FOOTER']]
-			: [
+		return self::getValue(
+			'BRAND_FOOTER',
+			[
 				$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
 				'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
 				(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('target', '_blank')
-			];
+			],
+			[]
+		);
 	}
 }

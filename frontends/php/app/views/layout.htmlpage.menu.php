@@ -38,7 +38,7 @@ $user_navigation = (new CList())
 $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
-	->addItem(CBrandHelper::isActive()
+	->addItem(CBrandHelper::isRebranded()
 		? null
 		: (new CListItem(
 			(new CLink('Support', 'https://www.zabbix.com/support/'))
@@ -47,7 +47,7 @@ $user_menu = (new CList())
 				->setTitle(_('Zabbix Technical Support'))
 		))->addStyle('padding-left:0')
 	)
-	->addItem(CBrandHelper::isActive()
+	->addItem(CBrandHelper::isRebranded()
 		? null
 		: (new CListItem(
 			(new CLink('Share', 'https://share.zabbix.com/'))
