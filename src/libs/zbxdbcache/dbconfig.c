@@ -1876,7 +1876,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: substitute_host_interface_macros                                 *
  *                                                                            *
- * Purpose: trying to resolve the macros in host inteface                     *
+ * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
