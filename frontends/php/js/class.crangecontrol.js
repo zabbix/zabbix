@@ -23,7 +23,7 @@
  * interactivity for better user experience.
  */
 jQuery(function ($) {
-	"use strict"
+	"use strict";
 
 	function getRange(start, end, step) {
 		return (new Array(Math.round((end - start) / step))).join(0).split(0).map(function(_, i) {

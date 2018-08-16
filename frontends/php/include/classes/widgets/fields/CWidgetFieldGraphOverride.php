@@ -19,7 +19,11 @@
 **/
 
 
+/**
+ * Class for override widget field used in Graph widget configuration overrides tab.
+ */
 class CWidgetFieldGraphOverride extends CWidgetField {
+
 	protected $override_options = [];
 
 	/**
@@ -44,20 +48,35 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 10],
 			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
-			'order'				=> ['type' => API_INT32],
+			'order'				=> ['type' => API_INT32]
 		]]);
+
+		/**
+		 * No default values for overrides but let's set an empty field here because extended class have no default
+		 * 'default' value.
+		 */
 		$this->setDefault([]);
 
-		$this->override_options =
-			['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
+		// Supported override options.
+		$this->override_options
+			= ['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
 	}
 
-	public function getFieldLayout($value, $options) {
+	/**
+	 * Function returns array containing HTML objects filled with given values. Used to generate HTML in widget
+	 * overrides field.
+	 *
+	 * @param array $value              Values to fill in particular override row. See self::setValue() for detailed
+	 *                                  description.
+	 * @param array $options            Calculated options of particular override.
+	 * @param int   $options[row_num]   Unique override numeric identifier. Used to make unique field names.
+	 * @param int   $options[order_num] Sequential order number.
+	 *
+	 * @return array
+	 */
+	public function getFieldLayout(array $value, array $options) {
 		$overrides_options_list = [];
 		$fn = $this->getName();
-
-		// No default values for overrides, but make sure that all fields are present.
-		//$value = array_merge(['hosts' => '', 'items' => ''], $value);
 
 		// Create override optins list.
 		foreach ($this->override_options as $opt) {
@@ -68,13 +87,15 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		}
 
 		return [
-			// Accordion head - data set selection fields and tools.
+			/**
+			 * First line: hosts pattern field, items pattern field.
+			 * Contains also hidden order field, drag and drop button and delete button.
+			 */
 			(new CDiv([
 				(new CVar($fn.'['.$options['row_num'].'][order]', $options['order_num'])),
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
-
 				(new CDiv([
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
@@ -96,7 +117,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 							)
 					]))
 						->addClass(ZBX_STYLE_COLUMN_50),
-
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
 							->setAttribute('placeholder', _('items pattern'))
@@ -132,7 +152,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			]))
 				->addClass(ZBX_STYLE_COLUMNS),
 
-			// Configuration configuration options.
+			// Selected override options.
 			(new CList($overrides_options_list))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem((new CButton(null, (new CSpan())
@@ -145,13 +165,32 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		];
 	}
 
+	/**
+	 * Set override field value.
+	 *
+	 * @param array  $value                  Values filled in particular override.
+	 * @param string $value[order]           Number by which overrides are sorted.
+	 * @param string $value[hosts]           Hosts pattern.
+	 * @param string $value[items]           Items pattern.
+	 * @param string $value[color]           (optional) Override color option.
+	 * @param string $value[width]           (optional) Override width option.
+	 * @param string $value[type]            (optional) Override type option.
+	 * @param string $value[transparency]    (optional) Override transparency option.
+	 * @param string $value[fill]            (optional) Override fill option.
+	 * @param string $value[pointsize]       (optional) Override pointsize option.
+	 * @param string $value[missingdatafunc] (optional) Override missingdatafunc option.
+	 * @param string $value[axisy]           (optional) Override axisy option.
+	 * @param string $value[timeshift]       (optional) Override timeshift option.
+	 *
+	 * @return object $this
+	 */
 	public function setValue($value) {
 		$this->value = (array) $value;
 
 		// Sort data sets according order field.
 		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
 
-		// If no values specified, field should be deleted.
+		// Delete empty fields.
 		foreach ($this->value as $index => $val) {
 			$hosts = array_key_exists('hosts', $val)
 				? (is_array($val['hosts']) ? implode(', ', $val['hosts']) : $val['hosts'])
@@ -176,6 +215,13 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		return $this;
 	}
 
+	/**
+	 * Function makes field specific validation for values set using self::setValue().
+	 *
+	 * @param  bool $strict    Either to make a strict validation.
+	 *
+	 * @return array $errors   List of errors found during validation.
+	 */
 	public function validate($strict = false) {
 		$errors = parent::validate($strict);
 		$values = $this->getValue();
@@ -281,6 +327,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		}
 	}
 
+	/**
+	 * Function returns array containing string values used as titles for override options.
+	 *
+	 * @return array
+	 */
 	public function getOverrideOptionNames() {
 		return [
 			'width' => _('Width'),
@@ -302,6 +353,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		];
 	}
 
+	/**
+	 * Function returns array used to construct override field menu of available override options.
+	 *
+	 * @return array
+	 */
 	public function getOverrideMenu() {
 		return [
 			'sections' => [
@@ -377,6 +433,8 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 	/**
 	 * Return javascript necessary to initialize field.
+	 *
+	 * @param string $form_name   Form name in which override field is located.
 	 *
 	 * @return string
 	 */
@@ -489,6 +547,8 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	/**
 	 * Return template used by dynamic rows.
 	 *
+	 * @param string $form_name   Form name in which override field is located.
+	 *
 	 * @return string
 	 */
 	public function getTemplate($form_name) {
@@ -509,6 +569,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			->toString();
 	}
 
+	/**
+	 * Returns array of supported override options.
+	 *
+	 * @return array
+	 */
 	public function getOverrideOptions() {
 		return $this->override_options;
 	}

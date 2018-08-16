@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class calculates graph data and makes SVG graph.
+ */
 class CSvgGraphHelper {
 
 	/**
@@ -130,6 +133,9 @@ class CSvgGraphHelper {
 		];
 	}
 
+	/**
+	 * Select data to show in graph for each metric.
+	 */
 	protected static function getMetricsData(array &$metrics = [], array &$errors = [], $width) {
 		// To reduce number of requests, group metrics by time range.
 		$same_timerange_metrics = [];
@@ -181,6 +187,9 @@ class CSvgGraphHelper {
 		return $metrics;
 	}
 
+	/**
+	 * Calculate what data source must be used for each metric.
+	 */
 	protected static function getGraphDataSource(array &$metrics = [], array &$errors = [], $data_source) {
 		$simple_interval_parser = new CSimpleIntervalParser();
 		$config = select_config();
@@ -260,6 +269,9 @@ class CSvgGraphHelper {
 		}
 	}
 
+	/**
+	 * Find problems at given time period that matches specified problem options.
+	 */
 	protected static function getProblems(array $problem_options = [], array $time_period) {
 		/**
 		 * There can be 2 problem groups in graph.
@@ -396,6 +408,9 @@ class CSvgGraphHelper {
 		return $problem_events;
 	}
 
+	/**
+	 * Select metrics from given data set options. Apply data set options to each selected metric.
+	 */
 	protected static function getMetrics(array &$metrics = [], array $data_sets = []) {
 		$data_set_num = 0;
 		$metrics = [];
@@ -487,6 +502,9 @@ class CSvgGraphHelper {
 		return $metrics;
 	}
 
+	/**
+	 * Apply overrides for each pattern matchig metric.
+	 */
 	protected static function applyOverrides(array &$metrics = [], array $overrides = []) {
 		foreach ($overrides as $override) {
 			// Convert timeshift to seconds.
@@ -574,6 +592,9 @@ class CSvgGraphHelper {
 		}
 	}
 
+	/**
+	 * Apply time period for each metric.
+	 */
 	protected static function getTimePeriods(array &$metrics = [], array $options) {
 		foreach ($metrics as &$metric) {
 			$metric['time_period'] = $options;
@@ -609,6 +630,10 @@ class CSvgGraphHelper {
 		return $patterns;
 	}
 
+	/*
+	 * Sort data points by clock field.
+	 * Do not use this function directly. It serves as value_compare_func function for usort.
+	 */
 	protected static function sortByClock($a, $b) {
 		$a = $a['clock'];
 		$b = $b['clock'];

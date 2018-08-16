@@ -1072,7 +1072,7 @@ jQuery(function ($) {
 
 
 jQuery(function ($) {
-	"use strict"
+	"use strict";
 
 	function calcRows($obj, options) {
 		var max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,

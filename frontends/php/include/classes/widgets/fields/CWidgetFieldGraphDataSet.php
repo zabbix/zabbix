@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * Class for data set widget field used in Graph widget configuration Data set tab.
+ */
 class CWidgetFieldGraphDataSet extends CWidgetField {
 
 	public $color_palete;
@@ -50,30 +53,56 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
 		$this->setDefault([]);
 
-		// Predefined colors for data-sets.
+		/**
+		 * Predefined colors for data-sets.
+		 * Used in 2 ways:
+		 * - each next data set takes next sequential value from palette;
+		 * - validator looks if submitted color code is taken from this palette to determine when user has specified its
+		 *   own color. When color is specified by user, it is assumed that data set is not in original state anymore
+		 *   and validator will not erase this data set but requires to fill all mandatory fields.
+		 */
 		$this->color_palete = [
 			'ff465c','b0af07','0ec9ac','524bbc','ed1248','d1e754','2ab5ff','385cc7','ec1594','bae37d',
 			'6ac8ff','ee2b29','3ca20d','6f4bbc','00a1ff','f3601b','1cae59','45cfdb','894bbc','6d6d6d'
 		];
 	}
 
+	/**
+	 * Default values filled in newly created data set or used as unspecified values.
+	 *
+	 * @return array
+	 */
 	public function getDefault() {
 		return [
 			'hosts' => '',
 			'items' => '',
 			'color' => $this->color_palete[0],
 			'type' => SVG_GRAPH_TYPE_LINE,
-			'width' => 1,
-			'pointsize' => 3,
-			'transparency' => 5,
-			'fill' => 3,
+			'width' => SVG_GRAPH_DEFAULT_WIDTH,
+			'pointsize' => SVG_GRAPH_DEFAULT_POINTSIZE,
+			'transparency' => SVG_GRAPH_DEFAULT_TRANSPARENCY,
+			'fill' => SVG_GRAPH_DEFAULT_FILL,
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE
 		];
 	}
 
-	public function getFieldLayout($value, $options) {
+	/**
+	 * Function returns array containing HTML objects filled with given values. Used to generate HTML row in widget
+	 * data set field.
+	 *
+	 * @param array    $value              Values to fill in particular data set row. See self::setValue() for detailed
+	 *                                     description.
+	 * @param array    $options            Calculated options of particular override.
+	 * @param int      $options[row_num]   Unique data set numeric identifier. Used to make unique field names.
+	 * @param int      $options[order_num] Sequential order number.
+	 * @param string   $options[form_name] Name of form in which data set fields resides.
+	 * @param bool     $options[is_opened] Either accordion row is made opened or closed.
+	 *
+	 * @return array
+	 */
+	public function getFieldLayout(array $value, array $options) {
 		$fn = $this->getName();
 
 		// Take default values for missing fields. This can happen if particular field is disabled.
@@ -90,7 +119,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					(new CDiv([
 						(new CDiv())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
-							->addStyle('background-color: #'.$value['color'].';'),
+							->addStyle('background-color: #'.$value['color'].';')
+							->setAttribute('title', $options['is_opened'] ? _('Collapse') : _('Expand')),
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
 							->setAttribute('placeholder', _('hosts pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -263,6 +293,25 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		];
 	}
 
+	/**
+	 * Set data set row values.
+	 *
+	 * @param array  $value                  Values filled in particular override.
+	 * @param string $value[order]           Number by which overrides are sorted.
+	 * @param string $value[hosts]           Hosts pattern.
+	 * @param string $value[items]           Items pattern.
+	 * @param string $value[color]           Data set color option.
+	 * @param string $value[type]            Data set type option.
+	 * @param string $value[width]           Data set width option.
+	 * @param string $value[pointsize]       Data set pointsize option.
+	 * @param string $value[transparency]    Data set transparency option.
+	 * @param string $value[fill]            Data set fill option.
+	 * @param string $value[axisy]           Data set axisy option.
+	 * @param string $value[timeshift]       Data set timeshift option.
+	 * @param string $value[missingdatafunc] Data set missingdatafunc option.
+	 *
+	 * @return object $this
+	 */
 	public function setValue($value) {
 		$this->value = (array) $value;
 
@@ -281,12 +330,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				: '';
 
 			if ($hosts === '' && $items === '' && in_array($val['color'], $this->color_palete)
-				&& $defaults['type'] == $val['type'] && $defaults['transparency'] == $val['transparency']
-				&& $defaults['fill'] == $val['fill'] && $defaults['axisy'] == $val['axisy']
-				&& $defaults['timeshift'] == $val['timeshift']
-				&& $defaults['missingdatafunc'] == $val['missingdatafunc']
-				&& (($defaults['type'] != SVG_GRAPH_TYPE_POINTS && $defaults['width'] == $val['width'])
-					|| ($defaults['type'] == SVG_GRAPH_TYPE_POINTS && $defaults['pointsize'] == $val['pointsize']))) {
+					&& $defaults['type'] == $val['type'] && $defaults['transparency'] == $val['transparency']
+					&& $defaults['fill'] == $val['fill'] && $defaults['axisy'] == $val['axisy']
+					&& $defaults['timeshift'] == $val['timeshift']
+					&& $defaults['missingdatafunc'] == $val['missingdatafunc']
+					&& (($defaults['type'] != SVG_GRAPH_TYPE_POINTS && $defaults['width'] == $val['width'])
+						|| ($defaults['type'] == SVG_GRAPH_TYPE_POINTS && $defaults['pointsize'] == $val['pointsize']))) {
 				unset($this->value[$index]);
 			}
 			else {
@@ -298,6 +347,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		return $this;
 	}
 
+	/**
+	 * Function makes field specific validation for values set using self::setValue().
+	 *
+	 * @param  bool $strict    Either to make a strict validation.
+	 *
+	 * @return array $errors   List of errors found during validation.
+	 */
 	public function validate($strict = false) {
 		$errors = parent::validate($strict);
 		$values = $this->getValue();
@@ -446,6 +502,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	/**
 	 * Return javascript necessary to initialize field.
 	 *
+	 * @param string $form_name   Form name in which data set field resides.
+	 *
 	 * @return string
 	 */
 	public function getJavascript($form_name) {
@@ -574,6 +632,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 	/**
 	 * Return template used by dynamic rows.
+	 *
+	 * @param string $form_name   Form name in which data set field resides.
 	 *
 	 * @return string
 	 */

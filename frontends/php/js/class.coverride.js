@@ -23,7 +23,7 @@
  * buttons on which user can change selected option. Used in graph widget configuration window.
  */
 jQuery(function ($) {
-	"use strict"
+	"use strict";
 
 	function createOverrideElement($override, option, value) {
 		var close = $('<button></button>', {'type': 'button'})

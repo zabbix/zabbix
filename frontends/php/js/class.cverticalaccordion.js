@@ -22,7 +22,7 @@
  * JQuery class that adds interactivity of vertical accordion for CList element.
  */
 jQuery(function ($) {
-	"use strict"
+	"use strict";
 
 	var methods = {
 		/**
@@ -34,7 +34,6 @@ jQuery(function ($) {
 		 * - body			- selector of UI element that should be opened/closed.
 		 * - active_class	- CSS class that will be applied for active section.
 		 * - closed_class	- CSS class that will be applied for closed section.
-		 * - auto_close		- boolean; close or leave inactive section opened.
 		 *
 		 * @param options
 		 */
@@ -44,8 +43,7 @@ jQuery(function ($) {
 				section: '.list-accordion-item',
 				active_class: 'list-accordion-item-opened',
 				closed_class: 'list-accordion-item-closed',
-				body: '.list-accordion-item-body',
-				auto_close: true
+				body: '.list-accordion-item-body'
 			}, options);
 
 			this.each(function() {
@@ -55,17 +53,18 @@ jQuery(function ($) {
 				accordion
 					.data('options', options)
 					.on('click', options['handler'], function() {
-						var section = $(this).closest(options['section']);
+						var section = $(this).closest(options['section']),
+							button = $(options['handler'], section);
 
 						if (section.hasClass(options['active_class'])) {
+							button.attr('title', t('S_EXPAND'));
 							section
 								.removeClass(options['active_class'])
 								.addClass(options['closed_class']);
 						}
 						else {
-							if (options['auto_close']) {
-								methods['collapseAll'].apply(accordion);
-							}
+							methods['collapseAll'].apply(accordion);
+							button.attr('title', t('S_COLLAPSE'));
 							section
 								.removeClass(options['closed_class'])
 								.addClass(options['active_class']);
@@ -73,17 +72,26 @@ jQuery(function ($) {
 					});
 			});
 		},
+		// Collapse all accordion rows.
 		collapseAll: function() {
 			var accordion = $(this),
+				options = accordion.data('options'),
 				active_class = accordion.data('options')['active_class'],
 				closed_class = accordion.data('options')['closed_class'];
 			$('.'+active_class, accordion)
 				.removeClass(active_class)
 				.addClass(closed_class);
+
+			$(options['handler'], accordion).attr('title', t('S_EXPAND'));
 		},
+		// Expand N-th row in accordion. Collapse others.
 		expandNth: function(n) {
 			var accordion = $(this),
 				options = accordion.data('options');
+
+			$(options['handler'], $('.'+options['active_class'], accordion)).attr('title', t('S_EXPAND'));
+			$(options['handler'], $(options['section']+':nth('+n+')', accordion)).attr('title', t('S_COLLAPSE'));
+
 			$('.'+options['active_class'], accordion)
 				.removeClass(options['active_class'])
 				.addClass(options['closed_class']);

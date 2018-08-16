@@ -583,7 +583,7 @@ class CWidgetHelper {
 			if (($time = CWidgetFormSvgGraph::getOverriteTime($fields, false)) !== false) {
 				$info[] = [
 					'icon' => 'btn-info-clock',
-					'hint' => _s('Graph uses overwritten relative time: %1$s - %1$s', $time['from'], $time['to'])
+					'hint' => _s('Graph uses overwritten relative time: %1$s - %2$s', $time['from'], $time['to'])
 				];
 			}
 		}

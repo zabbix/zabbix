@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * Class makes datepicker widget field.
+ */
 class CWidgetFieldDatePicker extends CWidgetField {
 	/**
 	 * Date picker widget field.
@@ -30,10 +34,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setDefault('');
-	}
-
-	public function setValue($value) {
-		return parent::setValue($value);
 	}
 
 	/**
@@ -66,6 +66,8 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	 *
 	 * @param string|null from
 	 * @param string|null to
+	 *
+	 * @return array
 	 */
 	static function validateTimeSelectorPeriod($from, $to) {
 		if ($from === null || $to === null) {
