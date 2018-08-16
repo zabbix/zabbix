@@ -1012,12 +1012,17 @@ output {
 		}
 	}
 
+	tbody th,
 	td {
 		padding: 6px 5px;
 		position: relative;
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+	}
+
+	tbody th {
+		text-align: inherit;
 	}
 
 	.vertical_rotation_inner {
