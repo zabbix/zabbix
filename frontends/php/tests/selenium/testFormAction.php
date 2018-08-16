@@ -1694,6 +1694,11 @@ class testFormAction extends CWebTest {
 						'type' => 'Application',
 						'value' => 'application',
 					],
+					[
+						'type' => 'Tag',
+						'operator' => 'not like',
+						'value' => 'Not like Tag',
+					],
 				],
 				'operations' => [
 					[
@@ -1728,6 +1733,11 @@ class testFormAction extends CWebTest {
 					[
 						'type' => 'Service type',
 						'value' => 'FTP',
+					],
+					[
+						'type' => 'Received value',
+						'operator' => 'not like',
+						'value' => 'Received value',
 					]
 				],
 				'operations' => [
@@ -1761,6 +1771,11 @@ class testFormAction extends CWebTest {
 				'conditions' => [
 					[
 						'type' => 'Host name',
+						'value' => 'Zabbix',
+					],
+					[
+						'type' => 'Host metadata',
+						'operator'=> 'not like',
 						'value' => 'Zabbix',
 					]
 				],
@@ -1848,6 +1863,11 @@ class testFormAction extends CWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
+					case 'Tag':
+					case 'Received value':
+						if (array_key_exists('operator', $condition)) {
+							$this->zbxTestDropdownSelectWait('new_condition_operator', $condition['operator']);
+						}
 						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
 						$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
 						switch($condition['type']){
@@ -1860,11 +1880,19 @@ class testFormAction extends CWebTest {
 								$conditionCount++;
 								break;
 							case 'Host metadata':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata not like '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Trigger name':
 								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name like '.$condition['value']);
+								$conditionCount++;
+								break;
+							case 'Tag':
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Tag not like '.$condition['value']);
+								$conditionCount++;
+								break;
+							case 'Received value':
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value not like '.$condition['value']);
 								$conditionCount++;
 								break;
 						}

@@ -86,13 +86,19 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 );
 
 // Show unacknowledged only.
-$form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']), CWidgetHelper::getCheckBox($fields['unacknowledged']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
+	CWidgetHelper::getCheckBox($fields['unacknowledged'])
+);
 
 // Sort entries by.
-$form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']), CWidgetHelper::getComboBox($fields['sort_triggers']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
+	CWidgetHelper::getComboBox($fields['sort_triggers'])
+);
 
 // Show timeline.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']), CWidgetHelper::getCheckBox($fields['show_timeline']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
+	CWidgetHelper::getCheckBox($fields['show_timeline'])
+);
 
 // Show lines.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));

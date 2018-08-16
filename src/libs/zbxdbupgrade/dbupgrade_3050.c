@@ -1521,7 +1521,7 @@ static int	DBpatch_3050122(void)
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], current_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
 			zbx_free(processed_parameter);
 			continue;
@@ -1584,6 +1584,26 @@ static int	DBpatch_3050124(void)
 
 static int	DBpatch_3050125(void)
 {
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050129(void)
+{
 	const ZBX_TABLE table =
 		{"event_suppress", "event_suppressid",	0,
 			{
@@ -1599,36 +1619,36 @@ static int	DBpatch_3050125(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050126(void)
+static int	DBpatch_3050130(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_1", "eventid,maintenanceid", 1);
 }
 
-static int	DBpatch_3050127(void)
+static int	DBpatch_3050131(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_2", "suppress_until", 0);
 }
 
-static int	DBpatch_3050128(void)
+static int	DBpatch_3050132(void)
 {
 	return DBcreate_index("event_suppress", "event_suppress_3", "maintenanceid", 0);
 }
 
-static int	DBpatch_3050129(void)
+static int	DBpatch_3050133(void)
 {
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 1, &field);
 }
 
-static int	DBpatch_3050130(void)
+static int	DBpatch_3050134(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 2, &field);
 }
 
-static int	DBpatch_3050131(void)
+static int	DBpatch_3050135(void)
 {
 	const ZBX_TABLE table =
 		{"maintenance_tag", "maintenancetagid", 0,
@@ -1646,40 +1666,40 @@ static int	DBpatch_3050131(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3050132(void)
+static int	DBpatch_3050136(void)
 {
 	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
 }
 
-static int	DBpatch_3050133(void)
+static int	DBpatch_3050137(void)
 {
 	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("maintenance_tag", 1, &field);
 }
 
-static int	DBpatch_3050134(void)
+static int	DBpatch_3050138(void)
 {
 	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
 
-static int	DBpatch_3050135(void)
+static int	DBpatch_3050139(void)
 {
 	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("maintenances", &field);
 }
 
-static int	DBpatch_3050136(void)
+static int	DBpatch_3050140(void)
 {
 	const ZBX_FIELD	field = {"pause_suppressed", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("actions", "maintenance_mode", &field);
 }
 
-static int	DBpatch_3050137(void)
+static int	DBpatch_3050141(void)
 {
 	int		ret;
 
@@ -1696,7 +1716,7 @@ static int	DBpatch_3050137(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050138(void)
+static int	DBpatch_3050142(void)
 {
 	int		ret;
 
@@ -1713,7 +1733,7 @@ static int	DBpatch_3050138(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050139(void)
+static int	DBpatch_3050143(void)
 {
 	int	ret;
 
@@ -1734,7 +1754,7 @@ static int	DBpatch_3050139(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050140(void)
+static int	DBpatch_3050144(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1772,7 +1792,7 @@ static int	DBpatch_3050140(void)
 	return ret;
 }
 
-static int	DBpatch_3050141(void)
+static int	DBpatch_3050145(void)
 {
 	int	ret;
 
@@ -1792,7 +1812,7 @@ static int	DBpatch_3050141(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_3050142(void)
+static int	DBpatch_3050146(void)
 {
 	int	ret;
 
@@ -1957,6 +1977,10 @@ DBPATCH_ADD(3050139, 0, 1)
 DBPATCH_ADD(3050140, 0, 1)
 DBPATCH_ADD(3050141, 0, 1)
 DBPATCH_ADD(3050142, 0, 1)
+DBPATCH_ADD(3050143, 0, 1)
+DBPATCH_ADD(3050144, 0, 1)
+DBPATCH_ADD(3050145, 0, 1)
+DBPATCH_ADD(3050146, 0, 1)
 
 DBPATCH_END()
 

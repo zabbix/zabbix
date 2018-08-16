@@ -1035,7 +1035,14 @@ void	zbx_strarr_free(char **arr);
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif
-void	__zbx_zbx_setproctitle(const char *fmt, ...);
+
+#if defined(__GNUC__) || defined(__clang__)
+#	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
+#else
+#	define __zbx_attr_format_printf(idx1, idx2)
+#endif
+
+void	__zbx_zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -1073,9 +1080,13 @@ int	zbx_day_in_month(int year, int mon);
 #	define zbx_snprintf __zbx_zbx_snprintf
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif
-void	__zbx_zbx_error(const char *fmt, ...);
+
+void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+
 size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
-void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...);
+
+void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+		__zbx_attr_format_printf(4, 5);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
@@ -1100,9 +1111,9 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #	define zbx_dsprintf __zbx_zbx_dsprintf
 #	define zbx_strdcatf __zbx_zbx_strdcatf
 #endif
-char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
+char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
-char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
@@ -1319,13 +1330,14 @@ int	zbx_alarm_timed_out(void);
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* tokens used in expressions */
-#define ZBX_TOKEN_OBJECTID	0x00001
-#define ZBX_TOKEN_MACRO		0x00002
-#define ZBX_TOKEN_LLD_MACRO	0x00004
-#define ZBX_TOKEN_USER_MACRO	0x00008
-#define ZBX_TOKEN_FUNC_MACRO	0x00010
-#define ZBX_TOKEN_SIMPLE_MACRO	0x00020
-#define ZBX_TOKEN_REFERENCE	0x00040
+#define ZBX_TOKEN_OBJECTID		0x00001
+#define ZBX_TOKEN_MACRO			0x00002
+#define ZBX_TOKEN_LLD_MACRO		0x00004
+#define ZBX_TOKEN_USER_MACRO		0x00008
+#define ZBX_TOKEN_FUNC_MACRO		0x00010
+#define ZBX_TOKEN_SIMPLE_MACRO		0x00020
+#define ZBX_TOKEN_REFERENCE		0x00040
+#define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 
 /* additional token flags */
 #define ZBX_TOKEN_NUMERIC	0x08000
@@ -1403,6 +1415,7 @@ typedef union
 	zbx_token_macro_t		lld_macro;
 	zbx_token_user_macro_t		user_macro;
 	zbx_token_func_macro_t		func_macro;
+	zbx_token_func_macro_t		lld_func_macro;
 	zbx_token_simple_macro_t	simple_macro;
 	zbx_token_reference_t		reference;
 }

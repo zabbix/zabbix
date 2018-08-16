@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha10');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050142);
+define('ZABBIX_DB_VERSION',		3050146);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -1521,6 +1521,7 @@ define('ZBX_STYLE_REL_CONTAINER', 'rel-container');
 define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
+define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

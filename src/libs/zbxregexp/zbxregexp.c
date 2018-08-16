@@ -91,7 +91,8 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 {
 	ZBX_THREAD_LOCAL static zbx_regexp_t	*curr_regexp = NULL;
 	ZBX_THREAD_LOCAL static char		*curr_pattern = NULL;
-	ZBX_THREAD_LOCAL static int		curr_flags = 0, ret = SUCCEED;
+	ZBX_THREAD_LOCAL static int		curr_flags = 0;
+	int					ret = SUCCEED;
 
 	if (NULL == curr_regexp || 0 != strcmp(curr_pattern, pattern) || curr_flags != flags)
 	{
@@ -177,6 +178,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		zbx_free(ovector);
 
 	return result;
+#undef MATCHES_BUFF_SIZE
+#undef MAX_REQUESTED_MATCHES
 }
 
 /******************************************************************************
@@ -382,7 +385,7 @@ out:
  *********************************************************************************/
 static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
 {
-	const int	MATCH_SIZE = 10;
+#define MATCH_SIZE 10
 	const char	*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
 	zbx_regmatch_t	 match[MATCH_SIZE];
@@ -406,6 +409,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		*out = regexp_sub_replace(string, output_template, match, MATCH_SIZE);
 
 	return SUCCEED;
+#undef MATCH_SIZE
 }
 
 /*********************************************************************************

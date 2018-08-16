@@ -97,7 +97,7 @@ static void	DCdump_hosts(void)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u", host->hostid,
 				host->host, host->name, host->status);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:%d", host->proxy_hostid);
+		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:" ZBX_FS_UI64, host->proxy_hostid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  zabbix:[available:%u, errors_from:%d disable_until:%d error:'%s']",
