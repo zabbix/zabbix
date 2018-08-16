@@ -24,10 +24,12 @@ class CSvg extends CSvgTag {
 	public function __construct() {
 		parent::__construct('svg', true);
 
-		$this->setAttribute('id', 'svg_'.base_convert(microtime()*1000, 10, 30));
-		$this->setAttribute('version', '1.1');
-		$this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-		$this->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+		$this
+			->setAttribute('id', 'svg_'.base_convert(microtime()*1000, 10, 30))
+			->setAttribute('version', '1.1')
+			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+			->setAttribute('shape-rendering', 'crispEdges');
 	}
 
 	protected function startToString() {
