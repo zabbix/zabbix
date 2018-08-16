@@ -41,78 +41,42 @@ $fields = [
 ];
 check_fields($fields);
 
-if (hasRequest('guest_login')) {
-	CWebUser::login(ZBX_GUEST_USER, '');
+if (hasRequest('guest_login') && CWebUser::login(ZBX_GUEST_USER, '')) {
 	redirect(ZBX_DEFAULT_URL);
+
 	exit;
 }
 
-$config = select_config();
-$http_user = '';
-
-// logout
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
 }
-elseif ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $config['http_login_form'] == ZBX_AUTH_FORM_ZABBIX) {
-	foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-		if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-			$http_user = $_SERVER[$key];
-			break;
-		}
-	}
+
+$config = select_config();
+$autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
+$request = getRequest('request', '');
+
+if ($request) {
+	$test_request = [];
+	preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
+
+	$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
+		? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
+		: '';
 }
 
 // login via form
-if (getRequest('enter') === _('Sign in') || $http_user) {
-	// try to login
-	$autoLogin = getRequest('autologin', 0);
-
-	if ($http_user) {
-		$parser = new CADNameAttributeParser(['strict' => true]);
-
-		if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-			$strip_domain = explode(',', $config['http_strip_domains']);
-			$strip_domain = array_map('trim', $strip_domain);
-
-			if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
-				$http_user = $parser->getUserName();
-			}
-		}
+if (hasRequest('enter') && CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
+	if (CWebUser::$data['autologin'] != $autologin) {
+		API::User()->update([
+			'userid' => CWebUser::$data['userid'],
+			'autologin' => $autologin
+		]);
 	}
 
-	$loggedin = CWebUser::login(getRequest('name', $http_user), getRequest('password', ''));
+	$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+	redirect(reset($redirect));
 
-	if ($loggedin) {
-		// save remember login preference
-		if (CWebUser::$data['autologin'] != $autoLogin) {
-			API::User()->update([
-				'userid' => CWebUser::$data['userid'],
-				'autologin' => $autoLogin
-			]);
-		}
-
-		$request = getRequest('request', '');
-
-		if ($request) {
-			preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
-
-			$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
-				? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
-				: '';
-		}
-
-		$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
-		redirect(reset($redirect));
-
-		exit;
-	}
-
-	if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $http_user
-			&& getRequest('name', $http_user) === $http_user) {
-		// Remove error messages for invalid SSO login attempt.
-		clear_messages();
-	}
+	exit;
 }
 
 if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
@@ -120,13 +84,14 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 }
 
 $messages = clear_messages();
-$autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
 
 (new CView('general.login', [
-	'http_auth_enabled' => ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED),
-	'http_login_url' => (new CUrl('index_http.php'))->removeArgument('sid'),
-	'guest_login_url' => (new CUrl())->setArgument('guest_login', 1),
-	'guest_login_enabled' => !CWebUser::isLoggedIn() && CWebUser::isGuestAllowed(),
+	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+		? (new CUrl('index_http.php'))->removeArgument('sid')
+		: '',
+	'guest_login_url' => CWebUser::isGuestAllowed()
+		? (new CUrl())->setArgument('guest_login', 1)
+		: '',
 	'autologin' => $autologin == 1,
 	'error' => array_pop($messages)
 ]))->render();

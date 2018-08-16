@@ -31,11 +31,10 @@ if ($data['error']) {
 	$error = (new CDiv($message))->addClass(ZBX_STYLE_RED);
 }
 
-$guest = $data['guest_login_enabled']
-	? (new CListItem(['or ', new CLink('sign in as guest', $data['guest_login_url'])]))
-		->addClass(ZBX_STYLE_SIGN_IN_TXT)
+$guest = $data['guest_login_url']
+	? (new CListItem(['or ', new CLink('sign in as guest', $data['guest_login_url'])]))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
-$http_login_link = $data['http_auth_enabled']
+$http_login_link = $data['http_login_url']
 	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 

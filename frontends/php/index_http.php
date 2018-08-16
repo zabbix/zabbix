@@ -22,79 +22,41 @@
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
-$config = select_config();
 
-if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED || (CWebUser::isLoggedIn() && !CWebUser::isGuest())) {
-	redirect((new CUrl('index.php'))->getUrl());
+$http_user = CWebUser::getHttpRemoteUser();
+$config = $http_user ? select_config() : [];
 
-	exit;
+$request = getRequest('request', '');
+$test_request = [];
+preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $request, $test_request);
+
+if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
+		|| $test_request['filename'] == basename(__FILE__)) {
+	$request = '';
 }
 
-$http_user = '';
+if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && CWebUser::isLoggedIn()) {
+	if (!CWebUser::isGuest() || CWebUser::authenticateHttpUser()){
+		CWebUser::setSessionCookie(CWebUser::$data['sessionid']);
+		$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+		redirect(reset($redirect));
 
-foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
-	if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
-		$http_user = $_SERVER[$key];
-		break;
+		exit;
 	}
 }
 
-if ($http_user !== '') {
-	$parser = new CADNameAttributeParser(['strict' => true]);
+$redirect_to = new CUrl('index.php');
 
-	if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
-		$strip_domain = explode(',', $config['http_strip_domains']);
-		$strip_domain = array_map('trim', $strip_domain);
-
-		if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
-			$http_user = $parser->getUserName();
-		}
-	}
-
-	CWebUser::login($http_user, '');
-
-	$request = getRequest('request', '');
-	$test_request = [];
-	preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $request, $test_request);
-
-	if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_request['filename'])
-			|| $test_request['filename'] == basename(__FILE__)) {
-		$request = '';
-	}
-
-	if (CWebUser::isGuest()) {
-		// Access denied page with custom "Login" URL.
-		$url = new CUrl('index.php');
-
-		if ($request !== '') {
-			$url->setArgument('request', $request);
-		}
-
-		$data = [
-			'header' => _('You are not logged in'),
-			'messages' => [
-				_('You must login to view this page.'),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			],
-			'buttons' => [
-				(new CButton('login', _('Login')))->onClick('document.location = '.CJs::encodeJson($url->getUrl()).';')
-			],
-			'theme' => getUserTheme(CWebUser::$data)
-		];
-
-		$errors = clear_messages();
-		if ($errors) {
-			$data['messages'] = array_merge(zbx_objectValues($errors, 'message'), $data['messages']);
-		}
-
-		(new CView('general.warning', $data))->render();
-	}
-	else {
-		$url = ($request === '') ? CWebUser::$data['url'] : $request;
-		redirect($url === '' ? ZBX_DEFAULT_URL : $url);
-	}
-
-	exit;
+if ($request !== '') {
+	$redirect_to->setArgument('request', $request);
 }
 
-redirect((new CUrl('index.php'))->getUrl());
+(new CView('general.warning', [
+	'header' => _('You are not logged in'),
+	'messages' => zbx_objectValues(clear_messages(), 'message'),
+	'buttons' => [
+		(new CButton('login', _('Login')))->onClick('document.location = '.
+			CJs::encodeJson($redirect_to->getUrl()).';')
+	],
+	'theme' => getUserTheme(CWebUser::$data)
+]))->render();
