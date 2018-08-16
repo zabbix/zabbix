@@ -599,7 +599,7 @@ class CTrigger extends CTriggerGeneral {
 
 	/**
 	 * @param array $triggerids
-	 * @param array $db_graphs
+	 * @param array $db_triggers
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
