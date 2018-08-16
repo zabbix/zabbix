@@ -6162,6 +6162,11 @@ input[type=text].range-control {
 	}
 }
 
+// Screen reader
+.inline-sr-only {
+	font-size: 0;
+}
+
 @if $theme_name == 'dev' {
 
 /*doc

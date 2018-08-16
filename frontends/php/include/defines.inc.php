@@ -1561,6 +1561,7 @@ define('ZBX_STYLE_REL_CONTAINER', 'rel-container');
 define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
+define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

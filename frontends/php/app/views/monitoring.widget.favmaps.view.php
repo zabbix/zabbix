@@ -31,6 +31,7 @@ foreach ($data['maps'] as $map) {
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
 			->addClass(ZBX_STYLE_REMOVE_BTN)
+			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $map['label']))
 	]);
 }
 

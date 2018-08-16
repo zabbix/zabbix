@@ -229,7 +229,7 @@ jQuery(function ($) {
 				case 'staircase':
 				case 'line':
 					var direction_string = nodes[i].querySelectorAll('.svg-graph-line')[0].getAttribute('d'),
-						direction = IE
+						direction = IE // IE11 transforms 'd' attribute.
 							? direction_string.replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
 							: direction_string.split(' '),
 						label = nodes[i].querySelectorAll('.svg-graph-line')[0].getAttribute('data-label').split(','),

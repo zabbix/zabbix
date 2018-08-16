@@ -109,11 +109,13 @@ $tranStrings = [
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Add a new widget' => _('Add a new widget'),
-		'color' => _('color'),
-		'time shift' => _('time shift'),
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'%1$s, selected' => _x('%1$s, selected', 'screen reader'),
+		'time shift' => _('time shift')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
+		'Close' => _('Close'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
 	],
@@ -191,6 +193,7 @@ $tranStrings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
+		'Close' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
@@ -265,6 +268,10 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Add child element' => _('Add child element'),
 		'Add multiple maps' => _('Add multiple maps')
+	],
+	'colorpicker.js' => [
+		'color' => _('color'),
+		'Close' => _('Close')
 	]
 ];
 

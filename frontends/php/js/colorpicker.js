@@ -57,7 +57,7 @@
 			 * @param array  options.palette    Array of arrays. Every nested array contains hex color for one cell.
 			 */
 			init: function(options) {
-				var close = $('<button type="button" class="overlay-close-btn"/>').click(methods.hide);
+				var close = $('<button type="button" class="overlay-close-btn" title="' + t('Close') + '"/>').click(methods.hide);
 
 				options = $.extend(options||{}, defaults);
 				overlay = $('<div class="overlay-dialogue" id="color_picker"/>').append(close).append(

@@ -4362,6 +4362,9 @@ input[type=text].range-control {
   .graph-widget-config-tabs > .tabs-nav {
     padding-left: calc(15% + 20px); }
 
+.inline-sr-only {
+  font-size: 0; }
+
 .icon-maint {
   margin: 0 18px 0 0; }
   .icon-maint::before {

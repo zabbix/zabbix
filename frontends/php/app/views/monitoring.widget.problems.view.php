@@ -155,6 +155,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				'',
 				true
 			)
+			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
+				$problem['name'], getSeverityName($problem['severity'], $data['config'])
+			))
 	]));
 
 	$description_style = getSeverityStyle($problem['severity']);
@@ -168,9 +171,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$duration = time() - $problem['clock'];
 
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
-			$description->addClass('blink');
-			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
+			$description
+				->addClass('blink')
+				->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration)
+				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 
@@ -209,11 +213,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		(new CCol(
-			($problem['r_eventid'] != 0)
-				? zbx_date2age($problem['clock'], $problem['r_clock'])
-				: zbx_date2age($problem['clock'])
-		))
+		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
@@ -226,6 +226,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 }
 
 $output = [
+	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
 	'body' => $table->toString(),
 	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()

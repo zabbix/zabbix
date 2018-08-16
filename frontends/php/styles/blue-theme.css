@@ -4374,3 +4374,6 @@ input[type=text].range-control {
   padding: 10px 0px; }
   .graph-widget-config-tabs > .tabs-nav {
     padding-left: calc(15% + 20px); }
+
+.inline-sr-only {
+  font-size: 0; }

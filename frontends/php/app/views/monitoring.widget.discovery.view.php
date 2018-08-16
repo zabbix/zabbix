@@ -28,7 +28,8 @@ else {
 			_('Discovery rule'),
 			_x('Up', 'discovery results in dashboard'),
 			_x('Down', 'discovery results in dashboard')
-		]);
+		])
+		->setHeadingColumn(0);
 
 	foreach ($data['drules'] as $drule) {
 		$table->addRow([
