@@ -307,7 +307,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_host_prototypes
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -344,8 +344,8 @@ class CHostPrototype extends CHostBase {
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
 
-		foreach ($host_prototypes as $host_prototype) {
-			// Check if this value map exists.
+		foreach ($host_prototypes as &$host_prototype) {
+			// Check if this host prototype exists.
 			if (!array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -353,15 +353,21 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
-			$ruleid = $db_host_prototype['discoveryRule']['itemid'];
+			$host_prototype['ruleid'] = $db_host_prototype['discoveryRule']['itemid'];
 
 			if (array_key_exists('host', $host_prototype) && $host_prototype['host'] !== $db_host_prototype['host']) {
-				$hosts_by_ruleid[$ruleid][] = $host_prototype['host'];
+				$hosts_by_ruleid[$host_prototype['ruleid']][] = $host_prototype['host'];
 			}
 
 			if (array_key_exists('name', $host_prototype) && $host_prototype['name'] !== $db_host_prototype['name']) {
-				$names_by_ruleid[$ruleid][] = $host_prototype['name'];
+				$names_by_ruleid[$host_prototype['ruleid']][] = $host_prototype['name'];
 			}
+		}
+		unset($host_prototype);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']]];
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host_prototypes, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$groupids = [];
@@ -426,11 +432,6 @@ class CHostPrototype extends CHostBase {
 		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
 			['host', 'name', 'groupLinks', 'groupPrototypes']
 		);
-
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['ruleid'] = $db_host_prototypes[$host_prototype['hostid']]['discoveryRule']['itemid'];
-		}
-		unset($host_prototype);
 
 		if ($hosts_by_ruleid) {
 			$this->checkDuplicates('host', $hosts_by_ruleid);
