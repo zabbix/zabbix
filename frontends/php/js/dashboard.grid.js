@@ -35,17 +35,9 @@
 		 */
 		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
 
-		var info_btns = [];
-		if (widget['info'].length) {
-			widget['info'].each(function(i) {
-				info_btns.push($('<button>', {'type': 'button', 'class': i.icon, 'data-hintbox': 1}));
-				info_btns.push($('<div></div>').html(i.hint).addClass('hint-box').hide());
-			});
-		}
-
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
-				.append(info_btns.length ? info_btns : null)
+				.append(makeWidgetInfoBtns(widget['info']))
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
@@ -78,6 +70,18 @@
 					.append(widget['content_footer'])
 					.append(widget['content_script'])
 			);
+	}
+
+	function makeWidgetInfoBtns(btns) {
+		var info_btns = [];
+		if (btns.length) {
+			btns.each(function(btn) {
+				info_btns.push($('<button>', {'type': 'button', 'class': btn.icon, 'data-hintbox': 1}));
+				info_btns.push($('<div></div>').html(btn.hint).addClass('hint-box').hide());
+			});
+		}
+
+		return info_btns.length ? info_btns : null;
 	}
 
 	function resizeDashboardGrid($obj, data, min_rows) {
@@ -510,6 +514,11 @@
 				}
 
 				widget['content_footer'].html(resp.footer);
+
+				if (typeof(resp.info) !== 'undefined') {
+					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
+					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
+				}
 
 				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();

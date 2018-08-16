@@ -29,6 +29,12 @@ if (!$data['preview']) {
 		'script_inline' => $data['script_inline'],
 		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
 	];
+
+	if ($data['info']) {
+		$output += [
+			'info' => $data['info']
+		];
+	}
 }
 
 if ($data['initial_load']) {

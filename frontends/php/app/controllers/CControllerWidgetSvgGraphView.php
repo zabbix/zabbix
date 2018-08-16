@@ -254,6 +254,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'script_inline' => $script_inline,
 			'initial_load' => $initial_load,
 			'preview' => $preview,
+			'info' => CWidgetHelper::makeWidgetInfo(WIDGET_SVG_GRAPH, $fields),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
