@@ -94,16 +94,22 @@ class CAudit {
 				$table_name = 'graphs';
 				break;
 
+			case AUDIT_RESOURCE_HOST_GROUP:
+				$field_name_resourceid = 'groupid';
+				$field_name_resourcename = 'name';
+				$table_name = 'groups';
+				break;
+
 			case AUDIT_RESOURCE_ICON_MAP:
 				$field_name_resourceid = 'iconmapid';
 				$field_name_resourcename = 'name';
 				$table_name = 'icon_map';
 				break;
 
-			case AUDIT_RESOURCE_HOST_GROUP:
-				$field_name_resourceid = 'groupid';
+			case AUDIT_RESOURCE_ITEM:
+				$field_name_resourceid = 'itemid';
 				$field_name_resourcename = 'name';
-				$table_name = 'groups';
+				$table_name = 'items';
 				break;
 
 			case AUDIT_RESOURCE_MACRO:

@@ -583,7 +583,7 @@ class CTemplate extends CHostGeneral {
 			'preservekeys' => true
 		]);
 		if ($delItems) {
-			API::Item()->delete(array_keys($delItems), true);
+			CItemManager::delete(array_keys($delItems));
 		}
 
 		// delete host from maps

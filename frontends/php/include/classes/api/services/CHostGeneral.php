@@ -380,8 +380,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])) {
 			if ($clear) {
-				$result = API::Item()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear items'));
+				CItemManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]));
 			}
 			else{
 				DB::update('items', [

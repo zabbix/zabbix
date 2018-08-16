@@ -924,7 +924,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 		if ($createdItems) {
 			// This API call will also make sure that discovered applications are no longer linked to other items.
-			API::Item()->delete($createdItems, true);
+			CItemManager::delete($createdItems);
 		}
 
 
