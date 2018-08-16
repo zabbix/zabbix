@@ -936,7 +936,7 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true,
 		]);
 		if ($delTriggerPrototypes) {
-			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
+			CTriggerPrototypeManager::delete(array_keys($delTriggerPrototypes));
 		}
 
 		// screen items

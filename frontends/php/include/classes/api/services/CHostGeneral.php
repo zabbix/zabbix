@@ -325,11 +325,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				$result = API::TriggerPrototype()->delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE], true);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-				}
+				CTriggerPrototypeManager::delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
 				DB::update('triggers', [

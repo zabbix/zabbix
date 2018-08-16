@@ -50,15 +50,9 @@ class CGraphPrototypeManager {
 		$del_graphids = array_keys($del_graphids);
 
 		// Deleting discovered graphs.
-		$db_discovered_graphs = DBselect(
+		$del_discovered_graphids = DBfetchColumn(DBselect(
 			'SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $del_graphids)
-		);
-
-		$del_discovered_graphids = [];
-
-		while ($db_discovered_graph = DBfetch($db_discovered_graphs)) {
-			$del_discovered_graphids[] = $db_discovered_graph['graphid'];
-		}
+		), 'graphid');
 
 		if ($del_discovered_graphids) {
 			CGraphManager::delete($del_discovered_graphids);

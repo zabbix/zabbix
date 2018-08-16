@@ -761,7 +761,7 @@ class CItem extends CItemGeneral {
 			'preservekeys' => true
 		]);
 		if ($triggerPrototypes) {
-			API::TriggerPrototype()->delete(array_keys($triggerPrototypes), true);
+			CTriggerPrototypeManager::delete(array_keys($triggerPrototypes));
 		}
 
 		DB::delete('screens_items', [

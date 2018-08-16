@@ -131,6 +131,7 @@ class CAudit {
 				break;
 
 			case AUDIT_RESOURCE_TRIGGER:
+			case AUDIT_RESOURCE_TRIGGER_PROTOTYPE:
 				$field_name_resourceid = 'triggerid';
 				$field_name_resourcename = 'description';
 				$table_name = 'triggers';
