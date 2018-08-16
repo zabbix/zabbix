@@ -44,12 +44,12 @@
  ******************************************************************************/
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	maintenanceid;
 	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -57,21 +57,32 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select maintenanceid from maintenances where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,
 			maintenanceids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid" ZBX_FOR_UPDATE);
+#if defined(HAVE_MYSQL)
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid lock in share mode");
+#elif defined(HAVE_IBM_DB2)
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid with rs use and keep share locks");
+#else
+	/* Row level shared locks are not supported in Oracle. For PostgreSQL table level locks */
+	/* are used because row level shared locks have reader preference, which could lead to  */
+	/* theoretical situation when server blocks out frontend from maintenances updates.     */
+	DBexecute("lock table maintenances in share mode");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid");
+#endif
 
 	result = DBselect("%s", sql);
 	zbx_free(sql);
 
-	i = 0;
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; NULL != (row = DBfetch(result)); i++)
 	{
 		ZBX_STR2UINT64(maintenanceid, row[0]);
 
 		while (maintenanceid != maintenanceids->values[i])
 			zbx_vector_uint64_remove(maintenanceids, i);
-		i++;
 	}
 	DBfree_result(result);
+
+	while (i != maintenanceids->values_num)
+		zbx_vector_uint64_remove_noorder(maintenanceids, i);
 
 	return (0 != maintenanceids->values_num ? SUCCEED : FAIL);
 }
