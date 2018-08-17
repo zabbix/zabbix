@@ -263,7 +263,10 @@ if (isset($_REQUEST['form'])) {
 			'templateid' => getRequest('templateid'),
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
-			'status' => getRequest('status', HOST_STATUS_MONITORED),
+			'status' => getRequest('status', !getRequest('form_refresh')
+				? HOST_STATUS_MONITORED
+				: HOST_STATUS_NOT_MONITORED
+			),
 			'templates' => [],
 			'inventory' => [
 				'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode'])
