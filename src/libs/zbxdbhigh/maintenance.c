@@ -26,9 +26,9 @@
  *                                                                            *
  * Purpose: lock maintenances in database                                     *
  *                                                                            *
- * Parameters: maintenanceids - [IN/OUT] the maintenance ids                  *
+ * Parameters: maintenanceids - [IN/OUT] a vector of unique maintenance ids   *
  *                                 IN - the maintenances to lock              *
- *                                 OUT - the locked maintenances              *
+ *                                 OUT - the locked maintenance ids (sorted)  *
  *                                                                            *
  * Return value: SUCCEED - at least one maintenance was locked                *
  *               FAIL    - no maintenances were locked (all target            *
@@ -52,7 +52,6 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	DB_ROW		row;
 
 	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select maintenanceid from maintenances where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,
