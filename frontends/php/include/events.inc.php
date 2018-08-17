@@ -771,7 +771,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 
 				$hint_content = [];
 
-				foreach ($event['tags'] as $tag) {
+				foreach ($event_tags as $tag) {
 					$value = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
 					$hint_content[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
