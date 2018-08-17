@@ -65,6 +65,8 @@ class CHostGroupNameParser extends CParser {
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
+	 *
+	 * @return int
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;

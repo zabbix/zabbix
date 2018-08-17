@@ -65,6 +65,8 @@ class CHostNameParser extends CParser {
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
+	 *
+	 * @return int
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
@@ -109,6 +111,7 @@ class CHostNameParser extends CParser {
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
+	 *
 	 * @return bool
 	 */
 	private static function parseCharacters($source, &$pos) {
@@ -122,7 +125,7 @@ class CHostNameParser extends CParser {
 	}
 
 	/**
-	 * Parse LLD macro or any character.
+	 * Parse LLD macros.
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
