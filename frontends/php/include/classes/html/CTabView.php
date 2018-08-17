@@ -28,6 +28,11 @@ class CTabView extends CDiv {
 	protected $selectedTab = null;
 
 	/**
+	 * Script for tab change event.
+	 */
+	protected $tab_change_js = '';
+
+	/**
 	 * Disabled tabs IDs, tab option
 	 *
 	 * @var array
@@ -51,6 +56,18 @@ class CTabView extends CDiv {
 
 	public function setSelected($selected) {
 		$this->selectedTab = $selected;
+		return $this;
+	}
+
+	/**
+	 * Set javascript on tab change event.
+	 *
+	 * @param string $value    Script body.
+	 * @return CTabView
+	 */
+	public function onTabChange($value) {
+		$this->tab_change_js = $value;
+
 		return $this;
 	}
 
@@ -121,6 +138,7 @@ class CTabView extends CDiv {
 				'active: '.CJs::encodeJson($active_tab).','.
 				'activate: function(event, ui) {'.
 					'jQuery.cookie("tab", ui.newTab.index().toString());'.
+					$this->tab_change_js.
 				'}'.
 			'})'.
 			'.css("visibility", "visible");';
