@@ -32,6 +32,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'uniqueid' => 'required|string',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'initial_load' => 'in 0,1',
+			'edit_mode' => 'in 0,1',
 			'content_width' => 'int32',
 			'content_height' => 'int32',
 			'preview' => 'in 1',
@@ -42,6 +43,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 		$uniqueid = $this->getInput('uniqueid');
+		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', 100);
 		$height = (int) $this->getInput('content_height', 100);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
@@ -254,7 +256,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'script_inline' => $script_inline,
 			'initial_load' => $initial_load,
 			'preview' => $preview,
-			'info' => CWidgetHelper::makeWidgetInfo(WIDGET_SVG_GRAPH, $fields),
+			'info' => $edit_mode ? null : CWidgetHelper::makeWidgetInfo(WIDGET_SVG_GRAPH, $fields),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
