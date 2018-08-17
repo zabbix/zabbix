@@ -859,8 +859,20 @@ output {
 				margin: 0 1px 0 2px !important;
 				vertical-align: bottom;
 
-				&::before {
-					background-position: -48px -804px;
+				@if $theme_name == 'blue' or $theme_name == "dark" {
+					&::before {
+						background-position: -48px -804px;
+					}
+				}
+				@elseif $theme_name == 'hc-light' {
+					&::before {
+						background-position: -206px -804px;
+					}
+				}
+				@elseif $theme_name == 'hc-dark' {
+					&::before {
+						background-position: -360px -804px;
+					}
 				}
 			}
 
