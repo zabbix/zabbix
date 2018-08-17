@@ -732,22 +732,23 @@ class CSvgGraph extends CSvg {
 
 		// Add missing values.
 		$prev_clock = null;
+		$missing_points = [];
 		foreach ($points as $clock => $point) {
 			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
 				$gap_interval = floor(($clock - $prev_clock) / $threshold);
 
-				$new_point_clock = $prev_clock;
 				do {
-					$new_point_clock = $new_point_clock + $gap_interval;
-					$points[$new_point_clock] = $added_value;
+					$prev_clock += $gap_interval;
+					$missing_points[$prev_clock] = $added_value;
 				}
-				while ($clock > $new_point_clock);
+				while ($clock > $prev_clock);
 			}
 
 			$prev_clock = $clock;
 		}
 
 		// Sort according new clock times.
+		$points += $missing_points;
 		ksort($points);
 	}
 
