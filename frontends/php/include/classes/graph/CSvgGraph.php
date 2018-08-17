@@ -370,10 +370,10 @@ class CSvgGraph extends CSvg {
 			SEC_PER_HOUR * 3 => 'H:i',		// 3 hours
 			SEC_PER_HOUR * 6 => 'H:i',		// 6 hours
 			SEC_PER_HOUR * 12 => 'H:i',		// 12 hours
-			SEC_PER_DAY => 'd H:i',			// 1 day
-			SEC_PER_WEEK => 'd H:i',		// 1 week
-			SEC_PER_WEEK * 2 => 'd H:i',	// 2 weeks
-			SEC_PER_MONTH => 'd H:i',		// 30 days
+			SEC_PER_DAY => 'n-d',			// 1 day
+			SEC_PER_WEEK => 'n-d',			// 1 week
+			SEC_PER_WEEK * 2 => 'n-d',		// 2 weeks
+			SEC_PER_MONTH => 'n-d',			// 30 days
 			SEC_PER_MONTH * 3 => 'Y-n-d',	// 90 days
 			SEC_PER_MONTH * 4 => 'Y-n-d',	// 120 days
 			SEC_PER_MONTH * 6 => 'Y-n-d',	// 180 days
@@ -665,7 +665,9 @@ class CSvgGraph extends CSvg {
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
 
-			$this->applyMissingDataFunc($this->points[$index], (int) $metric['options']['missingdatafunc']);
+			if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
+				$this->applyMissingDataFunc($this->points[$index], (int) $metric['options']['missingdatafunc']);
+			}
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
@@ -799,12 +801,10 @@ class CSvgGraph extends CSvg {
 	protected function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphPoints($path, $metric))
-						->setPosition($this->canvas_x, $this->canvas_y)
-						->setSize($this->canvas_width, $this->canvas_height)
-					);
-				}
+				$this->addItem((new CSvgGraphPoints(reset($this->paths[$index]), $metric))
+					->setPosition($this->canvas_x, $this->canvas_y)
+					->setSize($this->canvas_width, $this->canvas_height)
+				);
 			}
 		}
 	}
