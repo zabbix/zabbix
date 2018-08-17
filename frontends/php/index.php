@@ -39,7 +39,7 @@ $fields = [
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
 	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,	null],
-	'form' =>		[T_ZBX_INT, O_OPT, null,	null,	null]
+	'form' =>		[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
 
@@ -109,5 +109,5 @@ $messages = clear_messages();
 		? (new CUrl())->setArgument('guest_login', 1)
 		: '',
 	'autologin' => $autologin == 1,
-	'error' => hasRequest('enter') ? array_shift($messages) : null
+	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
 ]))->render();

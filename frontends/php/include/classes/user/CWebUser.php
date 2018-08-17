@@ -320,7 +320,7 @@ class CWebUser {
 				'userData' => true
 			]);
 
-			$sessionid = array_key_exists('sessionid', self::$data) ? self::$data['sessionid'] : null;
+			$sessionid = (self::$data && array_key_exists('sessionid', self::$data)) ? self::$data['sessionid'] : null;
 		}
 
 		return $sessionid;

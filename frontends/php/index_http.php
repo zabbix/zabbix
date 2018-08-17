@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
+clear_messages();
 $http_user = CWebUser::getHttpRemoteUser();
 $config = $http_user ? select_config() : [];
 
@@ -45,10 +46,19 @@ if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && CWebU
 	}
 }
 
-$redirect_to = new CUrl('index.php');
+$redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
 if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
+}
+
+if ($config && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_DISABLED) {
+	redirect($redirect_to->toString());
+
+	exit;
+}
+elseif (!$http_user) {
+	error(_('Login name or password is incorrect.'));
 }
 
 (new CView('general.warning', [

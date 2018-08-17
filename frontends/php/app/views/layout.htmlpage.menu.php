@@ -71,7 +71,7 @@ $user_menu->addItem(
 	(new CLink(SPACE,
 		(new CUrl('index.php'))
 			->setArgument('reconnect', 1)
-			->setArgument('form', 1)
+			->setArgument('form', 'default')
 			->toString()
 	))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
