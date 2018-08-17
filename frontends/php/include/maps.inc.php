@@ -659,10 +659,8 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	}
 
 	if ($i['maintenance']) {
-		if (!$hasProblem) {
-			$info['iconid'] = $selement['iconid_maintenance'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
-		}
+		$info['iconid'] = $selement['iconid_maintenance'];
+		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		$info['info']['maintenance'] = [
 			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => 'EE9600'
@@ -1236,13 +1234,15 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				foreach ($trigger['hosts'] as $host) {
-					if (array_key_exists('maintenance_status', $host)
-							&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-						$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
-						$i['maintenance_title'] = $maintenance['name'];
+				foreach ($selement['triggers'] as $trigger) {
+					foreach ($trigger['hosts'] as $host) {
+						if (array_key_exists('maintenance_status', $host)
+								&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+							$maintenance = get_maintenance_by_maintenanceid($host['maintenanceid']);
+							$i['maintenance_title'] = $maintenance['name'];
 
-						break;
+							break;
+						}
 					}
 				}
 
