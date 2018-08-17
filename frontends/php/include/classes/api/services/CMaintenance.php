@@ -880,15 +880,15 @@ class CMaintenance extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$options = [
+		$maintenances = $this->get([
 			'output' => ['maintenanceid', 'name'],
 			'maintenanceids' => $maintenanceids,
 			'editable' => true,
 			'preservekeys' => true
-		];
-		$maintenances = $this->get($options);
+		]);
+
 		foreach ($maintenanceids as $maintenanceid) {
-			if (!isset($maintenances[$maintenanceid])) {
+			if (!array_key_exists($maintenanceid, $maintenances)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
@@ -906,19 +906,19 @@ class CMaintenance extends CApiService {
 
 		$midCond = ['maintenanceid' => $maintenanceids];
 
-		// remove maintenanceid from hosts table
-		$options = [
-			'real_hosts' => true,
-			'output' => ['hostid'],
-			'filter' => ['maintenanceid' => $maintenanceids]
-		];
-		$hosts = API::Host()->get($options);
-		if (!empty($hosts)) {
-			DB::update('hosts', [
-				'values' => ['maintenanceid' => 0],
-				'where' => ['hostid' => zbx_objectValues($hosts, 'hostid')]
-			]);
-		}
+		// Lock maintenances table before maintenance delete to prevent server from adding host to maintenance.
+		DBselect(
+			'SELECT NULL'.
+			' FROM maintenances'.
+			' WHERE '.dbConditionId('maintenanceid', $maintenanceids).
+			' FOR UPDATE'
+		);
+
+		// Remove maintenanceid from hosts table.
+		DB::update('hosts', [
+			'values' => ['maintenanceid' => 0],
+			'where' => ['maintenanceid' => $maintenanceids]
+		]);
 
 		DB::delete('timeperiods', ['timeperiodid' => $timeperiodids]);
 		DB::delete('maintenances_windows', $midCond);
