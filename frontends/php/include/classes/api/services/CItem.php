@@ -669,8 +669,6 @@ class CItem extends CItemGeneral {
 
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $db_items);
 
-		self::exception(ZBX_API_ERROR_PARAMETERS, 'STOP!');
-
 		return ['itemids' => $itemids];
 	}
 

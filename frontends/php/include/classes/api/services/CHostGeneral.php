@@ -399,11 +399,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($clear) {
 				// This will include deletion of linked application prototypes.
-				$result = API::ItemPrototype()->delete($item_prototypeids, true);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
-				}
+				CItemPrototypeManager::delete($item_prototypeids);
 			}
 			else {
 				DB::update('items', [

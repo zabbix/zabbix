@@ -90,7 +90,7 @@ class CItemManager {
 		$del_itemids = array_keys($del_itemids);
 
 		if ($del_item_prototypeids) {
-			API::ItemPrototype()->delete(array_keys($del_item_prototypeids), true);
+			CItemPrototypeManager::delete(array_keys($del_item_prototypeids));
 		}
 
 		// Deleting graphs and graph prototypes, which will remain without items.

@@ -107,6 +107,7 @@ class CAudit {
 				break;
 
 			case AUDIT_RESOURCE_ITEM:
+			case AUDIT_RESOURCE_ITEM_PROTOTYPE:
 				$field_name_resourceid = 'itemid';
 				$field_name_resourcename = 'name';
 				$table_name = 'items';

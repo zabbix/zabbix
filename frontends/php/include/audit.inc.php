@@ -35,6 +35,7 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
 		AUDIT_RESOURCE_HOST_GROUP => _('Host group'),
 		AUDIT_RESOURCE_ITEM => _('Item'),
+		AUDIT_RESOURCE_ITEM_PROTOTYPE => _('Item prototype'),
 		AUDIT_RESOURCE_IMAGE => _('Image'),
 		AUDIT_RESOURCE_VALUE_MAP => _('Value map'),
 		AUDIT_RESOURCE_IT_SERVICE => _('Service'),
