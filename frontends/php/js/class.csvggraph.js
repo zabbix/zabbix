@@ -252,7 +252,7 @@ jQuery(function ($) {
 						if (x > parseInt(point[0])) {
 							px = point[0];
 							py = point[1];
-							pv = label[data_set === 'line' ? index : index / 2];
+							pv = label[data_set === 'line' ? index : Math.ceil(index / 2)];
 							break;
 						}
 					}
