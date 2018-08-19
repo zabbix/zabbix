@@ -225,12 +225,11 @@ static char	*get_expanded_expression(const char *expression)
 {
 	char	*expression_ex;
 
-	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression, NULL)))
+	if (NULL != (expression_ex = DCexpression_expand_user_macros(expression)))
 		zbx_remove_whitespace(expression_ex);
 
 	return expression_ex;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -361,6 +360,115 @@ static void	DCexpand_trigger_expression(char **expression)
 	*expression = tmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __function_name, *expression);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_trigger_severity_name                                        *
+ *                                                                            *
+ * Purpose: get trigger severity name                                         *
+ *                                                                            *
+ * Parameters: trigger    - [IN] a trigger data with priority field;          *
+ *                               TRIGGER_SEVERITY_*                           *
+ *             replace_to - [OUT] pointer to a buffer that will receive       *
+ *                          a null-terminated trigger severity string         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
+{
+	zbx_config_t	cfg;
+
+	if (TRIGGER_SEVERITY_COUNT <= priority)
+		return FAIL;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+
+	*replace_to = zbx_strdup(*replace_to, cfg.severity_name[priority]);
+
+	zbx_config_clean(&cfg);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_problem_update_actions                                       *
+ *                                                                            *
+ * Purpose: get human readable list of problem update actions                 *
+ *                                                                            *
+ * Parameters: ack     - [IN] the acknowledge (problem update) data           *
+ *             actions - [IN] the required action flags                       *
+ *             out     - [OUT] the output buffer                              *
+ *                                                                            *
+ * Return value: SUCCEED - successfully returned list of problem update       *
+ *               FAIL    - no matching actions were made                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, char **out)
+{
+	char	*buf = NULL, *prefixes[] = {"", ", ", ", ", ", "};
+	size_t	buf_alloc = 0, buf_offset = 0;
+	int	i, index, flags;
+
+	if (0 == (flags = ack->action & actions))
+		return FAIL;
+
+	for (i = 0, index = 0; i < ZBX_PROBLEM_UPDATE_ACTION_COUNT; i++)
+	{
+		if (0 != (flags & (1 << i)))
+			index++;
+	}
+
+	if (1 < index)
+		prefixes[index - 1] = " and ";
+
+	index = 0;
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "acknowledged");
+		index++;
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_MESSAGE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "commented");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_SEVERITY))
+	{
+		zbx_config_t	cfg;
+		const char	*from = "unknown", *to = "unknown";
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+
+		if (TRIGGER_SEVERITY_COUNT > ack->old_severity && 0 <= ack->old_severity)
+			from = cfg.severity_name[ack->old_severity];
+
+		if (TRIGGER_SEVERITY_COUNT > ack->new_severity && 0 <= ack->new_severity)
+			to = cfg.severity_name[ack->new_severity];
+
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "changed severity from %s to %s",
+				from, to);
+
+		zbx_config_clean(&cfg);
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_CLOSE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "closed");
+	}
+
+	zbx_free(*out);
+	*out = buf;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1567,26 +1675,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 
 /******************************************************************************
  *                                                                            *
- * Function: acknowledge_expand_action_names                                  *
- *                                                                            *
- * Purpose: expand acknowledge action flags into user readable list           *
- *                                                                            *
- * Parameters: str        - [IN/OUT]                                          *
- *             str_alloc  - [IN/OUT]                                          *
- *             str_offset - [IN/OUT]                                          *
- *             action       [IN] the acknowledge action flags                 *
- *                               (see ZBX_ACKNOWLEDGE_ACTION_* defines)       *
- *                                                                            *
- ******************************************************************************/
-static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_t *str_offset, int action)
-{
-	if (0 != (action & ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM))
-		zbx_strcpy_alloc(str, str_alloc, str_offset, "Close problem");
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_event_ack_history                                            *
+ * Function: get_event_update_history                                         *
  *                                                                            *
  * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
@@ -1597,26 +1686,17 @@ static void	acknowledge_expand_action_names(char **str, size_t *str_alloc, size_
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
+static void	get_event_update_history(const DB_EVENT *event, char **replace_to, const zbx_uint64_t *recipient_userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*buf = NULL;
 	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
-	time_t		now;
-	zbx_uint64_t	userid;
-	int		action;
-
-	if (0 == event->acknowledged)
-	{
-		*replace_to = zbx_strdup(*replace_to, "");
-		return;
-	}
 
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
-	result = DBselect("select clock,userid,message,action"
+	result = DBselect("select clock,userid,message,action,old_severity,new_severity"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
 			event->eventid);
@@ -1624,30 +1704,39 @@ static void	get_event_ack_history(const DB_EVENT *event, char **replace_to, cons
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*user_name;
+		char		*actions = NULL;
+		DB_ACKNOWLEDGE	ack;
 
-		now = atoi(row[0]);
-		ZBX_STR2UINT64(userid, row[1]);
-		action = atoi(row[3]);
+		ack.clock = atoi(row[0]);
+		ZBX_STR2UINT64(ack.userid, row[1]);
+		ack.message = row[2];
+		ack.acknowledgeid = 0;
+		ack.action = atoi(row[3]);
+		ack.old_severity = atoi(row[4]);
+		ack.new_severity = atoi(row[5]);
 
-		if (SUCCEED == zbx_check_user_permissions(&userid, recipient_userid))
-			user_name = zbx_user_string(userid);
+		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
+			user_name = zbx_user_string(ack.userid);
 		else
 			user_name = "Inaccessible user";
 
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n",
-				zbx_date2str(now),
-				zbx_time2str(now),
+				zbx_date2str(ack.clock),
+				zbx_time2str(ack.clock),
 				user_name);
 
-		if (ZBX_ACKNOWLEDGE_ACTION_NONE != action)
+		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY, &actions))
 		{
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "Action: ");
-			acknowledge_expand_action_names(&buf, &buf_alloc, &buf_offset, action);
-			zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
+			zbx_free(actions);
 		}
 
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n\n", row[2]);
+		if ('\0' != *ack.message)
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n", ack.message);
+
+		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 	}
 	DBfree_result(result);
 
@@ -1708,23 +1797,31 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"
 #define MVAR_DATE			"{DATE}"
 #define MVAR_EVENT			"{EVENT."			/* a prefix for all event macros */
-#define MVAR_EVENT_ACK_HISTORY		MVAR_EVENT "ACK.HISTORY}"
+#define MVAR_EVENT_ACK_HISTORY		MVAR_EVENT "ACK.HISTORY}"	/* deprecated */
 #define MVAR_EVENT_ACK_STATUS		MVAR_EVENT "ACK.STATUS}"
 #define MVAR_EVENT_AGE			MVAR_EVENT "AGE}"
 #define MVAR_EVENT_DATE			MVAR_EVENT "DATE}"
 #define MVAR_EVENT_ID			MVAR_EVENT "ID}"
+#define MVAR_EVENT_NAME			MVAR_EVENT "NAME}"
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
+#define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
 #define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
-#define MVAR_EVENT_NAME		MVAR_EVENT "NAME}"
-#define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
+#define MVAR_EVENT_SEVERITY		MVAR_EVENT "SEVERITY}"
+#define MVAR_EVENT_NSEVERITY		MVAR_EVENT "NSEVERITY}"
 #define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
 #define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
 #define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
 #define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"	/* deprecated */
+#define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
-#define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
+#define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE."
+#define MVAR_EVENT_UPDATE_ACTION	MVAR_EVENT_UPDATE "ACTION}"
+#define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT_UPDATE "DATE}"
+#define MVAR_EVENT_UPDATE_HISTORY	MVAR_EVENT_UPDATE "HISTORY}"
+#define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT_UPDATE "MESSAGE}"
+#define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT_UPDATE "TIME}"
 
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
@@ -1889,9 +1986,9 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ALERT_SUBJECT		"{ALERT.SUBJECT}"
 #define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
 
-#define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"
-#define MVAR_ACK_TIME	                "{ACK.TIME}"
-#define MVAR_ACK_DATE	                "{ACK.DATE}"
+#define MVAR_ACK_MESSAGE                "{ACK.MESSAGE}"			/* deprecated */
+#define MVAR_ACK_TIME	                "{ACK.TIME}"			/* deprecated */
+#define MVAR_ACK_DATE	                "{ACK.DATE}"			/* deprecated */
 #define MVAR_USER_FULLNAME          	"{USER.FULLNAME}"
 
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
@@ -2282,9 +2379,9 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 	}
 	else if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
+		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
 		{
-			get_event_ack_history(event, replace_to, recipient_userid);
+			get_event_update_history(event, replace_to, recipient_userid);
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 		{
@@ -2293,6 +2390,15 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
 			get_event_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)event->severity);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_SEVERITY))
+		{
+			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
+				*replace_to = zbx_strdup(*replace_to, "unknown");
 		}
 	}
 }
@@ -2494,37 +2600,6 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_trigger_severity_name                                        *
- *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
-{
-	zbx_config_t	cfg;
-
-	if (TRIGGER_SEVERITY_COUNT <= priority)
-		return FAIL;
-
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
-
-	*replace_to = zbx_strdup(*replace_to, cfg.severity_name[priority]);
-
-	zbx_config_clean(&cfg);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: wrap_negative_double_suffix                                      *
  *                                                                            *
  * Purpose: wrap a replacement string that represents a negative number in    *
@@ -2642,6 +2717,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		{
 			case ZBX_TOKEN_OBJECTID:
 			case ZBX_TOKEN_LLD_MACRO:
+			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				/* neither lld or {123123} macros are processed by this function, skip them */
 				pos = token.token.r + 1;
 				continue;
@@ -2751,6 +2827,30 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->name);
+				}
+				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						replace_to = zbx_strdup(replace_to, ack->message);
+				}
+				else if (0 == strcmp(m, MVAR_ACK_TIME) || 0 == strcmp(m, MVAR_EVENT_UPDATE_TIME))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock));
+				}
+				else if (0 == strcmp(m, MVAR_ACK_DATE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_DATE))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock));
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTION))
+				{
+					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
+					{
+						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
+								ZBX_PROBLEM_UPDATE_SEVERITY, &replace_to);
+					}
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -2978,21 +3078,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
-				}
-				else if (0 == strcmp(m, MVAR_ACK_MESSAGE))
-				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, ack->message);
-				}
-				else if (0 == strcmp(m, MVAR_ACK_TIME))
-				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, zbx_time2str(ack->clock));
-				}
-				else if (0 == strcmp(m, MVAR_ACK_DATE))
-				{
-					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
-						replace_to = zbx_strdup(replace_to, zbx_date2str(ack->clock));
 				}
 				else if (0 == strcmp(m, MVAR_USER_FULLNAME))
 				{
@@ -3708,7 +3793,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					if (NULL != error)
 					{
 						zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
-								token.token.r - token.token.l + 1,
+								(int)(token.token.r - token.token.l + 1),
 								*data + token.token.l);
 					}
 
@@ -3767,6 +3852,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				{
+					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value);
 				}
 			}
 		}
@@ -4134,14 +4229,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			else if (NULL != error)
 			{
 				zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
-						token.token.r - token.token.l + 1, *data + token.token.l);
+						(int)(token.token.r - token.token.l + 1), *data + token.token.l);
 			}
 		}
 
 		if (FAIL == ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'", token.token.r - token.token.l + 1,
-					*data + token.token.l);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'",
+					(int)(token.token.r - token.token.l + 1), *data + token.token.l);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
@@ -4475,8 +4570,21 @@ static void	func_clean(void *ptr)
 	zbx_free(func->error);
 }
 
-static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
-		zbx_hashset_t *ifuncs, zbx_vector_ptr_t *triggers)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_populate_function_items                                      *
+ *                                                                            *
+ * Purpose: prepare hashset of functions to evaluate                          *
+ *                                                                            *
+ * Parameters: functionids - [IN] function identifiers                        *
+ *             funcs       - [OUT] functions indexed by itemid, name,         *
+ *                                 parameter, timestamp                       *
+ *             ifuncs      - [OUT] function index by functionid               *
+ *             trigger     - [IN] vector of triggers, sorted by triggerid     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
+		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "zbx_populate_function_items";
 
@@ -4793,7 +4901,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *                                                                            *
  * Purpose: substitute expression functions with their values                 *
  *                                                                            *
- * Parameters: triggers - array of DC_TRIGGER structures                      *
+ * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ *                             triggerids                                     *
  *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
  *                            items and failed functions                      *
  *                                                                            *
@@ -4845,7 +4954,8 @@ empty:
  *                                                                            *
  * Purpose: evaluate trigger expressions                                      *
  *                                                                            *
- * Parameters: triggers - [IN] array of DC_TRIGGER structures                 *
+ * Parameters: triggers - [IN] vector of DC_TRIGGGER pointers, sorted by      *
+ *                             triggerids                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -5039,40 +5149,80 @@ out:
  *               otherwise FAIL with an error message.                        *
  *                                                                            *
  ******************************************************************************/
-static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
-		const struct zbx_json_parse *jp_row, char *error, size_t error_len)
+static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
+		char *error, size_t error_len)
 {
 	char	c, *replace_to = NULL;
-	int	ret = SUCCEED;
+	int	ret = SUCCEED, l ,r;
 	size_t	replace_to_alloc = 0;
 
-	c = (*data)[token->token.r + 1];
-	(*data)[token->token.r + 1] = '\0';
-
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + token->token.l, &replace_to, &replace_to_alloc))
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
-				*data + token->token.l);
+		l = token->data.lld_func_macro.macro.l;
+		r = token->data.lld_func_macro.macro.r;
+	}
+	else
+	{
+		l = token->token.l;
+		r = token->token.r;
+	}
+
+	c = (*data)[r + 1];
+	(*data)[r + 1] = '\0';
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + l, &replace_to, &replace_to_alloc))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
 		if (0 != (flags & ZBX_TOKEN_NUMERIC))
 		{
-			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
+			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + l);
 			ret = FAIL;
 		}
 
+		(*data)[r + 1] = c;
 		zbx_free(replace_to);
+
+		return ret;
 	}
-	else if (0 != (flags & ZBX_TOKEN_NUMERIC))
+
+	(*data)[r + 1] = c;
+
+	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
-		if (SUCCEED == (ret = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+		replace_to_alloc = 0;
+		if (SUCCEED != (zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
+		{
+			int	len = token->data.lld_func_macro.func.r - token->data.lld_func_macro.func.l + 1;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot execute function \"%.*s\"", len,
+					*data + token->data.lld_func_macro.func.l);
+
+			if (0 != (flags & ZBX_TOKEN_NUMERIC))
+			{
+				zbx_snprintf(error, error_len, "unable to execute function \"%.*s\"", len,
+						*data + token->data.lld_func_macro.func.l);
+				ret = FAIL;
+			}
+
+			zbx_free(replace_to);
+
+			return ret;
+		}
+	}
+
+	if (0 != (flags & ZBX_TOKEN_NUMERIC))
+	{
+		if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 		{
 			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 		}
 		else
 		{
 			zbx_free(replace_to);
-			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
-			ret = FAIL;
+			zbx_snprintf(error, error_len, "not numeric value in macro \"%.*s\"",
+					(int)(token->token.r - token->token.l + 1), *data + token->token.l);
+			return FAIL;
 		}
 	}
 	else if (0 != (flags & ZBX_TOKEN_JSON))
@@ -5096,15 +5246,17 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 		xml_escape_xpath(&replace_to);
 	}
 
-	(*data)[token->token.r + 1] = c;
-
 	if (NULL != replace_to)
 	{
-		zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
+		size_t	data_alloc, data_len;
+
+		data_alloc = data_len = strlen(*data) + 1;
+		token->token.r += zbx_replace_mem_dyn(data, &data_alloc, &data_len, token->token.l,
+				token->token.r - token->token.l + 1, replace_to, strlen(replace_to));
 		zbx_free(replace_to);
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -5132,8 +5284,8 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
 	force_quote = ('"' == (*data)[macro->context.l]);
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
-	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
-	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
+	/* substitute_lld_macros() can't fail with ZBX_TOKEN_LLD_MACRO or ZBX_TOKEN_LLD_FUNC_MACRO flags set */
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -5232,6 +5384,7 @@ int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, int 
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
+				case ZBX_TOKEN_LLD_FUNC_MACRO:
 					ret = process_lld_macro_token(data, &token, flags, jp_row, error,
 							max_error_len);
 					pos = token.token.r;
@@ -5487,6 +5640,86 @@ out:
 	zbx_free(param);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros_in_json_pairs                                  *
+ *                                                                            *
+ * Purpose: substitute LLD macros in JSON pairs                               *
+ *                                                                            *
+ * Parameters: data   -    [IN/OUT] pointer to a buffer that JSON pair        *
+ *             jp_row -    [IN] discovery data for LLD macro substitution     *
+ *             error  -    [OUT] reason for JSON pair parsing failure         *
+ *             maxerrlen - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL if cannot parse JSON pair                    *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row, char *error,
+		int maxerrlen)
+{
+	const char		*__function_name = "substitute_macros_in_json_pairs";
+	struct zbx_json_parse	jp_array, jp_object;
+	struct zbx_json		json;
+	const char		*member, *element = NULL;
+	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *p_name = NULL, *p_value = NULL;
+	int			ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if ('\0' == **data)
+		goto exit;
+
+	if (SUCCEED != zbx_json_open(*data, &jp_array))
+	{
+		zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+		ret = FAIL;
+		goto exit;
+	}
+
+	if (NULL == (element = zbx_json_next(&jp_array, element)))
+	{
+		zbx_strlcpy(error, "cannot parse query fields: array is empty", maxerrlen);
+		ret = FAIL;
+		goto exit;
+	}
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	do
+	{
+		if (SUCCEED != zbx_json_brackets_open(element, &jp_object) ||
+				NULL == (member = zbx_json_pair_next(&jp_object, NULL, name, sizeof(name))) ||
+				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
+		{
+			zbx_snprintf(error, maxerrlen, "cannot parse query fields: %s", zbx_json_strerror());
+			ret = FAIL;
+			goto clean;
+		}
+
+		p_name = zbx_strdup(NULL, name);
+		p_value = zbx_strdup(NULL, value);
+
+		substitute_lld_macros(&p_name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&p_value, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, p_name, p_value, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+		zbx_free(p_name);
+		zbx_free(p_value);
+	}
+	while (NULL != (element = zbx_json_next(&jp_array, element)));
+
+	zbx_free(*data);
+	*data = zbx_strdup(NULL, json.buffer);
+clean:
+	zbx_json_free(&json);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

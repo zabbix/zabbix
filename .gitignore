@@ -78,6 +78,7 @@ frontends/php/locale/ka/LC_MESSAGES/frontend.mo
 frontends/php/locale/ko/LC_MESSAGES/frontend.mo
 frontends/php/locale/lt/LC_MESSAGES/frontend.mo
 frontends/php/locale/lv/LC_MESSAGES/frontend.mo
+frontends/php/locale/nb/LC_MESSAGES/frontend.mo
 frontends/php/locale/nl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pl/LC_MESSAGES/frontend.mo
 frontends/php/locale/pt_BR/LC_MESSAGES/frontend.mo
@@ -388,9 +389,12 @@ tests/libs/zbxalgo/evaluate
 tests/libs/zbxcommon/.deps
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
+tests/libs/zbxcommon/calculate_item_nextcheck
 tests/libs/zbxcommon/parse_key
 tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
+tests/libs/zbxcommon/zbx_function_get_param_dyn
+tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in
@@ -429,6 +433,7 @@ tests/libs/zbxsysinfo/common/.deps
 tests/libs/zbxsysinfo/common/Makefile
 tests/libs/zbxsysinfo/common/Makefile.in
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
+tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS
 tests/libs/zbxsysinfo/common/WEB_PAGE_GET
 tests/libs/zbxsysinfo/linux/.deps
 tests/libs/zbxsysinfo/linux/KERNEL_MAXFILES

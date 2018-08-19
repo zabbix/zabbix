@@ -296,8 +296,8 @@ function zbx_date2str($format, $value = null) {
 /**
  * Calculates and converts timestamp to string represenation.
  *
- * @param int|string $start_date Start date timestamp.
- * @param int|string $end_date   End date timestamp.
+ * @param int|string $start_date  Start date timestamp.
+ * @param int|string $end_date    End date timestamp.
  *
  * @return string
  */
@@ -482,8 +482,8 @@ function convertUnitsUptime($value) {
  * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
- * @param int $value	time period in seconds
- * @param bool $ignore_millisec	without ms (1s 200 ms = 1.2s)
+ * @param int  $value            Time period in seconds.
+ * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
  *
  * @return string
  */
@@ -574,15 +574,21 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		}
 	}
 
-	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
-	$str .= isset($values['m']) ? $values['m']._x('m', 'month short').' ' : '';
-	$str .= isset($values['d']) ? $values['d']._x('d', 'day short').' ' : '';
-	$str .= isset($values['h']) ? $values['h']._x('h', 'hour short').' ' : '';
-	$str .= isset($values['mm']) ? $values['mm']._x('m', 'minute short').' ' : '';
-	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
-	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
+	$units = [
+		'y' => _x('y', 'year short'),
+		'm' => _x('m', 'month short'),
+		'd' => _x('d', 'day short'),
+		'h' => _x('h', 'hour short'),
+		'mm' => _x('m', 'minute short'),
+		's' => _x('s', 'second short'),
+		'ms' => _x('ms', 'millisecond short')
+	];
 
-	return $str ? rtrim($str) : '0';
+	foreach (array_filter($values) as $unit => $value) {
+		$str .= ' '.$value.$units[$unit];
+	}
+
+	return $str ? trim($str) : '0';
 }
 
 /**
@@ -1271,15 +1277,17 @@ function zbx_toHash($value, $field = null) {
  * key.
  *
  * E.g:
- * zbx_toObject(array(1, 2), 'hostid')  // returns array(array('hostid' => 1), array('hostid' => 2))
- * zbx_toObject(3, 'hostid')            // returns array(array('hostid' => 3))
+ * zbx_toObject(array(1, 2), 'hostid')            // returns array(array('hostid' => 1), array('hostid' => 2))
+ * zbx_toObject(3, 'hostid')                      // returns array(array('hostid' => 3))
+ * zbx_toObject(array('a' => 1), 'hostid', true)  // returns array('a' => array('hostid' => 1))
  *
  * @param $value
  * @param $field
+ * @param $preserve_keys
  *
  * @return array
  */
-function zbx_toObject($value, $field) {
+function zbx_toObject($value, $field, $preserve_keys = false) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1290,10 +1298,14 @@ function zbx_toObject($value, $field) {
 		$result = [[$field => $value]];
 	}
 	elseif (!isset($value[$field])) {
-		foreach ($value as $val) {
+		foreach ($value as $key => $val) {
 			if (!is_array($val)) {
-				$result[] = [$field => $val];
+				$result[$key] = [$field => $val];
 			}
+		}
+
+		if (!$preserve_keys) {
+			$result = array_values($result);
 		}
 	}
 
@@ -1808,10 +1820,12 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 					->setId('details-arrow')
 					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
+				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
 				->onClick('javascript: '.
 					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
 						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
-					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'
+					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'.
+					'jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0)'
 				);
 		}
 
@@ -1832,7 +1846,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))->addClass($class);
+	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
+		->addClass($class)
+		->setAttribute('role', 'contentinfo')
+		->setAttribute('aria-label', $good ? _('Success message') : _('Error message'));
 
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
@@ -1883,8 +1900,7 @@ function filter_messages(array $messages = []) {
  *
  * @return CDiv|null
  */
-function getMessages($good = false, $title = null)
-{
+function getMessages($good = false, $title = null) {
 	global $ZBX_MESSAGES;
 
 	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? filter_messages($ZBX_MESSAGES) : [];
@@ -2112,14 +2128,14 @@ function get_status() {
 	];
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-	$status['is_running'] = $server->isRunning(get_cookie('zbx_sessionid'));
+	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
 	if ($status['is_running'] === false) {
 		return $status;
 	}
 
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, 15, ZBX_SOCKET_BYTES_LIMIT);
-	$server_status = $server->getStatus(get_cookie('zbx_sessionid'));
+	$server_status = $server->getStatus(get_cookie(ZBX_SESSION_NAME));
 	$status['has_status'] = (bool) $server_status;
 
 	if ($server_status === false) {
@@ -2534,7 +2550,7 @@ function makeUpdateIntervalFilter($field_name, $values) {
  * @param string|null $options['from']
  * @param string|null $options['to']
  */
-function updateTimeSelectorPeriod($options) {
+function updateTimeSelectorPeriod(array $options) {
 	if ($options['from'] !== null && $options['to'] !== null) {
 		CProfile::update($options['profileIdx'].'.from', $options['from'], PROFILE_TYPE_STR, $options['profileIdx2']);
 		CProfile::update($options['profileIdx'].'.to', $options['to'], PROFILE_TYPE_STR, $options['profileIdx2']);

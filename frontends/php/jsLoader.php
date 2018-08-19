@@ -59,6 +59,7 @@ $availableJScripts = [
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
+	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
@@ -107,10 +108,13 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'Add a new widget' => _('Add a new widget')
+		'Add a new widget' => _('Add a new widget'),
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'%1$s, selected' => _x('%1$s, selected', 'screen reader')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
+		'Close' => _('Close'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
 	],
@@ -188,13 +192,23 @@ $tranStrings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
+		'Close' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
-		'Select' => _('Select')
+		'Select' => _('Select'),
+		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
+		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
+		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
+		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
+		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
+		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
@@ -253,6 +267,9 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Add child element' => _('Add child element'),
 		'Add multiple maps' => _('Add multiple maps')
+	],
+	'colorpicker.js' => [
+		'Close' => _('Close')
 	]
 ];
 

@@ -1724,7 +1724,7 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 			continue;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s='%.*s' where %s=%s;\n",
-				table, field, semicolon - row[1], row[1], recid, row[0]);
+				table, field, (int)(semicolon - row[1]), row[1], recid, row[0]);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;

@@ -541,8 +541,10 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn'}
-				)
+					'class': 'overlay-close-btn',
+					'title': t('Close')
+				}
+			)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
@@ -691,80 +693,6 @@ var hintBox = {
 		return hintboxid;
 	}
 };
-
-/*
- * Color picker
- */
-function hide_color_picker() {
-	if (!color_picker) {
-		return;
-	}
-
-	color_picker.style.zIndex = 1000;
-	color_picker.style.display = 'none';
-	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
-	curr_lbl = null;
-	curr_txt = null;
-
-	removeFromOverlaysStack('color_picker');
-}
-
-function show_color_picker(id, event) {
-	if (!color_picker) {
-		return;
-	}
-
-	curr_txt = document.getElementById(id);
-	if (curr_txt.hasAttribute('disabled')) {
-		return;
-	}
-	curr_lbl = document.getElementById('lbl_' + id);
-	var pos = getPosition(curr_lbl);
-	color_picker.x = pos.left;
-	color_picker.y = pos.top;
-	color_picker.style.left = (color_picker.x + 20) + 'px';
-	color_picker.style.top = color_picker.y + 'px';
-	color_picker.style.display = 'block';
-
-	addToOverlaysStack('color_picker', event.target, 'color_picker');
-	overlayDialogueOnLoad(true, color_picker);
-}
-
-function create_color_picker() {
-	if (color_picker) {
-		return;
-	}
-
-	color_picker = document.createElement('div');
-	color_picker.setAttribute('class', 'overlay-dialogue');
-	color_picker.innerHTML = color_table;
-	document.body.appendChild(color_picker);
-	hide_color_picker();
-}
-
-function set_color(color) {
-	var background = color;
-
-	if (curr_lbl) {
-		if (color.trim() !== '') {
-			background = '#' + color;
-		}
-
-		curr_lbl.style.color = background;
-		curr_lbl.style.background = background;
-		curr_lbl.title = background;
-	}
-	if (curr_txt) {
-		curr_txt.value = color.toString().toUpperCase();
-	}
-	hide_color_picker();
-}
-
-function set_color_by_name(id, color) {
-	curr_lbl = document.getElementById('lbl_' + id);
-	curr_txt = document.getElementById(id);
-	set_color(color);
-}
 
 /**
  * Add object to the list of favourites.

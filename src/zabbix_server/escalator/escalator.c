@@ -2083,30 +2083,31 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	DB_ROW		row;
 	DB_RESULT	result;
-	DB_ACKNOWLEDGE	ack;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, escalation->acknowledgeid,
 			zbx_escalation_status_string(escalation->status));
 
-	memset(&ack, 0, sizeof(ack));
-
 	result = DBselect(
-			"select message,userid,clock from acknowledges"
+			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ack.message = zbx_strdup(NULL, row[0]);
+		DB_ACKNOWLEDGE	ack;
+
+		ack.message = row[0];
 		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.clock = atoi(row[2]);
 		ack.acknowledgeid = escalation->acknowledgeid;
+		ack.action = atoi(row[3]);
+		ack.old_severity = atoi(row[4]);
+		ack.new_severity = atoi(row[5]);
 
 		escalation_execute_acknowledge_operations(event, r_event, action, &ack);
 	}
 
-	zbx_free(ack.message);
 	DBfree_result(result);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
@@ -2208,7 +2209,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 	{
 		zbx_db_get_eventid_r_eventid_pairs(&ack_eventids, event_pairs, &r_eventids);
 
-		zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
+		if (0 < r_eventids.values_num)
+			zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
 	}
 
 	zbx_vector_uint64_destroy(&ack_eventids);
@@ -2435,7 +2437,7 @@ cancel_warning:
 			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator,
-						diff->status);
+						(int)diff->status);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",
