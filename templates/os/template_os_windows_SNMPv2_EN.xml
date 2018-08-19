@@ -37,9 +37,6 @@ device : *</description>
          <macros/>
          <templates>
             <template>
-               <name>Template Module EtherLike-MIB SNMPv2</name>
-            </template>
-            <template>
                <name>Template Module Generic SNMPv2</name>
             </template>
             <template>
