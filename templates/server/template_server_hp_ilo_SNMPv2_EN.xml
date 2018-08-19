@@ -1782,32 +1782,8 @@ Please check the device for faults</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: CPQIDA-MIB&#13;
-Cache Module/Operations Status.This describes the status of the cache module and/or cache operations.&#13;
-Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.&#13;
-For these configurations, the Instrument Agent will continue to populate variables that are related to read caching operations.&#13;
-The status can be:&#13;
-Other (1)  Indicates that the instrument agent does not recognize the  status of the cache module.  You may need to upgrade  the instrument agent.&#13;
-&#13;
-Invalid (2)  Indicates that a cache module board has not been  installed in this system or is present but not configured.&#13;
-&#13;
-Enabled (3)  Indicates that cache operations are currently configured  and enabled for at least one logical drive.&#13;
-&#13;
-Temporarily Disabled (4)  Indicates that cache operations have been temporarily  disabled.&#13;
-View the cache module board error code object to determine why the write cache operations have been  temporarily disabled.&#13;
-&#13;
-Permanently Disabled (5)  Indicates that cache operations have been permanently  disabled.&#13;
-View the cache module board error code object  to determine why the write cache operations have been disabled.&#13;
-&#13;
-Cache Module Flash Memory Not Attached (6)  Indicates that the flash memory component of the flash backed cache module is not attached.&#13;
-This status will be set when the flash memory is not attached and the Supercap is attached. This value is only used on flash backed cache modules that support removable flash memory.&#13;
-&#13;
-Cache Module Degraded Failsafe Speed (7)  Indicates that the cache module board is currently degraded and  operating at a failsafe speed.&#13;
-View variables   cpqDaCacheMemoryDataWidth and cpqDaCacheMemoryTransferRate to  obtain the cache module board's current memory data width and  memory transfer rate.&#13;
-&#13;
-Cache Module Critical Failure (8)  Indicates that the cache module board has encountered a critical  failure.  The controller is currently operating in Zero Memory Raid  mode.&#13;
-&#13;
-Read Cache Could Not Be Mapped (9)  Indicates that the read cache memory in a split cache configuration could not be mapped by the operating system and as a result is not available.&#13;
-This status may be caused by virtual space limitations in certain operating systems and is only applicable to B-Series controllers.</description>
+Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
+Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2473,127 +2449,7 @@ Disk serial number has changed. Ack to close</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>Logical Drive Status.&#13;
-&#13;
-The logical drive can be in one of the following states:&#13;
-&#13;
-Ok (2)&#13;
-Indicates that the logical drive is in normal operation mode.&#13;
-&#13;
-Failed (3)&#13;
-Indicates that more physical drives have failed than the&#13;
-fault tolerance mode of the logical drive can handle without&#13;
-data loss.&#13;
-&#13;
-Unconfigured (4)&#13;
-Indicates that the logical drive is not configured.&#13;
-&#13;
-Recovering (5)&#13;
-Indicates that the logical drive is using Interim Recovery Mode.&#13;
-In Interim Recovery Mode, at least one physical drive has&#13;
-failed, but the logical drive's fault tolerance mode lets the&#13;
-drive continue to operate with no data loss.&#13;
-&#13;
-Ready Rebuild (6)&#13;
-Indicates that the logical drive is ready for Automatic Data&#13;
-Recovery.  The physical drive that failed has been replaced,&#13;
-but the logical drive is still operating in Interim Recovery&#13;
-Mode.&#13;
-&#13;
-Rebuilding (7)&#13;
-Indicates that the logical drive is currently doing Automatic&#13;
-Data Recovery.  During Automatic Data Recovery, fault tolerance&#13;
-algorithms restore data to the replacement drive.&#13;
-&#13;
-Wrong Drive (8)&#13;
-Indicates that the wrong physical drive was replaced after a&#13;
-physical drive failure.&#13;
-&#13;
-Bad Connect (9)&#13;
-Indicates that a physical drive is not responding.&#13;
-&#13;
-Overheating (10)&#13;
-Indicates that the drive array enclosure that contains the&#13;
-logical drive is overheating.  The drive array is still&#13;
-functioning, but should be shutdown.&#13;
-&#13;
-Shutdown (11)&#13;
-Indicates that the drive array enclosure that contains the&#13;
-logical drive has overheated.  The logical drive is no longer&#13;
-functioning.&#13;
-&#13;
-Expanding (12)&#13;
-Indicates that the logical drive is currently undergoing a&#13;
-transformation (expansion, shrinkage or movement). During&#13;
-transformation, fault tolerance algorithms redistribute logical&#13;
-drive data according to the transformation operation selected.&#13;
-&#13;
-Not Available (13)&#13;
-Indicates that the logical drive is currently unavailable.&#13;
-If a logical drive is expanding and the new configuration&#13;
-frees additional disk space, this free space can be&#13;
-configured into another logical volume.  If this is done,&#13;
-the new volume will be set to not available.&#13;
-&#13;
-Queued For Expansion (14)&#13;
-Indicates that the logical drive is ready for transformation&#13;
-(expansion, shrinkage or movement). The logical drive is in the&#13;
-queue for transformation.&#13;
-&#13;
-Multi-path Access Degraded (15)&#13;
-Indicates that previously all disk drives of this logical&#13;
-drive had more than one I/O path to the controller, but now&#13;
-one or few of them have only one I/O path.&#13;
-&#13;
-Erasing (16)&#13;
-Indicates that the logical drive is currently being erased.&#13;
-&#13;
-Predictive Spare Rebuild Ready (17)&#13;
-Indicates that the logical drive is ready to perform a predictive&#13;
-spare rebuild. The logical drive is in the queue for rebuild.&#13;
-&#13;
-Rapid Parity Initialization In Progress (18)&#13;
-Indicates that the logical drive is currently undergoing rapid&#13;
-parity initialization (RPI). The logical drive is unavailable to the&#13;
-operating system during RPI and will be made available once RPI&#13;
-has completed.&#13;
-&#13;
-Rapid Parity Initialization Pending (19)&#13;
-Indicates that the logical drive is currently pending rapid&#13;
-parity initialization and will be unavailable.&#13;
-&#13;
-No Access - Encrypted - Missing Key (20)&#13;
-Indicates that the logical drive is currently encrypted and cannot&#13;
-be accessed because the array controller has not yet received the&#13;
-encryption key from iLO nor was it found in the controller's CSP&#13;
-NVRAM.&#13;
-&#13;
-Unencrypted to Encrypted Transformation in Progress (21)&#13;
-Indicates that the logical drive is currently being transformed from&#13;
-unencrypted to encrypted and the volume is online. Data will be&#13;
-written unencrypted if the write is directed to an LBA range on the&#13;
-logical drive that has not yet been migrated.&#13;
-&#13;
-New Logical Drive Key Rekey in Progress (22)&#13;
-Indicates that the logical drive is currently encrypted and all data&#13;
-is currently being rekeyed with a new logical drive key using the&#13;
-background capacity expansion transformation task. The logical drive&#13;
-is online.&#13;
-&#13;
-No Access - Encrypted with Controller Encryption Not Enabled (23)&#13;
-Indicates that the logical drive is currently encrypted and cannot&#13;
-be accessed because the array controller does not have encryption&#13;
-enabled.&#13;
-&#13;
-Unencrypted To Encrypted Transformation Not Started (24)&#13;
-Indicates that the logical drive has received a request to transform&#13;
-from unencrypted to encrypted but this process has not yet started.&#13;
-The unencrypted logical drive is currently online.&#13;
-&#13;
-New Logical Drive Key Rekey Request Received (25)&#13;
-Indicates that the logical drive is encrypted and has received&#13;
-a request to rekey all data with a new logical drive encryption key.&#13;
-The logical drive is online.</description>
+                     <description>Logical Drive Status.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -2638,66 +2494,7 @@ The logical drive is online.</description>
                      <privatekey/>
                      <port/>
                      <description>Logical Drive Fault Tolerance.&#13;
-&#13;
-This shows the fault tolerance mode of the logical drive.&#13;
-The following values are valid for the Logical Drive Fault&#13;
-Tolerance:&#13;
-&#13;
-None (2)&#13;
-Fault tolerance is not enabled.  If a physical drive reports&#13;
-an error, the data cannot be recovered by the drive array&#13;
-controller.&#13;
-&#13;
-Mirroring - RAID 1/RAID 1+0 (3)&#13;
-For each physical drive, there is a second physical drive&#13;
-containing identical data. If a drive fails, the data can be&#13;
-retrieved from the mirror drive.&#13;
-&#13;
-Data Guard - RAID 4 (4)&#13;
-One of the physical drives is used as a data guard drive and&#13;
-contains the exclusive OR of the data on the remaining drives.&#13;
-If a failure is detected, the drive array controller rebuilds&#13;
-the data using the data guard information plus information&#13;
-from the other drives.&#13;
-&#13;
-Distributed Data Guard - RAID 5 (5)&#13;
-Distributed Data Guarding, sometimes referred to as RAID 5,&#13;
-is similar to Data Guarding, but instead of storing the parity&#13;
-information on one drive, the information is distributed across&#13;
-all of the drives.  If a failure is detected, the drive array&#13;
-controller rebuilds the data using the data guard information&#13;
-from all the drives.&#13;
-&#13;
-Advanced Data Guarding - RAID 6 (7)&#13;
-Advanced Data Guarding (RAID ADG) is the fault tolerance method&#13;
-that provides the highest level of data protection.  It&#13;
-'stripes' data and parity across all the physical drives in the&#13;
-configuration to ensure the uninterrupted availability of&#13;
-uncorrupted data.  This fault-tolerance method is similar to&#13;
-distributed data guard (RAID 5) in that parity data is&#13;
-distributed across all drives in the array, except in RAID ADG&#13;
-the capacity of multiple drives is used to store parity data.&#13;
-Assuming the capacity of 2 drives is used for parity data,&#13;
-this allows continued operation despite simultaneous failure of&#13;
-any 2 drives in the array, whereas RAID 4 and RAID 5 can only&#13;
-sustain failure of a single drive.&#13;
-&#13;
-RAID 50 (8)&#13;
-Distributed data guarding (RAID 5) with multiple parity groups.&#13;
-&#13;
-RAID 60 (9)&#13;
-Advanced data guarding (RAID 6) with multiple parity groups.&#13;
-&#13;
-RAID 1 ADM (10) - Advanced Data Mirroring -&#13;
-For each physical drive, there are two or more physical drives&#13;
-containing identical data. If a drive fails, the data can be&#13;
-retrieved from any of the mirrored drives.&#13;
-&#13;
-RAID 10 ADM (11) - Advanced Data Mirroring with Striping -&#13;
-For each physical drive, there are two or more physical drives&#13;
-containing identical data in addition to data being striped across&#13;
-multiple drives. If a drive fails, the data can be retrieved from&#13;
-any of the mirrored drives.</description>
+This shows the fault tolerance mode of the logical drive.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
