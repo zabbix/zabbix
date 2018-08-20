@@ -865,7 +865,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		}
 	}
 
-	$triggerTable = new CTableInfo();
+	$triggerTable = (new CTableInfo())->setHeadingColumn(0);
 
 	if (!$host_names) {
 		return $triggerTable;
@@ -922,7 +922,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = (new CLinkAction($host_name))
 				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
-			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
+			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(

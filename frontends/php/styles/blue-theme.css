@@ -467,8 +467,8 @@ article, main {
     white-space: nowrap; }
     .filter-breadcrumb > li:first-child > span {
       display: inline-block;
-      line-height: 1;
-      padding: 4px 7px; }
+      line-height: 14px;
+      padding: 3px 7px; }
       .filter-breadcrumb > li:first-child > span a {
         display: inline-block;
         max-width: 200px;
@@ -656,12 +656,15 @@ output {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #fff; }
+  .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
     position: relative;
     border-bottom: 1px solid #ebeef0;
     line-height: 18px;
     vertical-align: top; }
+  .list-table tbody th {
+    text-align: inherit; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -4121,3 +4124,6 @@ svg {
   color: #1f2c33; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.inline-sr-only {
+  font-size: 0; }

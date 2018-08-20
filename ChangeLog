@@ -1,6 +1,8 @@
 Changes for 4.0.0alpha10
 
 New features:
+..F....... [ZBXNEXT-4455] added screen reader to the dashboard and widgets (ashubin)
+........S. [ZBXNEXT-4627] added support of macro functions to LLD macros (viktors, vso)
 ..F....... [ZBXNEXT-4049] added option to hide timeline in Problems widget (vasilijs)
 ..F....... [ZBXNEXT-4611] changed default method for http agent items from "post" to "get" (gcalenko)
 ..F....... [ZBXNEXT-4587] added new column 'Value' and filter in Triggers list (Ivo, vasilijs)
@@ -8,9 +10,15 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
+..F....... [ZBX-14629] fixed breadcrumb labels clipping (ashubin)
+........S. [ZBX-14628] fixed empty MAIL FROM in email alerts (mindbound)
+....I..... [ZBX-14696] changed problem_tag index to optimize database queries (wiper)
+..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 ........S. [ZBX-9731] changed value cache to drop unused items from cache when new values are added instead performing this cleanup only when cache runs out of free space (wiper)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
+...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
 ..F....... [ZBX-14631] fixed typo in string: ouf, not out (vasilijs)
 ........S. [ZBX-14410] fixed output of information about the error for expressions with functions of triggers or calculated items (MVekslers)
 ...G...PS. [ZBX-14341] fixed duplicate value generation in environments with poor connectivity (wiper)
@@ -435,6 +443,8 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
+..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 ...G...PS. [ZBX-13730] fixed incorrect behavior of zbxregexp library when reusing latest regular expression (yurii)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
@@ -1745,6 +1755,7 @@ Changes for 3.0.21rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
 ...G...... [ZBX-372] added "zone" parameter to proc.num[] item for Solaris (viktors)
