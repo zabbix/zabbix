@@ -25,13 +25,14 @@
 class CBrandHelper {
 
 	/**
-	 * Brand configuration array
+	 * Brand configuration array.
+	 *
 	 * @var array
 	 */
 	private static $config = [];
 
 	/**
-	 * Lazy loading configuration
+	 * Lazy configuration loading.
 	 */
 	private static function loadConfig() {
 		if (!self::$config) {
@@ -47,8 +48,8 @@ class CBrandHelper {
 	/**
 	 * Get value by key from configuration (load configuration if need).
 	 *
-	 * @param string $key
-	 * @param mixed $default  Default value.
+	 * @param string $key      configuration key
+	 * @param mixed  $default  default value
 	 *
 	 * @return mixed
 	 */
@@ -68,7 +69,7 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get Help URL.
+	 * Get help URL.
 	 *
 	 * @return string
 	 */
@@ -77,9 +78,9 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get Logo style.
+	 * Get logo style.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public static function getLogoStyle() {
 		$logo = self::getValue('BRAND_LOGO', null);
@@ -89,11 +90,11 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get Footer Content.
+	 * Get footer content.
 	 *
 	 * @param boolean $with_version
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public static function getFooterContent($with_version) {
 		$footer = self::getValue(
