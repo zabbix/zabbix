@@ -117,7 +117,6 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getFooterLabel($with_version) {
-		self::loadConfig();
 		return self::getValue(
 			'BRAND_FOOTER',
 			[
