@@ -1,0 +1,305 @@
+---
+test case: Calculate active item nextcheck from simple delay
+in:
+  item type: ZABBIX_ACTIVE
+  delay: 1h
+  timezone: :Europe/Riga
+  at: 2017-10-29 04:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 04:00:00 +02:00
+    - 2017-10-29 05:00:00 +02:00
+---
+test case: Calculate active item nextcheck from scheduled interval
+in:
+  item type: ZABBIX_ACTIVE
+  delay: 0;h12
+  timezone: :Europe/Riga
+  at: 2017-10-29 04:00:00 +03:00
+out:
+  checks:
+    - 2038-01-01 02:00:00 +02:00
+---
+test case: Scheduled every 15m check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;m/15
+  timezone: :Europe/Riga
+  at: 2017-10-29 03:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 03:15:00 +03:00
+    - 2017-10-29 03:30:00 +03:00
+    - 2017-10-29 03:45:00 +03:00
+    # 2017-10-29 04:00:00 +03:00 clocks were turned backward 1 hour to
+    # 2017-10-29 03:00:00 +02:00 local standard time instead
+    - 2017-10-29 03:00:00 +02:00
+    - 2017-10-29 03:15:00 +02:00
+    - 2017-10-29 03:30:00 +02:00
+---
+test case: Scheduled every 1h check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h/1
+  timezone: :Europe/Riga
+  at: 2017-10-29 03:00:00 +03:00
+out:
+  checks:
+    # 2017-10-29 04:00:00 +03:00 clocks were turned backward 1 hour to
+    # 2017-10-29 03:00:00 +02:00 local standard time instead
+    - 2017-10-29 03:00:00 +02:00
+    - 2017-10-29 04:00:00 +02:00
+    - 2017-10-29 05:00:00 +02:00
+---
+test case: Scheduled 9:00 check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h9
+  timezone: :Europe/Riga
+  at: 2017-10-29 03:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 09:00:00 +02:00
+    - 2017-10-30 09:00:00 +02:00
+---
+test case: Scheduled 15m check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;m15
+  timezone: :Europe/Riga
+  at: 2017-10-29 03:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 03:15:00 +03:00
+    # 2017-10-29 04:00:00 +03:00 clocks were turned backward 1 hour to
+    # 2017-10-29 03:00:00 +02:00 local standard time instead
+    - 2017-10-29 03:15:00 +02:00
+    - 2017-10-29 04:15:00 +02:00
+    - 2017-10-29 05:15:00 +02:00
+---
+test case: Scheduled 3:30 check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h3m30
+  timezone: :Europe/Riga
+  at: 2017-10-29 03:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 03:30:00 +03:00
+    # 2017-10-29 04:00:00 +03:00 clocks were turned backward 1 hour to
+    # 2017-10-29 03:00:00 +02:00 local standard time instead
+    - 2017-10-29 03:30:00 +02:00
+    - 2017-10-30 03:30:00 +02:00
+---
+test case: Scheduled every 2h check when changing from summer time to winter
+in:
+  item type: ZABBIX
+  delay: 0;h/2
+  timezone: :Europe/Riga
+  at: 2017-10-29 01:00:00 +03:00
+out:
+  checks:
+    - 2017-10-29 02:00:00 +03:00
+    # 2017-10-29 04:00:00 +03:00 clocks were turned backward 1 hour to
+    # 2017-10-29 03:00:00 +02:00 local standard time instead
+    - 2017-10-29 04:00:00 +02:00
+    - 2017-10-29 06:00:00 +02:00
+
+---
+test case: Sheduled every 15m check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;m/15
+  timezone: :Europe/Riga
+  at: 2017-03-26 02:00:00 +02:00
+out:
+  checks:
+    - 2017-03-26 02:15:00 +02:00
+    - 2017-03-26 02:30:00 +02:00
+    - 2017-03-26 02:45:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-26 04:00:00 +03:00
+    - 2017-03-26 04:15:00 +03:00
+    - 2017-03-26 04:30:00 +03:00
+---
+test case: Scheduled every 1h check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h/1
+  timezone: :Europe/Riga
+  at: 2017-03-26 01:00:00 +02:00
+out:
+  checks:
+    - 2017-03-26 02:00:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-26 04:00:00 +03:00
+    - 2017-03-26 05:00:00 +03:00
+    - 2017-03-26 06:00:00 +03:00
+---
+test case: Scheduled 9:00 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h9
+  timezone: :Europe/Riga
+  at: 2017-03-26 02:00:00 +02:00
+out:
+  checks:
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-26 09:00:00 +03:00
+    - 2017-03-27 09:00:00 +03:00
+---
+test case: Scheduled 15m check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;m15
+  timezone: :Europe/Riga
+  at: 2017-03-26 02:00:00 +02:00
+out:
+  checks:
+    - 2017-03-26 02:15:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-26 04:15:00 +03:00
+    - 2017-03-26 05:15:00 +03:00
+---
+test case: Scheduled 3:30 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h3m30
+  timezone: :Europe/Riga
+  at: 2017-03-25 02:00:00 +02:00
+out:
+  checks:
+    - 2017-03-25 03:30:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-27 03:30:00 +03:00
+    - 2017-03-28 03:30:00 +03:00
+---
+test case: Scheduled every 2h check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h/2
+  timezone: :Europe/Riga
+  at: 2017-03-26 01:00:00 +03:00
+out:
+  checks:
+    - 2017-03-26 02:00:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-26 04:00:00 +03:00
+    - 2017-03-26 06:00:00 +03:00
+---
+test case: Scheduled 3:00 check when changing from winter time to summer
+in:
+  item type: ZABBIX
+  delay: 0;h3
+  timezone: :Europe/Riga
+  at: 2017-03-25 02:00:00 +02:00
+out:
+  checks:
+    - 2017-03-25 03:00:00 +02:00
+    # 2017-03-26 03:00:00 +02:00 clocks were turned forward 1 hour to
+    # 2017-03-26 04:00:00 +03:00 local daylight time instead
+    - 2017-03-27 03:00:00 +03:00
+    - 2017-03-28 03:00:00 +03:00
+---
+test case: Time zone 1:30 west of UTC
+in:
+  item type: ZABBIX
+  delay: 1m
+  timezone: ZBX1:30
+  at: 2018-01-01 00:00:00 -01:30
+out:
+  checks:
+    - 2018-01-01 00:01:00 -01:30
+---
+test case: Time zone 0:45 west of UTC
+in:
+  item type: ZABBIX
+  delay: 1m
+  timezone: ZBX0:45
+  at: 2018-01-01 00:00:00 -00:45
+out:
+  checks:
+    - 2018-01-01 00:01:00 -00:45
+---
+test case: Scheduling interval with month day and week day filters
+in:
+  item type: ZABBIX
+  delay: 0;md1wd6
+  timezone: UTC
+  at: 1970-01-01 00:00:00 +00:00
+out:
+  checks:
+    - 1970-08-01 00:00:00 +00:00
+---
+test case: Scheduling interval month day is outside of current month day range
+in:
+  item type: ZABBIX
+  delay: 0;md1,31
+  timezone: UTC
+  at: 1970-02-01 00:00:00 +00:00
+out:
+  checks:
+    - 1970-03-01 00:00:00 +00:00
+    - 1970-03-31 00:00:00 +00:00
+---
+test case: Scheduling check every day at 2 a.m. when government decides drastically change the timezone
+in:
+  item type: ZABBIX
+  delay: 0;h2
+  timezone: :Pacific/Apia
+  at: 2011-12-29 00:00:00 -10:00
+out:
+  checks:
+    - 2011-12-29 02:00:00 -10:00
+    # 2011-12-30 00:00:00 -10:00 clocks were turned forward 1 day to
+    # 2011-12-31 00:00:00 +14:00 instead, there was no 2011-12-30 in Samoa
+    - 2011-12-31 02:00:00 +14:00
+    - 2012-01-01 02:00:00 +14:00
+---
+test case: Scheduling check around DST change in the Southern Hemisphere
+in:
+  item type: ZABBIX
+  delay: 0;h0,10,14,17,20m30
+  timezone: :America/Sao_Paulo
+  at: 2018-02-17 20:00:00 -02:00
+out:
+  checks:
+    - 2018-02-17 20:30:00 -02:00
+    # 2018-02-18 00:00:00 -02:00 clocks were turned backward 1 hour to
+    # 2018-02-17 23:00:00 -03:00 local standard time instead
+    - 2018-02-18 00:30:00 -03:00
+    - 2018-02-18 10:30:00 -03:00
+---
+test case: Scheduling check around DST change back in the Moscow
+in:
+  item type: ZABBIX
+  delay: 0;h0,10,11,20m30
+  timezone: :Europe/Moscow
+  at: 1981-09-30 20:00:00 +04:00
+out:
+  checks:
+    - 1981-09-30 20:30:00 +04:00
+    # 1981-10-01 00:00:00 +04:00 clocks were turned backward 1 hour to
+    # 1981-10-01 23:00:00 +03:00 local standard time instead
+    - 1981-10-01 00:30:00 +03:00
+    - 1981-10-01 10:30:00 +03:00
+---
+test case: Scheduling check around DST change forward in the Moscow
+in:
+  item type: ZABBIX
+  delay: 0;h0,0m59;h10,20m30
+  timezone: :Europe/Moscow
+  at: 1981-03-31 20:00:00 +03:00
+out:
+  checks:
+    - 1981-03-31 20:30:00 +03:00
+    # 1981-04-01 00:00:00 +03:00 local standard time instead
+    # 1981-04-01 01:00:00 +04:00 clocks were turned forward 1 hour to
+    - 1981-04-01 10:30:00 +04:00
+...

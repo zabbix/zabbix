@@ -68,7 +68,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
 			'details' => 0
-		], $config, true);
+		], true);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
@@ -82,13 +82,19 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
 				'show' => $fields['show'],
-				'show_tags' => $fields['show_tags']
+				'show_tags' => $fields['show_tags'],
+				'show_timeline' => $fields['show_timeline']
 			],
 			'config' => [
-				'event_ack_enable' => $config['event_ack_enable'],
 				'problem_unack_style' => $config['problem_unack_style'],
 				'problem_ack_style' => $config['problem_ack_style'],
-				'blink_period' => timeUnitToSeconds($config['blink_period'])
+				'blink_period' => timeUnitToSeconds($config['blink_period']),
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
 			],
 			'data' => $data,
 			'info' => $info,
@@ -122,10 +128,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_SEVERITY_ASC:
-				return ['priority', ZBX_SORT_UP];
+				return ['severity', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
-				return ['priority', ZBX_SORT_DOWN];
+				return ['severity', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
 				return ['host', ZBX_SORT_UP];

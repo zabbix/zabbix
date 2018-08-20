@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/acknow.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/events.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -73,42 +72,25 @@ if (!$triggers) {
 
 $trigger = reset($triggers);
 
-$alert_options = ['alertid', 'alerttype', 'mediatypes', 'status', 'retries', 'userid', 'sendto', 'error', 'esc_step',
-	'clock', 'subject', 'message', 'p_eventid', 'acknowledgeid'
-];
-$options = [
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'value', 'name'],
-	'select_alerts' => $alert_options,
+$events = API::Event()->get([
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity'],
 	'selectTags' => ['tag', 'value'],
+	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity'],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
-	'objectids' => getRequest('triggerid')
-];
+	'objectids' => getRequest('triggerid'),
+	'value' => TRIGGER_VALUE_TRUE
+]);
 
-if ($config['event_ack_enable']) {
-	$options['output'][] = 'acknowledged';
-	$options['select_acknowledges'] = ['clock', 'message', 'action', 'userid', 'alias', 'name', 'surname'];
-}
-
-$events = API::Event()->get($options);
 if (!$events) {
 	access_deny();
 }
 $event = reset($events);
 
-$alerts = [];
-$r_alerts = [];
-
-if ($event['alerts']) {
-	$alerts = $event['alerts'];
-	CArrayHelper::sort($alerts, [['field' => 'alertid', 'order' => ZBX_SORT_DOWN]]);
-}
-
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
-		'select_alerts' => $alert_options,
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
@@ -120,39 +102,38 @@ if ($event['r_eventid'] != 0) {
 
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
-
-		if ($r_event['alerts']) {
-			CArrayHelper::sort($r_alerts, [['field' => 'alertid', 'order' => ZBX_SORT_DOWN]]);
-			foreach ($r_event['alerts'] as $alert) {
-				if ($alert['p_eventid'] == $event['eventid']) {
-					$r_alerts[] = $alert;
-				}
-			}
-		}
 	}
 }
 
-// Filter out acknowledgement notification messages.
-$all_alerts = [&$alerts, &$r_alerts];
+$config = select_config();
+$severity_config = [
+	'severity_name_0' => $config['severity_name_0'],
+	'severity_name_1' => $config['severity_name_1'],
+	'severity_name_2' => $config['severity_name_2'],
+	'severity_name_3' => $config['severity_name_3'],
+	'severity_name_4' => $config['severity_name_4'],
+	'severity_name_5' => $config['severity_name_5']
+];
+$actions = getEventDetailsActions($event);
+$users = API::User()->get([
+	'output' => ['alias', 'name', 'surname'],
+	'userids' => array_keys($actions['userids']),
+	'preservekeys' => true
+]);
+$mediatypes = API::Mediatype()->get([
+	'output' => ['maxattempts'],
+	'mediatypeids' => array_keys($actions['mediatypeids']),
+	'preservekeys' => true
+]);
 
-foreach ($all_alerts as &$alerts_data) {
-	foreach ($alerts_data as $index => $alert) {
-		if ($alert['acknowledgeid'] > 0) {
-			unset($alerts_data[$index]);
-		}
-	}
-}
-unset($alerts_data);
 /*
  * Display
  */
-$config = select_config();
-
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
 			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
-				->setHeader(_('Event source details')),
+				->setHeader(_('Trigger details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
@@ -160,17 +141,11 @@ $eventTab = (new CTable())
 			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
-			($config['event_ack_enable'] && $event['value'] == TRIGGER_VALUE_TRUE)
-				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
-					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-					->setHeader(_('Acknowledgements'), [], false, 'tr_events.php')
-				: null,
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($alerts, $r_alerts)))
-				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
-				->setHeader(_('Message actions'), [], false, 'tr_events.php'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($alerts, $r_alerts)))
-				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
-				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK,
+					makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+			))
+				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
+				->setHeader(_('Actions'), [], false, 'tr_events.php'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
 				make_small_eventlist($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')

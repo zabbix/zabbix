@@ -40,12 +40,16 @@
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
+					'title': t('Adjust widget refresh interval'),
 					'data-menu-popup': JSON.stringify({
 						'type': 'refresh',
 						'widgetName': widget['widgetid'],
 						'currentRate': widget['rf_rate'],
 						'multiplier': false
-					})
+					}),
+					'attr': {
+						'aria-haspopup': true
+					}
 				}))
 			)
 		);
@@ -478,12 +482,12 @@
 			dataType: 'json',
 			success: function(resp) {
 				stopPreloader(widget);
+				var $content_header = $('h4', widget['content_header']);
 
-				$('h4', widget['content_header']).text(resp.header);
-				if ('period_string' in resp) {
-					$('h4', widget['content_header']).append(
-						$('<span class="dashbrd-grid-widget-head-period-string">').text(resp.period_string)
-					);
+				$content_header.text(resp.header);
+
+				if (typeof resp.aria_label !== 'undefined') {
+					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
 				}
 
 				widget['content_body'].find('[data-hintbox=1]').trigger('remove');

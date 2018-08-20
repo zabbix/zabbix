@@ -85,18 +85,14 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  *                                                                            *
  * Function: check_perm2system                                                *
  *                                                                            *
- * Purpose: Checking user permissions to access system.                       *
+ * Purpose: Check user permissions to access system                           *
  *                                                                            *
  * Parameters: userid - user ID                                               *
  *                                                                            *
- * Return value: SUCCEED - permission is positive, FAIL - otherwise           *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
+ * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
  *                                                                            *
  ******************************************************************************/
-int	check_perm2system(zbx_uint64_t userid)
+static int	check_perm2system(zbx_uint64_t userid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -144,10 +140,6 @@ static	int	get_user_type(zbx_uint64_t userid)
  *                                                                            *
  * Return value: PERM_DENY - if host or user not found,                       *
  *                   or permission otherwise                                  *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
@@ -443,13 +435,10 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_uint64_t mediatypeid,
 		ZBX_USER_MSG **user_msg, const char *subject, const char *message, const DB_EVENT *event,
 		const DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack, int macro_type)
-
 {
 	const char	*__function_name = "add_object_msg";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	userid;
-	char		*subject_dyn, *message_dyn;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -466,6 +455,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	userid;
+		char		*subject_dyn, *message_dyn;
+
 		ZBX_STR2UINT64(userid, row[0]);
 
 		/* exclude acknowledgement author from the recipient list */
@@ -1273,8 +1265,6 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	check_operation_conditions(const DB_EVENT *event, zbx_uint64_t operationid, unsigned char evaltype)
@@ -2093,30 +2083,31 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 
 	DB_ROW		row;
 	DB_RESULT	result;
-	DB_ACKNOWLEDGE	ack;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " acknowledgeid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, escalation->acknowledgeid,
 			zbx_escalation_status_string(escalation->status));
 
-	memset(&ack, 0, sizeof(ack));
-
 	result = DBselect(
-			"select message,userid,clock from acknowledges"
+			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ack.message = zbx_strdup(NULL, row[0]);
+		DB_ACKNOWLEDGE	ack;
+
+		ack.message = row[0];
 		ZBX_STR2UINT64(ack.userid, row[1]);
 		ack.clock = atoi(row[2]);
 		ack.acknowledgeid = escalation->acknowledgeid;
+		ack.action = atoi(row[3]);
+		ack.old_severity = atoi(row[4]);
+		ack.new_severity = atoi(row[5]);
 
 		escalation_execute_acknowledge_operations(event, r_event, action, &ack);
 	}
 
-	zbx_free(ack.message);
 	DBfree_result(result);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
@@ -2218,7 +2209,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_ptr_t *escalations, zbx_vec
 	{
 		zbx_db_get_eventid_r_eventid_pairs(&ack_eventids, event_pairs, &r_eventids);
 
-		zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
+		if (0 < r_eventids.values_num)
+			zbx_vector_uint64_append_array(eventids, r_eventids.values, r_eventids.values_num);
 	}
 
 	zbx_vector_uint64_destroy(&ack_eventids);
@@ -2445,7 +2437,7 @@ cancel_warning:
 			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator,
-						diff->status);
+						(int)diff->status);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",

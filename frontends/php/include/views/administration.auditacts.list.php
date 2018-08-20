@@ -21,8 +21,6 @@
 $auditWidget = (new CWidget())->setTitle(_('Action log'));
 
 // create filter
-$filterForm = new CFilter('web.auditacts.filter.state');
-
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('Recipient'), [
 	(new CTextBox('alias', $this->data['alias']))
@@ -41,9 +39,13 @@ $filterColumn->addRow(_('Recipient'), [
 		)
 ]);
 
-$filterForm->addColumn($filterColumn);
-$filterForm->addNavigator();
-$auditWidget->addItem($filterForm);
+$auditWidget->addItem(
+	(new CFilter())
+		->setProfile($data['timeline']['profileIdx'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+		->addFilterTab(_('Filter'), [$filterColumn])
+);
 
 // create form
 $auditForm = (new CForm('get'))->setName('auditForm');
@@ -125,15 +127,8 @@ $objData = [
 	'domid' => 'events',
 	'loadSBox' => 0,
 	'loadImage' => 0,
-	'loadScroll' => 1,
 	'dynamic' => 0,
-	'mainObject' => 1,
-	'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1),
-	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-	'profile' => [
-		'idx' => 'web.auditacts',
-		'idx2' => 0
-	]
+	'mainObject' => 1
 ];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');

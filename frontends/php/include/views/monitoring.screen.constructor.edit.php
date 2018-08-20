@@ -255,7 +255,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	}
 
 	$screenFormList->addRow(
-		(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
+		(new CLabel(_('Item'), 'resourceid_ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'resourceid',
 			'object_name' => 'items',
@@ -424,7 +424,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	$screenFormList
 		->addRow(
-			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
+			(new CLabel(_('Item'), 'resourceid_ms'))->setAsteriskMark(),
 			(new CMultiSelect([
 				'name' => 'resourceid',
 				'object_name' => 'items',
@@ -483,7 +483,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			}
 		}
 
-		$screenFormList->addRow(_('Group'),
+		$screenFormList->addRow((new CLabel(_('Group'), 'resourceid_ms')),
 			(new CMultiSelect([
 				'name' => 'resourceid',
 				'object_name' => 'hostGroup',
@@ -520,7 +520,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			}
 		}
 
-		$screenFormList->addRow(_('Host'),
+		$screenFormList->addRow((new CLabel(_('Host'), 'resourceid_ms')),
 			(new CMultiSelect([
 				'name' => 'resourceid',
 				'object_name' => 'hosts',
@@ -617,7 +617,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 		}
 	}
 
-	$screenFormList->addRow((new CLabel(_('Group'), 'resourceid'))->setAsteriskMark(),
+	$screenFormList->addRow((new CLabel(_('Group'), 'resourceid_ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'resourceid',
 			'object_name' => 'hostGroup',
@@ -713,7 +713,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOST_INFO || $resourceType == SCREEN_RE
 		}
 	}
 
-	$screenFormList->addRow(_('Group'),
+	$screenFormList->addRow((new CLabel(_('Group'), 'resourceid_ms')),
 		(new CMultiSelect([
 			'name' => 'resourceid',
 			'object_name' => 'hostGroup',
@@ -767,7 +767,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 
 		$screenFormList->addRow(
-			(new CLabel(_('Item'), 'resourceid'))->setAsteriskMark(),
+			(new CLabel(_('Item'), 'resourceid_ms'))->setAsteriskMark(),
 			(new CMultiSelect([
 				'name' => 'resourceid',
 				'object_name' => 'items',

@@ -83,11 +83,15 @@ else {
 				->addItem((new CTag('nav', true, [
 					(new CList())
 						->addItem((
-							(new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable'])))
-						->addItem((new CButton(SPACE))
+							(new CButton('dashbrd-edit', _('Edit dashboard')))
+								->setEnabled($data['dashboard']['editable'])
+								->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+						))
+						->addItem((new CButton('', '&nbsp;'))
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashbrd-actions')
 							->setTitle(_('Actions'))
+							->setAttribute('aria-haspopup', true)
 							->setMenuPopup([
 								'type' => 'dashboard',
 								'label' => _('Actions'),
@@ -146,6 +150,7 @@ else {
 				->setAttribute('aria-label', _('Breadcrumbs'))
 				->addItem($breadcrumbs)
 				->addClass(ZBX_STYLE_OBJECT_GROUP)
+				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 			);
 	}
 	else {
@@ -157,11 +162,14 @@ else {
 	}
 
 	$timeline = null;
-	if ($data['show_timeline']) {
-		$timeline = (new CFilter('web.dashbrd.filter.state'))->addNavigator();
+	if ($data['show_timeselector']) {
+		$timeline = (new CFilter())
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 		if ($data['kioskmode']) {
-			$timeline->setHidden();
+			$timeline = (new CDiv($timeline))->addStyle('display: none;');
 		}
 	}
 
@@ -202,7 +210,7 @@ else {
 	}
 
 	// must be done before adding widgets, because it causes dashboard to resize.
-	if ($data['show_timeline']) {
+	if ($data['show_timeselector']) {
 		$this->addPostJS(
 			'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
 			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.

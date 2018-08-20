@@ -59,6 +59,7 @@ $availableJScripts = [
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
 	'multiselect.js' => '',
+	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
@@ -90,17 +91,11 @@ $availableJScripts = [
 
 $tranStrings = [
 	'gtlc.js' => [
-		'S_ALL_S' => _('All'),
-		'S_ZOOM' => _('Zoom'),
-		'S_FIXED_SMALL' => _('fixed'),
-		'S_DYNAMIC_SMALL' => _('dynamic'),
-		'S_NOW_SMALL' => _('now'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'S_DATE_FORMAT' => DATE_TIME_FORMAT
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'dashboard.grid.js' => [
 		'Edit widget' => _('Edit widget'),
@@ -113,14 +108,18 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
-		'Add a new widget' => _('Add a new widget')
+		'Add a new widget' => _('Add a new widget'),
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'%1$s, selected' => _x('%1$s, selected', 'screen reader')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
+		'Close' => _('Close'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation')
 	],
 	'class.calendar.js' => [
+		'S_Calendar' => _('Calendar'),
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
@@ -133,16 +132,20 @@ $tranStrings = [
 		'S_OCTOBER' => _('October'),
 		'S_NOVEMBER' => _('November'),
 		'S_DECEMBER' => _('December'),
+		'S_MONDAY' => _('Monday'),
+		'S_TUESDAY' => _('Tuesday'),
+		'S_WEDNESDAY' => _('Wednesday'),
+		'S_THURSDAY' => _('Thursday'),
+		'S_FRIDAY' => _('Friday'),
+		'S_SATURDAY' => _('Saturday'),
+		'S_SUNDAY' => _('Sunday'),
 		'S_MONDAY_SHORT_BIG' => _x('M', 'Monday short'),
 		'S_TUESDAY_SHORT_BIG' => _x('T', 'Tuesday short'),
 		'S_WEDNESDAY_SHORT_BIG' => _x('W', 'Wednesday short'),
 		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
 		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
 		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
-		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
-		'S_NOW' => _('Now'),
-		'S_DONE' => _('Done'),
-		'S_TIME' => _('Time')
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short')
 	],
 	'class.cmap.js' => [
 		'S_ON' => _('On'),
@@ -189,13 +192,23 @@ $tranStrings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
+		'Close' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
-		'Select' => _('Select')
+		'Select' => _('Select'),
+		'Added, %1$s' => _x('Added, %1$s', 'screen reader'),
+		'Removed, %1$s' => _x('Removed, %1$s', 'screen reader'),
+		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
+		'Can not be removed' => _x('Can not be removed', 'screen reader'),
+		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
+		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
+		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
@@ -254,6 +267,9 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Add child element' => _('Add child element'),
 		'Add multiple maps' => _('Add multiple maps')
+	],
+	'colorpicker.js' => [
+		'Close' => _('Close')
 	]
 ];
 

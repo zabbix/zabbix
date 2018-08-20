@@ -25,9 +25,9 @@
 #include "log.h"
 #include "mutexs.h"
 
-extern ZBX_MUTEX		diskstats_lock;
-#define LOCK_DISKSTATS		zbx_mutex_lock(&diskstats_lock)
-#define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
+extern zbx_mutex_t		diskstats_lock;
+#define LOCK_DISKSTATS		zbx_mutex_lock(diskstats_lock)
+#define UNLOCK_DISKSTATS	zbx_mutex_unlock(diskstats_lock)
 
 static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
 {
@@ -148,7 +148,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 	}
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
 
 	return device;
 }
@@ -186,7 +186,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 end:
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
 
 	return device;
 }

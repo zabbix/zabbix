@@ -1012,7 +1012,7 @@ static void	test_DCitem_poller_type_update(void)
 				zbx_cu_item_type_string(test_cases[i].item_type),
 				test_cases[i].item_key,
 				zbx_cu_poller_type_string(test_cases[i].item_poller_type),
-				(0 == (test_cases[i].flags & ZBX_ITEM_COLLECTED) ? "n't" : ""), i);
+				(0 == (test_cases[i].flags & ZBX_ITEM_COLLECTED) ? "n't" : ""), (zbx_fs_size_t)i);
 
 		/* run */
 

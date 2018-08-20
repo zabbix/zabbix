@@ -212,7 +212,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param array  options['gotos']['showGraphs']     Display "Graphs" link enabled or disabled.
  * @param array  options['gotos']['screens']        Link to host screen page with url parameters ("name" => "value").
  * @param array  options['gotos']['showScreens']    Display "Screens" link enabled or disabled.
- * @param array  options['gotos']['triggerStatus']  Link to trigger status page with url parameters ("name" => "value").
+ * @param array  options['gotos']['triggerStatus']  Link to "Problems" page with url parameters ("name" => "value").
  * @param array  options['gotos']['showTriggers']   Display "Problems" link enabled or disabled.
  * @param array  options['gotos']['submap']         Link to submap page with url parameters ("name" => "value").
  * @param array  options['gotos']['events']         Link to events page with url parameters ("name" => "value").
@@ -377,6 +377,10 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				}
 			});
 
+			if (fullscreen) {
+				url.setArgument('fullscreen', '1');
+			}
+
 			gotos.push({
 				label: t('Submap'),
 				url: url.getUrl()
@@ -501,10 +505,14 @@ function getMenuPopupRefresh(options) {
 						var link = jQuery(this);
 
 						if (link.data('value') == currentRate) {
-							link.addClass('selected');
+							link
+								.addClass('selected')
+								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 						}
 						else {
-							link.removeClass('selected');
+							link
+								.removeClass('selected')
+								.attr('aria-label', link.data('aria-label'));
 						}
 					});
 
@@ -513,7 +521,7 @@ function getMenuPopupRefresh(options) {
 				else {
 					var url = new Curl('zabbix.php');
 
-					url.setArgument('action', 'dashboard.widget.rfrate')
+					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
 						url: url.getUrl(),
@@ -528,10 +536,14 @@ function getMenuPopupRefresh(options) {
 								var link = jQuery(this);
 
 								if (link.data('value') == currentRate) {
-									link.addClass('selected');
+									link
+										.addClass('selected')
+										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 								}
 								else {
-									link.removeClass('selected');
+									link
+										.removeClass('selected')
+										.attr('aria-label', link.data('aria-label'));
 								}
 							});
 
@@ -1281,14 +1293,18 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function createMenuItem(options) {
-		options = $.extend({ariaLabel: options.label}, options);
+		options = $.extend({
+			ariaLabel: options.label,
+			selected: false,
+			disabled: false
+		}, options);
 
 		var item = $('<li>'),
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.ariaLabel
-			});
+				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {
 			link.text(options.label);
@@ -1305,7 +1321,7 @@ jQuery(function($) {
 			});
 		}
 
-		if (typeof options.disabled !== 'undefined' && options.disabled) {
+		if (options.disabled) {
 			link.addClass('action-menu-item-disabled');
 		}
 		else {
@@ -1320,7 +1336,7 @@ jQuery(function($) {
 			}
 		}
 
-		if (typeof options.selected !== 'undefined' && options.selected) {
+		if (options.selected) {
 			link.addClass('selected');
 		}
 

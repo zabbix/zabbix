@@ -389,7 +389,7 @@ return [
 			],
 		],
 	],
-	'groups' => [
+	'hstgrp' => [
 		'key' => 'groupid',
 		'fields' => [
 			'groupid' => [
@@ -442,7 +442,7 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'templateid' => [
@@ -461,7 +461,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'parent_group_prototypeid' => [
@@ -1622,7 +1622,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '1',
+				'default' => '0',
 			],
 			'output_format' => [
 				'null' => false,
@@ -1947,7 +1947,7 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'description' => [
@@ -2312,7 +2312,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -2336,7 +2336,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -2468,12 +2468,6 @@ return [
 				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid',
 			],
-			'event_ack_enable' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
 			'default_theme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -2538,7 +2532,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'max_in_table' => [
@@ -2629,13 +2623,13 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '30m',
+				'default' => '5m',
 			],
 			'blink_period' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '30m',
+				'default' => '2m',
 			],
 			'problem_unack_color' => [
 				'null' => false,
@@ -2977,7 +2971,7 @@ return [
 				'ref_table' => 'triggers',
 				'ref_field' => 'triggerid',
 			],
-			'function' => [
+			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 12,
@@ -3324,7 +3318,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -3479,7 +3473,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -4233,7 +4227,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -4879,6 +4873,12 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'trends' => [
@@ -5000,6 +5000,18 @@ return [
 				'default' => '',
 			],
 			'action' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'old_severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'new_severity' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -6442,6 +6454,18 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
+			'acknowledged' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'problem_tag' => [
@@ -6492,7 +6516,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'tag' => [
@@ -6649,7 +6673,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 		],
@@ -7348,7 +7372,7 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'groups',
+				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid',
 			],
 			'value_hostid' => [

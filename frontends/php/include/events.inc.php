@@ -142,13 +142,20 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param array  $event								An array of event data.
  * @param string $event['eventid']					Event ID.
  * @param string $event['correlationid']			OK Event correlation ID.
- * @param string $event['userid]					User ID who gerenerated the OK event.
+ * @param string $event['userid]					User ID who generated the OK event.
  * @param string $event['name']						Event name.
+ * @param string $event['acknowledged']				State of acknowledgement.
  * @param string $backurl							A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
 function make_event_details($event, $backurl) {
+	$event_update_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'acknowledge.edit')
+		->setArgument('eventids', [$event['eventid']])
+		->setArgument('backurl', $backurl)
+		->getUrl();
+
 	$config = select_config();
 
 	$table = (new CTableInfo())
@@ -157,15 +164,19 @@ function make_event_details($event, $backurl) {
 			$event['name']
 		])
 		->addRow([
+			_('Severity'),
+			getSeverityCell($event['severity'], $config)
+		])
+		->addRow([
 			_('Time'),
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
+		])
+		->addRow([
+			_('Acknowledged'),
+			(new CLink($event['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $event_update_url))
+				->addClass($event['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT)
 		]);
-
-	if ($config['event_ack_enable']) {
-		// to make resulting link not have hint with acknowledges
-		$event['acknowledges'] = count($event['acknowledges']);
-		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
-	}
 
 	if ($event['r_eventid'] != 0) {
 		if ($event['correlationid'] != 0) {
@@ -236,14 +247,13 @@ function make_small_eventlist($startEvent, $backurl) {
 			_('Status'),
 			_('Age'),
 			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Ack'),
 			_('Actions')
 		]);
 
-	$clock = $startEvent['clock'];
-
-	$options = [
-		'output' => ['eventid', 'r_eventid', 'source', 'object', 'objectid', 'clock', 'ns'],
+	$events = API::Event()->get([
+		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid'],
+		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
@@ -253,14 +263,7 @@ function make_small_eventlist($startEvent, $backurl) {
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20,
 		'preservekeys' => true
-	];
-
-	if ($config['event_ack_enable']) {
-		$options['output'][] = 'acknowledged';
-		$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
-	}
-
-	$events = API::Event()->get($options);
+	]);
 
 	$r_eventids = [];
 
@@ -271,7 +274,7 @@ function make_small_eventlist($startEvent, $backurl) {
 
 	$r_events = $r_eventids
 		? API::Event()->get([
-			'output' => ['clock', 'correlationid', 'userid'],
+			'output' => ['clock'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => array_keys($r_eventids),
@@ -279,23 +282,46 @@ function make_small_eventlist($startEvent, $backurl) {
 		])
 		: [];
 
+	$triggerids = [];
 	foreach ($events as &$event) {
-		if (array_key_exists($event['r_eventid'], $r_events)) {
-			$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
-			$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
-			$event['userid'] = $r_events[$event['r_eventid']]['userid'];
-		}
-		else {
-			$event['r_clock'] = 0;
-			$event['correlationid'] = 0;
-			$event['userid'] = 0;
-		}
+		$triggerids[] = $event['objectid'];
+
+		$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
+			? $r_events[$event['r_eventid']]['clock']
+			: 0;
 	}
 	unset($event);
 
-	$actions = makeEventsActions($events, true);
+	// Get trigger severities.
+	$triggers = $triggerids
+		? API::Trigger()->get([
+			'output' => ['priority'],
+			'triggerids' => $triggerids,
+			'preservekeys' => true
+		])
+		: [];
 
-	foreach ($events as $index => $event) {
+	$severity_config = [
+		'severity_name_0' => $config['severity_name_0'],
+		'severity_name_1' => $config['severity_name_1'],
+		'severity_name_2' => $config['severity_name_2'],
+		'severity_name_3' => $config['severity_name_3'],
+		'severity_name_4' => $config['severity_name_4'],
+		'severity_name_5' => $config['severity_name_5']
+	];
+	$actions = getEventsActionsIconsData($events, $triggers, $r_events);
+	$users = API::User()->get([
+		'output' => ['alias', 'name', 'surname'],
+		'userids' => array_keys($actions['userids']),
+		'preservekeys' => true
+	]);
+	$mediatypes = API::Mediatype()->get([
+		'output' => ['description', 'maxattempts'],
+		'mediatypeids' => array_keys($actions['mediatypeids']),
+		'preservekeys' => true
+	]);
+
+	foreach ($events as $event) {
 		$duration = ($event['r_eventid'] != 0)
 			? zbx_date2age($event['clock'], $event['r_clock'])
 			: zbx_date2age($event['clock']);
@@ -303,12 +329,10 @@ function make_small_eventlist($startEvent, $backurl) {
 		if ($event['r_eventid'] == 0) {
 			$in_closing = false;
 
-			if ($config['event_ack_enable']) {
-				foreach ($event['acknowledges'] as $acknowledge) {
-					if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-						$in_closing = true;
-						break;
-					}
+			foreach ($event['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+					$in_closing = true;
+					break;
 				}
 			}
 
@@ -328,13 +352,14 @@ function make_small_eventlist($startEvent, $backurl) {
 		 * Add colors to span depending on configuration and trigger parameters. No blinking added to status,
 		 * since the page is not on autorefresh.
 		 */
-		addTriggerValueStyle($cell_status, $value, $value_clock,
-			$config['event_ack_enable'] ? (bool) $event['acknowledges'] : false
-		);
+		addTriggerValueStyle($cell_status, $value, $value_clock, $event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
-		if ($config['event_ack_enable']) {
-			$acknowledges = makeEventsAcknowledges($events, $backurl);
-		}
+		// Create link to Problem update page.
+		$problem_update_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'acknowledge.edit')
+			->setArgument('eventids', [$event['eventid']])
+			->setArgument('backurl', $backurl)
+			->getUrl();
 
 		$table->addRow([
 			(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -348,10 +373,10 @@ function make_small_eventlist($startEvent, $backurl) {
 			$cell_status,
 			zbx_date2age($event['clock']),
 			$duration,
-			$config['event_ack_enable'] ? $acknowledges[$event['eventid']] : null,
-			array_key_exists($index, $actions)
-				? (new CCol($actions[$index]))->addClass(ZBX_STYLE_NOWRAP)
-				: ''
+			(new CLink($event['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
+				->addClass($event['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT),
+			makeEventActionsIcons($event['eventid'], $actions['data'], $mediatypes, $users, $severity_config)
 		]);
 	}
 
@@ -367,13 +392,13 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['url']					Trigger URL.
  * @param string $eventid_till
  * @param string $backurl							URL to return to.
- * @param array  $config
- * @param int    $config['event_ack_enable']
  * @param bool   $fullscreen
+ * @param bool   $show_timeline						show time line flag.
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, $fullscreen = false) {
+function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false, $show_timeline = true) {
+
 	// Show trigger description and URL.
 	$div = new CDiv();
 
@@ -400,8 +425,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 		);
 	}
 
-	$show_timeline = true;
-
 	// indicator of sort field
 	$sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 
@@ -422,14 +445,15 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			_('Recovery time'),
 			_('Status'),
 			_('Duration'),
-			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Ack'),
 			_('Tags')
 		]));
 
 	if ($eventid_till != 0) {
-		$options = [
-			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid'],
+		$problems = API::Event()->get([
+			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
+			'select_acknowledges' => ['action'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventid_till' => $eventid_till,
@@ -438,12 +462,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => ZBX_WIDGET_ROWS
-		];
-		if ($config['event_ack_enable']) {
-			$options['select_acknowledges'] = ['userid', 'clock', 'message', 'action'];
-		}
-
-		$problems = API::Event()->get($options);
+		]);
 
 		CArrayHelper::sort($problems, [
 			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
@@ -469,9 +488,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 
 		$today = strtotime('today');
 		$last_clock = 0;
-		if ($config['event_ack_enable']) {
-			$acknowledges = makeEventsAcknowledges($problems, $backurl);
-		}
+
 		if ($problems) {
 			$tags = makeEventsTags($problems);
 		}
@@ -501,12 +518,10 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			else {
 				$in_closing = false;
 
-				if ($config['event_ack_enable']) {
-					foreach ($problem['acknowledges'] as $acknowledge) {
-						if ($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) {
-							$in_closing = true;
-							break;
-						}
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$in_closing = true;
+						break;
 					}
 				}
 
@@ -538,9 +553,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 			$cell_status = new CSpan($value_str);
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle($cell_status, $value, $value_clock,
-				$config['event_ack_enable'] && (bool) $problem['acknowledges']
-			);
+			addTriggerValueStyle($cell_status, $value, $value_clock, $problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 			if ($show_timeline) {
 				if ($last_clock != 0) {
@@ -564,6 +577,18 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 				];
 			}
 
+			// Create acknowledge link.
+			$problem_update_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'acknowledge.edit')
+				->setArgument('eventids', [$problem['eventid']])
+				->setArgument('backurl', $backurl)
+				->getUrl();
+
+			$acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
+			$problem_update_link = (new CLink($acknowledged ? _('Yes') : _('No'), $problem_update_url))
+				->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_LINK_ALT);
+
 			$table->addRow(array_merge($row, [
 				$cell_r_clock,
 				$cell_status,
@@ -573,7 +598,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 						: zbx_date2age($problem['clock'])
 				))
 					->addClass(ZBX_STYLE_NOWRAP),
-				$config['event_ack_enable'] ? $acknowledges[$problem['eventid']] : null,
+				$problem_update_link,
 				$tags[$problem['eventid']]
 			]));
 		}
@@ -582,131 +607,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, array $config, 
 	$div->addItem($table);
 
 	return $div;
-}
-
-/**
- * Create element with event acknowledges info.
- * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
- *
- * @param array  $event                  Event data.
- * @param int    $event['acknowledged']
- * @param int    $event['eventid']
- * @param mixed  $event['acknowledges']
- * @param string $backurl                Add url param to link with current page file name.
- *
- * @deprecated use makeEventsAcknowledges instead
- *
- * @return CLink
- */
-function getEventAckState($event, $backurl) {
-	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
-		$acknowledges_num = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
-	}
-
-	$link = 'zabbix.php?action=acknowledge.edit&eventids[]='.$event['eventid'].'&backurl='.urlencode($backurl);
-
-	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
-		$ack = (new CLink(_('Yes'), $link))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREEN);
-		if (is_array($event['acknowledges'])) {
-			$ack->setHint(makeAckTab(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS)), '', false);
-		}
-		$ack = [$ack, CViewHelper::showNum($acknowledges_num)];
-	}
-	else {
-		$ack = (new CLink(_('No'), $link))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_RED);
-	}
-
-	return $ack;
-}
-
-/**
- * Create element with event acknowledges info.
- *
- * @param array  $events
- * @param int    $events[]['eventid']
- * @param int    $events[]['objectid']
- * @param array  $events[]['acknowledges']
- * @param string $events[]['acknowledges'][]['userid']
- * @param int    $events[]['acknowledges'][]['clock']
- * @param string $events[]['acknowledges'][]['message']
- * @param string $events[]['acknowledges'][]['action']
- * @param string $backurl  add url param to link with current page file name
- *
- * @return array
- */
-function makeEventsAcknowledges($events, $backurl) {
-	$db_users = [];
-	$userids = [];
-
-	foreach ($events as &$event) {
-		foreach ($event['acknowledges'] as $acknowledge) {
-			$userids[$acknowledge['userid']] = true;
-		}
-		CArrayHelper::sort($event['acknowledges'], [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-	}
-	unset($event);
-
-	if ($userids) {
-		$db_users = API::User()->get([
-			'output' => ['alias', 'name', 'surname'],
-			'userids' => array_keys($userids),
-			'preservekeys' => true
-		]);
-	}
-
-	$acknowledges = [];
-
-	foreach ($events as $event) {
-		$link = 'zabbix.php?action=acknowledge.edit&eventids[]='.$event['eventid'].'&backurl='.urlencode($backurl);
-
-		if ($event['acknowledges']) {
-			$hint = makeAcknowledgesTable(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS), $db_users);
-			$ack = (new CLink(_('Yes'), $link))
-				->setHint($hint, '', false)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
-			$acknowledges[$event['eventid']] = [$ack, CViewHelper::showNum(count($event['acknowledges']))];
-		}
-		else {
-			$acknowledges[$event['eventid']] = (new CLink(_('No'), $link))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_RED);
-		}
-	}
-
-	return $acknowledges;
-}
-
-/**
- * Get acknowledgement table.
- *
- * @param array  $acknowledges
- * @param string $acknowledges[]['userid']
- * @param int    $acknowledges[]['clock']
- * @param string $acknowledges[]['message']
- * @param string $acknowledges[]['action']
- *
- * @return CTableInfo
- */
-function makeAcknowledgesTable($acknowledges, $users) {
-	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message'), _('User action')]);
-
-	foreach ($acknowledges as $acknowledge) {
-		$table->addRow([
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
-			array_key_exists($acknowledge['userid'], $users)
-				? getUserFullname($users[$acknowledge['userid']])
-				: _('Inaccessible user'),
-			zbx_nl2br($acknowledge['message']),
-			($acknowledge['action'] == ZBX_ACKNOWLEDGE_ACTION_CLOSE_PROBLEM) ? _('Close problem') : ''
-		]);
-	}
-
-	return $table;
 }
 
 /**

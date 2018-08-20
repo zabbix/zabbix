@@ -76,13 +76,6 @@ class CScreenBuilder {
 	public $profileIdx2;
 
 	/**
-	 * Is profile will be updated
-	 *
-	 * @var boolean
-	 */
-	public $updateProfile;
-
-	/**
 	 * Time control timeline
 	 *
 	 * @var array
@@ -98,11 +91,10 @@ class CScreenBuilder {
 	 * @param int		$options['mode']
 	 * @param int		$options['timestamp']
 	 * @param int		$options['hostid']
-	 * @param int		$options['period']
-	 * @param int		$options['stime']
-	 * @param string	$options['profileIdx']
-	 * @param int		$options['profileIdx2']
-	 * @param boolean	$options['updateProfile']
+	 * @param string	$options['profileIdx']      Profile idx value.
+	 * @param int		$options['profileIdx2']     Profile idx2 value.
+	 * @param string	$options['from']            Start time of selected time period.
+	 * @param string	$options['to']              End time of selected time period.
 	 * @param array		$options['screen']
 	 */
 	public function __construct(array $options = []) {
@@ -143,15 +135,12 @@ class CScreenBuilder {
 		// calculate time
 		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
-		$this->updateProfile = array_key_exists('updateProfile', $options) ? $options['updateProfile'] : false;
 
-		$this->timeline = calculateTime([
+		$this->timeline = getTimeSelectorPeriod([
 			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
-			'updateProfile' => $this->updateProfile,
-			'period' => array_key_exists('period', $options) ? $options['period'] : null,
-			'stime' => array_key_exists('stime', $options) ? $options['stime'] : null,
-			'isNow' => array_key_exists('isNow', $options) ? $options['isNow'] : null
+			'from' => array_key_exists('from', $options) ? $options['from'] : null,
+			'to' => array_key_exists('to', $options) ? $options['to'] : null
 		]);
 	}
 
@@ -492,7 +481,6 @@ class CScreenBuilder {
 						'hostid' => $this->hostid,
 						'profileIdx' => $this->profileIdx,
 						'profileIdx2' => $this->profileIdx2,
-						'updateProfile' => $this->updateProfile,
 						'timeline' => $this->timeline,
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem
@@ -640,28 +628,15 @@ class CScreenBuilder {
 	 *
 	 * @static
 	 *
-	 * @param array $options
-	 * @param array $options['timeline']
-	 * @param string $options['profileIdx']
+	 * @param array $timeline
 	 */
-	public static function insertScreenScrollJs(array $options = []) {
-		$options['timeline'] = array_key_exists('timeline', $options) ? $options['timeline'] : '';
-		$options['profileIdx'] = array_key_exists('profileIdx', $options) ? $options['profileIdx'] : '';
-		$options['profileIdx2'] = array_key_exists('profileIdx2', $options) ? $options['profileIdx2'] : 0;
-
-		$timeControlData = [
+	private static function insertScreenScrollJs(array $timeline) {
+		$obj_data = [
 			'id' => 'scrollbar',
-			'loadScroll' => 1,
-			'mainObject' => 1,
-			'periodFixed' => CProfile::get($options['profileIdx'].'.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD,
-			'profile' => [
-				'idx' => $options['profileIdx'],
-				'idx2' => $options['profileIdx2']
-			]
+			'mainObject' => 1
 		];
 
-		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($options['timeline']).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.addObject("scrollbar", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($obj_data).');');
 	}
 
 	/**
@@ -705,14 +680,12 @@ class CScreenBuilder {
 	/**
 	 * Insert javascript for standard screens.
 	 *
-	 * @param array $options
-	 * @param array $options['timeline']
-	 * @param string $options['profileIdx']
+	 * @param array $timeline
 	 *
 	 * @static
 	 */
-	public static function insertScreenStandardJs(array $options = []) {
-		CScreenBuilder::insertScreenScrollJs($options);
+	public static function insertScreenStandardJs(array $timeline) {
+		CScreenBuilder::insertScreenScrollJs($timeline);
 		CScreenBuilder::insertScreenRefreshTimeJs();
 		CScreenBuilder::insertProcessObjectsJs();
 	}

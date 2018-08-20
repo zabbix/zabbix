@@ -45,7 +45,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static int		shm_id;
 int 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
+zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
 
 /******************************************************************************
@@ -418,9 +418,10 @@ void	diskstat_shm_extend(void)
 	my_diskstat_shmid = collector->diskstat_shmid;
 	diskdevices = new_diskdevices;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() extended diskstat shared memory: old_max:%d new_max:%d old_size:%d"
-			" new_size:%d old_shmid:%d new_shmid:%d", __function_name, old_max, new_max, old_shm_size,
-			new_shm_size, old_shmid, collector->diskstat_shmid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() extended diskstat shared memory: old_max:%d new_max:%d old_size:"
+			ZBX_FS_SIZE_T " new_size:" ZBX_FS_SIZE_T " old_shmid:%d new_shmid:%d", __function_name, old_max,
+			new_max, (zbx_fs_size_t)old_shm_size, (zbx_fs_size_t)new_shm_size, old_shmid,
+			collector->diskstat_shmid);
 #endif
 }
 
