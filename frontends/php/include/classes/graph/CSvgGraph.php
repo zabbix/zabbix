@@ -757,8 +757,8 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawMetricsArea() {
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['fill'] > 0 && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
-					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
+			if (($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
+					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) && $metric['options']['fill'] > 0) {
 				foreach ($this->paths[$index] as $path) {
 					$this->addItem((new CSvgGraphArea($path, $metric))
 						->setPosition($this->canvas_x, $this->canvas_y)

@@ -464,11 +464,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			];
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.fill.'.$index,
-				'value' => $val['fill']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 				'name' => $this->name.'.axisy.'.$index,
 				'value' => $val['axisy']
 			];
@@ -476,11 +471,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 				'name' => $this->name.'.timeshift.'.$index,
 				'value' => $val['timeshift']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.missingdatafunc.'.$index,
-				'value' => $val['missingdatafunc']
 			];
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -500,6 +490,20 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 					'name' => $this->name.'.pointsize.'.$index,
 					'value' => $val['pointsize']
+				];
+			}
+			if (array_key_exists('fill', $val)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.fill.'.$index,
+					'value' => $val['fill']
+				];
+			}
+			if (array_key_exists('missingdatafunc', $val)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.missingdatafunc.'.$index,
+					'value' => $val['missingdatafunc']
 				];
 			}
 		}
