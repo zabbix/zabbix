@@ -89,13 +89,13 @@ class CBrandHelper {
 	}
 
 	/**
-	 * Get Footer Label.
+	 * Get Footer Content.
 	 *
 	 * @param boolean $with_version
 	 *
 	 * @return string
 	 */
-	public static function getFooterLabel($with_version) {
+	public static function getFooterContent($with_version) {
 		$footer = self::getValue(
 			'BRAND_FOOTER',
 			[

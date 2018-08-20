@@ -757,7 +757,7 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, CBrandHelper::getFooterLabel($with_version)))->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))->setAttribute('role', 'contentinfo');
 }
 
 /**
