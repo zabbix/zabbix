@@ -240,7 +240,7 @@ jQuery(function ($) {
 
 					label = label.join(',').split(',');
 
-					var direction = IE // IE11 transforms 'd' attribute.
+					var direction = (IE || ED) // IE11 & Edge transforms 'd' attribute.
 							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
 							: direction_string.substr(1).split(' '),
 						index = direction.length,
