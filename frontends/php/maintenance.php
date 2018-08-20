@@ -328,7 +328,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
 		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 		$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-		$_REQUEST['new_timeperiod']['start_date'] = $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date'];
+		$_REQUEST['new_timeperiod_start_date'] = $_REQUEST['new_timeperiod']['start_date'];
 	}
 }
 
