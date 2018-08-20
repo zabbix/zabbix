@@ -48,37 +48,14 @@ class CBrandHelper {
 	 * Get value by key from configuration (load configuration if need).
 	 *
 	 * @param string $key
-	 * @param mixed $default	Default value
-	 * @param mixed $pattern	Pattern for extraction
+	 * @param mixed $default  Default value.
 	 *
 	 * @return mixed
 	 */
-	private static function getValue($key, $default = false, $pattern = false) {
+	private static function getValue($key, $default = false) {
 		self::loadConfig();
 
-		return (array_key_exists($key, self::$config) ? self::extractValue($key, $pattern) : $default);
-	}
-
-	/**
-	 * Extracting value from configuration according to the type of the pattern.
-	 *
-	 * @param string $key
-	 * @param mixed $pattern
-	 *
-	 * @return mixed
-	 */
-	private static function extractValue($key, $pattern) {
-		if (is_string($pattern)) {
-			$value = sprintf($pattern, self::$config[$key]);
-		}
-		elseif (is_array($pattern)) {
-			$value = [self::$config[$key]];
-		}
-		else {
-			$value = self::$config[$key];
-		}
-
-		return $value;
+		return (array_key_exists($key, self::$config) ? self::$config[$key] : $default);
 	}
 
 	/**
@@ -96,7 +73,7 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getHelpUrl() {
-		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/4.0/', '%s');
+		return self::getValue('BRAND_HELP_URL', 'https://www.zabbix.com/documentation/4.0/');
 	}
 
 	/**
@@ -105,8 +82,10 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getLogoStyle() {
-		return self::getValue('BRAND_LOGO', null,
-			'background: url("%s") no-repeat center center; background-size: contain;');
+		$logo = self::getValue('BRAND_LOGO', null);
+		return ($logo !== null)
+			? 'background: url("'.$logo.'") no-repeat center center; background-size: contain;'
+			: null;
 	}
 
 	/**
@@ -117,7 +96,7 @@ class CBrandHelper {
 	 * @return string
 	 */
 	public static function getFooterLabel($with_version) {
-		return self::getValue(
+		$footer = self::getValue(
 			'BRAND_FOOTER',
 			[
 				$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
@@ -126,8 +105,13 @@ class CBrandHelper {
 					->addClass(ZBX_STYLE_GREY)
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('target', '_blank')
-			],
-			[]
+			]
 		);
+
+		if (!is_array($footer)) {
+			$footer = [$footer];
+		}
+
+		return $footer;
 	}
 }
