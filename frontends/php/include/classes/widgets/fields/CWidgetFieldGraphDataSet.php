@@ -44,10 +44,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'pointsize'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
-			'fill'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
+			'fill'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 10],
-			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
+			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
 			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED]
 		]]);
 		$this->setFlags(parent::FLAG_NOT_EMPTY);
@@ -195,19 +195,21 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 									->onChange(
 										'var rnum = this.id.replace("'.$fn.'_","").replace("_type","");'.
-										'switch (jQuery(":checked", jQuery(this)).val()) {'.
-											'case "'.SVG_GRAPH_TYPE_LINE.'":'.
-												'jQuery("[name=\"ds["+rnum+"][width]\"]").rangeControl("enable");'.
-												'jQuery("[name=\"ds["+rnum+"][pointsize]\"]").rangeControl("disable");'.
-												'break;'.
-											'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-												'jQuery("[name=\"ds["+rnum+"][width]\"]").rangeControl("disable");'.
-												'jQuery("[name=\"ds["+rnum+"][pointsize]\"]").rangeControl("enable");'.
-												'break;'.
-											'case "'.SVG_GRAPH_TYPE_STAIRCASE.'":'.
-												'jQuery("[name=\"ds["+rnum+"][width]\"]").rangeControl("enable");'.
-												'jQuery("[name=\"ds["+rnum+"][pointsize]\"]").rangeControl("disable");'.
-												'break;'.
+										'if (jQuery(":checked", jQuery(this)).val() == "'.SVG_GRAPH_TYPE_POINTS.'") {'.
+											'jQuery("#ds_"+rnum+"_width").rangeControl("disable");'.
+											'jQuery("#ds_"+rnum+"_fill").rangeControl("disable");'.
+											'jQuery("#ds_"+rnum+"_pointsize").rangeControl("enable");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_0").attr("disabled", "disabled");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_1").attr("disabled", "disabled");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_2").attr("disabled", "disabled");'.
+										'}'.
+										'else {'.
+											'jQuery("[name=\"ds["+rnum+"][width]\"]").rangeControl("enable");'.
+											'jQuery("[name=\"ds["+rnum+"][fill]\"]").rangeControl("enable");'.
+											'jQuery("[name=\"ds["+rnum+"][pointsize]\"]").rangeControl("disable");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_0").removeAttr("disabled");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_1").removeAttr("disabled");'.
+											'jQuery("#ds_"+rnum+"_missingdatafunc_2").removeAttr("disabled");'.
 										'}'
 									)
 									->setModern(true)
@@ -244,6 +246,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							)
 							->addRow(_('Fill'),
 								(new CRangeControl($fn.'['.$options['row_num'].'][fill]', (int) $value['fill']))
+									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
 									->addClass('range-control')
 									->setAttribute('maxlength', 2)
 									->setStep(1)
@@ -268,6 +271,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 									->addValue(_x('Treat as 0', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO
 									)
+									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
 									->setModern(true)
 							)
 							->addRow(_('Y-axis'),
@@ -321,7 +325,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		// Data sets with unchanged default values are removed. Color is changed if matches none of predefined colors.
 		$defaults = $this->getDefault();
 		foreach ($this->value as $index => $val) {
-			// Values received from frontend are strings. Values received from data base comes as arrays.
+			// Values received from frontend are strings. Values received from database comes as arrays.
 			$hosts = array_key_exists('hosts', $val)
 				? (is_array($val['hosts']) ? implode(', ', $val['hosts']) : $val['hosts'])
 				: '';
@@ -329,13 +333,15 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				? (is_array($val['items']) ? implode(', ', $val['items']) : $val['items'])
 				: '';
 
-			if ($hosts === '' && $items === '' && in_array($val['color'], $this->color_palete)
+			if ($hosts === '' && $items === '' && in_array(strtolower($val['color']), $this->color_palete)
 					&& $defaults['type'] == $val['type'] && $defaults['transparency'] == $val['transparency']
-					&& $defaults['fill'] == $val['fill'] && $defaults['axisy'] == $val['axisy']
-					&& $defaults['timeshift'] == $val['timeshift']
-					&& $defaults['missingdatafunc'] == $val['missingdatafunc']
-					&& (($defaults['type'] != SVG_GRAPH_TYPE_POINTS && $defaults['width'] == $val['width'])
-						|| ($defaults['type'] == SVG_GRAPH_TYPE_POINTS && $defaults['pointsize'] == $val['pointsize']))) {
+					&& $defaults['axisy'] == $val['axisy'] && $defaults['timeshift'] == $val['timeshift']
+					&& ($defaults['type'] != SVG_GRAPH_TYPE_POINTS
+						&& $defaults['missingdatafunc'] == $val['missingdatafunc'])
+					&& (($defaults['type'] != SVG_GRAPH_TYPE_POINTS && $defaults['width'] == $val['width']
+							&& $defaults['fill'] == $val['fill'])
+						|| ($defaults['type'] == SVG_GRAPH_TYPE_POINTS || $defaults['pointsize'] == $val['pointsize'])
+					)) {
 				unset($this->value[$index]);
 			}
 			else {
