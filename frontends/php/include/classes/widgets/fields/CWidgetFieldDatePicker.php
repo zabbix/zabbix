@@ -48,13 +48,15 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		return
 			'var input = jQuery("[name=\"'.$this->getName().'\"]", jQuery("#'.$form_name.'")).get(0);'.
 			'jQuery("#'.$this->getName().'_dp")'.
-				'.data("clndr", create_calendar(null, input))'.
+				'.data("clndr", create_calendar(null, input, null, null, "'.$form_name.'"))'.
 				'.data("input", input)'.
 				'.click(function() {'.
 					'var b = jQuery(this),'.
 						'o = b.offset(),'.
-						't = parseInt(o.top + b.outerHeight(), 10),'.
-						'l = parseInt(o.left, 10);'.
+						'h = jQuery(b.data("clndr").clndr.clndr_calendar).outerHeight(),'. // Calendar height.
+						'd = jQuery("#overlay_dialogue").offset(),'. // Dialog offset.
+						't = parseInt(o.top + b.outerHeight() - h - d.top, 10),'. // Calculated calendar top position.
+						'l = parseInt(o.left - d.left + b.outerWidth(), 10);'. // Calculated calendar left position.
 					'b.data("clndr").clndr.clndrshow(t, l, b.data("input"));'.
 					($onselect !== '' ? 'b.data("clndr").clndr.onselect = function() {'.$onselect.'};' : '').
 					'return false;'.

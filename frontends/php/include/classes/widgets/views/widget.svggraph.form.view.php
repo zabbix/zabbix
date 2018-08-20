@@ -183,7 +183,7 @@ $jq_templates['overrides-row'] = $fields['or']->getTemplate($form_name);
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), $tab_data_set)
 	->addTab('display_options',  _('Display options'), $tab_display_opt)
-	->addTab('time_perios',  _('Time period'), $tab_time_period)
+	->addTab('time_period',  _('Time period'), $tab_time_period)
 	->addTab('axes',  _('Axes'), $tab_axes)
 	->addTab('legend',  _('Legend'), $tab_legend)
 	->addTab('problems',  _('Problems'), $tab_problems)
