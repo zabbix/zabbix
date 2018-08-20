@@ -630,6 +630,10 @@ ul.top-nav-icons {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
+			.icon-maint::before {
+				background-position-x: -206px;
+			}
+
 			.icon-wzrd-action {
 				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
 			}

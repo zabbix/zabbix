@@ -758,7 +758,7 @@ output {
 					}
 				}
 
-				@if $theme_name == 'blue' or $theme_name == "dark" {
+				@if $theme_name == 'blue' or $theme_name == 'dark' {
 
 					&:not(.row-selected):not(:hover) {
 						td {
@@ -859,20 +859,8 @@ output {
 				margin: 0 1px 0 2px !important;
 				vertical-align: bottom;
 
-				@if $theme_name == 'blue' or $theme_name == "dark" {
-					&::before {
-						background-position: -48px -804px;
-					}
-				}
-				@elseif $theme_name == 'hc-light' {
-					&::before {
-						background-position: -206px -804px;
-					}
-				}
-				@elseif $theme_name == 'hc-dark' {
-					&::before {
-						background-position: -360px -804px;
-					}
+				&::before {
+					background-position: -48px -804px;
 				}
 			}
 
