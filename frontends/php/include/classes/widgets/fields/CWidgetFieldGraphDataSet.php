@@ -62,8 +62,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		 *   and validator will not erase this data set but requires to fill all mandatory fields.
 		 */
 		$this->color_palete = [
-			'ff465c','b0af07','0ec9ac','524bbc','ed1248','d1e754','2ab5ff','385cc7','ec1594','bae37d',
-			'6ac8ff','ee2b29','3ca20d','6f4bbc','00a1ff','f3601b','1cae59','45cfdb','894bbc','6d6d6d'
+			'FF465C','B0AF07','0EC9AC','524BBC','ED1248','D1E754','2AB5FF','385CC7','EC1594','BAE37D',
+			'6AC8FF','EE2B29','3CA20D','6F4BBC','00A1FF','F3601B','1CAE59','45CFDB','894BBC','6D6D6D'
 		];
 	}
 
@@ -333,7 +333,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				? (is_array($val['items']) ? implode(', ', $val['items']) : $val['items'])
 				: '';
 
-			if ($hosts === '' && $items === '' && in_array(strtolower($val['color']), $this->color_palete)
+			if ($hosts === '' && $items === '' && in_array(strtoupper($val['color']), $this->color_palete)
 					&& $defaults['type'] == $val['type'] && $defaults['transparency'] == $val['transparency']
 					&& $defaults['axisy'] == $val['axisy'] && $defaults['timeshift'] == $val['timeshift']
 					&& ($defaults['type'] != SVG_GRAPH_TYPE_POINTS
