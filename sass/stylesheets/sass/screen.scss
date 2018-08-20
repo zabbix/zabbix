@@ -4216,6 +4216,16 @@ $form-icon-btn: (
 	}
 }
 
+.svg-graph-hintbox {
+	padding-top: 5px;
+	display: block;
+
+	.list-table tbody tr:last-child td {
+		border-bottom-style: none;
+		box-shadow: none;
+	}
+}
+
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;

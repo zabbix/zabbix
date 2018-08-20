@@ -353,11 +353,13 @@ jQuery(function ($) {
 						);
 					});
 
-					html = $('<div></div>').append(
-							$('<table></table>')
-								.addClass('list-table compact-view')
-								.append(tbody)
-						);
+					html = $('<div></div>')
+							.addClass('svg-graph-hintbox')
+							.append(
+								$('<table></table>')
+									.addClass('list-table compact-view')
+									.append(tbody)
+							);
 				}
 			}
 			// Show graph values if mouse is over the graph canvas.
@@ -420,7 +422,9 @@ jQuery(function ($) {
 				});
 
 				if (show_hint) {
-					html = $('<div></div>').append(html);
+					html = $('<div></div>')
+							.addClass('svg-graph-hintbox')
+							.append(html);
 				}
 			}
 			else {
