@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/APITest.php';
 
 /**
  * @backup users
  */
-class testUsers extends CZabbixTest {
+class testUsers extends CAPITest {
 
 	public static function user_create() {
 		return [
@@ -252,7 +252,7 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.zbx_dbstr($id).
+				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
 						' and usrgrpid='.zbx_dbstr($user[$key]['usrgrps'][0]['usrgrpid']))
 				);
 
@@ -267,7 +267,7 @@ class testUsers extends CZabbixTest {
 				}
 				else {
 					$dbResultGroup = 'select * from media where userid='.$id;
-					$this->assertEquals(0, DBcount($dbResultGroup));
+					$this->assertEquals(0, CDBHelper::getCount($dbResultGroup));
 				}
 			}
 		}
@@ -293,7 +293,7 @@ class testUsers extends CZabbixTest {
 
 		$result = $this->call('user.create', $user);
 		$id = $result['result']['userids'][0];
-		$this->assertEquals(1, DBcount('select * from users where userid='.zbx_dbstr($id)));
+		$this->assertEquals(1, CDBHelper::getCount('select * from users where userid='.zbx_dbstr($id)));
 
 		$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
 		$dbRowMedia = DBFetch($dbResultMedia);
@@ -559,7 +559,7 @@ class testUsers extends CZabbixTest {
 			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
 					&& $expected_error !== null) {
 				$sqlUser = "select * from users where userid=".zbx_dbstr($user['userid']);
-				$oldHashUser = DBhash($sqlUser);
+				$oldHashUser = CDBHelper::getHash($sqlUser);
 			}
 		}
 
@@ -581,7 +581,7 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.zbx_dbstr($id).
+				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
 						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
 				);
 
@@ -596,13 +596,13 @@ class testUsers extends CZabbixTest {
 				}
 				else {
 					$dbResultGroup = 'select * from media where userid='.zbx_dbstr($id);
-					$this->assertEquals(0, DBcount($dbResultGroup));
+					$this->assertEquals(0, CDBHelper::getCount($dbResultGroup));
 				}
 			}
 		}
 		else {
 			if (isset($oldHashUser)) {
-				$this->assertEquals($oldHashUser, DBhash($sqlUser));
+				$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlUser));
 			}
 		}
 	}
@@ -1499,7 +1499,7 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowUser['theme'], $user['theme']);
 				$this->assertEquals($dbRowUser['url'], $user['url']);
 
-				$this->assertEquals(1, DBcount('select * from users_groups where userid='.
+				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.
 						zbx_dbstr($result['result']['userids'][0]).' and usrgrpid='.
 						zbx_dbstr($user['usrgrps'][0]['usrgrpid']))
 				);
@@ -1516,7 +1516,7 @@ class testUsers extends CZabbixTest {
 				$this->assertEquals($dbRowMedia['period'], $user['user_medias'][0]['period']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from users where alias='.zbx_dbstr($user['alias'])));
+				$this->assertEquals(0, CDBHelper::getCount('select * from users where alias='.zbx_dbstr($user['alias'])));
 			}
 		}
 	}
@@ -1594,7 +1594,7 @@ class testUsers extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['userids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from users where userid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from users where userid='.zbx_dbstr($id)));
 			}
 		}
 	}

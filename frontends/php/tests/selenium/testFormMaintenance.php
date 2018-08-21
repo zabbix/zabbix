@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Tests for "Configuration -> Maintenance".
@@ -30,7 +30,7 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
  *
  * @backup maintenances
  */
-class testFormMaintenance extends CWebTest {
+class testFormMaintenance extends CLegacyWebTest {
 	public $name = 'Test maintenance';
 
 	/**
@@ -95,7 +95,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestTextPresent($this->name);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 
 	/**
@@ -105,7 +105,7 @@ class testFormMaintenance extends CWebTest {
 	 */
 	public function testFromMaintenance_Cancel() {
 		$sql_hash = 'SELECT * FROM maintenances ORDER BY maintenanceid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Open form and change maintenance name.
 		$this->zbxTestLogin('maintenance.php?ddreset=1');
@@ -123,7 +123,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the result in DB.
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 
 		// Open form to check changes was not saved.
 		$this->zbxTestClickLinkTextWait($this->name);
@@ -190,7 +190,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		// Check the results in DB.
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 
 	/**
@@ -218,8 +218,8 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestTextPresent([$this->name.$suffix, $this->name]);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
 	}
 
 	/**
@@ -239,6 +239,6 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance deleted');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
 	}
 }

@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup correlation
  */
 
-class testFormEventCorrelation extends CWebTest {
+class testFormEventCorrelation extends CLegacyWebTest {
 
 	public static function create() {
 		return [
@@ -80,7 +80,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		$this->zbxTestCheckFatalErrors();
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function validation() {
@@ -145,12 +145,12 @@ class testFormEventCorrelation extends CWebTest {
 
 		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
 		if (array_key_exists('name', $data) && $data['name'] != 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -179,7 +179,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		// Name longer than 255 symbols is truncated on frontend, check the shortened name in DB
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($db_name);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function tags() {
@@ -348,7 +348,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function tagsValidation() {
@@ -430,7 +430,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public static function calculation() {
@@ -514,7 +514,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function formulaValidation() {
@@ -637,7 +637,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Clone() {
@@ -655,13 +655,13 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation' AND description='Test description clone'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone' AND description='Test description clone'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='clone tag'";
-		$this->assertEquals(2, DBcount($sql));
+		$this->assertEquals(2, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -669,7 +669,7 @@ class testFormEventCorrelation extends CWebTest {
 	 */
 	public function testFormEventCorrelation_UpdateNone() {
 		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for update');
@@ -682,7 +682,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for update');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
 	public function testFormEventCorrelation_UpdateAllFields() {
@@ -711,16 +711,16 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update' AND description='New test description update'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='New update tag'";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 
 		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Delete() {
@@ -736,12 +736,12 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public function testFormEventCorrelation_Cancel() {
 		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('correlation.php');
 		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
@@ -753,6 +753,6 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestTextPresent('Event correlation for cancel');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 }

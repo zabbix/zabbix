@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormLogin extends CWebTest {
+class testFormLogin extends CLegacyWebTest {
 
 	public static function data() {
 		return [
@@ -113,9 +113,9 @@ class testFormLogin extends CWebTest {
 		elseif ($data['dbCheck']) {
 			$this->zbxTestAssertElementText("//form//div[@class='red']", 'Login name or password is incorrect.');
 			$this->zbxTestTextPresent(['Username', 'Password']);
-			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
-			$this->assertEquals(1, DBcount("SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND alias='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND alias='".$data['login']."'"));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_ip<>'' AND alias='".$data['login']."'"));
 		}
 	}
 
@@ -131,11 +131,11 @@ class testFormLogin extends CWebTest {
 			$this->zbxTestTextPresent('Password');
 
 			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_failed='.$i.'';
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 			$sql = 'SELECT * FROM users WHERE alias=\'user-for-blocking\' AND attempt_clock>0';
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 			$sql = "SELECT * FROM users WHERE alias='user-for-blocking' AND attempt_ip<>''";
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 
 		$this->zbxTestInputType('name', 'user-for-blocking');

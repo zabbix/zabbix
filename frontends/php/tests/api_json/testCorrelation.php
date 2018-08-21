@@ -19,12 +19,12 @@
  * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * */
 
-require_once dirname(__FILE__) . '/../include/class.czabbixtest.php';
+require_once dirname(__FILE__) . '/../include/APITest.php';
 
 /**
  * @backup correlation
  */
-class testCorrelation extends CZabbixTest {
+class testCorrelation extends CAPITest {
 
 	public static function getCorrelationDeleteData() {
 		return [
@@ -81,7 +81,7 @@ class testCorrelation extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['correlationids'] as $id) {
-				$this->assertEquals(0, DBcount('SELECT NULL from correlation where correlationid='. $id));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL from correlation where correlationid='. $id));
 			}
 		}
 	}
@@ -111,11 +111,11 @@ class testCorrelation extends CZabbixTest {
 	 */
 	public function testCorrelation_DeletePermissions($login, $correlation, $expected_error) {
 		$sql_correlation = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash_correlation = DBhash($sql_correlation);
+		$old_hash_correlation = CDBHelper::getHash($sql_correlation);
 
 		$this->authorize($login['user'], $login['password']);
 		$this->call('correlation.delete', $correlation, $expected_error);
 
-		$this->assertEquals($old_hash_correlation, DBhash($sql_correlation));
+		$this->assertEquals($old_hash_correlation, CDBHelper::getHash($sql_correlation));
 	}
 }
