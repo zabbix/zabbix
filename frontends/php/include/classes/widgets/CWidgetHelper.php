@@ -579,13 +579,11 @@ class CWidgetHelper {
 	public static function makeWidgetInfo($type, $fields) {
 		$info = [];
 
-		if ($type === WIDGET_SVG_GRAPH) {
-			if (CWidgetFormSvgGraph::getOverriteTime($fields, false) !== false) {
-				$info[] = [
-					'icon' => 'btn-info-clock',
-					'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
-				];
-			}
+		if ($type === WIDGET_SVG_GRAPH && CWidgetFormSvgGraph::getOverriteTime($fields, false) !== false) {
+			$info[] = [
+				'icon' => 'btn-info-clock',
+				'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
+			];
 		}
 
 		return $info;
