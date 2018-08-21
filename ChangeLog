@@ -11,6 +11,7 @@ A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD m
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+..F....... [ZBXNEXT-4500] fixed item prototype master item links leading to error when master item is a web item (Ivo)
 ........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
 ..F....... [ZBX-14629] fixed breadcrumb labels clipping (ashubin)
 ........S. [ZBX-14628] fixed empty MAIL FROM in email alerts (mindbound)
