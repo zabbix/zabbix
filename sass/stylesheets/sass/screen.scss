@@ -860,6 +860,8 @@ output {
 				vertical-align: bottom;
 
 				&::before {
+					height: 12px;
+					width: 12px;
 					background-position: -48px -804px;
 				}
 			}
