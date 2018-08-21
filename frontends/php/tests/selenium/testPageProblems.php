@@ -244,11 +244,9 @@ class testPageProblems extends CWebTest {
 			// Check tag priority.
 			[
 				[
-					'tags' =>
-					['Kappa'],
+					'tag_priority' => 'Kappa',
 					'show_tags' => '3',
-					'sorting' =>
-					[
+					'sorting' => [
 						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b', 'Delta: d'],
 						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
 						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
@@ -258,10 +256,9 @@ class testPageProblems extends CWebTest {
 			],
 			[
 				[
-					'tags' => 'Kappa, Beta',
+					'tag_priority' => 'Kappa, Beta',
 					'show_tags' => '3',
-					'sorting' =>
-					[
+					'sorting' => [
 						'First test trigger with tag priority' => ['Beta: b', 'Alpha: a', 'Delta: d'],
 						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
 						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
@@ -271,10 +268,9 @@ class testPageProblems extends CWebTest {
 			],
 			[
 				[
-					'tags' => 'Gamma, Kappa, Beta',
+					'tag_priority' => 'Gamma, Kappa, Beta',
 					'show_tags' => '3',
-					'sorting' =>
-					[
+					'sorting' => [
 						'First test trigger with tag priority' => ['Gamma: g','Beta: b', 'Alpha: a'],
 						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
 						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
@@ -285,11 +281,10 @@ class testPageProblems extends CWebTest {
 			// Check tag name format.
 			[
 				[
-					'tags' => 'Gamma, Kappa, Beta',
+					'tag_priority' => 'Gamma, Kappa, Beta',
 					'show_tags' => '3',
-					'tag_name_format' => 'shortened',
-					'sorting' =>
-					[
+					'tag_name_format' => 'Shortened',
+					'sorting' => [
 						'First test trigger with tag priority' => ['Gam: g','Bet: b', 'Alp: a'],
 						'Second test trigger with tag priority' => ['Bet: b', 'Eps: e', 'Eta: e'],
 						'Third test trigger with tag priority' => ['Kap: k', 'Alp: a', 'Iot: i'],
@@ -299,11 +294,10 @@ class testPageProblems extends CWebTest {
 			],
 			[
 				[
-					'tags' => 'Gamma, Kappa, Beta',
+					'tag_priority' => 'Gamma, Kappa, Beta',
 					'show_tags' => '3',
-					'tag_name_format' => 'none',
-					'sorting' =>
-					[
+					'tag_name_format' => 'None',
+					'sorting' => [
 						'First test trigger with tag priority' => ['g','b', 'a'],
 						'Second test trigger with tag priority' => ['b', 'e', 'e'],
 						'Third test trigger with tag priority' => ['k', 'a', 'i'],
@@ -314,11 +308,9 @@ class testPageProblems extends CWebTest {
 			// Check tags count.
 			[
 				[
-					'tags' =>
-					['Kappa'],
+					'tag_priority' => 'Kappa',
 					'show_tags' => '2',
-					'sorting' =>
-					[
+					'sorting' => [
 						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b'],
 						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e'],
 						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a'],
@@ -328,11 +320,9 @@ class testPageProblems extends CWebTest {
 			],
 			[
 				[
-					'tags' =>
-					['Kappa'],
+					'tag_priority' => 'Kappa',
 					'show_tags' => '1',
-					'sorting' =>
-					[
+					'sorting' => [
 						'First test trigger with tag priority' => ['Alpha: a'],
 						'Second test trigger with tag priority' => ['Beta: b'],
 						'Third test trigger with tag priority' => ['Kappa: k'],
@@ -360,17 +350,12 @@ class testPageProblems extends CWebTest {
 			$this->zbxTestClickXpath('//label[@for="filter_show_tags_'.$data['show_tags'].'"]');
 		}
 
-		if (array_key_exists('tags', $data)) {
-			$this->zbxTestInputType('filter_tag_priority', $data['tags']);
+		if (array_key_exists('tag_priority', $data)) {
+			$this->zbxTestInputType('filter_tag_priority', $data['tag_priority']);
 		}
 
 		if (array_key_exists('tag_name_format', $data)) {
-			if ($data['tag_name_format'] === 'shortened') {
-				$this->zbxTestClickXpath('//label[@for="filter_tag_name_format_1"][text()="Shortened"]');
-			}
-			else {
-				$this->zbxTestClickXpath('//label[@for="filter_tag_name_format_2"][text()="None"]');
-			}
+			$this->zbxTestClickXpath('//ul[@id="filter_tag_name_format"]//label[text()="'.$data['tag_name_format'].'"]');
 		}
 
 		$this->zbxTestClickButtonText('Apply');
@@ -381,7 +366,7 @@ class testPageProblems extends CWebTest {
 				$tags_priority = [];
 				$get_tags_rows = $this->webDriver->findElements(WebDriverBy::xpath('//a[text()="'.$problem.'"]/../../td/span[@class="tag"]'));
 				foreach ($get_tags_rows as $row) {
-							$tags_priority[] = $row->getText();
+					$tags_priority[] = $row->getText();
 				}
 				$this->assertEquals($tags, $tags_priority);
 			}
@@ -390,7 +375,7 @@ class testPageProblems extends CWebTest {
 		if ($data['show_tags'] === '0') {
 			$this->zbxTestAssertElementNotPresentXpath('//th[text()="Tags"]');
 			$this->zbxTestAssertElementPresentXpath('//input[@id="filter_tag_priority"][@disabled]');
-			$this->zbxTestAssertElementPresentXpath('//input[contains( @id, "filter_tag_name_format")][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//input[contains(@id, "filter_tag_name_format")][@disabled]');
 		}
 	}
 }
