@@ -1756,8 +1756,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.21rc1
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
