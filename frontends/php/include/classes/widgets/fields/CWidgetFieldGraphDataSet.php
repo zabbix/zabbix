@@ -122,7 +122,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $options['is_opened'] ? _('Collapse') : _('Expand')),
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
-							->setAttribute('placeholder', _('hosts pattern'))
+							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -141,7 +141,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
-							->setAttribute('placeholder', _('items pattern'))
+							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -302,8 +302,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	 *
 	 * @param array  $value                  Values filled in particular override.
 	 * @param string $value[order]           Number by which overrides are sorted.
-	 * @param string $value[hosts]           Hosts pattern.
-	 * @param string $value[items]           Items pattern.
+	 * @param string $value[hosts]           Host pattern.
+	 * @param string $value[items]           Item pattern.
 	 * @param string $value[color]           Data set color option.
 	 * @param string $value[type]            Data set type option.
 	 * @param string $value[width]           Data set width option.
@@ -373,13 +373,13 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
 				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('hosts pattern'), _('Data set'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('host pattern'), _('Data set'),
 						_('cannot be empty')
 					);
 					break;
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('items pattern'), _('Data set'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('item pattern'), _('Data set'),
 						_('cannot be empty')
 					);
 					break;

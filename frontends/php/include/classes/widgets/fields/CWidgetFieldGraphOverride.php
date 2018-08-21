@@ -88,7 +88,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		return [
 			/**
-			 * First line: hosts pattern field, items pattern field.
+			 * First line: host pattern field, item pattern field.
 			 * Contains also hidden order field, drag and drop button and delete button.
 			 */
 			(new CDiv([
@@ -99,7 +99,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				(new CDiv([
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][hosts]', $value['hosts'], ['rows' => 1]))
-							->setAttribute('placeholder', _('hosts pattern'))
+							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -119,7 +119,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
 						(new CTextArea($fn.'['.$options['row_num'].'][items]', $value['items'], ['rows' => 1]))
-							->setAttribute('placeholder', _('items pattern'))
+							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -170,8 +170,8 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	 *
 	 * @param array  $value                  Values filled in particular override.
 	 * @param string $value[order]           Number by which overrides are sorted.
-	 * @param string $value[hosts]           Hosts pattern.
-	 * @param string $value[items]           Items pattern.
+	 * @param string $value[hosts]           Host pattern.
+	 * @param string $value[items]           Item pattern.
 	 * @param string $value[color]           (optional) Override color option.
 	 * @param string $value[width]           (optional) Override width option.
 	 * @param string $value[type]            (optional) Override type option.
@@ -231,13 +231,13 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		if (!$errors && $strict) {
 			foreach ($values as $val) {
 				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('hosts pattern'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('host pattern'),
 						_('Overrides'), _('cannot be empty')
 					);
 					break;
 				}
 				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('items pattern'),
+					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('item pattern'),
 						_('Overrides'), _('cannot be empty')
 					);
 					break;

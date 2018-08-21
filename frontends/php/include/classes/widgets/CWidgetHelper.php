@@ -157,7 +157,7 @@ class CWidgetHelper {
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->setAttribute('placeholder', _('hosts pattern'))
+				->setAttribute('placeholder', _('host pattern'))
 				->addClass(ZBX_STYLE_PATTERNSELECT),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton($field->getName().'_select', _('Select')))
@@ -583,7 +583,7 @@ class CWidgetHelper {
 			if (($time = CWidgetFormSvgGraph::getOverriteTime($fields, false)) !== false) {
 				$info[] = [
 					'icon' => 'btn-info-clock',
-					'hint' => _s('Graph uses overwritten relative time: %1$s - %2$s', $time['from'], $time['to'])
+					'hint' => _s('Graph uses overridden relative time: %1$s - %2$s', $time['from'], $time['to'])
 				];
 			}
 		}

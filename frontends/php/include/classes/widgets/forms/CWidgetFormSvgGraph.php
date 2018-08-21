@@ -418,13 +418,13 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	}
 
 	/**
-	 * Check if widget configuration is set to use overwritten time and calculates start and end time for graph.
+	 * Check if widget configuration is set to use overridden time and calculates start and end time for graph.
 	 *
 	 * @param array $fields    Widget configuration fields.
 	 * @param bool  $unixtime  Return start and end time as unix timestamps.
 	 *
 	 * @return array|bool    Returns start and end time of widget's custom time or false if relative time is not
-	 *	                     overwritten.
+	 *	                     overridden.
 	 */
 	public static function getOverriteTime($fields, $unixtime = true) {
 		if (array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME) {
