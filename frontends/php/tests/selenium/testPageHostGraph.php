@@ -24,45 +24,37 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
  * @backup graphs
  */
 class testPageHostGraph extends CWebTest {
-	public static function getLayoutData() {
-		return [
-			[
-				[
-					'host' => 'Host to check graph 1'
-				]
-			]
-		];
-	}
 
-	/**
-	 * @dataProvider getLayoutData
-	 */
-	public function testPageHostGraph_CheckLayout($data) {
+	public function testPageHostGraph_CheckLayout() {
+		$host_name = 'Host to check graph 1';
+
 		// Get graphs data on host.
-		$sql='SELECT graphid, name, width, height, graphtype'.
-		' FROM graphs'.
-		' WHERE graphid IN'.
-			'(SELECT graphid'.
-			' FROM graphs_items'.
-			' WHERE itemid IN'.
-				'(SELECT itemid'.
-				' FROM items'.
-				' WHERE hostid IN'.
-					'(SELECT hostid'.
-					' FROM hosts'.
-					' WHERE host='.zbx_dbstr($data['host']).
+		$sql = 'SELECT graphid, name, width, height, graphtype'.
+				' FROM graphs'.
+				' WHERE graphid IN'.
+					'(SELECT graphid'.
+					' FROM graphs_items'.
+					' WHERE itemid IN'.
+						'(SELECT itemid'.
+						' FROM items'.
+						' WHERE hostid IN'.
+							'(SELECT hostid'.
+							' FROM hosts'.
+							' WHERE host='.zbx_dbstr($host_name).
+							')'.
+						')'.
 					')'.
-				')'.
-			')'.
-		'ORDER BY name';
+				'ORDER BY name';
 
-		$hostid = $this->openPageHostGraphs($data);
+		$hostid = $this->openPageHostGraphs($host_name);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 
 		$groups = ['all'];
-		foreach (DBfetchArray(DBselect('SELECT name FROM hstgrp WHERE groupid IN ( SELECT DISTINCT groupid'.
-				' FROM hosts_groups ORDER BY groupid)')) as $group) {
+		$rows = DBfetchArray(DBselect(
+				'SELECT name FROM hstgrp WHERE groupid IN ( SELECT DISTINCT groupid FROM hosts_groups ORDER BY groupid)'
+		));
+		foreach ($rows as $group) {
 			$groups[] = $group['name'];
 		}
 		$this->zbxTestDropdownHasOptions('groupid', $groups);
@@ -71,19 +63,18 @@ class testPageHostGraph extends CWebTest {
 		foreach (DBfetchArray(DBselect('SELECT name FROM hosts WHERE flags IN (0,4) AND status IN (0,1,3)')) as $host) {
 			$hosts[] = $host['name'];
 		}
-
 		$this->zbxTestDropdownHasOptions('hostid', $hosts);
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
-		foreach (['zbx','snmp','jmx','ipmi'] as $text) {
+		foreach (['zbx', 'snmp', 'jmx', 'ipmi'] as $text) {
 			$this->zbxTestAssertElementPresentXpath('//span[@class="status-grey"][text()="'.$text.'"]');
 		}
 
 		// Check host breadcrumbs text and url.
 		$breadcrumbs = [
 			'hosts.php?hostid='.$hostid.'&groupid=0' => 'All hosts',
-			'hosts.php?form=update&hostid='.$hostid => $data['host'],
+			'hosts.php?form=update&hostid='.$hostid => $host_name,
 			'applications.php?hostid='.$hostid => 'Applications',
 			'items.php?filter_set=1&hostid='.$hostid => 'Items',
 			'triggers.php?hostid='.$hostid => 'Triggers',
@@ -99,44 +90,51 @@ class testPageHostGraph extends CWebTest {
 
 			// Check item and graph count.
 			if ($text === 'Items' || $text === 'Graphs') {
-				$count = ($text === 'Items') ? $count_items : $count_graphs;
 				$get_number = $this->zbxTestGetText('//a[@href="'.$url.'"]/..//sup');
-				$this->assertEquals($get_number, $count);
+				$this->assertEquals($get_number, ($text === 'Items') ? $count_items : $count_graphs);
 			}
 		}
 
 		// Check table headers on page.
-		$headers = ['Name', 'Width', 'Height', 'Graph type'];
 		$get_headers = $this->webDriver->findElements(WebDriverBy::xpath('//thead/tr/th[not(@class)]'));
 		foreach ($get_headers as $row) {
 			$table_headers[] = $row->getText();
 		}
-		$this->assertEquals($headers, $table_headers);
+		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type'], $table_headers);
 
 		// Check graph configuration parameters.
-		$graphs = DBdata($sql);
 		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
 
-		foreach ($graphs as $graph) {
+		foreach (DBdata($sql, false) as $graph) {
 			$graph = $graph[0];
+
 			// Get graph row in table.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//table[@class="list-table"]/tbody'
-					. '//input[@value="'.$graph['graphid'].'"]/../..'));
+			$element = $this->webDriver->findElement(
+					WebDriverBy::xpath('//table[@class="list-table"]/tbody//input[@value="'.$graph['graphid'].'"]/../..')
+			);
+
 			// Check name value.
-			$this->assertEquals($graph['name'], $element->findElement(WebDriverBy::xpath('./td'
-					. '/a[@href="graphs.php?form=update&graphid='.$graph['graphid'].'&hostid='.$hostid.'"]'))->getText());
+			$this->assertEquals($graph['name'],
+					$element->findElement(WebDriverBy::xpath('./td/a[@href="graphs.php?form=update&graphid='
+					.$graph['graphid'].'&hostid='.$hostid.'"]'))->getText()
+			);
+
 			// Check width value.
 			$this->assertEquals($graph['width'], $element->findElement(WebDriverBy::xpath('./td[3]'))->getText());
 			// Check height value.
 			$this->assertEquals($graph['height'], $element->findElement(WebDriverBy::xpath('./td[4]'))->getText());
 			// Check graph type value.
-			$types[$graph['graphtype']];
-			$this->assertEquals($types[$graph['graphtype']], $element->findElement(WebDriverBy::xpath('./td[5]'))->getText());
+			$this->assertEquals($types[$graph['graphtype']],
+					$element->findElement(WebDriverBy::xpath('./td[5]'))->getText()
+			);
 		}
 
 		// Check table footer.
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$count_graphs.' of '.$count_graphs.' found');
-		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying '.$count_graphs.' of '
+				.$count_graphs.' found'
+		);
+
+		$this->zbxTestAssertElementText('//span[@id="selected_count"]', '0 selected');
 	}
 
 	public static function getCopyData() {
@@ -437,6 +435,7 @@ class testPageHostGraph extends CWebTest {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
 		$this->zbxTestDropdownSelectWait('copy_type', $data['target_type']);
+
 		if (array_key_exists('group', $data)) {
 			$this->zbxTestDropdownSelectWait('copy_groupid', $data['group']);
 		}
@@ -473,17 +472,16 @@ class testPageHostGraph extends CWebTest {
 			// DB check, if copy target was host or template.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Save graph data of original host.
-				$original = $this->getGraphFromDb($data, $data['host']);
+				$original = $this->getGraphHash($data, $data['host']);
 				// Save graph data of copy target.
 				foreach ($data['targets'] as $target) {
-					$copy = $this->getGraphFromDb($data, $target);
-					$this->assertEquals(DBhash($original), DBhash($copy));
+					$this->assertEquals($original, $this->getGraphHash($data, $target));
 				}
 			}
 			// DB check, if copy target is host group.
 			elseif ($data['target_type'] === 'Host groups') {
 				// Save graph data of original host.
-				$original = DBhash($this->getGraphFromDb($data, $data['host']));
+				$original = $this->getGraphHash($data, $data['host']);
 				// Get every host from the group.
 				foreach ($data['targets'] as $target) {
 					$group_host = DBdata('SELECT host'.
@@ -495,16 +493,17 @@ class testPageHostGraph extends CWebTest {
 									'SELECT groupid'.
 									' FROM hstgrp'.
 									' WHERE name IN ('.zbx_dbstr($target).')))', false);
+
 					// Check DB with every host
 					foreach ($group_host as $host) {
 						$name = $host[0]['host'];
 						// Save graph data of copy target - host group
-						$copy = $this->getGraphFromDb($data, $name);
-						$this->assertEquals($original, DBhash($copy));
+						$this->assertEquals($original, $this->getGraphHash($data, $name));
 					}
 				}
 			}
 		}
+
 		$this->zbxTestCheckFatalErrors();
 	}
 
@@ -513,7 +512,7 @@ class testPageHostGraph extends CWebTest {
 	 * @param type $data test case data from data provider.
 	 * @param type $hosts host or template name, depends on target type.
 	 */
-	private function getGraphFromDb($data, $hosts) {
+	private function getGraphHash($data, $hosts) {
 		$names = [];
 		// Get graph names in string, if need to copy ALL graphs of the host.
 		if ($data['graph'] === 'all') {
@@ -531,9 +530,9 @@ class testPageHostGraph extends CWebTest {
 								' WHERE host='.zbx_dbstr($data['host']).
 								')'.
 							')'.
-						')';
-			$result = DBdata($sql, false);
-			foreach ($result as $graph) {
+					')';
+
+			foreach (DBdata($sql, false) as $graph) {
 				$names[] = zbx_dbstr($graph[0]['name']);
 			}
 		}
@@ -554,8 +553,9 @@ class testPageHostGraph extends CWebTest {
 		});
 
 		// Select graphs by hostid or templateid.
-		$sql = 'SELECT name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype,'.
-				' show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type,flags, ymin_itemid, ymax_itemid'.
+		$sql = 'SELECT name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers,'.
+				' graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type,flags,'.
+				' ymin_itemid, ymax_itemid'.
 				' FROM graphs'.
 				' WHERE name IN ('.implode(',', $names).')'.
 				' AND graphid IN ('.
@@ -568,11 +568,12 @@ class testPageHostGraph extends CWebTest {
 							'SELECT hostid'.
 							' FROM hosts'.
 							' WHERE host IN ('.implode(',', $hosts).')'.
-							')'.
 						')'.
 					')'.
+				')'.
 				' ORDER BY name';
-		return $sql;
+
+		return DBhash($sql);
 	}
 
 	public static function getDeleteData() {
@@ -640,9 +641,9 @@ class testPageHostGraph extends CWebTest {
 								'SELECT hostid'.
 								' FROM hosts'.
 								' WHERE host IN ('.zbx_dbstr($data['host']).')'.
-								')'.
 							')'.
 						')'.
+					')'.
 					' ORDER BY name';
 		}
 
@@ -693,7 +694,7 @@ class testPageHostGraph extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageHostGraph_CheckFilter($data) {
-		$this->openPageHostGraphs($data);
+		$this->openPageHostGraphs($data['host']);
 		if (array_key_exists('group', $data)) {
 			$this->zbxTestDropdownSelect('groupid', $data['group']);
 		}
@@ -705,12 +706,16 @@ class testPageHostGraph extends CWebTest {
 		}
 
 		if ($data['host'] === 'all') {
-			$this->zbxTestAssertElementPresentXpath('//button[@id="form"][@disabled][text()="Create graph (select host first)"]');
+			$this->zbxTestAssertElementPresentXpath(
+					'//button[@id="form"][@disabled][text()="Create graph (select host first)"]'
+			);
 		}
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->zbxTestAssertElementPresentXpath('//a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]');
+				$this->zbxTestAssertElementPresentXpath(
+						'//a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]'
+				);
 			}
 		}
 		else {
@@ -718,16 +723,17 @@ class testPageHostGraph extends CWebTest {
 		}
 	}
 
-	private function openPageHostGraphs($data) {
-		if ($data['host'] === 'all') {
-			$this->zbxTestLogin('graphs.php?groupid=0&hostid=0');
+	private function openPageHostGraphs($host) {
+		if ($host !== 'all') {
+			$row = DBfetch(DBselect('SELECT hostid FROM hosts where host='.zbx_dbstr($host)));
+			$hostid = $row['hostid'];
 		}
 		else {
-			$hostid = DBfetch(DBselect('SELECT hostid FROM hosts where host='.zbx_dbstr($data['host'])));
-			$hostid = $hostid['hostid'];
-			$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
-			return $hostid;
+			$hostid = 0;
 		}
+
+		$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
+		return $hostid;
 	}
 
 	/**
@@ -736,7 +742,7 @@ class testPageHostGraph extends CWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function selectGraph($data) {
-		$this->openPageHostGraphs($data);
+		$this->openPageHostGraphs($data['host']);
 
 		if ($data['graph'] === 'all') {
 			$this->zbxTestCheckboxSelect('all_graphs');
@@ -757,11 +763,11 @@ class testPageHostGraph extends CWebTest {
 								'SELECT hostid'.
 								' FROM hosts'.
 								' WHERE name='. zbx_dbstr($data['host']).
-								')'.
 							')'.
 						')'.
+					')'.
 					' ORDER BY name'
-					);
+			);
 
 			while ($row = DBfetch($result)) {
 				$this->zbxTestCheckboxSelect('group_graphid_'.$row['graphid']);
