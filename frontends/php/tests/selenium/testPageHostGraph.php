@@ -60,16 +60,19 @@ class testPageHostGraph extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 
-		$this->zbxTestDropdownHasOptions('groupid', ['all', 'Group for host graph check', 'Host group for tag permissions',
-				'Templates', 'Templates/Applications', 'Templates/Databases', 'Templates/Modules', 'Templates/Network Devices',
-				'Templates/Operating Systems', 'Templates/Servers Hardware', 'Templates/Virtualization', 'Zabbix servers',
-				'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']);
-		$this->zbxTestDropdownHasOptions('hostid', ['all', 'Form test template', 'Host-layout-test-001', 'Host-map-test-zbx6840',
-				'Host for different items types', 'Host for host prototype tests', 'Host for tag permissions',
-				'Host for trigger description macros', 'Host to check graph 1', 'Host ZBX6663', 'Inheritance test template',
-				'Inheritance test template 2', 'Inheritance test template for unlink', 'Simple form test host', 'Template-layout-test-001',
-				'Template App Apache Tomcat JMX', 'Template App FTP Service', 'Template App Generic Java JMX',
-				'Template App HTTP Service', 'Template App HTTPS Service']);
+		$groups = ['all'];
+		foreach (DBfetchArray(DBselect('SELECT name FROM hstgrp WHERE groupid IN ( SELECT DISTINCT groupid'.
+				' FROM hosts_groups ORDER BY groupid)')) as $group) {
+			$groups[] = $group['name'];
+		}
+		$this->zbxTestDropdownHasOptions('groupid', $groups);
+
+		$hosts = ['all'];
+		foreach (DBfetchArray(DBselect('SELECT name FROM hosts WHERE flags IN (0,4) AND status IN (0,1,3)')) as $host) {
+			$hosts[] = $host['name'];
+		}
+
+		$this->zbxTestDropdownHasOptions('hostid', $hosts);
 
 		$this->zbxTestAssertElementPresentXpath('//button[@type="button"][text()="Create graph"]');
 		$this->zbxTestAssertElementPresentXpath('//span[@class="green"][text()="Enabled"]');
@@ -224,6 +227,22 @@ class testPageHostGraph extends CWebTest {
 					]
 				]
 			],
+			// Copy graphs to hosts.
+			[
+				[
+					'host' => 'Host to delete graphs',
+					'graph' => [
+						'Delete graph 4'
+					],
+					'target_type' => 'Hosts',
+					'group' => 'Group for host graph check',
+					'targets' => [
+						'Host to check graph 3',
+						'Host to check graph 4',
+						'Host to check graph 5'
+					]
+				]
+			],
 			// Copy to host group.
 			// Copy without target selection.
 			[
@@ -288,6 +307,20 @@ class testPageHostGraph extends CWebTest {
 					'target_type' => 'Host groups',
 					'targets' => [
 						'Group to copy all graph'
+					]
+				]
+			],
+			// Copy graph to host groups.
+			[
+				[
+					'host' => 'Host to delete graphs',
+					'graph' => [
+						'Delete graph 1'
+					],
+					'target_type' => 'Host groups',
+					'targets' => [
+						'Copy graph to several groups 1',
+						'Copy graph to several groups 2'
 					]
 				]
 			],
@@ -378,6 +411,21 @@ class testPageHostGraph extends CWebTest {
 						'Template with item graph[1] for copy all graph'
 					]
 				]
+			],
+			// Copy graph to several templates.
+			[
+				[
+					'host' => 'Host to delete graphs',
+					'graph' => [
+						'Delete graph 2'
+					],
+					'target_type' => 'Templates',
+					'group' => 'Templates',
+					'targets' => [
+						'Template to copy graph to several templates 1',
+						'Template to copy graph to several templates 2'
+					]
+				]
 			]
 		];
 	}
@@ -427,8 +475,10 @@ class testPageHostGraph extends CWebTest {
 				// Save graph data of original host.
 				$original = $this->getGraphFromDb($data, $data['host']);
 				// Save graph data of copy target.
-				$copy = $this->getGraphFromDb($data, $data['targets']);
-				$this->assertEquals(DBhash($original), DBhash($copy));
+				foreach ($data['targets'] as $target) {
+					$copy = $this->getGraphFromDb($data, $target);
+					$this->assertEquals(DBhash($original), DBhash($copy));
+				}
 			}
 			// DB check, if copy target is host group.
 			elseif ($data['target_type'] === 'Host groups') {
@@ -457,6 +507,7 @@ class testPageHostGraph extends CWebTest {
 		}
 		$this->zbxTestCheckFatalErrors();
 	}
+
 	/**
 	 * Get data from DB
 	 * @param type $data test case data from data provider.
@@ -627,7 +678,14 @@ class testPageHostGraph extends CWebTest {
 						'Check graph 2'
 					]
 				]
-			]
+			],
+			// TODO add test case after ZBX-14689 will be resolve
+//			[
+//				[
+//					'host' => 'Host to check graph 1',
+//					'change_group' => 'Empty group'
+//				]
+//			]
 		];
 	}
 
@@ -635,10 +693,16 @@ class testPageHostGraph extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageHostGraph_CheckFilter($data) {
-		$this->zbxTestLogin('graphs.php?groupid=0&hostid=0');
-		$this->zbxTestAssertElementPresentXpath('//button[@id="form"][@disabled][text()="Create graph (select host first)"]');
-		$this->zbxTestDropdownSelect('groupid', $data['group']);
-		$this->zbxTestDropdownSelect('hostid', $data['host']);
+		$this->openPageHostGraphs($data);
+		if (array_key_exists('group', $data)) {
+			$this->zbxTestDropdownSelect('groupid', $data['group']);
+		}
+		if (array_key_exists('host', $data)) {
+			$this->zbxTestDropdownSelect('hostid', $data['host']);
+			if (array_key_exists('change_group', $data)) {
+				$this->zbxTestDropdownSelect('groupid', $data['change_group']);
+			}
+		}
 
 		if ($data['host'] === 'all') {
 			$this->zbxTestAssertElementPresentXpath('//button[@id="form"][@disabled][text()="Create graph (select host first)"]');
@@ -655,10 +719,15 @@ class testPageHostGraph extends CWebTest {
 	}
 
 	private function openPageHostGraphs($data) {
-		$hostid = DBfetch(DBselect('SELECT hostid FROM hosts where host='.zbx_dbstr($data['host'])));
-		$hostid = $hostid['hostid'];
-		$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
-		return $hostid;
+		if ($data['host'] === 'all') {
+			$this->zbxTestLogin('graphs.php?groupid=0&hostid=0');
+		}
+		else {
+			$hostid = DBfetch(DBselect('SELECT hostid FROM hosts where host='.zbx_dbstr($data['host'])));
+			$hostid = $hostid['hostid'];
+			$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
+			return $hostid;
+		}
 	}
 
 	/**
