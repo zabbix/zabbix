@@ -4848,10 +4848,10 @@ int	zbx_vmware_init(char **error)
 	memset(vmware, 0, sizeof(zbx_vmware_t));
 
 	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
-
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_mem_malloc_func, __vm_mem_realloc_func, __vm_mem_free_func);
-
+#endif
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -4871,8 +4871,9 @@ void	zbx_vmware_destroy(void)
 	const char	*__function_name = "zbx_vmware_destroy";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	zbx_hashset_destroy(&vmware->strpool);
+#endif
 	zbx_mutex_destroy(&vmware_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
