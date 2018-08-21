@@ -139,8 +139,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	$newHostPrototype = [
-		'host' => getRequest('host'),
-		'name' => getRequest('name'),
+		'host' => getRequest('host', ''),
+		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
@@ -150,13 +150,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		]
 	];
 
+	// API requires 'templateid' property.
+	if ($newHostPrototype['templates']) {
+		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
+	}
+
 	// add custom group prototypes
 	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
 		if (!$groupPrototype['group_prototypeid']) {
 			unset($groupPrototype['group_prototypeid']);
 		}
 
-		if (!zbx_empty($groupPrototype['name'])) {
+		if ($groupPrototype['name'] !== '') {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
 		}
 	}
