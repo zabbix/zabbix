@@ -168,6 +168,7 @@ class CMacrosResolverGeneral {
 
 		if ($extract_lldmacros) {
 			$lld_macro_parser = new CLLDMacroParser();
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 
 		if ($extract_functionids) {
@@ -202,6 +203,10 @@ class CMacrosResolverGeneral {
 			elseif ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $lld_macro_parser->getMatch();
 				$pos += $lld_macro_parser->getLength() - 1;
+			}
+			elseif ($extract_lldmacros && $lld_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $lld_macro_function_parser->getMatch();
+				$pos += $lld_macro_function_parser->getLength() - 1;
 			}
 			elseif ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $functionid_parser->getMatch();
@@ -284,6 +289,7 @@ class CMacrosResolverGeneral {
 			$macros['lldmacros'] = [];
 
 			$lld_macro_parser = new CLLDMacroParser();
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 
 		if ($extract_functionids) {
@@ -360,10 +366,17 @@ class CMacrosResolverGeneral {
 					continue;
 				}
 
-				if ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-					$macros['lldmacros'][$lld_macro_parser->getMatch()] = null;
-					$pos += $lld_macro_parser->getLength() - 1;
-					continue;
+				if ($extract_lldmacros) {
+					if ($lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+						$macros['lldmacros'][$lld_macro_parser->getMatch()] = null;
+						$pos += $lld_macro_parser->getLength() - 1;
+						continue;
+					}
+					elseif ($lld_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+						$macros['lldmacros'][$lld_macro_function_parser->getMatch()] = null;
+						$pos += $lld_macro_function_parser->getLength() - 1;
+						continue;
+					}
 				}
 
 				if ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {

@@ -1128,6 +1128,27 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Incorrect validation rules.'
 			],
 			[
+				['type' => API_OBJECTS, 'fields' => [
+					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+				]],
+				[
+					['host' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2'],
+					['host' => 'host 3'],
+					['host' => 'host 4']
+				],
+				'/',
+				[
+					['host' => 'host 0', 'name' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2', 'name' => 'host 2'],
+					['host' => 'host 3', 'name' => 'host 3'],
+					['host' => 'host 4', 'name' => 'host 4']
+				]
+			],
+			[
 				['type' => API_HG_NAME, 'length' => 16],
 				'Zabbix servers',
 				'/1/name',
@@ -1180,7 +1201,86 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_HG_NAME],
 				'/Latvia/Riga',
 				'/1/name',
-				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
+				'Invalid parameter "/1/name": invalid host group name.'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Latvia/Riga',
+				'/1/name',
+				'Invalid parameter "/1/name": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Latvia/Riga/{#DC.NAME}',
+				'/1/name',
+				'Latvia/Riga/{#DC.NAME}'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{{#DC}.regsub(".*", "//\1")}',
+				'/1/name',
+				'{{#DC}.regsub(".*", "//\1")}'
+			],
+			[
+				['type' => API_H_NAME, 'length' => 16],
+				'Zabbix server',
+				'/1/name',
+				'Zabbix server'
+			],
+			[
+				['type' => API_H_NAME, 'length' => 16],
+				'Zabbix server++++',
+				'/1/name',
+				'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				['type' => API_H_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				['type' => API_H_NAME],
+				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				null,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				// broken UTF-8 byte sequence
+				'Zabbix '."\xd1".'server',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Linux server',
+				'/1/name',
+				'Invalid parameter "/1/name": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{#PREFIX}-server',
+				'/1/name',
+				'{#PREFIX}-server'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{{#HOST}.regsub("^[a-z]+", "\1")}',
+				'/1/name',
+				'{{#HOST}.regsub("^[a-z]+", "\1")}'
 			],
 			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],

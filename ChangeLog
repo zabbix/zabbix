@@ -1,8 +1,9 @@
 Changes for 4.0.0alpha10
 
 New features:
+A......... [ZBXNEXT-4656] added strict validation of hostprototype.create() and hostprototype.update() methods; added audit logging for these methods (Ivo, Sasha)
 ..F....... [ZBXNEXT-4455] added screen reader to the dashboard and widgets (ashubin)
-........S. [ZBXNEXT-4627] added support of macro functions to LLD macros (viktors, vso)
+A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD macros (Ivo, Sasha, viktors, vso)
 ..F....... [ZBXNEXT-4049] added option to hide timeline in Problems widget (vasilijs)
 ..F....... [ZBXNEXT-4611] changed default method for http agent items from "post" to "get" (gcalenko)
 ..F....... [ZBXNEXT-4587] added new column 'Value' and filter in Triggers list (Ivo, vasilijs)
@@ -10,6 +11,8 @@ New features:
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
+..F....... [ZBXNEXT-4500] fixed item prototype master item links leading to error when master item is a web item (Ivo)
 ........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
 ..F....... [ZBX-14629] fixed breadcrumb labels clipping (ashubin)
 ........S. [ZBX-14628] fixed empty MAIL FROM in email alerts (mindbound)
@@ -443,6 +446,7 @@ New features:
 ...G...PS. [ZBX-13730] replaced pcreposix library with pcre, lowered backtracking limit, fixed libevent build issues (yurii)
 
 Bug fixes:
+.......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
 ..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 ...G...PS. [ZBX-13730] fixed incorrect behavior of zbxregexp library when reusing latest regular expression (yurii)
@@ -1755,6 +1759,7 @@ Changes for 3.0.21rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ..F....... [ZBX-12293] renamed trigger functions by adding function name at the beginning and removing the operator and "N" and placing operator in a separate field allowing two new operators "<=" and ">=" for selection (Ivo)
 .......PS. [ZBX-14593] fixed error message for invalid vmware endpoint (MVekslers)
 ........S. [ZBX-14614] fixed trigger dependency link to the template instead of the host during the discovery action (MVekslers)
