@@ -338,9 +338,26 @@ jQuery(function ($) {
 
 				var values = findProblems(graph[0], e.offsetX);
 				if (values.length) {
-					var tbody = $('<tbody>');
+					var tbody = $('<tbody>'),
+						foot = null;
 
-					values.forEach(function(val) {
+					values.forEach(function(val, i) {
+						if (i >= data.hintMaxRows) {
+							var msg = sprintf(t('Displaying %1$s of %2$s found'), data.hintMaxRows, values.length);
+							foot = $('<div></div>')
+										.addClass('table-paging')
+										.append(
+											$('<div></div>')
+												.addClass('paging-btn-container')
+												.append(
+													$('<div></div>')
+														.addClass('table-stats')
+														.text(msg)
+												)
+										);
+							return;
+						}
+
 						tbody.append(
 							$('<tr>')
 								.append($('<td>').append($('<a>', {'href': val.url}).text(val.clock)))
@@ -359,7 +376,8 @@ jQuery(function ($) {
 								$('<table></table>')
 									.addClass('list-table compact-view')
 									.append(tbody)
-							);
+							)
+							.append(foot);
 				}
 			}
 			// Show graph values if mouse is over the graph canvas.
@@ -371,6 +389,7 @@ jQuery(function ($) {
 				var points = findValues(graph[0], e.offsetX),
 					show_hint = false,
 					xy_point = false,
+					foot = null,
 					tolerance;
 
 				/**
@@ -397,13 +416,13 @@ jQuery(function ($) {
 				if (show_hint) {
 					html = $('<ul></ul>');
 				}
-				points.forEach(function(point) {
+				points.forEach(function(point, i) {
 					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
 					if (xy_point === false || xy_point === point) {
 						point_highlight.setAttribute('cx', point.x);
 						point_highlight.setAttribute('cy', point.y);
 
-						if (show_hint) {
+						if (show_hint && data.hintMaxRows > i) {
 							$('<li></li>')
 								.append(
 									$('<span></span>')
@@ -418,13 +437,28 @@ jQuery(function ($) {
 						point_highlight.setAttribute('cx', -10);
 						point_highlight.setAttribute('cy', -10);
 					}
-
 				});
+
+				if (points.length > data.hintMaxRows) {
+					var msg = sprintf(t('Displaying %1$s of %2$s found'), data.hintMaxRows, points.length);
+					foot = $('<div></div>')
+								.addClass('table-paging')
+								.append(
+									$('<div></div>')
+										.addClass('paging-btn-container')
+										.append(
+											$('<div></div>')
+												.addClass('table-stats')
+												.text(msg)
+										)
+								);
+				}
 
 				if (show_hint) {
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
-							.append(html);
+							.append(html)
+							.append(foot);
 				}
 			}
 			else {
@@ -458,6 +492,7 @@ jQuery(function ($) {
 			options = $.extend({}, {
 				sbox: false,
 				show_problems: true,
+				hint_max_rows: 20,
 				min_period: 60
 			}, options);
 
@@ -469,6 +504,7 @@ jQuery(function ($) {
 						dimW: options.dims.w,
 						dimH: options.dims.h,
 						showProblems: options.show_problems,
+						hintMaxRows: options.hint_max_rows,
 						isHintBoxFrozen: false,
 						spp: options.spp || null,
 						minPeriod: options.min_period,

@@ -2939,7 +2939,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .svg-graph-hintbox {
   padding-top: 5px;
-  display: block; }
+  display: block;
+  font-size: 12px;
+  line-height: 18px; }
+  .svg-graph-hintbox .table-paging {
+    min-height: 18px;
+    padding: 0px 0px 2px;
+    border: none;
+    top: 2px; }
+    .svg-graph-hintbox .table-paging .paging-btn-container {
+      min-height: inherit; }
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }

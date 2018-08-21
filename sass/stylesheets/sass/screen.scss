@@ -4219,6 +4219,19 @@ $form-icon-btn: (
 .svg-graph-hintbox {
 	padding-top: 5px;
 	display: block;
+	font-size: 12px;
+	line-height: 18px;
+
+	.table-paging {
+		min-height: 18px;
+		padding: 0px 0px 2px;
+		border: none;
+		top: 2px;
+
+		.paging-btn-container {
+			min-height: inherit;
+		}
+	}
 
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
