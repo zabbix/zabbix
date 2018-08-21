@@ -1708,7 +1708,7 @@ static int	DBpatch_3050137(void)
 		return SUCCEED;
 
 	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
-	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_MATCH. */
+	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_SENSITIVE. */
 	res = DBexecute(
 		"update config"
 		" set ldap_configured=1, ldap_case_sensitive=1"
