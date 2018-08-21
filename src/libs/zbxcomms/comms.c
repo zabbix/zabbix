@@ -67,6 +67,8 @@ const char	*zbx_socket_strerror(void)
 #else
 #	define zbx_set_socket_strerror __zbx_zbx_set_socket_strerror
 #endif
+
+__zbx_attr_format_printf(1, 2)
 static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
 {
 	va_list args;
@@ -1652,8 +1654,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s exceeds the "
-						"maximum size " ZBX_FS_UI64 " bytes. Message ignored.", expected_len,
-						s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+						"maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
+						(zbx_uint64_t)expected_len, s->peer,
+						(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 				nbytes = ZBX_PROTO_ERROR;
 				goto out;
 			}
@@ -1663,7 +1666,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
 						" from %s exceeds the maximum size " ZBX_FS_UI64
-						" bytes. Message ignored.", expected_len,
+						" bytes. Message ignored.", (zbx_uint64_t)expected_len,
 						s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 				nbytes = ZBX_PROTO_ERROR;
 				goto out;
@@ -1711,8 +1714,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 				if (out_size != reserved)
 				{
 					zbx_free(out);
-					zbx_set_socket_strerror("size of uncompressed data is less than expected",
-							zbx_compress_strerror());
+					zbx_set_socket_strerror("size of uncompressed data is less than expected");
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}
@@ -1726,7 +1728,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
 						" compression ratio %.1f", __function_name,
-						buf_stat_bytes + buf_dyn_bytes,
+						(zbx_fs_size_t)(buf_stat_bytes + buf_dyn_bytes),
 						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
 			}
 			else
@@ -1739,12 +1741,12 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			if (buf_stat_bytes + buf_dyn_bytes < expected_len)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64
-						" bytes. Message ignored.", s->peer, expected_len);
+						" bytes. Message ignored.", s->peer, (zbx_uint64_t)expected_len);
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than expected " ZBX_FS_UI64
-						" bytes. Message ignored.", s->peer, expected_len);
+						" bytes. Message ignored.", s->peer, (zbx_uint64_t)expected_len);
 			}
 
 			nbytes = ZBX_PROTO_ERROR;

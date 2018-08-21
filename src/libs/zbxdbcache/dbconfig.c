@@ -98,6 +98,24 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_strdup                                                        *
+ *                                                                            *
+ * Purpose: copies string into configuration cache shared memory              *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dc_strdup(const char *source)
+{
+	char	*dst;
+	size_t	len;
+
+	len = strlen(source) + 1;
+	dst = (char *)__config_mem_malloc_func(NULL, len);
+	memcpy(dst, source, len);
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: is_item_processed_by_server                                      *
  *                                                                            *
  * Parameters: type - [IN] item type [ITEM_TYPE_* flag]                       *
@@ -1191,7 +1209,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
 								" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
-								psk_owner->first, psk_owner->second, host->host);
+								(char *)psk_owner->first, (char *)psk_owner->second,
+								host->host);
 					}
 				}
 
@@ -1231,7 +1250,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
 							" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
-							psk_owner->first, psk_owner->second, host->host);
+							(char *)psk_owner->first, (char *)psk_owner->second,
+							host->host);
 				}
 			}
 
@@ -4884,68 +4904,89 @@ void	DCsync_configuration(unsigned char mode)
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + update_sec;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, csec, csec2, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
 				hosts_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, hisec, hisec2, hi_sync.add_num, hi_sync.update_num,
 				hi_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, htsec, htsec2, htmpl_sync.add_num, htmpl_sync.update_num,
 				htmpl_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, gmsec, gmsec2, gmacro_sync.add_num, gmacro_sync.update_num,
 				gmacro_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, hmsec, hmsec2, hmacro_sync.add_num, hmacro_sync.update_num,
 				hmacro_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
 				if_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, isec, isec2, items_sync.add_num, items_sync.update_num,
 				items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
 				triggers_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, dsec, dsec2, tdep_sync.add_num, tdep_sync.update_num,
 				tdep_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, trigger_tag_sec, trigger_tag_sec2, trigger_tag_sync.add_num,
 				trigger_tag_sync.update_num, trigger_tag_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, fsec, fsec2, func_sync.add_num, func_sync.update_num,
 				func_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, expr_sec, expr_sec2, expr_sync.add_num, expr_sync.update_num,
 				expr_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, action_sec, action_sec2, action_sync.add_num, action_sync.update_num,
 				action_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, action_op_sec, action_op_sec2, action_op_sync.add_num,
 				action_op_sync.update_num, action_op_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, action_condition_sec, action_condition_sec2,
 				action_condition_sync.add_num, action_condition_sync.update_num,
 				action_condition_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr       : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr       : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, correlation_sec, correlation_sec2, correlation_sync.add_num,
 				correlation_sync.update_num, correlation_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_cond  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_cond  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, corr_condition_sec, corr_condition_sec2, corr_condition_sync.add_num,
 				corr_condition_sync.update_num, corr_condition_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, corr_operation_sec, corr_operation_sec2, corr_operation_sync.add_num,
 				corr_operation_sync.update_num, corr_operation_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, hgroups_sec, hgroups_sec2, hgroups_sync.add_num,
 				hgroups_sync.update_num, hgroups_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec (%d/%d/%d).",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
 				itempp_sync.remove_num);
 
@@ -5396,6 +5437,24 @@ static int	__config_timer_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+static zbx_hash_t	__config_data_session_hash(const void *data)
+{
+	const zbx_data_session_t	*session = (const zbx_data_session_t *)data;
+	zbx_hash_t			hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&session->hostid);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(session->token, strlen(session->token), hash);
+}
+
+static int	__config_data_session_compare(const void *d1, const void *d2)
+{
+	const zbx_data_session_t	*s1 = (const zbx_data_session_t *)d1;
+	const zbx_data_session_t	*s2 = (const zbx_data_session_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(s1->hostid, s2->hostid);
+	return strcmp(s1->token, s2->token);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: init_configuration_cache                                         *
@@ -5541,6 +5600,8 @@ int	init_configuration_cache(char **error)
 					__config_mem_realloc_func,
 					__config_mem_free_func);
 
+	CREATE_HASHSET_EXT(config->data_sessions, 0, __config_data_session_hash, __config_data_session_compare);
+
 	config->config = NULL;
 
 	config->status = (ZBX_DC_STATUS *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_STATUS));
@@ -5550,6 +5611,18 @@ int	init_configuration_cache(char **error)
 	config->sync_ts = 0;
 	config->item_sync_ts = 0;
 	config->proxy_lastaccess_ts = time(NULL);
+
+	/* create data session token for proxies */
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	{
+		char	*token;
+
+		token = zbx_create_token(0);
+		config->session_token = dc_strdup(token);
+		zbx_free(token);
+	}
+	else
+		config->session_token = NULL;
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -11392,4 +11465,98 @@ void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 
 		zbx_vector_uint64_pair_sort(lastaccess, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_session_token                                         *
+ *                                                                            *
+ * Purpose: returns session token                                             *
+ *                                                                            *
+ * Return value: pointer to session token (NULL for server).                  *
+ *                                                                            *
+ * Comments: The session token is generated during configuration cache        *
+ *           initialization and is not changed later. Therefore no locking    *
+ *           is required.                                                     *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_dc_get_session_token(void)
+{
+	return config->session_token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_or_create_data_session                                *
+ *                                                                            *
+ * Purpose: returns data session, creates a new session if none found         *
+ *                                                                            *
+ * Parameter: hostid - [IN] the host (proxy) identifier                       *
+ *            token  - [IN] the session token (not NULL)                      *
+ *                                                                            *
+ * Return value: pointer to data session.                                     *
+ *                                                                            *
+ * Comments: The last_valueid property of the returned session object can be  *
+ *           updated directly without locking cache because only one data     *
+ *           session is updated at the same time and after retrieving the     *
+ *           session object will not be deleted for 24 hours.                 *
+ *                                                                            *
+ ******************************************************************************/
+zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token)
+{
+	zbx_data_session_t	*session, session_local;
+	time_t			now;
+
+	now = time(NULL);
+	session_local.hostid = hostid;
+	session_local.token = token;
+
+	RDLOCK_CACHE;
+	session = (zbx_data_session_t *)zbx_hashset_search(&config->data_sessions, &session_local);
+	UNLOCK_CACHE;
+
+	if (NULL == session)
+	{
+		WRLOCK_CACHE;
+		session = (zbx_data_session_t *)zbx_hashset_insert(&config->data_sessions, &session_local,
+				sizeof(session_local));
+		session->token = dc_strdup(token);
+		UNLOCK_CACHE;
+
+		session->last_valueid = 0;
+	}
+
+	session->lastaccess = now;
+
+	return session;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_cleanup_data_sessions                                     *
+ *                                                                            *
+ * Purpose: removes data sessions not accessed for 24 hours                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_cleanup_data_sessions(void)
+{
+	zbx_data_session_t	*session;
+	zbx_hashset_iter_t	iter;
+	time_t			now;
+
+	now = time(NULL);
+
+	WRLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->data_sessions, &iter);
+	while (NULL != (session = (zbx_data_session_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (session->lastaccess + SEC_PER_DAY <= now)
+		{
+			__config_mem_free_func((char *)session->token);
+			zbx_hashset_iter_remove(&iter);
+		}
+	}
+
+	UNLOCK_CACHE;
 }

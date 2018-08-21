@@ -750,82 +750,6 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 }
 
 /**
- * Create array with all inputs required for date selection and calendar.
- *
- * @param string      $name
- * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
- *
- * @return array
- */
-function createDateSelector($name, $date) {
-	$onClick = 'dateSelectorOnClick(event, this, "'.$name.'_calendar");';
-
-	if (is_array($date)) {
-		$y = $date['y'];
-		$m = $date['m'];
-		$d = $date['d'];
-		$h = $date['h'];
-		$i = $date['i'];
-	}
-	else {
-		$y = date('Y', $date);
-		$m = date('m', $date);
-		$d = date('d', $date);
-		$h = date('H', $date);
-		$i = date('i', $date);
-	}
-
-	$fields = [
-		(new CNumericBox($name.'_year', $y, 4))
-			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
-			->setAttribute('placeholder', _('yyyy')),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		'-',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_month', $m, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('mm'))
-			->onChange('validateDatePartBox(this, 1, 12, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		'-',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_day', $d, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('dd'))
-			->onChange('validateDatePartBox(this, 1, 31, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_hour', $h, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('hh'))
-			->onChange('validateDatePartBox(this, 0, 23, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		':',
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox($name.'_minute', $i, false, 2))
-			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
-			->addStyle('text-align: right;')
-			->setAttribute('placeholder', _('mm'))
-			->onChange('validateDatePartBox(this, 0, 59, 2);'),
-		(new CButton())
-			->addClass(ZBX_STYLE_ICON_CAL)
-			->onClick($onClick)
-			->removeId()
-	];
-
-	zbx_add_post_js('create_calendar(null,'.
-		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
-		'"'.$name.'_calendar",'.
-		'"'.$name.'");'
-	);
-
-	return $fields;
-}
-
-/**
  * Renders a page footer.
  *
  * @param bool $with_logo
@@ -918,6 +842,12 @@ function makeActionIcon(array $icon_data) {
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);
+	}
+
+	if (array_key_exists('aria-label', $icon_data)) {
+		$icon
+			->addItem($icon_data['aria-label'])
+			->addClass(ZBX_STYLE_INLINE_SR_ONLY);
 	}
 
 	return $icon;

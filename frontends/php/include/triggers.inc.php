@@ -617,6 +617,7 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 	$user_macro_parser = new CUserMacroParser();
 	$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
 	$lld_macro_parser = new CLLDMacroParser();
+	$lld_macro_function_parser = new CLLDMacroFunctionParser();
 
 	for ($pos = 0, $pos_left = 0; isset($expression[$pos]); $pos++) {
 		if ($function_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
@@ -642,6 +643,9 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 		}
 		elseif ($lld_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
 			$pos += $lld_macro_parser->getLength() - 1;
+		}
+		elseif ($lld_macro_function_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+			$pos += $lld_macro_function_parser->getLength() - 1;
 		}
 	}
 
@@ -861,7 +865,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		}
 	}
 
-	$triggerTable = new CTableInfo();
+	$triggerTable = (new CTableInfo())->setHeadingColumn(0);
 
 	if (!$host_names) {
 		return $triggerTable;
@@ -918,7 +922,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name = (new CLinkAction($host_name))
 				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
 
-			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
+			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(

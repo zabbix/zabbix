@@ -1445,56 +1445,27 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
-static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_len)
 {
-	const char	*pin = src;
-	char		*pout = dst;
-	size_t		pos, len, sep;
-	int		quoted = 0;
+	*dst++ = '^';				/* start anchor */
 
-	zbx_function_param_parse(src, &pos, &len, &sep);
-
-	if (0 != pos)		/* copy leading spaces */
+	if (0 != src_len)
 	{
-		memcpy(pout, src, pos);
-		pout += pos;
-		pin += pos;
+		memcpy(dst, src, src_len);	/* parameter body */
+		dst += src_len;
 	}
 
-	if ('"' == *pin)
-	{
-		*pout++ = *pin++;
-		len -= 2;	/* length without starting and ending quotes */
-		quoted = 1;
-	}
-
-	*pout++ = '^';		/* start anchor */
-
-	if (0 != len)
-	{
-		memcpy(pout, pin, len);
-		pout += len;
-		pin += len;
-	}
-
-	*pout++ = '$';		/* end anchor */
-
-	if (0 != quoted)
-	{
-		memcpy(pout, pin, sep - (size_t)(pin - src));
-		pout += sep - (size_t)(pin - src);
-	}
-
-	*pout = '\0';
+	*dst++ = '$';				/* end anchor */
+	*dst = '\0';
 }
 
 static int	DBpatch_3050122(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			ret = FAIL;
-	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = FAIL;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1502,37 +1473,68 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	required_len;
+		const char	*orig_param = row[1];
+		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_anchored = NULL,
+				*db_parameter_esc;
+		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, current_len;
+		int		was_quoted;
 
-		parameter = zbx_strdup(NULL, row[1]);
-		zbx_regexp_escape(&parameter);
+		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
 
-		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
+		/* copy leading whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
-		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(parameter) + 2))
+		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted);
+
+		zbx_regexp_escape(&unquoted_parameter);
+
+		current_len = strlen(unquoted_parameter);
+
+		/* increasing length by 3 for ^, $, '\0' */
+		parameter_anchored = (char *)zbx_malloc(NULL, current_len + 3);
+		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
+		zbx_free(unquoted_parameter);
+
+		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
+					" logsource (functionid: %s) to regexp during database upgrade. The"
+					" parameter needs to but cannot be quoted after conversion.",
+					row[1], row[0]);
+
+			zbx_free(parameter_anchored);
+			zbx_free(processed_parameter);
+			continue;
+		}
+
+		/* copy the parameter */
+		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_anchored);
+		zbx_free(parameter_anchored);
+
+		/* copy trailing whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
+				sep_pos - param_pos - param_len + 1);
+
+		if (FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
-			zbx_free(parameter);
+			zbx_free(processed_parameter);
 			continue;
 		}
 
-		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
-
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 3);	/* 3 for ^, $, '\0' */
-		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
+		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
-				parameter_esc_anchored, row[0]);
+				db_parameter_esc, row[0]);
 
-		zbx_free(parameter);
-		zbx_free(parameter_esc);
-		zbx_free(parameter_esc_anchored);
+		zbx_free(db_parameter_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
@@ -1552,6 +1554,52 @@ out:
 	zbx_free(sql);
 
 	return ret;
+}
+
+static int	DBpatch_3050123(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles where idx in ("
+			"'web.toptriggers.filter.from','web.toptriggers.filter.till','web.avail_report.0.timesince',"
+			"'web.avail_report.0.timetill','web.avail_report.1.timesince','web.avail_report.1.timetill'"
+		")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
 }
 
 #endif
@@ -1679,5 +1727,11 @@ DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
+DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
 
 DBPATCH_END()
