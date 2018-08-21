@@ -2181,19 +2181,9 @@ function getTimeperiodForm(array $data) {
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-		if ($data['new_timeperiod_start_date'] === null) {
-			$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
-		}
-		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			if ($range_time_parser->parse($data['new_timeperiod_start_date']) == CParser::PARSE_SUCCESS) {
-				$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
-			}
-			else {
-				$new_timeperiod['start_date'] = $data['new_timeperiod_start_date'];
-			}
-		}
+		$new_timeperiod['start_date'] = ($data['new_timeperiod_start_date'] === null)
+			? date(ZBX_DATE_TIME, time())
+			: $data['new_timeperiod_start_date'];
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
