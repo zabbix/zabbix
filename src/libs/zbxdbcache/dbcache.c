@@ -4102,7 +4102,7 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
+ZBX_MEM_FUNC_IMPL(__trend, trend_mem)
 
 static int	init_trend_cache(char **error)
 {
