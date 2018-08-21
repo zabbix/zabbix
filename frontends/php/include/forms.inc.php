@@ -2189,7 +2189,7 @@ function getTimeperiodForm(array $data) {
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
 			(new CDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date']))
 				->setDateFormat(ZBX_DATE_TIME)
-				->setPlaceholder('YYYY-MM-DD hh:mm')
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		);
 	}

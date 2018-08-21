@@ -52,13 +52,13 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
 		(new CDateSelector('active_since', $data['active_since']))
 			->setDateFormat(ZBX_DATE_TIME)
-			->setPlaceholder('YYYY-MM-DD hh:mm')
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
-			->setPlaceholder('YYYY-MM-DD hh:mm')
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 	);
 
