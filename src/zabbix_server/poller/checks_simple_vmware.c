@@ -206,6 +206,12 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
+	if (NULL != entity->error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, entity->error));
+		goto out;
+	}
+
 	if (FAIL == (i = zbx_vector_ptr_bsearch(&entity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
@@ -1903,7 +1909,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid, "*"))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
@@ -3058,7 +3064,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid))
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid, "*"))
 	{
 		ret = SYSINFO_RET_OK;
 		goto unlock;
