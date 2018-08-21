@@ -273,65 +273,14 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	protected static function getProblems(array $problem_options = [], array $time_period) {
-		/**
-		 * There can be 2 problem groups in graph.
-		 *  - problems that has started before the graph start time and ended later than graph start time or never;
-		 *  - problems that has started between graph start time and end time.
-		 *
-		 * This is solved making 2 separate requests:
-		 * - First is made with raw SQL, requesting all eventids in calculated time period;
-		 * - Seconds request is made using problem.get API method. This returns final response for getProblems.
-		 */
 		$options = [
 			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
 			'select_acknowledges' => ['action'],
-			'preservekeys' => true
+			'problem_time_from' => $time_period['time_from'],
+			'problem_time_till' => $time_period['time_to'],
+			'preservekeys' => true,
+			'limit' => 100
 		];
-		$config = select_config();
-
-		/**
-		 * Select problem eventids in given time period. First, find problem events that are started during the graph
-		 * visible period.
-		 */
-		$query = '
-		SELECT e.eventid FROM events e WHERE
-			e.clock BETWEEN '.$time_period['time_from'].' AND '.$time_period['time_to'].' AND
-			e.value = '.TRIGGER_VALUE_TRUE.' AND
-			e.source = '.EVENT_SOURCE_TRIGGERS.' AND
-			e.object = '.EVENT_OBJECT_TRIGGER;
-
-		$events_data = DBselect($query, $config['search_limit']);
-		while ($event = DBfetch($events_data)) {
-			$options['eventids'][] = $event['eventid'];
-		}
-
-		/**
-		 * Select eventids for problem events that was started before the graph visible period, but was recovered later
-		 * than the graph beginning time or was never recovered.
-		 */
-		$query = '
-		SELECT e.eventid, er1.r_eventid
-		FROM events e
-		LEFT JOIN event_recovery er1
-		ON er1.eventid = e.eventid
-		WHERE
-			'.$time_period['time_from'].' > e.clock AND
-			e.value = '.TRIGGER_VALUE_TRUE.' AND
-			e.source = '.EVENT_SOURCE_TRIGGERS.' AND
-			e.object = '.EVENT_OBJECT_TRIGGER.'
-		HAVING
-			EXISTS (SELECT NULL FROM events WHERE eventid = er1.r_eventid AND clock > '.$time_period['time_from'].') OR
-			er1.r_eventid IS NULL';
-
-		$events_data = DBselect($query, $config['search_limit']);
-		while ($event = DBfetch($events_data)) {
-			$options['eventids'][] = $event['eventid'];
-		}
-
-		// No events, no problems.
-		if (!$options['eventids']) {
-			return [];
-		}
 
 		// Find triggers involved.
 		if (array_key_exists('problemhosts', $problem_options)) {
@@ -371,14 +320,18 @@ class CSvgGraphHelper {
 				: array_keys($triggers);
 		}
 
-		// Add other filters.
+		// Add severity filter.
 		if (array_key_exists('severities', $problem_options)) {
 			$options['severities'] = $problem_options['severities'];
 		}
+
+		// Add problem name filter.
 		if (array_key_exists('problem_name', $problem_options)) {
 			$options['searchWildcardsEnabled'] = true;
 			$options['search']['name'] = $problem_options['problem_name'];
 		}
+
+		// Add tags filter.
 		if (array_key_exists('tags', $problem_options)) {
 			if (array_key_exists('evaltype', $problem_options)) {
 				$options['evaltype'] = $problem_options['evaltype'];

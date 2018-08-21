@@ -86,6 +86,8 @@ class CEvent extends CApiService {
 			'time_till'					=> null,
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
+			'problem_time_from'			=> null,
+			'problem_time_till'			=> null,
 			'acknowledged'				=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
@@ -120,6 +122,12 @@ class CEvent extends CApiService {
 		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
 			if ($options['value'] === null) {
 				$options['value'] = [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE];
+			}
+
+			if ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null) {
+				$options['eventids'] = $options['eventids']
+					? array_intersect($options['eventids'], $this->getProblemEventsInTimeRange($options))
+					: $this->getProblemEventsInTimeRange($options);
 			}
 
 			$problems = in_array(TRIGGER_VALUE_TRUE, $options['value'])
@@ -177,6 +185,80 @@ class CEvent extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Select problem events that was unresolved at requested time range.
+	 * Function is optimized to work with range, so full time range is mandatory.
+	 *
+	 * @param array   $options
+	 * @param int     $options[problem_time_from]   (mandatory) time from.
+	 * @param int     $options[problem_time_till]   (mandatory) time to.
+	 *
+	 * @return array
+	 */
+	private function getProblemEventsInTimeRange(array $options) {
+		$time_from = $options['problem_time_from'];
+		$time_to = $options['problem_time_till'];
+		$result = [];
+
+		if (!$time_from || !$time_to) {
+			return $result;
+		}
+
+		/**
+		 * Select problem events started later than $time_from but earlier than $time_to.
+		 */
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid')],
+			'from'		=> ['e' => 'events e'],
+			'where'		=> [
+				'e.value = '.TRIGGER_VALUE_TRUE,
+				'e.source = '.EVENT_SOURCE_TRIGGERS,
+				'e.object = '.EVENT_OBJECT_TRIGGER,
+				'e.clock BETWEEN '.zbx_dbstr($time_from).' AND '.zbx_dbstr($time_to)
+			],
+			'limit'		=> null
+		];
+
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		while ($event = DBfetch($res)) {
+			$result[$event['eventid']] = true;
+		}
+
+		// Select problem events started earlier but still in problem state at requested time range.
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid'), 'er1.r_eventid'],
+			'from'		=> ['e' => 'events e'],
+			'where'		=> [
+				'e.value = '.TRIGGER_VALUE_TRUE,
+				'e.source = '.EVENT_SOURCE_TRIGGERS,
+				'e.object = '.EVENT_OBJECT_TRIGGER
+			],
+			'left_join' => [['from' => 'event_recovery er1', 'on' => 'er1.eventid = e.eventid']],
+			'left_table' => 'e',
+			'having' => [
+				'EXISTS ('.
+					'SELECT NULL FROM events WHERE eventid = er1.r_eventid AND clock >= '.zbx_dbstr($time_from).
+				') '.
+				'OR er1.r_eventid IS NULL'
+			],
+			'order'		=> [],
+			'group'		=> [],
+			'limit'		=> null
+		];
+
+		// Skip events already selected.
+		if ($result) {
+			$sqlParts['where'][] = dbConditionInt('e.eventid', array_keys($result), true, false, false, false);
+		}
+
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		while ($event = DBfetch($res)) {
+			$result[$event['eventid']] = true;
+		}
+
+		return array_keys($result);
 	}
 
 	/**
