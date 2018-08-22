@@ -46,6 +46,8 @@ zbx_vc_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
 
+zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@
+
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_add_values.c \
 	valuecache_mock.c \
@@ -67,6 +69,7 @@ zbx_vc_add_values_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_add_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
+zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_add_values_CFLAGS = \
 	 $(zbx_vc_add_values_WRAP_FUNCS) \
@@ -96,6 +99,7 @@ zbx_vc_get_value_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_get_value_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
+zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_get_value_CFLAGS = \
 	 $(zbx_vc_get_value_WRAP_FUNCS) \
