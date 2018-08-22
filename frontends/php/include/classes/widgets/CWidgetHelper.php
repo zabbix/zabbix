@@ -567,25 +567,4 @@ class CWidgetHelper {
 
 		return $patterns;
 	}
-
-	/**
-	 * Make widget specific info to show in widget's header.
-	 *
-	 * @param string   $type		Widget type.
-	 * @param string   $fields		Widget fields.
-	 *
-	 * @return array
-	 */
-	public static function makeWidgetInfo($type, $fields) {
-		$info = [];
-
-		if ($type === WIDGET_SVG_GRAPH && CWidgetFormSvgGraph::getOverriteTime($fields, false) !== false) {
-			$info[] = [
-				'icon' => 'btn-info-clock',
-				'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
-			];
-		}
-
-		return $info;
-	}
 }

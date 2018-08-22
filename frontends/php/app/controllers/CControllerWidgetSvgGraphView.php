@@ -75,13 +75,17 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		 *
 		 * First, try get widget's custom time.
 		 */
-		if (($time = CWidgetFormSvgGraph::getOverriteTime($fields)) !== false) {
-			$graph_data['time_period']['time_from'] = $time['from'];
-			$graph_data['time_period']['time_to'] = $time['to'];
-		}
+		if (CWidgetFormSvgGraph::hasOverrideTime($fields)) {
+			$range_time_parser = new CRangeTimeParser();
 
-		// If no valid date range specified, use dashboard time from user profile.
-		if (!$graph_data['time_period']['time_from'] || !$graph_data['time_period']['time_to']) {
+			$range_time_parser->parse($fields['time_from']);
+			$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+
+			$range_time_parser->parse($fields['time_to']);
+			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
+		}
+		// Otherwise, use dashboard time from user profile.
+		else {
 			$timeline = getTimeSelectorPeriod([
 				'profileIdx' => 'web.dashbrd.filter',
 				'profileIdx2' => $this->getInput('dashboardid', 0)
@@ -257,10 +261,30 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'script_inline' => $script_inline,
 			'initial_load' => $initial_load,
 			'preview' => $preview,
-			'info' => $edit_mode ? null : CWidgetHelper::makeWidgetInfo(WIDGET_SVG_GRAPH, $fields),
+			'info' => $edit_mode ? null : self::makeWidgetInfo($fields),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 *
+	 * @param array  $fields
+	 *
+	 * @return array
+	 */
+	private static function makeWidgetInfo(array $fields) {
+		$info = [];
+
+		if (CWidgetFormSvgGraph::hasOverrideTime($fields)) {
+			$info[] = [
+				'icon' => 'btn-info-clock',
+				'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
+			];
+		}
+
+		return $info;
 	}
 }

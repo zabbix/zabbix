@@ -71,7 +71,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_time_mode->getName()] = $field_time_mode;
 
 		// Date from.
-		$field_time_from = new CWidgetFieldDatePicker('time_from', _('From'));
+		$field_time_from = (new CWidgetFieldDatePicker('time_from', _('From')))->setDefault('now-1h');
 		if ($field_time_mode->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_from->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -81,7 +81,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_time_from->getName()] = $field_time_from;
 
 		// Time to.
-		$field_time_to = new CWidgetFieldDatePicker('time_to', _('To'));
+		$field_time_to = (new CWidgetFieldDatePicker('time_to', _('To')))->setDefault('now');
 		if ($field_time_mode->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_to->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -369,6 +369,40 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	}
 
 	/**
+	 * Validate "from" and "to" parameters for allowed period.
+	 *
+	 * @param string $from
+	 * @param string $to
+	 *
+	 * @return array
+	 */
+	private static function validateTimeSelectorPeriod($from, $to) {
+		$errors = [];
+		$ts = [];
+		$range_time_parser = new CRangeTimeParser();
+
+		foreach (['from' => $from, 'to' => $to] as $field => $value) {
+			$range_time_parser->parse($value);
+			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		}
+
+		$period = $ts['to'] - $ts['from'] + 1;
+
+		if ($period < ZBX_MIN_PERIOD) {
+			$errors[] = _n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN
+			);
+		}
+		elseif ($period > ZBX_MAX_PERIOD) {
+			$errors[] = _n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY
+			);
+		}
+
+		return $errors;
+	}
+
+	/**
 	 * Validate form fields.
 	 *
 	 * @param bool $strict  Enables more strict validation of the form fields.
@@ -381,9 +415,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Test graph custom time period.
 		if ($this->fields['graph_time']->getValue() == SVG_GRAPH_CUSTOM_TIME) {
-			$from = $this->fields['time_from']->getValue();
-			$to = $this->fields['time_to']->getValue();
-			$errors = zbx_array_merge($errors, CWidgetFieldDatePicker::validateTimeSelectorPeriod($from, $to));
+			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->fields['time_from']->getValue(),
+				$this->fields['time_to']->getValue()
+			));
 		}
 
 		// Validate Min/Max values in Axes tab.
@@ -414,53 +448,19 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), $righty_min);
 			}
 		}
+
 		return $errors;
 	}
 
 	/**
-	 * Check if widget configuration is set to use overridden time and calculates start and end time for graph.
+	 * Check if widget configuration is set to use overridden time.
 	 *
-	 * @param array $fields    Widget configuration fields.
-	 * @param bool  $unixtime  Return start and end time as unix timestamps.
+	 * @param array $fields                Widget configuration fields.
+	 * @param int   $fields['graph_time']  (optional)
 	 *
-	 * @return array|bool    Returns start and end time of widget's custom time or false if relative time is not
-	 *	                     overridden.
+	 * @return bool
 	 */
-	public static function getOverriteTime($fields, $unixtime = true) {
-		if (array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME) {
-			$range_time_parser = new CRangeTimeParser();
-			if (!$unixtime) {
-				$date = new DateTime();
-			}
-			$from = null;
-			$to = null;
-
-			if (array_key_exists('time_from', $fields) && $fields['time_from'] !== ''
-					&& $range_time_parser->parse($fields['time_from']) === CParser::PARSE_SUCCESS) {
-				$from = $unixtime
-					? $range_time_parser->getDateTime(true)->getTimestamp()
-					: $date
-						->setTimestamp($range_time_parser->getDateTime(true)->getTimestamp())
-						->format(ZBX_FULL_DATE_TIME);
-			}
-
-			if (array_key_exists('time_to', $fields) && $fields['time_to'] !== ''
-					&& $range_time_parser->parse($fields['time_to']) === CParser::PARSE_SUCCESS) {
-				$to = $unixtime
-					? $range_time_parser->getDateTime(false)->getTimestamp()
-					: $date
-						->setTimestamp($range_time_parser->getDateTime(false)->getTimestamp())
-						->format(ZBX_FULL_DATE_TIME);
-			}
-
-			if ($from && $to) {
-				return [
-					'from' => $from,
-					'to' => $to
-				];
-			}
-		}
-
-		return false;
+	public static function hasOverrideTime($fields) {
+		return (array_key_exists('graph_time', $fields) && $fields['graph_time'] == SVG_GRAPH_CUSTOM_TIME);
 	}
 }

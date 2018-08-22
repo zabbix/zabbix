@@ -163,17 +163,19 @@ class CWidgetConfig {
 	 * Detect if widget uses time selector.
 	 *
 	 * @param array $widget
-	 * @param array $widget[type]    WIDGET_ constant
-	 * @param array $widget[fields]  Widget fields
+	 * @param array $widget[type]
+	 * @param array $widget[fields]
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function usesTimeSelector(array $widget) {
 		switch ($widget['type']) {
 			case WIDGET_SVG_GRAPH:
-				return (CWidgetFormSvgGraph::getOverriteTime($widget['fields']) === false);
+				return !CWidgetFormSvgGraph::hasOverrideTime($widget['fields']);
+
 			case WIDGET_GRAPH:
 				return true;
+
 			default:
 				return false;
 		}

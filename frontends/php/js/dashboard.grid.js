@@ -37,7 +37,6 @@
 
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
-				.append(makeWidgetInfoBtns(widget['info']))
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
@@ -1133,8 +1132,7 @@
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
-				'storage': {},
-				'info': []
+				'storage': {}
 			}, widget);
 
 			return this.each(function() {
