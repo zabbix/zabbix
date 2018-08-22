@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha10');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050124);
+define('ZABBIX_DB_VERSION',		3050128);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -225,6 +225,7 @@ define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
 define('AUDIT_RESOURCE_ICON_MAP',		32);
 define('AUDIT_RESOURCE_DASHBOARD',		33);
 define('AUDIT_RESOURCE_CORRELATION',	34);
+define('AUDIT_RESOURCE_HOST_PROTOTYPE', 35);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1142,16 +1143,18 @@ define('API_VARIABLE_NAME',		17);
 define('API_OUTPUT',			18);
 define('API_TIME_UNIT',			19);
 define('API_URL',				20);
+define('API_H_NAME',			21);
 
 // flags
-define('API_REQUIRED',			0x01);
-define('API_NOT_EMPTY',			0x02);
-define('API_ALLOW_NULL',		0x04);
-define('API_NORMALIZE',			0x08);
-define('API_DEPRECATED',		0x10);
-define('API_ALLOW_USER_MACRO',	0x20);
-define('API_ALLOW_COUNT',		0x40);
-define('API_ALLOW_LLD_MACRO',	0x80);
+define('API_REQUIRED',				0x0001);
+define('API_NOT_EMPTY',				0x0002);
+define('API_ALLOW_NULL',			0x0004);
+define('API_NORMALIZE',				0x0008);
+define('API_DEPRECATED',			0x0010);
+define('API_ALLOW_USER_MACRO',		0x0020);
+define('API_ALLOW_COUNT',			0x0040);
+define('API_ALLOW_LLD_MACRO',		0x0080);
+define('API_REQUIRED_LLD_MACRO',	0x0100);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {
@@ -1510,6 +1513,7 @@ define('ZBX_STYLE_REL_CONTAINER', 'rel-container');
 define('ZBX_STYLE_REMOVE_BTN', 'remove-btn');
 define('ZBX_STYLE_RIGHT', 'right');
 define('ZBX_STYLE_ROW', 'row');
+define('ZBX_STYLE_INLINE_SR_ONLY', 'inline-sr-only');
 define('ZBX_STYLE_SCREEN_TABLE', 'screen-table');
 define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_SECOND_COLUMN_LABEL', 'second-column-label');

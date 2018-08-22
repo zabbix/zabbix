@@ -2731,7 +2731,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
+static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 {
 	int			history_num, next_sync = 0;
 	time_t			sync_start, now;
@@ -2797,7 +2797,7 @@ int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 	return next_sync;
 }
 
-int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
+static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -4102,7 +4102,7 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
+ZBX_MEM_FUNC_IMPL(__trend, trend_mem)
 
 static int	init_trend_cache(char **error)
 {

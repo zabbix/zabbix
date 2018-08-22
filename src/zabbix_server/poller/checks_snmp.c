@@ -750,9 +750,9 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 	else if (ASN_INTEGER == var->type)
 #endif
 	{
-		char	buffer[12];
+		char	buffer[21];
 
-		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
+		zbx_snprintf(buffer, sizeof(buffer), "%ld", *var->val.integer);
 
 		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buffer);
 	}
