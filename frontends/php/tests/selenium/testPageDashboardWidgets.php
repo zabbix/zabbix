@@ -203,20 +203,7 @@ class testPageDashboardWidgets extends CWebTest {
 
 		// Get "Host groups" multiselect.
 		$groups = $form->getField('Host groups')->asMultiselect();
-		// Check selected labels of multiselect.
-		$this->assertEquals([
-					'Discovered hosts', 'Templates/Operating Systems', 'ZBX6648 Enabled Triggers',
-					'ZBX6648 Disabled Triggers', 'ZBX6648 All Triggers', 'Zabbix servers', 'Virtual machines',
-					'Templates/Virtualization', 'Templates/Servers Hardware', 'Templates/Network Devices',
-					'Host group for tag permissions', 'Templates/Modules', 'Templates/Databases',
-					'Templates/Applications', 'Templates', 'Linux servers', 'Inheritance test', 'Hypervisors',
-					'ZBX6648 Group No Hosts'
-				],
-				$groups->getSelected()
-		);
 
-		// Remove all groups from multiselect.
-		$groups->clear();
 		// Select a single group.
 		$groups->select('Zabbix servers');
 
