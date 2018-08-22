@@ -144,11 +144,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
-		'templates' => getRequest('templates', []),
-		'inventory' => [
-			'inventory_mode' => getRequest('inventory_mode')
-		]
+		'templates' => getRequest('templates', [])
 	];
+
+	// If 'inventory' is present, API requires 'inventory_mode' to have a value, but templated prototypes don't have it.
+	if (getRequest('inventory_mode')) {
+		$newHostPrototype['inventory']['inventory_mode'] = getRequest('inventory_mode');
+	}
 
 	// API requires 'templateid' property.
 	if ($newHostPrototype['templates']) {
