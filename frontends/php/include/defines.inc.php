@@ -1624,6 +1624,11 @@ define('PROBLEMS_SHOW_TAGS_1', 1);
 define('PROBLEMS_SHOW_TAGS_2', 2);
 define('PROBLEMS_SHOW_TAGS_3', 3);
 
+// Tag name format to display in Problems widget and Monitoring > Problems.
+define('PROBLEMS_TAG_NAME_FULL',      0);
+define('PROBLEMS_TAG_NAME_SHORTENED', 1);
+define('PROBLEMS_TAG_NAME_NONE',      2);
+
 // HTTP headers
 /*
  * Value of HTTP X-Frame-options header.

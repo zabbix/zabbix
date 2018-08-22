@@ -120,13 +120,39 @@ class CWidgetFormProblems extends CWidgetForm {
 			PROBLEMS_SHOW_TAGS_3 => PROBLEMS_SHOW_TAGS_3
 		]))
 			->setDefault(PROBLEMS_SHOW_TAGS_NONE)
-			->setModern(true);
+			->setModern(true)
+			->setAction('var disabled = jQuery(this).filter("[value=\''.PROBLEMS_SHOW_TAGS_NONE.'\']").is(":checked");'.
+				'jQuery("#tag_priority").prop("disabled", disabled);'.
+				'jQuery("#tag_name_format input").prop("disabled", disabled)'
+			);
 
 		if (array_key_exists('show_tags', $this->data)) {
 			$field_show_tags->setValue($this->data['show_tags']);
 		}
 
 		$this->fields[$field_show_tags->getName()] = $field_show_tags;
+
+		// Tag name.
+		$tag_format_line = (new CWidgetFieldRadioButtonList('tag_name_format', _('Tag name'), [
+			PROBLEMS_TAG_NAME_FULL => _('Full'),
+			PROBLEMS_TAG_NAME_SHORTENED => _('Shortened'),
+			PROBLEMS_TAG_NAME_NONE => _('None')
+		]))
+			->setDefault(PROBLEMS_TAG_NAME_FULL)
+			->setModern(true);
+
+		if (array_key_exists('tag_name_format', $this->data)) {
+			$tag_format_line->setValue($this->data['tag_name_format']);
+		}
+		$this->fields[$tag_format_line->getName()] = $tag_format_line;
+
+		// Tag display priority.
+		$tag_priority = (new CWidgetFieldTextBox('tag_priority', _('Tag display priority')));
+
+		if (array_key_exists('tag_priority', $this->data)) {
+			$tag_priority->setValue($this->data['tag_priority']);
+		}
+		$this->fields[$tag_priority->getName()] = $tag_priority;
 
 		// Show hosts in maintenance.
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1);
