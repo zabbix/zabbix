@@ -1972,8 +1972,11 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			$this->zbxTestWaitForPageToLoad();
-			$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+			// Fire onchange event.
+			$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+				'event.initEvent("change", false, true);'.
+				'document.getElementById("esc_period").dispatchEvent(event);'
+			);
 			$this->zbxTestWaitForPageToLoad();
 		}
 

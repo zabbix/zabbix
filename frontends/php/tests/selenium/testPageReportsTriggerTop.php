@@ -76,7 +76,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					'date' => [
 						'from' => 'now/d',
 						'to' => 'now/d'
-					],
+					]
 				]
 			],
 			[
@@ -96,8 +96,8 @@ class testPageReportsTriggerTop extends CWebTest {
 					'host_group' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
 					'date' => [
-						'from' => '2018-01-01 00:00'
-					],
+						'from' => '2018-08-18 00:00'
+					]
 				]
 			],
 			[
