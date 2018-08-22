@@ -1,6 +1,7 @@
 Changes for 4.0.0alpha10
 
 New features:
+..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
 A......... [ZBXNEXT-4656] added strict validation of hostprototype.create() and hostprototype.update() methods; added audit logging for these methods (Ivo, Sasha)
 ..F....... [ZBXNEXT-4455] added screen reader to the dashboard and widgets (ashubin)
 A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD macros (Ivo, Sasha, viktors, vso)
