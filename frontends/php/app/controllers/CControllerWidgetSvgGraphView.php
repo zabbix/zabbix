@@ -60,7 +60,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_from' => null,
 				'time_to' => null
 			],
-			'dashboard_time' => false,
+			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
 			'overrides' => []
 		];
 
@@ -70,22 +70,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$graph_data['data_source'] = $fields['source'];
 		}
 
-		/**
-		 * Set graph time period options.
-		 *
-		 * First, try get widget's custom time.
-		 */
-		if (CWidgetFormSvgGraph::hasOverrideTime($fields)) {
-			$range_time_parser = new CRangeTimeParser();
-
-			$range_time_parser->parse($fields['time_from']);
-			$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
-
-			$range_time_parser->parse($fields['time_to']);
-			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
-		}
-		// Otherwise, use dashboard time from user profile.
-		else {
+		// Use dashboard time from user profile.
+		if ($graph_data['dashboard_time'] && !$preview) {
 			$timeline = getTimeSelectorPeriod([
 				'profileIdx' => 'web.dashbrd.filter',
 				'profileIdx2' => $this->getInput('dashboardid', 0)
@@ -96,8 +82,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_to' => $timeline['to_ts']
 			];
 
-			$graph_data['dashboard_time'] = true;
-
 			// Init script that refreshes widget once timeselector changes.
 			if ($initial_load) {
 				$script_inline .=
@@ -105,6 +89,16 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid(\'refreshWidget\', "'.$uniqueid.'");'.
 					'});';
 			}
+		}
+		// Otherwise, set graph time period options.
+		else {
+			$range_time_parser = new CRangeTimeParser();
+
+			$range_time_parser->parse($graph_data['dashboard_time'] ? 'now-1h' : $fields['time_from']);
+			$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+
+			$range_time_parser->parse($graph_data['dashboard_time'] ? 'now' : $fields['time_to']);
+			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 		}
 
 		// Set left Y axis options.

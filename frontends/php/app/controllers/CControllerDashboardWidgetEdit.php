@@ -24,7 +24,6 @@ class CControllerDashboardWidgetEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
-			'dashboardid' => 'db dashboard.dashboardid',
 			'name' => 'string',
 			'fields' => 'json'
 		];
@@ -70,7 +69,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'dashboardid' => $this->getInput('dashboardid', 0),
 			'dialogue' => [
 				'type' => $type,
 				'name' => $this->getInput('name', ''),
