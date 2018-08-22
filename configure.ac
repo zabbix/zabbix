@@ -1707,24 +1707,24 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-if test "x$cross_compiling" != "xyes"; then
-	AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
-		tests/Makefile
-		tests/libs/Makefile
-		tests/libs/zbxcommon/Makefile
-		tests/libs/zbxconf/Makefile
-		tests/libs/zbxdbcache/Makefile
-		tests/libs/zbxdbhigh/Makefile
-		tests/libs/zbxhistory/Makefile
-		tests/libs/zbxjson/Makefile
-		tests/libs/zbxsysinfo/Makefile
-		tests/libs/zbxsysinfo/linux/Makefile
-		tests/libs/zbxsysinfo/common/Makefile
-		tests/libs/zbxcommshigh/Makefile
-		tests/libs/zbxalgo/Makefile
-		)
-		AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
-	])
+if test -d tests; then
+	AC_CONFIG_FILES(
+	tests/Makefile
+	tests/libs/Makefile
+	tests/libs/zbxcommon/Makefile
+	tests/libs/zbxconf/Makefile
+	tests/libs/zbxdbcache/Makefile
+	tests/libs/zbxdbhigh/Makefile
+	tests/libs/zbxhistory/Makefile
+	tests/libs/zbxjson/Makefile
+	tests/libs/zbxsysinfo/Makefile
+	tests/libs/zbxsysinfo/linux/Makefile
+	tests/libs/zbxsysinfo/common/Makefile
+	tests/libs/zbxcommshigh/Makefile
+	tests/libs/zbxalgo/Makefile
+	)
+	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
+
 fi
 
 AC_OUTPUT([
