@@ -755,6 +755,13 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{#M}'
 				]
 			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
 			// partial success
 			[
 				'random text.....md01-31....text', 16, [],
@@ -1898,6 +1905,7 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => ''
 				]
 			],
+			// User macros are not enabled.
 			[
 				'{$M}', 0, [],
 				[
@@ -1905,8 +1913,16 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => ''
 				]
 			],
+			// Lld macros are not enabled.
 			[
 				'{#M}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
