@@ -820,9 +820,9 @@ function makeInformationIcon($message) {
 /**
  * Renders an icon for host in maintenance.
  *
- * @param int    $type        Type of the maintenance.
- * @param string $name        Name of the maintenance.
- * @param string $description Description of the maintenance.
+ * @param int    $type         Type of the maintenance.
+ * @param string $name         Name of the maintenance.
+ * @param string $description  Description of the maintenance.
  *
  * @return CSpan
  */

@@ -1163,12 +1163,11 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 			if (array_key_exists('problems', $trigger)) {
 				foreach ($trigger['problems'] as $problem) {
-
-					if (!$problem['r_clock']) {
+					if ($problem['r_clock'] == 0) {
 						$i['problem']++;
 					}
 
-					if (!$problem['acknowledged']) {
+					if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 						$i['problem_unack']++;
 					}
 
