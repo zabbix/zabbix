@@ -1700,14 +1700,14 @@ case "x$ARCH" in
 		AC_DEFINE(ZBX_PROCSTAT_COLLECTOR, 1 , [Define to 1 on linux and solaris platforms])
 		;;
 esac
-cross_compiling=yes
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-if test "x$cross_compiling" == "xyes"; then
+if test "x$cross_compiling" != "xyes"; then
 	AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 		tests/Makefile
 		tests/libs/Makefile
