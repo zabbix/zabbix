@@ -1724,7 +1724,6 @@ if test -d tests; then
 	tests/libs/zbxalgo/Makefile
 	)
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
-
 fi
 
 AC_OUTPUT([
