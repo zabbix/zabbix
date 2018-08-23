@@ -1167,7 +1167,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 						$i['problem']++;
 					}
 
-					if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+					if ($problem['r_clock'] == 0 && $problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
 						$i['problem_unack']++;
 					}
 
