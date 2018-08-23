@@ -215,15 +215,13 @@ class CScreenHistory extends CScreenBase {
 				foreach ($history_data as $history_row) {
 					$value = $history_row['value'];
 
-					if ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-						sscanf($value, '%f', $value);
-					}
-					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-						$value = rtrim($value, " \t\r\n");
-					}
-					else {
+					if (in_array($items[$history_row['itemid']]['value_type'],
+							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
 						$value = rtrim($value, " \t\r\n");
 						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
+					}
+					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						sscanf($value, '%f', $value);
 					}
 
 					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
