@@ -238,4 +238,30 @@ class testPageProblems extends CWebTest {
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
 	}
+
+	public function testPageProblems_SuppressedProblems() {
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestCheckHeader('Problems');
+		$this->zbxTestClickButtonText('Reset');
+
+		$this->zbxTestClickButtonMultiselect('filter_hostids_');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickWait('spanid99011');
+		$this->zbxTestClickButtonText('Apply');
+
+		$this->zbxTestTextNotPresent('Trigger for suppression');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
+
+		$this->zbxTestCheckboxSelect('filter_show_suppressed');
+		$this->zbxTestClickButtonText('Apply');
+
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Trigger for suppression');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'SupTag: A');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
+
+		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@style, "top") and text()="Suppressed till: 2021-05-18 12:17"]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@style, "top") and text()="Maintenance: Maintenance for suppression test"]');
+	}
 }

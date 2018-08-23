@@ -294,14 +294,16 @@ INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200010,
 INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200011, 200003, 200020, 4, 60);
 
 -- Add maintenance periods
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680);
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (2,'Maintenance period 2 (no data collection)',1,'Test description 1',1294760280,1294846680,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (3,'Maintenance for update (data collection)',0,'Test description',1534885200,1534971600,2);
 
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1,1,20000);
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2,2,20000);
 
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,3,4);
 
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760400);
@@ -313,6 +315,7 @@ INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek,
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760400);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760460);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760520);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (11,0,1,0,0,1,43200,90000,1534950000);
 
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
@@ -324,6 +327,10 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (8,2,8);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (9,2,9);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (11,3,11);
+
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (1,3,'Tag1',2,'A');
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (2,3,'Tag2',0,'B');
 
 -- Add maps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
@@ -1732,3 +1739,24 @@ INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'In
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
 INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (317, 99008, 99007);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99009, 15001, 'Application on host');
+
+-- Problem suppression test: host, item, trigger, maintenance, event, problem, tags
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host for suppression', 'Host for suppression', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 4);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99087, 2, 99011, 'Trapper for suppression', '', 'trapper_sup', 30, NULL, '', '', '', '', '','');
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger for suppression', '{100031}>0', 0, 3, 0, '1535012391', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '0');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (104, 'SupTag','A', 100031);
+
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (4,'Maintenance for suppression test',0,'',1534971600,2147378400,2);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (3,4,99011);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (12,0,1,0,0,1,43200,86399940,1535021880);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (12,4,12);
+INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (3,4,'SupTag',2,'A');
+
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (175,0,0,100031,1535012391,445429746,1,'Trigger for suppression',3);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (100,175,'SupTag','A');
+INSERT INTO event_suppress (event_suppressid,eventid,maintenanceid,suppress_until) VALUES (1,175,4,1621329420);
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (175,0,0,100031,1535012391,445429746,'Trigger for suppression',3);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (100,175,'SupTag','A');

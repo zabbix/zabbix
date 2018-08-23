@@ -412,11 +412,13 @@ class testFormUserProfile extends CWebTest {
 			]],
 			[[
 				'expected' => TEST_GOOD,
-				'timeout' => '1m'
+				'timeout' => '1m',
+				'suppressed' => true
 			]],
 			[[
 				'expected' => TEST_GOOD,
-				'timeout' => '1d'
+				'timeout' => '1d',
+				'suppressed' => false
 			]],
 			[[
 				'expected' => TEST_GOOD
@@ -458,6 +460,10 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
+		}
+
+		if (array_key_exists('suppressed', $data)) {
+			$this->zbxTestCheckboxSelect('messages_show_suppressed', $data['suppressed']);
 		}
 
 		$this->zbxTestClickWait('update');
