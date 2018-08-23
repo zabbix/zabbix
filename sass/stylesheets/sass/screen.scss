@@ -3733,6 +3733,7 @@ $form-icon-btn: (
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
+			@extend %webkit-scrollbar;
 		}
 		.overlay-dialogue-controls {
 			text-align: right;
@@ -4177,6 +4178,23 @@ $form-icon-btn: (
 	height: 10px;
 	float: left;
 	display: block;
+}
+
+.svg-graph-preview {
+	margin-top: 10px;
+	width: 960px;
+	height: 300px;
+	position: relative;
+
+	> div {
+		background: $ui-bg-color;
+		height: 300px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		z-index: 999;
+	}
 }
 
 .svg-graph-legend {

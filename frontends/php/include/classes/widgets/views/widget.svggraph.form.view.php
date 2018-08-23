@@ -37,43 +37,33 @@ $jq_templates = [];
 $form_name = $form->getName();
 
 // Create graph preview box.
-$preview_width = 960;
-$preview_height = 300;
-
 $form->addItem(
 	(new CDiv(
-		(new CDiv())
-			->addStyle('background: #'.$data['theme']['backgroundcolor'].'; width: '.$preview_width.'px;'.
-				'height: '.$preview_height.'px; z-index: 999;'
-			)
-			->setId('svg-grapg-preview')
-	))
-		->addStyle('margin: 10px 0; height: '.$preview_height.'px; width: '.$preview_width.'px;')
+		(new CDiv())->setId('svg-graph-preview')
+	))->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
 );
 
 // Stick preview to the top of configuration window when scroll.
 $scripts[] =
 	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
-		'var elmnt = jQuery("#svg-grapg-preview"),'.
-			'fixed = (elmnt.css("position") === "absolute"),'.
-			'winh = jQuery(".overlay-dialogue-body").height();'.
-		'if (jQuery(this).offset().top >= elmnt.offset().top && !fixed && winh > 500) {'.
-			'var top = jQuery(".overlay-dialogue-body").offset().top - jQuery("#overlay_dialogue").offset().top - 1;'.
-			'elmnt.css({"position": "absolute", "top": top});'.
-		'}'.
-		'else if (jQuery(this).offset().top < elmnt.parent().offset().top) {'.
-			'elmnt.css({"position": "", "top": ""});'.
-		'}'.
+		'var $dialogue_body = jQuery(this),'.
+			'$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");'.
+			'jQuery("#svg-graph-preview").css("top",'.
+				'($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)'.
+					' ? $dialogue_body.offset().top - $preview_container.offset().top'.
+					' : 0'.
+			');'.
 	'})';
 
 $scripts[] =
 	'function updateGraphPreview() {'.
-		'var url = new Curl("zabbix.php"),'.
+		'var $preview = jQuery("#svg-graph-preview"),'.
+			'url = new Curl("zabbix.php"),'.
 			'data = {'.
 				'uniqueid: 0,'.
 				'preview: 1,'.
-				'content_width: '.$preview_width.','.
-				'content_height: '.$preview_height.','.
+				'content_width: $preview.width(),'.
+				'content_height: $preview.height() - 10,'.
 				'fields: JSON.stringify(jQuery("#'.$form->getId().'").serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
@@ -85,8 +75,7 @@ $scripts[] =
 			'dataType: "json",'.
 			'success: function(r) {'.
 				'if (typeof r.body !== "undefined" && typeof r.errors === "undefined") {'.
-					'jQuery("#svg-grapg-preview").html(jQuery(r.body));'.
-					'jQuery("#svg-grapg-preview > svg").attr("unselectable", "on").css("user-select", "none");'.
+					'$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");'.
 				'}'.
 			'}'.
 		'})'.

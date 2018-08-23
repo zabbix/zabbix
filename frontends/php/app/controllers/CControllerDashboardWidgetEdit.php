@@ -65,7 +65,6 @@ class CControllerDashboardWidgetEdit extends CController {
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
 			],
-			'theme' => getUserGraphTheme(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
