@@ -233,7 +233,7 @@ class CScreenHistory extends CScreenBase {
 
 					if (count($items) > 1) {
 						$row .= ' "'.str_replace('"', '""', $host_names[$items[$history_row['itemid']]['hostid']].
-							': '.$items[$history_row['itemid']]['name_expanded']).'"';
+							NAME_DELIMITER.$items[$history_row['itemid']]['name_expanded']).'"';
 					}
 					$output[] = $row;
 				}
