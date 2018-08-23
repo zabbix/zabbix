@@ -200,7 +200,10 @@ class CScreenHistory extends CScreenBase {
 						$host_names[$item['hostid']] = $item['hosts'][0]['name'];
 						$options['itemids'] = [$item['itemid']];
 						$options['history'] = $item['value_type'];
-						$history_data = array_merge($history_data, API::History()->get($options));
+						$item_data = API::History()->get($options);
+						if ($item_data) {
+							$history_data = array_merge($history_data, $item_data);
+						}
 					}
 				} else {
 					$history_data = API::History()->get($options);
