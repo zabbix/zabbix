@@ -33,7 +33,6 @@ Bug fixes:
 ........S. [ZBX-14579] improved several functions to distinguish between 'failed to compile' and 'not matched' states in regexp processing (mindbound)
 ..F....... [ZBX-14584] fixed mass update some options for items (vasilijs)
 ..F....... [ZBX-12217] removed links to templates with no permissions for templated applications and items (agriscenko, Sasha)
-.......PS. [ZBX-14615] fixed processing of JMX errors, now treated as distinct and separate from network errors (mindbound)
 ..F....... [ZBXNEXT-4607] removed column Recovery time in Problems mode (vasilijs)
 
 --------------------------------------------------------------------------------
