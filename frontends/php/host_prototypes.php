@@ -148,7 +148,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	];
 
 	// If 'inventory' is present, API requires 'inventory_mode' to have a value, but templated prototypes don't have it.
-	if (getRequest('inventory_mode')) {
+	if (getRequest('inventory_mode') !== null) {
 		$newHostPrototype['inventory']['inventory_mode'] = getRequest('inventory_mode');
 	}
 
