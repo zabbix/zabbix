@@ -193,11 +193,9 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 				$history_data = [];
-				$host_names = [];
 
 				if (count($items) > 1) {
 					foreach ($items as $item) {
-						$host_names[$item['hostid']] = $item['hosts'][0]['name'];
 						$options['itemids'] = [$item['itemid']];
 						$options['history'] = $item['value_type'];
 						$item_data = API::History()->get($options);
@@ -232,7 +230,7 @@ class CScreenHistory extends CScreenBase {
 						' '.$value;
 
 					if (count($items) > 1) {
-						$row .= ' "'.str_replace('"', '""', $host_names[$items[$history_row['itemid']]['hostid']].
+						$row .= ' "'.str_replace('"', '""', $items[$history_row['itemid']]['hosts'][0]['name'].
 							NAME_DELIMITER.$items[$history_row['itemid']]['name_expanded']).'"';
 					}
 					$output[] = $row;
