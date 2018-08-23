@@ -308,46 +308,6 @@ class CSvgGraph extends CSvg {
 
 
 	/**
-	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
-	 * axis units.
-	 *
-	 * @param int $side    Type of X axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
-	 * @return array
-	 */
-	public function getValuesGridWithPosition($side = null) {
-		if ($side === GRAPH_YAXIS_SIDE_RIGHT && $this->min_value_right !== null) {
-			$min_value = $this->right_y_min;
-			$max_value = $this->right_y_max;
-			$units = $this->right_y_units;
-		}
-		elseif ($side === GRAPH_YAXIS_SIDE_LEFT && $this->min_value_left !== null) {
-			$min_value = $this->left_y_min;
-			$max_value = $this->left_y_max;
-			$units = $this->left_y_units;
-		}
-		else {
-			return [];
-		}
-
-		$grid = $this->getValueGrid($min_value, $max_value);
-		$delta = ($max_value - $min_value ? : 1);
-		$grid_values = [];
-
-		foreach ($grid as $value) {
-			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
-
-			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
-				$grid_values[$relative_pos] = convert_units([
-					'value' => $value,
-					'units' => $units
-				]);
-			}
-		}
-
-		return $grid_values;
-	}
-
-	/**
 	 * Return array of horizontal labels with positions. Array key will be position, value will be label.
 	 *
 	 * @return array
@@ -456,7 +416,7 @@ class CSvgGraph extends CSvg {
 	 * Add dynamic clip path to hide metric lines and area outside graph canvas.
 	 */
 	protected function addClipArea() {
-		$areaid = 'metric_clip_'.base_convert(microtime()*1000, 10, 30);
+		$areaid = uniqid('metric_clip_');
 
 		// CSS styles.
 		$this->styles['.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA]['clip-path'] = 'url(#'.$areaid.')';
@@ -543,6 +503,46 @@ class CSvgGraph extends CSvg {
 		// TODO: move XAxis height to property.
 		$this->offset_bottom = 20;
 		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
+	}
+
+	/**
+	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
+	 * axis units.
+	 *
+	 * @param int $side    Type of X axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
+	 * @return array
+	 */
+	protected function getValuesGridWithPosition($side) {
+		if ($side === GRAPH_YAXIS_SIDE_RIGHT && $this->min_value_right !== null) {
+			$min_value = $this->right_y_min;
+			$max_value = $this->right_y_max;
+			$units = $this->right_y_units;
+		}
+		elseif ($side === GRAPH_YAXIS_SIDE_LEFT && $this->min_value_left !== null) {
+			$min_value = $this->left_y_min;
+			$max_value = $this->left_y_max;
+			$units = $this->left_y_units;
+		}
+		else {
+			return [];
+		}
+
+		$grid = $this->getValueGrid($min_value, $max_value);
+		$delta = ($max_value - $min_value ? : 1);
+		$grid_values = [];
+
+		foreach ($grid as $value) {
+			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
+
+			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
+				$grid_values[$relative_pos] = convert_units([
+					'value' => $value,
+					'units' => $units
+				]);
+			}
+		}
+
+		return $grid_values;
 	}
 
 	/**
