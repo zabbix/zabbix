@@ -1165,10 +1165,10 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 				foreach ($trigger['problems'] as $problem) {
 					if ($problem['r_clock'] == 0) {
 						$i['problem']++;
-					}
 
-					if ($problem['r_clock'] == 0 && $problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-						$i['problem_unack']++;
+						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+							$i['problem_unack']++;
+						}
 					}
 
 					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
@@ -1833,7 +1833,7 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 
 		$c = $dX * $koef;
 
-		// if point is further than area diagonal, we should use calculations with width instead of height
+		// If point is further than area diagonal, we should use calculations with width instead of height.
 		if (($halfHeight / $c) > ($halfHeight / $halfWidth)) {
 			$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
 			$ax = ($x2 < $ax) ? $ax - $c : $ax + $c;
@@ -1917,8 +1917,8 @@ function get_parent_sysmaps($sysmapid) {
 /**
  * Get labels for map elements.
  *
- * @param array $map        Sysmap data array.
- * @param array $map_info   Array of selements (@see getSelementsInfo).
+ * @param array $map       Sysmap data array.
+ * @param array $map_info  Array of selements (@see getSelementsInfo).
  *
  * @return array
  */
