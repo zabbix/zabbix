@@ -148,10 +148,6 @@ class CScreenHistory extends CScreenBase {
 			ITEM_VALUE_TYPE_LOG => 1,
 			ITEM_VALUE_TYPE_TEXT => 1
 		];
-		$iv_numeric = [
-			ITEM_VALUE_TYPE_FLOAT => 1,
-			ITEM_VALUE_TYPE_UINT64 => 1
-		];
 
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
 			$options = [
