@@ -266,7 +266,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('users', 'passwd')],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -293,12 +293,16 @@ class CUser extends CApiService {
 		foreach ($users as &$user) {
 			$user = $this->checkLoginOptions($user);
 
-			$user['passwd'] = ($user['passwd'] === '' && $user['alias'] !== ZBX_GUEST_USER) ? '' : md5($user['passwd']);
+			/*
+			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
+			 * as his password in database.
+			 */
+			$user['passwd'] = (array_key_exists('passwd', $user)) ? md5($user['passwd']) : '';
 		}
 		unset($user);
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
-		$this->checkUserGroups($users);
+		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
@@ -367,7 +371,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'passwd')],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -433,7 +437,7 @@ class CUser extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
 				}
 
-				$user['passwd'] = $user['passwd'] === '' ? '' : md5($user['passwd']);
+				$user['passwd'] = md5($user['passwd']);
 			}
 		}
 		unset($user);
@@ -441,7 +445,7 @@ class CUser extends CApiService {
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
-		$this->checkUserGroups($users);
+		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
@@ -472,11 +476,14 @@ class CUser extends CApiService {
 	 * Check for valid user groups.
 	 *
 	 * @param array $users
+	 * @param array $users[]['passwd']  (optional)
 	 * @param array $users[]['usrgrps']  (optional)
+	 * @param array $db_users
+	 * @param array $db_users[]['passwd']
 	 *
 	 * @throws APIException  if user groups is not exists.
 	 */
-	private function checkUserGroups(array $users) {
+	private function checkUserGroups(array $users, array $db_users) {
 		$usrgrpids = [];
 
 		foreach ($users as $user) {
@@ -506,20 +513,66 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $user) {
-			if (array_key_exists('passwd', $user) && $user['passwd'] === '') {
-				$groups = array_intersect_key($db_usrgrps,
-					array_fill_keys(zbx_objectValues($user['usrgrps'], 'usrgrpid'), '')
-				);
-				$gui_access = zbx_objectValues($groups, 'gui_access');
+			if (array_key_exists('passwd', $user)) {
+				$passwd = $user['passwd'];
+			}
+			elseif (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
+				$passwd = $db_users[$user['userid']]['passwd'];
+			}
+			else {
+				$passwd = '';
+			}
 
-				//  Do not allow empty password for users with ZBX_AUTH_INTERNAL.
-				if (max($gui_access) == GROUP_GUI_ACCESS_INTERNAL) {
+			if ($passwd === '') {
+				$gui_access = self::getGroupGuiAccess($user, $db_usrgrps);
+
+				// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
+				if (in_array(GROUP_GUI_ACCESS_INTERNAL, $gui_access)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 					);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get list of all current authentication options available to user.
+	 *
+	 * @param array  $user
+	 * @param string $user['usrgrps'][]['usrgrpid']
+	 * @param array  $db_usrgrps
+	 * @param int    $db_usrgrps[usrgrpid]['gui_access']
+	 *
+	 * @return array
+	 */
+	private static function getGroupGuiAccess($user, $db_usrgrps) {
+		$config = select_config();
+		$gui_access_arr = [];
+		$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+
+		foreach($usrgrps as $usergrp) {
+			if (array_key_exists($usergrp, $db_usrgrps)) {
+				$gui_access = $db_usrgrps[$usergrp]['gui_access'];
+
+				if ($db_usrgrps[$usergrp]['gui_access'] == GROUP_GUI_ACCESS_SYSTEM) {
+					switch ($config['authentication_type']) {
+						case ZBX_AUTH_INTERNAL:
+							$gui_access = GROUP_GUI_ACCESS_INTERNAL;
+							break;
+						case ZBX_AUTH_LDAP:
+							$gui_access = GROUP_GUI_ACCESS_LDAP;
+							break;
+					}
+				}
+
+				if (!in_array($gui_access, $gui_access_arr)) {
+					$gui_access_arr[] = $gui_access;
+				}
+			}
+		}
+
+		return $gui_access_arr;
 	}
 
 	/**

@@ -149,7 +149,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$create = hasRequest('userid');
+	$update = hasRequest('userid');
 	$usrgrps = getRequest('user_groups', []);
 
 	// authentication type
@@ -157,14 +157,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$authType = $create
+		$authType = $update
 			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
 			: $config['authentication_type'];
 	}
 
 	// password validation
 	if (getRequest('password1', '') != getRequest('password2', '')) {
-		show_error_message($create
+		show_error_message($update
 			? _('Cannot update user. Both passwords must be equal.')
 			: _('Cannot add user. Both passwords must be equal.')
 		);
@@ -184,8 +184,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'usrgrps' => zbx_toObject($usrgrps, 'usrgrpid')
 		];
 
-		if (hasRequest('password1') || $create) {
-			$user['passwd'] = getRequest('password1', '');
+		if (getRequest('password1', '') !== '') {
+			$user['passwd'] = getRequest('password1');
 		}
 
 		foreach (getRequest('user_medias', []) as $media) {
@@ -202,7 +202,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		if ($create) {
+		if ($update) {
 			if (bccomp(CWebUser::$data['userid'], getRequest('userid')) != 0) {
 				$user['type'] = getRequest('user_type');
 			}
