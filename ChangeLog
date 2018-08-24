@@ -445,8 +445,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.4.13rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-14765] fixed vmware incorrect memory release (MVekslers)
 
