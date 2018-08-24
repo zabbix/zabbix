@@ -23,6 +23,8 @@
  */
 class CSvgGraph extends CSvg {
 
+	const SVG_GRAPH_X_AXIS_HEIGHT = 20;
+
 	protected $canvas_height;
 	protected $canvas_width;
 	protected $canvas_x;
@@ -63,16 +65,20 @@ class CSvgGraph extends CSvg {
 	 */
 	protected $problems = [];
 
-	//protected $min_clock;
-	protected $max_value_left;
-	protected $max_value_right;
-	protected $min_value_left;
-	protected $min_value_right;
+	protected $max_value_left = null;
+	protected $max_value_right = null;
+	protected $min_value_left = null;
+	protected $min_value_right = null;
 
-	protected $left_y_max;
-	protected $left_y_min;
-	protected $left_y_show;
-	protected $left_y_units;
+	protected $left_y_max = null;
+	protected $left_y_min = null;
+	protected $left_y_show = null;
+	protected $left_y_units = null;
+
+	protected $right_y_max = null;
+	protected $right_y_min = null;
+	protected $right_y_show = null;
+	protected $right_y_units = null;
 
 	protected $offset_bottom;
 
@@ -101,11 +107,6 @@ class CSvgGraph extends CSvg {
 	protected $time_from;
 	protected $time_till;
 
-	protected $right_y_max;
-	protected $right_y_min;
-	protected $right_y_show;
-	protected $right_y_units;
-
 	protected $x_axis;
 
 	/**
@@ -116,7 +117,7 @@ class CSvgGraph extends CSvg {
 	protected $xaxis_height = 20;
 
 	/**
-	 * SVG width.
+	 * SVG default size.
 	 */
 	protected $width = 1000;
 	protected $height = 1000;
@@ -170,7 +171,8 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set problems data for graph.
 	 *
-	 * @param array $problems   Array of problems data.
+	 * @param array $problems  Array of problems data.
+	 *
 	 * @return CSvgGraph
 	 */
 	public function addProblems(array $problems = []) {
@@ -182,7 +184,8 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set metrics data for graph.
 	 *
-	 * @param array $metrics    Array of metrics data.
+	 * @param array $metrics  Array of metrics data.
+	 *
 	 * @return CSvgGraph
 	 */
 	public function addMetrics(array $metrics = []) {
@@ -190,18 +193,18 @@ class CSvgGraph extends CSvg {
 			$min_value = null;
 			$max_value = null;
 
-			foreach ($metric['points'] as $point) {
-				if ($min_value === null || $min_value > $point['value']) {
-					$min_value = $point['value'];
-				}
-				if ($max_value === null || $point['value'] > $max_value) {
-					$max_value = $point['value'];
+			if ($metric['points']) {
+				foreach ($metric['points'] as $point) {
+					if ($min_value === null || $min_value > $point['value']) {
+						$min_value = $point['value'];
+					}
+					if ($max_value === null || $max_value < $point['value']) {
+						$max_value = $point['value'];
+					}
+
+					$this->points[$i][$point['clock']] = $point['value'];
 				}
 
-				$this->points[$i][$point['clock']] = $point['value'];
-			}
-
-			if ($min_value !== null) {
 				if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
 					if ($this->min_value_left === null || $this->min_value_left > $min_value) {
 						$this->min_value_left = $min_value;
@@ -210,7 +213,7 @@ class CSvgGraph extends CSvg {
 						$this->max_value_left = $max_value;
 					}
 				}
-				elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				else {
 					if ($this->min_value_right === null || $this->min_value_right > $min_value) {
 						$this->min_value_right = $min_value;
 					}
@@ -235,8 +238,9 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set graph time period.
 	 *
-	 * @param int $time_from    Timestamp.
-	 * @param int @time_till    Timestamp.
+	 * @param int $time_from  Timestamp.
+	 * @param int @time_till  Timestamp.
+	 *
 	 * @return CSvgGraph
 	 */
 	public function setTimePeriod($time_from, $time_till) {
@@ -249,7 +253,8 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set left side Y axis display options.
 	 *
-	 * @param array $options    Options array.
+	 * @param array $options  Options array.
+	 *
 	 * @return CSvgGraph
 	 */
 	public function setYAxisLeft($options) {
@@ -298,6 +303,7 @@ class CSvgGraph extends CSvg {
 	 * Show or hide X axis.
 	 *
 	 * @param bool $state
+	 *
 	 * @return CSvgGraph
 	 */
 	public function setXAxis($state) {
@@ -305,7 +311,6 @@ class CSvgGraph extends CSvg {
 
 		return $this;
 	}
-
 
 	/**
 	 * Return array of horizontal labels with positions. Array key will be position, value will be label.
@@ -400,15 +405,27 @@ class CSvgGraph extends CSvg {
 	public function draw() {
 		$this->calculateDimensions();
 		$this->calculatePaths();
+
 		$this->drawGrid();
+
+		if ($this->left_y_show) {
+			$this->drawCanvasLeftYAxis();
+		}
+		if ($this->right_y_show && (!$this->left_y_show || $this->max_value_right !== null)) {
+			$this->drawCanvasRightYAxis();
+		}
+		if ($this->x_axis) {
+			$this->drawCanvasXAxis();
+		}
+
 		$this->drawMetricsArea();
 		$this->drawMetricsLine();
-		$this->drawCanvasLeftYAxis();
-		$this->drawCanvasRightYAxis();
 		$this->drawMetricsPoint();
-		$this->drawCanvasXAxis();
+
 		$this->drawProblems();
+
 		$this->addClipArea();
+
 		return $this;
 	}
 
@@ -426,10 +443,10 @@ class CSvgGraph extends CSvg {
 			(new CsvgTag('clipPath'))
 				->addItem(
 					(new CSvgPath(implode(' ', [
-						'M'.$this->canvas_x.','.$this->canvas_y,
+						'M'.$this->canvas_x.','.($this->canvas_y - 10),
 						'H'.($this->canvas_width + $this->canvas_x),
 						'V'.($this->canvas_height + $this->canvas_y),
-						'H'.$this->canvas_x
+						'H'.($this->canvas_x)
 					])))
 				)
 				->setAttribute('id', $areaid)
@@ -478,7 +495,7 @@ class CSvgGraph extends CSvg {
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
 		$approx_width = 10;
 
-		if ($this->left_y_show && $this->left_y_min) {
+		if ($this->left_y_show) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
 
 			if ($values) {
@@ -487,7 +504,7 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		if ($this->right_y_show && $this->right_y_min) {
+		if ($this->right_y_show) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
 
 			if ($values) {
@@ -500,8 +517,7 @@ class CSvgGraph extends CSvg {
 		$this->offset_top = 10;
 		$this->canvas_x = $this->offset_left;
 		$this->canvas_y = $this->offset_top;
-		// TODO: move XAxis height to property.
-		$this->offset_bottom = 20;
+		$this->offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
 		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
 	}
 
@@ -509,26 +525,24 @@ class CSvgGraph extends CSvg {
 	 * Get array of X points with labels, for grid and X/Y axes. Array key is Y coordinate for SVG, value is label with
 	 * axis units.
 	 *
-	 * @param int $side    Type of X axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
+	 * @param int $side  Type of X axis: GRAPH_YAXIS_SIDE_RIGHT, GRAPH_YAXIS_SIDE_LEFT
+	 *
 	 * @return array
 	 */
 	protected function getValuesGridWithPosition($side) {
-		if ($side === GRAPH_YAXIS_SIDE_RIGHT && $this->min_value_right !== null) {
-			$min_value = $this->right_y_min;
-			$max_value = $this->right_y_max;
-			$units = $this->right_y_units;
-		}
-		elseif ($side === GRAPH_YAXIS_SIDE_LEFT && $this->min_value_left !== null) {
+		if ($side === GRAPH_YAXIS_SIDE_LEFT) {
 			$min_value = $this->left_y_min;
 			$max_value = $this->left_y_max;
 			$units = $this->left_y_units;
 		}
 		else {
-			return [];
+			$min_value = $this->right_y_min;
+			$max_value = $this->right_y_max;
+			$units = $this->right_y_units;
 		}
 
 		$grid = $this->getValueGrid($min_value, $max_value);
-		$delta = ($max_value - $min_value ? : 1);
+		$delta = (($max_value - $min_value) ? : 1);
 		$grid_values = [];
 
 		foreach ($grid as $value) {
@@ -549,65 +563,63 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to left side of graph.
 	 */
 	protected function drawCanvasLeftYaxis() {
-		if ($this->left_y_show) {
-			$this->addItem(
-				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
-					->setSize($this->offset_left, $this->canvas_height)
-					->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
-			);
-		}
+		$this->addItem(
+			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
+				->setSize($this->offset_left, $this->canvas_height)
+				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
+		);
 	}
 
 	/**
 	 * Add Y axis with labels to right side of graph.
 	 */
 	protected function drawCanvasRightYAxis() {
-		if ($this->right_y_show) {
-			$has_left_axis = ($this->left_y_show && $this->min_value_left !== null);
-
-			$this->addItem(
-				(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
-					->setAxisVisibility(!$has_left_axis)
-					->setSize($this->offset_right, $this->canvas_height)
-					->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
-			);
-		}
+		$this->addItem(
+			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
+				->setSize($this->offset_right, $this->canvas_height)
+				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
+		);
 	}
 
 	/**
 	 * Add X axis with labels to graph.
 	 */
 	protected function drawCanvasXAxis() {
-		if ($this->x_axis) {
-			$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
-				->setSize($this->canvas_width, $this->xaxis_height)
-				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-			);
-		}
+		$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+			->setSize($this->canvas_width, $this->xaxis_height)
+			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+		);
 	}
 
 	/**
 	 * Calculate array of points between $min and $max value.
 	 *
-	 * @param int $min    Minimum value.
-	 * @param int $max    Maximum value.
+	 * @param int $min  Minimum value.
+	 * @param int $max  Maximum value.
+	 *
 	 * @return $array
 	 */
 	protected function getValueGrid($min, $max) {
-		$mul = 1 / pow(10, floor(log10($max)));
-		$max10 = ceil($mul * $max) / $mul;
-		$min10 = floor($mul * $min) / $mul;
-		$delta = $max10 - $min10;
-		$delta = ceil($mul * $delta) / $mul;
-
 		$res = [];
-		if ($delta) {
-			for($i = 0; $delta >= $i; $i += $delta / 5) {
-				$res[] = $i + $min10;
+
+		for ($base = 10; $base > .01; $base /= 10) {
+			$mul = $max ? 1 / pow($base, floor(log10($max))) : 1;
+			$max10 = ceil($mul * $max) / $mul;
+			$min10 = floor($mul * $min) / $mul;
+			$delta = $max10 - $min10;
+			$delta = ceil($mul * $delta) / $mul;
+
+			if ($mul >= 1) {
+				if ($delta) {
+					for($i = 0; $delta >= $i; $i += $delta / 5) {
+						$res[] = $i + $min10;
+					}
+				}
+				else {
+					$res[] = $min10;
+				}
+				break;
 			}
-		}
-		else {
-			$res[] = $min10;
 		}
 
 		return $res;
@@ -618,26 +630,24 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawGrid() {
 		$time_points = $this->getTimeGridWithPosition();
+		$value_points = [];
 
 		if ($this->left_y_show) {
-			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
 
 			unset($time_points[0]);
 		}
 		elseif ($this->right_y_show) {
-			$points_value = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
 
 			unset($time_points[$this->canvas_width]);
 		}
-		else {
-			$points_value = [];
-		}
 
 		if ($this->x_axis) {
-			unset($points_value[0]);
+			unset($value_points[0]);
 		}
 
-		$this->addItem((new CSvgGraphGrid($points_value, $time_points))
+		$this->addItem((new CSvgGraphGrid($value_points, $time_points))
 			->setPosition($this->canvas_x, $this->canvas_y)
 			->setSize($this->canvas_width, $this->canvas_height)
 		);
@@ -692,10 +702,10 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Modifies metric data according $missingdatafunc value.
 	 *
-	 * @param array $points             Array of metric points to modify, where key is metric timestamp.
-	 * @param int   $missingdatafunc    Type of function, allowed value:
-	 *                                  SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO, SVG_GRAPH_MISSING_DATA_NONE,
-	 *                                  SVG_GRAPH_MISSING_DATA_CONNECTED
+	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
+	 * @param int   $missingdatafunc  Type of function, allowed value:
+	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO, SVG_GRAPH_MISSING_DATA_NONE,
+	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
 	 */
 	protected function applyMissingDataFunc(array &$points = [], $missingdatafunc) {
 		if (!$points || $missingdatafunc == SVG_GRAPH_MISSING_DATA_CONNECTED) {
@@ -779,10 +789,7 @@ class CSvgGraph extends CSvg {
 				$group = (new CSvgGroup())
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 					->setAttribute('data-metric', $metric['name'])
-					->setAttribute('data-color', $metric['options']['color'])
-					->addItem(
-						(new CSvgCircle(-10, -10, 20))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
-					);
+					->setAttribute('data-color', $metric['options']['color']);
 
 				foreach ($this->paths[$index] as $path) {
 					$group->addItem((new CSvgGraphLine($path, $metric))
@@ -791,7 +798,9 @@ class CSvgGraph extends CSvg {
 					);
 				}
 
-				$this->addItem($group);
+				$this->addItem($group
+					->addItem((new CSvgCircle(-6, -6, 12))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				));
 			}
 		}
 	}

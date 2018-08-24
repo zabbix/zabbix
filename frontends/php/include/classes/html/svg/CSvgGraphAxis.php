@@ -189,7 +189,6 @@ class CSvgGraphAxis extends CSvgTag {
 			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ?  $margin : $this->width - $margin;
 		}
 
-
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
 

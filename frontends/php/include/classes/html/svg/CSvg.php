@@ -28,8 +28,7 @@ class CSvg extends CSvgTag {
 			->setAttribute('id', uniqid('svg_'))
 			->setAttribute('version', '1.1')
 			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
-			->setAttribute('shape-rendering', 'crispEdges');
+			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
 	}
 
 	protected function startToString() {
