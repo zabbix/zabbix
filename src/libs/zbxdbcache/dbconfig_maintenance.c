@@ -425,7 +425,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	zbx_vector_ptr_t	maintenances;
 	zbx_dc_maintenance_t	*maintenance = NULL;
 	int			index, ret, i;
-	zbx_uint64_t		last_maintenanceid = 0, maintenanceid, hostid;
+	zbx_uint64_t		last_maintenanceid, maintenanceid, hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -441,7 +441,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(maintenanceid, row[0]);
 
-		if (last_maintenanceid != maintenanceid || 0 == last_maintenanceid)
+		if (NULL == maintenance || last_maintenanceid != maintenanceid)
 		{
 			if (NULL == (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_search(&config->maintenances,
 					&maintenanceid)))
