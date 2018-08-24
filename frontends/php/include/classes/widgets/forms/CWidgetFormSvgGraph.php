@@ -308,7 +308,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Severity checkboxes list.
 		$field_severities = (new CWidgetFieldSeverities('severities', _('Severity')))
-			->setStyle(ZBX_STYLE_LIST_HOR_CHECK_RADIO);
+			->setOrientation(CWidgetFieldSeverities::ORIENTATION_HORIZONTAL);
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_severities->setFlags(CWidgetField::FLAG_DISABLED);
 		}
