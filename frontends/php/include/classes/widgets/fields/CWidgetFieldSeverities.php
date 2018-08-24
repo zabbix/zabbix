@@ -22,7 +22,7 @@
 class CWidgetFieldSeverities extends CWidgetField {
 
 	const ORIENTATION_HORIZONTAL = 0;
-	const ORIENTATION_VERTICAL = 0;
+	const ORIENTATION_VERTICAL = 1;
 
 	private $orientation;
 
