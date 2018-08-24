@@ -57,22 +57,15 @@ $itemTable = (new CTableInfo())
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 
-foreach ($this->data['items'] as $item) {
+foreach ($data['items'] as $item) {
 	$description = [];
-	if (!empty($item['templateid'])) {
-		$template_host = get_realhost_by_itemid($item['templateid']);
 
-		$description[] = (new CLink($template_host['name'],
-			(new CUrl('disc_prototypes.php'))
-				->setArgument('parent_discoveryid',
-					get_realrule_by_itemid_and_hostid($data['parent_discoveryid'], $template_host['hostid'])
-				)
-				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
-		$description[] = NAME_DELIMITER;
+	if ($item['templateid']) {
+		$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE
+		);
 	}
+
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
 			$description[] = CHtml::encode($item['master_item']['name_expanded']);

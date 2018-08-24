@@ -788,10 +788,11 @@ function get_realhost_by_itemid($itemid) {
  * @param array  $items                 An array of items.
  * @param string $items[]['itemid']     ID of an item.
  * @param string $items[]['templateid'] ID of parent template item.
- *
+ * @param int    $flag                  Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                      ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @return array
  */
-function getItemParentTemplates(array $items) {
+function getItemParentTemplates(array $items, $flag) {
 	$parent_itemids = [];
 	$data = [
 		'links' => [],
@@ -813,14 +814,31 @@ function getItemParentTemplates(array $items) {
 	$hostids = [];
 
 	do {
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'templateid'],
-			'itemids' => array_keys($parent_itemids),
-			'webitems' => true
-		]);
+		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+			$db_items = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids)
+			]);
+		}
+		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids),
+				'selectDiscoveryRule' => ['itemid']
+			]);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$db_items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids),
+				'webitems' => true
+			]);
+		}
 
 		$all_parent_itemids += $parent_itemids;
 		$parent_itemids = [];
+		$parent_discoveryids = [];
 
 		foreach ($db_items as $db_item) {
 			$data['templates'][$db_item['hostid']] = [];
@@ -832,6 +850,10 @@ function getItemParentTemplates(array $items) {
 				}
 
 				$data['links'][$db_item['itemid']] = ['itemid' => $db_item['templateid']];
+			}
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE && array_key_exists('itemid', $db_item['discoveryRule'])) {
+				$parent_discoveryids[$db_item['hostid']] = $db_item['discoveryRule']['itemid'];
 			}
 		}
 	}
@@ -875,6 +897,10 @@ function getItemParentTemplates(array $items) {
 				'name' => _('Inaccessible template'),
 				'permission' => PERM_DENY
 			];
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE && array_key_exists($hostid, $parent_discoveryids)) {
+			$template['parent_discoveryid'] = $parent_discoveryids[$hostid];
+		}
 	}
 	unset($template);
 
@@ -886,10 +912,12 @@ function getItemParentTemplates(array $items) {
  *
  * @param string $itemid
  * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return CLink|CSpan|null
  */
-function makeItemTemplatePrefix($itemid, array $parent_templates) {
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
 		return null;
 	}
@@ -901,11 +929,21 @@ function makeItemTemplatePrefix($itemid, array $parent_templates) {
 	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
 	if ($template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
-			(new CUrl('items.php'))
+		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+			$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $template['hostid']);
+		}
+		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$url = (new CUrl('disc_prototypes.php'))
+				->setArgument('parent_discoveryid', $template['parent_discoveryid']);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$url = (new CUrl('items.php'))
 				->setArgument('hostid', $template['hostid'])
-				->setArgument('filter_set', 1)
-		))->addClass(ZBX_STYLE_LINK_ALT);
+				->setArgument('filter_set', 1);
+		}
+
+		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
 		$name = new CSpan(CHtml::encode($template['name']));
@@ -930,7 +968,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates) {
 
 		if ($template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink(CHtml::encode($template['name']),
-				(new CUrl('items.php'))
+				(new CUrl())
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 			);

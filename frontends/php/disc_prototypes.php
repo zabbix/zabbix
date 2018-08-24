@@ -759,6 +759,10 @@ else {
 			order_result($data['items'], $sortField, $sortOrder);
 	}
 
+	$data['parent_templates'] = $data['items']
+		? getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE)
+		: [];
+
 	$url = (new CUrl('disc_prototypes.php'))
 		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
