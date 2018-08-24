@@ -774,14 +774,6 @@ function get_same_item_for_host($item, $dest_hostids) {
 	return false;
 }
 
-function get_realhost_by_itemid($itemid) {
-	$item = get_item_by_itemid($itemid);
-	if ($item['templateid'] <> 0) {
-		return get_realhost_by_itemid($item['templateid']); // attention recursion!
-	}
-	return get_host_by_itemid($itemid);
-}
-
 /**
  * Get parent templates for each given item.
  *
