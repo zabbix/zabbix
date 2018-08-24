@@ -14,7 +14,6 @@ A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD m
 
 Bug fixes:
 ....I..... [ZBX-14751] fixed "cannot run test program while cross compiling" and "cannot check for file existence when cross compiling" errors during cross-compilation (vso)
-.......PS. [ZBX-14765] fixed vmware incorrect memory release (MVekslers)
 .......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ..F....... [ZBXNEXT-4500] fixed item prototype master item links leading to error when master item is a web item (Ivo)
 ........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
