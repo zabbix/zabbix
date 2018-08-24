@@ -101,7 +101,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldTextBox|CWidgetFieldUrl $field
+	 * @param CWidgetFieldTextBox $field
 	 *
 	 * @return CTextBox
 	 */
@@ -116,6 +116,17 @@ class CWidgetHelper {
 		}
 
 		return $text_box;
+	}
+
+	/**
+	 * @param CWidgetFieldUrl $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getUrlBox($field) {
+		return (new CTextBox($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**

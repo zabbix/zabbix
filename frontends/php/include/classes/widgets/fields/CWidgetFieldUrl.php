@@ -21,8 +21,6 @@
 
 class CWidgetFieldUrl extends CWidgetField {
 
-	protected $attributes;
-
 	/**
 	 * URL widget field.
 	 *
@@ -46,14 +44,5 @@ class CWidgetFieldUrl extends CWidgetField {
 		}
 
 		return $errors;
-	}
-
-	public function setAttribute($name, $value) {
-		$this->attributes[$name] = $value;
-		return $this;
-}
-
-	public function getAttribute($name) {
-		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
 	}
 }
