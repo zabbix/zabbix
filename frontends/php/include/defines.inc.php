@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0alpha10');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050128);
+define('ZABBIX_DB_VERSION',		3050146);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -242,7 +242,7 @@ define('CONDITION_TYPE_DVALUE',				12);
 define('CONDITION_TYPE_TEMPLATE',			13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
-define('CONDITION_TYPE_MAINTENANCE',		16);
+define('CONDITION_TYPE_SUPPRESSED',			16);
 define('CONDITION_TYPE_DRULE',				18);
 define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
@@ -263,6 +263,8 @@ define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
 define('CONDITION_OPERATOR_NOT_REGEXP',	9);
+define('CONDITION_OPERATOR_YES',		10);
+define('CONDITION_OPERATOR_NO',			11);
 
 // correlation statuses
 define('ZBX_CORRELATION_ENABLED',		0);
@@ -325,6 +327,11 @@ define('MAINTENANCE_STATUS_EXPIRED',	2);
 define('HOST_AVAILABLE_UNKNOWN',	0);
 define('HOST_AVAILABLE_TRUE',		1);
 define('HOST_AVAILABLE_FALSE',		2);
+
+define('MAINTENANCE_TAG_EVAL_TYPE_AND_OR',	0);
+define('MAINTENANCE_TAG_EVAL_TYPE_OR',		2);
+define('MAINTENANCE_TAG_OPERATOR_EQUAL',	0);
+define('MAINTENANCE_TAG_OPERATOR_LIKE',		2);
 
 define('MAINTENANCE_TYPE_NORMAL',	0);
 define('MAINTENANCE_TYPE_NODATA',	1);
@@ -633,8 +640,8 @@ define('ACTION_DEFAULT_MSG_RECOVERY', "Problem has been resolved at {EVENT.RECOV
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
 
-define('ACTION_MAINTENANCE_MODE_NORMAL',	0);
-define('ACTION_MAINTENANCE_MODE_PAUSE',		1);
+define('ACTION_PAUSE_SUPPRESSED_FALSE',		0);
+define('ACTION_PAUSE_SUPPRESSED_TRUE',		1);
 
 define('OPERATION_TYPE_MESSAGE',			0);
 define('OPERATION_TYPE_COMMAND',			1);
@@ -870,6 +877,9 @@ define('EVENT_ACKNOWLEDGED',		'1');
 
 define('ZBX_ACKNOWLEDGE_SELECTED',	0);
 define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
+
+define('ZBX_PROBLEM_SUPPRESSED_FALSE',	0);
+define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 
 define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
@@ -1447,6 +1457,7 @@ define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
+define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
@@ -1623,6 +1634,11 @@ define('PROBLEMS_SHOW_TAGS_NONE', 0);
 define('PROBLEMS_SHOW_TAGS_1', 1);
 define('PROBLEMS_SHOW_TAGS_2', 2);
 define('PROBLEMS_SHOW_TAGS_3', 3);
+
+// Tag name format to display in Problems widget and Monitoring > Problems.
+define('PROBLEMS_TAG_NAME_FULL',      0);
+define('PROBLEMS_TAG_NAME_SHORTENED', 1);
+define('PROBLEMS_TAG_NAME_NONE',      2);
 
 // HTTP headers
 /*

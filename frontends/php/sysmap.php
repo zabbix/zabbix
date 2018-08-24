@@ -200,7 +200,7 @@ $data = [
 ];
 
 // get selements
-add_elementNames($data['sysmap']['selements']);
+addElementNames($data['sysmap']['selements']);
 
 foreach ($data['sysmap']['shapes'] as &$shape) {
 	$shape['expanded'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
