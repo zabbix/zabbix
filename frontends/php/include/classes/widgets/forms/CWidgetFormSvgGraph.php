@@ -139,7 +139,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;')
 			->setAction('jQuery("#lefty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 		if ($field_left_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
@@ -207,7 +206,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_AXIS_UNITS_STATIC => _x('Static', 'history source selection method')
 		]))
 			->setDefault(SVG_GRAPH_AXIS_UNITS_AUTO)
-			->setAttribute('style', 'width: '.ZBX_TEXTAREA_TINY_WIDTH.'px;')
 			->setAction('jQuery("#righty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 		if ($field_right_y->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {

@@ -20,7 +20,7 @@
 
 class CWidgetFieldCheckBox extends CWidgetField {
 
-	protected $caption;
+	private $caption;
 
 	/**
 	 * Check box widget field.

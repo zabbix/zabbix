@@ -97,13 +97,6 @@ class CWidgetHelper {
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
 
-		if ($field->getAttribute('style') !== null) {
-			$combo_box->addStyle($field->getAttribute('style'));
-		}
-		else {
-			$combo_box->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-		}
-
 		return $combo_box;
 	}
 
