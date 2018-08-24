@@ -93,9 +93,9 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
 );
 
-// Show hosts in maintenance.
-$form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']),
-	CWidgetHelper::getCheckBox($fields['maintenance'])
+// Show suppressed problems.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
 );
 
 // Show unacknowledged only.

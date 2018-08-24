@@ -47,7 +47,7 @@ static void	get_exp_value_and_compare(const char *param, size_t found_value)
 	if (expected_value != found_value)
 	{
 		fail_msg("Position "ZBX_FS_SIZE_T" of '%s' not equal to expected "ZBX_FS_SIZE_T,
-				found_value, param, expected_value);
+				(zbx_fs_size_t)found_value, param, (zbx_fs_size_t)expected_value);
 	}
 }
 

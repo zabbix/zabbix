@@ -132,7 +132,7 @@ $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -203px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -203px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -629,6 +629,10 @@ ul.top-nav-icons {
 		td {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
+			.icon-maint::before {
+				background-position: -206px -804px;
+			}
 
 			.icon-wzrd-action {
 				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;
@@ -1162,6 +1166,9 @@ td.inactive-bg {
 }
 .icon-action-ack::before {
 	background-position: -323px -285px;
+}
+.icon-invisible::before {
+	background-position: -249px -803px,
 }
 .icon-problem-generated::before {
 	background-position: -449px -285px;

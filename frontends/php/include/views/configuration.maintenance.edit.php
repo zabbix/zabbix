@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
@@ -150,12 +152,101 @@ if ($data['new_timeperiod']) {
 	);
 }
 
-// Hosts and groups tab.
+/*
+ * Hosts and groups tab.
+ */
+$tags = $data['tags'];
+if (!$tags) {
+	$tags = [['tag' => '', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => '']];
+}
+
+$tag_table = (new CTable())
+	->setId('tags')
+	->addRow(
+		(new CCol(
+			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
+				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
+				->setModern(true)
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
+		))->setColSpan(4)
+	);
+
+$i = 0;
+foreach ($tags as $tag) {
+	if ($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA) {
+		$tag_table->addRow([
+			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setEnabled(false),
+			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->setModern(true)
+				->setEnabled(false),
+			(new CTextBox('tags['.$i.'][value]', $tag['value']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setEnabled(false),
+			(new CCol(
+				(new CButton('tags['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+					->setEnabled(false)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		], 'form_row');
+	}
+	else {
+		$tag_table->addRow([
+			(new CTextBox('tags['.$i.'][tag]', $tag['tag']))
+				->setAttribute('placeholder', _('tag'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
+				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->setModern(true),
+			(new CTextBox('tags['.$i.'][value]', $tag['value']))
+				->setAttribute('placeholder', _('value'))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CCol(
+				(new CButton('tags['.$i.'][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		], 'form_row');
+	}
+
+	$i++;
+}
+$tag_table->addRow(
+	(new CCol(
+		(new CButton('tags_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : true)
+	))->setColSpan(3)
+);
+
 $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 	->addRow('',
-		(new CLabel(_('At least one host or host group must be selected.')))->setAsteriskMark()
+		(new CLabel(_('At least one host group or host must be selected.')))->setAsteriskMark()
 	)
-	->addRow(new CLabel(_('Hosts in maintenance'), 'hostids__ms'),
+	->addRow(new CLabel(_('Host groups'), 'groupids__ms'),
+		(new CMultiSelect([
+			'name' => 'groupids[]',
+			'object_name' => 'hostGroup',
+			'data' => $data['groups_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $maintenanceForm->getName(),
+					'dstfld1' => 'groupids_',
+					'editable' => true
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(new CLabel(_('Hosts'), 'hostids__ms'),
 		(new CMultiSelect([
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
@@ -171,28 +262,17 @@ $hostsAndGroupsFormList = (new CFormList('hostsAndGroupsFormList'))
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Groups in maintenance'), 'groupids__ms'),
-		(new CMultiSelect([
-			'name' => 'groupids[]',
-			'object_name' => 'hostGroup',
-			'data' => $data['groups_ms'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $maintenanceForm->getName(),
-					'dstfld1' => 'groupids_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->addRow(_('Tags'),
+		(new CDiv($tag_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	);
 
 // Append tabs to form.
 $maintenanceTab = (new CTabView())
 	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
 	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList)
-	->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList);
+	->addTab('hostTab', _('Hosts and groups'), $hostsAndGroupsFormList);
 if (!$this->data['form_refresh']) {
 	$maintenanceTab->setSelected(0);
 }
