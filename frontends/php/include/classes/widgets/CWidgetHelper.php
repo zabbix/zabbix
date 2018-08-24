@@ -554,19 +554,18 @@ class CWidgetHelper {
 	/**
 	 * Make array of patterns from given comma separated patterns string.
 	 *
-	 * @param string   $patterns		String containing comma separated patterns.
+	 * @param string $patterns  String containing comma separated patterns.
 	 *
-	 * @return array   Returns array of patterns or NULL if '*' used, thus all database records are valid.
+	 * @return array  Returns array of unique patterns.
 	 */
 	public static function splitPatternIntoParts($patterns) {
 		$patterns = explode(',', $patterns);
-		$patterns = array_keys(array_flip($patterns));
 
 		foreach ($patterns as &$pattern) {
 			$pattern = trim($pattern);
 		}
 		unset($pattern);
 
-		return $patterns;
+		return array_unique($patterns);
 	}
 }

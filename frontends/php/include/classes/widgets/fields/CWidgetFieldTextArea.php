@@ -52,7 +52,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
 
-		if ($value !== null && $value !== $this->default) {
+		if ($value !== $this->default) {
 			foreach (CWidgetHelper::splitPatternIntoParts($value) as $num => $val) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
