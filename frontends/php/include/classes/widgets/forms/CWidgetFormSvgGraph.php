@@ -294,7 +294,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_problems->getName()] = $field_problems;
 
 		// Problem hosts.
-		$field_problem_hosts = (new CWidgetFieldTextArea('problemhosts', _('Problem hosts')));
+		$field_problem_hosts = (new CWidgetFieldTextArea('problemhosts', _('Problem hosts')))
+			->setPlaceholder(_('host pattern'));
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {
 			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}

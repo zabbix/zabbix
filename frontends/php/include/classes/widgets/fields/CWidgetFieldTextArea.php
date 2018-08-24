@@ -21,7 +21,7 @@
 
 class CWidgetFieldTextArea extends CWidgetField {
 
-	protected $attributes;
+	private $placeholder;
 
 	/**
 	 * Textarea widget field.
@@ -33,23 +33,13 @@ class CWidgetFieldTextArea extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setDefault('');
-		$this->attributes = [];
+		$this->placeholder = '';
 
 		/**
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.
 		 * Save type is set in self::toApi method for each string field separately.
 		 */
 		$this->setValidationRules(['type' => API_STRING_UTF8]);
-	}
-
-	public function validate($strict = false) {
-		$errors = parent::validate($strict);
-
-		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && $this->getValue() === '') {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
-		}
-
-		return $errors;
 	}
 
 	/**
@@ -73,12 +63,13 @@ class CWidgetFieldTextArea extends CWidgetField {
 		}
 	}
 
-	public function setAttribute($name, $value) {
-		$this->attributes[$name] = $value;
+	public function setPlaceholder($placeholder) {
+		$this->placeholder = $placeholder;
+
 		return $this;
 	}
 
-	public function getAttribute($name) {
-		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
+	public function getPlaceholder() {
+		return $this->placeholder;
 	}
 }

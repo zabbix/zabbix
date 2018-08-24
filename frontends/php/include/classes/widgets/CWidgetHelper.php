@@ -152,10 +152,10 @@ class CWidgetHelper {
 	public static function getHostsPatternTextBox($field, $form_name) {
 		return [
 			(new CTextArea($field->getName(), $field->getValue(), ['rows' => 1]))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->setAttribute('placeholder', _('host pattern'))
+				->setAttribute('placeholder', $field->getPlaceholder())
 				->addClass(ZBX_STYLE_PATTERNSELECT),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton($field->getName().'_select', _('Select')))
