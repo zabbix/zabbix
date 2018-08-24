@@ -108,17 +108,11 @@ class CWidgetHelper {
 	public static function getTextBox($field) {
 		$text_box = (new CTextBox($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
-			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth($field->getWidth());
 
-		if ($field->getAttribute('style') !== null) {
-			$text_box->addStyle($field->getAttribute('style'));
-		}
-		else {
-			$text_box->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-		}
-
-		if ($field->getAttribute('placeholder') !== null) {
-			$text_box->setAttribute('placeholder', $field->getAttribute('placeholder'));
+		if ($field->getPlaceholder() !== '') {
+			$text_box->setAttribute('placeholder', $field->getPlaceholder());
 		}
 
 		return $text_box;

@@ -21,7 +21,8 @@
 
 class CWidgetFieldTextBox extends CWidgetField {
 
-	protected $attributes;
+	private $placeholder;
+	private $width;
 
 	/**
 	 * Text box widget field.
@@ -34,7 +35,8 @@ class CWidgetFieldTextBox extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setDefault('');
-		$this->attributes = [];
+		$this->placeholder = '';
+		$this->width = ZBX_TEXTAREA_STANDARD_WIDTH;
 	}
 
 	public function validate($strict = false) {
@@ -47,12 +49,23 @@ class CWidgetFieldTextBox extends CWidgetField {
 		return $errors;
 	}
 
-	public function setAttribute($name, $value) {
-		$this->attributes[$name] = $value;
+	public function setPlaceholder($placeholder) {
+		$this->placeholder = $placeholder;
+
 		return $this;
 	}
 
-	public function getAttribute($name) {
-		return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : null;
+	public function getPlaceholder() {
+		return $this->placeholder;
+	}
+
+	public function setWidth($width) {
+		$this->width = $width;
+
+		return $this;
+	}
+
+	public function getWidth() {
+		return $this->width;
 	}
 }
