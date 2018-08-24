@@ -738,7 +738,7 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 		vmware_shared_strfree(hv->clusterid);
 
 	if (NULL != hv->datacenter_name)
-		__vm_mem_free_func(hv->datacenter_name);
+		vmware_shared_strfree(hv->datacenter_name);
 
 	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
