@@ -839,6 +839,9 @@ function getLastEvents($options) {
 		$triggerOptions['filter']['value'] = $options['value'];
 		$eventOptions['value'] = $options['value'];
 	}
+	if (array_key_exists('suppressed', $options)) {
+		$eventOptions['suppressed'] = $options['suppressed'];
+	}
 
 	// triggers
 	$triggers = API::Trigger()->get($triggerOptions);

@@ -83,8 +83,8 @@ class testFormMaintenance extends CWebTest {
 		$this->assertRegexp('/January/', $text);
 		$this->assertRegexp('/November/', $text);
 
-		// Open "Hosts & Groups" tab and add group.
-		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts & Groups');
+		// Open "Hosts and groups" tab and add group.
+		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts and groups');
 		$this->zbxTestClickButtonMultiselect('groupids_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');

@@ -165,7 +165,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
-	 * @param int    $filter['maintenance']           (optional)
+	 * @param int    $filter['show_suppressed']       (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 *
@@ -253,6 +253,7 @@ class CScreenProblem extends CScreenBase {
 				'applicationids' => $filter_applicationids,
 				'objectids' => $filter_triggerids,
 				'eventid_till' => $eventid_till,
+				'suppressed' => false,
 				'limit' => $config['search_limit'] + 1
 			];
 
@@ -293,6 +294,10 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
+			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
+				unset($options['suppressed']);
+				$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
+			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
 				? self::getDataEvents($options)
@@ -303,6 +308,10 @@ class CScreenProblem extends CScreenBase {
 			if ($problems) {
 				$eventid_till = end($problems)['eventid'] - 1;
 				$triggerids = [];
+
+				if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
+					self::addMaintenanceNames($problems);
+				}
 
 				foreach ($problems as $problem) {
 					if (!array_key_exists($problem['objectid'], $seen_triggerids)) {
@@ -326,9 +335,6 @@ class CScreenProblem extends CScreenBase {
 					if (array_key_exists('details', $filter) && $filter['details'] == 1) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
 					}
-					if (array_key_exists('maintenance', $filter) && $filter['maintenance'] == 0) {
-						$options['maintenance'] = false;
-					}
 
 					$data['triggers'] += API::Trigger()->get($options);
 				}
@@ -347,6 +353,47 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, $config['search_limit'] + 1, true);
 
 		return $data;
+	}
+
+	/**
+	 * Adds maintenance names of suppressed problems.
+	 *
+	 * @param array $problems
+	 * @param array $problems[]['suppression_data']
+	 * @param int   $problems[]['suppression_data'][]['maintenanceid']
+	 *
+	 * @static
+	 */
+	public static function addMaintenanceNames(array &$problems) {
+		$maintenanceids = [];
+
+		foreach ($problems as $problem) {
+			if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+				foreach ($problem['suppression_data'] as $data) {
+					$maintenanceids[] = $data['maintenanceid'];
+				}
+			}
+		}
+
+		$maintenances = $maintenanceids
+			? API::Maintenance()->get([
+				'output' => ['name'],
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => true
+			])
+			: [];
+
+		if ($maintenances) {
+			foreach ($problems as &$problem) {
+				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+					foreach ($problem['suppression_data'] as &$data) {
+						$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
+					}
+					unset($data);
+				}
+			}
+			unset($problem);
+		}
 	}
 
 	/**
@@ -793,12 +840,12 @@ class CScreenProblem extends CScreenBase {
 						)->addStyle('width: 120px;'),
 						$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
 						$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
-						(new CColHeader(_('Info')))->addStyle('width: 22px;'),
+						(new CColHeader(_('Info')))->addStyle('width: 24px;'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 42%;'),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 58%;'),
-						(new CColHeader(_('Duration')))->addStyle('width: 75px;'),
+						(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
 						(new CColHeader(_('Ack')))->addStyle('width: 36px;'),
 						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
 						$tags_header
@@ -928,6 +975,20 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
+				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+					$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+				}
+
+				$cell_info = ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
+						&& count($info_icons) > 1)
+					? (new CSpan(
+							(new CButton(null))
+								->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+								->addStyle('margin-left: -3px;')
+								->setHint((new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER))
+							))->addClass(ZBX_STYLE_REL_CONTAINER)
+					: makeInformationList($info_icons);
+
 				$options = [
 					'description_enabled' => ($trigger['comments'] !== ''
 						|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
@@ -986,7 +1047,7 @@ class CScreenProblem extends CScreenBase {
 					getSeverityCell($problem['severity'], $this->config, null, $value == TRIGGER_VALUE_FALSE),
 					$show_recovery_data ? $cell_r_clock : null,
 					$show_recovery_data ? $cell_status : null,
-					makeInformationList($info_icons),
+					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
 					($problem['r_eventid'] != 0)

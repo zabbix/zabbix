@@ -430,7 +430,12 @@ if ($this->data['is_profile']) {
 		zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
 	}
 
-	$userMessagingFormList->addRow(_('Trigger severity'), $triggersTable, 'triggers_row');
+	$userMessagingFormList
+		->addRow(_('Trigger severity'), $triggersTable, 'triggers_row')
+		->addRow(_('Show suppressed problems'),
+			(new CCheckBox('messages[show_suppressed]'))
+				->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+		);
 }
 
 // append form lists to tab
