@@ -626,15 +626,12 @@ else {
 			order_result($data['discoveries'], $sortField, $sortOrder);
 	}
 
-	$data['parent_templates'] = $data['discoveries']
-		? getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE)
-		: [];
-
 	// paging
 	$url = (new CUrl('host_discovery.php'))
 		->setArgument('hostid', $data['hostid']);
 
 	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
+	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

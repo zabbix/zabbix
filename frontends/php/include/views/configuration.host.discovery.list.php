@@ -61,13 +61,7 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
-
-	if ($discovery['templateid']) {
-		$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'],
-			ZBX_FLAG_DISCOVERY_RULE
-		);
-	}
-
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE);
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status

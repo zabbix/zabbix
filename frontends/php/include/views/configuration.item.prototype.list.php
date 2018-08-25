@@ -59,12 +59,7 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldm
 
 foreach ($data['items'] as $item) {
 	$description = [];
-
-	if ($item['templateid']) {
-		$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE
-		);
-	}
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {

@@ -1807,9 +1807,6 @@ else {
 
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
-		// Get parent templates.
-		$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
-
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
 
@@ -1962,6 +1959,7 @@ else {
 	}
 
 	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
