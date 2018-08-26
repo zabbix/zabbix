@@ -757,7 +757,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 				if ($value !== '') {
 					$tags[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
-						->setHint($value);
+						->setHint($tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']));
 					$tags_shown++;
 					if ($tags_shown >= $list_tags_count) {
 						break;
