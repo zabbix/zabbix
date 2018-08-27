@@ -57,6 +57,8 @@ class CRouter {
 		// action							controller								layout					view
 		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',			null,					null],
 		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',			'layout.htmlpage',		'monitoring.acknowledge.edit'],
+		'authentication.edit'			=> ['CControllerAuthenticationEdit',		'layout.htmlpage',		'administration.authentication.edit'],
+		'authentication.update'			=> ['CControllerAuthenticationUpdate',		null,					null],
 		'dashboard.view'				=> ['CControllerDashboardView',				'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.list'				=> ['CControllerDashboardList',				'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.delete'				=> ['CControllerDashboardDelete',			null,					null],

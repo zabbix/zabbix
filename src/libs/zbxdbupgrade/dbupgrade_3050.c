@@ -1832,6 +1832,124 @@ static int	DBpatch_3050146(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050147(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050148(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_login_form", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050149(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_strip_domains", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050150(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"http_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050151(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050152(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	const ZBX_FIELD	field = {"ldap_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050153(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
+	res = DBexecute(
+		"update config"
+		" set authentication_type=0,"
+		"  http_auth_enabled=1"
+		" where authentication_type=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050154(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* New GUI access type is added GROUP_GUI_ACCESS_LDAP, update value of GROUP_GUI_ACCESS_DISABLED. */
+	/* 2 - old value of GROUP_GUI_ACCESS_DISABLED */
+	/* 3 - new value of GROUP_GUI_ACCESS_DISABLED */
+	res = DBexecute("update usrgrp set gui_access=3 where gui_access=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050155(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
+	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_SENSITIVE. */
+	res = DBexecute(
+		"update config"
+		" set ldap_configured=1, ldap_case_sensitive=1"
+		" where authentication_type=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -1981,6 +2099,15 @@ DBPATCH_ADD(3050143, 0, 1)
 DBPATCH_ADD(3050144, 0, 1)
 DBPATCH_ADD(3050145, 0, 1)
 DBPATCH_ADD(3050146, 0, 1)
+DBPATCH_ADD(3050147, 0, 1)
+DBPATCH_ADD(3050148, 0, 1)
+DBPATCH_ADD(3050149, 0, 1)
+DBPATCH_ADD(3050150, 0, 1)
+DBPATCH_ADD(3050151, 0, 1)
+DBPATCH_ADD(3050152, 0, 1)
+DBPATCH_ADD(3050153, 0, 1)
+DBPATCH_ADD(3050154, 0, 1)
+DBPATCH_ADD(3050155, 0, 1)
 
 DBPATCH_END()
 
