@@ -1,4 +1,4 @@
-Changes for 4.0.0alpha10
+Changes for 4.0.0beta1
 
 New features:
 A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
