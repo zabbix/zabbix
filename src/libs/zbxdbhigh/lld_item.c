@@ -589,11 +589,11 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
-		const zbx_lld_item_prototype_t	*item_prototype;
+		const zbx_lld_item_prototype_t	*itemprototype;
 
-		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
+		itemprototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
 
-		zbx_vector_uint64_append(&parent_itemids, item_prototype->itemid);
+		zbx_vector_uint64_append(&parent_itemids, itemprototype->itemid);
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
