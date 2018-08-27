@@ -136,6 +136,7 @@
 			 */
 			show: function(id, target) {
 				input = $('#' + id);
+				colorbox = colorbox || $('#lbl_' + id);
 
 				if (input.is(':disabled,[readonly]')) {
 					return;
