@@ -96,6 +96,7 @@ $expression_form_list->addRow(_('Function'), $function_combo_box);
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	foreach ($data['functions'][$data['selectedFunction']]['params'] as $paramid => $param_function) {
 		$param_value = array_key_exists($paramid, $data['params']) ? $data['params'][$paramid] : null;
+		$label = ($param_function['A']) ? (new CLabel($param_function['C']))->setAsteriskMark() : $param_function['C'];
 
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
@@ -121,14 +122,14 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 					: (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
-			$expression_form_list->addRow($param_function['C'], [
+			$expression_form_list->addRow($label, [
 				$param_field,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				$param_type_element
 			]);
 		}
 		else {
-			$expression_form_list->addRow($param_function['C'],
+			$expression_form_list->addRow($label,
 				(new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
 			$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
@@ -171,14 +172,17 @@ $output = [
 	'script_inline' =>
 		'jQuery(function($) {'.
 			'function setReadOnly() {'.
-				'var selected_fn = $("#function option:selected");'.
+				'var selected_fn = $("#function option:selected"),'.
+					'$label = $("#params_0").parents("li").find("label");'.
 
 				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
 					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
 						'$("#params_0").removeAttr("readonly");'.
+						'$label.addClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
 					'}'.
 					'else {'.
 						'$("#params_0").attr("readonly", "readonly");'.
+						'$label.removeClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
 					'}'.
 				'}'.
 			'}'.
