@@ -429,7 +429,7 @@ function check_fields(&$fields, $show_messages = true, $add_messages_to_message_
  * @param string|null to
  */
 function validateTimeSelectorPeriod($from, $to) {
-	if ($from === null || $to == null) {
+	if ($from === null || $to === null) {
 		return;
 	}
 

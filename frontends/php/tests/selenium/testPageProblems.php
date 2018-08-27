@@ -29,7 +29,7 @@ class testPageProblems extends CWebTest {
 
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_0'));
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum severity', 'Age less than', 'Host inventory', 'Tags', 'Show hosts in maintenance',
+			'Minimum severity', 'Age less than', 'Host inventory', 'Tags', 'Show suppressed problems',
 			'Show unacknowledged only',
 			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
@@ -45,7 +45,7 @@ class testPageProblems extends CWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_show_2'));
 		$this->zbxTestAssertNotVisibleId('filter_age_state');
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Application', 'Triggers', 'Problem',
-			'Minimum severity', 'Host inventory', 'Tags', 'Show hosts in maintenance',
+			'Minimum severity', 'Host inventory', 'Tags', 'Show suppressed problems',
 			'Show unacknowledged only',
 			'Severity', 'Time', 'Recovery time', 'Status', 'Host', 'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
@@ -237,5 +237,145 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestTextNotVisibleOnPage('Tag5: 5');
 		// Check Show More tags hint button
 		$this->zbxTestAssertVisibleXpath('//tr/td[14]/span/button[@class="icon-wzrd-action"]');
+	}
+
+	public function getTagPriorityData() {
+		return [
+			// Check tag priority.
+			[
+				[
+					'tag_priority' => 'Kappa',
+					'show_tags' => '3',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b', 'Delta: d'],
+						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
+						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
+						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e', 'Gamma: g']
+					]
+				]
+			],
+			[
+				[
+					'tag_priority' => 'Kappa, Beta',
+					'show_tags' => '3',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Beta: b', 'Alpha: a', 'Delta: d'],
+						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
+						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
+						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e', 'Gamma: g']
+					]
+				]
+			],
+			[
+				[
+					'tag_priority' => 'Gamma, Kappa, Beta',
+					'show_tags' => '3',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Gamma: g','Beta: b', 'Alpha: a'],
+						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
+						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
+						'Fourth test trigger with tag priority' => ['Gamma: g','Delta: t', 'Eta: e']
+					]
+				]
+			],
+			// Check tag name format.
+			[
+				[
+					'tag_priority' => 'Gamma, Kappa, Beta',
+					'show_tags' => '3',
+					'tag_name_format' => 'Shortened',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Gam: g','Bet: b', 'Alp: a'],
+						'Second test trigger with tag priority' => ['Bet: b', 'Eps: e', 'Eta: e'],
+						'Third test trigger with tag priority' => ['Kap: k', 'Alp: a', 'Iot: i'],
+						'Fourth test trigger with tag priority' => ['Gam: g','Del: t', 'Eta: e']
+					]
+				]
+			],
+			[
+				[
+					'tag_priority' => 'Gamma, Kappa, Beta',
+					'show_tags' => '3',
+					'tag_name_format' => 'None',
+					'sorting' => [
+						'First test trigger with tag priority' => ['g','b', 'a'],
+						'Second test trigger with tag priority' => ['b', 'e', 'e'],
+						'Third test trigger with tag priority' => ['k', 'a', 'i'],
+						'Fourth test trigger with tag priority' => ['g','t', 'e']
+					]
+				]
+			],
+			// Check tags count.
+			[
+				[
+					'tag_priority' => 'Kappa',
+					'show_tags' => '2',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b'],
+						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e'],
+						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a'],
+						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e']
+					]
+				]
+			],
+			[
+				[
+					'tag_priority' => 'Kappa',
+					'show_tags' => '1',
+					'sorting' => [
+						'First test trigger with tag priority' => ['Alpha: a'],
+						'Second test trigger with tag priority' => ['Beta: b'],
+						'Third test trigger with tag priority' => ['Kappa: k'],
+						'Fourth test trigger with tag priority' => ['Delta: t']
+					]
+				]
+			],
+			[
+				[
+					'show_tags' => '0'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getTagPriorityData
+	 */
+	public function testPageProblems_TagPriority($data) {
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestInputType('filter_name', 'trigger with tag priority');
+
+		if (array_key_exists('show_tags', $data)) {
+			$this->zbxTestClickXpath('//label[@for="filter_show_tags_'.$data['show_tags'].'"]');
+		}
+
+		if (array_key_exists('tag_priority', $data)) {
+			$this->zbxTestInputType('filter_tag_priority', $data['tag_priority']);
+		}
+
+		if (array_key_exists('tag_name_format', $data)) {
+			$this->zbxTestClickXpath('//ul[@id="filter_tag_name_format"]//label[text()="'.$data['tag_name_format'].'"]');
+		}
+
+		$this->zbxTestClickButtonText('Apply');
+
+		// Check tag priority sorting.
+		if (array_key_exists('sorting', $data)) {
+			foreach ($data['sorting'] as $problem => $tags) {
+				$tags_priority = [];
+				$get_tags_rows = $this->webDriver->findElements(WebDriverBy::xpath('//a[text()="'.$problem.'"]/../../td/span[@class="tag"]'));
+				foreach ($get_tags_rows as $row) {
+					$tags_priority[] = $row->getText();
+				}
+				$this->assertEquals($tags, $tags_priority);
+			}
+		}
+
+		if ($data['show_tags'] === '0') {
+			$this->zbxTestAssertElementNotPresentXpath('//th[text()="Tags"]');
+			$this->zbxTestAssertElementPresentXpath('//input[@id="filter_tag_priority"][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//input[contains(@id, "filter_tag_name_format")][@disabled]');
+		}
 	}
 }

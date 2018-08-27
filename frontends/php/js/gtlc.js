@@ -413,7 +413,7 @@ jQuery(function ($){
 	function selectionHandlerDragEnd(e) {
 		var left = Math.floor(selection.dom.position().left),
 			from_offset = (left - selection.min) * selection.seconds_per_px,
-			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px
+			to_offset = (selection.max - selection.dom.width() - left) * selection.seconds_per_px,
 			zbx_sbox = e.data.zbx_sbox;
 
 		zbx_sbox.prevent_refresh = false;

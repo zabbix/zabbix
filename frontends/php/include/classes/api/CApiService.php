@@ -434,6 +434,7 @@ class CApiService {
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
+		$sqlHaving = empty($sqlParts['having']) ? '' : ' HAVING '.implode(' AND ', array_unique($sqlParts['having']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
 		return 'SELECT'.zbx_db_distinct($sqlParts).' '.$sqlSelect.
@@ -441,6 +442,7 @@ class CApiService {
 				$sql_left_join.
 				$sqlWhere.
 				$sqlGroup.
+				$sqlHaving.
 				$sqlOrder;
 	}
 

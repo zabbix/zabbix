@@ -167,7 +167,7 @@ class testFormAction extends CWebTest {
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Maintenance status']
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Problem is suppressed']
 			],
 			[
 				['eventsource' => 'Discovery']
@@ -549,7 +549,7 @@ class testFormAction extends CWebTest {
 						'Trigger name',
 						'Trigger severity',
 						'Time period',
-						'Maintenance status'
+						'Problem is suppressed'
 				]);
 				break;
 			case 'Discovery':
@@ -653,10 +653,15 @@ class testFormAction extends CWebTest {
 				]);
 				break;
 			case 'Time period':
-			case 'Maintenance status':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'in',
 						'not in'
+				]);
+				break;
+			case 'Problem is suppressed':
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
+						'No',
+						'Yes'
 				]);
 				break;
 			case 'Uptime/Downtime':
@@ -836,15 +841,6 @@ class testFormAction extends CWebTest {
 				break;
 			case 'Event type':
 				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']', 'selected');
-				break;
-		}
-
-		switch ($new_condition_conditiontype) {
-			case 'Maintenance status':
-				$this->zbxTestAssertElementPresentXpath('//td[text()=\'maintenance\']');
-				break;
-			default:
-				$this->zbxTestAssertElementNotPresentXpath('//td[text()=\'maintenance\']');
 				break;
 		}
 
@@ -1972,8 +1968,11 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			$this->zbxTestWaitForPageToLoad();
-			$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+			// Fire onchange event.
+			$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+				'event.initEvent("change", false, true);'.
+				'document.getElementById("esc_period").dispatchEvent(event);'
+			);
 			$this->zbxTestWaitForPageToLoad();
 		}
 

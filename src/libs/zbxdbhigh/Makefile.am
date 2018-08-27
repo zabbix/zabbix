@@ -24,6 +24,7 @@ libzbxdbhigh_a_SOURCES = \
 	template.h \
 	trigger.c \
 	event.c \
-	export.c
+	export.c \
+	maintenance.c
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/

@@ -70,6 +70,13 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'7,00:00-0:01', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '7,00:00-0:01'
+				]
+			],
+			[
 				'{$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -84,10 +91,10 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'7,00:00-0:01', 0, [],
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '7,00:00-0:01'
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
 				]
 			],
 			// partial success
@@ -373,12 +380,21 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'1-7,00:0-24:00', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			// User macros are not enabled.
+			[
 				'{$M}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
 			],
+			// LLD macros are not enabled.
 			[
 				'{#M}', 0, [],
 				[
@@ -387,7 +403,7 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'1-7,00:0-24:00', 0, [],
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
