@@ -2829,7 +2829,7 @@ return [
 				'length' => 2048,
 				'default' => '',
 			],
-			'login_case_sensitive' => [
+			'http_case_sensitive' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -2840,6 +2840,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'ldap_case_sensitive' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
 			],
 		],
 	],
