@@ -736,12 +736,12 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 			$tags_shown = 0;
 
 			foreach ($event_tags as $tag) {
-				$value = getTagString($tag_name_format, $tag);
+				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
 					$tags[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
-						->setHint(getTagString(PROBLEMS_TAG_NAME_FULL, $tag));
+						->setHint(getTagString($tag));
 					$tags_shown++;
 					if ($tags_shown >= $list_tags_count) {
 						break;
@@ -755,7 +755,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 				$hint_content = [];
 
 				foreach ($event['tags'] as $tag) {
-					$value = getTagString(PROBLEMS_TAG_NAME_FULL, $tag);
+					$value = getTagString($tag);
 					$hint_content[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint($value);
@@ -772,7 +772,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 			// Show all and uncut for CSV.
 
 			foreach ($event['tags'] as $tag) {
-				$tags[$event['eventid']][] = getTagString(PROBLEMS_TAG_NAME_FULL, $tag);
+				$tags[$event['eventid']][] = getTagString($tag);
 			}
 		}
 	}
@@ -783,14 +783,14 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 /**
  * Returns tag name in selected format.
  *
- * @param int    $tag_name_format  PROBLEMS_TAG_NAME_*
  * @param array  $tag
  * @param string $tag['tag']
  * @param string $tag['value']
+ * @param int    $tag_name_format  PROBLEMS_TAG_NAME_*
  *
  * @return string
  */
-function getTagString($tag_name_format, array $tag) {
+function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 	switch ($tag_name_format) {
 		case PROBLEMS_TAG_NAME_NONE:
 			return $tag['value'];
