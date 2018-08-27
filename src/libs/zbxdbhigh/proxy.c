@@ -1757,7 +1757,6 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
 	{
-		int	i;
 		char	*sql = NULL;
 		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
