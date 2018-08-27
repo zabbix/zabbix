@@ -46,13 +46,18 @@ $form->addItem(
 // Stick preview to the top of configuration window when scroll.
 $scripts[] =
 	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
-		'var $dialogue_body = jQuery(this),'.
-			'$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");'.
-			'jQuery("#svg-graph-preview").css("top",'.
-				'($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)'.
-					' ? $dialogue_body.offset().top - $preview_container.offset().top'.
-					' : 0'.
-			');'.
+		'if (jQuery("#svg-graph-preview").length) {'.
+			'var $dialogue_body = jQuery(this),'.
+				'$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");'.
+				'jQuery("#svg-graph-preview").css("top",'.
+					'($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)'.
+						' ? $dialogue_body.offset().top - $preview_container.offset().top'.
+						' : 0'.
+				');'.
+		'}'.
+		'else {'.
+			'jQuery(".overlay-dialogue-body").off("scroll");'.
+		'}'.
 	'})';
 
 $scripts[] =
