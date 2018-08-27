@@ -457,12 +457,12 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 	// Select and show events.
 	$table = (new CTableInfo())
 		->setHeader(array_merge($header, [
-				_('Recovery time'),
-				_('Status'),
-				_('Duration'),
-				_('Ack')
-			], ($show_tags > PROBLEMS_SHOW_TAGS_NONE) ? [_('Tags')] : []
-		));
+			_('Recovery time'),
+			_('Status'),
+			_('Duration'),
+			_('Ack'),
+			($show_tags != PROBLEMS_SHOW_TAGS_NONE) ? _('Tags') : null
+		]));
 
 	if ($eventid_till != 0) {
 		$problems = API::Event()->get([
@@ -503,9 +503,8 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 
 		$today = strtotime('today');
 		$last_clock = 0;
-		$tags = [];
 
-		if ($problems && $show_tags > PROBLEMS_SHOW_TAGS_NONE) {
+		if ($problems && $show_tags != PROBLEMS_SHOW_TAGS_NONE) {
 			$tags = makeEventsTags($problems, true, $show_tags, $filter_tags, $tag_name_format, $tag_priority);
 		}
 
@@ -615,7 +614,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 				))
 					->addClass(ZBX_STYLE_NOWRAP),
 				$problem_update_link,
-				$tags ? $tags[$problem['eventid']] : ''
+				($show_tags != PROBLEMS_SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
 			]));
 		}
 	}
@@ -758,7 +757,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 				if ($value !== '') {
 					$tags[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
-						->setHint($value);
+						->setHint($tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']));
 					$tags_shown++;
 					if ($tags_shown >= $list_tags_count) {
 						break;
