@@ -735,10 +735,10 @@ class CSvgGraph extends CSvg {
 		 */
 		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
 		$threshold = $points_distance ? $average_distance * 3 : 0;
-		$added_value = [
+		$missing_data_values = [
 			SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO => 0,
 			SVG_GRAPH_MISSING_DATA_NONE => null
-		][$missingdatafunc];
+		];
 
 		// Add missing values.
 		$prev_clock = null;
@@ -749,7 +749,7 @@ class CSvgGraph extends CSvg {
 
 				do {
 					$prev_clock += $gap_interval;
-					$missing_points[$prev_clock] = $added_value;
+					$missing_points[$prev_clock] = $missing_data_values[$missingdatafunc];
 				}
 				while ($clock > $prev_clock);
 			}
