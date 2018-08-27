@@ -1883,7 +1883,6 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	if (0 != new_escalations.values_num)
 	{
 		zbx_db_insert_t	db_insert;
-		int		i;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
 					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
