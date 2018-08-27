@@ -903,7 +903,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else
 	{
-		int			simple_interval;
+		int			simple_interval, history;
 		zbx_custom_interval_t	*custom_intervals;
 		zbx_token_t		token;
 		char			*errmsg;
@@ -918,14 +918,14 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						(0 != item->itemid ? "update" : "create"));
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
-				if (SUCCEED == zbx_token_find(item->delay, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
 						0 != (token.type & ZBX_TOKEN_USER_MACRO))
 				{
 					return;
 				}
 
 				errmsg = NULL;
-				if (SUCCEED == zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals,
+				if (SUCCEED == zbx_interval_preproc(*field, &simple_interval, &custom_intervals,
 						&errmsg))
 				{
 					zbx_custom_interval_free(custom_intervals);
@@ -935,6 +935,27 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
 						(0 != item->itemid ? "update" : "create"), errmsg);
 				zbx_free(errmsg);
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
+				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+						0 != (token.type & ZBX_TOKEN_USER_MACRO))
+				{
+					return;
+				}
+
+				if (SUCCEED != is_time_suffix(*field, &history, ZBX_LENGTH_UNLIMITED))
+				{
+					*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
+							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				}
+				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
+				{
+					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
+							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
+							*field);
+				}
+				else
+					return;
 				break;
 			default:
 				return;
