@@ -19,30 +19,16 @@
 **/
 
 
-class CRowHeader extends CTag {
+class CRowHeader extends CRow {
 
-	public function __construct($item = null) {
-		parent::__construct('tr', true);
-		$this->addItem($item);
-	}
-
-	public function addItem($item) {
-		if (is_object($item) && strtolower(get_class($item)) === 'ccolheader') {
-			parent::addItem($item);
-		}
-		elseif (is_array($item)) {
-			foreach ($item as $el) {
-				if (is_object($el) && strtolower(get_class($el)) === 'ccolheader') {
-					parent::addItem($el);
-				}
-				elseif (!is_null($el)) {
-					parent::addItem(new CColHeader($el));
-				}
-			}
-		}
-		elseif (!is_null($item)) {
-			parent::addItem(new CColHeader($item));
-		}
-		return $this;
+	/**
+	 * Create cell (th tag) with given content.
+	 *
+	 * @param CTag|array $item  Cell content.
+	 *
+	 * @return CCol
+	 */
+	protected function createCell($item) {
+		return (new CColHeader($item));
 	}
 }

@@ -74,18 +74,24 @@ foreach ($this->data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$link = ($item['master_item']['source'] === 'itemprototypes')
-			? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
+		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+		}
+		else {
+			$link = ($item['master_item']['source'] === 'itemprototypes')
+				? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
 
-		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-			$link
-				->setArgument('form', 'update')
-				->setArgument('itemid', $item['master_item']['itemid'])
-				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_TEAL);
+			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+				$link
+					->setArgument('form', 'update')
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_TEAL);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 

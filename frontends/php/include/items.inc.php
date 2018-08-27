@@ -1004,7 +1004,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	]);
+	], ZBX_PROBLEM_SUPPRESSED_TRUE);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
@@ -1110,7 +1110,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		}
 	}
 
-	$table = new CTableInfo();
+	$table = (new CTableInfo())->setHeadingColumn(0);
 	if (!$host_names) {
 		return $table;
 	}
@@ -1156,7 +1156,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 			$name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
 
-			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
+			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
 					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);

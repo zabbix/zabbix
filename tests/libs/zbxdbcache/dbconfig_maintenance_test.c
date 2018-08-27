@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,38 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-class CHostGroupNormalValidator extends CValidator {
-
-	/**
-	 * Error message
-	 *
-	 * @var string
-	 */
-	public $message;
-
-	/**
-	 * Checks is any of the given host groups are discovered.
-	 *
-	 * @param mixed $hostGroupIds
-	 *
-	 * @return bool
-	 */
-	public function validate($hostGroupIds) {
-		$hostGroups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $hostGroupIds,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-			'limit' => 1
-		]);
-
-		if ($hostGroups) {
-			$hostGroup = reset($hostGroups);
-			$this->error($this->message, $hostGroup['name']);
-
-			return false;
-		}
-
-		return true;
-	}
+int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_ptr_t *tags)
+{
+	return dc_maintenance_match_tags(maintenance, tags);
 }

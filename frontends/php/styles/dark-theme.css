@@ -493,8 +493,8 @@ article, main {
     white-space: nowrap; }
     .filter-breadcrumb > li:first-child > span {
       display: inline-block;
-      line-height: 1;
-      padding: 4px 7px; }
+      line-height: 14px;
+      padding: 3px 7px; }
       .filter-breadcrumb > li:first-child > span a {
         display: inline-block;
         max-width: 200px;
@@ -597,6 +597,17 @@ output {
       @media screen and (min-width: 1600px) {
         .list-table.compact-view td .tag {
           max-width: 133px; } }
+    .list-table.compact-view td .icon-maint {
+      position: relative;
+      display: inline-block;
+      height: 12px;
+      width: 12px;
+      margin: 0 1px 0 2px !important;
+      vertical-align: bottom; }
+      .list-table.compact-view td .icon-maint::before {
+        height: 12px;
+        width: 12px;
+        background-position: -48px -804px; }
     .list-table.compact-view td .icon-wzrd-action {
       background: url(../img/icon-sprite.svg) no-repeat -6px -624px;
       height: 12px;
@@ -680,12 +691,15 @@ output {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #2b2b2b; }
+  .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
     position: relative;
     border-bottom: 1px solid #383838;
     line-height: 18px;
     vertical-align: top; }
+  .list-table tbody th {
+    text-align: inherit; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -3694,11 +3708,13 @@ tr.cursor-move td * {
   min-width: 16px;
   white-space: nowrap; }
   .rel-container .icon-info {
-    margin-right: 10px; }
+    margin-right: 5px; }
     .rel-container .icon-info:only-of-type {
       margin-right: 0; }
     .rel-container .icon-info:last-child {
       margin-right: 0; }
+    .rel-container .icon-info.status-green {
+      border-right: 1px solid #2f9f5e; }
 
 .server-name {
   color: #737373;
@@ -4050,6 +4066,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -4072,6 +4089,7 @@ svg {
   .icon-action-severity-changed::before,
   .icon-action-message::before,
   .icon-action-ack::before,
+  .icon-invisible::before,
   .icon-problem-generated::before,
   .icon-problem-recovery::before,
   .icon-actions-number-gray::before,
@@ -4120,6 +4138,9 @@ svg {
 .icon-action-ack::before {
   background-position: -323px -245px; }
 
+.icon-invisible::before {
+  background-position: -89px -803px; }
+
 .icon-problem-generated::before {
   background-position: -449px -245px; }
 
@@ -4145,6 +4166,9 @@ svg {
   color: #f2f2f2; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.inline-sr-only {
+  font-size: 0; }
 
 .list-table thead th {
   border-color: #404040; }

@@ -409,6 +409,7 @@ tests/libs/zbxdbcache/.deps
 tests/libs/zbxdbcache/.dirstamp
 tests/libs/zbxdbcache/Makefile
 tests/libs/zbxdbcache/Makefile.in
+tests/libs/zbxdbcache/dc_maintenance_match_tags
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values

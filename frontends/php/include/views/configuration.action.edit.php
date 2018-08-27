@@ -235,10 +235,6 @@ switch ($data['new_condition']['conditiontype']) {
 		$condition = new CComboBox('new_condition[value]', null, null, $severityNames);
 		break;
 
-	case CONDITION_TYPE_MAINTENANCE:
-		$condition = _('maintenance');
-		break;
-
 	case CONDITION_TYPE_DRULE:
 		$action_tab->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
@@ -421,9 +417,9 @@ $operation_tab
 	);
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operation_tab->addRow(_('Pause operations while in maintenance'),
-		(new CCheckBox('maintenance_mode', ACTION_MAINTENANCE_MODE_PAUSE))
-			->setChecked($data['action']['maintenance_mode'] == ACTION_MAINTENANCE_MODE_PAUSE)
+	$operation_tab->addRow(_('Pause operations for suppressed problems'),
+		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
 	);
 }
 

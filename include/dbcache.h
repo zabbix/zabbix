@@ -818,4 +818,50 @@ const char	*zbx_dc_get_session_token(void);
 zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
 void	zbx_dc_cleanup_data_sessions(void);
 
+/* maintenance support */
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	maintenanceid;
+	int		maintenance_from;
+	unsigned char	maintenance_type;
+	unsigned char	maintenance_status;
+
+	unsigned int	flags;
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID		0x0001
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM	0x0002
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE	0x0003
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS	0x0004
+}
+zbx_host_maintenance_diff_t;
+
+/* event maintenance query data, used to get event maintenances from cache */
+typedef struct
+{
+	zbx_uint64_t			eventid;		/* [IN] eventid */
+	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
+	zbx_uint64_t			triggerid;		/* [-] triggerid */
+	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
+	zbx_vector_ptr_t		tags;			/* [IN] event tags */
+	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
+								/* (maintenanceid, suppress_until) pairs */
+}
+zbx_event_suppress_query_t;
+
+#define ZBX_MAINTENANCE_UPDATE_TRUE	1
+#define ZBX_MAINTENANCE_UPDATE_FALSE	0
+
+void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
+int	zbx_dc_update_maintenances(void);
+void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates);
+void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates);
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids);
+int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids);
+
+void	zbx_dc_maintenance_set_update_flags(void);
+void	zbx_dc_maintenance_reset_update_flag(int timer);
+int	zbx_dc_maintenance_check_update_flag(int timer);
+int	zbx_dc_maintenance_check_update_flags(void);
+
 #endif

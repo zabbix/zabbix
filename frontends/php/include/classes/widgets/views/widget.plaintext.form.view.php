@@ -44,7 +44,9 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::get
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));
 
 // Show text as HTML.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_as_html']), CWidgetHelper::getCheckBox($fields['show_as_html']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_as_html']),
+	CWidgetHelper::getCheckBox($fields['show_as_html'])
+);
 
 // Dynamic items.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));

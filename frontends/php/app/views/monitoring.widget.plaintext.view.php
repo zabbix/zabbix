@@ -58,6 +58,7 @@ else {
 				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))->addClass(ZBX_STYLE_NOWRAP)
 			];
 			if ($data['style'] == STYLE_LEFT) {
+				$table->setHeadingColumn(1);
 				$table_row[] = ($data['same_host']
 					? ''
 					: $data['items'][$history_item['itemid']]['hosts'][0]['name'].NAME_DELIMITER).
