@@ -104,4 +104,14 @@ class CTextArea extends CTag {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
 	}
+
+	public function setEnabled($value) {
+		if ($value) {
+			$this->removeAttribute('disabled');
+		}
+		else {
+			$this->setAttribute('disabled', 'disabled');
+		}
+		return $this;
+	}
 }

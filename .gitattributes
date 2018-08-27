@@ -20,6 +20,7 @@ frontends/php/audio/alarm_warning.wav -text svneol=unset#audio/x-wav
 frontends/php/audio/no_sound.wav -text svneol=unset#audio/x-wav
 frontends/php/favicon.ico -text svneol=unset#image/x-icon
 frontends/php/fonts/DejaVuSans.ttf -text svneol=unset#application/x-font-ttf
+frontends/php/fonts/arial.ttf -text svneol=unset#application/x-font-ttf
 frontends/php/images/general/arrow_down.png -text svneol=unset#image/png
 frontends/php/images/general/arrow_up.png -text svneol=unset#image/png
 frontends/php/images/general/no_icon.png -text svneol=unset#image/png
