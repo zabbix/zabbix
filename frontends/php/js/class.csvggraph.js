@@ -87,7 +87,7 @@ jQuery(function ($) {
 			destroyHintbox(graph);
 		});
 
-		repositionHintBox(e, graph.hintBoxItem);
+		repositionHintBox(e, graph);
 		graph
 			.off('mouseup', hintboxSilentMode)
 			.on('mouseup', {graph: graph}, hintboxSilentMode);
@@ -311,8 +311,10 @@ jQuery(function ($) {
 	}
 
 	// Position hintbox near current mouse position.
-	function repositionHintBox(e, hbox) {
-		var l = (document.body.clientWidth >= e.screenX + hbox.width()) ? e.offsetX : e.offsetX - hbox.width(),
+	function repositionHintBox(e, graph) {
+		var hbox = $(graph.hintBoxItem),
+			offsetX = e.clientX - graph.offset().left,
+			l = (document.body.clientWidth >= offsetX + hbox.width()) ? offsetX : offsetX - hbox.width(),
 			t = (window.screen.height >= e.screenY + hbox.height() + 60) ? e.offsetY + 60 : e.offsetY - hbox.height();
 		hbox.css({'left': l, 'top': t});
 	}
@@ -475,7 +477,8 @@ jQuery(function ($) {
 					hbox.find('> div').replaceWith(html);
 				}
 
-				repositionHintBox(e, hbox);
+				graph.hintBoxItem = hbox;
+				repositionHintBox(e, graph);
 			}
 		}
 		else {
