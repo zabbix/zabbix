@@ -268,7 +268,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 */
 		// Checkbox: Selected items only.
 		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
-			->setDefault(SVG_GRAPH_PROBLEMS_SHOW)
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
 				'jQuery("#graph_item_problems, #problemhosts, #problem_name, #problemhosts_select")'.

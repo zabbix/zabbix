@@ -246,7 +246,7 @@ class CEvent extends CApiService {
 				'OR er1.r_eventid IS NULL'
 			],
 			'order'		=> [],
-			'group'		=> [],
+			'group'		=> ['e.eventid', 'er1.r_eventid'],
 			'limit'		=> null
 		];
 
