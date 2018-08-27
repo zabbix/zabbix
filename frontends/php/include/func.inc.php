@@ -1783,6 +1783,16 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
+		$config = select_config();
+
+		if ($config['http_login_form'] == ZBX_AUTH_FORM_HTTP && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
+			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
+			redirect($redirect_to->toString());
+
+			exit;
+		}
+
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
