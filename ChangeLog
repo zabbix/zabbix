@@ -1,6 +1,7 @@
 Changes for 4.0.0beta1
 
 New features:
+A.F.I..... [ZBXNEXT-4573] added support of HTTP authentication as optional authentication mechanism (gcalenko, Ivo, vmurzins)
 A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
 ..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
 A......... [ZBXNEXT-4656] added strict validation of hostprototype.create() and hostprototype.update() methods; added audit logging for these methods (Ivo, Sasha)

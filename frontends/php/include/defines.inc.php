@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'4.0.0beta1');
 define('ZABBIX_API_VERSION',	'4.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050146);
+define('ZABBIX_DB_VERSION',		3050155);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -107,7 +107,14 @@ define('ZBX_FONT_NAME', 'DejaVuSans');
 
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
-define('ZBX_AUTH_HTTP',		2);
+define('ZBX_AUTH_HTTP_DISABLED',	0);
+define('ZBX_AUTH_HTTP_ENABLED',		1);
+define('ZBX_AUTH_LDAP_DISABLED',	0);
+define('ZBX_AUTH_LDAP_ENABLED',		1);
+define('ZBX_AUTH_FORM_ZABBIX',	0);
+define('ZBX_AUTH_FORM_HTTP',	1);
+define('ZBX_AUTH_CASE_INSENSITIVE',	0);
+define('ZBX_AUTH_CASE_SENSITIVE',	1);
 
 define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
@@ -803,7 +810,8 @@ define('LINE_TYPE_BOLD',	1);
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);
-define('GROUP_GUI_ACCESS_DISABLED', 2);
+define('GROUP_GUI_ACCESS_LDAP', 	2);
+define('GROUP_GUI_ACCESS_DISABLED', 3);
 
 /**
  * @see access_deny()
