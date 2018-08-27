@@ -212,7 +212,7 @@ jQuery(function ($) {
 						circle_nodes = nodes[i].querySelectorAll('circle'),
 						points = [];
 
-					for (var c = 0, cl = circle_nodes.length; cl > c; c ++) {
+					for (var c = 0, cl = circle_nodes.length; cl > c; c++) {
 						if (test_x >= parseInt(circle_nodes[c].getAttribute('cx'))) {
 							points.push(circle_nodes[c]);
 						}
@@ -249,7 +249,7 @@ jQuery(function ($) {
 					while (index) {
 						index--;
 						point = direction[index].substr(1).split(',');
-						if (x > parseInt(point[0])) {
+						if (x >= parseInt(point[0])) {
 							px = point[0];
 							py = point[1];
 							pv = label[data_set === 'line' ? index : Math.ceil(index / 2)];
@@ -288,9 +288,9 @@ jQuery(function ($) {
 	function setHelperPosition(e, graph) {
 		var data = graph.data('options');
 		graph.find('.svg-helper').attr({
-			'x1': e.offsetX,
+			'x1': e.clientX - graph.offset().left,
 			'y1': data.dimY,
-			'x2': e.offsetX,
+			'x2': e.clientX - graph.offset().left,
 			'y2': data.dimY + data.dimH
 		});
 	}
@@ -324,12 +324,12 @@ jQuery(function ($) {
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
 			hbox = graph.data('hintbox') || null,
+			offsetX = e.clientX - graph.offset().left,
 			html = null,
 			inx = false;
-
 		if (data.boxing === false) {
 			// Check if mouse in the horizontal area in which hintbox must be shown.
-			inx = (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW);
+			inx = (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW);
 
 			// Show problems when mouse is in the 15px high area under the graph canvas.
 			if (data.showProblems && data.isHintBoxFrozen === false && inx && data.dimY + data.dimH <= e.offsetY
@@ -386,7 +386,7 @@ jQuery(function ($) {
 				setHelperPosition(e, graph);
 
 				// Find values.
-				var points = findValues(graph[0], e.offsetX),
+				var points = findValues(graph[0], offsetX),
 					show_hint = false,
 					xy_point = false,
 					foot = null,
