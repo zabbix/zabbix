@@ -1529,12 +1529,12 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	int			i, ret = SUCCEED;
 
 	table_ids_t		*table_ids;
-	zbx_vector_ptr_t	tables;
+	zbx_vector_ptr_t	px_tables;
 	const ZBX_TABLE		*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&tables);
+	zbx_vector_ptr_create(&px_tables);
 
 	DBbegin();
 
@@ -1558,7 +1558,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		table_ids = (table_ids_t *)zbx_malloc(NULL, sizeof(table_ids_t));
 		table_ids->table = table;
 		zbx_vector_uint64_create(&table_ids->ids);
-		zbx_vector_ptr_append(&tables, table_ids);
+		zbx_vector_ptr_append(&px_tables, table_ids);
 
 		ret = process_proxyconfig_table(table, &jp_obj, &table_ids->ids, &error);
 	}
@@ -1572,9 +1572,9 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = tables.values_num - 1; 0 <= i; i--)
+		for (i = px_tables.values_num - 1; 0 <= i; i--)
 		{
-			table_ids = (table_ids_t *)tables.values[i];
+			table_ids = (table_ids_t *)px_tables.values[i];
 
 			if (0 == table_ids->ids.values_num)
 				continue;
@@ -1597,14 +1597,14 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		zbx_free(sql);
 	}
 
-	for (i = 0; i < tables.values_num; i++)
+	for (i = 0; i < px_tables.values_num; i++)
 	{
-		table_ids = (table_ids_t *)tables.values[i];
+		table_ids = (table_ids_t *)px_tables.values[i];
 
 		zbx_vector_uint64_destroy(&table_ids->ids);
 		zbx_free(table_ids);
 	}
-	zbx_vector_ptr_destroy(&tables);
+	zbx_vector_ptr_destroy(&px_tables);
 
 	DBend(ret);
 
