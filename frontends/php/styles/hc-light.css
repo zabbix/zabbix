@@ -2874,7 +2874,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-width: 2px; }
 
 .svg-point-highlight {
-  fill: #000; }
+  fill: #000;
+  fill-opacity: 1; }
 
 .svg-graph-hintbox-item-color {
   margin: 3px 10px 3px 3px;
