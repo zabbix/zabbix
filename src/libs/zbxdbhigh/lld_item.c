@@ -903,6 +903,11 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else
 	{
+		int			simple_interval;
+		zbx_custom_interval_t	*custom_intervals;
+		zbx_token_t		token;
+		char			*errmsg;
+
 		switch (flag)
 		{
 			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
@@ -911,6 +916,25 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 
 				*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
 						(0 != item->itemid ? "update" : "create"));
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
+				if (SUCCEED == zbx_token_find(item->delay, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+						0 != (token.type & ZBX_TOKEN_USER_MACRO))
+				{
+					return;
+				}
+
+				errmsg = NULL;
+				if (SUCCEED == zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals,
+						&errmsg))
+				{
+					zbx_custom_interval_free(custom_intervals);
+					return;
+				}
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
+						(0 != item->itemid ? "update" : "create"), errmsg);
+				zbx_free(errmsg);
 				break;
 			default:
 				return;
