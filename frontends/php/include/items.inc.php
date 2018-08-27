@@ -1004,7 +1004,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	]);
+	], ZBX_PROBLEM_SUPPRESSED_TRUE);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {

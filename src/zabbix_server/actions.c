@@ -381,41 +381,17 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		zbx_free(period);
 	}
-	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
+	else if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
 	{
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_IN:
-				result = DBselect(
-						"select count(*)"
-						" from hosts h,items i,functions f,triggers t"
-						" where h.hostid=i.hostid"
-							" and h.maintenance_status=%d"
-							" and i.itemid=f.itemid"
-							" and f.triggerid=t.triggerid"
-							" and t.triggerid=" ZBX_FS_UI64,
-						HOST_MAINTENANCE_STATUS_ON,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+			case CONDITION_OPERATOR_YES:
+				if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
 					ret = SUCCEED;
-				DBfree_result(result);
 				break;
-			case CONDITION_OPERATOR_NOT_IN:
-				result = DBselect(
-						"select count(*)"
-						" from hosts h,items i,functions f,triggers t"
-						" where h.hostid=i.hostid"
-							" and h.maintenance_status=%d"
-							" and i.itemid=f.itemid"
-							" and f.triggerid=t.triggerid"
-							" and t.triggerid=" ZBX_FS_UI64,
-						HOST_MAINTENANCE_STATUS_OFF,
-						event->objectid);
-
-				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
+			case CONDITION_OPERATOR_NO:
+				if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
 					ret = SUCCEED;
-				DBfree_result(result);
 				break;
 			default:
 				ret = NOTSUPPORTED;
@@ -2149,7 +2125,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 			actionids->values_num);
 
 	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,maintenance_mode,ack_shortdata,ack_longdata"
+				"r_longdata,pause_suppressed,ack_shortdata,ack_longdata"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2177,7 +2153,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		action->longdata = zbx_strdup(NULL, row[6]);
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
 		action->r_longdata = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(action->maintenance_mode, row[9]);
+		ZBX_STR2UCHAR(action->pause_suppressed, row[9]);
 		action->ack_shortdata = zbx_strdup(NULL, row[10]);
 		action->ack_longdata = zbx_strdup(NULL, row[11]);
 		action->name = zbx_strdup(NULL, row[1]);
