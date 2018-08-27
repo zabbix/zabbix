@@ -736,28 +736,12 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 			$tags_shown = 0;
 
 			foreach ($event_tags as $tag) {
-				$separator = ': ';
-
-				switch ($tag_name_format) {
-					case PROBLEMS_TAG_NAME_NONE:
-						$tagname = '';
-						$separator = '';
-						break;
-
-					case PROBLEMS_TAG_NAME_SHORTENED:
-						$tagname = substr($tag['tag'], 0, 3);
-						break;
-
-					default:
-						$tagname = $tag['tag'];
-				}
-
-				$value = $tagname.(($tag['value'] === '') ? '' : $separator.$tag['value']);
+				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
 					$tags[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
-						->setHint($tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']));
+						->setHint(getTagString($tag));
 					$tags_shown++;
 					if ($tags_shown >= $list_tags_count) {
 						break;
@@ -771,7 +755,7 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 				$hint_content = [];
 
 				foreach ($event['tags'] as $tag) {
-					$value = $tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value']);
+					$value = getTagString($tag);
 					$hint_content[$event['eventid']][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint($value);
@@ -788,13 +772,35 @@ function makeEventsTags(array $events, $html = true, $list_tags_count = EVENTS_L
 			// Show all and uncut for CSV.
 
 			foreach ($event['tags'] as $tag) {
-				$value = $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
-				$tags[$event['eventid']][] = $value;
+				$tags[$event['eventid']][] = getTagString($tag);
 			}
 		}
 	}
 
 	return $tags;
+}
+
+/**
+ * Returns tag name in selected format.
+ *
+ * @param array  $tag
+ * @param string $tag['tag']
+ * @param string $tag['value']
+ * @param int    $tag_name_format  PROBLEMS_TAG_NAME_*
+ *
+ * @return string
+ */
+function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
+	switch ($tag_name_format) {
+		case PROBLEMS_TAG_NAME_NONE:
+			return $tag['value'];
+
+		case PROBLEMS_TAG_NAME_SHORTENED:
+			return substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
+
+		default:
+			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
+	}
 }
 
 function getLastEvents($options) {
