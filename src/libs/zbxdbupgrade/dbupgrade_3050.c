@@ -1834,9 +1834,6 @@ static int	DBpatch_3050146(void)
 
 static int	DBpatch_3050147(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"http_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1844,9 +1841,6 @@ static int	DBpatch_3050147(void)
 
 static int	DBpatch_3050148(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"http_login_form", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1854,9 +1848,6 @@ static int	DBpatch_3050148(void)
 
 static int	DBpatch_3050149(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"http_strip_domains", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1864,9 +1855,6 @@ static int	DBpatch_3050149(void)
 
 static int	DBpatch_3050150(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"http_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1874,9 +1862,6 @@ static int	DBpatch_3050150(void)
 
 static int	DBpatch_3050151(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1884,9 +1869,6 @@ static int	DBpatch_3050151(void)
 
 static int	DBpatch_3050152(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"ldap_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
@@ -1900,11 +1882,7 @@ static int	DBpatch_3050153(void)
 		return SUCCEED;
 
 	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
-	res = DBexecute(
-		"update config"
-		" set authentication_type=0,"
-		"  http_auth_enabled=1"
-		" where authentication_type=2");
+	res = DBexecute("update config set authentication_type=0,http_auth_enabled=1 where authentication_type=2");
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
@@ -1939,10 +1917,7 @@ static int	DBpatch_3050155(void)
 
 	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
 	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_SENSITIVE. */
-	res = DBexecute(
-		"update config"
-		" set ldap_configured=1, ldap_case_sensitive=1"
-		" where authentication_type=1");
+	res = DBexecute("update config set ldap_configured=1,ldap_case_sensitive=1 where authentication_type=1");
 
 	if (ZBX_DB_OK > res)
 		return FAIL;
