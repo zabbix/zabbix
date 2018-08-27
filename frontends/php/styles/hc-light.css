@@ -1600,7 +1600,7 @@ button {
   background: url(../img/icon-sprite.svg) no-repeat -6px -510px; }
 
 .btn-info-clock {
-  background: url(../img/icon-sprite.svg) no-repeat -6px -726px; }
+  background: url(../img/icon-sprite.svg) no-repeat -87px -762px; }
 
 .ui-tabs-nav .btn-time,
 .ui-tabs-nav .filter-trigger {
@@ -4472,6 +4472,9 @@ input[type=text].range-control {
 
 .btn-sound-off {
   background: url(../img/icon-sprite.svg) no-repeat -165px -510px; }
+
+.btn-info-clock {
+  background: url(../img/icon-sprite.svg) no-repeat -246px -762px; }
 
 .top-nav-help {
   background: url(../img/icon-sprite.svg) no-repeat -162px -32px !important; }
