@@ -36,6 +36,12 @@ if(array_key_exists('jq_templates', $widget_view)) {
 	}
 }
 
+if(array_key_exists('js_includes', $widget_view)) {
+	foreach ($widget_view['js_includes'] as $path) {
+		$output['body'] .= '<script src="'.$path.'"></script>'."\n";
+	}
+}
+
 if(array_key_exists('scripts', $widget_view)) {
 	$output['body'] .= get_js(implode("\n", $widget_view['scripts']));
 }
