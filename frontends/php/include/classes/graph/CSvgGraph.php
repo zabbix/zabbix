@@ -323,7 +323,7 @@ class CSvgGraph extends CSvg {
 			5 => 'H:i:s',					// 5 seconds
 			10 => 'H:i:s',					// 10 seconds
 			30 => 'H:i:s',					// 30 seconds
-			SEC_PER_MIN => 'H:i',			// 1 minute
+			SEC_PER_MIN => 'H:i:s',			// 1 minute
 			SEC_PER_MIN * 2 => 'H:i',		// 2 minutes
 			SEC_PER_MIN * 5 => 'H:i',		// 5 minutes
 			SEC_PER_MIN * 15 => 'H:i',		// 15 minutes
