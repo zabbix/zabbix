@@ -259,7 +259,9 @@ jQuery(function ($) {
 					break;
 			}
 
-			data_sets.push({g: nodes[i], x: px, y: py, v: pv});
+			if (pv !== null) {
+				data_sets.push({g: nodes[i], x: px, y: py, v: pv});
+			}
 		}
 
 		return data_sets;
