@@ -3679,9 +3679,11 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_update(zbx_vmware_service_t *service, CURL* easyhandle)
+static void	vmware_service_update(zbx_vmware_service_t *service)
 {
 	const char		*__function_name = "vmware_service_update";
+
+	CURL			*easyhandle = NULL;
 	CURLoption		opt;
 	CURLcode		err;
 	struct curl_slist	*headers = NULL;
@@ -3700,7 +3702,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service, CURL* easyhandl
 
 	zbx_vector_str_create(&hvs);
 
-	if (NULL == easyhandle)
+	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");
 		goto out;
@@ -3983,9 +3985,11 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vec
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_update_perf(zbx_vmware_service_t *service, CURL* easyhandle)
+static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 {
 	const char			*__function_name = "vmware_service_update_perf";
+
+	CURL				*easyhandle = NULL;
 	CURLoption			opt;
 	CURLcode			err;
 	struct curl_slist		*headers = NULL;
@@ -4000,7 +4004,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service, CURL* easy
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
-	if (NULL == easyhandle)
+	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		error = zbx_strdup(error, "cannot initialize cURL library");
 		goto out;
@@ -4513,7 +4517,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	zbx_vmware_service_t	*service = NULL;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t			last_stat_time;
-	CURL* easyhandle = curl_easy_init();
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -4603,11 +4606,11 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			switch (task)
 			{
 				case ZBX_VMWARE_TASK_UPDATE:
-					vmware_service_update(service, easyhandle);
+					vmware_service_update(service);
 					updated_services++;
 					break;
 				case ZBX_VMWARE_TASK_UPDATE_PERF:
-					vmware_service_update_perf(service, easyhandle);
+					vmware_service_update_perf(service);
 					updated_services++;
 					break;
 				case ZBX_VMWARE_TASK_REMOVE:
