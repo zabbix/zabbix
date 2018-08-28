@@ -1816,6 +1816,14 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		goto out;
 	}
 
+	if (NULL != simple_interval && SEC_PER_DAY < *simple_interval)
+	{
+		ret = FAIL;
+		interval_type = "update";
+		goto out;
+	}
+
+
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
 		goto out;
 
