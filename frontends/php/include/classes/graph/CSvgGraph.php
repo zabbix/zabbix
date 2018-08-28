@@ -596,7 +596,7 @@ class CSvgGraph extends CSvg {
 		$res = [];
 
 		for ($base = 10; $base > .01; $base /= 10) {
-			$mul = $max ? 1 / pow($base, floor(log10($max))) : 1;
+			$mul = ($max > 0) ? 1 / pow($base, floor(log10($max))) : 1;
 			$max10 = ceil($mul * $max) / $mul;
 			$min10 = floor($mul * $min) / $mul;
 			$delta = $max10 - $min10;
