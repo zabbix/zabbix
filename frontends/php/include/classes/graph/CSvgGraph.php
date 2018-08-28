@@ -722,7 +722,6 @@ class CSvgGraph extends CSvg {
 		/**
 		 * $threshold          is a minimal period of time at what we assume that data point is missed;
 		 * $average_distance   is an average distance between existing data points;
-		 * $added_value        is a value that will be applied in time gaps that are longer than $threshold;
 		 * $gap_interval       is a time distance between missing points used to fulfill gaps of missing data.
 		 *                     It's unique for each gap.
 		 */
