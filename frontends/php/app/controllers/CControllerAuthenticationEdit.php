@@ -124,7 +124,7 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Authentication'));
+		$response->setTitle(_('Configuration of authentication'));
 		$this->setResponse($response);
 	}
 }
