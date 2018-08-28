@@ -1046,8 +1046,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
-			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle " ZBX_FS_DBL " sec during "
-					ZBX_FS_DBL " sec]", get_process_type_string(process_type), process_num,
+			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
+					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
+					get_process_type_string(process_type), process_num,
 					manager.queued_num, manager.processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;

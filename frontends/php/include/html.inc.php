@@ -818,6 +818,58 @@ function makeInformationIcon($message) {
 }
 
 /**
+ * Renders an icon for host in maintenance.
+ *
+ * @param int    $type         Type of the maintenance.
+ * @param string $name         Name of the maintenance.
+ * @param string $description  Description of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeMaintenanceIcon($type, $name, $description) {
+	$hint = $name.' ['.($type
+		? _('Maintenance without data collection')
+		: _('Maintenance with data collection')).']';
+
+	if ($description !== '') {
+		$hint .= "\n".$description;
+	}
+
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint($hint);
+}
+
+/**
+ * Renders an icon for suppressed problem.
+ *
+ * @param array  $icon_data
+ * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
+ * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeSuppressedProblemIcon(array $icon_data) {
+	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+
+	CArrayHelper::sort($icon_data, ['maintenance_name']);
+	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
+
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INVISIBLE)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint(
+			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
+				? zbx_date2str(TIME_FORMAT, $suppress_until)
+				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
+			).
+			"\n".
+			_s('Maintenance: %1$s', $maintenance_names)
+		);
+}
+
+/**
  * Renders an action icon.
  *
  * @param array  $icon_data
@@ -842,6 +894,12 @@ function makeActionIcon(array $icon_data) {
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);
+	}
+
+	if (array_key_exists('aria-label', $icon_data)) {
+		$icon
+			->addItem($icon_data['aria-label'])
+			->addClass(ZBX_STYLE_INLINE_SR_ONLY);
 	}
 
 	return $icon;

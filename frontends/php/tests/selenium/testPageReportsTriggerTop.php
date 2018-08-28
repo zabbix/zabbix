@@ -76,7 +76,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					'date' => [
 						'from' => 'now/d',
 						'to' => 'now/d'
-					],
+					]
 				]
 			],
 			[
@@ -96,8 +96,8 @@ class testPageReportsTriggerTop extends CWebTest {
 					'host_group' => 'Zabbix servers',
 					'host' => 'ЗАББИКС Сервер',
 					'date' => [
-						'from' => '2018-01-01 00:00'
-					],
+						'from' => '2018-08-18 00:00'
+					]
 				]
 			],
 			[
@@ -216,8 +216,10 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a'));
-			$this->zbxTestTextPresent($data['result']);
+			foreach ($data['result'] as $result) {
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a'));
+				$this->zbxTestAssertElementPresentXpath('//tbody//td[2]//a[text()="'.$result.'"]');
+			}
 		}
 		else {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//tr[@class="nothing-to-show"]'));

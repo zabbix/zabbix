@@ -148,7 +148,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 	}
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
 
 	return device;
 }
@@ -186,7 +186,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 end:
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)device);
 
 	return device;
 }

@@ -48,7 +48,7 @@ class CRegexValidator extends CValidator
 			return false;
 		}
 
-		// escape '/' since Zabbix server threats them as literal characters.
+		// escape '/' since Zabbix server treats them as literal characters.
 		$value = str_replace('/', '\/', $value);
 
 		// validate through preg_match
