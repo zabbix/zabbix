@@ -450,6 +450,12 @@ class CSvgGraph extends CSvg {
 	 * Calculate canvas size, margins and offsets for graph canvas inside SVG element.
 	 */
 	protected function calculateDimensions() {
+		// Canvas height must be specified before call self::getValuesGridWithPosition.
+		$this->offset_top = 10;
+		$this->offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
+		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
+		$this->canvas_y = $this->offset_top;
+
 		// Set missing properties for left Y axis.
 		if ($this->left_y_min === null) {
 			$this->left_y_min = $this->min_value_left ? : 0;
@@ -507,11 +513,7 @@ class CSvgGraph extends CSvg {
 		}
 
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
-		$this->offset_top = 10;
 		$this->canvas_x = $this->offset_left;
-		$this->canvas_y = $this->offset_top;
-		$this->offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
-		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
 	}
 
 	/**
