@@ -318,9 +318,6 @@ class CSvgGraph extends CSvg {
 	 * @return array
 	 */
 	public function getTimeGridWithPosition() {
-		$period = $this->time_till - $this->time_from;
-		// 100px is grid cell desired size.
-		$time_interval = (100 * $period) / $this->canvas_width;
 		$intervals = [
 			1 => 'H:i:s',					// 1 second
 			5 => 'H:i:s',					// 5 seconds
@@ -335,7 +332,7 @@ class CSvgGraph extends CSvg {
 			SEC_PER_HOUR * 3 => 'H:i',		// 3 hours
 			SEC_PER_HOUR * 6 => 'H:i',		// 6 hours
 			SEC_PER_HOUR * 12 => 'H:i',		// 12 hours
-			SEC_PER_DAY => 'n-d',			// 1 day
+			SEC_PER_DAY => 'H:i',			// 1 day
 			SEC_PER_WEEK => 'n-d',			// 1 week
 			SEC_PER_WEEK * 2 => 'n-d',		// 2 weeks
 			SEC_PER_MONTH => 'n-d',			// 30 days
@@ -346,18 +343,14 @@ class CSvgGraph extends CSvg {
 			SEC_PER_YEAR * 2 => 'Y-n-d'		// 2 years
 		];
 
-		// Default inteval values.
-		$distance = SEC_PER_YEAR * 5;
+		$period = $this->time_till - $this->time_from;
+		$step = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
 		$time_fmt = 'Y-n-d';
-		$step = 0;
 
 		foreach ($intervals as $interval => $format) {
-			$time = abs($interval - $time_interval);
-
-			if ($time < $distance) {
-				$distance = $time;
-				$step = $interval;
+			if ($interval >= $period) {
 				$time_fmt = $format;
+				break;
 			}
 		}
 
