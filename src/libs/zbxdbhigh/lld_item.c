@@ -943,19 +943,21 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					return;
 				}
 
-				if (SUCCEED != is_time_suffix(*field, &history, ZBX_LENGTH_UNLIMITED))
+				if (SUCCEED == is_time_suffix(*field, &history, ZBX_LENGTH_UNLIMITED))
+				{
+					if (0 == history || ZBX_HK_HISTORY_MIN <= history)
+						return;
+
+					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
+							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
+							*field);
+
+				}
+				else
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
 							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
 				}
-				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
-							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
-							*field);
-				}
-				else
-					return;
 				break;
 			default:
 				return;
