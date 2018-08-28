@@ -63,14 +63,14 @@ $scripts[] =
 $scripts[] =
 	'function updateGraphPreview() {'.
 		'var $preview = jQuery("#svg-graph-preview"),'.
-			'$form = jQuery("#widget_dialogue_form"),'.
+			'$form = jQuery("#'.$form->getId().'"),'.
 			'url = new Curl("zabbix.php"),'.
 			'data = {'.
 				'uniqueid: 0,'.
 				'preview: 1,'.
 				'content_width: $preview.width(),'.
 				'content_height: $preview.height() - 10,'.
-				'fields: JSON.stringify(jQuery("#'.$form->getId().'").serializeJSON())'.
+				'fields: JSON.stringify($form.serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
