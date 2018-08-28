@@ -951,7 +951,6 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
 							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
 							*field);
-
 				}
 				else
 				{
