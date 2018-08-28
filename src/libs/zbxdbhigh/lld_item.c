@@ -575,7 +575,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	DB_ROW				row;
 	zbx_lld_item_t			*item, *master;
 	zbx_lld_item_preproc_t		*preproc_op;
-	zbx_lld_item_prototype_t	*item_prototype;
+	const zbx_lld_item_prototype_t	*item_prototype;
 	zbx_uint64_t			db_valuemapid, db_interfaceid, itemid, master_itemid;
 	zbx_vector_uint64_t		parent_itemids;
 	int				i, index;
@@ -589,11 +589,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
-		const zbx_lld_item_prototype_t	*itemprototype;
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
 
-		itemprototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
-
-		zbx_vector_uint64_append(&parent_itemids, itemprototype->itemid);
+		zbx_vector_uint64_append(&parent_itemids, item_prototype->itemid);
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -629,7 +627,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
 		item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
 
@@ -826,7 +824,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
 		if (master_itemid != item_prototype->master_itemid)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM;
