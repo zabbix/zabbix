@@ -46,9 +46,6 @@
 #	define ZBX_HOST_TLS_OFFSET	0
 #endif
 
-
-struct zbx_dbsync;
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbsync_preproc_row_func_t                                    *
@@ -79,7 +76,7 @@ typedef struct
 }
 zbx_dbsync_row_t;
 
-typedef struct zbx_dbsync
+struct zbx_dbsync
 {
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
 	unsigned char			mode;
@@ -109,8 +106,7 @@ typedef struct zbx_dbsync
 	zbx_uint64_t	add_num;
 	zbx_uint64_t	update_num;
 	zbx_uint64_t	remove_num;
-}
-zbx_dbsync_t;
+};
 
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache);
 void	zbx_dbsync_free_env(void);
