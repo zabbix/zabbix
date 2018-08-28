@@ -70,7 +70,7 @@ $filter = (new CFilter())
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 
 if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass('hidden');
+	$filter->addClass(ZBX_STYLE_HIDDEN);
 }
 $chartsWidget->addItem($filter);
 

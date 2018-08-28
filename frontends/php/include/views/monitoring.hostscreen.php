@@ -81,7 +81,7 @@ else {
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 
 	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-		$filter->addClass('hidden');
+		$filter->addClass(ZBX_STYLE_HIDDEN);
 	}
 	$screen_widget->addItem($filter);
 

@@ -207,7 +207,7 @@ $filter = (new CFilter())
 	->addTimeSelector($timeline['from'], $timeline['to']);
 
 if ($page['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass('hidden');
+	$filter->addClass(ZBX_STYLE_HIDDEN);
 }
 $widget->addItem($filter);
 
