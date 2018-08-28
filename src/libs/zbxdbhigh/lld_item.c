@@ -877,6 +877,33 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_user_macro                                                    *
+ *                                                                            *
+ * Purpose: checks if string is user macro                                    *
+ *                                                                            *
+ * Parameters: str - [IN] string to validate                                  *
+ *                                                                            *
+ * Returns: SUCCEED - either "{$MACRO}" or "{$MACRO:"{#MACRO}"}"              *
+ *          FAIL    - not user macro or contains other characters for example:*
+ *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_user_macro(const char *str)
+{
+	zbx_token_t	token;
+
+	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
+			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
+			0 != token.token.l || '\0' != str[token.token.r + 1])
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_validate_item_field                                          *
  *                                                                            *
  ******************************************************************************/
@@ -905,7 +932,6 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	{
 		int			value;
 		zbx_custom_interval_t	*custom_intervals;
-		zbx_token_t		token;
 		char			*errmsg;
 
 		switch (flag)
@@ -918,11 +944,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						(0 != item->itemid ? "update" : "create"));
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
-				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
-						0 != (token.type & ZBX_TOKEN_USER_MACRO))
-				{
+				if (SUCCEED == is_user_macro(*field))
 					return;
-				}
 
 				errmsg = NULL;
 				if (SUCCEED == zbx_interval_preproc(*field, NULL, &custom_intervals, &errmsg))
@@ -936,11 +959,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				zbx_free(errmsg);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
-				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
-						0 != (token.type & ZBX_TOKEN_USER_MACRO))
-				{
+				if (SUCCEED == is_user_macro(*field))
 					return;
-				}
 
 				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
 				{
@@ -958,11 +978,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				}
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
-				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
-						0 != (token.type & ZBX_TOKEN_USER_MACRO))
-				{
+				if (SUCCEED == is_user_macro(*field))
 					return;
-				}
 
 				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
 				{
