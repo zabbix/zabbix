@@ -2870,9 +2870,7 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 
 		if (0 != history_items.values_num)
 		{
-			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
-
-			if (0 == history_num)
+			if (0 == (history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids)))
 			{
 				LOCK_CACHE;
 				hc_push_items(&history_items);
