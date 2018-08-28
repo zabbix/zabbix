@@ -925,8 +925,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				}
 
 				errmsg = NULL;
-				if (SUCCEED == zbx_interval_preproc(*field, NULL, &custom_intervals,
-						&errmsg))
+				if (SUCCEED == zbx_interval_preproc(*field, NULL, &custom_intervals, &errmsg))
 				{
 					zbx_custom_interval_free(custom_intervals);
 					return;
