@@ -598,8 +598,10 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param array $triggerids
-	 * @param array $db_triggers
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $triggerids   [IN/OUT]
+	 * @param array $db_triggers  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

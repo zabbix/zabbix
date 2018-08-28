@@ -673,8 +673,10 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * @param array $itemids
-	 * @param array $db_items
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $itemids   [IN/OUT]
+	 * @param array $db_items  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

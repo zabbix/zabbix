@@ -25,6 +25,8 @@
 class CGraphPrototypeManager {
 
 	/**
+	 * Deletes graph prototypes, inherited graph prototypes, discovered graphs and screen items.
+	 *
 	 * @param array $graphids
 	 */
 	public static function delete(array $graphids) {

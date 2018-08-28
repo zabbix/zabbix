@@ -507,8 +507,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param array $triggerids
-	 * @param array $db_triggers
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $triggerids   [IN/OUT]
+	 * @param array $db_triggers  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -537,8 +539,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if ($db_trigger['templateid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot delete templated trigger prototype "%1$s:%2$s".', $db_trigger['description'],
-					CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
-				));
+						CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
+					)
+				);
 			}
 		}
 	}

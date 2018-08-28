@@ -25,6 +25,9 @@
 class CTriggerManager {
 
 	/**
+	 * Deletes triggers, inherited triggers, dependent triggers, tags, map elements, disables actions and deletes action
+	 * conditions, updates IT services and performs house keeping of events.
+	 *
 	 * @param array $triggerids
 	 */
 	public static function delete(array $triggerids) {

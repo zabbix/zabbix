@@ -25,6 +25,9 @@
 class CItemManager {
 
 	/**
+	 * Deletes items, inherited items, dependent items, graphs, graph prototypes, triggers, trigger prototypes,
+	 * screen items, performs profile cleaning and housekeeping.
+	 *
 	 * @param array $itemids
 	 */
 	public static function delete(array $itemids) {

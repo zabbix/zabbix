@@ -25,6 +25,8 @@
 class CGraphManager {
 
 	/**
+	 * Deletes graphs, inherited graphs, screen items and performs profile cleaning.
+	 *
 	 * @param array $graphids
 	 */
 	public static function delete(array $graphids) {

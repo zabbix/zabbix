@@ -544,8 +544,10 @@ class CGraphPrototype extends CGraphGeneral {
 	}
 
 	/**
-	 * @param array $graphids
-	 * @param array $db_graphs
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @param array $graphids   [IN/OUT]
+	 * @param array $db_graphs  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

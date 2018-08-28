@@ -25,6 +25,9 @@
 class CItemPrototypeManager {
 
 	/**
+	 * Deletes item prototypes, inherited item prototypes, dependent items and item prototypes, discovered items,
+	 * graph prototypes, trigger prototypes, screen items, performs application prototype unlinking.
+	 *
 	 * @param array $itemids
 	 */
 	public static function delete(array $itemids) {
@@ -202,5 +205,4 @@ class CItemPrototypeManager {
 			}
 		}
 	}
-
 }
