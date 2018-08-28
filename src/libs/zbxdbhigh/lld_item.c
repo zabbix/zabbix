@@ -925,16 +925,22 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				}
 
 				errmsg = NULL;
-				if (SUCCEED == zbx_interval_preproc(*field, NULL, &custom_intervals,
-						&errmsg))
+				if (SUCCEED == zbx_interval_preproc(*field, &value, &custom_intervals, &errmsg))
 				{
 					zbx_custom_interval_free(custom_intervals);
-					return;
-				}
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
-						(0 != item->itemid ? "update" : "create"), errmsg);
-				zbx_free(errmsg);
+					if (SEC_PER_DAY >= value)
+						return;
+
+					*error = zbx_strdcatf(*error, "Cannot %s item: update interval is too high"
+							" \"%s\"\n", (0 != item->itemid ? "update" : "create"), *field);
+				}
+				else
+				{
+					*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
+							(0 != item->itemid ? "update" : "create"), errmsg);
+					zbx_free(errmsg);
+				}
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
 				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
