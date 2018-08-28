@@ -61,7 +61,6 @@ class CView {
 	 * @array - directories where views are stored, ordered by priority
 	 * include/views should be removed once we fully move to MVC
 	 */
-//	static $viewsDir = array('app/local/views', 'app/views', 'include/views');
 	static $viewsDir = ['local/app/views', 'app/views', 'include/views'];
 
 	/**
