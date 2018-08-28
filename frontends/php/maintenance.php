@@ -412,7 +412,9 @@ if (!empty($data['form'])) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
-		if (getRequest('new_timeperiod', []) != 1 && getRequest('new_timeperiod', [])) {
+
+		if ($data['new_timeperiod'] != 1 && $data['new_timeperiod'] !== []
+				&& hasRequest('new_timeperiod_start_date')) {
 			$data['new_timeperiod']['start_date'] = getRequest('new_timeperiod_start_date');
 		}
 
