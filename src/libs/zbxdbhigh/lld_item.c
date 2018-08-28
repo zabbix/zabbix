@@ -903,7 +903,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else
 	{
-		int			simple_interval, history;
+		int			value;
 		zbx_custom_interval_t	*custom_intervals;
 		zbx_token_t		token;
 		char			*errmsg;
@@ -925,7 +925,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				}
 
 				errmsg = NULL;
-				if (SUCCEED == zbx_interval_preproc(*field, &simple_interval, &custom_intervals,
+				if (SUCCEED == zbx_interval_preproc(*field, NULL, &custom_intervals,
 						&errmsg))
 				{
 					zbx_custom_interval_free(custom_intervals);
@@ -943,9 +943,9 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					return;
 				}
 
-				if (SUCCEED == is_time_suffix(*field, &history, ZBX_LENGTH_UNLIMITED))
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
 				{
-					if (0 == history || ZBX_HK_HISTORY_MIN <= history)
+					if (0 == value || ZBX_HK_HISTORY_MIN <= value)
 						return;
 
 					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
@@ -955,6 +955,28 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				else
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
+							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				}
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
+				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+						0 != (token.type & ZBX_TOKEN_USER_MACRO))
+				{
+					return;
+				}
+
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
+				{
+					if (0 == value || ZBX_HK_TRENDS_MIN <= value)
+						return;
+
+					*error = zbx_strdcatf(*error, "Cannot %s item: trends storage period is"
+							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
+							*field);
+				}
+				else
+				{
+					*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
 							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
 				}
 				break;
