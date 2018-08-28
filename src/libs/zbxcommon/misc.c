@@ -1823,7 +1823,6 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		goto out;
 	}
 
-
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
 		goto out;
 
