@@ -24,6 +24,55 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
+				['type' => API_COLOR],
+				'ffffff',
+				'/1/color',
+				'ffffff'
+			],
+			[
+				['type' => API_COLOR],
+				'037ACF',
+				'/1/color',
+				'037ACF'
+			],
+			[
+				['type' => API_COLOR],
+				'000000',
+				'/1/color',
+				'000000'
+			],
+			[
+				['type' => API_COLOR],
+				'',
+				'/1/color',
+				'Invalid parameter "/1/color": cannot be empty.'
+			],
+			[
+				['type' => API_COLOR],
+				[],
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				true,
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				null,
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/color',
+				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_STRING_UTF8, 'length' => 16],
 				'Zabbix server',
 				'/1/name',
@@ -1837,15 +1886,45 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_TIME_UNIT],
+				'-2147483649s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'-2147483648s',
+				'/1/time_unit',
+				'-2147483648s'
+			],
+			[
+				['type' => API_TIME_UNIT],
 				'2147483647s',
 				'/1/time_unit',
 				'2147483647s'
 			],
 			[
 				['type' => API_TIME_UNIT],
+				'2147483648s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
 				'3550w',
 				'/1/time_unit',
 				'3550w'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'',
+				'/1/time_unit',
+				''
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": cannot be empty.'
 			],
 			[
 				['type' => API_TIME_UNIT],
@@ -1864,6 +1943,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'30mm',
 				'/1/time_unit',
 				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'in' => '-100:100'],
+				'-101s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value must be one of -100-100.'
 			],
 			[
 				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],

@@ -70,6 +70,9 @@ class CApiInputValidator {
 	 */
 	private static function validateData($rule, &$data, $path, &$error, array $parent_data = null) {
 		switch ($rule['type']) {
+			case API_COLOR:
+				return self::validateColor($rule, $data, $path, $error);
+
 			case API_MULTIPLE:
 				if ($parent_data !== null) {
 					return self::validateMultiple($rule, $data, $path, $error, $parent_data);
@@ -161,6 +164,7 @@ class CApiInputValidator {
 	 */
 	private static function validateDataUniqueness($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
+			case API_COLOR:
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
@@ -236,6 +240,30 @@ class CApiInputValidator {
 		return true;
 	}
 
+	/**
+	 * Color validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateColor($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (preg_match('/^[0-9a-f]{6}$/i', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('a hexadecimal colour code (6 symbols) is expected')
+			);
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * Multiple data types validator.
 	 *
@@ -1038,7 +1066,7 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['in']      (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -1057,13 +1085,18 @@ class CApiInputValidator {
 			$data = (string) $data;
 		}
 
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
 		}
 
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'negative' => true
 		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
@@ -1075,9 +1108,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$seconds = timeUnitToSeconds($data);
+		$seconds = timeUnitToSeconds($data, true);
 
-		if (bccomp($seconds, ZBX_MAX_INT32) > 0) {
+		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
