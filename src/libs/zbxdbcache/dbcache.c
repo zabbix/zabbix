@@ -2766,7 +2766,7 @@ static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total
 
 		LOCK_CACHE;
 
-		next_sync = hc_push_items(&history_items);	/* return processed items into history cache */
+		next_sync = hc_push_items(&history_items);	/* return items to history cache */
 		cache->history_num -= history_num;
 
 		UNLOCK_CACHE;
@@ -2877,12 +2877,12 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 				LOCK_CACHE;
 				hc_push_items(&history_items);
 				UNLOCK_CACHE;
+				zbx_vector_ptr_clear(&history_items);
 			}
 		}
 		else
 			history_num = 0;
 
-		UNLOCK_CACHE;
 
 		if (0 != history_num)
 		{
@@ -2979,10 +2979,8 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		if (0 != history_num)
 		{
 			LOCK_CACHE;
-
 			next_sync = hc_push_items(&history_items);	/* return items to history cache */
 			cache->history_num -= history_num;
-
 			UNLOCK_CACHE;
 
 			*total_num += history_num;
@@ -3124,7 +3122,13 @@ int	sync_history_cache(int sync_type, int *total_num)
 
 		/* add all items from history index to the new history queue */
 		while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
-			hc_queue_item(item);
+		{
+			if (NULL != item->tail)
+			{
+				item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+				hc_queue_item(item);
+			}
+		}
 
 		UNLOCK_CACHE;
 
@@ -4009,12 +4013,12 @@ static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *histor
 
 /******************************************************************************
  *                                                                            *
- * Function: hc_push_items                                                    *
+ * Function: hc_push_processed_items                                          *
  *                                                                            *
- * Purpose: push back items into history cache                                *
+ * Purpose: push back the processed history items into history cache          *
  *                                                                            *
- * Parameters: history_items - [IN] the history items acquired with           *
- *                                  hc_pop_items() function                   *
+ * Parameters: history_items - [IN] the history items containing processed    *
+ *                                  (available) and busy items                *
  *                                                                            *
  * Return value: time of the next history item to sync                        *
  *                                                                            *
