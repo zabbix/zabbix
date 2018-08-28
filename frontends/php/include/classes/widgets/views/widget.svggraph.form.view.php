@@ -63,6 +63,7 @@ $scripts[] =
 $scripts[] =
 	'function updateGraphPreview() {'.
 		'var $preview = jQuery("#svg-graph-preview"),'.
+			'$form = jQuery("#widget_dialogue_form"),'.
 			'url = new Curl("zabbix.php"),'.
 			'data = {'.
 				'uniqueid: 0,'.
@@ -79,7 +80,11 @@ $scripts[] =
 			'data: data,'.
 			'dataType: "json",'.
 			'success: function(r) {'.
-				'if (typeof r.body !== "undefined" && typeof r.errors === "undefined") {'.
+				'$form.prev(".msg-bad").remove();'.
+				'if (typeof r.messages !== "undefined") {'.
+					'jQuery(r.messages).insertBefore($form);'.
+				'}'.
+				'if (typeof r.body !== "undefined") {'.
 					'$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");'.
 				'}'.
 			'}'.

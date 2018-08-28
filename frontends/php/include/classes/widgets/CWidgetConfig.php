@@ -205,9 +205,6 @@ class CWidgetConfig {
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
 
-			case WIDGET_SVG_GRAPH:
-				return new CWidgetFormSvgGraph($data);
-
 			case WIDGET_MAP:
 				return new CWidgetFormMap($data);
 
@@ -225,6 +222,9 @@ class CWidgetConfig {
 
 			case WIDGET_PROBLEMS_BY_SV:
 				return new CWidgetFormProblemsBySv($data);
+
+			case WIDGET_SVG_GRAPH:
+				return new CWidgetFormSvgGraph($data);
 
 			case WIDGET_TRIG_OVER:
 				return new CWidgetFormTrigOver($data);

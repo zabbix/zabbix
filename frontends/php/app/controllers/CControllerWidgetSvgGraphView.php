@@ -50,6 +50,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
+		// Validate fields when preview is loaded to show error messages.
+		if ($preview) {
+			foreach ($this->getForm()->validate(true) as $message) {
+				error($message);
+			}
+		}
+
 		// Sort fields by its natural order.
 		CArrayHelper::sort($fields['ds'], ['order']);
 
