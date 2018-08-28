@@ -31,7 +31,6 @@ class CControllerAuthenticationUpdate extends CController {
 			->setArgument('action', 'authentication.edit')
 			->getUrl()
 		);
-		$this->response->setTitle(_('Configuration of authentication'));
 
 		$this->disableSIDValidation();
 	}
