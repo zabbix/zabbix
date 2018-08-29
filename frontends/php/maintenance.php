@@ -53,6 +53,8 @@ $fields = [
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'edit_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'tags_evaltype' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
+	'tags' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add_timeperiod' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -92,6 +94,7 @@ if (isset($_REQUEST['maintenanceid'])) {
 	$dbMaintenance = API::Maintenance()->get([
 		'output' => API_OUTPUT_EXTEND,
 		'selectTimeperiods' => API_OUTPUT_EXTEND,
+		'selectTags' => API_OUTPUT_EXTEND,
 		'editable' => true,
 		'maintenanceids' => getRequest('maintenanceid'),
 	]);
@@ -162,6 +165,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'hostids' => getRequest('hostids', []),
 			'groupids' => getRequest('groupids', [])
 		];
+
+		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {
+			$maintenance += [
+				'tags_evaltype' => getRequest('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
+				'tags' => getRequest('tags', [])
+			];
+
+			foreach ($maintenance['tags'] as $tnum => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($maintenance['tags'][$tnum]);
+				}
+			}
+		}
 
 		if (isset($_REQUEST['maintenanceid'])) {
 			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
@@ -383,6 +399,11 @@ if (!empty($data['form'])) {
 			'maintenanceids' => $data['maintenanceid'],
 			'editable' => true
 		]);
+
+		// tags
+		$data['tags_evaltype'] = $dbMaintenance['tags_evaltype'];
+		$data['tags'] = $dbMaintenance['tags'];
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
 		if (getRequest('new_timeperiod', []) != 1 && getRequest('new_timeperiod', [])) {
@@ -395,7 +416,9 @@ if (!empty($data['form'])) {
 			'active_since' => getRequest('active_since', date(ZBX_DATE_TIME, strtotime('today'))),
 			'active_till' => getRequest('active_till', date(ZBX_DATE_TIME, strtotime('tomorrow'))),
 			'description' => getRequest('description', ''),
-			'timeperiods' => getRequest('timeperiods', [])
+			'timeperiods' => getRequest('timeperiods', []),
+			'tags_evaltype' => getRequest('tags_evaltype', MAINTENANCE_TAG_EVAL_TYPE_AND_OR),
+			'tags' => getRequest('tags', [])
 		];
 
 		$hostids = getRequest('hostids', []);

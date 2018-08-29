@@ -44,7 +44,7 @@ $options = [
 			'show_tags' => $data['filter']['show_tags'],
 			'tag_name_format' => $data['filter']['tag_name_format'],
 			'tag_priority' => $data['filter']['tag_priority'],
-			'maintenance' => $data['filter']['maintenance'],
+			'show_suppressed' => $data['filter']['show_suppressed'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
@@ -282,11 +282,12 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Tag display priority'),
 			(new CTextBox('filter_tag_priority', $data['filter']['tag_priority']))
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('Comma-separated list'))
+				->setAttribute('placeholder', _('comma-separated list'))
 				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		)
-		->addRow(_('Show hosts in maintenance'), [
-			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
+		->addRow(_('Show suppressed problems'), [
+			(new CCheckBox('filter_show_suppressed'))
+				->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE),
 			(new CDiv([
 				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),

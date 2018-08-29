@@ -52,7 +52,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'severities' => $fields['severities'],
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
-			'maintenance' => $fields['maintenance'],
+			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged']
 		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);

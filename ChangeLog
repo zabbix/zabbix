@@ -1,6 +1,16 @@
-Changes for 4.0.0alpha10
+Changes for 4.0.0beta2
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.0beta1
+
+New features:
+A.F....... [ZBXNEXT-4588] implemented SVG graph widget (ashubin, gcalenko, miks, Sasha)
+A.F.I..... [ZBXNEXT-4573] added support of HTTP authentication as optional authentication mechanism (gcalenko, Ivo, vmurzins)
+A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
 ..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
 A......... [ZBXNEXT-4656] added strict validation of hostprototype.create() and hostprototype.update() methods; added audit logging for these methods (Ivo, Sasha)
 ..F....... [ZBXNEXT-4455] added screen reader to the dashboard and widgets (ashubin)
@@ -12,6 +22,7 @@ A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD m
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+....I..... [ZBX-14751] fixed "cannot run test program while cross compiling" and "cannot check for file existence when cross compiling" errors during cross-compilation (vso)
 .......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ..F....... [ZBXNEXT-4500] fixed item prototype master item links leading to error when master item is a web item (Ivo)
 ........S. [ZBX-14697] fixed memory leak in alert manager when connection to database was lost (vso)
@@ -438,6 +449,24 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.4.13
+
+3.4.13rc2 was released as 3.4.13 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.4.13rc2
+
+Bug fixes:
+.......PS. [ZBX-14765] fixed vmware incorrect memory release (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.13rc1
@@ -1752,6 +1781,18 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.22rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.21
+
+3.0.21rc1 was released as 3.0.21 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.21rc1

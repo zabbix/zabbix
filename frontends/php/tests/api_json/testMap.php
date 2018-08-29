@@ -63,6 +63,7 @@ class testMap extends CZabbixTest {
 						'iconmapid' => '0',
 						'expand_macros' => '0',
 						'severity_min' => '0',
+						'show_suppressed' => '0',
 						'userid' => '1',
 						'private' => '1',
 						'selements' => []
@@ -95,6 +96,7 @@ class testMap extends CZabbixTest {
 						'iconmapid' => '0',
 						'expand_macros' => '0',
 						'severity_min' => '0',
+						'show_suppressed' => '0',
 						'userid' => '1',
 						'private' => '1',
 						'selements' => [
@@ -158,6 +160,7 @@ class testMap extends CZabbixTest {
 						'iconmapid' => '0',
 						'expand_macros' => '0',
 						'severity_min' => '0',
+						'show_suppressed' => '0',
 						'userid' => '1',
 						'private' => '1',
 						'selements' => [
@@ -220,6 +223,7 @@ class testMap extends CZabbixTest {
 						'iconmapid' => '0',
 						'expand_macros' => '0',
 						'severity_min' => '0',
+						'show_suppressed' => '0',
 						'userid' => '1',
 						'private' => '1',
 						'selements' => []
@@ -258,6 +262,7 @@ class testMap extends CZabbixTest {
 						'iconmapid' => '0',
 						'expand_macros' => '0',
 						'severity_min' => '0',
+						'show_suppressed' => '0',
 						'userid' => '1',
 						'private' => '1',
 						'selements' => [

@@ -21,6 +21,7 @@ zbx_jsonpath_next_LDADD = $(JSON_LIBS)
 
 if SERVER
 zbx_jsonpath_next_LDADD += @SERVER_LIBS@
+zbx_jsonpath_next_LDFLAGS = @SERVER_LDFLAGS@
 endif
 
 zbx_jsonpath_next_CFLAGS = -I@top_srcdir@/tests
@@ -33,6 +34,7 @@ zbx_json_path_open_LDADD = $(JSON_LIBS)
 
 if SERVER
 zbx_json_path_open_LDADD += @SERVER_LIBS@
+zbx_json_path_open_LDFLAGS = @SERVER_LDFLAGS@
 endif
 
 zbx_json_path_open_CFLAGS = -I@top_srcdir@/tests

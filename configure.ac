@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.0alpha10])
+AC_INIT([Zabbix],[4.0.0beta2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1707,7 +1707,8 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
+if test -d tests; then
+	AC_CONFIG_FILES(
 	tests/Makefile
 	tests/libs/Makefile
 	tests/libs/zbxcommon/Makefile
@@ -1723,7 +1724,7 @@ AC_CHECK_FILE(tests, [AC_CONFIG_FILES(
 	tests/libs/zbxalgo/Makefile
 	)
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
-])
+fi
 
 AC_OUTPUT([
 	Makefile

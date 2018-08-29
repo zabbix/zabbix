@@ -89,13 +89,13 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['tag_name_format']),
 // Tag display priority.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 	CWidgetHelper::getTextBox($fields['tag_priority'])
-		->setAttribute('placeholder', _('Comma-separated list'))
+		->setAttribute('placeholder', _('comma-separated list'))
 		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
 );
 
-// Show hosts in maintenance.
-$form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']),
-	CWidgetHelper::getCheckBox($fields['maintenance'])
+// Show suppressed problems.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
 );
 
 // Show unacknowledged only.

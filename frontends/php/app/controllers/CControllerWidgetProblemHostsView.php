@@ -46,7 +46,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 		$filter_severities = $fields['severities']
 			? $fields['severities']
 			: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-		$filter_maintenance = $fields['maintenance'];
+		$filter_show_suppressed = $fields['show_suppressed'];
 		$filter_ext_ack = $fields['ext_ack'];
 
 		if ($fields['exclude_groupids']) {
@@ -91,12 +91,12 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 
 		// Get hosts.
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name'],
+			'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'selectGroups' => ['groupid'],
 			'groupids' => array_keys($groups),
 			'hostids' => $filter_hostids,
 			'filter' => [
-				'maintenance_status' => ($filter_maintenance == 0) ? 0 : null
+				'maintenance_status' => null
 			],
 			'monitored_hosts' => true,
 			'preservekeys' => true
@@ -111,7 +111,6 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'filter' => [
 				'value' => TRIGGER_VALUE_TRUE
 			],
-			'maintenance' => ($filter_maintenance == 0) ? false : null,
 			'monitored' => true,
 			'preservekeys' => true
 		]);
@@ -149,7 +148,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				'name' => $filter_problem
 			],
 			'severities' => $filter_severities,
-			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null
+			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
+			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);
 
 		$hosts_data = [];
@@ -163,6 +163,9 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				$hosts_data[$host['hostid']] = [
 					'host' => $host['name'],
 					'hostid' => $host['hostid'],
+					'maintenanceid' => $host['maintenanceid'],
+					'maintenance_status' => $host['maintenance_status'],
+					'maintenance_type' => $host['maintenance_type'],
 					'severities' => array_fill_keys($filter_severities, 0)
 				];
 			}
@@ -226,7 +229,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				'hostids' => $fields['hostids'],
 				'problem' => $fields['problem'],
 				'severities' => $filter_severities,
-				'maintenance' => $fields['maintenance'],
+				'show_suppressed' => $fields['show_suppressed'],
 				'hide_empty_groups' => $fields['hide_empty_groups'],
 				'ext_ack' => $fields['ext_ack']
 			],
