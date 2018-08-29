@@ -882,6 +882,7 @@ class CWidgetHelper {
 
 		return implode ('', $scripts);
 	}
+
 	/**
 	 * @param CWidgetField $field
 	 *
