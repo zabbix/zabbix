@@ -320,29 +320,31 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  *                                                                            *
  * Purpose: abstracts the curl_easy_setopt/curl_easy_perform call pair        *
  *                                                                            *
+ * Parameters: easyhandle - [IN] the CURL handle                              *
+ *             val        - [IN] the http request                             *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED - the http request was completed successfully        *
+ *               FAIL    - the http request has failed                        *
  ******************************************************************************/
-int zbx_http_post(CURL *handle, char *val, const char **error)
+static int	zbx_http_post(CURL *easyhandle, const char *val, char **error)
 {
 	CURLoption	opt;
 	CURLcode	err;
 
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_POSTFIELDS, val)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, val)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
-
 		return FAIL;
 	}
 
 	page.offset = 0;
 
-	if (CURLE_OK != (err = curl_easy_perform(handle)))
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
-
 		return FAIL;
 	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
 
 	return SUCCEED;
 }
@@ -1486,7 +1488,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
 			username_esc, password_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, *error, xml))
+	if (SUCCEED != zbx_http_post(easyhandle, xml, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
