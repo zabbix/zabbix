@@ -100,6 +100,7 @@ class CControllerAuthenticationEdit extends CController {
 				'ldap_search_attribute',
 				'ldap_bind_password',
 				'ldap_test_user',
+				'ldap_test_password',
 				'http_auth_enabled',
 				'http_login_form',
 				'http_strip_domains'

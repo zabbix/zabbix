@@ -118,7 +118,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('User password'), 'ldap_test_password'),
-		(new CPassBox('ldap_test_password'))
+		(new CPassBox('ldap_test_password', $data['ldap_test_password']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
