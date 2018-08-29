@@ -264,6 +264,7 @@ class CApiInputValidator {
 
 		return true;
 	}
+
 	/**
 	 * Multiple data types validator.
 	 *
