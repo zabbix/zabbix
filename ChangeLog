@@ -1,9 +1,10 @@
 Changes for 4.0.0beta2
 
 New features:
-.......PS. [ZBX-14677] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
+.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 
 Bug fixes:
+.......PS. [ZBX-14771] fixed memory leak in poller if scheduling interval is invalid (vso)
 ..F....... [ZBX-14462] improved time selection when opening calendar with missing time (vmurzins)
 .......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
 ..F....... [ZBX-14637] fixed fixed text readable on the problems widgets in dark theme (ashubin)
@@ -461,6 +462,7 @@ Changes for 3.4.14rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14771] fixed memory leak in poller if scheduling interval is invalid (vso)
 .......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
 ..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
 ...G...PS. [ZBX-14756] fixed zbxregexp library not compiling with old versions of pcre; thanks to Simon Matter for the patch (yurii)
