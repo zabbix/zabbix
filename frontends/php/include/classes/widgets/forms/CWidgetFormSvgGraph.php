@@ -31,8 +31,20 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 *
 		 * Contains single CWidgetFieldGraphDataSet field for data sets definition and configuration.
 		 */
-		$field_dataset = (new CWidgetFieldGraphDataSet('ds', ''));
+		$field_dataset = (new CWidgetFieldGraphDataSet('ds', _('Data set')));
 		if (array_key_exists('ds', $this->data)) {
+			// Values received from frontend are strings. Values received from database comes as arrays.
+			// TODO: remove hack with modifying of unvalidated data.
+			foreach ($this->data['ds'] as &$value) {
+				if (array_key_exists('hosts', $value)) {
+					$value['hosts'] = is_array($value['hosts']) ? implode(', ', $value['hosts']) : $value['hosts'];
+				}
+				if (array_key_exists('items', $value)) {
+					$value['items'] = is_array($value['items']) ? implode(', ', $value['items']) : $value['items'];
+				}
+			}
+			unset($value);
+
 			$field_dataset->setValue($this->data['ds']);
 		}
 		$this->fields[$field_dataset->getName()] = $field_dataset;
@@ -299,6 +311,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$field_problem_hosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('problemhosts', $this->data)) {
+			// Values received from frontend are strings. Values received from database comes as arrays.
+			// TODO: remove hack with modifying of unvalidated data.
 			$problem_hosts = is_array($this->data['problemhosts'])
 				? implode(', ', $this->data['problemhosts'])
 				: $this->data['problemhosts'];

@@ -95,8 +95,8 @@ $scripts[] =
 // Create 'Data set' tab.
 $tab_data_set = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['ds']), CWidgetHelper::getGraphDataSet($fields['ds'], $form_name));
-$scripts[] = $fields['ds']->getJavascript($form_name);
-$jq_templates['dataset-row'] = $fields['ds']->getTemplate($form_name);
+$scripts[] = CWidgetHelper::getGraphDataSetJavascript($fields['ds'], $form_name);
+$jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name);
 
 // Create 'Display options' tab.
 $tab_display_opt = (new CFormList())
