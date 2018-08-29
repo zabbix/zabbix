@@ -456,30 +456,149 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Function returns array containing HTML objects filled with given values. Used to generate HTML in widget
+	 * overrides field.
+	 *
+	 * @param string     $field_name
+	 * @param array      $value      Values to fill in particular data set row. See self::setValue() for detailed
+	 *                               description.
+	 * @param string     $form_name  Name of form in which data set fields resides.
+	 * @param int|string $row_num    Unique data set numeric identifier. Used to make unique field names.
+	 * @param int|string $order_num  Sequential order number.
+	 *
+	 * @return array
+	 */
+	public static function getGraphOverrideLayout($field_name, array $value, $form_name, $row_num, $order_num) {
+		$inputs = [];
+
+		// Create override optins list.
+		foreach (CWidgetFieldGraphOverride::getOverrideOptions() as $option) {
+			if (array_key_exists($option, $value)) {
+				$inputs[] = (new CVar($field_name.'['.$row_num.']['.$option.']', $value[$option]));
+			}
+		}
+
+		return (new CListItem([
+			/**
+			 * First line: host pattern field, item pattern field.
+			 * Contains also hidden order field, drag and drop button and delete button.
+			 */
+			(new CDiv([
+				(new CVar($field_name.'['.$row_num.'][order]', $order_num)),
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('position: absolute; margin-left: -25px;'),
+				(new CDiv([
+					(new CDiv([
+						(new CTextArea($field_name.'['.$row_num.'][hosts]', $value['hosts'], ['rows' => 1]))
+							->setAttribute('placeholder', _('host pattern'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->addClass(ZBX_STYLE_PATTERNSELECT),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('return PopUp("popup.generic", '.
+								CJs::encodeJson([
+									'srctbl' => 'hosts',
+									'srcfld1' => 'host',
+									'reference' => 'name',
+									'multiselect' => 1,
+									'dstfrm' => $form_name,
+									'dstfld1' => $field_name.'['.$row_num.'][hosts]'
+								]).', null, this);'
+							)
+					]))
+						->addClass(ZBX_STYLE_COLUMN_50),
+					(new CDiv([
+						(new CTextArea($field_name.'['.$row_num.'][items]', $value['items'], ['rows' => 1]))
+							->setAttribute('placeholder', _('item pattern'))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							->addClass(ZBX_STYLE_PATTERNSELECT),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						(new CButton(null, _('Select')))
+							->addClass(ZBX_STYLE_BTN_GREY)
+							->onClick('return PopUp("popup.generic", '.
+								CJs::encodeJson([
+									'srctbl' => 'items',
+									'srcfld1' => 'itemid',
+									'reference' => 'name_expanded',
+									'multiselect' => 1,
+									'real_hosts' => 1,
+									'numeric' => 1,
+									'dstfrm' => $form_name,
+									'dstfld1' => $field_name.'['.$row_num.'][items]'
+								]).', null, this);'
+							)
+					]))
+						->addClass(ZBX_STYLE_COLUMN_50)
+				]))
+					->addClass(ZBX_STYLE_COLUMN_95)
+					->addClass(ZBX_STYLE_COLUMNS),
+
+				(new CDiv(
+					(new CButton())
+						->setAttribute('title', _('Delete'))
+						->addClass(ZBX_STYLE_BTN_TRASH)
+				))
+					->addClass(ZBX_STYLE_COLUMN_5)
+			]))
+				->addClass(ZBX_STYLE_COLUMNS),
+
+			// Selected override options.
+			(new CList($inputs))
+				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
+				->addItem((new CButton(null, (new CSpan())
+							->addClass(ZBX_STYLE_PLUS_ICON)
+							->addStyle('margin-right: 0px;')
+					))
+						->setAttribute('data-row', $row_num)
+						->addClass(ZBX_STYLE_BTN_ALT)
+				)
+		]))
+			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
+	}
+
+	/**
+	 * Return template used by dynamic rows.
+	 *
+	 * @param CWidgetFieldGraphOverride $field
+	 * @param string                    $form_name  Form name in which override field is located.
+	 *
+	 * @return string
+	 */
+	public static function getGraphOverrideTemplate($field, $form_name) {
+		$value = CWidgetFieldGraphOverride::getDefaults();
+
+		return self::getGraphOverrideLayout($field->getName(), $value, $form_name, '#{rowNum}', '#{orderNum}')
+			->toString();
+	}
+
+	/**
 	 * @param CWidgetFieldGraphOverride $field
 	 *
 	 * @return CList
 	 */
 	public static function getGraphOverride($field, $form_name) {
-		$override_list = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST)->setId('overrides');
-		$overrides = $field->getValue();
-		if (!$overrides) {
-			$overrides = [];
-		}
-		$i = 0;
-		foreach ($overrides as $override) {
-			$options = [
-				'row_num' => $i,
-				'order_num' => $i + 1,
-				'form_name' => $form_name
-			];
+		$list = (new CList())
+			->addClass(ZBX_STYLE_OVERRIDES_LIST)
+			->setId('overrides');
 
-			$override_list->addItem($field->getFieldLayout($override, $options), ZBX_STYLE_OVERRIDES_LIST_ITEM);
+		$values = $field->getValue();
+
+		if (!$values) {
+			$values = [];
+		}
+
+		$i = 0;
+
+		foreach ($values as $override) {
+			$list->addItem(self::getGraphOverrideLayout($field->getName(), $override, $form_name, $i, $i + 1));
+
 			$i++;
 		}
 
 		// Add 'Add' button under the list.
-		$override_list->addItem(
+		$list->addItem(
 			(new CDiv(
 				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
@@ -489,7 +608,228 @@ class CWidgetHelper {
 			'overrides-foot'
 		);
 
-		return $override_list;
+		return $list;
+	}
+
+	/**
+	 * Function returns array containing string values used as titles for override options.
+	 *
+	 * @return array
+	 */
+	private static function getGraphOverrideOptionNames() {
+		return [
+			'width' => _('Width'),
+			'type' => _('Draw'),
+			'type'.SVG_GRAPH_TYPE_LINE => _('Line'),
+			'type'.SVG_GRAPH_TYPE_POINTS => _('Points'),
+			'type'.SVG_GRAPH_TYPE_STAIRCASE => _('Staircase'),
+			'transparency' => _('Transparency'),
+			'fill' => _('Fill'),
+			'pointsize' => _('Point size'),
+			'missingdatafunc' => _('Missing data'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_NONE => _('None'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_CONNECTED => _x('Connected', 'missing data function'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO => _x('Treat as 0', 'missing data function'),
+			'axisy' => _('Y-axis'),
+			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
+			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
+			'timeshift' => _('Time shift')
+		];
+	}
+
+	/**
+	 * Function returns array used to construct override field menu of available override options.
+	 *
+	 * @return array
+	 */
+	private static function getGraphOverrideMenu() {
+		return [
+			'sections' => [
+				[
+					'name' => _('ADD OVERRIDE'),
+					'options' => [
+						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '']],
+
+						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
+						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
+						['name' => _('Width').'/2', 'callback' => 'addOverride', 'args' => ['width', 2]],
+						['name' => _('Width').'/3', 'callback' => 'addOverride', 'args' => ['width', 3]],
+						['name' => _('Width').'/4', 'callback' => 'addOverride', 'args' => ['width', 4]],
+						['name' => _('Width').'/5', 'callback' => 'addOverride', 'args' => ['width', 5]],
+						['name' => _('Width').'/6', 'callback' => 'addOverride', 'args' => ['width', 6]],
+						['name' => _('Width').'/7', 'callback' => 'addOverride', 'args' => ['width', 7]],
+						['name' => _('Width').'/8', 'callback' => 'addOverride', 'args' => ['width', 8]],
+						['name' => _('Width').'/9', 'callback' => 'addOverride', 'args' => ['width', 9]],
+						['name' => _('Width').'/10', 'callback' => 'addOverride', 'args' => ['width', 10]],
+
+						['name' => _('Draw').'/'._('Line'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_LINE]],
+						['name' => _('Draw').'/'._('Points'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_POINTS]],
+						['name' => _('Draw').'/'._('Staircase'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_STAIRCASE]],
+
+						['name' => _('Transparency').'/0', 'callback' => 'addOverride', 'args' => ['transparency', 0]],
+						['name' => _('Transparency').'/1', 'callback' => 'addOverride', 'args' => ['transparency', 1]],
+						['name' => _('Transparency').'/2', 'callback' => 'addOverride', 'args' => ['transparency', 2]],
+						['name' => _('Transparency').'/3', 'callback' => 'addOverride', 'args' => ['transparency', 3]],
+						['name' => _('Transparency').'/4', 'callback' => 'addOverride', 'args' => ['transparency', 4]],
+						['name' => _('Transparency').'/5', 'callback' => 'addOverride', 'args' => ['transparency', 5]],
+						['name' => _('Transparency').'/6', 'callback' => 'addOverride', 'args' => ['transparency', 6]],
+						['name' => _('Transparency').'/7', 'callback' => 'addOverride', 'args' => ['transparency', 7]],
+						['name' => _('Transparency').'/8', 'callback' => 'addOverride', 'args' => ['transparency', 8]],
+						['name' => _('Transparency').'/9', 'callback' => 'addOverride', 'args' => ['transparency', 9]],
+						['name' => _('Transparency').'/10', 'callback' => 'addOverride', 'args' => ['transparency', 10]],
+
+						['name' => _('Fill').'/0', 'callback' => 'addOverride', 'args' => ['fill', 0]],
+						['name' => _('Fill').'/1', 'callback' => 'addOverride', 'args' => ['fill', 1]],
+						['name' => _('Fill').'/2', 'callback' => 'addOverride', 'args' => ['fill', 2]],
+						['name' => _('Fill').'/3', 'callback' => 'addOverride', 'args' => ['fill', 3]],
+						['name' => _('Fill').'/4', 'callback' => 'addOverride', 'args' => ['fill', 4]],
+						['name' => _('Fill').'/5', 'callback' => 'addOverride', 'args' => ['fill', 5]],
+						['name' => _('Fill').'/6', 'callback' => 'addOverride', 'args' => ['fill', 6]],
+						['name' => _('Fill').'/7', 'callback' => 'addOverride', 'args' => ['fill', 7]],
+						['name' => _('Fill').'/8', 'callback' => 'addOverride', 'args' => ['fill', 8]],
+						['name' => _('Fill').'/9', 'callback' => 'addOverride', 'args' => ['fill', 9]],
+						['name' => _('Fill').'/10', 'callback' => 'addOverride', 'args' => ['fill', 10]],
+
+						['name' => _('Point size').'/1', 'callback' => 'addOverride', 'args' => ['pointsize', 1]],
+						['name' => _('Point size').'/2', 'callback' => 'addOverride', 'args' => ['pointsize', 2]],
+						['name' => _('Point size').'/3', 'callback' => 'addOverride', 'args' => ['pointsize', 3]],
+						['name' => _('Point size').'/4', 'callback' => 'addOverride', 'args' => ['pointsize', 4]],
+						['name' => _('Point size').'/5', 'callback' => 'addOverride', 'args' => ['pointsize', 5]],
+						['name' => _('Point size').'/6', 'callback' => 'addOverride', 'args' => ['pointsize', 6]],
+						['name' => _('Point size').'/7', 'callback' => 'addOverride', 'args' => ['pointsize', 7]],
+						['name' => _('Point size').'/8', 'callback' => 'addOverride', 'args' => ['pointsize', 8]],
+						['name' => _('Point size').'/9', 'callback' => 'addOverride', 'args' => ['pointsize', 9]],
+						['name' => _('Point size').'/10', 'callback' => 'addOverride', 'args' => ['pointsize', 10]],
+
+						['name' => _('Missing data').'/'._('None'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_NONE]],
+						['name' => _('Missing data').'/'._x('Connected', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_CONNECTED]],
+						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO]],
+
+						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
+						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
+
+						['name' => _('Time shift'), 'callback' => 'addOverride', 'args' => ['timeshift']]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Return javascript necessary to initialize field.
+	 *
+	 * @param CWidgetFieldGraphOverride $field
+	 * @param string                    $form_name  Form name in which override field is located.
+	 *
+	 * @return string
+	 */
+	public static function getGraphOverrideJavascript($field, $form_name) {
+		$scripts = [
+			// Define it as function to avoid redundancy.
+			'function initializeOverrides() {'.
+				'jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({'.
+					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
+					'options: "input[type=hidden]",'.
+					'captions: '.CJs::encodeJson(self::getGraphOverrideOptionNames()).','.
+					'makeName: function(option) {return "'.$field->getName().'["+this.rowId+"]["+option+"]";},'.
+					'makeOption: function(name) {'.
+						'return name.match('.
+							'/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/'.
+						')[1];'.
+					'},'.
+					'onUpdate: updateGraphPreview,'.
+					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
+				'});'.
+			'}',
+
+			// Initialize dynamicRows.
+			'jQuery("#overrides")'.
+				'.dynamicRows({'.
+					'template: "#overrides-row",'.
+					'beforeRow: ".overrides-foot",'.
+					'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
+					'add: "#override-add",'.
+					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
+					'dataCallback: function(data) {'.
+						'data.orderNum = data.rowNum + 1;'.
+						'return data;'.
+					'}'.
+				'})'.
+				'.bind("afteradd.dynamicRows", function(event, options) {'.
+					'var container = jQuery(".overlay-dialogue-body");'.
+					'container.scrollTop(container[0].scrollHeight);'.
+
+					// Initialize textarea autogrow.
+					'jQuery("textarea", jQuery("#overrides"))'.
+						'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
+						'.each(function() {'.
+							'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+								'hostsId = jQuery(this).attr("id");'.
+							'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+						'});'.
+				'})'.
+				'.bind("afterremove.dynamicRows", function(event, options) {'.
+					'updateGraphPreview();'.
+				'})'.
+				'.bind("tableupdate.dynamicRows", function(event, options) {'.
+					'initializeOverrides();'.
+					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
+						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
+						'jQuery("#overrides").sortable("enable");'.
+					'}'.
+					'else {'.
+						'jQuery("#overrides .drag-icon").addClass("disabled");'.
+						'jQuery("#overrides").sortable("disable");'.
+					'}'.
+				'});',
+
+			// Initialize overrides UI control.
+			'initializeOverrides();',
+
+			// Initialize textarea autogrow.
+			'jQuery("textarea", jQuery("#overrides"))'.
+				'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
+				'.each(function() {'.
+					'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
+						'hostsId = jQuery(this).attr("id");'.
+					'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
+					'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
+				'});',
+
+			// Make overrides sortable.
+			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.
+				'jQuery("#overrides .drag-icon").addClass("disabled");'.
+			'}'.
+			'jQuery("#overrides").sortable({'.
+				'items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
+				'containment: "parent",'.
+				'handle: ".drag-icon",'.
+				'tolerance: "pointer",'.
+				'scroll: false,'.
+				'cursor: "move",'.
+				'opacity: 0.6,'.
+				'axis: "y",'.
+				'disable: function() {'.
+					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
+				'},'.
+				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
+					'jQuery(this).sortable("refreshPositions");'.
+				'},'.
+				'stop: function() {'.
+					'updateGraphPreview();'.
+				'},'.
+				'update: function() {'.
+					'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
+						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
+					'}).each(function(i) {'.
+						'jQuery(this).val(i + 1);'.
+					'});'.
+				'}'.
+			'});'
+		];
+
+		return implode ('', $scripts);
 	}
 
 	/**
@@ -718,7 +1058,9 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getGraphDataSet($field, $form_name) {
-		$list = (new CList())->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION)->setId('data_sets');
+		$list = (new CList())
+			->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION)
+			->setId('data_sets');
 
 		$values = $field->getValue();
 
