@@ -962,39 +962,27 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_HISTORY_MAX >= value)))
 				{
-					if (0 == value || ZBX_HK_HISTORY_MIN <= value)
-						return;
+					return;
+				}
 
-					*error = zbx_strdcatf(*error, "Cannot %s item: history storage period is"
-							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
-							*field);
-				}
-				else
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
-							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
-				}
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED))
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_TRENDS_MAX >= value)))
 				{
-					if (0 == value || ZBX_HK_TRENDS_MIN <= value)
-						return;
+					return;
+				}
 
-					*error = zbx_strdcatf(*error, "Cannot %s item: trends storage period is"
-							" too low \"%s\".\n", (0 != item->itemid ? "update" : "create"),
-							*field);
-				}
-				else
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
-							" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
-				}
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
 				break;
 			default:
 				return;
