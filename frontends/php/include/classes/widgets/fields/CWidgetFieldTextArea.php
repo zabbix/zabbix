@@ -33,7 +33,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setDefault('');
-		$this->placeholder = '';
+		$this->placeholder = null;
 
 		/**
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.

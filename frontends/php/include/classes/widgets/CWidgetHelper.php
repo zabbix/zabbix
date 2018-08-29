@@ -106,16 +106,11 @@ class CWidgetHelper {
 	 * @return CTextBox
 	 */
 	public static function getTextBox($field) {
-		$text_box = (new CTextBox($field->getName(), $field->getValue()))
+		return (new CTextBox($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('placeholder', $field->getPlaceholder())
 			->setWidth($field->getWidth());
-
-		if ($field->getPlaceholder() !== '') {
-			$text_box->setAttribute('placeholder', $field->getPlaceholder());
-		}
-
-		return $text_box;
 	}
 
 	/**

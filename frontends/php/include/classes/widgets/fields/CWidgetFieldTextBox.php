@@ -35,7 +35,7 @@ class CWidgetFieldTextBox extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setDefault('');
-		$this->placeholder = '';
+		$this->placeholder = null;
 		$this->width = ZBX_TEXTAREA_STANDARD_WIDTH;
 	}
 
