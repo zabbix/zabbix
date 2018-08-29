@@ -45,6 +45,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_COLOR],
 				'',
 				'/1/color',
+				''
+			],
+			[
+				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/color',
 				'Invalid parameter "/1/color": cannot be empty.'
 			],
 			[
@@ -523,6 +529,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				0,
 				'/1/id',
 				'0'
+			],
+			[
+				['type' => API_ID, 'flags' => API_NOT_EMPTY],
+				0,
+				'/1/id',
+				'Invalid parameter "/1/id": cannot be empty.'
 			],
 			[
 				['type' => API_ID],
@@ -2118,6 +2130,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'',
 				'/1/url',
 				''
+			],
+			[
+				['type' => API_URL, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/url',
+				'Invalid parameter "/1/url": cannot be empty.'
 			],
 			[
 				['type' => API_URL],

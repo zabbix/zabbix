@@ -244,6 +244,7 @@ class CApiInputValidator {
 	 * Color validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -251,8 +252,14 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateColor($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
 		}
 
 		if (preg_match('/^[0-9a-f]{6}$/i', $data) !== 1) {
@@ -525,7 +532,7 @@ class CApiInputValidator {
 	 * Identifier validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -541,6 +548,11 @@ class CApiInputValidator {
 
 		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && $data == 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
 
@@ -1304,7 +1316,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1314,7 +1326,7 @@ class CApiInputValidator {
 	private static function validateUrl($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 

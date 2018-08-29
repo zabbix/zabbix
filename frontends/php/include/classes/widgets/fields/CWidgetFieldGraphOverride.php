@@ -37,29 +37,50 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
+			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED],
 			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'color'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 6],
-			'type'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
-			'width'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'pointsize'			=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(1, 10))],
-			'transparency'		=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'fill'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', range(0, 10))],
-			'axisy'				=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
-			'timeshift'			=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'length' => 10],
-			'missingdatafunc'	=> ['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
-			'order'				=> ['type' => API_INT32]
+			'color'				=> ['type' => API_COLOR],
+			'type'				=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
+			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+			'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
+			'transparency'		=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+			'fill'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+			'missingdatafunc'	=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
+			'axisy'				=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
+			'timeshift'			=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
 		]]);
-
-		/**
-		 * No default values for overrides but let's set an empty field here because extended class have no default
-		 * 'default' value.
-		 */
 		$this->setDefault([]);
 
 		// Supported override options.
-		$this->override_options
-			= ['color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'];
+		$this->override_options = [
+			'color', 'width', 'type', 'transparency', 'fill', 'pointsize', 'missingdatafunc', 'axisy', 'timeshift'
+		];
+	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['color'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['timeshift'], API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules(null);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -166,56 +187,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	}
 
 	/**
-	 * Set override field value.
-	 *
-	 * @param array  $value                  Values filled in particular override.
-	 * @param string $value[order]           Number by which overrides are sorted.
-	 * @param string $value[hosts]           Host pattern.
-	 * @param string $value[items]           Item pattern.
-	 * @param string $value[color]           (optional) Override color option.
-	 * @param string $value[width]           (optional) Override width option.
-	 * @param string $value[type]            (optional) Override type option.
-	 * @param string $value[transparency]    (optional) Override transparency option.
-	 * @param string $value[fill]            (optional) Override fill option.
-	 * @param string $value[pointsize]       (optional) Override pointsize option.
-	 * @param string $value[missingdatafunc] (optional) Override missingdatafunc option.
-	 * @param string $value[axisy]           (optional) Override axisy option.
-	 * @param string $value[timeshift]       (optional) Override timeshift option.
-	 *
-	 * @return object $this
-	 */
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		// Sort data sets according order field.
-		CArrayHelper::sort($this->value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
-
-		// Delete empty fields.
-		foreach ($this->value as $index => $val) {
-			$hosts = array_key_exists('hosts', $val)
-				? (is_array($val['hosts']) ? implode(', ', $val['hosts']) : $val['hosts'])
-				: '';
-			$items = array_key_exists('items', $val)
-				? (is_array($val['items']) ? implode(', ', $val['items']) : $val['items'])
-				: '';
-
-			$is_hosts_specified = ($hosts !== '');
-			$is_items_specified = ($items !== '');
-			$is_options_specified = (bool) array_intersect(array_keys($val), $this->override_options);
-
-			if (!$is_hosts_specified && !$is_items_specified && !$is_options_specified) {
-				unset($this->value[$index]);
-			}
-			else {
-				$this->value[$index]['hosts'] = $hosts;
-				$this->value[$index]['items'] = $items;
-			}
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Function makes field specific validation for values set using self::setValue().
 	 *
 	 * @param  bool $strict    Either to make a strict validation.
@@ -224,61 +195,40 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	 */
 	public function validate($strict = false) {
 		$errors = parent::validate($strict);
-		$values = $this->getValue();
-		$color_validator = new CColorValidator();
-
-		// Validate host and item pattern fields.
-		if (!$errors && $strict) {
-			foreach ($values as $val) {
-				if (!array_key_exists('hosts', $val) || $val['hosts'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('host pattern'),
-						_('Overrides'), _('cannot be empty')
-					);
-					break;
-				}
-				elseif (!array_key_exists('items', $val) || $val['items'] === '') {
-					$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('item pattern'),
-						_('Overrides'), _('cannot be empty')
-					);
-					break;
-				}
-			}
-		}
+		$value = $this->getValue();
+		$label = ($this->label === null) ? $this->name : $this->label;
 
 		// Validate options.
 		if (!$errors && $strict) {
-			foreach ($values as $override) {
-				$options_set = 0;
-				foreach ($override as $option => $val) {
-					if (!in_array($option, $this->override_options)) {
-						continue;
-					}
-
-					if ($option === 'color' && !$color_validator->validate($val)) {
-						$errors[]
-							= _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $val);
-					}
-					elseif ($option === 'timeshift') {
-						$timeshift = timeUnitToSeconds($val, true);
-						if ($timeshift === null // invalid
-							|| bccomp(ZBX_MIN_TIMESHIFT, $timeshift) == 1 // exceeds min timeshift
-							|| bccomp(ZBX_MAX_TIMESHIFT, $timeshift) == -1 // exceeds max timeshift
-						) {
-							$errors[]
-								= _s('Invalid parameter "%1$s": %2$s.', _('Time shift'), _('a time unit is expected'));
-						}
-					}
-					$options_set++;
-				}
-
-				if ($options_set == 0) {
-					$errors[] = _s('Override options are not specified.');
+			foreach ($value as $index => $overrides) {
+				if (!array_intersect($this->override_options, array_keys($overrides))) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+						_('at least one override option must be specified')
+					);
 					break;
 				}
 			}
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Makes minor manipulation in value like sorting. Must be called after validation of this value.
+	 *
+	 * @return $this
+	 */
+	protected function prepareValue() {
+		parent::prepareValue();
+
+		$value = $this->getValue();
+
+		// Sort data sets according order field.
+		CArrayHelper::sort($value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
+
+		$this->setValue($value);
+
+		return $this;
 	}
 
 	/**

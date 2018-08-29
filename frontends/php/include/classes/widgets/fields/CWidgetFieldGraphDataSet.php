@@ -32,8 +32,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	// First color from the default color palete.
 	const DEFAULT_COLOR = 'FF465C';
 
-	private $strict_validation_rules;
-
 	/**
 	 * Create widget field for Data set selection.
 	 *
@@ -43,11 +41,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$validation_rules = ['type' => API_OBJECTS, 'fields' => [
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED],
 			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED],
+			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 			'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
@@ -56,15 +55,32 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'missingdatafunc'	=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO])],
 			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'			=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
-		]];
-		$this->strict_validation_rules = $validation_rules;
-		$this->strict_validation_rules['flags'] = API_NOT_EMPTY;
-		$this->strict_validation_rules['fields']['hosts']['flags'] |= API_NOT_EMPTY;
-		$this->strict_validation_rules['fields']['items']['flags'] |= API_NOT_EMPTY;
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules($validation_rules);
+		]]);
 		$this->setDefault([]);
+	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules(null);
+		}
+
+		return $this;
 	}
 
 	/**
@@ -86,27 +102,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE
 		];
-	}
-
-	/**
-	 * Function makes field specific validation for values set using self::setValue().
-	 *
-	 * @param  bool $strict    Either to make a strict validation.
-	 *
-	 * @return array $errors   List of errors found during validation.
-	 */
-	public function validate($strict = false) {
-		$errors = parent::validate($strict);
-		$value = $this->getValue();
-		$label = ($this->label === null) ? $this->name : $this->label;
-
-		// At least on data set is mandatory.
-		if (!$errors && $strict
-				&& !CApiInputValidator::validate($this->strict_validation_rules, $value, $label, $error)) {
-			$errors[] = $error;
-		}
-
-		return $errors;
 	}
 
 	/**
@@ -137,6 +132,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
 
+		// TODO: fields with default values shouldn't be saved in the database
 		foreach ($value as $index => $val) {
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

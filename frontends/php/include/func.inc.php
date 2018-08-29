@@ -814,6 +814,7 @@ function convert_units($options = []) {
  *
  * @return int   Integer for valid input. Null otherwise.
  */
+// TODO: remove $allow_negative and time validation from low-level funtion.
 function timeUnitToSeconds($time, $allow_negative = false) {
 	$re = $allow_negative
 		? '/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/'

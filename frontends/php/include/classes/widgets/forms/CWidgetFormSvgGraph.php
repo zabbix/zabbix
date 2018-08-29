@@ -31,7 +31,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 *
 		 * Contains single CWidgetFieldGraphDataSet field for data sets definition and configuration.
 		 */
-		$field_dataset = (new CWidgetFieldGraphDataSet('ds', _('Data set')));
+		$field_dataset = (new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 		if (array_key_exists('ds', $this->data)) {
 			// Values received from frontend are strings. Values received from database comes as arrays.
 			// TODO: remove hack with modifying of unvalidated data.
@@ -372,8 +372,20 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 *
 		 * Contains single field for override configuration.
 		 */
-		$overrides = (new CWidgetFieldGraphOverride('or', ''));
+		$overrides = (new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 		if (array_key_exists('or', $this->data)) {
+			// Values received from frontend are strings. Values received from database comes as arrays.
+			// TODO: remove hack with modifying of unvalidated data.
+			foreach ($this->data['or'] as &$value) {
+				if (array_key_exists('hosts', $value)) {
+					$value['hosts'] = is_array($value['hosts']) ? implode(', ', $value['hosts']) : $value['hosts'];
+				}
+				if (array_key_exists('items', $value)) {
+					$value['items'] = is_array($value['items']) ? implode(', ', $value['items']) : $value['items'];
+				}
+			}
+			unset($value);
+
 			$overrides->setValue($this->data['or']);
 		}
 
