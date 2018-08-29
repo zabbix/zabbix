@@ -758,7 +758,7 @@ output {
 					}
 				}
 
-				@if $theme_name == 'blue' or $theme_name == "dark" {
+				@if $theme_name == 'blue' or $theme_name == 'dark' {
 
 					&:not(.row-selected):not(:hover) {
 						td {
@@ -810,6 +810,7 @@ output {
 			height: 22px;
 			line-height: 1;
 			vertical-align: middle;
+			white-space: nowrap;
 
 			[class*='icon-'] {
 				vertical-align: middle;
@@ -848,6 +849,21 @@ output {
 
 				@media screen and (min-width: 1600px) {
 					max-width: 133px;
+				}
+			}
+
+			.icon-maint {
+				position: relative;
+				display: inline-block;
+				height: 12px;
+				width: 12px;
+				margin: 0 1px 0 2px !important;
+				vertical-align: bottom;
+
+				&::before {
+					height: 12px;
+					width: 12px;
+					background-position: -48px -804px;
 				}
 			}
 
@@ -1011,12 +1027,17 @@ output {
 		}
 	}
 
+	tbody th,
 	td {
 		padding: 6px 5px;
 		position: relative;
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+	}
+
+	tbody th {
+		text-align: inherit;
 	}
 
 	.vertical_rotation_inner {
@@ -1509,6 +1530,7 @@ output {
 	}
 
 	div[aria-live] {
+		overflow: hidden;
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -2344,7 +2366,8 @@ $icon-widget-btn: (
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -6px -546px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -6px -582px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -6px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px
+	sound-off: url(../img/icon-sprite.svg) no-repeat -6px -510px,
+	info-clock: url(../img/icon-sprite.svg) no-repeat -87px -762px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -2620,7 +2643,7 @@ $icon-widget-btn: (
 			.icon-cal {
 				position: relative;
 				vertical-align: middle;
-				margin-left: -5px;
+				margin-left: 2px;
 			}
 		}
 	}
@@ -2848,7 +2871,7 @@ $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -3725,6 +3748,7 @@ $form-icon-btn: (
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
 			margin: 0 0 10px 0;
+			@extend %webkit-scrollbar;
 		}
 		.overlay-dialogue-controls {
 			text-align: right;
@@ -3741,6 +3765,10 @@ $form-icon-btn: (
 			top: -13px;
 			right: -8px;
 		}
+	}
+
+	&.sticked-to-top {
+		top: 50px;
 	}
 
 	&.modal-popup {
@@ -4145,6 +4173,105 @@ $form-icon-btn: (
 	border-top: none;
 	border-bottom: none;
 }
+.svg-graph-selection {
+	fill: $yellow;
+	fill-opacity: 0.35;
+	stroke-color: rgba($dark-yellow,0.6);
+	stroke-width: 1px;
+}
+.svg-helper {
+	stroke-opacity: 0.35;
+	stroke: $red;
+	stroke-width: 2px;
+}
+.svg-point-highlight {
+	fill: $font-color;
+	fill-opacity: 0.5;
+}
+.svg-graph-hintbox-item-color {
+	margin: 3px 10px 3px 3px;
+	width: 10px;
+	height: 10px;
+	float: left;
+	display: block;
+}
+
+.svg-graph-preview {
+	margin-top: 10px;
+	width: 960px;
+	height: 300px;
+	position: relative;
+
+	> div {
+		background: $ui-bg-color;
+		height: 300px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		z-index: 999;
+	}
+}
+
+.svg-graph-legend {
+	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
+	$svg-legend-line-height: 18px;
+	$svg-legend-handle-height: 4px;
+
+	overflow-y: hidden;
+	white-space: normal;
+	margin: 0 10px;
+
+	div {
+		display: inline-block;
+		margin: 0 4px;
+		font-size: 12px;
+		line-height: $svg-legend-line-height;
+		vertical-align: middle;
+		max-width: 30%;
+		min-width: 120px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		border: 0 none transparent;
+	}
+
+	div:before {
+		content: ' ';
+		display: inline-block;
+		margin-right: 4px;
+		width: 10px;
+		height: 0;
+		vertical-align: middle;
+		margin-top: -$svg-legend-handle-height;
+		border-top-width: $svg-legend-handle-height;
+		border-top-style: solid;
+		border-top-color: inherit;
+	}
+}
+
+.svg-graph-hintbox {
+	padding-top: 5px;
+	display: block;
+	font-size: 12px;
+	line-height: 18px;
+
+	.table-paging {
+		min-height: 18px;
+		padding: 0px 0px 2px;
+		border: none;
+		top: 2px;
+
+		.paging-btn-container {
+			min-height: inherit;
+		}
+	}
+
+	.list-table tbody tr:last-child td {
+		border-bottom-style: none;
+		box-shadow: none;
+	}
+}
 
 .ui-selectable-helper {
 	position: absolute;
@@ -4516,10 +4643,6 @@ a.link-action {
 	}
 }
 
-.na-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.na-bg {
 	~ td.na-bg {
 		border-left: 1px dotted $table-border-color;
@@ -4540,10 +4663,6 @@ td.na-bg {
 	}
 }
 
-.normal-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.normal-bg {
 	@extend td.na-bg;
 }
@@ -4555,10 +4674,6 @@ td.normal-bg {
 	input[type="radio"]:checked + label {
 		color: darken($alt-dark-blue, 45%);
 	}
-}
-
-.info-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
 }
 
 td.info-bg {
@@ -4579,10 +4694,6 @@ td.info-bg {
 	}
 }
 
-.average-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.average-bg {
 	@extend td.na-bg;
 }
@@ -4594,10 +4705,6 @@ td.average-bg {
 	input[type="radio"]:checked + label {
 		color: darken($alt-yellow, 45%);
 	}
-}
-
-.warning-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
 }
 
 td.warning-bg {
@@ -4618,10 +4725,6 @@ td.warning-bg {
 	}
 }
 
-.high-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
-}
-
 td.high-bg {
 	@extend td.na-bg;
 }
@@ -4640,8 +4743,25 @@ td.high-bg {
 	}
 }
 
-.disaster-bg.blink-hidden {
-	background-color: rgba(0, 0, 0, 0.0);
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg {
+
+	a {
+		transition: none;
+	}
+
+	&.blink-hidden {
+		background-color: transparent;
+
+		a {
+			color: $font-color;
+		}
+	}
 }
 
 td.disaster-bg {
@@ -5087,6 +5207,10 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
+	input[readonly] + div, input:disabled + div {
+		cursor: default;
+	}
+
 	input[type="text"] {
 		padding-left: 25px;
 	}
@@ -5305,7 +5429,7 @@ tr.cursor-move {
 	white-space: nowrap;
 
 	.icon-info {
-		margin-right: 10px;
+		margin-right: 5px;
 
 		&:only-of-type {
 			margin-right: 0;
@@ -5313,6 +5437,9 @@ tr.cursor-move {
 
 		&:last-child {
 			margin-right: 0;
+		}
+		&.status-green {
+			border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
 		}
 	}
 }
@@ -5417,6 +5544,141 @@ svg {
 	.navtree .problems {
 		margin-left: 10px;
 		left: -15px;
+	}
+}
+
+.overrides-list {
+	display: table;
+	width: 90%;
+	padding-left: 15px;
+
+	.overrides-list-item {
+		display: table-row;
+	}
+}
+
+.overrides-options-list {
+	white-space: normal;
+	padding: 0px 0px 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid $table-border-color;
+
+	> li {
+		display: inline-block;
+		margin: 2px 7px 2px 0;
+		white-space: nowrap;
+
+		> div {
+			position: relative;
+			padding: 1px 22px 1px 1px;
+			background-color: lighten($ui-bg-selected-color, 10%);
+			border-radius: 2px;
+
+			> span {
+				color: lighten($ui-bg-selected-color, 100%);
+				padding-left: 8px;
+				line-height: 22px;
+			}
+
+			> input[type=text] {
+				border-style: none;
+				line-height: 22px;
+				min-height: 22px;
+				width: 85px;
+			}
+
+			> .remove-btn {
+				color: #ffffff;
+				right: 2px;
+				top: 3px;
+
+				&:active {
+					background-color: lighten($ui-bg-selected-color, 100%);
+				}
+			}
+		}
+	}
+}
+
+.color-preview-box {
+	height: 24px;
+	width: 24px;
+	float: left;
+	margin-right: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.list-vertical-accordion {
+	display: table;
+	padding-left: 15px;
+	width: 100%;
+
+	.list-accordion-item {
+		display: table-row;
+	}
+
+	.list-accordion-item-closed {
+		height: 30px;
+
+		.list-accordion-item-body {
+			display: none;
+		}
+		.patternselect {
+			overflow: hidden;
+			max-height: 24px;
+			line-height: 24px;
+			padding: 0px 5px;
+			height: 24px;
+		}
+	}
+}
+
+.columns-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+
+	.column-5,
+	.column-10,
+	.column-33,
+	.column-50,
+	.column-90,
+	.column-95 {
+		-webkit-box-flex: 0;
+	}
+	.column-5 {
+		-ms-flex: 0 0 5%;
+		flex: 0 0 5%;
+		max-width: 5%;
+	}
+	.column-10 {
+		-ms-flex: 0 0 10%;
+		flex: 0 0 10%;
+		max-width: 10%;
+	}
+	.column-33 {
+		-ms-flex: 0 0 33.33333%;
+		flex: 0 0 33.33333%;
+		max-width: 33.33333%;
+	}
+	.column-50 {
+		-ms-flex: 0 0 50%;
+		flex: 0 0 50%;
+		max-width: 50%;
+	}
+	.column-90 {
+		-ms-flex: 0 0 90%;
+		flex: 0 0 90%;
+		max-width: 90%;
+	}
+	.column-95 {
+		-ms-flex: 0 0 95%;
+		flex: 0 0 95%;
+		max-width: 95%;
 	}
 }
 
@@ -5722,6 +5984,7 @@ svg {
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
+.icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -5783,6 +6046,9 @@ svg {
 .icon-action-ack::before {
 	background-position: -323px -245px;
 }
+.icon-invisible::before {
+	background-position: -89px -803px;
+}
 .icon-problem-generated::before {
 	background-position: -449px -245px;
 }
@@ -5820,6 +6086,147 @@ svg {
 	&::before {
 		background-position: -524px -245px;
 	}
+}
+
+// RANGE CONTROL
+$range-track-color: silver;
+$range-progress-color: $link-color;
+$range-thumb-color: $link-color;
+$range-thumb-color-focus: $link-active-color;
+$range-progress-color-focus: $link-active-color;
+$range-thumb-size: 10px;
+$range-track-height: 2px;
+
+[type=range] {
+	cursor: pointer;
+	-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+	width: 100%; /* Specific width is required for Firefox. */
+	opacity: 0;
+	vertical-align: middle;
+	padding: 0px;
+	height: 24px;
+}
+
+[type=range]:focus {
+	outline: none;
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+	cursor: pointer;
+	margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+	height: $range-thumb-size;
+	width: $range-thumb-size;
+	opacity: 0;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+	height: $range-thumb-size;
+	opacity: 0;
+}
+
+
+.range-control {
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 $range-thumb-size 0 0;
+
+	.range-control-track, .range-control-progress {
+		position: absolute;
+		top: 50%;
+		margin-top: -$range-track-height/2;
+		left: 0;
+		height: $range-track-height;
+		cursor: pointer;
+	}
+
+	.range-control-thumb {
+		position: absolute;
+		top: 50%;
+		margin-top: -$range-thumb-size/2;
+		margin-left: -$range-thumb-size/2;
+		width: $range-thumb-size;
+		height: $range-thumb-size;
+		border-radius: $range-thumb-size/2;
+		box-shadow: 0 0 1px white;
+		background: $range-thumb-color;
+	}
+
+	.range-control-track {
+		width: 100%;
+		background: $range-track-color;
+	}
+
+	.range-control-progress {
+		background: $range-progress-color;
+	}
+
+	&.disabled {
+		opacity: 1;
+
+		[type=range] {
+			cursor: default;
+		}
+		.range-control-progress,
+		.range-control-thumb {
+			background: silver;
+		}
+	}
+
+	datalist {
+		position: absolute;
+		display: flex;
+		width: 100%;
+		top: 50%;
+		margin-top: -$range-track-height/2;
+
+		option {
+			padding: 0;
+			font-size: 0;
+			flex: 1 0 0px;
+			height: $range-track-height;
+			border-left: 1px solid $body-bg-color;
+		}
+	}
+}
+
+div.range-control {
+	width: 240px;
+}
+input[type=text].range-control {
+	width: 31px;
+}
+
+.range-control-focus {
+	.range-control-thumb {
+		background: $range-thumb-color-focus;
+		box-shadow: 0 0 1px black;
+	}
+
+	.range-control-progress {
+		background: $range-progress-color-focus;
+	}
+}
+
+.graph-legend {
+	text-align: left;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.graph-widget-config-tabs {
+	padding: 10px 0px;
+
+	> .tabs-nav {
+		padding-left: calc(15% + 20px);
+	}
+}
+
+// Screen reader
+.inline-sr-only {
+	font-size: 0;
 }
 
 @if $theme_name == 'dev' {

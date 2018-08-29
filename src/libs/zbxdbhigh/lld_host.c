@@ -646,7 +646,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, host);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)host);
 
 	return host;
 }
@@ -987,7 +987,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t gr
 out:
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, group);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)group);
 
 	return group;
 }

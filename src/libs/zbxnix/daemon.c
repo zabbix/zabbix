@@ -196,7 +196,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			SIG_CHECKED_FIELD(siginfo, si_pid),
 			SIG_CHECKED_FIELD(siginfo, si_uid),
 			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT),
-			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
+			(unsigned int)SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
 	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
 
