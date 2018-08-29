@@ -40,7 +40,12 @@ class CBrandHelper {
 
 			if (file_exists($config_file_path)) {
 				self::$config = include $config_file_path;
-				self::$config['IS_REBRANDED'] = true;
+				if (is_array(self::$config)) {
+					self::$config['IS_REBRANDED'] = true;
+				}
+				else {
+					self::$config = [];
+				}
 			}
 		}
 	}
