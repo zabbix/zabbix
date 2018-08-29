@@ -143,5 +143,6 @@ dc_maintenance_match_tags_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	@SERVER_LIBS@	
-	
+
+dc_maintenance_match_tags_LDFLAGS = @SERVER_LDFLAGS@
 endif
