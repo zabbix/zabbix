@@ -22,6 +22,7 @@ A.F.....S. [ZBXNEXT-4627,ZBXNEXT-4656] added support of macro functions to LLD m
 ..F.I..... [ZBXNEXT-4597] implemented single textbox date fields in maintenances, services, top 100 triggers and availability reports pages (Ivo)
 
 Bug fixes:
+..F....... [ZBX-14637] fixed fixed text readable on the problems widgets in dark theme (ashubin)
 ....I..... [ZBX-14751] fixed "cannot run test program while cross compiling" and "cannot check for file existence when cross compiling" errors during cross-compilation (vso)
 .......PS. [ZBX-14677] fixed vmware performance counter retrieval on installations with large number of datastores (wiper)
 ..F....... [ZBXNEXT-4500] fixed item prototype master item links leading to error when master item is a web item (Ivo)
