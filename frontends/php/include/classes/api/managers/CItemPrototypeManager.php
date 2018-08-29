@@ -25,8 +25,7 @@
 class CItemPrototypeManager {
 
 	/**
-	 * Deletes item prototypes, inherited item prototypes, dependent items and item prototypes, discovered items,
-	 * graph prototypes, trigger prototypes, screen items, performs application prototype unlinking.
+	 * Deletes item prototypes and related entities without permission check.
 	 *
 	 * @param array $itemids
 	 */

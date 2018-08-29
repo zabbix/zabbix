@@ -25,8 +25,7 @@
 class CTriggerPrototypeManager {
 
 	/**
-	 * Deletes trigger prototypes, inherited trigger prototypes, discovered triggers, tags, dependent triggers
-	 * and prototypes.
+	 * Deletes trigger prototypes and related entities without permission check.
 	 *
 	 * @param array $triggerids
 	 */

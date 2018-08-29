@@ -25,7 +25,7 @@
 class CGraphPrototypeManager {
 
 	/**
-	 * Deletes graph prototypes, inherited graph prototypes, discovered graphs and screen items.
+	 * Deletes graph prototypes and related entities without permission check.
 	 *
 	 * @param array $graphids
 	 */

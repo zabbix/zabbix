@@ -25,8 +25,7 @@
 class CItemManager {
 
 	/**
-	 * Deletes items, inherited items, dependent items, graphs, graph prototypes, triggers, trigger prototypes,
-	 * screen items, performs profile cleaning and housekeeping.
+	 * Deletes items and related entities without permission check.
 	 *
 	 * @param array $itemids
 	 */
