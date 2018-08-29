@@ -71,57 +71,48 @@ class CControllerAuthenticationEdit extends CController {
 
 	protected function doAction() {
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-		$config = select_config();
 
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
-			'ldap_configured' => $config['ldap_configured'],
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'ldap_test_password' => '',
+			'ldap_test_user' => CWebUser::$data['alias'],
 			'change_bind_password' => 0,
-			'authentication_type' => $config['authentication_type'],
-			'db_authentication_type' => $config['authentication_type'],
-			'http_case_sensitive' => $config['http_case_sensitive'],
-			'ldap_case_sensitive' => $config['ldap_case_sensitive'],
-			'ldap_host' => $config['ldap_host'],
-			'ldap_port' => $config['ldap_port'],
-			'ldap_base_dn' => $config['ldap_base_dn'],
-			'ldap_bind_dn' => $config['ldap_bind_dn'],
-			'ldap_search_attribute' => $config['ldap_search_attribute'],
-			'ldap_bind_password' => $this->getInput('change_bind_password', 0) ? '' : $config['ldap_bind_password'],
-			'ldap_test_user' => '',
-			'http_auth_enabled' => $config['http_auth_enabled'],
-			'http_login_form' => $config['http_login_form'],
-			'http_strip_domains' => $config['http_strip_domains'],
 			'form_refresh' => 0
 		];
 
-		$this->getInputs($data, [
-			'form_refresh',
-			'change_bind_password',
-			'authentication_type',
-			'http_case_sensitive',
-			'ldap_case_sensitive',
-			'ldap_configured',
-			'ldap_host',
-			'ldap_port',
-			'ldap_base_dn',
-			'ldap_bind_dn',
-			'ldap_search_attribute',
-			'ldap_bind_password',
-			'ldap_test_user',
-			'http_auth_enabled',
-			'http_login_form',
-			'http_strip_domains'
-		]);
+		if ($this->hasInput('form_refresh')) {
+			// Fill value for unchecked state to prevent defaults values from database to be set.
+			$data += array_fill_keys(['http_case_sensitive', 'ldap_case_sensitive'], 0);
+
+			$this->getInputs($data, [
+				'form_refresh',
+				'change_bind_password',
+				'authentication_type',
+				'http_case_sensitive',
+				'ldap_case_sensitive',
+				'ldap_configured',
+				'ldap_host',
+				'ldap_port',
+				'ldap_base_dn',
+				'ldap_bind_dn',
+				'ldap_search_attribute',
+				'ldap_bind_password',
+				'ldap_test_user',
+				'http_auth_enabled',
+				'http_login_form',
+				'http_strip_domains'
+			]);
+
+			$data += DB::getDefaults('config');
+		}
+		else {
+			$data += select_config();
+		}
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
 				&& $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
-
-		if ($data['ldap_test_user'] === '') {
-			$data['ldap_test_user'] = CWebUser::$data['alias'];
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of authentication'));

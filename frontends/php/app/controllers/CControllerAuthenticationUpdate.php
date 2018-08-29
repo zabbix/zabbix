@@ -149,73 +149,51 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'http_case_sensitive' => 0,
-			'http_auth_enabled' => 0,
-			'ldap_configured' => 0,
-			'ldap_case_sensitive' => 0,
-		];
+		// Only ZBX_AUTH_LDAP have 'Test' option.
+		if ($this->hasInput('ldap_test')) {
+			$this->response->setMessageOk(_('LDAP login successful'));
+
+			$this->response->setFormData($this->getInputAll());
+
+			$this->setResponse($this->response);
+			return;
+		}
+
+		$data = DB::getDefaults('config');
+
+		$http_fields = $this->getInput('http_auth_enabled', 0) == ZBX_AUTH_HTTP_ENABLED
+			? ['http_case_sensitive', 'http_login_form', 'http_strip_domains']
+			: [];
+
+		$ldap_fields = $this->getInput('http_auth_enabled', 0) == ZBX_AUTH_LDAP_ENABLED
+			? ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute', 'ldap_bind_password']
+			[];
 
 		$this->getInputs($data, [
 			'authentication_type',
-			'http_case_sensitive',
 			'ldap_case_sensitive',
 			'ldap_configured',
-			'ldap_host',
-			'ldap_port',
-			'ldap_base_dn',
-			'ldap_bind_dn',
-			'ldap_search_attribute',
-			'ldap_bind_password',
 			'http_auth_enabled',
-			'http_login_form',
-			'http_strip_domains'
-		]);
+		] + $http_fields + $ldap_fields);
 
-		if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
-			$data = array_merge($data, [
-				'ldap_host' => '',
-				'ldap_port' => '389',
-				'ldap_base_dn' => '',
-				'ldap_bind_dn' => '',
-				'ldap_search_attribute' => '',
-				'ldap_bind_password' => ''
-			]);
-		}
+		$config = select_config();
+		$data = array_diff_assoc($data, $config);
 
-		if ($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED) {
-			$data = array_merge($data, [
-				'http_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE,
-				'http_login_form' => ZBX_AUTH_FORM_ZABBIX,
-				'http_strip_domains' => ''
-			]);
-		}
+		if ($data) {
+			$result = update_config($data);
 
-		if ($this->hasInput('ldap_test')) {
-			// Only ZBX_AUTH_LDAP have 'Test' option.
-			$this->response->setMessageOk(_('LDAP login successful'));
-			$this->response->setFormData($this->getInputAll());
-		}
-		else {
-			$config = select_config();
-			$data = array_diff_assoc($data, $config);
-
-			if ($data) {
-				$result = update_config($data);
-
-				if ($result) {
-					if (array_key_exists('authentication_type', $data)
-							&& $config['authentication_type'] != $data['authentication_type']) {
-						$this->invalidateSessions();
-					}
-
-					$this->response->setMessageOk(_('Authentication settings updated'));
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
+			if ($result) {
+				if (array_key_exists('authentication_type', $data)
+						&& $config['authentication_type'] != $data['authentication_type']) {
+					$this->invalidateSessions();
 				}
-				else {
-					$this->response->setFormData($this->getInputAll());
-					$this->response->setMessageError(_('Cannot update authentication'));
-				}
+
+				$this->response->setMessageOk(_('Authentication settings updated'));
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed'));
+			}
+			else {
+				$this->response->setFormData($this->getInputAll());
+				$this->response->setMessageError(_('Cannot update authentication'));
 			}
 		}
 
