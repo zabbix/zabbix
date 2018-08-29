@@ -398,6 +398,7 @@ class CSvgGraph extends CSvg {
 	public function draw() {
 		$this->calculateDimensions();
 		$this->calculatePaths();
+		$this->calculateYAxis();
 
 		$this->drawGrid();
 
@@ -444,6 +445,27 @@ class CSvgGraph extends CSvg {
 				)
 				->setAttribute('id', $areaid)
 		);
+	}
+
+	/**
+	 * Calculate which Y axis will be shown in graph.
+	 */
+	protected function calculateYAxis() {
+		$metrics_for_each_axes = [
+			GRAPH_YAXIS_SIDE_LEFT => 0,
+			GRAPH_YAXIS_SIDE_RIGHT => 0
+		];
+
+		foreach ($this->metrics as $metric) {
+			$metrics_for_each_axes[$metric['options']['axisy']]++;
+		}
+
+		if ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_LEFT] == 0) {
+			$this->left_y_show = false;
+		}
+		if ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_RIGHT] == 0) {
+			$this->right_y_show = false;
+		}
 	}
 
 	/**
@@ -676,7 +698,7 @@ class CSvgGraph extends CSvg {
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
-				// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be skipped in multiple svg shapes.
+				// If missing data function is SVG_GRAPH_MISSING_DATA_NONE, path should be splitted in multiple svg shapes.
 				if ($point === null) {
 					$path_num++;
 					continue;
