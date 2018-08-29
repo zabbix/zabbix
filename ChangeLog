@@ -1,6 +1,7 @@
 Changes for 4.0.0beta2
 
 New features:
+.......PS. [ZBX-14677] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 
 Bug fixes:
 ..F....... [ZBX-14462] improved time selection when opening calendar with missing time (vmurzins)
