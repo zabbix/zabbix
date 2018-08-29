@@ -471,7 +471,12 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype'], [
+				'table' => 'event_tag',
+				'alias' => 'et',
+				'parent_alias' => 'e',
+				'field' => 'eventid'
+			]);
 		}
 
 		// time_from
@@ -539,16 +544,17 @@ class CEvent extends CApiService {
 	/**
 	 * Returns SQL condition for tag filters.
 	 *
-	 * @param array $tags
-	 * @param int   $evaltype
-	 * @param bool  $is_events
+	 * @param array  $tags
+	 * @param int    $evaltype
+	 * @param array  $params
+	 * @param string $params['table']
+	 * @param string $params['alias']
+	 * @param string $params['parent_alias']
+	 * @param string $params['field']
 	 *
 	 * @return array
 	 */
-	public static function getTagsWhereCondition(array $tags, $evaltype, $is_events = true) {
-		$alias = $is_events ? 'et' : 'pt';
-		$parent_alias = $is_events ? 'e' : 'p';
-		$table = $is_events ? 'event_tag' : 'problem_tag';
+	public static function getTagsWhereCondition(array $tags, $evaltype, array $params) {
 		$values_by_tag = [];
 
 		foreach ($tags as $tag) {
@@ -557,7 +563,7 @@ class CEvent extends CApiService {
 
 			if (!array_key_exists($tag['tag'], $values_by_tag) || is_array($values_by_tag[$tag['tag']])) {
 				if ($operator == TAG_OPERATOR_EQUAL) {
-					$values_by_tag[$tag['tag']][] = $alias.'.value='.zbx_dbstr($value);
+					$values_by_tag[$tag['tag']][] = $params['alias'].'.value='.zbx_dbstr($value);
 				}
 				elseif ($value !== '') {
 					$value = str_replace('!', '!!', $value);
@@ -565,7 +571,8 @@ class CEvent extends CApiService {
 					$value = str_replace('_', '!_', $value);
 					$value = '%'.mb_strtoupper($value).'%';
 
-					$values_by_tag[$tag['tag']][] = 'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+					$values_by_tag[$tag['tag']][] =
+						'UPPER('.$params['alias'].'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 				}
 				// ($value === '') - all other conditions can be omitted
 				else {
@@ -589,9 +596,9 @@ class CEvent extends CApiService {
 
 			$sql_where[] = 'EXISTS ('.
 				'SELECT NULL'.
-				' FROM '.$table.' '.$alias.
-				' WHERE '.$parent_alias.'.eventid='.$alias.'.eventid'.
-					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
+				' FROM '.$params['table'].' '.$params['alias'].
+				' WHERE '.$params['parent_alias'].'.'.$params['field'].'='.$params['alias'].'.'.$params['field'].
+					' AND '.$params['alias'].'.tag='.zbx_dbstr($tag).$values.
 			')';
 		}
 
