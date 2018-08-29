@@ -87,9 +87,6 @@ $theme = CWebUser::$data ? getUserTheme(CWebUser::$data) : ZBX_DEFAULT_THEME;
 
 DBclose();
 
-// Init brand configuration.
-CBrand::getInstance(realpath(dirname(__FILE__).'/../../..'));
-
 /*
  * Setup wizard
  */

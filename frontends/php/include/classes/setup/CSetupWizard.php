@@ -96,7 +96,7 @@ class CSetupWizard extends CForm {
 		$setup_left = (new CDiv([
 			(new CDiv())
 				->addClass(ZBX_STYLE_SIGNIN_LOGO)
-				->addClass(CBrand::isBrand() ? ZBX_STYLE_BRAND_LOGO : null),
+				->addStyle(CBrandHelper::getLogoStyle()),
 			$this->getList()
 		]))->addClass(ZBX_STYLE_SETUP_LEFT);
 
