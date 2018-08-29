@@ -21,7 +21,7 @@
 
 class CWidgetFieldComboBox extends CWidgetField {
 
-	protected $values;
+	private $values;
 
 	/**
 	 * Combo box widget field. Can use both, string and integer type keys.

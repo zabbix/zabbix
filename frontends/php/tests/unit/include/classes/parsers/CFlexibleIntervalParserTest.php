@@ -69,6 +69,36 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{#A}/{#B}'
 				]
 			],
+			[
+				'{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}'
+				]
+			],
+			[
+				'{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
+				]
+			],
+			[
+				'{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}', 0,
+					['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
+				]
+			],
+			[
+				'{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}.regsub("^([0-9]+)", "{#B}: \1")}', 0,
+					['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}'
+				]
+			],
 			// partial success
 			[
 				'random text.....52w/7,00:00-0:01....text', 16, [],

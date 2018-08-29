@@ -48,6 +48,7 @@ FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|0
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|tags_evaltype	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|active_since,active_till
 UNIQUE		|2		|name
 
@@ -443,7 +444,7 @@ FIELD		|def_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|r_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|maintenance_mode|t_integer	|'1'	|NOT NULL	|0
+FIELD		|pause_suppressed|t_integer	|'1'	|NOT NULL	|0
 FIELD		|ack_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|ack_longdata	|t_shorttext	|''	|NOT NULL	|0
 INDEX		|1		|eventsource,status
@@ -602,6 +603,12 @@ FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends	|t_varchar(32)	|'365d'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
 FIELD		|custom_color	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|http_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|http_login_form	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -835,6 +842,7 @@ FIELD		|expand_macros	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity_min	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users	|		|RESTRICT
 FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|show_suppressed|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|backgroundid
 INDEX		|3		|iconmapid
@@ -1621,7 +1629,24 @@ TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 
+TABLE|event_suppress|event_suppressid|0
+FIELD		|event_suppressid|t_id		|	|NOT NULL	|0
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
+FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
+UNIQUE		|1		|eventid,maintenanceid
+INDEX		|2		|suppress_until
+INDEX		|3		|maintenanceid
+
+TABLE|maintenance_tag|maintenancetagid|ZBX_DATA
+FIELD		|maintenancetagid|t_id		|	|NOT NULL	|0
+FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0			|1|maintenances
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX|1|maintenanceid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050128	|3050128
+ROW		|3050155	|3050155

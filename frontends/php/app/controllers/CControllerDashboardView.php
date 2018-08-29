@@ -112,13 +112,15 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			];
 			updateTimeSelectorPeriod($timeselector_options);
 
+			$widgets = self::getWidgets($this->dashboard['widgets']);
+
 			$data = [
 				'dashboard' => $dashboard,
 				'fullscreen' => $fullscreen,
 				'kioskmode' => $kioskmode,
-				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
+				'grid_widgets' => $widgets,
 				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
+				'show_timeselector' => self::showTimeSelector($widgets),
 				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
 				'timeline' => getTimeSelectorPeriod($timeselector_options)
 			];
@@ -519,7 +521,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private static function showTimeSelector(array $widgets) {
 		foreach ($widgets as $widget) {
-			if (CWidgetConfig::usesTimeline($widget['type'])) {
+			if (CWidgetConfig::usesTimeSelector($widget)) {
 				return true;
 			}
 		}

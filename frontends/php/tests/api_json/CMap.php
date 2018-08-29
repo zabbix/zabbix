@@ -31,7 +31,6 @@ class API_JSON_Map extends CZabbixTest {
 					'width' => 600,
 					'height' => 800,
 					'backgroundid' => 0,
-					'highlight' => 0,
 					'label_type' => 0,
 					'label_location' => 0,
 					'grid_size' => 100,
@@ -42,6 +41,7 @@ class API_JSON_Map extends CZabbixTest {
 					'markelements' => 0,
 					'show_unack' => 0,
 					'severity_min' => 0,
+					'show_suppressed' => 0,
 					'selements' => []
 				]],
 			],
