@@ -34,13 +34,6 @@ class CWebUser {
 	static $extend_session = true;
 
 	/**
-	 * Initialize guest user session if session id is not present.
-	 *
-	 * @var bool
-	 */
-	protected static $init_guest_session = true;
-
-	/**
 	 * Disable automatic cookie setting.
 	 * First checkAuthentication call (performed in initialization phase) will not be sending cookies.
 	 */
@@ -53,13 +46,6 @@ class CWebUser {
 	 */
 	public static function disableSessionExtension() {
 		self::$extend_session = false;
-	}
-
-	/**
-	 * Disable automatic fallback to guest user session initialization when no valid session were found.
-	 */
-	public static function disableGuestAutoLogin() {
-		self::$init_guest_session = false;
 	}
 
 	/**
@@ -127,7 +113,7 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication($sessionId) {
-		if ($sessionId === null && !self::$init_guest_session) {
+		if ($sessionId === null) {
 			self::setDefault();
 			return false;
 		}

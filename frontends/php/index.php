@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
-CWebUser::disableGuestAutoLogin();
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -38,23 +37,9 @@ $fields = [
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
 	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'guest_login' => [T_ZBX_INT, O_OPT, null,	null,	null],
 	'form' =>		[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
-
-/**
- * When HTTP authentication is enabled attempt to silently login as guest by opening any URL except this one
- * will fail to HTTP authentication therefore we have to login guest user explicitly.
- */
-if (hasRequest('guest_login')) {
-	// Remove HTTP authentication step messages if any exists.
-	clear_messages();
-	CWebUser::login(ZBX_GUEST_USER, '');
-	redirect(ZBX_DEFAULT_URL);
-
-	exit;
-}
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
@@ -105,9 +90,7 @@ $messages = clear_messages();
 	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 		? (new CUrl('index_http.php'))->removeArgument('sid')
 		: '',
-	'guest_login_url' => CWebUser::isGuestAllowed()
-		? (new CUrl())->setArgument('guest_login', 1)
-		: '',
+	'guest_login_url' => CWebUser::isGuestAllowed() ? ZBX_DEFAULT_URL : '',
 	'autologin' => $autologin == 1,
 	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
 ]))->render();
