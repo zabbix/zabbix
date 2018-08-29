@@ -167,7 +167,7 @@ class CADNameAttributeParser extends CParser {
 	 * @return int
 	 */
 	private function parseUserPrincipalName($source, &$pos) {
-		$regex = '/^(?<user>[_a-z0-9-@]+(\.[_a-z0-9-]+)*)@(?<domain>[a-z0-9-]+(\.[a-z0-9-]+)*(?:\.[a-z]{2,4}))/i';
+		$regex = '/^(?<user>[_a-z0-9-@]+(\.[_a-z0-9-]+)*)@(?<domain>[a-z0-9-]+(\.[a-z0-9-]+)*)/i';
 
 		if (preg_match($regex, substr($source, $pos), $matches)) {
 			$this->length = strlen($matches[0]);
