@@ -22,6 +22,8 @@
 $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
 	->addItem((new CList())
+	->setAttribute('role', 'navigation')
+	->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
 		(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
