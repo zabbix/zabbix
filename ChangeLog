@@ -457,6 +457,7 @@ Changes for 3.4.14rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-14756] fixed zbxregexp library not compiling with old versions of pcre; thanks to Simon Matter for the patch (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.13
