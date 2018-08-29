@@ -963,7 +963,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					return;
 
 				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_HISTORY_MAX >= value)))
+						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
 				{
 					return;
 				}
@@ -976,7 +976,7 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					return;
 
 				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_TRENDS_MAX >= value)))
+						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
 				{
 					return;
 				}
