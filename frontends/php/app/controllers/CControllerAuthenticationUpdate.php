@@ -179,7 +179,15 @@ class CControllerAuthenticationUpdate extends CController {
 				'ldap_base_dn' => '',
 				'ldap_bind_dn' => '',
 				'ldap_search_attribute' => '',
-				'ldap_bind_password' => '',
+				'ldap_bind_password' => ''
+			]);
+		}
+
+		if ($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED) {
+			$data = array_merge($data, [
+				'http_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE,
+				'http_login_form' => ZBX_AUTH_FORM_ZABBIX,
+				'http_strip_domains' => ''
 			]);
 		}
 
