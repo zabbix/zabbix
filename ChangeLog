@@ -1,6 +1,19 @@
-Changes for 4.0.0alpha10
+Changes for 4.0.0beta2
 
 New features:
+
+Bug fixes:
+..F....... [ZBX-14462] improved time selection when opening calendar with missing time (vmurzins)
+.......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
+..F....... [ZBX-14637] fixed fixed text readable on the problems widgets in dark theme (ashubin)
+..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.0beta1
+
+New features:
+A.F....... [ZBXNEXT-4588] implemented SVG graph widget (ashubin, gcalenko, miks, Sasha)
+A.F.I..... [ZBXNEXT-4573] added support of HTTP authentication as optional authentication mechanism (gcalenko, Ivo, vmurzins)
 A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
 ..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
 A......... [ZBXNEXT-4656] added strict validation of hostprototype.create() and hostprototype.update() methods; added audit logging for these methods (Ivo, Sasha)
@@ -440,6 +453,21 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.14rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
+..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
+...G...PS. [ZBX-14756] fixed zbxregexp library not compiling with old versions of pcre; thanks to Simon Matter for the patch (yurii)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.13
+
+3.4.13rc2 was released as 3.4.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.13rc2
@@ -1760,6 +1788,20 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.22rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
+..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.21
+
+3.0.21rc1 was released as 3.0.21 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.21rc1

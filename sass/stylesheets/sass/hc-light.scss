@@ -171,7 +171,8 @@ $icon-widget-btn: (
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px
+	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px,
+	info-clock: url(../img/icon-sprite.svg) no-repeat -246px -762px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {

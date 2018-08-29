@@ -46,7 +46,7 @@ class CDateSelector extends CTag {
 	 * @return CDateSelector
 	 */
 	public function __construct($name = 'calendar', $value = null) {
-		parent::__construct('div');
+		parent::__construct('div', true);
 
 		$this->name = $name;
 
@@ -97,9 +97,7 @@ class CDateSelector extends CTag {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		zbx_add_post_js('create_calendar(null, "'.$this->name.'", "'.$this->name.'_calendar", null, null, '.
-			'"'.$this->date_format.'");'
-		);
+		zbx_add_post_js('create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'");');
 
 		return parent::toString($destroy);
 	}

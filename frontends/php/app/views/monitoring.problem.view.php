@@ -282,7 +282,7 @@ if ($data['action'] == 'problem.view') {
 		->addRow(_('Tag display priority'),
 			(new CTextBox('filter_tag_priority', $data['filter']['tag_priority']))
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('Comma-separated list'))
+				->setAttribute('placeholder', _('comma-separated list'))
 				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
 		)
 		->addRow(_('Show suppressed problems'), [
