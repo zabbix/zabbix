@@ -88,7 +88,7 @@ $messages = clear_messages();
 
 (new CView('general.login', [
 	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		? (new CUrl('index_http.php'))->removeArgument('sid')
+		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
 		: '',
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,
