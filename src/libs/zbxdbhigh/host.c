@@ -995,17 +995,17 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose:  adds table and field with specific id to housekeeper list        *
  *                                                                            *
- * Parameters: ids    - [IN] identificators for data removal                  *
- *             field  - [IN] field name from table                            *
- *             tables - [IN] table name to delete information from            *
- *             count  - [IN] number of tables in tables array                 *
+ * Parameters: ids       - [IN] identificators for data removal               *
+ *             field     - [IN] field name from table                         *
+ *             tables_hk - [IN] table name to delete information from         *
+ *             count     - [IN] number of tables in tables array              *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables, int count)
+static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
 {
 	const char	*__function_name = "DBadd_to_housekeeper";
 	int		i, j;
@@ -1024,7 +1024,7 @@ static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, co
 	for (i = 0; i < ids->values_num; i++)
 	{
 		for (j = 0; j < count; j++)
-			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables[j], field, ids->values[i]);
+			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables_hk[j], field, ids->values[i]);
 	}
 
 	zbx_db_insert_execute(&db_insert);

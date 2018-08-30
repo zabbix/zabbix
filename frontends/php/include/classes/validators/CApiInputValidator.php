@@ -121,6 +121,9 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
 
+			case API_RANGE_TIME:
+				return self::validateRangeTime($rule, $data, $path, $error);
+
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
 
@@ -169,6 +172,7 @@ class CApiInputValidator {
 			case API_H_NAME:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
+			case API_RANGE_TIME:
 			case API_TIME_PERIOD:
 			case API_TIME_UNIT:
 			case API_REGEX:
@@ -921,6 +925,39 @@ class CApiInputValidator {
 
 		if ((new CUserMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a user macro is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Time period validator like "1-7,00:00-24:00".
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateRangeTime($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		if ($range_time_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time range is expected'));
 			return false;
 		}
 

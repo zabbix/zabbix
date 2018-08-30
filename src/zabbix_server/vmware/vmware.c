@@ -329,6 +329,9 @@ static void	vmware_shared_strfree(char *str)
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
+#define ZBX_XPATH_MAXQUERYMETRICS()									\
+	"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
+
 typedef struct
 {
 	char	*data;
@@ -738,7 +741,7 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 		vmware_shared_strfree(hv->clusterid);
 
 	if (NULL != hv->datacenter_name)
-		__vm_mem_free_func(hv->datacenter_name);
+		vmware_shared_strfree(hv->datacenter_name);
 
 	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
@@ -1160,6 +1163,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 			zbx_hashset_insert(&data->vms_index, &vmi_local, sizeof(vmi_local));
 		}
 	}
+
+	data->max_query_metrics = src->max_query_metrics;
 
 	return data;
 }
@@ -2121,13 +2126,10 @@ out:
  *                                                                            *
  * Function: vmware_vm_get_file_systems                                       *
  *                                                                            *
- * Purpose: gets virtual machine network interface devices                    *
+ * Purpose: gets the parameters of virtual machine disks                      *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] a xml string containing virtual machine data    *
- *                                                                            *
- * Comments: The network interface devices are taken from vm device list      *
- *           filtered by macAddress key.                                      *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, const char *details)
@@ -3706,6 +3708,76 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_service_get_maxquerymetrics                               *
+ *                                                                            *
+ * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             max_qm       - [OUT] max count of Datastore metrics in one     *
+ *                                  request                                   *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, char **error)
+{
+#	define ZBX_POST_MAXQUERYMETRICS								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:QueryOptions>"								\
+			"<ns0:_this type=\"OptionManager\">VpxSettings</ns0:_this>"		\
+			"<ns0:name>config.vpxd.stats.maxQueryMetrics</ns0:name>"		\
+		"</ns0:QueryOptions>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_get_maxquerymetrics";
+
+	CURLoption	opt;
+	CURLcode	err;
+	int		ret = FAIL;
+	char		*val;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_MAXQUERYMETRICS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+		goto out;
+
+	if (NULL == (val = zbx_xml_read_value(page.data, ZBX_XPATH_MAXQUERYMETRICS())))
+	{
+		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics used default value %d", ZBX_VPXD_STATS_MAXQUERYMETRICS);
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != (ret = is_uint31(val, max_qm)))
+		*error = zbx_dsprintf(*error, "Cannot convert maxQueryMetrics from %s.",  val);
+
+	zbx_free(val);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_counters_add_new                                          *
  *                                                                            *
  * Purpose: creates a new performance counter object in shared memory and     *
@@ -3990,6 +4062,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	{
 		goto clean;
 	}
+
+	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
+		data->max_query_metrics = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, &data->max_query_metrics, &data->error))
+		goto clean;
 
 	ret = SUCCEED;
 clean:
@@ -4282,7 +4359,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 	int				i, j, err, opt, start_counter = 0;
 	zbx_vmware_perf_entity_t	*entity;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counters_max:%d", __function_name, counters_max);
 
 	if (0 == counters_max)
 		counters_max = INT_MAX;
@@ -4532,7 +4609,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_vmware_unlock();
 
 	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, 0, &perfdata);
-	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, ZBX_VPXD_STATS_MAXQUERYMETRICS,
+	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, service->data->max_query_metrics,
 			&perfdata);
 
 	ret = SUCCEED;
