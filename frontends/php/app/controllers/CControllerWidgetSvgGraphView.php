@@ -51,14 +51,14 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$script_inline = '';
 
 		$graph_data = [
-			'data_sets' => array_values($fields['ds']),
+			'data_sets' => $fields['ds'],
 			'data_source' => SVG_GRAPH_DATA_SOURCE_AUTO,
 			'time_period' => [
 				'time_from' => null,
 				'time_to' => null
 			],
 			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
-			'overrides' => []
+			'overrides' => array_key_exists('or', $fields) ? $fields['or'] : []
 		];
 
 		// Set data source options.
@@ -193,11 +193,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			if (array_key_exists('tags', $fields) && $fields['tags']) {
 				$graph_data['problems']['tags'] = $fields['tags'];
 			}
-		}
-
-		// Set overrides.
-		if (array_key_exists('or', $fields)) {
-			$graph_data['overrides'] = $fields['or'];
 		}
 
 		$svg_data = CSvgGraphHelper::get($graph_data, $width, $height);

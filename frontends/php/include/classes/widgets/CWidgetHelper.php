@@ -766,9 +766,11 @@ class CWidgetHelper {
 						'});'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
+					'updateVariableOrder(jQuery("#overrides"), ".overrides-list-item", "or");'.
 					'updateGraphPreview();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
+					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
 					'initializeOverrides();'.
 					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
 						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
@@ -1129,9 +1131,11 @@ class CWidgetHelper {
 						'});'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
+					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
 					'updateGraphPreview();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
+					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
 						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
