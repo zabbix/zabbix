@@ -59,7 +59,7 @@ if ($request) {
 }
 
 if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
-		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP) {
+		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP && !hasRequest('enter')) {
 	redirect('index_http.php');
 
 	exit;
