@@ -2967,7 +2967,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding-top: 5px;
   display: block;
   font-size: 12px;
-  line-height: 18px; }
+  line-height: 18px;
+  white-space: nowrap;
+  min-width: 145px; }
   .svg-graph-hintbox .table-paging {
     min-height: 18px;
     padding: 0px 0px 2px;

@@ -4255,6 +4255,8 @@ $form-icon-btn: (
 	display: block;
 	font-size: 12px;
 	line-height: 18px;
+	white-space: nowrap;
+	min-width: 145px;
 
 	.table-paging {
 		min-height: 18px;
