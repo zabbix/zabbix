@@ -539,6 +539,20 @@ class CSvgGraphHelper {
 				foreach ($metrics_matched as $i => $metric_num) {
 					$metric = &$metrics[$metric_num];
 					$metric['options'] = $override + $metric['options'] + ($colors ? ['color' => $colors[$i]] : []);
+
+					// Fix missing options if draw type has changed.
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('fill', $metric['options'])) {
+						$metric['options']['fill'] = SVG_GRAPH_DEFAULT_FILL;
+					}
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('missingdatafunc', $metric['options'])) {
+						$metric['options']['missingdatafunc'] = SVG_GRAPH_MISSING_DATA_NONE;
+					}
+					if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('pointsize', $metric['options'])) {
+						$metric['options']['pointsize'] = SVG_GRAPH_DEFAULT_POINTSIZE;
+					}
 				}
 				unset($metric);
 			}
