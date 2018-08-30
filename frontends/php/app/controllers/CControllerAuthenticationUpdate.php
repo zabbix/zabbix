@@ -158,21 +158,34 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$data = DB::getDefaults('config');
+		$fields = [
+			'authentication_type' => 0,
+			'ldap_configured' => 0,
+			'http_auth_enabled' => 0,
+		];
 
-		$http_fields = $this->getInput('http_auth_enabled') == ZBX_AUTH_HTTP_ENABLED
-			? ['http_case_sensitive', 'http_login_form', 'http_strip_domains']
-			: [];
+		if ($this->getInput('http_auth_enabled', 0) == ZBX_AUTH_HTTP_ENABLED) {
+			$fields += [
+				'http_case_sensitive' => 0,
+				'http_login_form' => 0,
+				'http_strip_domains' => ''
+			];
+		}
 
-		$ldap_fields = $this->getInput('ldap_configured') == ZBX_AUTH_LDAP_ENABLED
-			? ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute', 'ldap_bind_password']
-			: [];
+		if ($this->getInput('ldap_configured', 0) == ZBX_AUTH_LDAP_ENABLED) {
+			$fields += [
+				'ldap_host' => '',
+				'ldap_port' => '',
+				'ldap_base_dn' => '',
+				'ldap_bind_dn' => '',
+				'ldap_search_attribute' => '',
+				'ldap_bind_password' => '',
+				'ldap_case_sensitive' => 0
+			];
+		}
 
-		$this->getInputs($data, array_merge([
-			'authentication_type',
-			'ldap_case_sensitive',
-			'ldap_configured',
-			'http_auth_enabled',
-		], $http_fields, $ldap_fields));
+		$data = array_merge($data, $fields);
+		$this->getInputs($data, array_keys($fields));
 
 		$config = select_config();
 		$data = array_diff_assoc($data, $config);
