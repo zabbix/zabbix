@@ -403,6 +403,35 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 
 	return SUCCEED;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_soap_post                                                    *
+ *                                                                            *
+ * Purpose: unification of vmware web service call with SOAP error validation *
+ *                                                                            *
+ * Parameters: fn_parent  - [IN] the parent function name for Log records     *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             request    - [IN] the http request                             *
+ *             response   - [OUT] the http response                           *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED - the SOAP request was completed successfully        *
+ *               FAIL    - the SOAP request has failed                        *
+ ******************************************************************************/
+static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, ZBX_HTTPPAGE **response,
+		char **error)
+{
+	if (SUCCEED != zbx_http_post(easyhandle, request, response, error))
+		return FAIL;
+
+	if (NULL != fn_parent)
+		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", fn_parent, (*response)->data);
+
+	if (NULL != (*error = zbx_xml_read_value((*response)->data, ZBX_XPATH_FAULTSTRING())))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1519,12 +1548,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, vmware_service_objects[service->type].session_manager,
 			username_esc, password_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, xml, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, xml, &resp, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -1661,22 +1685,14 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char *
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_contents";
-	int		ret = FAIL;
 	ZBX_HTTPPAGE	*resp;
 
-	if (SUCCEED != zbx_http_post(easyhandle, ZBX_POST_VMWARE_CONTENTS, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
-		goto out;
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_VMWARE_CONTENTS, &resp, error))
+		return FAIL;
 
 	*contents = zbx_strdup(*contents, resp->data);
 
-	ret = SUCCEED;
-out:
-	return ret;
+	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
 }
@@ -1721,18 +1737,11 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type: %s id: %s", __function_name, type, id);
 
 	id_esc = xml_escape_dyn(id);
-
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE,
 			vmware_service_objects[service->type].performance_manager, type, id_esc);
-
 	zbx_free(id_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	if (NULL != (value = zbx_xml_read_value(resp->data, ZBX_XPATH_ISAGGREGATE())))
@@ -1811,10 +1820,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].performance_manager);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &resp, error))
 		goto out;
 
 	if (NULL == (doc = xmlReadMemory(resp->data, resp->offset, ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
@@ -2204,12 +2210,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	zbx_free(vmid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	*data = zbx_strdup(NULL, resp->data);
@@ -2375,10 +2376,8 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	zbx_free(id_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, &error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, &error))
 		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
 
 	name = zbx_xml_read_value(resp->data, ZBX_XPATH_DATASTORE_SUMMARY("name"));
 
@@ -2501,12 +2500,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	*data = zbx_strdup(NULL, resp->data);
@@ -2597,12 +2591,7 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
 			vmware_service_objects[service->type].property_collector, hv->id);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	if (NULL == (hv->datacenter_name = zbx_xml_read_value(resp->data, "/*/*/*/*/*/*[local-name()='val']")))
@@ -2917,12 +2906,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
 			vmware_service_objects[service->type].event_manager);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	if (NULL == (*event_session = zbx_xml_read_value(resp->data, "/*/*/*/*[@type='EventHistoryCollector']")))
@@ -2976,10 +2960,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &resp, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -3029,10 +3010,7 @@ static int	vmware_service_read_previous_events(CURL *easyhandle, const char *eve
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, resp, error))
-		goto out;
-
-	if (NULL != (*error = zbx_xml_read_value((*resp)->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, resp, error))
 		goto out;
 
 	zabbix_log(LOG_LEVEL_TRACE, "SOAP response: %s", (*resp)->data);
@@ -3081,10 +3059,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &resp, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -3397,12 +3372,7 @@ static int	vmware_service_get_clusters(CURL *easyhandle, char **clusters, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != zbx_http_post(easyhandle, ZBX_POST_VCENTER_CLUSTER, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_VCENTER_CLUSTER, &resp, error))
 		goto out;
 
 	*clusters = zbx_strdup(*clusters, resp->data);
@@ -3465,12 +3435,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zbx_free(clusterid_esc);
 
-	if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, error))
 		goto out;
 
 	*status = zbx_strdup(NULL, resp->data);
@@ -3585,12 +3550,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if(SUCCEED != zbx_http_post(easyhandle, ZBX_POST_MAXQUERYMETRICS, &resp, error))
-		goto out;
-
-	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-	if (NULL != (*error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_MAXQUERYMETRICS, &resp, error))
 		goto out;
 
 	if (NULL == (val = zbx_xml_read_value(resp->data, ZBX_XPATH_MAXQUERYMETRICS())))
@@ -4282,21 +4242,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP request: %s", __function_name, tmp);
 
-		if (SUCCEED != zbx_http_post(easyhandle, tmp, &resp, &error))
-		{
-			for (j = i + 1; j < entities->values_num; j++)
-			{
-				entity = (zbx_vmware_perf_entity_t *)entities->values[j];
-				vmware_perf_data_add_error(perfdata, entity->type, entity->id, error);
-			}
-
-			zbx_free(error);
-			break;
-		}
-
-		zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, resp->data);
-
-		if (NULL != (error = zbx_xml_read_value(resp->data, ZBX_XPATH_FAULTSTRING())))
+		if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &resp, &error))
 		{
 			for (j = i + 1; j < entities->values_num; j++)
 			{
