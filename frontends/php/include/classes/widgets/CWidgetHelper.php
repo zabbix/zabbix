@@ -464,11 +464,10 @@ class CWidgetHelper {
 	 *                               description.
 	 * @param string     $form_name  Name of form in which data set fields resides.
 	 * @param int|string $row_num    Unique data set numeric identifier. Used to make unique field names.
-	 * @param int|string $order_num  Sequential order number.
 	 *
 	 * @return array
 	 */
-	public static function getGraphOverrideLayout($field_name, array $value, $form_name, $row_num, $order_num) {
+	public static function getGraphOverrideLayout($field_name, array $value, $form_name, $row_num) {
 		$inputs = [];
 
 		// Create override optins list.
@@ -481,10 +480,9 @@ class CWidgetHelper {
 		return (new CListItem([
 			/**
 			 * First line: host pattern field, item pattern field.
-			 * Contains also hidden order field, drag and drop button and delete button.
+			 * Contains also drag and drop button and delete button.
 			 */
 			(new CDiv([
-				(new CVar($field_name.'['.$row_num.'][order]', $order_num)),
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
@@ -569,8 +567,7 @@ class CWidgetHelper {
 	public static function getGraphOverrideTemplate($field, $form_name) {
 		$value = CWidgetFieldGraphOverride::getDefaults();
 
-		return self::getGraphOverrideLayout($field->getName(), $value, $form_name, '#{rowNum}', '#{orderNum}')
-			->toString();
+		return self::getGraphOverrideLayout($field->getName(), $value, $form_name, '#{rowNum}')->toString();
 	}
 
 	/**
@@ -592,7 +589,7 @@ class CWidgetHelper {
 		$i = 0;
 
 		foreach ($values as $override) {
-			$list->addItem(self::getGraphOverrideLayout($field->getName(), $override, $form_name, $i, $i + 1));
+			$list->addItem(self::getGraphOverrideLayout($field->getName(), $override, $form_name, $i));
 
 			$i++;
 		}
@@ -751,7 +748,6 @@ class CWidgetHelper {
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'dataCallback: function(data) {'.
-						'data.orderNum = data.rowNum + 1;'.
 						'return data;'.
 					'}'.
 				'})'.
@@ -820,11 +816,7 @@ class CWidgetHelper {
 					'updateGraphPreview();'.
 				'},'.
 				'update: function() {'.
-					'jQuery("input[type=hidden]", jQuery("#overrides")).filter(function() {'.
-						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
-					'}).each(function(i) {'.
-						'jQuery(this).val(i + 1);'.
-					'});'.
+					'updateVariableOrder(jQuery("#overrides"), ".overrides-list-item", "or");'.
 				'}'.
 			'});'
 		];
@@ -841,17 +833,14 @@ class CWidgetHelper {
 	 *                               description.
 	 * @param string     $form_name  Name of form in which data set fields resides.
 	 * @param int|string $row_num    Unique data set numeric identifier. Used to make unique field names.
-	 * @param int|string $order_num  Sequential order number.
 	 * @param bool       $is_opened  Either accordion row is made opened or closed.
 	 *
 	 * @return CListItem
 	 */
-	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $order_num,
-			$is_opened) {
+	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened) {
 		return (new CListItem([
 			// Accordion head - data set selection fields and tools.
 			(new CDiv([
-				(new CVar($field_name.'['.$row_num.'][order]', $order_num)),
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
@@ -1048,8 +1037,7 @@ class CWidgetHelper {
 	public static function getGraphDataSetTemplate($field, $form_name) {
 		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
 
-		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', '#{orderNum}', true)
-			->toString();
+		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', true)->toString();
 	}
 
 	/**
@@ -1074,7 +1062,7 @@ class CWidgetHelper {
 			// Take default values for missing fields. This can happen if particular field is disabled.
 			$value += CWidgetFieldGraphDataSet::getDefaults();
 
-			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i + 1, $i == 0));
+			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
 
 			$i++;
 		}
@@ -1112,11 +1100,10 @@ class CWidgetHelper {
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
-						'data.color= function(num) {'.
+						'data.color = function(num) {'.
 							'var palete = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETE.';'.
 							'return palete[num % palete.length];'.
-						'}(data.rowNum);'.
-						'data.orderNum = data.rowNum + 1;'.
+						'} (data.rowNum);'.
 						'return data;'.
 					'}'.
 				'})'.
@@ -1213,11 +1200,7 @@ class CWidgetHelper {
 					'updateGraphPreview();'.
 				'},'.
 				'update: function() {'.
-					'jQuery("input[type=hidden]", jQuery("#data_sets")).filter(function() {'.
-						'return jQuery(this).attr("name").match(/.*\[\d+\]\[order\]/);'.
-					'}).each(function(i) {'.
-						'jQuery(this).val(i + 1);'.
-					'});'.
+					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
 				'}'.
 			'});'
 		];

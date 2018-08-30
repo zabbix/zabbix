@@ -35,7 +35,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'order'				=> ['type' => API_INT32, 'flags' => API_REQUIRED],
 			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'color'				=> ['type' => API_COLOR],
@@ -125,24 +124,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	}
 
 	/**
-	 * Makes minor manipulation in value like sorting. Must be called after validation of this value.
-	 *
-	 * @return $this
-	 */
-	protected function prepareValue() {
-		parent::prepareValue();
-
-		$value = $this->getValue();
-
-		// Sort data sets according order field.
-		CArrayHelper::sort($value, [['field' => 'order', 'order' => ZBX_SORT_UP]]);
-
-		$this->setValue($value);
-
-		return $this;
-	}
-
-	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.
@@ -168,11 +149,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 					'value' => $pattern_item
 				];
 			}
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.order.'.$index,
-				'value' => $val['order']
-			];
 
 			foreach (self::getOverrideOptions() as $opt) {
 				if (array_key_exists($opt, $val)) {

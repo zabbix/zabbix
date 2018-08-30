@@ -92,6 +92,36 @@ $scripts[] =
 	'}'.
 	'updateGraphPreview();';
 
+$scripts[] =
+	/**
+	 * This function needs to rename ids and names of the elements in "Data set" or "Overrides" controls after
+	 * reordering elements.
+	 *
+	 * @param obj           "Data set" or "Overrides" element.
+	 * @param row_selector  jQuery selector for rows.
+	 * @param var_prefix    Prefix for the variables, which will be renamed.
+	 */
+	'function updateVariableOrder(obj, row_selector, var_prefix) {'.
+		'jQuery.each([10000, 0], function(index, value) {'.
+			'jQuery(row_selector, obj).each(function(i) {'.
+				'jQuery(\'[name^="\' + var_prefix + \'["]\', this).filter(function() {'.
+					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z]+\]/);'.
+				'}).each(function() {'.
+					'jQuery(this).attr("name", '.
+						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
+					');'.
+				'});'.
+				'jQuery(\'[id^="\' + var_prefix + \'_"]\', this).filter(function() {'.
+					'return jQuery(this).attr("id").match(/[a-z+]_\d+[a-z0-9_]+/);'.
+				'}).each(function() {'.
+					'jQuery(this).attr("id", '.
+						'jQuery(this).attr("id").replace(/([a-z]+_)\d+([a-z0-9_]+)/, "$1" + (value + i) + "$2")'.
+					');'.
+				'});'.
+			'});'.
+		'});'.
+	'}';
+
 // Create 'Data set' tab.
 $tab_data_set = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['ds']), CWidgetHelper::getGraphDataSet($fields['ds'], $form_name));

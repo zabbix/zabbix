@@ -210,21 +210,8 @@ class CWidgetField {
 			$this->setValue($this->default);
 			$errors[] = $error;
 		}
-		else {
-			// TODO: in the future prepareValue() can be removed and sorting moved into validation rules as option
-			$this->prepareValue();
-		}
 
 		return $errors;
-	}
-
-	/**
-	 * Makes minor manipulation in value like sorting. Must be called after validation of this value.
-	 *
-	 * @return $this
-	 */
-	protected function prepareValue() {
-		return $this;
 	}
 
 	/**
