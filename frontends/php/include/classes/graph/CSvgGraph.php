@@ -646,7 +646,7 @@ class CSvgGraph extends CSvg {
 	 * Add grid to graph.
 	 */
 	protected function drawGrid() {
-		$time_points = $this->getTimeGridWithPosition();
+		$time_points = $this->x_axis ? $this->getTimeGridWithPosition() : [];
 		$value_points = [];
 
 		if ($this->left_y_show) {
