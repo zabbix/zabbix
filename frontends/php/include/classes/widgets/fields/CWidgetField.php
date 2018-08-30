@@ -152,7 +152,7 @@ class CWidgetField {
 	}
 
 	/**
-	 * Set additional flags fro validation rule array.
+	 * Set additional flags for validation rule array.
 	 *
 	 * @param array $validation_rule
 	 * @param int   $flag
