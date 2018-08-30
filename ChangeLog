@@ -4,6 +4,7 @@ New features:
 .......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 
 Bug fixes:
+..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
 ........S. [ZBX-14777] increased severity of housekeeper logs in the case of invalid history/trends intervals (wiper)
 ........S. [ZBX-14778] fixed housekeeper attempting to remove history of discovery rules/prototypes (wiper)
 .......PS. [ZBX-14771] fixed memory leak in poller if scheduling interval is invalid (vso)
