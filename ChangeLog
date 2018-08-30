@@ -1800,6 +1800,7 @@ Changes for 3.0.22rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
 ........S. [ZBX-14778] fixed housekeeper attempting to remove history of discovery rules/prototypes (wiper)
 .......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
 ..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
