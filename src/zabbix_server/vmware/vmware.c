@@ -407,7 +407,6 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 		return FAIL;
 	}
 
-
 	return SUCCEED;
 }
 /******************************************************************************
