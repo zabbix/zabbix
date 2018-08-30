@@ -523,7 +523,7 @@
 					widget['content_header'].find('[data-hintbox=1]').next('.hint-box').remove();
 					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
 				}
-				if (typeof(resp.info) !== 'undefined') {
+				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
 					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
 				}
 
