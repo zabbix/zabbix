@@ -415,12 +415,9 @@ class CTrigger extends CTriggerGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], [
-				'table' => 'trigger_tag',
-				'alias' => 'tt',
-				'parent_alias' => 't',
-				'field' => 'triggerid'
-			]);
+			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], 'trigger_tag',
+				'tt', 't', 'triggerid'
+			);
 		}
 
 		// limit
