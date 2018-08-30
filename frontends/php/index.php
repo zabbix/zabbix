@@ -30,8 +30,8 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter})', _('Username')],
-	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter})'],
+	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
 	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
@@ -66,7 +66,7 @@ if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 }
 
 // login via form
-if (hasRequest('enter') && CWebUser::login(getRequest('name', ''), getRequest('password', ''))) {
+if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', 'zabbix'))) {
 	if (CWebUser::$data['autologin'] != $autologin) {
 		API::User()->update([
 			'userid' => CWebUser::$data['userid'],
@@ -90,7 +90,7 @@ $messages = clear_messages();
 	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 		? (new CUrl('index_http.php'))->removeArgument('sid')
 		: '',
-	'guest_login_url' => CWebUser::isGuestAllowed() ? ZBX_DEFAULT_URL : '',
+	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,
 	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
 ]))->render();

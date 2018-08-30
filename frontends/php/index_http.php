@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-clear_messages();
 $http_user = CWebUser::getHttpRemoteUser();
 $config = $http_user ? select_config() : [];
 
