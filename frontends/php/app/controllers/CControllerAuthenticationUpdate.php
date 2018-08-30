@@ -41,6 +41,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_test_user' => 'string',
 			'ldap_test_password' => 'string',
 			'ldap_test' => 'in 1',
+			'db_authentication_type' => 'int32',
 			'change_bind_password' => 'in 0,1',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
@@ -62,6 +63,9 @@ class CControllerAuthenticationUpdate extends CController {
 		if ($ret && $this->getInput('ldap_configured', '') == ZBX_AUTH_LDAP_ENABLED) {
 			$ret = $this->validateLdap();
 		}
+		else {
+			$ret &= $this->validateDefaultAuth();
+		}
 
 		if (!$ret) {
 			$this->response->setFormData($this->getInputAll());
@@ -69,6 +73,30 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * Validate default athentication. Do not allow user change default authentication to LDAP if LDAP is not
+	 * configured.
+	 *
+	 * @return bool
+	 */
+	private function validateDefaultAuth() {
+		$data = [
+			'ldap_configured' => 0,
+			'authentication_type' => 0
+		];
+		$this->getInputs($data, array_keys($data));
+		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP || $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+
+		if (!$is_valid) {
+			$this->response->setMessageError(_s('Incorrect value for field "%1$s": %2$s.',
+				'authentication_type',
+				_('LDAP is not configured')
+			));
+		}
+
+		return $is_valid;
 	}
 
 	/**
@@ -179,9 +207,15 @@ class CControllerAuthenticationUpdate extends CController {
 				'ldap_base_dn' => '',
 				'ldap_bind_dn' => '',
 				'ldap_search_attribute' => '',
-				'ldap_bind_password' => '',
 				'ldap_case_sensitive' => 0
 			];
+
+			if ($this->hasInput('ldap_bind_password')) {
+				$fields['ldap_bind_password'] = '';
+			}
+			else {
+				unset($data['ldap_bind_password']);
+			}
 		}
 
 		$data = array_merge($data, $fields);

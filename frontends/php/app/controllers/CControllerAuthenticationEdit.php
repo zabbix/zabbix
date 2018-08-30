@@ -36,6 +36,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_test_user' => 'string',
 			'ldap_test_password' => 'string',
 			'change_bind_password' => 'in 0,1',
+			'db_authentication_type' => 'string',
 			'authentication_type' => 'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'http_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_case_sensitive' => 'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
@@ -89,6 +90,7 @@ class CControllerAuthenticationEdit extends CController {
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',
+				'db_authentication_type',
 				'authentication_type',
 				'http_case_sensitive',
 				'ldap_case_sensitive',
@@ -107,9 +109,15 @@ class CControllerAuthenticationEdit extends CController {
 			]);
 
 			$data += DB::getDefaults('config');
+
+			if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
+				$data['change_bind_password'] = 1;
+			}
 		}
 		else {
 			$data += select_config();
+			$data['db_authentication_type'] = $data['authentication_type'];
+			$data['change_bind_password'] = $data['ldap_bind_password'] === '' ? 1 : 0;
 		}
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
