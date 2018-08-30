@@ -396,9 +396,9 @@ class CSvgGraph extends CSvg {
 	 * @return CSvgGraph
 	 */
 	public function draw() {
+		$this->calculateYAxis();
 		$this->calculateDimensions();
 		$this->calculatePaths();
-		$this->calculateYAxis();
 
 		$this->drawGrid();
 
