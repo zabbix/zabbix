@@ -340,28 +340,12 @@ jQuery(function ($) {
 					&& e.offsetY <= data.dimY + data.dimH + 15) {
 				hideHelper(graph);
 
-				var values = findProblems(graph[0], e.offsetX);
-				if (values.length) {
-					var tbody = $('<tbody>'),
-						foot = null;
+				var problems = findProblems(graph[0], e.offsetX),
+					problems_total = problems.length;
+				if (problems_total > 0) {
+					var tbody = $('<tbody>');
 
-					values.forEach(function(val, i) {
-						if (i >= data.hintMaxRows) {
-							var msg = sprintf(t('Displaying %1$s of %2$s found'), data.hintMaxRows, values.length);
-							foot = $('<div></div>')
-										.addClass('table-paging')
-										.append(
-											$('<div></div>')
-												.addClass('paging-btn-container')
-												.append(
-													$('<div></div>')
-														.addClass('table-stats')
-														.text(msg)
-												)
-										);
-							return;
-						}
-
+					problems.slice(0, data.hintMaxRows).forEach(function(val, i) {
 						tbody.append(
 							$('<tr>')
 								.append($('<td>').append($('<a>', {'href': val.url}).text(val.clock)))
@@ -381,7 +365,10 @@ jQuery(function ($) {
 									.addClass('list-table compact-view')
 									.append(tbody)
 							)
-							.append(foot);
+							.append(problems_total > data.hintMaxRows
+								? makeHintBoxFooter(data.hintMaxRows, problems_total)
+								: null
+							);
 				}
 			}
 			// Show graph values if mouse is over the graph canvas.
@@ -391,9 +378,9 @@ jQuery(function ($) {
 
 				// Find values.
 				var points = findValues(graph[0], offsetX),
+					points_total = points.length,
 					show_hint = false,
 					xy_point = false,
-					foot = null,
 					tolerance;
 
 				/**
@@ -411,6 +398,7 @@ jQuery(function ($) {
 								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
 								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
 							xy_point = point;
+							points_total = 1;
 							return;
 						}
 					});
@@ -443,26 +431,14 @@ jQuery(function ($) {
 					}
 				});
 
-				if (points.length > data.hintMaxRows) {
-					var msg = sprintf(t('Displaying %1$s of %2$s found'), data.hintMaxRows, points.length);
-					foot = $('<div></div>')
-								.addClass('table-paging')
-								.append(
-									$('<div></div>')
-										.addClass('paging-btn-container')
-										.append(
-											$('<div></div>')
-												.addClass('table-stats')
-												.text(msg)
-										)
-								);
-				}
-
 				if (show_hint) {
 					html = $('<div></div>')
 							.addClass('svg-graph-hintbox')
 							.append(html)
-							.append(foot);
+							.append(points_total > data.hintMaxRows
+								? makeHintBoxFooter(data.hintMaxRows, points_total)
+								: null
+							);
 				}
 			}
 			else {
@@ -490,6 +466,22 @@ jQuery(function ($) {
 		if (html === null) {
 			destroyHintbox(graph);
 		}
+	}
+
+	// Function createing HTML for hintbox footer.
+	function makeHintBoxFooter(num_displayed, num_total) {
+		var msg = sprintf(t('Displaying %1$s of %2$s found'), num_displayed, num_total);
+		return $('<div></div>')
+			.addClass('table-paging')
+			.append(
+				$('<div></div>')
+					.addClass('paging-btn-container')
+					.append(
+						$('<div></div>')
+							.addClass('table-stats')
+							.text(msg)
+					)
+		);
 	}
 
 	var methods = {
