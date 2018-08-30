@@ -468,7 +468,7 @@ jQuery(function ($) {
 		}
 	}
 
-	// Function createing HTML for hintbox footer.
+	// Function creates hintbox footer.
 	function makeHintBoxFooter(num_displayed, num_total) {
 		return $('<div></div>')
 			.addClass('table-paging')
