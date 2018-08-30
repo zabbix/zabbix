@@ -415,12 +415,12 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid history storage '%s' for itemid '%s'", tmp,
-							row[0]);
+					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
+							tmp, row[0]);
 				}
 				else if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid history storage period for itemid '%s'",
+					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'",
 							row[0]);
 				}
 				else
@@ -443,12 +443,12 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid trends storage '%s' for itemid '%s'", tmp,
-							row[0]);
+					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
+							tmp, row[0]);
 				}
 				else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid trends storage preiod for itemid '%s'",
+					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'",
 							row[0]);
 				}
 				else
