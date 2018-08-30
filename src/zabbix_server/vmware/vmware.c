@@ -399,7 +399,14 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 		return FAIL;
 	}
 
-	*response = &page;
+	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_PRIVATE, response)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Cannot get response buffer: %s.", curl_easy_strerror(err));
+
+		return FAIL;
+	}
+
 
 	return SUCCEED;
 }
@@ -1476,6 +1483,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, &page)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PRIVATE, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, curl_header_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
