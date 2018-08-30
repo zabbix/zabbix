@@ -72,26 +72,28 @@ jQuery(function ($) {
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
 			hbox = graph.data('hintbox'),
-			content = hbox.find('> div');
+			content = hbox ? hbox.find('> div') : null;
 
 		// Destroy old hintbox to make new one with close button.
 		destroyHintbox(graph);
 
-		// Should be put inside hintBoxItem to use functionality of hintBox.
-		graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
-		data.isHintBoxFrozen = true;
+		if (content) {
+			// Should be put inside hintBoxItem to use functionality of hintBox.
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
+			data.isHintBoxFrozen = true;
 
-		graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-			data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
-			graph.off('mouseup', hintboxSilentMode);
-			destroyHintbox(graph);
-		});
+			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
+				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
+				graph.off('mouseup', hintboxSilentMode);
+				destroyHintbox(graph);
+			});
 
-		repositionHintBox(e, graph);
-		graph
-			.off('mouseup', hintboxSilentMode)
-			.on('mouseup', {graph: graph}, hintboxSilentMode);
-		graph.data('hintbox', graph.hintBoxItem);
+			repositionHintBox(e, graph);
+			graph
+				.off('mouseup', hintboxSilentMode)
+				.on('mouseup', {graph: graph}, hintboxSilentMode);
+			graph.data('hintbox', graph.hintBoxItem);
+		}
 	}
 
 	/**
@@ -102,9 +104,11 @@ jQuery(function ($) {
 		var graph = e.data.graph,
 			data = graph.data('options');
 
-		data.isHintBoxFrozen = false;
-		showHintbox(e, graph);
-		makeHintboxStatic(e, graph);
+		if (data.isHintBoxFrozen) {
+			data.isHintBoxFrozen = false;
+			showHintbox(e, graph);
+			makeHintboxStatic(e, graph);
+		}
 	}
 
 	// Method to start selection of some horizontal area in graph.
@@ -330,14 +334,18 @@ jQuery(function ($) {
 			hbox = graph.data('hintbox') || null,
 			offsetX = e.clientX - graph.offset().left,
 			html = null,
-			inx = false;
+			in_x = false,
+			in_values_area = false,
+			in_problem_area = false;
+
 		if (data.boxing === false) {
 			// Check if mouse in the horizontal area in which hintbox must be shown.
-			inx = (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW);
+			in_x = (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW);
+			in_problem_area = in_x && (data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15);
+			in_values_area = in_x && (data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH);
 
 			// Show problems when mouse is in the 15px high area under the graph canvas.
-			if (data.showProblems && data.isHintBoxFrozen === false && inx && data.dimY + data.dimH <= e.offsetY
-					&& e.offsetY <= data.dimY + data.dimH + 15) {
+			if (data.showProblems && data.isHintBoxFrozen === false && in_problem_area) {
 				hideHelper(graph);
 
 				var problems = findProblems(graph[0], e.offsetX),
@@ -372,7 +380,7 @@ jQuery(function ($) {
 				}
 			}
 			// Show graph values if mouse is over the graph canvas.
-			else if (inx && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH) {
+			else if (in_values_area) {
 				// Set position of mouse following helper line.
 				setHelperPosition(e, graph);
 
@@ -448,7 +456,9 @@ jQuery(function ($) {
 			if (html !== null) {
 				if (hbox === null) {
 					hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
-					graph.on('mouseup', {graph: graph}, makeHintboxStatic);
+					graph
+						.off('mouseup', makeHintboxStatic)
+						.on('mouseup', {graph: graph}, makeHintboxStatic);
 					graph.data('hintbox', hbox);
 				}
 				else {
@@ -463,7 +473,7 @@ jQuery(function ($) {
 			hideHelper(graph);
 		}
 
-		if (html === null) {
+		if (html === null && (in_values_area || in_problem_area)) {
 			destroyHintbox(graph);
 		}
 	}
