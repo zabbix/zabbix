@@ -559,7 +559,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Return template used by dynamic rows.
+	 * Return template used by dynamic rows in CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
 	 * @param string                    $form_name  Form name in which override field is located.
@@ -716,7 +716,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Return javascript necessary to initialize field.
+	 * Return javascript necessary to initialize CWidgetFieldGraphOverride field.
 	 *
 	 * @param CWidgetFieldGraphOverride $field
 	 * @param string                    $form_name  Form name in which override field is located.
@@ -1038,7 +1038,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Return template used by dynamic rows.
+	 * Return template used by dynamic rows in CWidgetFieldGraphDataSet field.
 	 *
 	 * @param CWidgetFieldGraphDataSet $field
 	 * @param string                   $form_name   Form name in which data set field resides.
@@ -1094,7 +1094,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Return javascript necessary to initialize field.
+	 * Return javascript necessary to initialize CWidgetFieldGraphDataSet field.
 	 *
 	 * @param CWidgetFieldGraphDataSet $field
 	 * @param string                   $form_name  Form name in which data set field resides.
