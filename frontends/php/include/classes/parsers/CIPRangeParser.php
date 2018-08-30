@@ -66,6 +66,11 @@ class CIPRangeParser {
 	private $user_macro_parser;
 
 	/**
+	 * @var CMacroParser
+	 */
+	private $macro_parser;
+
+	/**
 	 * Supported options:
 	 *   v6             enabled support of IPv6 addresses
 	 *   dns            enabled support of DNS names
@@ -80,14 +85,15 @@ class CIPRangeParser {
 		'dns' => true,
 		'ranges' => true,
 		'max_ipv4_cidr' => 32,
-		'usermacros' => false
+		'usermacros' => false,
+		'macros' => false
 	];
 
 	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = []) {
-		foreach (['v6', 'dns', 'ranges', 'max_ipv4_cidr', 'usermacros'] as $option) {
+		foreach (['v6', 'dns', 'ranges', 'max_ipv4_cidr', 'usermacros', 'macros'] as $option) {
 			if (array_key_exists($option, $options)) {
 				$this->options[$option] = $options[$option];
 			}
@@ -102,6 +108,9 @@ class CIPRangeParser {
 		}
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
+		}
+		if ($this->options['macros']) {
+			$this->macro_parser = new CMacroParser($this->options['macros']);
 		}
 	}
 
@@ -121,7 +130,7 @@ class CIPRangeParser {
 			$range = trim($range, " \t\r\n");
 
 			if (!$this->isValidMask($range) && !$this->isValidRange($range) && !$this->isValidDns($range)
-					&& !$this->isValidUserMacro($range)) {
+					&& !$this->isValidUserMacro($range) && !$this->isValidMacro($range)) {
 				$this->error = _s('invalid address range "%1$s"', $range);
 				$this->max_ip_count = '0';
 				$this->max_ip_range = '';
@@ -372,5 +381,21 @@ class CIPRangeParser {
 		}
 
 		return ($this->user_macro_parser->parse($range) == CParser::PARSE_SUCCESS);
+	}
+
+	/**
+	 * Validate a host macros syntax.
+	 * Example: {HOST.IP}, {HOST.CONN} etc.
+	 *
+	 * @param string $range
+	 *
+	 * @return bool
+	 */
+	protected function isValidMacro($range) {
+		if (!$this->options['macros']) {
+			return false;
+		}
+
+		return ($this->macro_parser->parse($range) == CParser::PARSE_SUCCESS);
 	}
 }
