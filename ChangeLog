@@ -463,6 +463,7 @@ Bug fixes:
 Changes for 3.4.14rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Portuguese (Portugal) translation to be displayed by default (zalex_ua)
 
 Bug fixes:
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
