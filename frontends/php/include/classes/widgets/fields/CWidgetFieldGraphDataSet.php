@@ -184,7 +184,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					// Left column fields.
 					(new CDiv(
 						(new CFormList())
-							->addRow(_('Base color'),
+							->addRow(_('Base colour'),
 								(new CColor($fn.'['.$options['row_num'].'][color]', $value['color']))
 									->appendColorPickerJs(false)
 							)

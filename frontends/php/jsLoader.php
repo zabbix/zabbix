@@ -271,7 +271,7 @@ $tranStrings = [
 		'Add multiple maps' => _('Add multiple maps')
 	],
 	'colorpicker.js' => [
-		'color' => _('color'),
+		'color' => _('colour'),
 		'Close' => _('Close')
 	]
 ];

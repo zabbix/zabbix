@@ -364,7 +364,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 				[
 					'name' => _('ADD OVERRIDE'),
 					'options' => [
-						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '']],
+						['name' => _('Base colour'), 'callback' => 'addOverride', 'args' => ['color', '']],
 
 						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
 						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
