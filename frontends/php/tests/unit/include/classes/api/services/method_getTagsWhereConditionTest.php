@@ -22,7 +22,7 @@
 class method_getTagsWhereConditionTest extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
-		$sql_args = ['event_tag', 'et', 'e', 'eventid'];
+		$sql_args = [2 => 'event_tag', 'et', 'e', 'eventid'];
 
 		return [
 			[
