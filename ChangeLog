@@ -11,7 +11,7 @@ Bug fixes:
 .......PS. [ZBX-14771] fixed memory leak in poller if scheduling interval is invalid (vso)
 ..F....... [ZBX-14462] improved time selection when opening calendar with missing time (vmurzins)
 .......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)
-..F....... [ZBX-14637] fixed fixed text readable on the problems widgets in dark theme (ashubin)
+..F....... [ZBX-14637] fixed unreadable text on the problems widgets in dark theme (ashubin)
 ..F....... [ZBX-14676] fixed displaying links containing UTF-8 characters (Ivo)
 
 --------------------------------------------------------------------------------
