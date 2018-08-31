@@ -495,15 +495,14 @@ class CWidgetHelper {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", '.
+							->onClick('return PopUp("popup.generic", jQuery.extend('.
 								CJs::encodeJson([
 									'srctbl' => 'hosts',
 									'srcfld1' => 'host',
 									'reference' => 'name',
 									'multiselect' => 1,
-									'dstfrm' => $form_name,
-									'dstfld1' => $field_name.'['.$row_num.'][hosts]'
-								]).', null, this);'
+									'dstfrm' => $form_name
+								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))
 						->addClass(ZBX_STYLE_COLUMN_50),
@@ -515,7 +514,7 @@ class CWidgetHelper {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", '.
+							->onClick('return PopUp("popup.generic", jQuery.extend('.
 								CJs::encodeJson([
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
@@ -524,9 +523,8 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'resolve_items' => 0,
-									'dstfrm' => $form_name,
-									'dstfld1' => $field_name.'['.$row_num.'][items]'
-								]).', null, this);'
+									'dstfrm' => $form_name
+								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))
 						->addClass(ZBX_STYLE_COLUMN_50)
@@ -861,15 +859,14 @@ class CWidgetHelper {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", '.
+							->onClick('return PopUp("popup.generic", jQuery.extend('.
 								CJs::encodeJson([
 									'srctbl' => 'hosts',
 									'srcfld1' => 'host',
 									'reference' => 'name',
 									'multiselect' => 1,
-									'dstfrm' => $form_name,
-									'dstfld1' => $field_name.'['.$row_num.'][hosts]'
-								]).', null, this);'
+									'dstfrm' => $form_name
+								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
@@ -880,7 +877,7 @@ class CWidgetHelper {
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", '.
+							->onClick('return PopUp("popup.generic", jQuery.extend('.
 								CJs::encodeJson([
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
@@ -891,9 +888,8 @@ class CWidgetHelper {
 									'numeric' => 1,
 									'with_webitems' => 1,
 									'resolve_items' => 0,
-									'dstfrm' => $form_name,
-									'dstfld1' => $field_name.'['.$row_num.'][items]',
-								]).', null, this);'
+									'dstfrm' => $form_name
+								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
