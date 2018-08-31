@@ -114,16 +114,6 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 	}
 
-	// authentication type
-	if ($data['user_groups']) {
-		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
-	}
-	else {
-		$data['auth_type'] = ($userId == 0)
-			? $config['authentication_type']
-			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
-	}
-
 	// set autologout
 	if ($data['autologin']) {
 		$data['autologout'] = '0';
