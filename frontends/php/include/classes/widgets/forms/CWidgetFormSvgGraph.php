@@ -254,7 +254,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 * Contains single check-box field to show/hide legend.
 		 */
 		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))
-			->setAction('jQuery("[name=legend_lines]").rangeControl(jQuery(this).is(":checked")?"enable":"disable");')
+			->setAction('jQuery("[name=legend_lines]").rangeControl('.
+				'jQuery(this).is(":checked") ? "enable" : "disable"'.
+			');')
 			->setDefault(SVG_GRAPH_LEGEND_TYPE_SHORT);
 		if (array_key_exists('legend', $this->data)) {
 			$field_legend->setValue($this->data['legend']);
@@ -262,9 +264,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_legend->getName()] = $field_legend;
 
 		$field_legend_lines = (new CWidgetFieldRangeControl('legend_lines', _('Number of lines'),
-				SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
-			))
-				->setDefault(SVG_GRAPH_LEGEND_LINES_DEFAULT);
+			SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
+		))
+			->setDefault(SVG_GRAPH_LEGEND_LINES_DEFAULT);
 		if ($field_legend->getValue() == SVG_GRAPH_LEGEND_TYPE_NONE) {
 			$field_legend_lines->setFlags(CWidgetField::FLAG_DISABLED);
 		}

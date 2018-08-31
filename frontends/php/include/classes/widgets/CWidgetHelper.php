@@ -132,11 +132,9 @@ class CWidgetHelper {
 	public static function getRangeControl($field) {
 		return (new CRangeControl($field->getName(), (int) $field->getValue()))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setAttribute('maxlength', strlen($field->getMaxValue()))
-			->setStep($field->getStepValue())
-			->setMin($field->getMinValue())
-			->setMax($field->getMaxValue())
-			->addClass('range-control');
+			->setStep($field->getStep())
+			->setMin($field->getMin())
+			->setMax($field->getMax());
 	}
 
 	/**
@@ -930,8 +928,6 @@ class CWidgetHelper {
 							->addRow(_('Width'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-									->addClass('range-control')
-									->setAttribute('maxlength', 2)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -939,8 +935,6 @@ class CWidgetHelper {
 							->addRow(_('Point size'),
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-									->addClass('range-control')
-									->setAttribute('maxlength', 2)
 									->setStep(1)
 									->setMin(1)
 									->setMax(10)
@@ -949,8 +943,6 @@ class CWidgetHelper {
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 										(int) $value['transparency'])
 									)
-									->addClass('range-control')
-									->setAttribute('maxlength', 2)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -958,8 +950,6 @@ class CWidgetHelper {
 							->addRow(_('Fill'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-									->addClass('range-control')
-									->setAttribute('maxlength', 2)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -1134,7 +1124,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'jQuery(".range-control[data-options]").rangeControl();'.
+					'jQuery(".'.ZBX_STYLE_RANGE_CONTROL.'[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
 						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
 						'jQuery("#data_sets").sortable("enable");'.
@@ -1151,7 +1141,7 @@ class CWidgetHelper {
 			'});',
 
 			// Initialize rangeControl UI elements.
-			'jQuery(".range-control", jQuery("#data_sets")).rangeControl();',
+			'jQuery(".'.ZBX_STYLE_RANGE_CONTROL.'", jQuery("#data_sets")).rangeControl();',
 
 			// Expand dataset when click in pattern fields.
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
