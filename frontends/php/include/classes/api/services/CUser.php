@@ -547,32 +547,24 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	private static function getGroupGuiAccess($user, $db_usrgrps) {
-		$config = select_config();
 		$gui_access_arr = [];
 		$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
+		$config = select_config();
+		$system_gui_access = array_search($config['authentication_type'], [
+			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
+		]);
+
 		foreach($usrgrps as $usergrp) {
 			if (array_key_exists($usergrp, $db_usrgrps)) {
-				$gui_access = $db_usrgrps[$usergrp]['gui_access'];
-
-				if ($db_usrgrps[$usergrp]['gui_access'] == GROUP_GUI_ACCESS_SYSTEM) {
-					switch ($config['authentication_type']) {
-						case ZBX_AUTH_INTERNAL:
-							$gui_access = GROUP_GUI_ACCESS_INTERNAL;
-							break;
-						case ZBX_AUTH_LDAP:
-							$gui_access = GROUP_GUI_ACCESS_LDAP;
-							break;
-					}
-				}
-
-				if (!in_array($gui_access, $gui_access_arr)) {
-					$gui_access_arr[] = $gui_access;
-				}
+				$gui_access = (int) $db_usrgrps[$usergrp]['gui_access'];
+				$index = ($gui_access == GROUP_GUI_ACCESS_SYSTEM) ? $system_gui_access : $gui_access;
+				$gui_access_arr[$index] = '';
 			}
 		}
 
-		return $gui_access_arr;
+		return array_keys($gui_access_arr);
 	}
 
 	/**
