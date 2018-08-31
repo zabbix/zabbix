@@ -37,7 +37,6 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
-			WIDGET_SVG_GRAPH			=> _('Graph'),
 			WIDGET_GRAPH				=> _('Classic graph'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
@@ -45,6 +44,7 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
+			WIDGET_SVG_GRAPH			=> _('Graph'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
@@ -69,13 +69,13 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
 			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
-			WIDGET_SVG_GRAPH			=> ['width' => 6, 'height' => 5],
 			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
 			WIDGET_PROBLEM_HOSTS		=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
 			WIDGET_PROBLEMS_BY_SV		=> ['width' => 6, 'height' => 5],
+			WIDGET_SVG_GRAPH			=> ['width' => 6, 'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
 			WIDGET_URL					=> ['width' => 6, 'height' => 5],
@@ -119,12 +119,12 @@ class CWidgetConfig {
 			case WIDGET_DATA_OVER:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GRAPH:
-			case WIDGET_SVG_GRAPH:
 			case WIDGET_PLAIN_TEXT:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_PROBLEMS_BY_SV:
 			case WIDGET_TRIG_OVER:
+			case WIDGET_SVG_GRAPH:
 			case WIDGET_WEB:
 				return SEC_PER_MIN;
 
