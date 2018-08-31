@@ -728,12 +728,14 @@ class CWidgetHelper {
 					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
 					'options: "input[type=hidden]",'.
 					'captions: '.CJs::encodeJson(self::getGraphOverrideOptionNames()).','.
-					'makeName: function(option) {return "'.$field->getName().'["+this.rowId+"]["+option+"]";},'.
+					'makeName: function(option, row_id) {return "'.$field->getName().'["+row_id+"]["+option+"]";},'.
 					'makeOption: function(name) {'.
 						'return name.match('.
 							'/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/'.
 						')[1];'.
 					'},'.
+					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
+					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
 					'onUpdate: updateGraphPreview,'.
 					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
 				'});'.
@@ -746,10 +748,7 @@ class CWidgetHelper {
 					'beforeRow: ".overrides-foot",'.
 					'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
 					'add: "#override-add",'.
-					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
-					'dataCallback: function(data) {'.
-						'return data;'.
-					'}'.
+					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
 				'.bind("afteradd.dynamicRows", function(event, options) {'.
 					'var container = jQuery(".overlay-dialogue-body");'.
@@ -766,11 +765,11 @@ class CWidgetHelper {
 						'});'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#overrides"), ".overrides-list-item", "or");'.
+					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 					'updateGraphPreview();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
+					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 					'initializeOverrides();'.
 					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
 						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
@@ -818,7 +817,7 @@ class CWidgetHelper {
 					'updateGraphPreview();'.
 				'},'.
 				'update: function() {'.
-					'updateVariableOrder(jQuery("#overrides"), ".overrides-list-item", "or");'.
+					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 				'}'.
 			'});'
 		];
@@ -925,25 +924,7 @@ class CWidgetHelper {
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
-									->onChange(
-										'var rnum = this.id.replace("'.$field_name.'_","").replace("_type","");'.
-										'if (jQuery(":checked", jQuery(this)).val() == "'.SVG_GRAPH_TYPE_POINTS.'") {'.
-											'jQuery("#ds_"+rnum+"_width").rangeControl("disable");'.
-											'jQuery("#ds_"+rnum+"_fill").rangeControl("disable");'.
-											'jQuery("#ds_"+rnum+"_pointsize").rangeControl("enable");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_0").attr("disabled", "disabled");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_1").attr("disabled", "disabled");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_2").attr("disabled", "disabled");'.
-										'}'.
-										'else {'.
-											'jQuery("[name=\"ds["+rnum+"][width]\"]").rangeControl("enable");'.
-											'jQuery("[name=\"ds["+rnum+"][fill]\"]").rangeControl("enable");'.
-											'jQuery("[name=\"ds["+rnum+"][pointsize]\"]").rangeControl("disable");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_0").removeAttr("disabled");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_1").removeAttr("disabled");'.
-											'jQuery("#ds_"+rnum+"_missingdatafunc_2").removeAttr("disabled");'.
-										'}'
-									)
+									->onChange('changeDataSetDrawType(this)')
 									->setModern(true)
 							)
 							->addRow(_('Width'),
@@ -1086,13 +1067,30 @@ class CWidgetHelper {
 	/**
 	 * Return javascript necessary to initialize CWidgetFieldGraphDataSet field.
 	 *
-	 * @param CWidgetFieldGraphDataSet $field
-	 * @param string                   $form_name  Form name in which data set field resides.
-	 *
 	 * @return string
 	 */
-	public static function getGraphDataSetJavascript($field, $form_name) {
+	public static function getGraphDataSetJavascript() {
 		$scripts = [
+			'function changeDataSetDrawType(obj) {'.
+				'var row_num = obj.id.replace("ds_", "").replace("_type", "");'.
+				'if (jQuery(":checked", jQuery(obj)).val() == '.SVG_GRAPH_TYPE_POINTS.') {'.
+					'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
+					'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
+					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_0").attr("disabled", "disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_1").attr("disabled", "disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_2").attr("disabled", "disabled");'.
+				'}'.
+				'else {'.
+					'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
+					'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
+					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_0").removeAttr("disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_1").removeAttr("disabled");'.
+					'jQuery("#ds_" + row_num + "_missingdatafunc_2").removeAttr("disabled");'.
+				'}'.
+			'};',
+
 			// Initialize dynamic rows.
 			'jQuery("#data_sets")'.
 				'.dynamicRows({'.
@@ -1131,11 +1129,11 @@ class CWidgetHelper {
 						'});'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
+					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 					'updateGraphPreview();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
+					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 					'jQuery(".range-control[data-options]").rangeControl();'.
 					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
 						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
@@ -1204,7 +1202,7 @@ class CWidgetHelper {
 					'updateGraphPreview();'.
 				'},'.
 				'update: function() {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".list-accordion-item", "ds");'.
+					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
 			'});'
 		];

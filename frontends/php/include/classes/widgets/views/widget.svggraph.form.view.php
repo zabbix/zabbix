@@ -94,8 +94,7 @@ $scripts[] =
 
 $scripts[] =
 	/**
-	 * This function needs to rename ids and names of the elements in "Data set" or "Overrides" controls after
-	 * reordering elements.
+	 * This function needs to change element names in "Data set" or "Overrides" controls after reordering elements.
 	 *
 	 * @param obj           "Data set" or "Overrides" element.
 	 * @param row_selector  jQuery selector for rows.
@@ -111,13 +110,6 @@ $scripts[] =
 						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
 					');'.
 				'});'.
-				'jQuery(\'[id^="\' + var_prefix + \'_"]\', this).filter(function() {'.
-					'return jQuery(this).attr("id").match(/[a-z+]_\d+[a-z0-9_]+/);'.
-				'}).each(function() {'.
-					'jQuery(this).attr("id", '.
-						'jQuery(this).attr("id").replace(/([a-z]+_)\d+([a-z0-9_]+)/, "$1" + (value + i) + "$2")'.
-					');'.
-				'});'.
 			'});'.
 		'});'.
 	'}';
@@ -125,7 +117,7 @@ $scripts[] =
 // Create 'Data set' tab.
 $tab_data_set = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['ds']), CWidgetHelper::getGraphDataSet($fields['ds'], $form_name));
-$scripts[] = CWidgetHelper::getGraphDataSetJavascript($fields['ds'], $form_name);
+$scripts[] = CWidgetHelper::getGraphDataSetJavascript();
 $jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name);
 
 // Create 'Display options' tab.
