@@ -124,9 +124,7 @@ class CDateSelector extends CTag {
 				->addClass(ZBX_STYLE_ICON_CAL)
 				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
 
-		zbx_add_post_js('create_calendar(null, "'.$this->name.'", "'.$this->name.'_calendar", null, null, '.
-			'"'.$this->date_format.'");'
-		);
+		zbx_add_post_js('create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'");');
 
 		return parent::toString($destroy);
 	}

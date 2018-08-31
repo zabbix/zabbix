@@ -29,11 +29,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var array
 	 */
-	public $css_class = [
-		GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
-		GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT,
-		GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM,
-	];
+	public $css_class;
 
 	/**
 	 * Axis type. One of CSvgGraphAxis::AXIS_* constants.
@@ -79,6 +75,12 @@ class CSvgGraphAxis extends CSvgTag {
 	private $axis_visible = true;
 
 	public function __construct(array $labels, $type) {
+		$this->css_class = [
+			GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
+			GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT,
+			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM,
+		];
+
 		$this->labels = $labels;
 		$this->type = $type;
 		$this->container = new CSvgGroup();

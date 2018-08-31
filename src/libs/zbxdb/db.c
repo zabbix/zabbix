@@ -758,7 +758,7 @@ out:
 	return ret;
 }
 
-int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
+int	zbx_db_init(const char *dbname, const char *const dbschema, char **error)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
@@ -778,7 +778,7 @@ int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
 		if (SUCCEED != zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error))
 			return FAIL;
 
-		zbx_db_execute("%s", db_schema);
+		zbx_db_execute("%s", dbschema);
 		zbx_db_close();
 		return SUCCEED;
 	}
@@ -786,7 +786,7 @@ int	zbx_db_init(const char *dbname, const char *const db_schema, char **error)
 	return zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE3, error);
 #else	/* not HAVE_SQLITE3 */
 	ZBX_UNUSED(dbname);
-	ZBX_UNUSED(db_schema);
+	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(error);
 
 	return SUCCEED;
