@@ -180,7 +180,7 @@ jQuery(function ($) {
 		 * - overridesList - selector for overrides list. Mandatory if getId() uses it.
 		 * - options	- selector of UI elements for already specified overrides.
 		 * - menu		- JSon for override options that appears in context menu.
-		 * - getId	    - Function returns unique identifier used for override name.
+		 * - getId	    - Function returns unique identifier of override used for override option name.
 		 * - makeName	- Function creates pattern matching name for input field that stores value of override option.
 		 * - makeOption	- Function extracts given string and returns override option from it.
 		 * - onUpdate	- Function called when override values changes.
