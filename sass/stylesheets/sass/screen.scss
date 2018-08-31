@@ -4174,9 +4174,8 @@ $form-icon-btn: (
 	border-bottom: none;
 }
 .svg-graph-selection {
-	fill: $yellow;
-	fill-opacity: 0.35;
-	stroke-color: rgba($dark-yellow,0.6);
+	fill: rgba($yellow,0.35);
+	stroke: rgba($dark-yellow,0.6);
 	stroke-width: 1px;
 }
 .svg-helper {

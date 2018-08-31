@@ -2863,9 +2863,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border-bottom: none; }
 
 .svg-graph-selection {
-  fill: #a78820;
-  fill-opacity: 0.35;
-  stroke-color: rgba(255, 162, 13, 0.6);
+  fill: rgba(167, 136, 32, 0.35);
+  stroke: rgba(255, 162, 13, 0.6);
   stroke-width: 1px; }
 
 .svg-helper {
@@ -5092,6 +5091,11 @@ td.inactive-bg {
   background-color: rgba(255, 255, 255, 0.2);
   border: none;
   outline: 2px solid rgba(255, 255, 255, 0.6); }
+
+.svg-graph-selection {
+  fill: rgba(255, 255, 255, 0.2);
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 2px; }
 
 .ui-selectable-helper {
   background-color: rgba(255, 255, 255, 0.2);
