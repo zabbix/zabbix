@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,37 +19,28 @@
 **/
 
 
-class CHostGroupNormalValidator extends CValidator {
+class CSvgText extends CSvgTag {
 
-	/**
-	 * Error message
-	 *
-	 * @var string
-	 */
-	public $message;
+	public function __construct($x, $y, $text) {
+		parent::__construct('text', true);
 
-	/**
-	 * Checks is any of the given host groups are discovered.
-	 *
-	 * @param mixed $hostGroupIds
-	 *
-	 * @return bool
-	 */
-	public function validate($hostGroupIds) {
-		$hostGroups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $hostGroupIds,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-			'limit' => 1
-		]);
+		$this->x = $x;
+		$this->y = $y;
 
-		if ($hostGroups) {
-			$hostGroup = reset($hostGroups);
-			$this->error($this->message, $hostGroup['name']);
+		$this->setAttribute('x', $this->x);
+		$this->setAttribute('y', $this->y);
+		$this->addItem($text);
+	}
 
-			return false;
-		}
+	public function setAngle($angle) {
+		$this->setAttribute('transform', 'rotate('.$angle.','.$this->x.','.$this->y.')');
 
-		return true;
+		return $this;
+	}
+
+	public function setFontSize($font_size) {
+		$this->setAttribute('font-size', $font_size);
+
+		return $this;
 	}
 }

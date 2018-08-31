@@ -67,6 +67,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['rows_per_page']		= $user['rows_per_page'];
 		$data['user_type']			= $user['type'];
 		$data['messages'] 			= getMessageSettings();
+		$data['change_password']	= 0;
 
 		$userGroups = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
@@ -93,7 +94,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['rows_per_page']		= getRequest('rows_per_page', 50);
 		$data['user_type']			= getRequest('user_type', USER_TYPE_ZABBIX_USER);
 		$data['user_groups']		= getRequest('user_groups', []);
-		$data['change_password']	= getRequest('change_password');
+		$data['change_password']	= getRequest('change_password', 0);
 		$data['user_medias']		= getRequest('user_medias', []);
 
 		// set messages
@@ -1093,82 +1094,20 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 
-		// discovery rule & item prototype
-		if ($data['is_discovery_rule'] || $data['parent_discoveryid'] != 0) {
-			// get templates
-			$itemid = $item['itemid'];
-			do {
-				$params = [
-					'itemids' => $itemid,
-					'output' => ['itemid', 'templateid'],
-					'selectHosts' => ['name']
-				];
-				if ($data['is_discovery_rule']) {
-					$item = API::DiscoveryRule()->get($params);
-				}
-				else {
-					$params['selectDiscoveryRule'] = ['itemid'];
-					$params['filter'] = ['flags' => null];
-					$item = API::Item()->get($params);
-				}
-				$item = reset($item);
-
-				if (!empty($item)) {
-					$host = reset($item['hosts']);
-					if (!empty($item['hosts'])) {
-						if (bccomp($data['itemid'], $itemid) != 0) {
-							$writable = API::Template()->get([
-								'output' => ['templateid'],
-								'templateids' => [$host['hostid']],
-								'editable' => true,
-								'preservekeys' => true
-							]);
-						}
-
-						$host['name'] = CHtml::encode($host['name']);
-						if (bccomp($data['itemid'], $itemid) == 0) {
-						}
-						// discovery rule
-						elseif ($data['is_discovery_rule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'],
-									'host_discovery.php?form=update&itemid='.$item['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-						// item prototype
-						elseif ($item['discoveryRule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
-									'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-					}
-					$itemid = $item['templateid'];
-				}
-				else {
-					break;
-				}
-			} while ($itemid != 0);
-
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
+		// discovery rule
+		if ($data['is_discovery_rule']) {
+			$flag = ZBX_FLAG_DISCOVERY_RULE;
+		}
+		// item prototype
+		elseif ($data['parent_discoveryid'] != 0) {
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
 		else {
-			$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item]));
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
 	}
 
 	// caption
@@ -1176,7 +1115,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['caption'] = _('Discovery rule');
 	}
 	else {
-		$data['caption'] = !empty($data['parent_discoveryid']) ? _('Item prototype') : _('Item');
+		$data['caption'] = ($data['parent_discoveryid'] != 0) ? _('Item prototype') : _('Item');
 	}
 
 	// hostname
@@ -1274,7 +1213,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 			$update_interval_parser = new CUpdateIntervalParser([
 				'usermacros' => true,
-				'lldmacros' => (bool) $data['parent_discoveryid']
+				'lldmacros' => ($data['parent_discoveryid'] != 0)
 			]);
 
 			if ($update_interval_parser->parse($data['delay']) == CParser::PARSE_SUCCESS) {
@@ -1349,7 +1288,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
 		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
-			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
+			(($data['parent_discoveryid'] != 0) ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
 
@@ -1374,7 +1313,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] === null
+	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
@@ -1396,7 +1335,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 
 	// possible host inventories
-	if (empty($data['parent_discoveryid'])) {
+	if ($data['parent_discoveryid'] == 0) {
 		$data['possibleHostInventories'] = getHostInventories();
 
 		// get already populated fields by other items

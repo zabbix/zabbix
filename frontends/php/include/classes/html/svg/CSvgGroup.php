@@ -19,16 +19,9 @@
 **/
 
 
-class CColorCell extends CDiv {
+class CSvgGroup extends CSvgTag {
 
-	public function __construct($name = null, $color) {
-		parent::__construct();
-
-		if ($name !== null) {
-			$this->setName($name);
-			$this->setId(zbx_formatDomId($name));
-		}
-
-		$this->setAttribute('style', preg_match('/[0-9A-F]{6}/i', $color) ? 'background: #'.$color : null);
+	public function __construct() {
+		parent::__construct('g', true);
 	}
 }

@@ -25,6 +25,7 @@ class CTable extends CTag {
 	protected $footer;
 	protected $colnum;
 	protected $rownum;
+	protected $heading_column;
 
 	public function __construct() {
 		parent::__construct('table', true);
@@ -32,6 +33,7 @@ class CTable extends CTag {
 		$this->header = '';
 		$this->footer = '';
 		$this->colnum = 1;
+		$this->heading_column = null;
 	}
 
 	public function setCellPadding($value) {
@@ -49,14 +51,14 @@ class CTable extends CTag {
 			return null;
 		}
 
-		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
+		if ($item instanceof CCol) {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
 			}
 		}
 
-		if (!is_object($item) || strtolower(get_class($item)) !== 'crow') {
-			$item = new CRow($item);
+		if (!($item instanceof CRow)) {
+			$item = new CRow($item, $this->heading_column);
 			if ($id !== null) {
 				$item->setId($id);
 			}
@@ -70,13 +72,26 @@ class CTable extends CTag {
 	}
 
 	public function setHeader($value = null) {
-		if (!is_object($value) || strtolower(get_class($value)) !== 'crow') {
+		if (!($value instanceof CRow)) {
 			$value = new CRowHeader($value);
 		}
 		$this->colnum = $value->itemsCount();
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
+		return $this;
+	}
+
+	/**
+	 * Format given column as row header.
+	 *
+	 * @param int|null $heading_column  Column index for heading column. Starts from 0. 'null' if no heading column.
+	 *
+	 * @return CTable
+	 */
+	public function setHeadingColumn($heading_column) {
+		$this->heading_column = $heading_column;
+
 		return $this;
 	}
 
@@ -87,7 +102,7 @@ class CTable extends CTag {
 	}
 
 	public function addRow($item, $class = null, $id = null) {
-		$item = $this->addItem($this->prepareRow($item, $class, $id));
+		$this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
 		return $this;
 	}

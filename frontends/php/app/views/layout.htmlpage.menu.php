@@ -71,7 +71,12 @@ if (!$data['user']['is_guest']) {
 }
 
 $user_menu->addItem(
-	(new CLink(SPACE, 'index.php?reconnect=1'))
+	(new CLink(SPACE,
+		(new CUrl('index.php'))
+			->setArgument('reconnect', 1)
+			->setArgument('form', 'default')
+			->toString()
+	))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
 		->addSID()

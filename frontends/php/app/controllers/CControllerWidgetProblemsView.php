@@ -52,7 +52,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'severities' => $fields['severities'],
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
-			'maintenance' => $fields['maintenance'],
+			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged']
 		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
@@ -71,7 +71,9 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags'],
+				$fields['tag_name_format'], $fields['tag_priority']
+			);
 		}
 
 		if ($data['problems']) {
@@ -83,7 +85,10 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'fields' => [
 				'show' => $fields['show'],
 				'show_tags' => $fields['show_tags'],
-				'show_timeline' => $fields['show_timeline']
+				'show_timeline' => $fields['show_timeline'],
+				'tags' => $fields['tags'],
+				'tag_name_format' => $fields['tag_name_format'],
+				'tag_priority' => $fields['tag_priority']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],

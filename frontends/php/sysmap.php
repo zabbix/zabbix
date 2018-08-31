@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'class.cviewswitcher.js',
-	'multiselect.js'
+	'multiselect.js', 'colorpicker.js'
 ];
 $page['type'] = detect_page_type();
 
@@ -200,7 +200,7 @@ $data = [
 ];
 
 // get selements
-add_elementNames($data['sysmap']['selements']);
+addElementNames($data['sysmap']['selements']);
 
 foreach ($data['sysmap']['shapes'] as &$shape) {
 	$shape['expanded'] = CMacrosResolverHelper::resolveMapLabelMacros($shape['text']);
