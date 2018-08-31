@@ -523,6 +523,7 @@ class CWidgetHelper {
 									'multiselect' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
+									'resolve_items' => 0,
 									'dstfrm' => $form_name,
 									'dstfld1' => $field_name.'['.$row_num.'][items]'
 								]).', null, this);'
@@ -887,6 +888,7 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'with_webitems' => 1,
+									'resolve_items' => 0,
 									'dstfrm' => $form_name,
 									'dstfld1' => $field_name.'['.$row_num.'][items]',
 								]).', null, this);'
