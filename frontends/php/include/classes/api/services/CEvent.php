@@ -570,8 +570,7 @@ class CEvent extends CApiService {
 					$value = str_replace('_', '!_', $value);
 					$value = '%'.mb_strtoupper($value).'%';
 
-					$values_by_tag[$tag['tag']][] =
-						'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
+					$values_by_tag[$tag['tag']][] = 'UPPER('.$alias.'.value) LIKE '.zbx_dbstr($value)." ESCAPE '!'";
 				}
 				// ($value === '') - all other conditions can be omitted
 				else {
