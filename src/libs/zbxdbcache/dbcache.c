@@ -3998,9 +3998,7 @@ static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *histor
 	/* change item's history data until it is pushed back to history queue */
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		/* busy items were replaced with NULL values in hc_push_busy_items() function */
-		if (NULL == (item = (zbx_hc_item_t *)history_items->values[i]))
-			continue;
+		item = (zbx_hc_item_t *)history_items->values[i];
 
 		if (ZBX_HC_ITEM_STATUS_BUSY == item->status)
 			continue;
