@@ -24,7 +24,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_SVG_GRAPH);
 
-		$this->data = self::convertDottedKeys($this->data, true);
+		$this->data = self::convertDottedKeys($this->data);
 
 		/**
 		 * Data set tab.
