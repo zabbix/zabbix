@@ -1015,13 +1015,15 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * Retrieve overview table object for items.
  *
  * @param array  $groupids
- * @param string $application  IDs of applications to filter items by.
+ * @param string $application      IDs of applications to filter items by.
  * @param int    $viewMode
- * @param bool   $fullscreen   Display mode.
+ * @param bool   $fullscreen       Display mode.
+ * @param int    $show_suppressed  Whether to show suppressed problems.
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false) {
+function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false,
+		$show_suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1053,7 +1055,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscr
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	], ZBX_PROBLEM_SUPPRESSED_TRUE);
+	], $show_suppressed);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {

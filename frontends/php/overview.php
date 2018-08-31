@@ -207,7 +207,8 @@ if ($type == SHOW_TRIGGERS) {
 // fetch item data
 else {
 	$data['filter'] = [
-		'application' => CProfile::get('web.overview.filter.application', '')
+		'application' => CProfile::get('web.overview.filter.application', ''),
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0)
 	];
 
 	$overviewView = new CView('monitoring.overview.items', $data);
