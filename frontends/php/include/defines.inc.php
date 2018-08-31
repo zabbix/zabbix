@@ -158,6 +158,7 @@ define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
+define('T_ZBX_ABS_TIME',	13);
 
 define('O_MAND',	0);
 define('O_OPT',		1);
