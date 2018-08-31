@@ -133,7 +133,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$active_since_date = $absolute_time_parser->getDateTime(true);
 
 	$absolute_time_parser->parse(getRequest('active_till'));
-	$active_till_date = $absolute_time_parser->getDateTime(false);
+	$active_till_date = $absolute_time_parser->getDateTime(true);
 
 	if (!validateDateInterval($active_since_date->format('Y'), $active_since_date->format('m'),
 			$active_since_date->format('d'))) {
