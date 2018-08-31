@@ -729,7 +729,9 @@ class CWidgetHelper {
 					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
 					'options: "input[type=hidden]",'.
 					'captions: '.CJs::encodeJson(self::getGraphOverrideOptionNames()).','.
-					'makeName: function(option, row_id) {return "'.$field->getName().'["+row_id+"]["+option+"]";},'.
+					'makeName: function(option, row_id) {'.
+						'return "'.$field->getName().'[" + row_id + "][" + option + "]";'.
+					'},'.
 					'makeOption: function(name) {'.
 						'return name.match('.
 							'/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/'.
