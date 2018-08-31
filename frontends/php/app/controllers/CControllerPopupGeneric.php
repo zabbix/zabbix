@@ -361,7 +361,7 @@ class CControllerPopupGeneric extends CController {
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
 			'reference' =>					'string',
-			'resolve_items' =>				'in 0,1',
+			'resolve_items' =>				'in 0',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
 			'submit_parent' =>				'in 1'
@@ -824,16 +824,11 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				// Resolve item names by default.
-				if (!array_key_exists('resolve_items', $page_options) || $page_options['resolve_items'] == 1) {
-					$records = CMacrosResolverHelper::resolveItemNames($records);
-					CArrayHelper::sort($records, ['name_expanded']);
-				}
-				else {
-					foreach ($records as &$item) {
-						$item['name_expanded'] = $item['name'];
-					}
-					unset($item);
-				}
+				$records = array_key_exists('resolve_items', $page_options)
+					? CArrayHelper::renameObjectsKeys($records, ['name' => 'name_expanded'])
+					: CMacrosResolverHelper::resolveItemNames($records);
+
+				CArrayHelper::sort($records, ['name_expanded']);
 				break;
 
 			case 'applications':
