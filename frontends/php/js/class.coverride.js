@@ -32,7 +32,7 @@ jQuery(function ($) {
 					e.stopPropagation();
 					e.preventDefault();
 				})
-				.addClass('remove-btn'),
+				.addClass('subfilter-disable-btn'),
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 

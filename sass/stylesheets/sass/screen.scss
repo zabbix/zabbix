@@ -5578,8 +5578,8 @@ svg {
 
 		> div {
 			position: relative;
-			padding: 1px 22px 1px 1px;
-			background-color: lighten($ui-bg-selected-color, 10%);
+			padding: 1px 18px 1px 1px;
+			background-color: $ui-bg-selected-color;
 			border-radius: 2px;
 
 			> span {
@@ -5595,13 +5595,14 @@ svg {
 				width: 85px;
 			}
 
-			> .remove-btn {
-				color: #ffffff;
-				right: 2px;
-				top: 3px;
+			> .subfilter-disable-btn {
+				border: none !important;
+				right: 0px;
+				top: 0px;
 
-				&:active {
-					background-color: lighten($ui-bg-selected-color, 100%);
+				&:focus,
+				&:hover {
+					background: none;
 				}
 			}
 		}

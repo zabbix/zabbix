@@ -1272,3 +1272,16 @@ td.inactive-bg {
 		background-position: -524px -325px;
 	}
 }
+
+// OVERRIDES
+.overrides-options-list {
+	> li > div {
+		border: 1px solid $ui-tab-bg-selected-color;
+		background-color: transparent !important;
+
+		> .subfilter-disable-btn {
+			border: none !important;
+			top: 0;
+		}
+	}
+}

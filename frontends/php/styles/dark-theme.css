@@ -3901,8 +3901,8 @@ svg {
     white-space: nowrap; }
     .overrides-options-list > li > div {
       position: relative;
-      padding: 1px 22px 1px 1px;
-      background-color: dimgray;
+      padding: 1px 18px 1px 1px;
+      background-color: #4f4f4f;
       border-radius: 2px; }
       .overrides-options-list > li > div > span {
         color: white;
@@ -3913,12 +3913,12 @@ svg {
         line-height: 22px;
         min-height: 22px;
         width: 85px; }
-      .overrides-options-list > li > div > .remove-btn {
-        color: #ffffff;
-        right: 2px;
-        top: 3px; }
-        .overrides-options-list > li > div > .remove-btn:active {
-          background-color: white; }
+      .overrides-options-list > li > div > .subfilter-disable-btn {
+        border: none !important;
+        right: 0px;
+        top: 0px; }
+        .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
+          background: none; }
 
 .color-preview-box {
   height: 24px;

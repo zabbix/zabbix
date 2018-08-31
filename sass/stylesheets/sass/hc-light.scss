@@ -1202,3 +1202,15 @@ td.inactive-bg {
 		background-position: -524px -285px;
 	}
 }
+
+// OVERRIDES
+.overrides-options-list {
+	> li > div {
+		background-color: $ui-bg-selected-color !important;
+
+		> .subfilter-disable-btn {
+			border: none !important;
+			top: 0;
+		}
+	}
+}
