@@ -66,7 +66,7 @@ if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
 }
 
 // login via form
-if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', 'zabbix'))) {
+if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', ''))) {
 	if (CWebUser::$data['autologin'] != $autologin) {
 		API::User()->update([
 			'userid' => CWebUser::$data['userid'],
