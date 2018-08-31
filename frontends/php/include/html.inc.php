@@ -296,7 +296,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'));
+		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -532,7 +532,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'))
+		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([

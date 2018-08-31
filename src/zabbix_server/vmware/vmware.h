@@ -174,7 +174,8 @@ typedef struct
 	zbx_hashset_t		hvs;
 	zbx_hashset_t		vms_index;
 	zbx_vector_ptr_t	clusters;
-	zbx_vector_ptr_t	events;		/* vector of pointers to zbx_vmware_event_t structures */
+	zbx_vector_ptr_t	events;			/* vector of pointers to zbx_vmware_event_t structures */
+	int			max_query_metrics;	/* max count of Datastore perfCounters in one request */
 }
 zbx_vmware_data_t;
 
@@ -201,7 +202,7 @@ typedef struct
 	char			*contents;
 
 	/* the performance counters */
-	zbx_hashset_t 		counters;
+	zbx_hashset_t		counters;
 
 	/* list of entities to monitor with performance counters */
 	zbx_hashset_t		entities;

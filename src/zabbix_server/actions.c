@@ -1883,17 +1883,17 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	if (0 != new_escalations.values_num)
 	{
 		zbx_db_insert_t	db_insert;
-		int		i;
+		int		j;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
 					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
 
-		for (i = 0; i < new_escalations.values_num; i++)
+		for (j = 0; j < new_escalations.values_num; j++)
 		{
 			zbx_uint64_t		triggerid = 0, itemid = 0;
 			zbx_escalation_new_t	*new_escalation;
 
-			new_escalation = (zbx_escalation_new_t *)new_escalations.values[i];
+			new_escalation = (zbx_escalation_new_t *)new_escalations.values[j];
 
 			switch (new_escalation->event->object)
 			{
