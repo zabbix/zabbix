@@ -846,8 +846,8 @@ class CSvgGraph extends CSvg {
 			// If problem is never recovered, it will be drown till the end of graph or till current time.
 			$time_to =  ($problem['r_clock'] == 0) ? min($this->time_till, time()) : $problem['r_clock'];
 			$time_range = $this->time_till - $this->time_from;
-			$x1 = $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
-			$x2 = $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
+			$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
+			$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
 
 			// Make problem info.
 			if ($problem['r_clock'] != 0) {
