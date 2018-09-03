@@ -2867,6 +2867,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke: rgba(255, 162, 13, 0.6);
   stroke-width: 1px; }
 
+.svg-graph-selection-text {
+  fill: #fff; }
+
 .svg-helper {
   stroke-opacity: 0.35;
   stroke: #ff5050;

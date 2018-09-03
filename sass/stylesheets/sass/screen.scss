@@ -4178,6 +4178,9 @@ $form-icon-btn: (
 	stroke: rgba($dark-yellow,0.6);
 	stroke-width: 1px;
 }
+.svg-graph-selection-text {
+	fill: $font-color;
+}
 .svg-helper {
 	stroke-opacity: 0.35;
 	stroke: $red;
