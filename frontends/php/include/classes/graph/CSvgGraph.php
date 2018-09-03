@@ -678,7 +678,7 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)) {
 				$min_value = $this->right_y_min;
-				$max_value = $this->max_value_right;
+				$max_value = $this->right_y_max;
 				$units = $this->right_y_units;
 			}
 			else {
