@@ -76,22 +76,23 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
-	 * Validate default athentication. Do not allow user change default authentication to LDAP if LDAP is not
+	 * Validate default authentication. Do not allow user to change default authentication to LDAP if LDAP is not
 	 * configured.
 	 *
 	 * @return bool
 	 */
 	private function validateDefaultAuth() {
 		$data = [
-			'ldap_configured' => 0,
-			'authentication_type' => 0
+			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'authentication_type' => ZBX_AUTH_INTERNAL
 		];
 		$this->getInputs($data, array_keys($data));
-		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP || $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
+
+		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP
+				|| $data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
-			$this->response->setMessageError(_s('Incorrect value for field "%1$s": %2$s.',
-				'authentication_type',
+			$this->response->setMessageError(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
 				_('LDAP is not configured')
 			));
 		}
@@ -126,10 +127,10 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 
-		if ($is_valid && ($config['ldap_port'] < 0 || $config['ldap_port'] > 65535)) {
+		if ($is_valid && ($config['ldap_port'] < ZBX_MIN_PORT_NUMBER || $config['ldap_port'] > ZBX_MAX_PORT_NUMBER)) {
 			$this->response->setMessageError(_s(
 				'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.', $this->getInput('ldap_port'),
-				'ldap_port', 0, 65535
+				'ldap_port', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER
 			));
 			$is_valid = false;
 		}
@@ -187,12 +188,12 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$data = DB::getDefaults('config');
 		$fields = [
-			'authentication_type' => 0,
-			'ldap_configured' => 0,
-			'http_auth_enabled' => 0,
+			'authentication_type' => ZBX_AUTH_INTERNAL,
+			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
+			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 		];
 
-		if ($this->getInput('http_auth_enabled', 0) == ZBX_AUTH_HTTP_ENABLED) {
+		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
 			$fields += [
 				'http_case_sensitive' => 0,
 				'http_login_form' => 0,
@@ -200,7 +201,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if ($this->getInput('ldap_configured', 0) == ZBX_AUTH_LDAP_ENABLED) {
+		if ($this->getInput('ldap_configured', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
 			$fields += [
 				'ldap_host' => '',
 				'ldap_port' => '',

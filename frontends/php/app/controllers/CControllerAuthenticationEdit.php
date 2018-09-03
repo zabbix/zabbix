@@ -117,7 +117,7 @@ class CControllerAuthenticationEdit extends CController {
 		else {
 			$data += select_config();
 			$data['db_authentication_type'] = $data['authentication_type'];
-			$data['change_bind_password'] = $data['ldap_bind_password'] === '' ? 1 : 0;
+			$data['change_bind_password'] = ($data['ldap_bind_password'] === '') ? 1 : 0;
 		}
 
 		$data['ldap_enabled'] = ($ldap_status['result'] == CFrontendSetup::CHECK_OK
