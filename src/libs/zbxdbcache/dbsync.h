@@ -34,11 +34,10 @@
 #define ZBX_DBSYNC_UPDATE_HOSTS			__UINT64_C(0x0001)
 #define ZBX_DBSYNC_UPDATE_ITEMS			__UINT64_C(0x0002)
 #define ZBX_DBSYNC_UPDATE_FUNCTIONS		__UINT64_C(0x0004)
-#define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0008)
-#define ZBX_DBSYNC_UPDATE_HOST_TEMPLATES	__UINT64_C(0x0010)
-#define ZBX_DBSYNC_UPDATE_TRIGGERS		__UINT64_C(0x0020)
-#define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0040)
-#define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0080)
+#define ZBX_DBSYNC_UPDATE_TRIGGERS		__UINT64_C(0x0008)
+#define ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY	__UINT64_C(0x0010)
+#define ZBX_DBSYNC_UPDATE_HOST_GROUPS		__UINT64_C(0x0020)
+#define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
 
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -46,9 +45,6 @@
 #else
 #	define ZBX_HOST_TLS_OFFSET	0
 #endif
-
-
-struct zbx_dbsync;
 
 /******************************************************************************
  *                                                                            *
@@ -80,7 +76,7 @@ typedef struct
 }
 zbx_dbsync_row_t;
 
-typedef struct zbx_dbsync
+struct zbx_dbsync
 {
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
 	unsigned char			mode;
@@ -110,8 +106,7 @@ typedef struct zbx_dbsync
 	zbx_uint64_t	add_num;
 	zbx_uint64_t	update_num;
 	zbx_uint64_t	remove_num;
-}
-zbx_dbsync_t;
+};
 
 void	zbx_dbsync_init_env(ZBX_DC_CONFIG *cache);
 void	zbx_dbsync_free_env(void);
@@ -141,6 +136,11 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync);
-
+int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

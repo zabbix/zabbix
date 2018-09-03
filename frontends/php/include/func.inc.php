@@ -379,6 +379,40 @@ function hex2rgb($color) {
 	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
+function getColorVariations($color, $variations_requested = 1) {
+	if (1 >= $variations_requested) {
+		return [$color];
+	}
+
+	$change = hex2rgb('#ffffff'); // Color which is increased/decreased in variations.
+	$max = 50;
+
+	$color = hex2rgb($color);
+	$variations = [];
+
+	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
+
+	// Remove redundant values.
+	while (count($range) > $variations_requested) {
+		(count($range) % 2) ? array_shift($range) : array_pop($range);
+	}
+
+	// Calculate colors.
+	foreach ($range as $var) {
+		$r = $color[0] + ($change[0] / 100 * $var);
+		$g = $color[1] + ($change[1] / 100 * $var);
+		$b = $color[2] + ($change[2] / 100 * $var);
+
+		$variations[] = '#' . rgb2hex([
+			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
+			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
+			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)
+		]);
+	}
+
+	return $variations;
+}
+
 function zbx_num2bitstr($num, $rev = false) {
 	if (!is_numeric($num)) {
 		return 0;
@@ -773,19 +807,28 @@ function convert_units($options = []) {
  * Examples:
  *		10m = 600
  *		3d = 10800
+ *		-10m = -600
  *
  * @param string $time
+ * @param bool   $allow_negative   Allow time to be negative.
  *
- * @return int
+ * @return int   Integer for valid input. Null otherwise.
  */
-function timeUnitToSeconds($time) {
-	preg_match('/^((\d)+)(['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+function timeUnitToSeconds($time, $allow_negative = false) {
+	$re = $allow_negative
+		? '/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/'
+		: '/^(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/';
+	preg_match($re, $time, $matches);
 
-	if (array_key_exists(3, $matches)) {
-		$suffix = $matches[3];
-		$time = $matches[1];
+	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
-		switch ($suffix) {
+	if (!array_key_exists('number', $matches)) {
+		return null;
+	}
+	elseif (array_key_exists('suffix', $matches)) {
+		$time = $matches['number'];
+
+		switch ($matches['suffix']) {
 			case 's':
 				$sec = $time;
 				break;
@@ -804,10 +847,10 @@ function timeUnitToSeconds($time) {
 		}
 	}
 	else {
-		$sec = $matches[0];
+		$sec = $matches['number'];
 	}
 
-	return $sec;
+	return $is_negative ? bcmul($sec, -1) : $sec;
 }
 
 /**
@@ -1436,17 +1479,27 @@ function zbx_str2links($text) {
 	foreach (explode("\n", $text) as $line) {
 		$line = rtrim($line, "\r ");
 
-		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches);
 
 		$start = 0;
+
 		foreach ($matches[0] as $match) {
-			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = new CLink($match[0], $match[0]);
-			$start = $match[1] + mb_strlen($match[0]);
+			if (($pos = mb_strpos($line, $match, $start)) !== false) {
+				if ($pos != $start) {
+					$result[] = mb_substr($line, $start, $pos - $start);
+				}
+				$result[] = new CLink(CHTML::encode($match), $match);
+				$start = $pos + mb_strlen($match);
+			}
 		}
-		$result[] = mb_substr($line, $start);
+
+		if (mb_strlen($line) != $start) {
+			$result[] = mb_substr($line, $start);
+		}
+
 		$result[] = BR();
 	}
+
 	array_pop($result);
 
 	return $result;
@@ -1740,6 +1793,16 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
+		$config = select_config();
+
+		if ($config['http_login_form'] == ZBX_AUTH_FORM_HTTP && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
+			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
+			redirect($redirect_to->toString());
+
+			exit;
+		}
+
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message

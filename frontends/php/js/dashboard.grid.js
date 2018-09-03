@@ -71,6 +71,18 @@
 			);
 	}
 
+	function makeWidgetInfoBtns(btns) {
+		var info_btns = [];
+		if (btns.length) {
+			btns.each(function(btn) {
+				info_btns.push($('<button>', {'type': 'button', 'class': btn.icon, 'data-hintbox': 1}));
+				info_btns.push($('<div></div>').html(btn.hint).addClass('hint-box').hide());
+			});
+		}
+
+		return info_btns.length ? info_btns : null;
+	}
+
 	function resizeDashboardGrid($obj, data, min_rows) {
 		data['options']['rows'] = 0;
 
@@ -502,6 +514,11 @@
 
 				widget['content_footer'].html(resp.footer);
 
+				if (typeof(resp.info) !== 'undefined') {
+					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
+					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
+				}
+
 				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
 				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
@@ -595,7 +612,9 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body'].prepend(resp.errors);
+					data.dialogue['body']
+						.prepend(resp.errors)
+						.scrollTop(0);
 				}
 				else {
 					// No errors, proceed with update.
@@ -938,7 +957,7 @@
 	 * @param {object} data       Data from dashboard grid.
 	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @return int               Number of triggers, that were called.
+	 * @return int                Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
@@ -1361,6 +1380,13 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
+						if (data.dialogue['widget_type'] === 'svggraph') {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+						else {
+							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+						}
+
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});

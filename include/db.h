@@ -312,6 +312,7 @@ typedef struct
 	int			acknowledged;
 	int			ns;
 	int			severity;
+	unsigned char		suppressed;
 
 	zbx_vector_ptr_t	tags;
 
@@ -441,7 +442,7 @@ typedef struct
 	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
-	unsigned char	maintenance_mode;
+	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
 }
@@ -764,5 +765,7 @@ typedef struct
 	zbx_uint64_t	flags;
 }
 zbx_proxy_diff_t;
+
+int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 #endif

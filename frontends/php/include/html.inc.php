@@ -296,7 +296,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'));
+		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -532,7 +532,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'))
+		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
@@ -752,21 +752,12 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 /**
  * Renders a page footer.
  *
- * @param bool $with_logo
  * @param bool $with_version
  *
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, [
-		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
-		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
-			->addClass(ZBX_STYLE_GREY)
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->setAttribute('target', '_blank')
-	]))
-	->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))->setAttribute('role', 'contentinfo');
 }
 
 /**
@@ -815,6 +806,58 @@ function makeInformationIcon($message) {
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message);
+}
+
+/**
+ * Renders an icon for host in maintenance.
+ *
+ * @param int    $type         Type of the maintenance.
+ * @param string $name         Name of the maintenance.
+ * @param string $description  Description of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeMaintenanceIcon($type, $name, $description) {
+	$hint = $name.' ['.($type
+		? _('Maintenance without data collection')
+		: _('Maintenance with data collection')).']';
+
+	if ($description !== '') {
+		$hint .= "\n".$description;
+	}
+
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint($hint);
+}
+
+/**
+ * Renders an icon for suppressed problem.
+ *
+ * @param array  $icon_data
+ * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
+ * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
+ *
+ * @return CSpan
+ */
+function makeSuppressedProblemIcon(array $icon_data) {
+	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+
+	CArrayHelper::sort($icon_data, ['maintenance_name']);
+	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
+
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_INVISIBLE)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint(
+			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
+				? zbx_date2str(TIME_FORMAT, $suppress_until)
+				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
+			).
+			"\n".
+			_s('Maintenance: %1$s', $maintenance_names)
+		);
 }
 
 /**
