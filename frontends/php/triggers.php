@@ -750,6 +750,11 @@ else {
 				}
 		}
 
+		if ($data['filter_tags']) {
+			$options['evaltype'] = $data['filter_evaltype'];
+			$options['tags'] = $data['filter_tags'];
+		}
+
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
@@ -798,9 +803,7 @@ else {
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectTags' => ['tag', 'value'],
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'evaltype' => $data['filter_evaltype'],
-		'tags' => $data['filter_tags']
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 
 	// sort for displaying full results
