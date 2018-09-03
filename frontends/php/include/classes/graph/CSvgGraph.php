@@ -396,6 +396,7 @@ class CSvgGraph extends CSvg {
 	 * @return CSvgGraph
 	 */
 	public function draw() {
+		$this->applyMissingDataFunc();
 		$this->calculateYAxis();
 		$this->calculateDimensions();
 		$this->calculatePaths();
@@ -676,7 +677,7 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function calculatePaths() {
 		foreach ($this->metrics as $index => $metric) {
-			if (($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
 				$min_value = $this->right_y_min;
 				$max_value = $this->right_y_max;
 				$units = $this->right_y_units;
@@ -691,10 +692,6 @@ class CSvgGraph extends CSvg {
 			$value_diff = $max_value - $min_value ? : 1;
 			$timeshift = $metric['options']['timeshift'];
 			$paths = [];
-
-			if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
-				$this->applyMissingDataFunc($this->points[$index], (int) $metric['options']['missingdatafunc']);
-			}
 
 			$path_num = 0;
 			foreach ($this->points[$index] as $clock => $point) {
@@ -717,22 +714,51 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
-	 * Modifies metric data according $missingdatafunc value.
+	 * Modifies metric data and Y value range according specified missing data function.
+	 */
+	protected function applyMissingDataFunc() {
+		foreach ($this->metrics as $index => $metric) {
+			/**
+			 * - Missing data points are calculated only between existing data points;
+			 * - Missing data points are not calculated for SVG_GRAPH_TYPE_POINTS metrics;
+			 * - SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
+			 *   here.
+			 */
+			if ($this->points[$index]
+					&& $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+					&& $metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
+				$points = &$this->points[$index];
+				$missing_data_points = $this->getMissingData($points, $metric['options']['missingdatafunc']);
+
+				// Sort according new clock times (array keys).
+				$points += $missing_data_points;
+				ksort($points);
+
+				// Missing data function can change min value of Y axis.
+				if ($missing_data_points
+						&& $metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO) {
+					if ($this->left_y_min === null && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+						$this->left_y_min = 0;
+					}
+					elseif ($this->right_y_min === null && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+						$this->right_y_min = 0;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Calculate missing data for given set of $points according given $missingdatafunc.
 	 *
 	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
 	 * @param int   $missingdatafunc  Type of function, allowed value:
 	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO, SVG_GRAPH_MISSING_DATA_NONE,
 	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
+	 *
+	 * @return array  Array of calculated missing data points.
 	 */
-	protected function applyMissingDataFunc(array &$points = [], $missingdatafunc) {
-		if (!$points || $missingdatafunc == SVG_GRAPH_MISSING_DATA_CONNECTED) {
-			/**
-			 * SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
-			 * here. Points will be connected anyway.
-			 */
-			return;
-		}
-
+	protected function getMissingData(array $points = [], $missingdatafunc) {
 		// Get average distance between points to detect gaps of missing data.
 		$prev_clock = null;
 		$points_distance = [];
@@ -773,9 +799,7 @@ class CSvgGraph extends CSvg {
 			$prev_clock = $clock;
 		}
 
-		// Sort according new clock times.
-		$points += $missing_points;
-		ksort($points);
+		return $missing_points;
 	}
 
 	/**
