@@ -26,7 +26,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$this->data = self::convertDottedKeys($this->data);
 
-		// API doesn't guarantee fields be retrieved in same order as stored.
+		// API doesn't guarantee fields to be retrieved in same order as stored.
 		if (array_key_exists('or', $this->data)) {
 			ksort($this->data['or']);
 		}
