@@ -251,7 +251,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		/**
 		 * Legend tab.
 		 *
-		 * Contains single check-box field to show/hide legend.
+		 * Contains check-box field to show/hide legend and field to specify number of lines in which legend is shown.
 		 */
 		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))
 			->setAction('jQuery("[name=legend_lines]").rangeControl('.

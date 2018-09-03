@@ -123,8 +123,8 @@ class CWidgetConfig {
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_PROBLEMS_BY_SV:
-			case WIDGET_TRIG_OVER:
 			case WIDGET_SVG_GRAPH:
+			case WIDGET_TRIG_OVER:
 			case WIDGET_WEB:
 				return SEC_PER_MIN;
 
@@ -170,11 +170,11 @@ class CWidgetConfig {
 	 */
 	public static function usesTimeSelector(array $widget) {
 		switch ($widget['type']) {
-			case WIDGET_SVG_GRAPH:
-				return !CWidgetFormSvgGraph::hasOverrideTime($widget['fields']);
-
 			case WIDGET_GRAPH:
 				return true;
+
+			case WIDGET_SVG_GRAPH:
+				return !CWidgetFormSvgGraph::hasOverrideTime($widget['fields']);
 
 			default:
 				return false;
