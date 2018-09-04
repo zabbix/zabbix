@@ -266,7 +266,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -293,12 +293,16 @@ class CUser extends CApiService {
 		foreach ($users as &$user) {
 			$user = $this->checkLoginOptions($user);
 
-			$user['passwd'] = md5($user['passwd']);
+			/*
+			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
+			 * as his password in database.
+			 */
+			$user['passwd'] = (array_key_exists('passwd', $user)) ? md5($user['passwd']) : '';
 		}
 		unset($user);
 
 		$this->checkDuplicates(zbx_objectValues($users, 'alias'));
-		$this->checkUserGroups($users);
+		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 	}
@@ -367,7 +371,7 @@ class CUser extends CApiService {
 			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'alias')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
-			'passwd' =>			['type' => API_STRING_UTF8, 'length' => 255],
+			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'passwd')],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
 			'autologout' =>		['type' => API_TIME_UNIT, 'in' => '0,90:'.SEC_PER_DAY],
@@ -441,7 +445,7 @@ class CUser extends CApiService {
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
-		$this->checkUserGroups($users);
+		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
@@ -472,11 +476,14 @@ class CUser extends CApiService {
 	 * Check for valid user groups.
 	 *
 	 * @param array $users
+	 * @param array $users[]['passwd']  (optional)
 	 * @param array $users[]['usrgrps']  (optional)
+	 * @param array $db_users
+	 * @param array $db_users[]['passwd']
 	 *
 	 * @throws APIException  if user groups is not exists.
 	 */
-	private function checkUserGroups(array $users) {
+	private function checkUserGroups(array $users, array $db_users) {
 		$usrgrpids = [];
 
 		foreach ($users as $user) {
@@ -494,7 +501,7 @@ class CUser extends CApiService {
 		$usrgrpids = array_keys($usrgrpids);
 
 		$db_usrgrps = DB::select('usrgrp', [
-			'output' => [],
+			'output' => ['gui_access'],
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
 		]);
@@ -504,6 +511,68 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
 			}
 		}
+
+		foreach ($users as $user) {
+			if (array_key_exists('passwd', $user)) {
+				$passwd = $user['passwd'];
+			}
+			elseif (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
+				$passwd = $db_users[$user['userid']]['passwd'];
+			}
+			else {
+				$passwd = '';
+			}
+
+			if ($passwd === '') {
+				$gui_access = self::getGroupGuiAccess($user, $db_usrgrps);
+
+				// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
+				if (in_array(GROUP_GUI_ACCESS_INTERNAL, $gui_access)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get list of all current authentication options available to user.
+	 *
+	 * @param array  $user
+	 * @param string $user['usrgrps'][]['usrgrpid']
+	 * @param array  $db_usrgrps
+	 * @param int    $db_usrgrps[usrgrpid]['gui_access']
+	 *
+	 * @return array
+	 */
+	private static function getGroupGuiAccess($user, $db_usrgrps) {
+		$config = select_config();
+		$gui_access_arr = [];
+		$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+
+		foreach($usrgrps as $usergrp) {
+			if (array_key_exists($usergrp, $db_usrgrps)) {
+				$gui_access = $db_usrgrps[$usergrp]['gui_access'];
+
+				if ($db_usrgrps[$usergrp]['gui_access'] == GROUP_GUI_ACCESS_SYSTEM) {
+					switch ($config['authentication_type']) {
+						case ZBX_AUTH_INTERNAL:
+							$gui_access = GROUP_GUI_ACCESS_INTERNAL;
+							break;
+						case ZBX_AUTH_LDAP:
+							$gui_access = GROUP_GUI_ACCESS_LDAP;
+							break;
+					}
+				}
+
+				if (!in_array($gui_access, $gui_access_arr)) {
+					$gui_access_arr[] = $gui_access;
+				}
+			}
+		}
+
+		return $gui_access_arr;
 	}
 
 	/**
@@ -1084,18 +1153,111 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_users = DB::select('users', [
-			'output' => ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
-			],
-			'filter' => ['alias' => $user['user']]
-		]);
+		$http_alias = '';
+		$config = select_config();
+		$group_to_auth_map = [
+			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
+			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
+			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
+			GROUP_GUI_ACCESS_DISABLED => null
+		];
+
+		if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && $user['password'] === '') {
+			// HTTP authentication.
+			foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+				if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
+					$http_alias = $_SERVER[$key];
+					break;
+				}
+			}
+
+			if ($http_alias !== '') {
+				$parser = new CADNameAttributeParser(['strict' => true]);
+
+				if ($parser->parse($http_alias) === CParser::PARSE_SUCCESS) {
+					$strip_domain = explode(',', $config['http_strip_domains']);
+					$strip_domain = array_map('trim', $strip_domain);
+
+					if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
+						$http_alias = $parser->getUserName();
+					}
+				}
+
+				$is_requested_user = ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+					? ($user['user'] === $http_alias)
+					: (strtolower($user['user']) === strtolower($http_alias));
+
+				if (!$is_requested_user) {
+					$http_alias = '';
+				}
+			}
+		}
+
+		$fields = ['userid', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'type', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'passwd'
+		];
+		$db_users = [];
+
+		// Try to login user with HTTP authentication module passed user alias.
+		if ($http_alias !== '') {
+			$http_authenticated = true;
+
+			if ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
+				$db_users = DB::select('users', [
+					'output' => $fields,
+					'filter' => ['alias' => $http_alias]
+				]);
+			}
+			else {
+				$db_users = DBfetchArray(DBselect(
+					'SELECT '.implode(',', $fields).
+					' FROM users'.
+					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($http_alias))
+				));
+			}
+		}
+
+		// Try to login user with passed credentials.
+		if (!$db_users) {
+			$http_authenticated = false;
+
+			if ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE) {
+				$db_users = DB::select('users', [
+					'output' => $fields,
+					'filter' => ['alias' => $user['user']]
+				]);
+			}
+			else {
+				$db_users_rows = DBfetchArray(DBselect(
+					'SELECT '.implode(',', $fields).
+					' FROM users'.
+						' WHERE LOWER(alias)='.zbx_dbstr(strtolower($user['user']))
+				));
+
+				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
+				$db_users = [];
+
+				foreach($db_users_rows as $db_user_row) {
+					$permissions = $this->getUserGroupsData($db_user_row['userid']);
+
+					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
+							|| $db_user_row['alias'] === $user['user']) {
+						$db_users[] = $db_user_row;
+					}
+				}
+			}
+		}
 
 		if (!$db_users) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 		}
+		elseif (count($db_users) > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
+			);
+		}
 
-		$db_user = $db_users[0];
+		$db_user = reset($db_users);
 
 		// Check if user is blocked.
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
@@ -1124,56 +1286,36 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 		}
 
-		$config = select_config();
-		$authentication_type = $config['authentication_type'];
+		if (!$http_authenticated) {
+			try {
+				switch ($group_to_auth_map[$db_user['gui_access']]) {
+					case ZBX_AUTH_LDAP:
+						$this->ldapLogin($user);
+						break;
 
-		if ($db_user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-			$authentication_type = ($authentication_type == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
-		}
-
-		if ($authentication_type == ZBX_AUTH_HTTP) {
-			// if PHP_AUTH_USER is not set, it means that HTTP authentication is not enabled
-			if (!array_key_exists('PHP_AUTH_USER', $_SERVER)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot login.'));
+					case ZBX_AUTH_INTERNAL:
+						if (md5($user['password']) !== $db_user['passwd']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+						}
+						break;
+				}
 			}
-			// check if the user name used when calling the API matches the one used for HTTP authentication
-			elseif ($user['user'] !== $_SERVER['PHP_AUTH_USER']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Login name "%1$s" does not match the name "%2$s" used to pass HTTP authentication.',
-						$user['user'], $_SERVER['PHP_AUTH_USER']
-					)
+			catch (APIException $e) {
+				DB::update('users', [
+					'values' => [
+						'attempt_failed' => ++$db_user['attempt_failed'],
+						'attempt_clock' => time(),
+						'attempt_ip' => $db_user['userip']
+					],
+					'where' => ['userid' => $db_user['userid']]
+				]);
+
+				$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+					$db_user['userip']
 				);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 			}
-		}
-
-		try {
-			switch ($authentication_type) {
-				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
-					break;
-
-				case ZBX_AUTH_INTERNAL:
-					if (md5($user['password']) !== $db_user['passwd']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
-					}
-					break;
-			}
-		}
-		catch (APIException $e) {
-			DB::update('users', [
-				'values' => [
-					'attempt_failed' => ++$db_user['attempt_failed'],
-					'attempt_clock' => time(),
-					'attempt_ip' => $db_user['userip']
-				],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-
-			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-				$db_user['userip']
-			);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 		}
 
 		// Start session.

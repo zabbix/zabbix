@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,37 +19,9 @@
 **/
 
 
-class CHostGroupNormalValidator extends CValidator {
+class CSvgGroup extends CSvgTag {
 
-	/**
-	 * Error message
-	 *
-	 * @var string
-	 */
-	public $message;
-
-	/**
-	 * Checks is any of the given host groups are discovered.
-	 *
-	 * @param mixed $hostGroupIds
-	 *
-	 * @return bool
-	 */
-	public function validate($hostGroupIds) {
-		$hostGroups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $hostGroupIds,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-			'limit' => 1
-		]);
-
-		if ($hostGroups) {
-			$hostGroup = reset($hostGroups);
-			$this->error($this->message, $hostGroup['name']);
-
-			return false;
-		}
-
-		return true;
+	public function __construct() {
+		parent::__construct('g', true);
 	}
 }

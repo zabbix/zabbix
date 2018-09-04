@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
@@ -386,65 +387,40 @@ var AudioControl = {
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
-	blinkInterval: 1000, // how fast will they blink (ms)
-	secondsSinceInit: 0,
+	interval: 1000, // how fast will they blink (ms)
 
 	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		// Right after page refresh, all blinking elements should be visible.
-		if (this.secondsSinceInit > 0) {
-			var objects = jQuery('.blink');
+		var that = this;
 
-			// maybe some of the objects should not blink any more?
-			objects = this.filterOutNonBlinking(objects);
+		setInterval(function() {
+			var $collection = jQuery('.blink');
 
-			// changing visibility state
-			jQuery.each(objects, function() {
-				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
+			$collection.each(function() {
+				var $el = jQuery(this),
+					blink = true;
+
+				if (typeof $el.data('timeToBlink') !== 'undefined') {
+					blink = (($el.data()['timeToBlink']--) > 0);
 				}
-				else {
-					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
+
+				if (blink) {
+					if (typeof $el.data('toggleClass') !== 'undefined') {
+						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
+					}
+					else {
+						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+					}
+				}
+				else if (that.shown) {
+					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
 				}
 			});
 
-			// reversing the value of indicator attribute
-			this.shown = !this.shown;
-		}
-
-		// I close my eyes only for a moment, and a moment's gone
-		this.secondsSinceInit += this.blinkInterval / 1000;
-
-		// repeating this function with delay
-		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
-	},
-
-	/**
-	 * Check all currently found objects and exclude ones that should stop blinking by now
-	 */
-	filterOutNonBlinking: function(objects) {
-		var that = this;
-
-		return objects.filter(function() {
-			var obj = jQuery(this);
-			if (typeof obj.data('timeToBlink') !== 'undefined') {
-				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
-
-				if (shouldBlink || !that.shown) {
-					return true;
-				}
-				else {
-					obj.removeClass('blink');
-					return false;
-				}
-			}
-			else {
-				// no time-to-blink attribute, should blink forever
-				return true;
-			}
-		});
+			that.shown = !that.shown;
+		}, this.interval);
 	}
 };
 
@@ -460,6 +436,9 @@ var hintBox = {
 	 * - content update using flickerfreeScreen.refreshHtml()
 	 * - widget update by updateWidgetContent()
 	 * - widget remove by deleteWidget().
+	 *
+	 * Triggered events:
+	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
@@ -507,9 +486,10 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles) {
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
+			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			appendTo = appendTo || 'body';
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -541,15 +521,17 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn'}
-				)
+					'class': 'overlay-close-btn',
+					'title': t('Close')
+				}
+			)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
 		}
 
-		jQuery('body').append(box);
+		jQuery(appendTo).append(box);
 
 		return box;
 	},
@@ -673,6 +655,7 @@ var hintBox = {
 		}
 
 		if (target.hintBoxItem) {
+			target.hintBoxItem.trigger('onDeleteHint.hintBox');
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
 
@@ -902,7 +885,10 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - tableupdate.dynamicRows 	- after adding or removing a row
+	 * - tableupdate.dynamicRows 	- after adding or removing a row.
+	 * - beforeadd.dynamicRows 	    - only before adding a new row.
+	 * - afteradd.dynamicRows 	    - only after adding a new row.
+	 * - afterremove.dynamicRows 	- only after removing a row.
 	 *
 	 * @param options
 	 */
@@ -913,6 +899,7 @@ function getConditionFormula(conditions, evalType) {
 			add: '.element-table-add',
 			remove: '.element-table-remove',
 			counter: null,
+			beforeRow: null,
 			dataCallback: function(data) {
 				return {};
 			}
@@ -927,8 +914,15 @@ function getConditionFormula(conditions, evalType) {
 
 			// add buttons
 			table.on('click', options.add, function() {
+				table.trigger('beforeadd.dynamicRows', options);
+
 				// add the new row before the row with the "Add" button
-				addRow(table, $(this).closest('tr'), options);
+				var beforeRow = (options['beforeRow'] !== null)
+					? $(options['beforeRow'], table)
+					:  $(this).closest('tr');
+				addRow(table, beforeRow, options);
+
+				table.trigger('afteradd.dynamicRows', options);
 			});
 
 			// remove buttons
@@ -970,6 +964,7 @@ function getConditionFormula(conditions, evalType) {
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
+		table.trigger('afterremove.dynamicRows', options);
 	}
 }(jQuery));
 
@@ -1048,4 +1043,73 @@ jQuery(function ($) {
 	if ((IE || ED) && typeof sessionStorage.scrollTop !== 'undefined') {
 		$(window).scrollTop(sessionStorage.scrollTop);
 	}
+});
+
+
+jQuery(function ($) {
+	"use strict";
+
+	function calcRows($obj, options) {
+		var max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,
+			clone = $obj
+				.clone(false)
+				.css({'position': 'absolute', 'z-index': '-1'})
+				.removeClass('patternselect')
+				.insertAfter($obj),
+			padding = parseInt(clone.css('padding-top'), 10) + parseInt(clone.css('padding-bottom'), 10),
+			line_height = parseInt(clone.css('font-size'), 10) * 1.14,
+			rows = 0;
+
+		do {
+			rows++;
+			clone.height(rows * line_height);
+		}
+		while (clone[0].scrollHeight - padding > clone.innerHeight()
+			&& (max_height === null || rows * line_height + padding <= max_height));
+		clone.remove();
+
+		return rows;
+	}
+
+	$.fn.autoGrowTextarea = function(options) {
+		this.each(function() {
+			if (typeof $(this).data('autogrow') === 'undefined') {
+				options = $.extend({}, options);
+
+				$(this)
+					.css({
+						'resize': 'none',
+						'overflow-x': 'hidden',
+						'white-space': 'pre-line'
+					})
+					.on('paste change keyup', function() {
+						var rows = calcRows($(this), options);
+
+						if (options && 'pair' in options) {
+							var pair_rows = calcRows($(options.pair), options);
+							if (pair_rows > rows) {
+								rows = pair_rows;
+							}
+							$(options.pair).attr('rows', rows);
+						}
+
+						$(this).attr('rows', rows);
+					})
+					.data('autogrow', options)
+					.trigger('change');
+			}
+
+			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+					if ($(this).val().length > $(this).attr('maxlength')) {
+						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
+					}
+				});
+			}
+
+			if (options && 'pair' in options) {
+				$(options.pair).css({'resize': 'none'});
+			}
+		});
+	};
 });

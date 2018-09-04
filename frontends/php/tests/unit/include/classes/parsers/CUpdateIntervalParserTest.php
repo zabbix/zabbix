@@ -58,14 +58,22 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0, ['usermacros' => true],
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}', 0,
+					['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{$SCHEDULING_INTERVAL}',
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};'.
+							'{$SCHEDULING_INTERVAL}',
 					'delay' => '{$SIMPLE_INTERVAL}',
 					'intervals' => [
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'],
-						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$SCHEDULING_INTERVAL}']
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+						],
+						[
+							'type' => ITEM_DELAY_SCHEDULING,
+							'interval' => '{$SCHEDULING_INTERVAL}'
+						]
 					]
 				]
 			],
@@ -82,14 +90,49 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => true],
+				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}',
+					'match' => '{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};'.
+							'{#SCHEDULING_INTERVAL}',
 					'delay' => '{#SIMPLE_INTERVAL}',
 					'intervals' => [
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD}'],
-						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{#SCHEDULING_INTERVAL}']
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD}'
+						],
+						[
+							'type' => ITEM_DELAY_SCHEDULING,
+							'interval' => '{#SCHEDULING_INTERVAL}'
+						]
+					]
+				]
+			],
+			[
+				'{{#SIMPLE_INTERVAL}.regsub("^([0-9]+)", "{#SIMPLE_INTERVAL}: \1")};'.
+						'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+						'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")};'.
+						'{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}', 0,
+					['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#SIMPLE_INTERVAL}.regsub("^([0-9]+)", "{#SIMPLE_INTERVAL}: \1")};'.
+							'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+							'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")};'.
+							'{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}',
+					'delay' => '{{#SIMPLE_INTERVAL}.regsub("^([0-9]+)", "{#SIMPLE_INTERVAL}: \1")}',
+					'intervals' => [
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' =>
+								'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+								'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")}'
+						],
+						[
+							'type' => ITEM_DELAY_SCHEDULING,
+							'interval' => '{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}'
+						]
 					]
 				]
 			],
@@ -170,7 +213,8 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
+				'{$SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL}',
@@ -179,7 +223,20 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
+				'{$SIMPLE_INTERVAL};'.
+						'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+						'{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['usermacros' => true, 'lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => []
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}',
@@ -190,14 +247,46 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['usermacros' => true, 'lldmacros' => false],
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/'.
+						'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")};'.
+						'{#SCHEDULING_INTERVAL}',
+					0,
+					['usermacros' => true, 'lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => [
+						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}']
+					]
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['usermacros' => true, 'lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
 					'delay' => '{$SIMPLE_INTERVAL}',
-					'intervals' => [
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}']
-					]
+					'intervals' => [[
+						'type' => ITEM_DELAY_FLEXIBLE,
+						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+					]]
+				]
+			],
+			[
+				'{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD};'.
+						'{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}',
+					0,
+					['usermacros' => true, 'lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$SIMPLE_INTERVAL};{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
+					'delay' => '{$SIMPLE_INTERVAL}',
+					'intervals' => [[
+						'type' => ITEM_DELAY_FLEXIBLE,
+						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+					]]
 				]
 			],
 			// fail
@@ -220,7 +309,22 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0, ['lldmacros' => false],
+				'{#SIMPLE_INTERVAL};{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD};{#SCHEDULING_INTERVAL}', 0,
+					['lldmacros' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'delay' => '',
+					'intervals' => []
+				]
+			],
+			[
+				'{{#SIMPLE_INTERVAL}.regsub("^([0-9]+)", "{#SIMPLE_INTERVAL}: \1")};'.
+						'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+						'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")};'.
+						'{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}',
+					0,
+					['lldmacros' => false],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',

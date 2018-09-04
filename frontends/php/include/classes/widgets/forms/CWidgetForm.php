@@ -61,7 +61,7 @@ class CWidgetForm {
 	}
 
 	/**
-	 * Convert all dot-delimited keys to arrays of objets.
+	 * Convert all dot-delimited keys to arrays of objects.
 	 * Example:
 	 *   source: [
 	 *               'tags.tag.1' => 'tag1',
@@ -78,15 +78,32 @@ class CWidgetForm {
 	 *
 	 * @static
 	 *
-	 * @param array $data  An array of key => value pairs.
+	 * @param array $data             An array of key => value pairs.
+	 * @param bool  $supports_arrays  If true, parses values with keys formated as 'tags.tag.1.0' as one level arrays.
 	 *
 	 * @return array
 	 */
-	protected static function convertDottedKeys(array $data) {
+	protected static function convertDottedKeys(array $data, $supports_arrays = false) {
 		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
-				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
-				unset($data[$key]);
+			if ($supports_arrays) {
+				if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
+					$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
+					unset($data[$key]);
+				}
+				elseif (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+					$data[$matches[1]][$matches[3]][$matches[2]] = $value;
+					unset($data[$key]);
+				}
+				elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+					$data[$matches[1]][$matches[2]] = $value;
+					unset($data[$key]);
+				}
+			}
+			else {
+				if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+					$data[$matches[1]][$matches[3]][$matches[2]] = $value;
+					unset($data[$key]);
+				}
 			}
 		}
 

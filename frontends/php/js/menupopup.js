@@ -179,27 +179,28 @@ function getMenuPopupHost(options, trigger_elmnt) {
 /**
  * Get menu popup map section data.
  *
- * @param string options['hostid']                  Host ID.
- * @param array  options['scripts']                 Host scripts (optional).
- * @param string options[]['name']                  Script name.
- * @param string options[]['scriptid']              Script ID.
- * @param string options[]['confirmation']          Confirmation text.
- * @param object options['gotos']                   Links section (optional).
- * @param array  options['gotos']['latestData']     Link to latest data page.
- * @param array  options['gotos']['inventory']      Link to host inventory page.
- * @param array  options['gotos']['graphs']         Link to host graph page with url parameters ("name" => "value").
- * @param array  options['gotos']['showGraphs']     Display "Graphs" link enabled or disabled.
- * @param array  options['gotos']['screens']        Link to host screen page with url parameters ("name" => "value").
- * @param array  options['gotos']['showScreens']    Display "Screens" link enabled or disabled.
- * @param array  options['gotos']['triggerStatus']  Link to "Problems" page with url parameters ("name" => "value").
- * @param array  options['gotos']['showTriggers']   Display "Problems" link enabled or disabled.
- * @param array  options['gotos']['submap']         Link to submap page with url parameters ("name" => "value").
- * @param array  options['gotos']['events']         Link to events page with url parameters ("name" => "value").
- * @param array  options['gotos']['showEvents']     Display "Events" link enabled or disabled.
- * @param array  options['urls']                    Local and global map link (optional).
- * @param string options['url'][]['label']          Link label.
- * @param string options['url'][]['url']            Link url.
- * @param {object} trigger_elmnt                    UI element which triggered opening of overlay dialogue.
+ * @param {string} options['hostid']                    Host ID.
+ * @param {array}  options['scripts']                   Host scripts (optional).
+ * @param {string} options[]['name']                    Script name.
+ * @param {string} options[]['scriptid']                Script ID.
+ * @param {string} options[]['confirmation']            Confirmation text.
+ * @param {object} options['gotos']                     Links section (optional).
+ * @param {array}  options['gotos']['latestData']       Link to latest data page.
+ * @param {array}  options['gotos']['inventory']        Link to host inventory page.
+ * @param {array}  options['gotos']['graphs']           Link to host graph page with url parameters ("name" => "value").
+ * @param {array}  options['gotos']['showGraphs']       Display "Graphs" link enabled or disabled.
+ * @param {array}  options['gotos']['screens']          Link to host screen page with url parameters ("name" => "value").
+ * @param {array}  options['gotos']['showScreens']      Display "Screens" link enabled or disabled.
+ * @param {array}  options['gotos']['triggerStatus']    Link to "Problems" page with url parameters ("name" => "value").
+ * @param {array}  options['gotos']['showTriggers']     Display "Problems" link enabled or disabled.
+ * @param {array}  options['gotos']['submap']           Link to submap page with url parameters ("name" => "value").
+ * @param {array}  options['gotos']['events']           Link to events page with url parameters ("name" => "value").
+ * @param {array}  options['gotos']['showEvents']       Display "Events" link enabled or disabled.
+ * @param {string} options['gotos']['show_suppressed']  Show suppressed problems (optional).
+ * @param {array}  options['urls']                      Local and global map link (optional).
+ * @param {string} options['url'][]['label']            Link label.
+ * @param {string} options['url'][]['url']              Link url.
+ * @param {object} trigger_elmnt                        UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -218,7 +219,8 @@ function getMenuPopupMap(options, trigger_elmnt) {
 	 * Gotos section
 	 */
 	if (typeof options.gotos !== 'undefined') {
-		var gotos = [];
+		var gotos = [],
+			show_suppressed = (typeof options.gotos.show_suppressed !== 'undefined' && options.gotos.show_suppressed);
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
@@ -265,7 +267,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			else {
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'problem.view');
-				url.setArgument('filter_maintenance', '1');
+				if (show_suppressed) {
+					url.setArgument('filter_show_suppressed', '1');
+				}
 				url.setArgument('filter_set', '1');
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
@@ -370,6 +374,9 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			else {
 				var url = new Curl('zabbix.php');
 				url.setArgument('action', 'problem.view');
+				if (show_suppressed) {
+					url.setArgument('filter_show_suppressed', '1');
+				}
 				url.setArgument('filter_triggerids[]', options.gotos.events.triggerids);
 				url.setArgument('filter_set', '1');
 				url.unsetArgument('sid');
@@ -460,10 +467,14 @@ function getMenuPopupRefresh(options) {
 						var link = jQuery(this);
 
 						if (link.data('value') == currentRate) {
-							link.addClass('selected');
+							link
+								.addClass('selected')
+								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 						}
 						else {
-							link.removeClass('selected');
+							link
+								.removeClass('selected')
+								.attr('aria-label', link.data('aria-label'));
 						}
 					});
 
@@ -472,7 +483,7 @@ function getMenuPopupRefresh(options) {
 				else {
 					var url = new Curl('zabbix.php');
 
-					url.setArgument('action', 'dashboard.widget.rfrate')
+					url.setArgument('action', 'dashboard.widget.rfrate');
 
 					jQuery.ajax({
 						url: url.getUrl(),
@@ -487,10 +498,14 @@ function getMenuPopupRefresh(options) {
 								var link = jQuery(this);
 
 								if (link.data('value') == currentRate) {
-									link.addClass('selected');
+									link
+										.addClass('selected')
+										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
 								}
 								else {
-									link.removeClass('selected');
+									link
+										.removeClass('selected')
+										.attr('aria-label', link.data('aria-label'));
 								}
 							});
 
@@ -1230,14 +1245,18 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function createMenuItem(options) {
-		options = $.extend({ariaLabel: options.label}, options);
+		options = $.extend({
+			ariaLabel: options.label,
+			selected: false,
+			disabled: false
+		}, options);
 
 		var item = $('<li>'),
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.ariaLabel
-			});
+				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {
 			link.text(options.label);
@@ -1254,7 +1273,7 @@ jQuery(function($) {
 			});
 		}
 
-		if (typeof options.disabled !== 'undefined' && options.disabled) {
+		if (options.disabled) {
 			link.addClass('action-menu-item-disabled');
 		}
 		else {
@@ -1269,7 +1288,7 @@ jQuery(function($) {
 			}
 		}
 
-		if (typeof options.selected !== 'undefined' && options.selected) {
+		if (options.selected) {
 			link.addClass('selected');
 		}
 

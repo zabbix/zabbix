@@ -123,7 +123,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			'txtSelect' => $filter['txtSelect'],
 			'application' => $filter['application'],
 			'inventory' => $filter['inventory'],
-			'showMaintenance' => $filter['showMaintenance'],
+			'show_suppressed' => $filter['show_suppressed'],
 			'hostId' => $data['hostid'],
 			'groupId' => $data['groupid']
 		],

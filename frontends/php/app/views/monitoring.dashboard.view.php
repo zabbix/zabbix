@@ -80,11 +80,15 @@ else {
 			->addItem((new CTag('nav', true, [
 				(new CList())
 					->addItem((
-						(new CButton('dashbrd-edit', _('Edit dashboard')))->setEnabled($data['dashboard']['editable'])))
+						(new CButton('dashbrd-edit', _('Edit dashboard')))
+							->setEnabled($data['dashboard']['editable'])
+							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
+					))
 					->addItem((new CButton('', '&nbsp;'))
 						->addClass(ZBX_STYLE_BTN_ACTION)
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
+						->setAttribute('aria-haspopup', true)
 						->setMenuPopup([
 							'type' => 'dashboard',
 							'label' => _('Actions'),
@@ -96,52 +100,52 @@ else {
 									],
 									'disabled' => !$data['dashboard']['editable']
 								],
-								'create' => [
-									'label' => _('Create new'),
-									'url' => $url_create->getUrl()
-								],
-								'clone' => [
-									'label' => _('Clone'),
-									'url' => $url_clone->getUrl()
-								],
-								'delete' => [
-									'label' => _('Delete'),
-									'confirmation' => _('Delete dashboard?'),
-									'url' => 'javascript:void(0)',
-									'redirect' => $data['dashboard']['editable']
-										? $url_delete->getUrl()
-										: null,
-									'disabled' => !$data['dashboard']['editable']
-								]
+							'create' => [
+								'label' => _('Create new'),
+								'url' => $url_create->getUrl()
+							],
+							'clone' => [
+								'label' => _('Clone'),
+								'url' => $url_clone->getUrl()
+							],
+							'delete' => [
+								'label' => _('Delete'),
+								'confirmation' => _('Delete dashboard?'),
+								'url' => 'javascript:void(0)',
+								'redirect' => $data['dashboard']['editable']
+									? $url_delete->getUrl()
+									: null,
+								'disabled' => !$data['dashboard']['editable']
 							]
-						])
-					)
-					->addItem(get_icon('fullscreen'))
-				]))->setAttribute('aria-label', _('Content controls'))
-			)
-			->addItem((new CListItem([
-				(new CTag('nav', true, [
-					new CList([
-						(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
-						(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
-							->addClass(ZBX_STYLE_BTN_ALT),
-						(new CButton('dashbrd-save', _('Save changes'))),
-						(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
-						''
+						]
 					])
-				]))
-					->setAttribute('aria-label', _('Content controls'))
-					->addClass(ZBX_STYLE_DASHBRD_EDIT)
-				]))
-					->addStyle('display: none')
-		))
-			->setBreadcrumbs((new CList())
-				->setAttribute('role', 'navigation')
-				->setAttribute('aria-label', _('Breadcrumbs'))
-				->addItem($breadcrumbs)
-				->addClass(ZBX_STYLE_OBJECT_GROUP)
-				->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-			);
+				)
+				->addItem(get_icon('fullscreen'))
+			]))->setAttribute('aria-label', _('Content controls'))
+		)
+		->addItem((new CListItem([
+			(new CTag('nav', true, [
+				new CList([
+					(new CButton('dashbrd-config'))->addClass(ZBX_STYLE_BTN_DASHBRD_CONF),
+					(new CButton('dashbrd-add-widget', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add widget')]))
+						->addClass(ZBX_STYLE_BTN_ALT),
+					(new CButton('dashbrd-save', _('Save changes'))),
+					(new CLink(_('Cancel'), '#'))->setId('dashbrd-cancel'),
+					''
+				])
+			]))
+				->setAttribute('aria-label', _('Content controls'))
+				->addClass(ZBX_STYLE_DASHBRD_EDIT)
+			]))
+				->addStyle('display: none')
+	))
+		->setBreadcrumbs((new CList())
+			->setAttribute('role', 'navigation')
+			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+			->addItem($breadcrumbs)
+			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+		);
 
 	$timeline = null;
 	if ($data['show_timeselector']) {

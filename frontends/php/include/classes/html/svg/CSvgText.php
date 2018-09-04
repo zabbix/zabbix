@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,32 +19,28 @@
 **/
 
 
-class CLldMacroStringValidator extends CStringValidator {
+class CSvgText extends CSvgTag {
 
-	/**
-	 * Error message if a string doesn't contain LLD macros.
-	 *
-	 * @var string
-	 */
-	public $messageMacro;
+	public function __construct($x, $y, $text) {
+		parent::__construct('text', true);
 
-	/**
-	 * Validates the given string and checks if it contains LLD macros.
-	 */
-	public function validate($value)
-	{
-		if (!parent::validate($value)) {
-			return false;
-		}
+		$this->x = $x;
+		$this->y = $y;
 
-		// check if a string contains an LLD macro
-		if (!zbx_empty($value) && !preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
-			$this->error($this->messageMacro);
-
-			return false;
-		}
-
-		return true;
+		$this->setAttribute('x', $this->x);
+		$this->setAttribute('y', $this->y);
+		$this->addItem($text);
 	}
 
+	public function setAngle($angle) {
+		$this->setAttribute('transform', 'rotate('.$angle.','.$this->x.','.$this->y.')');
+
+		return $this;
+	}
+
+	public function setFontSize($font_size) {
+		$this->setAttribute('font-size', $font_size);
+
+		return $this;
+	}
 }
