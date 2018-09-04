@@ -891,6 +891,10 @@ class CSvgGraph extends CSvg {
 			$x1 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $problem['clock']) / $time_range;
 			$x2 = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $time_to) / $time_range;
 
+			if ($this->canvas_x > $x1) {
+				$x1 = $this->canvas_x;
+			}
+
 			// Make problem info.
 			if ($problem['r_clock'] != 0) {
 				$status_str = _('RESOLVED');
