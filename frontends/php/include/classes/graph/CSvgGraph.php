@@ -541,14 +541,11 @@ class CSvgGraph extends CSvg {
 		$this->canvas_x = $this->offset_left;
 
 		// Calculate Y = 0 position.
-		if ($this->right_y_show) {
-			$delta = (($this->right_y_max - $this->right_y_min) ? : 1);
-			$this->right_y_zero = $this->canvas_y + $this->canvas_height * $this->right_y_max / $delta;
-		}
-		if ($this->left_y_show) {
-			$delta = (($this->left_y_max - $this->left_y_min) ? : 1);
-			$this->left_y_zero = $this->canvas_y + $this->canvas_height * $this->left_y_max / $delta;
-		}
+		$delta = (($this->right_y_max - $this->right_y_min) ? : 1);
+		$this->right_y_zero = $this->canvas_y + $this->canvas_height * $this->right_y_max / $delta;
+
+		$delta = (($this->left_y_max - $this->left_y_min) ? : 1);
+		$this->left_y_zero = $this->canvas_y + $this->canvas_height * $this->left_y_max / $delta;
 	}
 
 	/**
