@@ -416,7 +416,6 @@ class CSvgGraph extends CSvg {
 			$this->drawCanvasXAxis();
 		}
 
-		$this->drawMetricsArea();
 		$this->drawMetricsLine();
 		$this->drawMetricsPoint();
 
@@ -818,22 +817,14 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Add fill area to graph for metric of type SVG_GRAPH_TYPE_LINE or SVG_GRAPH_TYPE_STAIRCASE.
 	 */
-	protected function drawMetricsArea() {
-		foreach ($this->metrics as $index => $metric) {
-			if (($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
-					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) && $metric['options']['fill'] > 0) {
+	protected function drawMetricArea(array $metric, array $paths) {
+		$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) ? $this->right_y_zero : $this->left_y_zero;
 
-				$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
-					? $this->right_y_zero
-					: $this->left_y_zero;
-
-				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphArea($path, $metric, $y_zero))
-						->setPosition($this->canvas_x, $this->canvas_y)
-						->setSize($this->canvas_width, $this->canvas_height)
-					);
-				}
-			}
+		foreach ($paths as $path) {
+			$this->addItem((new CSvgGraphArea($path, $metric, $y_zero))
+				->setPosition($this->canvas_x, $this->canvas_y)
+				->setSize($this->canvas_width, $this->canvas_height)
+			);
 		}
 	}
 
@@ -848,6 +839,10 @@ class CSvgGraph extends CSvg {
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 					->setAttribute('data-metric', $metric['name'])
 					->setAttribute('data-color', $metric['options']['color']);
+
+				if ($metric['options']['fill'] > 0) {
+					$this->drawMetricArea($metric, $this->paths[$index]);
+				}
 
 				foreach ($this->paths[$index] as $path) {
 					$group->addItem((new CSvgGraphLine($path, $metric))
