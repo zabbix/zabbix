@@ -623,7 +623,7 @@ class CWidgetHelper {
 			'missingdatafunc' => _('Missing data'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_NONE => _('None'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_CONNECTED => _x('Connected', 'missing data function'),
-			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO => _x('Treat as 0', 'missing data function'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO => _x('Treat as 0', 'missing data function'),
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
@@ -697,7 +697,7 @@ class CWidgetHelper {
 
 						['name' => _('Missing data').'/'._('None'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_NONE]],
 						['name' => _('Missing data').'/'._x('Connected', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_CONNECTED]],
-						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO]],
+						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO]],
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
@@ -970,7 +970,7 @@ class CWidgetHelper {
 										SVG_GRAPH_MISSING_DATA_CONNECTED
 									)
 									->addValue(_x('Treat as 0', 'missing data function'),
-										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO
+										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
 									)
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
 									->setModern(true)

@@ -80,6 +80,9 @@ class CSvgGraph extends CSvg {
 	protected $right_y_show = null;
 	protected $right_y_units = null;
 
+	protected $right_y_zero = null;
+	protected $left_y_zero = null;
+
 	protected $offset_bottom;
 
 	/**
@@ -537,6 +540,16 @@ class CSvgGraph extends CSvg {
 
 		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
 		$this->canvas_x = $this->offset_left;
+
+		// Calculate Y = 0 position.
+		if ($this->right_y_show) {
+			$delta = (($this->right_y_max - $this->right_y_min) ? : 1);
+			$this->right_y_zero = $this->canvas_y + $this->canvas_height * $this->right_y_max / $delta;
+		}
+		if ($this->left_y_show) {
+			$delta = (($this->left_y_max - $this->left_y_min) ? : 1);
+			$this->left_y_zero = $this->canvas_y + $this->canvas_height * $this->left_y_max / $delta;
+		}
 	}
 
 	/**
@@ -736,7 +749,7 @@ class CSvgGraph extends CSvg {
 
 				// Missing data function can change min value of Y axis.
 				if ($missing_data_points
-						&& $metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO) {
+						&& $metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					if ($this->left_y_min === null && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
 						$this->left_y_min = 0;
 					}
@@ -753,7 +766,7 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
 	 * @param int   $missingdatafunc  Type of function, allowed value:
-	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO, SVG_GRAPH_MISSING_DATA_NONE,
+	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_NONE,
 	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
 	 *
 	 * @return array  Array of calculated missing data points.
@@ -789,7 +802,7 @@ class CSvgGraph extends CSvg {
 					$missing_points[$prev_clock + $gap_interval] = null;
 					break;
 				}
-				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO) {
+				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					$missing_points[$prev_clock + $gap_interval] = 0;
 					$missing_points[$clock - $gap_interval] = 0;
 					break;
@@ -809,8 +822,13 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) && $metric['options']['fill'] > 0) {
+
+				$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
+					? $this->right_y_zero
+					: $this->left_y_zero;
+
 				foreach ($this->paths[$index] as $path) {
-					$this->addItem((new CSvgGraphArea($path, $metric))
+					$this->addItem((new CSvgGraphArea($path, $metric, $y_zero))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setSize($this->canvas_width, $this->canvas_height)
 					);
