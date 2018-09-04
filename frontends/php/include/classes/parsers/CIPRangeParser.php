@@ -77,6 +77,7 @@ class CIPRangeParser {
 	 *   ranges         enabled support of IP ranges like 192.168.3.1-255
 	 *   max_ipv4_cidr  maximum value for IPv4 CIDR subnet mask notations
 	 *   usermacros     allow usermacros syntax
+	 *   macros         allow macros syntax like {HOST.HOST}, {HOST.NAME}, ...
 	 *
 	 * @var array
 	 */
@@ -86,7 +87,7 @@ class CIPRangeParser {
 		'ranges' => true,
 		'max_ipv4_cidr' => 32,
 		'usermacros' => false,
-		'macros' => false
+		'macros' => []
 	];
 
 	/**
