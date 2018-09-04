@@ -96,7 +96,11 @@ class CSvgGraphHelper {
 				? zbx_objectValues($metrics, 'itemid')
 				: null;
 
-			$graph->addProblems(self::getProblems($problems_options, $options['time_period']));
+			$problems = self::getProblems($problems_options, $options['time_period']);
+			if ($problems) {
+				CArrayHelper::sort($problems, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+				$graph->addProblems($problems);
+			}
 		}
 
 		if ($legend_height > 0) {
