@@ -240,7 +240,9 @@ abstract class CItemGeneral extends CApiService {
 			'v6' => ZBX_HAVE_IPV6,
 			'ranges' => false,
 			'usermacros' => true,
-			'macros' => ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}']
+			'macros' => [
+				'{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'
+			]
 		]);
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
