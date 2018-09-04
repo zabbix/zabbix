@@ -58,7 +58,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var string
 	 */
-	private $color = '#787878';
+	private $color;
 
 	/**
 	 * Axis container.
@@ -119,10 +119,24 @@ class CSvgGraphAxis extends CSvgTag {
 	 * Set axis line visibility.
 	 *
 	 * @param bool $visible   True if should be visible.
+	 *
 	 * @return CSvgGraphAxis
 	 */
 	public function setAxisVisibility($visible) {
 		$this->axis_visible = $visible;
+
+		return $this;
+	}
+
+	/**
+	 * Set color.
+	 *
+	 * @param string $color  Color value.
+	 *
+	 * @return CSvgGraphAxis
+	 */
+	public function setColor($color) {
+		$this->color = $color;
 
 		return $this;
 	}

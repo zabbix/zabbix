@@ -39,6 +39,13 @@ class CSvgGraph extends CSvg {
 	protected $color_annotation = '#AA4455';
 
 	/**
+	 * Text color.
+	 *
+	 * @var string
+	 */
+	protected $text_color;
+
+	/**
 	 * Array of graph metrics data.
 	 *
 	 * @var array
@@ -128,6 +135,10 @@ class CSvgGraph extends CSvg {
 
 	public function __construct(array $options) {
 		parent::__construct();
+
+		// Set colors.
+		$theme = getUserGraphTheme();
+		$this->text_color = '#' . $theme['textcolor'];
 
 		$this
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
@@ -600,6 +611,7 @@ class CSvgGraph extends CSvg {
 			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
+				->setColor($this->text_color)
 		);
 	}
 
@@ -611,6 +623,7 @@ class CSvgGraph extends CSvg {
 			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
+				->setColor($this->text_color)
 		);
 	}
 
@@ -621,6 +634,7 @@ class CSvgGraph extends CSvg {
 		$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
 			->setSize($this->canvas_width, $this->xaxis_height)
 			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+			->setColor($this->text_color)
 		);
 	}
 
@@ -683,9 +697,9 @@ class CSvgGraph extends CSvg {
 		$this->addItem((new CSvgGraphGrid($value_points, $time_points))
 			->setPosition($this->canvas_x, $this->canvas_y)
 			->setSize($this->canvas_width, $this->canvas_height)
+			->setColor($this->text_color)
 		);
 	}
-
 
 	/**
 	 * Calculate paths for metric elements.
