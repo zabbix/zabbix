@@ -52,6 +52,20 @@ class CDateSelector extends CTag {
 	private $value = null;
 
 	/**
+	 * Enabled or disabled state of HTML element.
+	 *
+	 * @var bool
+	 */
+	private $enabled = true;
+
+	/**
+	 * Callback function body for calendar date selected event.
+	 *
+	 * @var string
+	 */
+	private $on_change = '';
+
+	/**
 	 * Create array with all inputs required for date selection and calendar.
 	 *
 	 * @param string $name   Textbox field name and calendar name prefix.
@@ -97,12 +111,49 @@ class CDateSelector extends CTag {
 	 *
 	 * @param type $text  Placeholder text for date textbox field.
 	 *
-	 * @return $this
+	 * @return CDateSelector
 	 */
 	public function setPlaceholder($text) {
 		$this->placeholder = $text;
 
 		return $this;
+	}
+
+	/**
+	 * Set enabled or disabled  state to field.
+	 *
+	 * @param bool $enabled  Field state.
+	 *
+	 * @return CDateSelector
+	 */
+	public function setEnabled($enabled) {
+		$this->enabled = $enabled;
+
+		return $this;
+	}
+
+	/**
+	 * Set callback for date selected event.
+	 *
+	 * @param string $script  Javascript callback body.
+	 *
+	 * @return CDateSelector
+	 */
+	public function onChange($script) {
+		$this->on_change = $script;
+
+		return $this;
+	}
+
+	/**
+	 * Get initialization javascript.
+	 *
+	 * @return string
+	 */
+	public function getJavascript() {
+		return 'create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'")'.
+			($this->on_change ? '.clndr.onselected = function () { '.$this->on_change.' }' : '').
+			';';
 	}
 
 	/**
@@ -119,12 +170,14 @@ class CDateSelector extends CTag {
 					->setId($this->name)
 					->setAttribute('placeholder', $this->placeholder)
 					->setAriaRequired($this->is_required)
+					->setEnabled($this->enabled)
 			)
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_ICON_CAL)
+				->setEnabled($this->enabled)
 				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
 
-		zbx_add_post_js('create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'");');
+		zbx_add_post_js($this->getJavascript());
 
 		return parent::toString($destroy);
 	}

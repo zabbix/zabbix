@@ -645,9 +645,9 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				class: 'overlay-close-btn',
 				title: t('Close')
 			})
-				.click(function() {
+				.click(function(e) {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');
-					return false;
+					e.preventDefault();
 				})
 		)
 		.append(

@@ -100,6 +100,7 @@ calendar.prototype = {
 	ondateselected: function() {
 		this.setDateToOuterObj();
 		this.clndrhide();
+		this.onselected && this.onselected();
 	},
 
 	clndrhide: function(e) {
@@ -108,6 +109,8 @@ calendar.prototype = {
 		}
 		this.clndr_calendar.hide();
 		this.is_visible = false;
+
+		jQuery(window).off('resize', this.calendarPositionHandler);
 
 		jQuery(document)
 			.off('click', this.calendarDocumentClickHandler)
@@ -138,6 +141,8 @@ calendar.prototype = {
 			this.clndr_calendar.show();
 			this.is_visible = true;
 
+			jQuery(window).on('resize', {calendar: this, anchor: trigger_elmnt}, this.calendarPositionHandler);
+
 			jQuery(document)
 				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
 				.on('keyup', {calendar: this}, this.calendarKeyUpHandler)
@@ -152,12 +157,10 @@ calendar.prototype = {
 
 	setPosition: function(top, left) {
 		if (typeof(top) != 'undefined' && typeof(left) != 'undefined') {
-			var cw = jQuery(this.clndr_calendar).outerWidth();
-			if (document.body.clientWidth < +left + cw) {
-				left = document.body.clientWidth - cw;
-			}
-			this.clndr_calendar.style.top = top + 'px';
-			this.clndr_calendar.style.left = left + 'px';
+			jQuery(this.clndr_calendar).css({
+				top: Math.min(top, jQuery(window).height() - jQuery(this.clndr_calendar).outerHeight()) + 'px',
+				left: Math.min(left, jQuery(window).width() - jQuery(this.clndr_calendar).outerWidth()) + 'px'
+			});
 		}
 	},
 
@@ -167,6 +170,14 @@ calendar.prototype = {
 				cal.clndr.clndrhide();
 			}
 		});
+	},
+
+	calendarPositionHandler: function (event) {
+		var cal = event.data.calendar,
+			anchor = jQuery(event.data.anchor),
+			offset = anchor.offset();
+
+		cal.setPosition(offset.top + anchor.height(), offset.left + anchor.width());
 	},
 
 	/**

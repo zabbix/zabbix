@@ -100,12 +100,14 @@ $tab_display_opt = (new CFormList())
 	);
 
 // Create 'Time period' tab.
+$date_from = CWidgetHelper::getDatePicker($fields['time_from'])->onChange('updateGraphPreview()');
+$date_to = CWidgetHelper::getDatePicker($fields['time_to'])->onChange('updateGraphPreview()');
 $tab_time_period = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_time']), CWidgetHelper::getCheckBox($fields['graph_time']))
-	->addRow(CWidgetHelper::getLabel($fields['time_from']), CWidgetHelper::getDatePicker($fields['time_from']))
-	->addRow(CWidgetHelper::getLabel($fields['time_to']), CWidgetHelper::getDatePicker($fields['time_to']));
-$scripts[] = $fields['time_from']->getJavascript($form_name, 'updateGraphPreview();');
-$scripts[] = $fields['time_to']->getJavascript($form_name, 'updateGraphPreview();');
+	->addRow(CWidgetHelper::getLabel($fields['time_from']), $date_from)
+	->addRow(CWidgetHelper::getLabel($fields['time_to']), $date_to);
+$scripts[] = $date_from->getJavascript();
+$scripts[] = $date_to->getJavascript();
 
 // Create 'Axes' tab.
 $tab_axes = (new CFormList())->addRow('',
