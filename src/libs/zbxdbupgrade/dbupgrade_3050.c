@@ -1925,6 +1925,24 @@ static int	DBpatch_3050155(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050156(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_3050157(void)
+{
+	int res;
+
+	res = DBexecute("update users set passwd=rtrim(passwd)");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(3050)
@@ -2083,6 +2101,8 @@ DBPATCH_ADD(3050152, 0, 1)
 DBPATCH_ADD(3050153, 0, 1)
 DBPATCH_ADD(3050154, 0, 1)
 DBPATCH_ADD(3050155, 0, 1)
+DBPATCH_ADD(3050156, 0, 1)
+DBPATCH_ADD(3050157, 0, 1)
 
 DBPATCH_END()
 
