@@ -851,8 +851,9 @@ class CSvgGraph extends CSvg {
 					);
 				}
 
-				$this->addItem($group
-					->addItem((new CSvgCircle(-6, -6, 12))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				$this->addItem($group->addItem(
+					(new CSvgCircle(-10, -10, $metric['options']['width'] + 2))
+						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 				));
 			}
 		}
