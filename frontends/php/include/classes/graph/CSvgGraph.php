@@ -572,7 +572,7 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$grid = $this->getValueGrid((int) $min_value, (int) $max_value);
+		$grid = $this->getValueGrid((float) $min_value, (float) $max_value);
 		$delta = (($max_value - $min_value) ? : 1);
 		$grid_values = [];
 
