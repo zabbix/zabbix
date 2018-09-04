@@ -141,7 +141,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_lefty->getName()] = $field_lefty;
 
 		// Min value on left Y axis.
-		$field_lefty_min = (new CWidgetFieldTextBox('lefty_min', _('Min')))
+		$field_lefty_min = (new CWidgetFieldNumericBox('lefty_min', _('Min')))
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
@@ -155,7 +155,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_lefty_min->getName()] = $field_lefty_min;
 
 		// Max value on left Y axis.
-		$field_lefty_max = (new CWidgetFieldTextBox('lefty_max', _('Max')))
+		$field_lefty_max = (new CWidgetFieldNumericBox('lefty_max', _('Max')))
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
@@ -218,7 +218,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_righty->getName()] = $field_righty;
 
 		// Min value on right Y axis.
-		$field_righty_min = (new CWidgetFieldTextBox('righty_min', _('Min')))
+		$field_righty_min = (new CWidgetFieldNumericBox('righty_min', _('Min')))
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
@@ -232,7 +232,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_righty_min->getName()] = $field_righty_min;
 
 		// Max value on right Y axis.
-		$field_righty_max = (new CWidgetFieldTextBox('righty_max', _('Max')))
+		$field_righty_max = (new CWidgetFieldNumericBox('righty_max', _('Max')))
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
@@ -510,28 +510,26 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
 			$lefty_min = $this->fields['lefty_min']->getValue();
 			$lefty_max = $this->fields['lefty_max']->getValue();
-			if ($lefty_min !== '' && !is_numeric($lefty_min)) {
-				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Min'), _('Left Y'), _('a number is expected'));
-			}
-			elseif ($lefty_max !== '' && !is_numeric($lefty_max)) {
-				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Max'), _('Left Y'), _('a number is expected'));
-			}
-			elseif ($lefty_min !== '' && $lefty_max !== '' && (int)$lefty_min >= (int)$lefty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), $lefty_min);
+			$lefty_min = ($lefty_min !== '') ? convertFunctionValue($lefty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$lefty_max = ($lefty_max !== '') ? convertFunctionValue($lefty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+
+			if ($lefty_min !== '' && $lefty_max !== '' && bccomp($lefty_min, $lefty_max) >= 0) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
+					_('Y axis MAX value must be greater than Y axis MIN value.')
+				);
 			}
 		}
 
 		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
 			$righty_min = $this->fields['righty_min']->getValue();
 			$righty_max = $this->fields['righty_max']->getValue();
-			if ($righty_min !== '' && !is_numeric($righty_min)) {
-				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Min'), _('Right Y'), _('a number is expected'));
-			}
-			elseif ($righty_max !== '' && !is_numeric($righty_max)) {
-				$errors[] = _s('Invalid parameter "%1$s" in field "%2$s": %3$s.', _('Max'), _('Right Y'), _('a number is expected'));
-			}
-			elseif ($righty_min !== '' && $righty_max !== '' && (int)$righty_min >= (int)$righty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), $righty_min);
+			$righty_min = ($righty_min != '') ? convertFunctionValue($righty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$righty_max = ($righty_max != '') ? convertFunctionValue($righty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+
+			if ($righty_min !== '' && $righty_max !== '' && bccomp($righty_min, $righty_max) >= 0) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
+					_('Y axis MAX value must be greater than Y axis MIN value.')
+				);
 			}
 		}
 

@@ -300,14 +300,27 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldNumericBox $field
+	 * @param CWidgetFieldIntegerBox $field
 	 *
 	 * @return CNumericBox
 	 */
-	public static function getNumericBox($field) {
+	public static function getIntegerBox($field) {
 		return (new CNumericBox($field->getName(), $field->getValue(), $field->getMaxLength()))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldNumericBox $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getNumericBox($field) {
+		return (new CTextBox($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('placeholder', $field->getPlaceholder())
+			->setWidth($field->getWidth());
 	}
 
 	/**

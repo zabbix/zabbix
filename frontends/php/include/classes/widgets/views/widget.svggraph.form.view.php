@@ -139,8 +139,8 @@ $tab_axes = (new CFormList())->addRow('',
 	(new CDiv([
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['lefty']), CWidgetHelper::getCheckBox($fields['lefty']))
-			->addRow(CWidgetHelper::getLabel($fields['lefty_min']), CWidgetHelper::getTextBox($fields['lefty_min']))
-			->addRow(CWidgetHelper::getLabel($fields['lefty_max']), CWidgetHelper::getTextBox($fields['lefty_max']))
+			->addRow(CWidgetHelper::getLabel($fields['lefty_min']), CWidgetHelper::getNumericBox($fields['lefty_min']))
+			->addRow(CWidgetHelper::getLabel($fields['lefty_max']), CWidgetHelper::getNumericBox($fields['lefty_max']))
 			->addRow(CWidgetHelper::getLabel($fields['lefty_units']), [
 				CWidgetHelper::getComboBox($fields['lefty_units']),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -150,8 +150,12 @@ $tab_axes = (new CFormList())->addRow('',
 
 		(new CFormList())
 			->addRow(CWidgetHelper::getLabel($fields['righty']), CWidgetHelper::getCheckBox($fields['righty']))
-			->addRow(CWidgetHelper::getLabel($fields['righty_min']), CWidgetHelper::getTextBox($fields['righty_min']))
-			->addRow(CWidgetHelper::getLabel($fields['righty_max']), CWidgetHelper::getTextBox($fields['righty_max']))
+			->addRow(CWidgetHelper::getLabel($fields['righty_min']),
+				CWidgetHelper::getNumericBox($fields['righty_min'])
+			)
+			->addRow(CWidgetHelper::getLabel($fields['righty_max']),
+				CWidgetHelper::getNumericBox($fields['righty_max'])
+			)
 			->addRow(CWidgetHelper::getLabel($fields['righty_units']), [
 				CWidgetHelper::getComboBox($fields['righty_units']),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

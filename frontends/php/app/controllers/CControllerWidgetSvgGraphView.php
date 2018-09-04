@@ -102,16 +102,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if (array_key_exists('lefty', $fields) && $fields['lefty'] == SVG_GRAPH_AXIS_Y_SHOW) {
 			$graph_data['left_y_axis'] = [];
 
-			if (array_key_exists('lefty_min', $fields) && is_numeric($fields['lefty_min'])) {
-				$graph_data['left_y_axis']['min'] = $fields['lefty_min'];
+			if (array_key_exists('lefty_min', $fields) && $fields['lefty_min'] !== '') {
+				$graph_data['left_y_axis']['min'] =
+					convertFunctionValue($fields['lefty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 			}
-			if (array_key_exists('lefty_max', $fields) && is_numeric($fields['lefty_max'])) {
-				$graph_data['left_y_axis']['max'] = $fields['lefty_max'];
-			}
-			if (array_key_exists('min', $graph_data['left_y_axis'])
-					&& array_key_exists('max', $graph_data['left_y_axis'])
-					&& $graph_data['left_y_axis']['min'] >= $graph_data['left_y_axis']['max']) {
-				unset($graph_data['left_y_axis']['min'], $graph_data['left_y_axis']['max']); // Unset invalid.
+			if (array_key_exists('lefty_max', $fields) && $fields['lefty_max'] !== '') {
+				$graph_data['left_y_axis']['max'] =
+					convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 			}
 			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['left_y_axis']['units'] = array_key_exists('lefty_static_units', $fields)
@@ -124,16 +121,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if (array_key_exists('righty', $fields) && $fields['righty'] == SVG_GRAPH_AXIS_Y_SHOW) {
 			$graph_data['right_y_axis'] = [];
 
-			if (array_key_exists('righty_min', $fields) && is_numeric($fields['righty_min'])) {
-				$graph_data['right_y_axis']['min'] = $fields['righty_min'];
+			if (array_key_exists('righty_min', $fields) && $fields['righty_min'] !== '') {
+				$graph_data['right_y_axis']['min'] =
+					convertFunctionValue($fields['righty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 			}
-			if (array_key_exists('righty_max', $fields) && is_numeric($fields['righty_max'])) {
-				$graph_data['right_y_axis']['max'] = $fields['righty_max'];
-			}
-			if (array_key_exists('min', $graph_data['right_y_axis'])
-					&& array_key_exists('max', $graph_data['right_y_axis'])
-					&& $graph_data['right_y_axis']['min'] >= $graph_data['right_y_axis']['max']) {
-				unset($graph_data['right_y_axis']['min'], $graph_data['right_y_axis']['max']); // Unset invalid.
+			if (array_key_exists('righty_max', $fields) && $fields['righty_max'] !== '') {
+				$graph_data['right_y_axis']['max'] =
+					convertFunctionValue($fields['righty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 			}
 			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
 				$graph_data['right_y_axis']['units'] = array_key_exists('righty_static_units', $fields)

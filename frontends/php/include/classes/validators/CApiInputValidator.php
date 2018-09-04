@@ -118,6 +118,9 @@ class CApiInputValidator {
 			case API_H_NAME:
 				return self::validateHostName($rule, $data, $path, $error);
 
+			case API_NUMERIC:
+				return self::validateNumeric($rule, $data, $path, $error);
+
 			case API_SCRIPT_NAME:
 				return self::validateScriptName($rule, $data, $path, $error);
 
@@ -174,6 +177,7 @@ class CApiInputValidator {
 			case API_OUTPUT:
 			case API_HG_NAME:
 			case API_H_NAME:
+			case API_NUMERIC:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
 			case API_RANGE_TIME:
@@ -904,6 +908,60 @@ class CApiInputValidator {
 
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Validator for numeric data with optional suffix.
+	 * Supported time suffixes: s, m, h, d, w
+	 * Supported metric suffixes: K, M, G, T
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateNumeric($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (is_int($data)) {
+			$data = (string) $data;
+		}
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
+
+		if (1 != preg_match($pattern, strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		$value = convertFunctionValue($data, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+
+		if (bccomp($value, ZBX_MIN_INT64) < 0 || bccomp($value, ZBX_MAX_INT64) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+			return false;
+		}
+
+		// Trim leading zeroes.
+		$data = preg_replace($pattern, '${1}${2}${3}${4}', (string) $data);
 
 		return true;
 	}

@@ -20,49 +20,46 @@
 
 
 /**
- * Widget Field for numeric data.
+ * Widget Field for integer values.
  */
-class CWidgetFieldNumericBox extends CWidgetField {
+class CWidgetFieldIntegerBox extends CWidgetField {
 
-	private $placeholder;
-	private $width;
+	/**
+	 * Allowed min value
+	 *
+	 * @var int
+	 */
+	private $min;
+
+	/**
+	 * Allowed max value
+	 *
+	 * @var int
+	 */
+	private $max;
 
 	/**
 	 * A numeric box widget field.
-	 * Supported signed decimal values with suffix (KMGTsmhdw).
 	 *
 	 * @param string $name   field name in form
 	 * @param string $label  label for the field in form
+	 * @param int    $min    minimal allowed value (this included)
+	 * @param int    $max    maximal allowed value (this included)
 	 */
-	public function __construct($name, $label) {
+	public function __construct($name, $label, $min = 0, $max = ZBX_MAX_INT32) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
-		$this->setDefault('');
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
+		$this->min = $min;
+		$this->max = $max;
+		$this->setExValidationRules(['in' => $this->min.':'.$this->max]);
 	}
 
 	public function getMaxLength() {
 		return strlen((string) $this->max);
 	}
 
-	public function setPlaceholder($placeholder) {
-		$this->placeholder = $placeholder;
-
-		return $this;
-	}
-
-	public function getPlaceholder() {
-		return $this->placeholder;
-	}
-
-	public function setWidth($width) {
-		$this->width = $width;
-
-		return $this;
-	}
-
-	public function getWidth() {
-		return $this->width;
+	public function setValue($value) {
+		return parent::setValue((int) $value);
 	}
 }

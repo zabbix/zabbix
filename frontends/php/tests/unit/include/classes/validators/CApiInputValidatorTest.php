@@ -1344,6 +1344,210 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'{{#HOST}.regsub("^[a-z]+", "\1")}'
 			],
 			[
+				['type' => API_NUMERIC],
+				'',
+				'/1/numeric',
+				''
+			],
+			[
+				['type' => API_NUMERIC, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": cannot be empty.'
+			],
+			[
+				['type' => API_NUMERIC],
+				0,
+				'/1/numeric',
+				'0'
+			],
+			[
+				['type' => API_NUMERIC, 'length' => 5],
+				12345,
+				'/1/numeric',
+				'12345'
+			],
+			[
+				['type' => API_NUMERIC, 'length' => 5],
+				123456,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": value is too long.'
+			],
+			[
+				['type' => API_NUMERIC],
+				-12345,
+				'/1/numeric',
+				'-12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'00',
+				'/1/numeric',
+				'0'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-00',
+				'/1/numeric',
+				'-0'
+			],
+			[
+				['type' => API_NUMERIC],
+				'0001.15',
+				'/1/numeric',
+				'1.15'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-0000.0125',
+				'/1/numeric',
+				'-0.0125'
+			],
+			[
+				['type' => API_NUMERIC],
+				'012345',
+				'/1/numeric',
+				'12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-012345',
+				'/1/numeric',
+				'-12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775808',
+				'/1/numeric',
+				'-9223372036854775808'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775807',
+				'/1/numeric',
+				'9223372036854775807'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775809',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775808',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775808.000001',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775807.000001',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'.124',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'foo',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				[],
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				true,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				null,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5s',
+				'/1/numeric',
+				'5s'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5m',
+				'/1/numeric',
+				'5m'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5h',
+				'/1/numeric',
+				'5h'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5d',
+				'/1/numeric',
+				'5d'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5w',
+				'/1/numeric',
+				'5w'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5K',
+				'/1/numeric',
+				'5K'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5M',
+				'/1/numeric',
+				'5M'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5G',
+				'/1/numeric',
+				'5G'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5T',
+				'/1/numeric',
+				'5T'
+			],
+			[
+				['type' => API_NUMERIC],
+				'8388607T',
+				'/1/numeric',
+				'8388607T'
+			],
+			[
+				['type' => API_NUMERIC],
+				'8388608T',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],
 				'Detect operating system',
 				'/1/name',

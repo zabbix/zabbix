@@ -62,6 +62,10 @@ class CWidgetField {
 		return $this;
 	}
 
+	public function getDefault() {
+		return $this->default;
+	}
+
 	/**
 	 * Set JS code that will be called on field change.
 	 *
