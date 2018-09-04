@@ -52,20 +52,50 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		$graph_data = [
 			'data_sets' => $fields['ds'],
-			'data_source' => SVG_GRAPH_DATA_SOURCE_AUTO,
+			'data_source' => $fields['source'],
+			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
 			'time_period' => [
 				'time_from' => null,
 				'time_to' => null
 			],
-			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
-			'overrides' => array_key_exists('or', $fields) ? $fields['or'] : []
+			'left_y_axis' => [
+				'show' => $fields['lefty'],
+				'min' => ($fields['lefty_min'] !== '')
+					? convertFunctionValue($fields['lefty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
+					: '',
+				'max' => ($fields['lefty_max'] !== '')
+					? convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
+					: '',
+				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) ? $fields['lefty_static_units'] : ''
+			],
+			'right_y_axis' => [
+				'show' => $fields['righty'],
+				'min' => ($fields['righty_min'] !== '')
+					? convertFunctionValue($fields['righty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
+					: '',
+				'max' => ($fields['righty_max'] !== '')
+					? convertFunctionValue($fields['righty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
+					: '',
+				'units' => ($fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
+					? $fields['righty_static_units']
+					: ''
+			],
+			'x_axis' => [
+				'show' => $fields['axisx']
+			],
+			'legend' => $fields['legend'],
+			'legend_lines' => $fields['legend_lines'],
+			'problems' => [
+				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
+				'graph_item_problems' => $fields['graph_item_problems'],
+				'problemhosts' => $fields['problemhosts'],
+				'severities' => $fields['severities'],
+				'problem_name' => $fields['problem_name'],
+				'evaltype' => $fields['evaltype'],
+				'tags' => $fields['tags']
+			],
+			'overrides' => $fields['or']
 		];
-
-		// Set data source options.
-		if (array_key_exists('source', $fields)
-				&& in_array($fields['source'], [SVG_GRAPH_DATA_SOURCE_HISTORY, SVG_GRAPH_DATA_SOURCE_TRENDS])) {
-			$graph_data['data_source'] = $fields['source'];
-		}
 
 		// Use dashboard time from user profile.
 		if ($graph_data['dashboard_time'] && !$preview) {
@@ -91,102 +121,11 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		else {
 			$range_time_parser = new CRangeTimeParser();
 
-			$range_time_parser->parse($graph_data['dashboard_time'] ? 'now-1h' : $fields['time_from']);
+			$range_time_parser->parse($fields['time_from']);
 			$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
 
-			$range_time_parser->parse($graph_data['dashboard_time'] ? 'now' : $fields['time_to']);
+			$range_time_parser->parse($fields['time_to']);
 			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
-		}
-
-		// Set left Y axis options.
-		if (array_key_exists('lefty', $fields) && $fields['lefty'] == SVG_GRAPH_AXIS_Y_SHOW) {
-			$graph_data['left_y_axis'] = [];
-
-			if (array_key_exists('lefty_min', $fields) && $fields['lefty_min'] !== '') {
-				$graph_data['left_y_axis']['min'] =
-					convertFunctionValue($fields['lefty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-			}
-			if (array_key_exists('lefty_max', $fields) && $fields['lefty_max'] !== '') {
-				$graph_data['left_y_axis']['max'] =
-					convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-			}
-			if (array_key_exists('lefty_units', $fields) && $fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
-				$graph_data['left_y_axis']['units'] = array_key_exists('lefty_static_units', $fields)
-					? $fields['lefty_static_units']
-					: '';
-			}
-		}
-
-		// Set right Y axis options.
-		if (array_key_exists('righty', $fields) && $fields['righty'] == SVG_GRAPH_AXIS_Y_SHOW) {
-			$graph_data['right_y_axis'] = [];
-
-			if (array_key_exists('righty_min', $fields) && $fields['righty_min'] !== '') {
-				$graph_data['right_y_axis']['min'] =
-					convertFunctionValue($fields['righty_min'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-			}
-			if (array_key_exists('righty_max', $fields) && $fields['righty_max'] !== '') {
-				$graph_data['right_y_axis']['max'] =
-					convertFunctionValue($fields['righty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-			}
-			if (array_key_exists('righty_units', $fields) && $fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) {
-				$graph_data['right_y_axis']['units'] = array_key_exists('righty_static_units', $fields)
-					? $fields['righty_static_units']
-					: '';
-			}
-		}
-
-		// Set X axis options.
-		if (array_key_exists('axisx', $fields) && $fields['axisx'] == SVG_GRAPH_AXIS_X_SHOW) {
-			$graph_data['x_axis'] = SVG_GRAPH_AXIS_X_SHOW;
-		}
-
-		// Legend type and space to reserve (in terms of number of lines).
-		$graph_data['legend'] = array_key_exists('legend', $fields) ? $fields['legend'] : SVG_GRAPH_LEGEND_TYPE_NONE;
-		if ($graph_data['legend'] != SVG_GRAPH_LEGEND_TYPE_NONE) {
-			if (array_key_exists('legend_lines', $fields) && $fields['legend_lines'] >= SVG_GRAPH_LEGEND_LINES_MIN
-					&& $fields['legend_lines'] >= SVG_GRAPH_LEGEND_LINES_MIN
-					&& $fields['legend_lines'] <= SVG_GRAPH_LEGEND_LINES_MAX) {
-				$graph_data['legend_lines'] = $fields['legend_lines'];
-			}
-			else {
-				$graph_data['legend_lines'] = SVG_GRAPH_LEGEND_LINES_DEFAULT;
-			}
-		}
-
-		// Show problems.
-		if (array_key_exists('show_problems', $fields) && $fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			// Show graph item problems only.
-			if (array_key_exists('graph_item_problems', $fields)
-					&& $fields['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
-				$graph_data['problems']['graph_item_problems_only'] = SVG_GRAPH_SELECTED_ITEM_PROBLEMS;
-			}
-
-			// Problem hosts.
-			if (array_key_exists('problemhosts', $fields) && $fields['problemhosts'] !== '') {
-				$graph_data['problems']['problemhosts'] = $fields['problemhosts'];
-			}
-
-			// Problem severities.
-			$graph_data['problems']['severities'] = (array_key_exists('severities', $fields) && $fields['severities'])
-				? $fields['severities']
-				: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-
-			// Problem name.
-			if (array_key_exists('problem_name', $fields) && $fields['problem_name'] !== '') {
-				$graph_data['problems']['problem_name'] = $fields['problem_name'];
-			}
-
-			// Problem tag evaltype.
-			$graph_data['problems']['evaltype'] = (array_key_exists('evaltype', $fields)
-					&& $fields['evaltype'] == TAG_EVAL_TYPE_OR)
-				? $fields['evaltype']
-				: TAG_EVAL_TYPE_AND_OR;
-
-			// Problem tags.
-			if (array_key_exists('tags', $fields) && $fields['tags']) {
-				$graph_data['problems']['tags'] = $fields['tags'];
-			}
 		}
 
 		$svg_data = CSvgGraphHelper::get($graph_data, $width, $height);
@@ -194,13 +133,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			error($svg_data['errors']);
 		}
 
-		$graph_options = zbx_array_merge($svg_data['data'], [
-			'sbox' => ($graph_data['dashboard_time'] && !$edit_mode), // Available without custom time period only.
-			'show_problems' => array_key_exists('problems', $graph_data),
-			'hint_max_rows' => ZBX_WIDGET_ROWS
-		]);
-
 		if (!$preview) {
+			$graph_options = zbx_array_merge($svg_data['data'], [
+				'sbox' => ($graph_data['dashboard_time'] && !$edit_mode),
+				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
+				'hint_max_rows' => ZBX_WIDGET_ROWS
+			]);
+
 			$script_inline .=
 				'var widget = jQuery(".dashbrd-grid-widget-container")'.
 						'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.

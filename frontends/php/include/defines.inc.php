@@ -970,14 +970,12 @@ define('SVG_GRAPH_LEGEND_TYPE_SHORT', 1);
 
 define('SVG_GRAPH_LEGEND_LINES_MIN', 1);
 define('SVG_GRAPH_LEGEND_LINES_MAX', 5);
-define('SVG_GRAPH_LEGEND_LINES_DEFAULT', 1);
 
 define('SVG_GRAPH_PROBLEMS_SHOW', 1);
 
 define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
-define('SVG_GRAPH_AXIS_Y_SHOW', 1);
-define('SVG_GRAPH_AXIS_X_SHOW', 1);
+define('SVG_GRAPH_AXIS_SHOW', 1);
 
 define('SVG_GRAPH_AXIS_UNITS_AUTO', 0);
 define('SVG_GRAPH_AXIS_UNITS_STATIC', 1);
@@ -1418,7 +1416,7 @@ define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
-define('ZBX_STYLE_BTN_GEAR', 'btn-widget-edit');
+define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
@@ -1426,7 +1424,7 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
-define('ZBX_STYLE_BTN_TRASH', 'btn-widget-delete');
+define('ZBX_STYLE_BTN_WIDGET_DELETE', 'btn-widget-delete');
 define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');

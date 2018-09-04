@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * General class for SVG Graph usage.
  */
@@ -70,18 +71,20 @@ class CSvgGraph extends CSvg {
 	protected $min_value_left = null;
 	protected $min_value_right = null;
 
-	protected $left_y_max = null;
+	protected $left_y_show = false;
 	protected $left_y_min = null;
-	protected $left_y_show = null;
+	protected $left_y_max = null;
 	protected $left_y_units = null;
 
-	protected $right_y_max = null;
+	protected $right_y_show = false;
 	protected $right_y_min = null;
-	protected $right_y_show = null;
+	protected $right_y_max = null;
 	protected $right_y_units = null;
 
 	protected $right_y_zero = null;
 	protected $left_y_zero = null;
+
+	protected $x_show;
 
 	protected $offset_bottom;
 
@@ -110,8 +113,6 @@ class CSvgGraph extends CSvg {
 	protected $time_from;
 	protected $time_till;
 
-	protected $x_axis;
-
 	/**
 	 * Height for X axis container.
 	 *
@@ -130,9 +131,9 @@ class CSvgGraph extends CSvg {
 
 		$this
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
-			->setXAxis(array_key_exists('x_axis', $options) && $options['x_axis'] > 0)
-			->setYAxisRight(array_key_exists('right_y_axis', $options) ? $options['right_y_axis'] : false)
-			->setYAxisLeft(array_key_exists('left_y_axis', $options) ? $options['left_y_axis'] : false);
+			->setXAxis($options['x_axis'])
+			->setYAxisLeft($options['left_y_axis'])
+			->setYAxisRight($options['right_y_axis']);
 	}
 
 	/**
@@ -178,7 +179,7 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @return CSvgGraph
 	 */
-	public function addProblems(array $problems = []) {
+	public function addProblems(array $problems) {
 		$this->problems = $problems;
 
 		return $this;
@@ -256,23 +257,25 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set left side Y axis display options.
 	 *
-	 * @param array $options  Options array.
+	 * @param array  $options
+	 * @param int    $options['show']
+	 * @param string $options['min']
+	 * @param string $options['max']
+	 * @param string $options['units']
 	 *
 	 * @return CSvgGraph
 	 */
-	public function setYAxisLeft($options) {
-		if ($options !== false) {
-			$this->left_y_show = true;
+	public function setYAxisLeft(array $options) {
+		$this->left_y_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
 
-			if (array_key_exists('min', $options)) {
-				$this->left_y_min = $options['min'];
-			}
-			if (array_key_exists('max', $options)) {
-				$this->left_y_max = $options['max'];
-			}
-			if (array_key_exists('units', $options)) {
-				$this->left_y_units = $options['units'];
-			}
+		if ($options['min'] !== '') {
+			$this->left_y_min = $options['min'];
+		}
+		if ($options['max'] !== '') {
+			$this->left_y_max = $options['max'];
+		}
+		if ($options['units'] !== '') {
+			$this->left_y_units = $options['units'];
 		}
 
 		return $this;
@@ -281,22 +284,25 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Set right side Y axis display options.
 	 *
-	 * @param array $options    Options array.
+	 * @param array  $options
+	 * @param int    $options['show']
+	 * @param string $options['min']
+	 * @param string $options['max']
+	 * @param string $options['units']
+	 *
 	 * @return CSvgGraph
 	 */
-	public function setYAxisRight($options) {
-		if ($options !== false) {
-			$this->right_y_show = true;
+	public function setYAxisRight(array $options) {
+		$this->right_y_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
 
-			if (array_key_exists('min', $options)) {
-				$this->right_y_min = $options['min'];
-			}
-			if (array_key_exists('max', $options)) {
-				$this->right_y_max = $options['max'];
-			}
-			if (array_key_exists('units', $options)) {
-				$this->right_y_units = $options['units'];
-			}
+		if ($options['min'] !== '') {
+			$this->right_y_min = $options['min'];
+		}
+		if ($options['max'] !== '') {
+			$this->right_y_max = $options['max'];
+		}
+		if ($options['units'] !== '') {
+			$this->right_y_units = $options['units'];
 		}
 
 		return $this;
@@ -305,12 +311,12 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Show or hide X axis.
 	 *
-	 * @param bool $state
+	 * @param array $options
 	 *
 	 * @return CSvgGraph
 	 */
-	public function setXAxis($state) {
-		$this->x_axis = $state;
+	public function setXAxis(array $options) {
+		$this->x_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
 
 		return $this;
 	}
@@ -412,7 +418,7 @@ class CSvgGraph extends CSvg {
 		if ($this->right_y_show && (!$this->left_y_show || $this->max_value_right !== null)) {
 			$this->drawCanvasRightYAxis();
 		}
-		if ($this->x_axis) {
+		if ($this->x_show) {
 			$this->drawCanvasXAxis();
 		}
 
@@ -656,7 +662,7 @@ class CSvgGraph extends CSvg {
 	 * Add grid to graph.
 	 */
 	protected function drawGrid() {
-		$time_points = $this->x_axis ? $this->getTimeGridWithPosition() : [];
+		$time_points = $this->x_show ? $this->getTimeGridWithPosition() : [];
 		$value_points = [];
 
 		if ($this->left_y_show) {
@@ -670,7 +676,7 @@ class CSvgGraph extends CSvg {
 			unset($time_points[$this->canvas_width]);
 		}
 
-		if ($this->x_axis) {
+		if ($this->x_show) {
 			unset($value_points[0]);
 		}
 

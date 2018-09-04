@@ -126,7 +126,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 */
 		// Show left Y axis.
 		$field_lefty = (new CWidgetFieldCheckBox('lefty', _('Left Y'), _('Show')))
-			->setDefault(SVG_GRAPH_AXIS_Y_SHOW)
+			->setDefault(SVG_GRAPH_AXIS_SHOW)
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
 				'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
@@ -145,7 +145,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
-		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_min->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('lefty_min', $this->data)) {
@@ -159,7 +159,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
-		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_max->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('lefty_max', $this->data)) {
@@ -177,7 +177,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setAction('jQuery("#lefty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 
-		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_lefty_units->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('lefty_units', $this->data)) {
@@ -191,7 +191,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('value'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 
-		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_Y_SHOW
+		if ($field_lefty->getValue() != SVG_GRAPH_AXIS_SHOW
 				|| $field_lefty_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
 			$field_lefty_static_units->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -203,7 +203,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Show right Y axis.
 		$field_righty = (new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))
-			->setDefault(SVG_GRAPH_AXIS_Y_SHOW)
+			->setDefault(SVG_GRAPH_AXIS_SHOW)
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
 				'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
@@ -222,7 +222,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
-		if ($field_righty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_min->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('righty_min', $this->data)) {
@@ -236,7 +236,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('calculated'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
-		if ($field_righty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_max->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('righty_max', $this->data)) {
@@ -254,7 +254,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setAction('jQuery("#righty_static_units")'.
 							'.prop("disabled", (jQuery(this).val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"))');
 
-		if ($field_righty->getValue() != SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW) {
 			$field_righty_units->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('righty_units', $this->data)) {
@@ -268,7 +268,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			->setPlaceholder(_('value'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 
-		if ($field_righty->getValue() != SVG_GRAPH_AXIS_Y_SHOW
+		if ($field_righty->getValue() != SVG_GRAPH_AXIS_SHOW
 				|| $field_righty_units->getValue() != SVG_GRAPH_AXIS_UNITS_STATIC) {
 			$field_righty_static_units->setFlags(CWidgetField::FLAG_DISABLED);
 		}
@@ -279,7 +279,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_righty_static_units->getName()] = $field_righty_static_units;
 
 		// Show X axis.
-		$field_axisx = (new CWidgetFieldCheckBox('axisx', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_X_SHOW);
+		$field_axisx = (new CWidgetFieldCheckBox('axisx', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_SHOW);
 
 		if (array_key_exists('axisx', $this->data)) {
 			$field_axisx->setValue($this->data['axisx']);
@@ -309,7 +309,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_legend_lines = (new CWidgetFieldRangeControl('legend_lines', _('Number of lines'),
 			SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
 		))
-			->setDefault(SVG_GRAPH_LEGEND_LINES_DEFAULT);
+			->setDefault(SVG_GRAPH_LEGEND_LINES_MIN);
 
 		if ($field_legend->getValue() == SVG_GRAPH_LEGEND_TYPE_NONE) {
 			$field_legend_lines->setFlags(CWidgetField::FLAG_DISABLED);
@@ -507,7 +507,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 
 		// Validate Min/Max values in Axes tab.
-		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
 			$lefty_min = $this->fields['lefty_min']->getValue();
 			$lefty_max = $this->fields['lefty_max']->getValue();
 			$lefty_min = ($lefty_min !== '') ? convertFunctionValue($lefty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
@@ -520,7 +520,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			}
 		}
 
-		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_Y_SHOW) {
+		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
 			$righty_min = $this->fields['righty_min']->getValue();
 			$righty_max = $this->fields['righty_max']->getValue();
 			$righty_min = ($righty_min != '') ? convertFunctionValue($righty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';

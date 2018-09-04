@@ -546,7 +546,7 @@ class CWidgetHelper {
 				(new CDiv(
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_TRASH)
+						->addClass(ZBX_STYLE_BTN_WIDGET_DELETE)
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -758,7 +758,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#overrides-row",'.
 					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_WIDGET_DELETE.'",'.
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
@@ -909,10 +909,10 @@ class CWidgetHelper {
 				(new CDiv([
 					(new CButton())
 						->setAttribute('title', $is_opened ? _('Collapse') : _('Expand'))
-						->addClass(ZBX_STYLE_BTN_GEAR),
+						->addClass(ZBX_STYLE_BTN_WIDGET_EDIT),
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_TRASH)
+						->addClass(ZBX_STYLE_BTN_WIDGET_DELETE)
 				]))
 					->addStyle('margin-left: -25px;')
 					->addClass(ZBX_STYLE_COLUMN_5)
@@ -1099,7 +1099,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#dataset-row",'.
 					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_BTN_TRASH.'",'.
+					'remove: ".'.ZBX_STYLE_BTN_WIDGET_DELETE.'",'.
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
@@ -1150,7 +1150,7 @@ class CWidgetHelper {
 
 			// Intialize vertical accordion.
 			'jQuery("#data_sets").zbx_vertical_accordion({'.
-				'handler: ".'.ZBX_STYLE_BTN_GEAR.', .'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
+				'handler: ".'.ZBX_STYLE_BTN_WIDGET_EDIT.', .'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
 			'});',
 
 			// Initialize rangeControl UI elements.
