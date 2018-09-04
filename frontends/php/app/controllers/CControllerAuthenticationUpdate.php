@@ -190,7 +190,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
-			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
+			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
