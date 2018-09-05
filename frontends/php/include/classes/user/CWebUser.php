@@ -300,11 +300,10 @@ class CWebUser {
 				}
 			}
 
-			self::$data = API::User()->login([
+			self::$data = API::getApiService('user')->loginHttp([
 				'user' => $http_user,
-				'password' => '',
-				'userData' => true
-			]);
+				'password' => ''
+			], false);
 
 			$sessionid = (self::$data && array_key_exists('sessionid', self::$data)) ? self::$data['sessionid'] : null;
 		}
