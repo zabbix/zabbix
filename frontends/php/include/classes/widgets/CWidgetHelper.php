@@ -1235,7 +1235,7 @@ class CWidgetHelper {
 		$patterns = is_array($patterns) ? $patterns : explode(',', $patterns);
 
 		foreach ($patterns as &$pattern) {
-			$pattern = trim($pattern);
+			$pattern = is_string($pattern) ? trim($pattern) : '';
 		}
 		unset($pattern);
 
