@@ -35,14 +35,13 @@ if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_requ
 	$request = '';
 }
 
-if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && CWebUser::isLoggedIn()) {
-	if (!CWebUser::isGuest() || CWebUser::authenticateHttpUser()){
-		CWebUser::setSessionCookie(CWebUser::$data['sessionid']);
-		$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
-		redirect(reset($redirect));
+if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && CWebUser::authenticateHttpUser()
+		&& !CWebUser::isGuest()) {
+	CWebUser::setSessionCookie(CWebUser::$data['sessionid']);
+	$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+	redirect(reset($redirect));
 
-		exit;
-	}
+	exit;
 }
 
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');

@@ -1428,7 +1428,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function createSession($alias, $db_user) {
+	private function createSession($user, $db_user) {
 		$db_user['sessionid'] = md5(microtime().md5($user['password']).$user['user'].mt_rand());
 
 		DB::insert('sessions', [[

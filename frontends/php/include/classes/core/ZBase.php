@@ -358,13 +358,7 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionid = CWebUser::getSessionCookie();
-
-		if ($sessionid === null) {
-			$sessionid = CWebUser::authenticateHttpUser();
-		}
-
-		$sessionid = CWebUser::checkAuthentication($sessionid);
+		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 
 		if (!$sessionid) {
 			CWebUser::setDefault();
