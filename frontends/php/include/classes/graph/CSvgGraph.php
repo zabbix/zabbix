@@ -717,12 +717,10 @@ class CSvgGraph extends CSvg {
 			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
 				$min_value = $this->right_y_min;
 				$max_value = $this->right_y_max;
-				$units = $this->right_y_units;
 			}
 			else {
 				$min_value = $this->left_y_min;
 				$max_value = $this->left_y_max;
-				$units = $this->left_y_units;
 			}
 
 			$time_range = $this->time_till - $this->time_from ? : 1;
@@ -742,7 +740,7 @@ class CSvgGraph extends CSvg {
 				$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
 				$paths[$path_num][] = [$x, $y, convert_units([
 					'value' => $point,
-					'units' => $units
+					'units' => $metric['units']
 				])];
 			}
 
