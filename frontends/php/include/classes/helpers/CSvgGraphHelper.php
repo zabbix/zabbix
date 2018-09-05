@@ -368,9 +368,8 @@ class CSvgGraphHelper {
 	/**
 	 * Select metrics from given data set options. Apply data set options to each selected metric.
 	 */
-	protected static function getMetrics(array &$metrics = [], array $data_sets = []) {
+	protected static function getMetrics(array &$metrics, array $data_sets = []) {
 		$data_set_num = 0;
-		$metrics = [];
 
 		if (!$data_sets) {
 			return;
@@ -380,8 +379,8 @@ class CSvgGraphHelper {
 			$data_set = $data_sets[$data_set_num];
 			$data_set_num++;
 
-			if ((!array_key_exists('hosts', $data_set) || $data_set['hosts'] === '')
-					|| (!array_key_exists('items', $data_set) || $data_set['items'] === '')) {
+			if ((!array_key_exists('hosts', $data_set) || !$data_set['hosts'])
+					|| (!array_key_exists('items', $data_set) || !$data_set['items'])) {
 				continue;
 			}
 
@@ -453,8 +452,6 @@ class CSvgGraphHelper {
 			}
 		}
 		while (SVG_GRAPH_MAX_NUMBER_OF_METRICS > count($metrics) && array_key_exists($data_set_num, $data_sets));
-
-		return $metrics;
 	}
 
 	/**
@@ -555,6 +552,10 @@ class CSvgGraphHelper {
 							&& !array_key_exists('pointsize', $metric['options'])) {
 						$metric['options']['pointsize'] = SVG_GRAPH_DEFAULT_POINTSIZE;
 					}
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('width', $metric['options'])) {
+						$metric['options']['width'] = SVG_GRAPH_DEFAULT_WIDTH;
+					}
 				}
 				unset($metric);
 			}
@@ -577,14 +578,13 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Make array of patterns from given comma separated patterns string.
+	 * Prepare an array to be used for hosts/items filtering.
 	 *
-	 * @param string   $patterns		String containing comma separated patterns.
+	 * @param array   $patterns  Array containing hosts/items patterns.
 	 *
-	 * @return array   Returns array of patterns or NULL if '*' used, thus all database records are valid.
+	 * @return mixed|array  Returns array of patterns or NULL if all tested hosts/items are valid.
 	 */
-	protected static function processPattern($patterns) {
-		$patterns = explode(',', $patterns);
+	protected static function processPattern(array $patterns) {
 		$patterns = array_keys(array_flip($patterns));
 
 		foreach ($patterns as &$pattern) {
@@ -595,6 +595,10 @@ class CSvgGraphHelper {
 			}
 		}
 		unset($pattern);
+
+		if ($patterns !== null) {
+			$patterns = array_filter($patterns);
+		}
 
 		return $patterns;
 	}

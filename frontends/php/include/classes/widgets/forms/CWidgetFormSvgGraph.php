@@ -42,18 +42,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_ds = (new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if (array_key_exists('ds', $this->data)) {
-			// Values received from frontend are strings. Values received from database comes as arrays.
-			// TODO: remove hack with modifying of unvalidated data.
-			foreach ($this->data['ds'] as &$value) {
-				if (array_key_exists('hosts', $value)) {
-					$value['hosts'] = is_array($value['hosts']) ? implode(', ', $value['hosts']) : $value['hosts'];
-				}
-				if (array_key_exists('items', $value)) {
-					$value['items'] = is_array($value['items']) ? implode(', ', $value['items']) : $value['items'];
-				}
-			}
-			unset($value);
-
 			$field_ds->setValue($this->data['ds']);
 		}
 
@@ -363,12 +351,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$field_problemhosts->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		elseif (array_key_exists('problemhosts', $this->data)) {
-			// Values received from frontend are strings. Values received from database comes as arrays.
-			// TODO: remove hack with modifying of unvalidated data.
-			$problem_hosts = is_array($this->data['problemhosts'])
-				? implode(', ', $this->data['problemhosts'])
-				: $this->data['problemhosts'];
-			$field_problemhosts->setValue($problem_hosts);
+			$field_problemhosts->setValue($this->data['problemhosts']);
 		}
 
 		$this->fields[$field_problemhosts->getName()] = $field_problemhosts;
@@ -436,18 +419,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_or = (new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if (array_key_exists('or', $this->data)) {
-			// Values received from frontend are strings. Values received from database comes as arrays.
-			// TODO: remove hack with modifying of unvalidated data.
-			foreach ($this->data['or'] as &$value) {
-				if (array_key_exists('hosts', $value)) {
-					$value['hosts'] = is_array($value['hosts']) ? implode(', ', $value['hosts']) : $value['hosts'];
-				}
-				if (array_key_exists('items', $value)) {
-					$value['items'] = is_array($value['items']) ? implode(', ', $value['items']) : $value['items'];
-				}
-			}
-			unset($value);
-
 			$field_or->setValue($this->data['or']);
 		}
 

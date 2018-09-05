@@ -43,8 +43,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'hosts'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'items'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
@@ -56,6 +56,23 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'timeshift'			=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
 		]]);
 		$this->setDefault([]);
+	}
+
+	public function setValue($value) {
+		foreach ($value as &$val) {
+			// Values received from frontend are strings. Values received from database comes as arrays.
+			if (array_key_exists('hosts', $val)) {
+				$val['hosts'] = CWidgetHelper::splitPatternIntoParts($val['hosts']);
+			}
+			if (array_key_exists('items', $val)) {
+				$val['items'] = CWidgetHelper::splitPatternIntoParts($val['items']);
+			}
+		}
+		unset($val);
+
+		$this->value = $value;
+
+		return $this;
 	}
 
 	/**
@@ -89,8 +106,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	 */
 	public static function getDefaults() {
 		return [
-			'hosts' => '',
-			'items' => '',
+			'hosts' => [],
+			'items' => [],
 			'color' => self::DEFAULT_COLOR,
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'width' => SVG_GRAPH_DEFAULT_WIDTH,
@@ -116,14 +133,14 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		// TODO: fields with default values shouldn't be saved in the database
 		foreach ($value as $index => $val) {
 			// Hosts and items fields are stored as arrays to bypass length limit.
-			foreach (CWidgetHelper::splitPatternIntoParts($val['hosts']) as $num => $pattern_item) {
+			foreach ($val['hosts'] as $num => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => $this->name.'.hosts.'.$index.'.'.$num,
 					'value' => $pattern_item
 				];
 			}
-			foreach (CWidgetHelper::splitPatternIntoParts($val['items']) as $num => $pattern_item) {
+			foreach ($val['items'] as $num => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => $this->name.'.items.'.$index.'.'.$num,
