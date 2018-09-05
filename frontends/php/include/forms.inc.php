@@ -1094,82 +1094,20 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 
-		// discovery rule & item prototype
-		if ($data['is_discovery_rule'] || $data['parent_discoveryid'] != 0) {
-			// get templates
-			$itemid = $item['itemid'];
-			do {
-				$params = [
-					'itemids' => $itemid,
-					'output' => ['itemid', 'templateid'],
-					'selectHosts' => ['name']
-				];
-				if ($data['is_discovery_rule']) {
-					$item = API::DiscoveryRule()->get($params);
-				}
-				else {
-					$params['selectDiscoveryRule'] = ['itemid'];
-					$params['filter'] = ['flags' => null];
-					$item = API::Item()->get($params);
-				}
-				$item = reset($item);
-
-				if (!empty($item)) {
-					$host = reset($item['hosts']);
-					if (!empty($item['hosts'])) {
-						if (bccomp($data['itemid'], $itemid) != 0) {
-							$writable = API::Template()->get([
-								'output' => ['templateid'],
-								'templateids' => [$host['hostid']],
-								'editable' => true,
-								'preservekeys' => true
-							]);
-						}
-
-						$host['name'] = CHtml::encode($host['name']);
-						if (bccomp($data['itemid'], $itemid) == 0) {
-						}
-						// discovery rule
-						elseif ($data['is_discovery_rule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'],
-									'host_discovery.php?form=update&itemid='.$item['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-						// item prototype
-						elseif ($item['discoveryRule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
-									'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-					}
-					$itemid = $item['templateid'];
-				}
-				else {
-					break;
-				}
-			} while ($itemid != 0);
-
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
+		// discovery rule
+		if ($data['is_discovery_rule']) {
+			$flag = ZBX_FLAG_DISCOVERY_RULE;
+		}
+		// item prototype
+		elseif ($data['parent_discoveryid'] != 0) {
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
 		else {
-			$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item]));
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
 	}
 
 	// caption
@@ -2182,24 +2120,15 @@ function getTimeperiodForm(array $data) {
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-		if ($data['new_timeperiod_start_date'] === null) {
-			$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
-		}
-		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			if ($range_time_parser->parse($data['new_timeperiod_start_date']) == CParser::PARSE_SUCCESS) {
-				$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
-			}
-			else {
-				$new_timeperiod['start_date'] = $data['new_timeperiod_start_date'];
-			}
-		}
+		$new_timeperiod['start_date'] = ($data['new_timeperiod_start_date'] === null)
+			? date(ZBX_DATE_TIME, time())
+			: $data['new_timeperiod_start_date'];
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
 			(new CDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date']))
 				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		);
 	}

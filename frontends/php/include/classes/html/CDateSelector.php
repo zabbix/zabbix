@@ -33,9 +33,23 @@ class CDateSelector extends CTag {
 	/**
 	 * Set aria-required to textbox.
 	 *
-	 * @var string
+	 * @var bool
 	 */
 	private $is_required = false;
+
+	/**
+	 * Placeholder for date textbox field.
+	 *
+	 * @var string
+	 */
+	private $placeholder = null;
+
+	/**
+	 * Date and time set from view. Absolute (Y-m-d H:i:s) or relative time (now+1d, now/M ...).
+	 *
+	 * @var string
+	 */
+	private $value = null;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -49,18 +63,7 @@ class CDateSelector extends CTag {
 		parent::__construct('div', true);
 
 		$this->name = $name;
-
-		$this
-			->addItem(
-				(new CTextBox($this->name, $value))
-					->setId($this->name)
-					->setAriaRequired($this->is_required)
-			)
-			->addItem((new CButton($this->name.'_calendar'))
-				->addClass(ZBX_STYLE_ICON_CAL)
-				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
-
-		return $this;
+		$this->value = $value;
 	}
 
 	/**
@@ -90,6 +93,19 @@ class CDateSelector extends CTag {
 	}
 
 	/**
+	 * Add placeholder to date textbox field.
+	 *
+	 * @param type $text  Placeholder text for date textbox field.
+	 *
+	 * @return $this
+	 */
+	public function setPlaceholder($text) {
+		$this->placeholder = $text;
+
+		return $this;
+	}
+
+	/**
 	 * Gets string representation of date textbox and calendar button.
 	 *
 	 * @param bool $destroy
@@ -97,9 +113,18 @@ class CDateSelector extends CTag {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		zbx_add_post_js('create_calendar(null, "'.$this->name.'", "'.$this->name.'_calendar", null, null, '.
-			'"'.$this->date_format.'");'
-		);
+		$this
+			->addItem(
+				(new CTextBox($this->name, $this->value))
+					->setId($this->name)
+					->setAttribute('placeholder', $this->placeholder)
+					->setAriaRequired($this->is_required)
+			)
+			->addItem((new CButton($this->name.'_calendar'))
+				->addClass(ZBX_STYLE_ICON_CAL)
+				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
+
+		zbx_add_post_js('create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'");');
 
 		return parent::toString($destroy);
 	}

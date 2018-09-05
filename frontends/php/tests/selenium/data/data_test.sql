@@ -1719,18 +1719,18 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 -- testInheritanceApplication
 INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99002, 15001, 'Inheritance application');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (314, 99002, 99001);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (900, 99002, 99001);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99003, 15000, 'Inheritance application for delete without items');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99004, 15001, 'Inheritance application for delete without items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (315, 99004, 99003);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (901, 99004, 99003);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'Inheritance application for delete with items');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (316, 99006, 99005);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
 INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99001, 99006, 99085);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (317, 99008, 99007);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99009, 15001, 'Application on host');
 
 -- testPageProblems_TagPriority

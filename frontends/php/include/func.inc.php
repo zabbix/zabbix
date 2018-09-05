@@ -1483,17 +1483,27 @@ function zbx_str2links($text) {
 	foreach (explode("\n", $text) as $line) {
 		$line = rtrim($line, "\r ");
 
-		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches);
 
 		$start = 0;
+
 		foreach ($matches[0] as $match) {
-			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = new CLink($match[0], $match[0]);
-			$start = $match[1] + mb_strlen($match[0]);
+			if (($pos = mb_strpos($line, $match, $start)) !== false) {
+				if ($pos != $start) {
+					$result[] = mb_substr($line, $start, $pos - $start);
+				}
+				$result[] = new CLink(CHTML::encode($match), $match);
+				$start = $pos + mb_strlen($match);
+			}
 		}
-		$result[] = mb_substr($line, $start);
+
+		if (mb_strlen($line) != $start) {
+			$result[] = mb_substr($line, $start);
+		}
+
 		$result[] = BR();
 	}
+
 	array_pop($result);
 
 	return $result;
