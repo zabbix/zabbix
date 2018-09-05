@@ -474,6 +474,7 @@ New features:
 A.F....... [ZBX-1357] enabled Portuguese (Portugal) translation to be displayed by default (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
 ...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
