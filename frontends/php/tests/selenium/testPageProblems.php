@@ -378,4 +378,30 @@ class testPageProblems extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath('//input[contains(@id, "filter_tag_name_format")][@disabled]');
 		}
 	}
+
+	public function testPageProblems_SuppressedProblems() {
+		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestCheckHeader('Problems');
+		$this->zbxTestClickButtonText('Reset');
+
+		$this->zbxTestClickButtonMultiselect('filter_hostids_');
+		$this->zbxTestLaunchOverlayDialog('Hosts');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestClickLinkTextWait('Host for suppression');
+		$this->zbxTestClickButtonText('Apply');
+
+		$this->zbxTestTextNotPresent('Trigger for suppression');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
+
+		$this->zbxTestCheckboxSelect('filter_show_suppressed');
+		$this->zbxTestClickButtonText('Apply');
+
+		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Trigger for suppression');
+		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'SupTag: A');
+		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
+
+		// Click on suppression icon and check text in hintbox.
+		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
+		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 2021-05-18 12:17 Maintenance: Maintenance for suppression test');
+	}
 }
