@@ -416,13 +416,14 @@ jQuery(function ($) {
 				if (show_hint) {
 					html = $('<ul></ul>');
 				}
-				points.forEach(function(point, i) {
+				var rows_added = 0;
+				points.forEach(function(point) {
 					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
 					if (xy_point === false || xy_point === point) {
 						point_highlight.setAttribute('cx', point.x);
 						point_highlight.setAttribute('cy', point.y);
 
-						if (show_hint && data.hintMaxRows > i) {
+						if (show_hint && data.hintMaxRows > rows_added) {
 							$('<li></li>')
 								.append(
 									$('<span></span>')
@@ -431,6 +432,7 @@ jQuery(function ($) {
 								)
 								.append(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.appendTo(html);
+							rows_added++;
 						}
 					}
 					else {
