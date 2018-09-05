@@ -171,7 +171,8 @@ $icon-widget-btn: (
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -165px -546px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -165px -582px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -165px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px
+	sound-off: url(../img/icon-sprite.svg) no-repeat -165px -510px,
+	info-clock: url(../img/icon-sprite.svg) no-repeat -246px -762px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -629,6 +630,10 @@ ul.top-nav-icons {
 		td {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
+			.icon-maint::before {
+				background-position: -206px -804px;
+			}
 
 			.icon-wzrd-action {
 				background: transparent url(../img/icon-sprite.svg) no-repeat -165px -624px;

@@ -243,12 +243,14 @@ if ($data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 			(new CLabel(_('From'), 'new_service_time_from'))->setAsteriskMark(),
 			(new CDateSelector('new_service_time_from', $data['new_service_time_from']))
 				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		)
 		->addRow(
 			(new CLabel(_('Till'), 'new_service_time_till'))->setAsteriskMark(),
 			(new CDateSelector('new_service_time_till', $data['new_service_time_till']))
 				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		);
 }

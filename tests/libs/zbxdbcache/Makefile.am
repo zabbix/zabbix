@@ -38,6 +38,7 @@ zbx_vc_get_values_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_get_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
+zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_get_values_CFLAGS = \
 	 $(zbx_vc_get_values_WRAP_FUNCS) \
@@ -67,6 +68,7 @@ zbx_vc_add_values_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_add_values_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
+zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_add_values_CFLAGS = \
 	 $(zbx_vc_add_values_WRAP_FUNCS) \
@@ -96,6 +98,7 @@ zbx_vc_get_value_WRAP_FUNCS = \
 	-Wl,--wrap=time
 
 zbx_vc_get_value_LDADD = $(VALUECACHE_LIBS) @SERVER_LIBS@
+zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vc_get_value_CFLAGS = \
 	 $(zbx_vc_get_value_WRAP_FUNCS) \
@@ -140,5 +143,6 @@ dc_maintenance_match_tags_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	@SERVER_LIBS@	
-	
+
+dc_maintenance_match_tags_LDFLAGS = @SERVER_LDFLAGS@
 endif

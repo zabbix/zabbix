@@ -98,6 +98,7 @@ static int	zbx_get_cpu_num(void)
 #elif defined(_SC_NPROCESSORS_CONF)
 	/* FreeBSD 7.0 x86 */
 	/* Solaris 10 x86 */
+	/* AIX 6.1 */
 	int	ncpu;
 
 	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
@@ -136,17 +137,6 @@ static int	zbx_get_cpu_num(void)
 		goto return_one;
 
 	return ncpu;
-#elif defined(HAVE_LIBPERFSTAT)
-	/* AIX 6.1 */
-	perfstat_partition_config_t	part_cfg;
-	int				rc;
-
-	rc = perfstat_partition_config(NULL, &part_cfg, sizeof(perfstat_partition_config_t), 1);
-
-	if (1 != rc)
-		goto return_one;
-
-	return (int)part_cfg.lcpus;
 #endif
 
 #ifndef _WINDOWS

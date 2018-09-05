@@ -973,7 +973,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	// Get triggers data, triggers from current map, select all.
 	if ($triggerIdToSelementIds) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
 			'selectHosts' => ['maintenance_status', 'maintenanceid'],
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => ['state' => null],
@@ -1002,7 +1002,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	// triggers from submaps, skip dependent
 	if ($subSysmapTriggerIdToSelementIds) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => ['state' => null],
 			'skipDependent' => true,
@@ -1039,7 +1039,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	// triggers from all hosts/hostgroups, skip dependent
 	if ($monitored_hostids) {
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
+			'output' => ['triggerid', 'status', 'value', 'priority', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
 			'hostids' => array_keys($monitored_hostids),
@@ -1079,8 +1079,9 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 	}
 
 	$problems = API::Problem()->get([
-		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'severity'],
+		'output' => ['eventid', 'objectid', 'name', 'acknowledged', 'clock', 'r_clock', 'severity'],
 		'objectids' => array_keys($triggerids),
+		'recent' => true,
 		'suppressed' => ($sysmap['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 	]);
 
@@ -1152,6 +1153,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 		}
 
 		$critical_problem = [];
+		$lately_changed = 0;
 
 		foreach ($selement['triggers'] as $trigger) {
 			if ($trigger['status'] == TRIGGER_STATUS_DISABLED && $options['severity_min'] <= $trigger['priority']) {
@@ -1161,21 +1163,29 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 			if (array_key_exists('problems', $trigger)) {
 				foreach ($trigger['problems'] as $problem) {
-					$i['problem']++;
+					if ($problem['r_clock'] == 0) {
+						$i['problem']++;
 
-					if (!$problem['acknowledged']) {
-						$i['problem_unack']++;
+						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+							$i['problem_unack']++;
+						}
 					}
 
 					if (!$critical_problem || ($critical_problem['severity'] <= $problem['severity']
 							&& $critical_problem['eventid'] < $problem['eventid'])) {
 						$critical_problem = $problem;
 					}
+
+					if ($problem['r_clock'] > $lately_changed) {
+						$lately_changed = $problem['r_clock'];
+					}
+					elseif ($problem['clock'] > $lately_changed) {
+						$lately_changed = $problem['clock'];
+					}
 				}
 			}
 
-			$i['latelyChanged'] |=
-					((time() - $trigger['lastchange']) < timeUnitToSeconds($config['blink_period']));
+			$i['latelyChanged'] |= ((time() - $lately_changed) < timeUnitToSeconds($config['blink_period']));
 		}
 
 		if ($critical_problem) {
@@ -1823,7 +1833,7 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 
 		$c = $dX * $koef;
 
-		// if point is further than area diagonal, we should use calculations with width instead of height
+		// If point is further than area diagonal, we should use calculations with width instead of height.
 		if (($halfHeight / $c) > ($halfHeight / $halfWidth)) {
 			$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
 			$ax = ($x2 < $ax) ? $ax - $c : $ax + $c;
@@ -1907,8 +1917,8 @@ function get_parent_sysmaps($sysmapid) {
 /**
  * Get labels for map elements.
  *
- * @param array $map        Sysmap data array.
- * @param array $map_info   Array of selements (@see getSelementsInfo).
+ * @param array $map       Sysmap data array.
+ * @param array $map_info  Array of selements (@see getSelementsInfo).
  *
  * @return array
  */

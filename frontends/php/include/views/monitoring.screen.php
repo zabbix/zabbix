@@ -23,7 +23,7 @@ $widget = (new CWidget())
 	->setTitle(_('Screens'))
 	->addItem((new CList())
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _('Breadcrumbs'))
+		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([

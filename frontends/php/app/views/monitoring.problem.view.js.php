@@ -61,6 +61,12 @@
 			}
 		});
 
+		$('#filter_show_tags').change(function() {
+			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
+			$('#filter_tag_priority').prop('disabled', disabled);
+			$('#filter_tag_name_format input').prop('disabled', disabled);
+		});
+
 		$(document).on({
 			mouseenter: function() {
 				if ($(this).width() > $(this).parent('td').width()) {

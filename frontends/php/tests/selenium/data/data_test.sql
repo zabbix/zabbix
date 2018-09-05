@@ -1726,19 +1726,88 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 -- testInheritanceApplication
 INSERT INTO applications (applicationid, hostid, name) VALUES (99001, 15000, 'Inheritance application');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99002, 15001, 'Inheritance application');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (314, 99002, 99001);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (900, 99002, 99001);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99003, 15000, 'Inheritance application for delete without items');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99004, 15001, 'Inheritance application for delete without items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (315, 99004, 99003);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (901, 99004, 99003);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99005, 15000, 'Inheritance application for delete with items');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99006, 15001, 'Inheritance application for delete with items');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (316, 99006, 99005);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (902, 99006, 99005);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99085, 15001, 1, 0, 2, 'Item for testInheritanceApplication','item-with-inheritance-app', '30s', '90d', 0, '', '', 0, '', '');
 INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99001, 99006, 99085);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99007, 15000, 'Inheritance application for update');
 INSERT INTO applications (applicationid, hostid, name) VALUES (99008, 15001, 'Inheritance application for update');
-INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (317, 99008, 99007);
+INSERT INTO application_template (application_templateid, applicationid, templateid) VALUES (903, 99008, 99007);
 INSERT INTO applications (applicationid, hostid, name) VALUES (99009, 15001, 'Application on host');
+
+-- testPageProblems_TagPriority
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{13083}>100','0','1','','2','','1','0','0','','','99252');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99530','99252','23292','avg','5m');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99252','105');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99252','106');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99252','107');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99252','108');
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (96,0,0,99252,1534495628,128786843,1,'First test trigger with tag priority',2);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (100,96,'Delta','d');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (101,96,'Beta','b');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (102,96,'Alpha','a');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (103,96,'Gamma','g');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (96,0,0,99252,1534495628,128786843,'First test trigger with tag priority',2);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (100,96,'Delta','d');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (101,96,'Beta','b');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (102,96,'Alpha','a');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (103,96,'Gamma','g');
+
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Second test trigger with tag priority','{13083}>100','0','1','','2','','1','0','0','','','99253');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99531','99253','23292','avg','5m');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Zeta','z','99253','109');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99253','110');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Epsilon','e','99253','111');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99253','112');
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (97,0,0,99253,1534495628,128786843,1,'Second test trigger with tag priority',2);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (104,97,'Zeta','z');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (105,97,'Beta','b');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (106,97,'Epsilon','e');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (107,97,'Eta','e');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (97,0,0,99253,1534495628,128786843,'Second test trigger with tag priority',2);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (104,97,'Zeta','z');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (105,97,'Beta','b');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (106,97,'Epsilon','e');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (107,97,'Eta','e');
+
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Third test trigger with tag priority','{13083}>100','0','1','','2','','1','0','0','','','99254');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99532','99254','23292','avg','5m');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Kappa','k','99254','113');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Iota','i','99254','114');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99254','115');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99254','116');
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (98,0,0,99254,1534495628,128786843,1,'Third test trigger with tag priority',2);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (108,98,'Kappa','k');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (109,98,'Iota','i');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (110,98,'Alpha','a');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (111,98,'Theta','t');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (98,0,0,99253,1534495628,128786843,'Third test trigger with tag priority',2);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (108,98,'Kappa','k');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (109,98,'Iota','i');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (110,98,'Alpha','a');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (111,98,'Theta','t');
+
+INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Fourth test trigger with tag priority','{13083}>100','0','1','','2','','1','0','0','','','99255');
+INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('99533','99255','23292','avg','5m');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99255','117');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99255','118');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99255','119');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99255','120');
+INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (99,0,0,99254,1534495628,128786843,1,'Fourth test trigger with tag priority',2);
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (112,99,'Eta','e');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (113,99,'Gamma','g');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (114,99,'Theta','t');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
+INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (99,0,0,99253,1534495628,128786843,'Fourth test trigger with tag priority',2);
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (112,99,'Eta','e');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (113,99,'Gamma','g');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (114,99,'Theta','t');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
 
 -- Problem suppression test: host, item, trigger, maintenance, event, problem, tags
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host for suppression', 'Host for suppression', 0, '');
@@ -1756,7 +1825,7 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO maintenance_tag (maintenancetagid, maintenanceid, tag, operator,value) VALUES (3,4,'SupTag',2,'A');
 
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (175,0,0,100031,1535012391,445429746,1,'Trigger for suppression',3);
-INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (100,175,'SupTag','A');
+INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (200,175,'SupTag','A');
 INSERT INTO event_suppress (event_suppressid,eventid,maintenanceid,suppress_until) VALUES (1,175,4,1621329420);
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (175,0,0,100031,1535012391,445429746,'Trigger for suppression',3);
-INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (100,175,'SupTag','A');
+INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (200,175,'SupTag','A');
