@@ -6,6 +6,7 @@ New features:
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+........S. [ZBX-14808] fixed SQL error in user permission check when processing actions for internal item events (wiper)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
 ..F....... [ZBXNEXT-4597] fixed date selection fields in maintenance and services: fixed accepted date format, fixed validation and added placeholdrs (vmurzins)
 ...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
