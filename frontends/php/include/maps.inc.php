@@ -69,7 +69,6 @@ function sysmapElementLabel($label = null) {
  * @param int   $sysmap['show_suppressed']  Whether suppressed problems are shown.
  * @param array $options                    Options used to retrieve actions.
  * @param int   $options['severity_min']    Minimal severity used.
- * @param int   $options['fullscreen']      Fullscreen flag.
  *
  * @return array
  */
