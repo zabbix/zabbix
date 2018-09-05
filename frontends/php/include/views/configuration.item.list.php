@@ -48,6 +48,10 @@ if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
+$url = (new CUrl('items.php'))
+	->setArgument('hostid', $data['hostid'])
+	->getUrl();
+
 // create table
 $itemTable = (new CTableInfo())
 	->setHeader([
@@ -56,15 +60,15 @@ $itemTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
 		empty($this->data['filter_hostid']) ? _('Host') : null,
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
-		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
