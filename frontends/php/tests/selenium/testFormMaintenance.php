@@ -89,6 +89,17 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
+		// Add problem tags.
+		$this->zbxTestClickXpath('//label[text()="Or"]');
+		$tags = ['Tag1', 'Tag2', 'Tag3'];
+		$value = 'Value';
+		foreach ($tags as $i => $tag) {
+			$this->zbxTestInputTypeWait('tags_'.$i.'_tag', $tag);
+			$this->zbxTestClickXpath('//label[@for="tags_'.$i.'_operator_1"]');
+			$this->zbxTestInputType('tags_'.$i.'_value', $value );
+			$this->zbxTestClick('tags_add');
+		}
+
 		// Create maintenance and check the results in frontend.
 		$this->zbxTestClickXpath('//button[@id=\'add\'][@type=\'submit\']');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance added');
@@ -96,6 +107,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(3, DBcount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
 	/**
@@ -191,6 +203,33 @@ class testFormMaintenance extends CWebTest {
 
 		// Check the results in DB.
 		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+	}
+
+	public function testFormMaintenance_UpdateTags() {
+		$maintenance = 'Maintenance for update (data collection)';
+		$this->zbxTestLogin('maintenance.php?ddreset=1');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
+		$this->zbxTestCheckHeader('Maintenance periods');
+		$this->zbxTestClickLinkTextWait($maintenance);
+
+		// Update tags.
+		$this->zbxTestTabSwitch('Hosts and groups');
+		$this->zbxTestClickXpathWait('//label[text()="And/Or"]');
+		$tag = 'Tag';
+		$values = ['A1','B1'];
+		foreach ($values as $i => $value) {
+			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_tag', $tag);
+			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_value', $value);
+		}
+		$this->zbxTestClickXpath('//label[@for="tags_0_operator_1"]');
+		$this->zbxTestClickXpath('//label[@for="tags_1_operator_0"]');
+
+		$this->zbxTestClick('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
+
+		$this->assertEquals(2, DBcount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value="A1" and operator=0'));
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value="B1" and operator=2'));
 	}
 
 	/**
