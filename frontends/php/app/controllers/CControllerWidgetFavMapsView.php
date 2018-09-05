@@ -29,8 +29,7 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		$this->setType(WIDGET_FAV_MAPS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'json',
-			'fullscreen' => 'in 0,1'
+			'fields' => 'json'
 		]);
 	}
 
@@ -61,7 +60,6 @@ class CControllerWidgetFavMapsView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', CWidgetConfig::getKnownWidgetTypes()[WIDGET_FAV_MAPS]),
 			'maps' => $maps,
-			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

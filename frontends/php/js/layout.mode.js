@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -19,31 +18,26 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
+jQuery(function($) {
+	var $layout_mode_btn = $('.layout-mode');
 
-class CControllerWidgetDataOverView extends CControllerWidget {
+	if ($layout_mode_btn.length) {
+		$layout_mode_btn.on('click', function(e) {
+			e.stopPropagation();
+			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
+				location.reload();
+			});
+		});
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setType(WIDGET_DATA_OVER);
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'json',
-		]);
+		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($layout_mode_btn.data('timer'));
+				$layout_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$layout_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
 	}
-
-	protected function doAction() {
-		$fields = $this->getForm()->getFieldsData();
-
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->getDefaultHeader()),
-			'groupids' => getSubGroups($fields['groupids']),
-			'application' => $fields['application'],
-			'style' => $fields['style'],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
-	}
-}
+});
