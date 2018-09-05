@@ -706,7 +706,7 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *
  * @return array
  */
-function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count = EVENTS_LIST_TAGS_COUNT,
+function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count = ZBX_TAG_COUNT_DEFAULT,
 		array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL, $tag_priority = '') {
 	$tags = [];
 

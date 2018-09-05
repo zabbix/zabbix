@@ -814,7 +814,7 @@ else {
 		order_result($data['triggers'], $data['sort'], $data['sortorder']);
 	}
 
-	$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
+	$data['tags'] = makeTags($data['triggers'], true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $data['filter_tags']);
 
 	$depTriggerIds = [];
 	foreach ($data['triggers'] as $trigger) {
