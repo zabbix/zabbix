@@ -441,6 +441,7 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
 		}
 
 		if (array_key_exists('timeout', $data)) {
@@ -451,6 +452,7 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementNotPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementNotPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementNotPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
 		}
 		else {
 			$this->zbxTestCheckboxSelect('messages_enabled', false);
@@ -460,6 +462,7 @@ class testFormUserProfile extends CWebTest {
 			$this->zbxTestAssertElementPresentXpath("//select[@id='messages_sounds.recovery'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
 		}
 
 		if (array_key_exists('suppressed', $data)) {

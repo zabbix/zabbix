@@ -91,10 +91,10 @@ class testFormMaintenance extends CWebTest {
 
 		// Add problem tags.
 		$this->zbxTestClickXpath('//label[text()="Or"]');
-		$tag = ['Tag1', 'Tag2', 'Tag3'];
+		$tags = ['Tag1', 'Tag2', 'Tag3'];
 		$value = 'Value';
-		foreach ($tag as $i => $tag) {
-			$this->zbxTestInputType('tags_'.$i.'_tag', $tag);
+		foreach ($tags as $i => $tag) {
+			$this->zbxTestInputTypeWait('tags_'.$i.'_tag', $tag);
 			$this->zbxTestClickXpath('//label[@for="tags_'.$i.'_operator_1"]');
 			$this->zbxTestInputType('tags_'.$i.'_value', $value );
 			$this->zbxTestClick('tags_add');
@@ -213,11 +213,11 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestClickLinkTextWait($maintenance);
 
 		// Update tags.
-		$this->zbxTestTabSwitchById('tab_hostTab', 'Hosts and groups');
-		$this->zbxTestClickXpath('//label[text()="And/Or"]');
+		$this->zbxTestTabSwitch('Hosts and groups');
+		$this->zbxTestClickXpathWait('//label[text()="And/Or"]');
 		$tag = 'Tag';
-		$value = ['A1','B1'];
-		foreach ($value as $i => $value) {
+		$values = ['A1','B1'];
+		foreach ($values as $i => $value) {
 			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_tag', $tag);
 			$this->zbxTestInputTypeOverwrite('tags_'.$i.'_value', $value);
 		}
@@ -225,6 +225,7 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestClickXpath('//label[@for="tags_1_operator_0"]');
 
 		$this->zbxTestClick('update');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
 
 		$this->assertEquals(2, DBcount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
 		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value="A1" and operator=0'));

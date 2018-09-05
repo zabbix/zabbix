@@ -247,7 +247,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClickWait('spanid99011');
+		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 
 		$this->zbxTestTextNotPresent('Trigger for suppression');
@@ -260,8 +260,8 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'SupTag: A');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 
+		// Click on suppression icon and check text in hintbox.
 		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/span[contains(@class, "icon-invisible")]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@style, "top") and text()="Suppressed till: 2021-05-18 12:17"]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@style, "top") and text()="Maintenance: Maintenance for suppression test"]');
+		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 2021-05-18 12:17 Maintenance: Maintenance for suppression test');
 	}
 }
