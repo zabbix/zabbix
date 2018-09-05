@@ -343,7 +343,7 @@ class CSvgGraph extends CSvg {
 			5 => 'H:i:s',					// 5 seconds
 			10 => 'H:i:s',					// 10 seconds
 			30 => 'H:i:s',					// 30 seconds
-			SEC_PER_MIN => 'H:i:s',			// 1 minute
+			SEC_PER_MIN => 'H:i',			// 1 minute
 			SEC_PER_MIN * 2 => 'H:i',		// 2 minutes
 			SEC_PER_MIN * 5 => 'H:i',		// 5 minutes
 			SEC_PER_MIN * 15 => 'H:i',		// 15 minutes
@@ -364,13 +364,18 @@ class CSvgGraph extends CSvg {
 		];
 
 		$period = $this->time_till - $this->time_from;
-		$step = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
+		$time_interval = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
+		$distance = SEC_PER_YEAR * 5;
 		$time_fmt = 'Y-n-d';
+		$step = 0;
 
 		foreach ($intervals as $interval => $format) {
-			if ($interval >= $period) {
+			$time = abs($interval - $time_interval);
+
+			if ($time < $distance) {
+				$distance = $time;
+				$step = $interval;
 				$time_fmt = $format;
-				break;
 			}
 		}
 
