@@ -1163,9 +1163,8 @@ class CWidgetHelper {
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_PATTERNSELECT,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
 			]).'", function() {'.
-				'var num = jQuery(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'")'.
-					'.index(jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'"));'.
-				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", num);'.
+				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
+				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
 			'});',
 
 			// Initialize textarea autogrow.
