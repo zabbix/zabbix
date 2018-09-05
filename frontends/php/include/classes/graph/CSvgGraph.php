@@ -590,8 +590,10 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$grid = $this->getValueGrid((float) $min_value, (float) $max_value);
 		$delta = (($max_value - $min_value) ? : 1);
+		$min_value = $delta > 1 ? (int) $min_value : (float) $min_value;
+		$max_value = $delta > 1 ? (int) $max_value : (float) $max_value;
+		$grid = $this->getValueGrid($min_value, $max_value);
 		$grid_values = [];
 
 		foreach ($grid as $value) {
@@ -660,11 +662,12 @@ class CSvgGraph extends CSvg {
 			$min10 = floor($mul * $min) / $mul;
 			$delta = $max10 - $min10;
 			$delta = ceil($mul * $delta) / $mul;
+			$format = 1 > ($delta / 5) ? '%.2f' : '%d';
 
 			if ($mul >= 1) {
 				if ($delta) {
 					for($i = 0; $delta >= $i; $i += $delta / 5) {
-						$res[] = $i + $min10;
+						$res[] = sprintf($format, $i + $min10);
 					}
 				}
 				else {
