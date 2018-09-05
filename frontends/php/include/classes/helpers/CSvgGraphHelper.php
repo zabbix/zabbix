@@ -82,14 +82,6 @@ class CSvgGraphHelper {
 			->setSize($width, $height - $legend_height)
 			->addMetrics($metrics);
 
-		// SBox available only for graphs without overriten relative time.
-		if ($options['dashboard_time']) {
-			$graph->addSBox();
-		}
-
-		// Add mouse following helper line.
-		$graph->addHelper();
-
 		// Get problems to display in graph.
 		if ($problems_options['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
 			$problems_options['itemids_only'] =
@@ -120,8 +112,19 @@ class CSvgGraphHelper {
 			$legend = '';
 		}
 
+		// Draw graph.
+		$graph->draw();
+
+		// SBox available only for graphs without overriten relative time.
+		if ($options['dashboard_time']) {
+			$graph->addSBox();
+		}
+
+		// Add mouse following helper line.
+		$graph->addHelper();
+
 		return [
-			'svg' => $graph->draw(),
+			'svg' => $graph,
 			'legend' => $legend,
 			'data' => [
 				'dims' => [
