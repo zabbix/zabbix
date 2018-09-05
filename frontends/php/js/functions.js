@@ -599,7 +599,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
-		}).click(function() {
+		}).click(function(e) {
 			if (typeof obj.action === 'string') {
 				obj.action = new Function(obj.action);
 			}
@@ -613,7 +613,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				}
 			}
 
-			return false;
+			e.preventDefault();
 		});
 
 		if (!submit_btn && ('isSubmit' in obj) && obj.isSubmit === true) {
