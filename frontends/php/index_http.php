@@ -24,7 +24,7 @@ CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $http_user = CWebUser::getHttpRemoteUser();
-$config = $http_user ? select_config() : [];
+$config = select_config();
 
 $request = getRequest('request', '');
 $test_request = [];
@@ -50,7 +50,7 @@ if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 
-if ($config && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_DISABLED) {
+if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_DISABLED) {
 	redirect($redirect_to->toString());
 
 	exit;
