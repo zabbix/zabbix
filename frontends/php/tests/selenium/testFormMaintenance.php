@@ -228,8 +228,8 @@ class testFormMaintenance extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
 
 		$this->assertEquals(2, DBcount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value="A1" and operator=0'));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value="B1" and operator=2'));
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value=\'A1\' AND operator=0'));
+		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value=\'B1\' AND operator=2'));
 	}
 
 	/**
