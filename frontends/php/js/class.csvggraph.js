@@ -116,9 +116,10 @@ jQuery(function ($) {
 		e.stopPropagation();
 
 		var graph = e.data.graph,
+			offsetX = e.clientX - graph.offset().left,
 			data = graph.data('options');
 
-		if (data.dimX <= e.offsetX && e.offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
+		if (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
 			$(document).on('keydown', {graph: graph}, sBoxKeyboardInteraction);
 
@@ -126,7 +127,7 @@ jQuery(function ($) {
 				.on('mousemove', {graph: graph}, moveSBoxMouse)
 				.on('mouseup', {graph: graph}, destroySBox);
 
-			data.start = e.offsetX - data.dimX;
+			data.start = offsetX - data.dimX;
 		}
 	}
 
@@ -137,10 +138,11 @@ jQuery(function ($) {
 		var graph = e.data.graph,
 			data = graph.data('options'),
 			sbox = $('.svg-graph-selection', graph),
-			stxt = $('.svg-graph-selection-text', graph);
+			stxt = $('.svg-graph-selection-text', graph),
+			offsetX = e.clientX - graph.offset().left;
 
-		if ((e.offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= e.offsetX) {
-			data.end = e.offsetX - data.dimX;
+		if ((offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= offsetX) {
+			data.end = offsetX - data.dimX;
 			if (data.start != data.end) {
 				data.isHintBoxFrozen = false;
 				data.boxing = true;
@@ -152,7 +154,7 @@ jQuery(function ($) {
 				return false;
 			}
 
-			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
+			data.end = Math.min(offsetX - data.dimX, data.dimW);
 
 			sbox.attr({
 				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
@@ -179,10 +181,11 @@ jQuery(function ($) {
 		e.stopPropagation();
 
 		var graph = e.data.graph,
-			data = graph.data('options');
+			data = graph.data('options'),
+			offsetX = e.clientX - graph.offset().left;
 
 		if (data.boxing) {
-			data.end = Math.min(e.offsetX - data.dimX, data.dimW);
+			data.end = Math.min(offsetX - data.dimX, data.dimW);
 
 			destroySBox(e, graph);
 
@@ -554,8 +557,7 @@ jQuery(function ($) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
-		else {
-			return methods.init.apply(this, arguments);
-		}
+
+		return methods.init.apply(this, arguments);
 	};
 });
