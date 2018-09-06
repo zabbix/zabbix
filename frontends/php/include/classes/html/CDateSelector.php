@@ -59,13 +59,6 @@ class CDateSelector extends CTag {
 	private $enabled = true;
 
 	/**
-	 * Callback function body for calendar date selected event.
-	 *
-	 * @var string
-	 */
-	private $on_change = null;
-
-	/**
 	 * Create array with all inputs required for date selection and calendar.
 	 *
 	 * @param string $name   Textbox field name and calendar name prefix.
@@ -133,19 +126,6 @@ class CDateSelector extends CTag {
 	}
 
 	/**
-	 * Set callback for date selected event.
-	 *
-	 * @param string $script  Javascript callback body.
-	 *
-	 * @return CDateSelector
-	 */
-	public function onChange($script) {
-		$this->on_change = $script;
-
-		return $this;
-	}
-
-	/**
 	 * Gets string representation of date textbox and calendar button.
 	 *
 	 * @param bool $destroy
@@ -159,7 +139,6 @@ class CDateSelector extends CTag {
 					->setId($this->name)
 					->setAttribute('placeholder', $this->placeholder)
 					->setAriaRequired($this->is_required)
-					->onChange($this->on_change)
 					->setEnabled($this->enabled)
 			)
 			->addItem((new CButton($this->name.'_calendar'))
