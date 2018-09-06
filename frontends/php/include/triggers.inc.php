@@ -241,50 +241,6 @@ function trigger_value2str($value = null) {
 	return _('Unknown');
 }
 
-function getParentHostsByTriggers($triggers) {
-	$hosts = [];
-	$triggerParent = [];
-
-	while (!empty($triggers)) {
-		foreach ($triggers as $tnum => $trigger) {
-			if ($trigger['templateid'] == 0) {
-				if (isset($triggerParent[$trigger['triggerid']])) {
-					foreach ($triggerParent[$trigger['triggerid']] as $triggerid => $state) {
-						$hosts[$triggerid] = $trigger['hosts'];
-					}
-				}
-				else {
-					$hosts[$trigger['triggerid']] = $trigger['hosts'];
-				}
-				unset($triggers[$tnum]);
-			}
-			else {
-				if (isset($triggerParent[$trigger['triggerid']])) {
-					if (!isset($triggerParent[$trigger['templateid']])) {
-						$triggerParent[$trigger['templateid']] = [];
-					}
-					$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
-					$triggerParent[$trigger['templateid']] += $triggerParent[$trigger['triggerid']];
-				}
-				else {
-					if (!isset($triggerParent[$trigger['templateid']])) {
-						$triggerParent[$trigger['templateid']] = [];
-					}
-					$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
-				}
-			}
-		}
-		$triggers = API::Trigger()->get([
-			'triggerids' => zbx_objectValues($triggers, 'templateid'),
-			'selectHosts' => ['hostid', 'host', 'name', 'status'],
-			'output' => ['triggerid', 'templateid'],
-			'filter' => ['flags' => null]
-		]);
-	}
-
-	return $hosts;
-}
-
 function get_trigger_by_triggerid($triggerid) {
 	$db_trigger = DBfetch(DBselect('SELECT t.* FROM triggers t WHERE t.triggerid='.zbx_dbstr($triggerid)));
 	if (!empty($db_trigger)) {
@@ -2372,10 +2328,12 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
  * @param $array $triggers                  An array of triggers.
  * @param string $triggers[]['triggerid']   ID of a trigger.
  * @param string $triggers[]['templateid']  ID of parent template trigger.
+ * @param int    $flag                      Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or
+ *                                          ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */
-function getTriggerParentTemplates(array $triggers) {
+function getTriggerParentTemplates(array $triggers, $flag) {
 	$parent_triggerids = [];
 	$data = [
 		'links' => [],
@@ -2395,14 +2353,28 @@ function getTriggerParentTemplates(array $triggers) {
 
 	$all_parent_triggerids = [];
 	$hostids = [];
+	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$lld_ruleids = [];
+	}
 
 	do {
-		$db_triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'templateid'],
-			'selectHosts' => ['hostid'],
-			'triggerids' => array_keys($parent_triggerids),
-			'filter' => ['flags' => null]
-		]);
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_triggers = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'triggerids' => array_keys($parent_triggerids)
+			]);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'templateid'],
+				'selectHosts' => ['hostid'],
+				'triggerids' => array_keys($parent_triggerids),
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			]);
+		}
 
 		$all_parent_triggerids += $parent_triggerids;
 		$parent_triggerids = [];
@@ -2411,6 +2383,10 @@ function getTriggerParentTemplates(array $triggers) {
 			foreach ($db_trigger['hosts'] as $host) {
 				$data['templates'][$host['hostid']] = [];
 				$hostids[$db_trigger['triggerid']][] = $host['hostid'];
+			}
+
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_trigger['triggerid']] = $db_trigger['discoveryRule']['itemid'];
 			}
 
 			if ($db_trigger['templateid'] != 0) {
@@ -2425,11 +2401,14 @@ function getTriggerParentTemplates(array $triggers) {
 	while ($parent_triggerids);
 
 	foreach ($data['links'] as &$parent_trigger) {
-		if (array_key_exists($parent_trigger['triggerid'], $hostids)) {
-			$parent_trigger['hostids'] = $hostids[$parent_trigger['triggerid']];
-		}
-		else {
-			$parent_trigger['hostids'][] = 0;
+		$parent_trigger['hostids'] = array_key_exists($parent_trigger['triggerid'], $hostids)
+			? $hostids[$parent_trigger['triggerid']]
+			: [0];
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$parent_trigger['lld_ruleid'] = array_key_exists($parent_trigger['triggerid'], $lld_ruleids)
+				? $lld_ruleids[$parent_trigger['triggerid']]
+				: 0;
 		}
 	}
 	unset($parent_trigger);
@@ -2476,10 +2455,11 @@ function getTriggerParentTemplates(array $triggers) {
  *
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
+ * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array|null
  */
-function makeTriggerTemplatePrefix($triggerid, array $parent_templates) {
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 	if (!array_key_exists($triggerid, $parent_templates['links'])) {
 		return null;
 	}
@@ -2499,11 +2479,18 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates) {
 
 	foreach ($templates as $template) {
 		if ($template['permission'] == PERM_READ_WRITE) {
-			$name = (new CLink(CHtml::encode($template['name']),
-				(new CUrl('triggers.php'))
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('trigger_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$url = (new CUrl('triggers.php'))
 					->setArgument('hostid', $template['hostid'])
-					->setArgument('filter_set', 1)
-			))->addClass(ZBX_STYLE_LINK_ALT);
+					->setArgument('filter_set', 1);
+			}
+
+			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$name = new CSpan(CHtml::encode($template['name']));

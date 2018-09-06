@@ -799,7 +799,7 @@ else {
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
 
-	$data['parent_templates'] = getTriggerParentTemplates($data['triggers']);
+	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	// Do not show 'Info' column, if it is a template.
 	if ($data['hostid']) {

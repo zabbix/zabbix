@@ -606,8 +606,7 @@ else {
 		unset($dependencyTrigger);
 	}
 
-	// get real hosts
-	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view
 	$triggersView = new CView('configuration.trigger.prototype.list', $data);
