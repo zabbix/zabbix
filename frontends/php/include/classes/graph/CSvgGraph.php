@@ -347,43 +347,41 @@ class CSvgGraph extends CSvg {
 	 */
 	public function getTimeGridWithPosition() {
 		$intervals = [
-			1 => 'H:i:s',					// 1 second
-			5 => 'H:i:s',					// 5 seconds
-			10 => 'H:i:s',					// 10 seconds
-			30 => 'H:i:s',					// 30 seconds
-			SEC_PER_MIN => 'H:i',			// 1 minute
-			SEC_PER_MIN * 2 => 'H:i',		// 2 minutes
-			SEC_PER_MIN * 5 => 'H:i',		// 5 minutes
-			SEC_PER_MIN * 15 => 'H:i',		// 15 minutes
-			SEC_PER_MIN * 30 => 'H:i',		// 30 minutes
-			SEC_PER_HOUR => 'H:i',			// 1 hours
-			SEC_PER_HOUR * 3 => 'H:i',		// 3 hours
-			SEC_PER_HOUR * 6 => 'H:i',		// 6 hours
-			SEC_PER_HOUR * 12 => 'H:i',		// 12 hours
-			SEC_PER_DAY => 'H:i',			// 1 day
-			SEC_PER_WEEK => 'n-d',			// 1 week
-			SEC_PER_WEEK * 2 => 'n-d',		// 2 weeks
-			SEC_PER_MONTH => 'n-d',			// 30 days
-			SEC_PER_MONTH * 3 => 'Y-n-d',	// 90 days
-			SEC_PER_MONTH * 4 => 'Y-n-d',	// 120 days
-			SEC_PER_MONTH * 6 => 'Y-n-d',	// 180 days
-			SEC_PER_YEAR => 'Y-n-d',		// 1 year
-			SEC_PER_YEAR * 2 => 'Y-n-d'		// 2 years
+			1 => ['H:i:s', 'H:i:s'],					// 1 second
+			5 => ['H:i:s', 'H:i:s'],					// 5 seconds
+			10 => ['H:i:s', 'H:i:s'],					// 10 seconds
+			30 => ['H:i:s', 'H:i:s'],					// 30 seconds
+			SEC_PER_MIN => ['H:i:s'],					// 1 minute
+			SEC_PER_MIN * 2 => ['H:i'],					// 2 minutes
+			SEC_PER_MIN * 5 => ['H:i'],					// 5 minutes
+			SEC_PER_MIN * 15 => ['H:i'],				// 15 minutes
+			SEC_PER_MIN * 30 => ['H:i'],				// 30 minutes
+			SEC_PER_HOUR => ['H:i', 'H:i'],				// 1 hours
+			SEC_PER_HOUR * 3 => ['H:i', 'n-d H:i'],		// 3 hours
+			SEC_PER_HOUR * 6 => ['H:i', 'n-d H:i'],		// 6 hours
+			SEC_PER_HOUR * 12 => ['H:i', 'n-d H:i'],	// 12 hours
+			SEC_PER_DAY => ['H:i', 'n-d H:i'],			// 1 day
+			SEC_PER_WEEK => ['n-d', 'n-d'],				// 1 week
+			SEC_PER_WEEK * 2 => ['n-d', 'n-d'],			// 2 weeks
+			SEC_PER_MONTH => ['n-d', 'Y-n-d'],			// 30 days
+			SEC_PER_MONTH * 3 => ['Y-n-d', 'Y-n-d'],	// 90 days
+			SEC_PER_MONTH * 4 => ['Y-n-d', 'Y-n-d'],	// 120 days
+			SEC_PER_MONTH * 6 => ['Y-n-d', 'Y-n-d'],	// 180 days
+			SEC_PER_YEAR => ['Y-n-d', 'Y-n-d'],			// 1 year
+			SEC_PER_YEAR * 2 => ['Y-n-d', 'Y-n-d']		// 2 years
 		];
 
 		$period = $this->time_till - $this->time_from;
-		$time_interval = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
-		$distance = SEC_PER_YEAR * 5;
+		$step = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
+		$same_day = (date('d', $this->time_till) === date('d', $this->time_from));
+		$same_year = (date('y', $this->time_till) === date('y', $this->time_from));
 		$time_fmt = 'Y-n-d';
-		$step = 0;
 
 		foreach ($intervals as $interval => $format) {
-			$time = abs($interval - $time_interval);
-
-			if ($time < $distance) {
-				$distance = $time;
-				$step = $interval;
-				$time_fmt = $format;
+			if ($interval > $step) {
+				$fmt = $same_day && $same_year ? 0 : 1;
+				$time_fmt = $format[$fmt];
+				break;
 			}
 		}
 
