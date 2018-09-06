@@ -54,8 +54,8 @@ calendar.prototype = {
 	clndr_yearup: null,			// html bttn obj
 	clndr_yeardown: null,		// html bttn obj
 	timeobject: null,			// Input field with selected time. Source and destination of selected date.
-	is_visible: false,			// State of calendar visibility.
-	has_user_time: false,		// Confirms, if time was selected from input field.
+	is_visible: null,			// State of calendar visibility.
+	has_user_time: null,		// Confirms, if time was selected from input field.
 	hl_month: null,				// highlighted month number
 	hl_year: null,				// highlighted year number
 	hl_day: null,				// highlighted days number
@@ -74,6 +74,8 @@ calendar.prototype = {
 		this.id = jQuery(trigger_elmnt).attr('id');
 		this.trigger_elmnt = trigger_elmnt;
 		this.date_time_format = date_time_format;
+		this.is_visible = false;
+		this.has_user_time = false;
 		this.sdt = new CDate();
 	},
 
