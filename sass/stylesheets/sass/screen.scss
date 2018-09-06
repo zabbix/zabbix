@@ -4190,13 +4190,6 @@ $form-icon-btn: (
 	fill: $font-color;
 	fill-opacity: 0.5;
 }
-.svg-graph-hintbox-item-color {
-	margin: 3px 10px 3px 3px;
-	width: 10px;
-	height: 10px;
-	float: left;
-	display: block;
-}
 
 .svg-graph-preview {
 	margin-top: 10px;
@@ -4274,6 +4267,18 @@ $form-icon-btn: (
 	.list-table tbody tr:last-child td {
 		border-bottom-style: none;
 		box-shadow: none;
+	}
+
+	li {
+		padding-left: 23px;
+
+		.svg-graph-hintbox-item-color {
+			margin: 3px 10px 3px -20px;
+			width: 10px;
+			height: 10px;
+			float: left;
+			display: block;
+		}
 	}
 }
 
