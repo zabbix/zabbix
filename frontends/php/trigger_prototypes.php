@@ -559,9 +559,12 @@ else {
 		],
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],
+		'selectTags' => ['tag', 'value'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
 	order_result($data['triggers'], $sortField, $sortOrder);
+
+	$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
 
 	$depTriggerIds = [];
 	foreach ($data['triggers'] as $trigger) {

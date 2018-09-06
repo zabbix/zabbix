@@ -50,7 +50,8 @@ $triggersTable = (new CTableInfo())
 		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 		_('Expression'),
-		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 $this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
@@ -160,7 +161,8 @@ foreach ($this->data['triggers'] as $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		$expression,
-		$status
+		$status,
+		$data['tags'][$triggerid]
 	]);
 }
 

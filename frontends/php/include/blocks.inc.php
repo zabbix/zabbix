@@ -535,7 +535,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$triggers_hosts = getTriggersHostsList($triggers);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
-	$tags = makeEventsTags($problems);
+	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		CScreenProblem::addMaintenanceNames($problems);
