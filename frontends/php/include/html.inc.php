@@ -164,7 +164,7 @@ function get_icon($type, $params = []) {
 		case 'fullscreen':
 			switch (CView::getLayoutMode()) {
 				case ZBX_LAYOUT_KIOSKMODE:
-					$icon = (new CButton('&nbsp;'))
+					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Normal view'))
 						->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 						->addClass(ZBX_LAYOUT_MODE)
@@ -173,7 +173,7 @@ function get_icon($type, $params = []) {
 					break;
 
 				case ZBX_LAYOUT_FULLSCREEN:
-					$icon = (new CButton('&nbsp;'))
+					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Kiosk mode'))
 						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 						->addClass(ZBX_LAYOUT_MODE)
@@ -181,7 +181,7 @@ function get_icon($type, $params = []) {
 					break;
 
 				default:
-					$icon = (new CButton('&nbsp;'))
+					$icon = (new CButton(null, '&nbsp;'))
 						->setTitle(_('Fullscreen'))
 						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSCREEN)
 						->addClass(ZBX_LAYOUT_MODE)
