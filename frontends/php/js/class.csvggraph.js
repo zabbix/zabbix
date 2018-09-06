@@ -195,7 +195,7 @@ jQuery(function ($) {
 
 			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
 				$.publish('timeselector.rangeoffset', {
-					from_offset: Math.ceil(from_offset),
+					from_offset: Math.max(0, Math.ceil(from_offset)),
 					to_offset: Math.ceil(to_offset)
 				});
 			}
