@@ -322,9 +322,9 @@ jQuery(function ($) {
 	// Position hintbox near current mouse position.
 	function repositionHintBox(e, graph) {
 		var hbox = $(graph.hintBoxItem),
-			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth())
-				? e.clientX - graph.offset().left
-				: e.clientX - hbox.outerWidth() - graph.offset().left,
+			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + 20)
+				? e.clientX - graph.offset().left + 20
+				: e.clientX - hbox.outerWidth() - graph.offset().left - 15,
 			t = (window.screen.height >= e.screenY + hbox.outerHeight() + 60)
 				? e.pageY - graph.offset().top + 60
 				: e.pageY - graph.offset().top - hbox.height();
