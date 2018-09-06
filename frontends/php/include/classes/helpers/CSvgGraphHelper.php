@@ -455,8 +455,6 @@ class CSvgGraphHelper {
 			}
 		}
 		while (SVG_GRAPH_MAX_NUMBER_OF_METRICS > count($metrics) && array_key_exists($data_set_num, $data_sets));
-
-		$metrics = array_reverse($metrics);
 	}
 
 	/**
