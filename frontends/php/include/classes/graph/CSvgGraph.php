@@ -46,6 +46,13 @@ class CSvgGraph extends CSvg {
 	protected $text_color;
 
 	/**
+	 * Grid color.
+	 *
+	 * @var string
+	 */
+	protected $grid_color;
+
+	/**
 	 * Array of graph metrics data.
 	 *
 	 * @var array
@@ -139,6 +146,7 @@ class CSvgGraph extends CSvg {
 		// Set colors.
 		$theme = getUserGraphTheme();
 		$this->text_color = '#' . $theme['textcolor'];
+		$this->grid_color = '#' . $theme['gridcolor'];
 
 		$this
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
@@ -705,7 +713,7 @@ class CSvgGraph extends CSvg {
 		$this->addItem((new CSvgGraphGrid($value_points, $time_points))
 			->setPosition($this->canvas_x, $this->canvas_y)
 			->setSize($this->canvas_width, $this->canvas_height)
-			->setColor($this->text_color)
+			->setColor($this->grid_color)
 		);
 	}
 
