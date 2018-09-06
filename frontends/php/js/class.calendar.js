@@ -33,25 +33,23 @@ function getCalendarByID(clndr_id) {
 	return ret;
 }
 
-function create_calendar(timeobject, id, date_time_format) {
-	if (typeof id === 'undefined' || id === null) {
-		id = 'c' + CLNDR.length;
+function toggleCalendar(event, toggle, time_input, date_time_format) {
+	var $toggle = jQuery(toggle),
+		toggleid = $toggle.attr('id'),
+		clndr = getCalendarByID(toggleid);
+
+	if (clndr && clndr.clndr.is_visible) {
+		clndr.clndr.clndrhide();
 	}
+	else {
+		var pos = getPosition(toggleid);
 
-	var clndr = new Object;
-	clndr.clndr = new calendar(id, timeobject, date_time_format);
-	CLNDR.push(clndr);
+		clndr = new Object;
+		clndr.clndr = new calendar(toggleid, time_input, date_time_format);
+		CLNDR.push(clndr);
 
-	return clndr;
-}
-
-function dateSelectorOnClick(event, elmnt, name) {
-	var pos = getPosition(elmnt);
-	// This way calendar will never overlap with selector.
-	pos.top += elmnt.offsetHeight;
-	pos.left += elmnt.offsetWidth;
-
-	getCalendarByID(name).clndr.clndrshow(pos.top, pos.left, elmnt);
+		clndr.clndr.clndrshow(pos.top + $toggle.height(), pos.left + $toggle.width(), toggle);
+	}
 
 	event.stopPropagation();
 }
@@ -85,7 +83,6 @@ calendar.prototype = {
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
-	onselected: null,			// Callback will be called on date change.
 
 	initialize: function(id, timeobject, date_time_format) {
 		if (!this.checkOuterObj(timeobject)) {
@@ -100,7 +97,6 @@ calendar.prototype = {
 	ondateselected: function() {
 		this.setDateToOuterObj();
 		this.clndrhide();
-		this.onselected && this.onselected();
 	},
 
 	clndrhide: function(e) {
@@ -415,7 +411,9 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		this.timeobject.value = this.sdt.format(this.date_time_format);
+		jQuery(this.timeobject)
+			.val(this.sdt.format(this.date_time_format))
+			.trigger('change');
 	},
 
 	setday: function(e, day, month, year) {
@@ -761,6 +759,5 @@ calendar.prototype = {
 		removeListener(this.clndr_yeardown, 'click', this.yeardown);
 		removeListener(this.clndr_yearup, 'click', this.yearup);
 		jQuery(this.clndr_calendar).remove();
-		this.clndr_calendar = null;
 	}
 };

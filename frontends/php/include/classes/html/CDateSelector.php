@@ -63,7 +63,7 @@ class CDateSelector extends CTag {
 	 *
 	 * @var string
 	 */
-	private $on_change = '';
+	private $on_change = null;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -146,17 +146,6 @@ class CDateSelector extends CTag {
 	}
 
 	/**
-	 * Get initialization javascript.
-	 *
-	 * @return string
-	 */
-	public function getJavascript() {
-		return 'create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'")'.
-			($this->on_change ? '.clndr.onselected = function () { '.$this->on_change.' }' : '').
-			';';
-	}
-
-	/**
 	 * Gets string representation of date textbox and calendar button.
 	 *
 	 * @param bool $destroy
@@ -170,14 +159,13 @@ class CDateSelector extends CTag {
 					->setId($this->name)
 					->setAttribute('placeholder', $this->placeholder)
 					->setAriaRequired($this->is_required)
+					->onChange($this->on_change)
 					->setEnabled($this->enabled)
 			)
 			->addItem((new CButton($this->name.'_calendar'))
 				->addClass(ZBX_STYLE_ICON_CAL)
 				->setEnabled($this->enabled)
-				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
-
-		zbx_add_post_js($this->getJavascript());
+				->onClick('toggleCalendar(event, this, "'.$this->name.'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
 	}
