@@ -1,11 +1,13 @@
 Changes for 4.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
 ........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
 .......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14808] fixed SQL error in user permission check when processing actions for internal item events (wiper)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
 ..F....... [ZBXNEXT-4597] fixed date selection fields in maintenance and services: fixed accepted date format, fixed validation and added placeholdrs (vmurzins)
@@ -473,6 +475,7 @@ New features:
 A.F....... [ZBX-1357] enabled Portuguese (Portugal) translation to be displayed by default (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
 ...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
