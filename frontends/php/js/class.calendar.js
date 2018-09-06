@@ -86,47 +86,44 @@ calendar.prototype = {
 	},
 
 	clndrhide: function() {
-		this.calendardelete();
-		this.is_visible = false;
+		if (this.is_visible) {
+			this.calendardelete();
+			this.is_visible = false;
 
-		jQuery(window).off('resize', this.calendarPositionHandler);
+			jQuery(window).off('resize', this.calendarPositionHandler);
 
-		jQuery(document)
-			.off('click', this.calendarDocumentClickHandler)
-			.off('keydown', this.calendarKeyDownHandler)
-			.off('keyup', this.calendarKeyUpHandler);
+			jQuery(document)
+				.off('click', this.calendarDocumentClickHandler)
+				.off('keydown', this.calendarKeyDownHandler)
+				.off('keyup', this.calendarKeyUpHandler);
 
-		removeFromOverlaysStack(this.id);
+			removeFromOverlaysStack(this.id);
+		}
 	},
 
 	clndrshow: function(top, left) {
-		if (this.is_visible) {
-			this.clndrhide();
-		}
-		else {
-			this.calendarcreate();
-			this.setSDateFromOuterObj();
-			this.syncBSDateBySDT();
-			this.syncHlDate();
-			this.setCDate();
+		this.calendarcreate();
+		this.setSDateFromOuterObj();
+		this.syncBSDateBySDT();
+		this.syncHlDate();
+		this.setCDate();
 
-			this.setPosition(top, left);
-			this.clndr_calendar.show();
-			this.is_visible = true;
+		this.setPosition(top, left);
+		this.clndr_calendar.show();
+		this.is_visible = true;
 
-			jQuery(window).on('resize', jQuery.proxy(this.calendarPositionHandler, this));
-			jQuery(this.trigger_elmnt).on('remove', jQuery.proxy(this.clndrhide, this));
+		jQuery(window).on('resize', jQuery.proxy(this.calendarPositionHandler, this));
+		jQuery(this.trigger_elmnt).on('remove', jQuery.proxy(this.clndrhide, this));
 
-			jQuery(document)
-				.on('keydown', jQuery.proxy(this.calendarKeyDownHandler, this))
-				.on('keyup', jQuery.proxy(this.calendarKeyUpHandler, this))
-				.on('click', jQuery.proxy(this.calendarDocumentClickHandler, this));
+		jQuery(document)
+			.on('keydown', jQuery.proxy(this.calendarKeyDownHandler, this))
+			.on('keyup', jQuery.proxy(this.calendarKeyUpHandler, this))
+			.on('click', jQuery.proxy(this.calendarDocumentClickHandler, this));
 
-			addToOverlaysStack(this.id, this.trigger_elmnt, 'clndr');
+		addToOverlaysStack(this.id, this.trigger_elmnt, 'clndr');
 
-			this.active_section = this.sections.indexOf('.calendar-date');
-			this.focusSection();
-		}
+		this.active_section = this.sections.indexOf('.calendar-date');
+		this.focusSection();
 	},
 
 	setPosition: function(top, left) {
