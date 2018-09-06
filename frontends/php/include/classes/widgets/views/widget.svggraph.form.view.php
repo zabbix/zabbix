@@ -102,12 +102,8 @@ $tab_display_opt = (new CFormList())
 // Create 'Time period' tab.
 $tab_time_period = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_time']), CWidgetHelper::getCheckBox($fields['graph_time']))
-	->addRow(CWidgetHelper::getLabel($fields['time_from']),
-		CWidgetHelper::getDatePicker($fields['time_from'])->onChange('updateGraphPreview()')
-	)
-	->addRow(CWidgetHelper::getLabel($fields['time_to']),
-		CWidgetHelper::getDatePicker($fields['time_to'])->onChange('updateGraphPreview()')
-	);
+	->addRow(CWidgetHelper::getLabel($fields['time_from']), CWidgetHelper::getDatePicker($fields['time_from']))
+	->addRow(CWidgetHelper::getLabel($fields['time_to']), CWidgetHelper::getDatePicker($fields['time_to']));
 
 // Create 'Axes' tab.
 $tab_axes = (new CFormList())->addRow('',

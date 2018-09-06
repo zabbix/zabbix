@@ -387,9 +387,14 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		jQuery(this.timeobject)
-			.val(this.sdt.format(this.date_time_format))
-			.trigger('change');
+		var input = jQuery(this.timeobject),
+			changed = input.val() != this.sdt.format(this.date_time_format);
+
+		input.val(this.sdt.format(this.date_time_format));
+
+		if (changed) {
+			input.trigger('change');
+		}
 	},
 
 	setday: function(e, day, month, year) {
