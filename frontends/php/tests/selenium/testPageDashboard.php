@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup profiles
+ */
 class testPageDashboard extends CWebTest {
 
 	public $graphCpu = 'CPU load';
