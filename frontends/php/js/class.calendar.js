@@ -85,6 +85,7 @@ calendar.prototype = {
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
+	onselected: null,			// Callback will be called on date change.
 
 	initialize: function(id, timeobject, date_time_format) {
 		if (!this.checkOuterObj(timeobject)) {
@@ -94,7 +95,6 @@ calendar.prototype = {
 		this.id = id;
 		this.date_time_format = date_time_format;
 		this.sdt = new CDate();
-		this.calendarcreate();
 	},
 
 	ondateselected: function() {
@@ -107,7 +107,8 @@ calendar.prototype = {
 		if (typeof(e) != 'undefined') {
 			cancelEvent(e);
 		}
-		this.clndr_calendar.hide();
+
+		this.calendardelete();
 		this.is_visible = false;
 
 		jQuery(window).off('resize', this.calendarPositionHandler);
@@ -132,6 +133,7 @@ calendar.prototype = {
 				}
 			});
 
+			this.calendarcreate();
 			this.setSDateFromOuterObj();
 			this.syncBSDateBySDT();
 			this.syncHlDate();
@@ -142,6 +144,7 @@ calendar.prototype = {
 			this.is_visible = true;
 
 			jQuery(window).on('resize', {calendar: this, anchor: trigger_elmnt}, this.calendarPositionHandler);
+			jQuery(trigger_elmnt).on('remove', this.calendarDocumentClickHandler);
 
 			jQuery(document)
 				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
@@ -592,7 +595,9 @@ calendar.prototype = {
 		return cdt.getDate() + ', ' + this.dayname[cdt.getDay()] + ' ' + this.monthname[cdt.getMonth()] + ' ' +
 				cdt.getFullYear();
 	},
-
+	/**
+	 * Create and append calendar DOM element to body.
+	 */
 	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
 		Element.extend(this.clndr_calendar);
@@ -746,5 +751,16 @@ calendar.prototype = {
 					cal_obj.focusSection();
 				});
 		});
+	},
+	/**
+	 * Remove calendar DOM element. Detach event listeners.
+	 */
+	calendardelete: function() {
+		removeListener(this.clndr_monthdown, 'click', this.monthdown);
+		removeListener(this.clndr_monthup, 'click', this.monthup);
+		removeListener(this.clndr_yeardown, 'click', this.yeardown);
+		removeListener(this.clndr_yearup, 'click', this.yearup);
+		jQuery(this.clndr_calendar).remove();
+		this.clndr_calendar = null;
 	}
 };
