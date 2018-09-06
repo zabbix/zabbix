@@ -392,7 +392,6 @@ function make_small_eventlist($startEvent, $backurl) {
  * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
  * @param string $backurl                    URL to return to.
- * @param bool   $fullscreen                 Show object in fullscreen or no.
  * @param bool   $show_timeline              Show time line flag.
  * @param int    $show_tags                  Show tags flag. Possible values:
  *                                             - PROBLEMS_SHOW_TAGS_NONE;
@@ -411,7 +410,7 @@ function make_small_eventlist($startEvent, $backurl) {
  *
  * @return CDiv
  */
-function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = false, $show_timeline = true,
+function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline = true,
 		$show_tags = PROBLEMS_SHOW_TAGS_3, array $filter_tags = [], $tag_name_format = PROBLEMS_TAG_NAME_FULL,
 		$tag_priority = '') {
 	// Show trigger description and URL.
@@ -434,7 +433,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink($trigger['url'], $trigger_url))
+				->addItem(new CLink(CHTML::encode($trigger['url']), $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);
@@ -510,8 +509,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $fullscreen = f
 
 		$url_details = (new CUrl('tr_events.php'))
 			->setArgument('triggerid', '')
-			->setArgument('eventid', '')
-			->setArgument('fullscreen', $fullscreen ? '1' : null);
+			->setArgument('eventid', '');
 
 		foreach ($problems as $problem) {
 			if (array_key_exists($problem['r_eventid'], $r_events)) {

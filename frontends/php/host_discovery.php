@@ -631,27 +631,7 @@ else {
 		->setArgument('hostid', $data['hostid']);
 
 	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
-
-	// Get real hosts and select writable templates IDs.
-	$data['writable_templates'] = [];
-	$discovery_hostids = [];
-
-	foreach ($data['discoveries'] as &$discovery) {
-		if ($discovery['templateid']) {
-			$discovery['dbTemplate'] = get_realhost_by_itemid($discovery['templateid']);
-			$discovery_hostids[] = $discovery['dbTemplate']['hostid'];
-		}
-	}
-	unset($discovery);
-
-	if ($discovery_hostids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($discovery_hostids)),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
+	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);
