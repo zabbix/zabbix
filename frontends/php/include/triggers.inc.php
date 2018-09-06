@@ -2367,6 +2367,159 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 }
 
 /**
+ * Get parent templates for each given trigger.
+ *
+ * @param $array $triggers                  An array of triggers.
+ * @param string $triggers[]['triggerid']   ID of a trigger.
+ * @param string $triggers[]['templateid']  ID of parent template trigger.
+ *
+ * @return array
+ */
+function getTriggerParentTemplates(array $triggers) {
+	$parent_triggerids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
+
+	foreach ($triggers as $trigger) {
+		if ($trigger['templateid'] != 0) {
+			$parent_triggerids[$trigger['templateid']] = true;
+			$data['links'][$trigger['triggerid']] = ['triggerid' => $trigger['templateid']];
+		}
+	}
+
+	if (!$parent_triggerids) {
+		return $data;
+	}
+
+	$all_parent_triggerids = [];
+	$hostids = [];
+
+	do {
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'templateid'],
+			'selectHosts' => ['hostid'],
+			'triggerids' => array_keys($parent_triggerids),
+			'filter' => ['flags' => null]
+		]);
+
+		$all_parent_triggerids += $parent_triggerids;
+		$parent_triggerids = [];
+
+		foreach ($db_triggers as $db_trigger) {
+			foreach ($db_trigger['hosts'] as $host) {
+				$data['templates'][$host['hostid']] = [];
+				$hostids[$db_trigger['triggerid']][] = $host['hostid'];
+			}
+
+			if ($db_trigger['templateid'] != 0) {
+				if (!array_key_exists($db_trigger['templateid'], $all_parent_triggerids)) {
+					$parent_triggerids[$db_trigger['templateid']] = true;
+				}
+
+				$data['links'][$db_trigger['triggerid']] = ['triggerid' => $db_trigger['templateid']];
+			}
+		}
+	}
+	while ($parent_triggerids);
+
+	foreach ($data['links'] as &$parent_trigger) {
+		if (array_key_exists($parent_trigger['triggerid'], $hostids)) {
+			$parent_trigger['hostids'] = $hostids[$parent_trigger['triggerid']];
+		}
+		else {
+			$parent_trigger['hostids'][] = 0;
+		}
+	}
+	unset($parent_trigger);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected trigger.
+ *
+ * @param string $triggerid
+ * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
+ *
+ * @return array|null
+ */
+function makeTriggerTemplatePrefix($triggerid, array $parent_templates) {
+	if (!array_key_exists($triggerid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$triggerid]['triggerid'], $parent_templates['links'])) {
+		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
+	}
+
+	$templates = [];
+	foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
+		$templates[] = $parent_templates['templates'][$hostid];
+	}
+
+	CArrayHelper::sort($templates, ['name']);
+
+	$list = [];
+
+	foreach ($templates as $template) {
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = (new CLink(CHtml::encode($template['name']),
+				(new CUrl('triggers.php'))
+					->setArgument('hostid', $template['hostid'])
+					->setArgument('filter_set', 1)
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$name = new CSpan(CHtml::encode($template['name']));
+		}
+
+		$list[] = $name->addClass(ZBX_STYLE_GREY);
+		$list[] = ', ';
+	}
+
+	array_pop($list);
+	$list[] = NAME_DELIMITER;
+
+	return $list;
+}
+
+/**
  * Check if user has read permissions for triggers.
  *
  * @param $triggerids

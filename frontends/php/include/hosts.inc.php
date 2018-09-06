@@ -695,7 +695,7 @@ function getTopLevelTemplates($applicationid, array $parent_templates) {
  * @param string $applicationid
  * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
  *
- * @return array
+ * @return array|null
  */
 function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
 	if (!array_key_exists($applicationid, $parent_templates['links'])) {

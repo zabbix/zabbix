@@ -777,11 +777,11 @@ function get_same_item_for_host($item, $dest_hostids) {
 /**
  * Get parent templates for each given item.
  *
- * @param array  $items                 An array of items.
- * @param string $items[]['itemid']     ID of an item.
- * @param string $items[]['templateid'] ID of parent template item.
- * @param int    $flag                  Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                      ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param array  $items                  An array of items.
+ * @param string $items[]['itemid']      ID of an item.
+ * @param string $items[]['templateid']  ID of parent template item.
+ * @param int    $flag                   Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                       ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */

@@ -150,26 +150,9 @@ foreach ($data['items'] as $item) {
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
+
 		$trigger_description = [];
-
-		if ($trigger['templateid'] > 0) {
-			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$trigger_description[] = (new CSpan('Inaccessible template'))->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-
-				if (array_key_exists($realHost['hostid'], $data['writable_templates'])) {
-					$trigger_description[] = (new CLink(CHtml::encode($realHost['name']),
-						'triggers.php?hostid='.$realHost['hostid']
-					))->addClass(ZBX_STYLE_GREY);
-				}
-				else {
-					$trigger_description[] = (new CSpan(CHtml::encode($realHost['name'])))->addClass(ZBX_STYLE_GREY);
-				}
-			}
-			$trigger_description[] = NAME_DELIMITER;
-		}
+		$trigger_description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates']);
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 

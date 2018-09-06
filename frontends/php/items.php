@@ -1972,23 +1972,8 @@ else {
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
-	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
 
-	// Select writable templates IDs.
-	$hostids = [];
-
-	foreach ($data['triggerRealHosts'] as $real_host) {
-		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
-	}
-
-	$data['writable_templates'] = $hostids
-		? API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($hostids)),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
+	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers']);
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {
