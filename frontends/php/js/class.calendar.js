@@ -24,17 +24,14 @@ var CLNDR = null,
 	calendar = Class.create();
 
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
-	var $toggle = jQuery(trigger_elmnt),
-		offset = $toggle.offset();
-
-	if (CLNDR && $toggle.is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
+	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
 		CLNDR.clndrhide();
 		CLNDR = null;
 	}
 	else {
 		CLNDR && CLNDR.clndrhide();
 		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
-		CLNDR.clndrshow(offset.top + $toggle.height(), offset.left + $toggle.width());
+		CLNDR.clndrshow();
 	}
 }
 
@@ -101,14 +98,14 @@ calendar.prototype = {
 		}
 	},
 
-	clndrshow: function(top, left) {
+	clndrshow: function() {
 		this.calendarcreate();
 		this.setSDateFromOuterObj();
 		this.syncBSDateBySDT();
 		this.syncHlDate();
 		this.setCDate();
 
-		this.setPosition(top, left);
+		this.calendarPositionHandler();
 		this.clndr_calendar.show();
 		this.is_visible = true;
 
@@ -141,7 +138,7 @@ calendar.prototype = {
 		}
 	},
 
-	calendarPositionHandler: function (event) {
+	calendarPositionHandler: function () {
 		var anchor = jQuery(this.trigger_elmnt),
 			offset = anchor.offset();
 
