@@ -131,18 +131,18 @@ calendar.prototype = {
 	},
 
 	calendarDocumentClickHandler: function(e) {
-		var target = jQuery(e.target);
+		var $target = jQuery(e.target);
 
-		if (!target.is(this.trigger_elmnt) && !target.closest('.overlay-dialogue.calendar').length) {
+		if (!$target.is(this.trigger_elmnt) && !$target.closest('.overlay-dialogue.calendar').length) {
 			this.clndrhide();
 		}
 	},
 
 	calendarPositionHandler: function () {
-		var anchor = jQuery(this.trigger_elmnt),
-			offset = anchor.offset();
+		var $anchor = jQuery(this.trigger_elmnt),
+			offset = $anchor.offset();
 
-		this.setPosition(offset.top + anchor.height(), offset.left + anchor.width());
+		this.setPosition(offset.top + $anchor.height(), offset.left + $anchor.width());
 	},
 
 	/**
