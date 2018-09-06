@@ -1801,3 +1801,40 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (112,99,'Eta','e
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (113,99,'Gamma','g');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (114,99,'Theta','t');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
+
+-- testPageTriggers tags filtering test
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99020, 'Host for trigger tags filtering', 'Host for trigger tags filtering', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99010, 99020, 4);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50030,99020,1,1,1,'127.0.0.1','','10050');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99090, 2, 99020, 'Trapper', '', 'trap', 30, NULL, '', '', '', '', '','');
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100060, 99090, 100060, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (130, 'TagA','A', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (131, 'TagB','b', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (132, 'TagD','d', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (133, 'TagG','g', 100060);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100061, 'Second trigger for tag filtering', '{100061}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100061, 99090, 100061, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (134, 'TagB','b', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (135, 'TagE','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (136, 'TagE1','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (137, 'TagZ','z', 100061);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100062, 'Third trigger for tag filtering', '{100062}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100062, 99090, 100062, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (138, 'TagA','a', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (139, 'TagI','i', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (140, 'TagK','k', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (141, 'TagT','t', 100062);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100063, 'Fourth trigger for tag filtering', '{100063}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100063, 99090, 100063, 'last', '');
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (142, 'TagD','d', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (143, 'TagE1','e', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (144, 'TagG','g', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (145, 'TagT','t', 100063);
+
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 3, 0, '0', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '');
