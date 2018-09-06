@@ -372,7 +372,7 @@ class CSvgGraphHelper {
 	 * Select metrics from given data set options. Apply data set options to each selected metric.
 	 */
 	protected static function getMetrics(array &$metrics, array $data_sets = []) {
-		$data_set_num = 0;
+		$data_set_num = count($data_sets) - 1;
 
 		if (!$data_sets) {
 			return;
@@ -380,7 +380,7 @@ class CSvgGraphHelper {
 
 		do {
 			$data_set = $data_sets[$data_set_num];
-			$data_set_num++;
+			$data_set_num--;
 
 			if ((!array_key_exists('hosts', $data_set) || !$data_set['hosts'])
 					|| (!array_key_exists('items', $data_set) || !$data_set['items'])) {
