@@ -62,7 +62,7 @@ class CSvgGraphGrid extends CSvgTag {
 	 *
 	 * @param string $color  Color value.
 	 *
-	 * @return CSvgGraphAxis
+	 * @return CSvgGraphGrid
 	 */
 	public function setColor($color) {
 		$this->color = $color;

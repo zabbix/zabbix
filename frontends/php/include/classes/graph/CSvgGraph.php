@@ -626,7 +626,8 @@ class CSvgGraph extends CSvg {
 			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
-				->setColor($this->text_color)
+				->setTextColor($this->text_color)
+				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -638,7 +639,8 @@ class CSvgGraph extends CSvg {
 			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
-				->setColor($this->text_color)
+				->setTextColor($this->text_color)
+				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -649,7 +651,8 @@ class CSvgGraph extends CSvg {
 		$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
 			->setSize($this->canvas_width, $this->xaxis_height)
 			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-			->setColor($this->text_color)
+			->setTextColor($this->text_color)
+			->setLineColor($this->grid_color)
 		);
 	}
 
