@@ -21,7 +21,7 @@
 
 show_messages();
 
-if ($data['fullscreen'] == 0) {
+if ($data['web_layout_mode'] === ZBX_LAYOUT_NORMAL) {
 	makePageFooter()->show();
 }
 

@@ -126,6 +126,13 @@ class CTriggerExpression {
 	protected $lld_macro_parser;
 
 	/**
+	 * Parser for LLD macros with functions.
+	 *
+	 * @var CLLDMacroFunctionParser
+	 */
+	protected $lld_macro_function_parser;
+
+	/**
 	 * Parser for user macros.
 	 *
 	 * @var CUserMacroParser
@@ -162,6 +169,7 @@ class CTriggerExpression {
 		$this->function_macro_parser = new CFunctionMacroParser();
 		$this->function_parser = new CFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
+		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
 		$this->user_macro_parser = new CUserMacroParser();
 	}
 
@@ -499,15 +507,17 @@ class CTriggerExpression {
 
 	/**
 	 * Parses a constant in the trigger expression and moves a current position ($this->pos) on a last symbol of the
-	 * constant
+	 * constant.
 	 *
 	 * The constant can be:
 	 *  - trigger function like {host:item[].func()}
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
 	 *  - macro like {TRIGGER.VALUE}
 	 *  - user macro like {$MACRO}
+	 *  - LLD macro like {#LLD}
+	 *  - LLD macro with function like {{#LLD}.func())}
 	 *
-	 * @return bool returns true if parsed successfully, false otherwise
+	 * @return bool  Returns true if parsed successfully, false otherwise.
 	 */
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber()
@@ -516,10 +526,13 @@ class CTriggerExpression {
 			return true;
 		}
 
-		// LLD macro support for trigger prototypes
-		if ($this->options['lldmacros']
-				&& $this->parseUsing($this->lld_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
-			return true;
+		// LLD macro support for trigger prototypes.
+		if ($this->options['lldmacros']) {
+			if ($this->parseUsing($this->lld_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)
+					|| $this->parseUsing($this->lld_macro_function_parser,
+							CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
+				return true;
+			}
 		}
 
 		return false;

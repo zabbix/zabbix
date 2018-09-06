@@ -40,12 +40,16 @@
 				.append($('<button>', {
 					'type': 'button',
 					'class': 'btn-widget-action',
+					'title': t('Adjust widget refresh interval'),
 					'data-menu-popup': JSON.stringify({
 						'type': 'refresh',
 						'widgetName': widget['widgetid'],
 						'currentRate': widget['rf_rate'],
 						'multiplier': false
-					})
+					}),
+					'attr': {
+						'aria-haspopup': true
+					}
 				}))
 			)
 		);
@@ -65,6 +69,18 @@
 					.append(widget['content_footer'])
 					.append(widget['content_script'])
 			);
+	}
+
+	function makeWidgetInfoBtns(btns) {
+		var info_btns = [];
+		if (btns.length) {
+			btns.each(function(btn) {
+				info_btns.push($('<button>', {'type': 'button', 'class': btn.icon, 'data-hintbox': 1}));
+				info_btns.push($('<div></div>').html(btn.hint).addClass('hint-box').hide());
+			});
+		}
+
+		return info_btns.length ? info_btns : null;
 	}
 
 	function resizeDashboardGrid($obj, data, min_rows) {
@@ -443,8 +459,6 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data = {
-			'fullscreen': data['options']['fullscreen'] ? 1 : 0,
-			'kioskmode': data['options']['kioskmode'] ? 1 : 0,
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -478,8 +492,13 @@
 			dataType: 'json',
 			success: function(resp) {
 				stopPreloader(widget);
+				var $content_header = $('h4', widget['content_header']);
 
-				$('h4', widget['content_header']).text(resp.header);
+				$content_header.text(resp.header);
+
+				if (typeof resp.aria_label !== 'undefined') {
+					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
+				}
 
 				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
@@ -492,6 +511,11 @@
 				}
 
 				widget['content_footer'].html(resp.footer);
+
+				if (typeof(resp.info) !== 'undefined') {
+					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
+					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
+				}
 
 				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
@@ -586,7 +610,9 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body'].prepend(resp.errors);
+					data.dialogue['body']
+						.prepend(resp.errors)
+						.scrollTop(0);
 				}
 				else {
 					// No errors, proceed with update.
@@ -801,7 +827,6 @@
 		});
 
 		var ajax_data = {
-			fullscreen: data['options']['fullscreen'] ? 1 : 0,
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
@@ -929,7 +954,7 @@
 	 * @param {object} data       Data from dashboard grid.
 	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @return int               Number of triggers, that were called.
+	 * @return int                Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof(data['triggers'][hook_name]) === 'undefined') {
@@ -1006,8 +1031,6 @@
 	var	methods = {
 		init: function(options) {
 			var default_options = {
-				'fullscreen': false,
-				'kioskmode': false,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
@@ -1222,9 +1245,6 @@
 
 				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
-				if (data['options']['fullscreen']) {
-					url.setArgument('fullscreen', '1');
-				}
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}
@@ -1352,6 +1372,13 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
+						if (data.dialogue['widget_type'] === 'svggraph') {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+						else {
+							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+						}
+
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});

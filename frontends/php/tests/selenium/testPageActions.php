@@ -49,7 +49,7 @@ class testPageActions extends CWebTest {
 
 	private function calculateHash($actionid) {
 		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,'
-				. 'r_longdata,formula,maintenance_mode 	 FROM actions WHERE actionid='.$actionid;
+				. 'r_longdata,formula,pause_suppressed 	 FROM actions WHERE actionid='.$actionid;
 		$this->oldHashAction = DBhash($this->sqlHashAction);
 		$this->sqlHashConditions = 'SELECT * FROM conditions WHERE actionid='.$actionid.' AND actionid>2  ORDER BY conditionid';
 		$this->oldHashConditions = DBhash($this->sqlHashConditions);

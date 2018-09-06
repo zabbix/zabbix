@@ -28,40 +28,46 @@ found_libpthread="yes")
 
 AC_DEFUN([LIBPTHREAD_TRY_RUN],
 [
-AC_TRY_RUN(
-[
-#include <pthread.h>
+	AC_RUN_IFELSE(
+	[
+		AC_LANG_SOURCE(
+		#include <pthread.h>
 
-int	main()
-{
-	pthread_mutexattr_t	mta;
-	pthread_rwlockattr_t	rwa;
-	pthread_mutex_t		mutex;
-	pthread_rwlock_t	rwlock;
+		int	main()
+		{
+			pthread_mutexattr_t	mta;
+			pthread_rwlockattr_t	rwa;
+			pthread_mutex_t		mutex;
+			pthread_rwlock_t	rwlock;
 
-	if (0 != pthread_mutexattr_init(&mta))
-		return 1;
+			if (0 != pthread_mutexattr_init(&mta))
+				return 1;
 
-	if (0 != pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED))
-		return 2;
+			if (0 != pthread_mutexattr_setpshared(&mta, PTHREAD_PROCESS_SHARED))
+				return 2;
 
-	if (0 != pthread_mutex_init(&mutex, &mta))
-		return 3;
+			if (0 != pthread_mutex_init(&mutex, &mta))
+				return 3;
 
-	if (0 != pthread_rwlockattr_init(&rwa))
-		return 4;
+			if (0 != pthread_rwlockattr_init(&rwa))
+				return 4;
 
-	if (0 != pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED))
-		return 5;
+			if (0 != pthread_rwlockattr_setpshared(&rwa, PTHREAD_PROCESS_SHARED))
+				return 5;
 
-	if (0 != pthread_rwlock_init(&rwlock, &rwa))
-		return 6;
+			if (0 != pthread_rwlock_init(&rwlock, &rwa))
+				return 6;
 
-	return 0;
-}
-],
-found_libpthread_process_shared="yes")
-])dnl
+			return 0;
+		}
+		)
+	]
+	,
+	found_libpthread_process_shared="yes",
+	found_libpthread_process_shared="no",
+	found_libpthread_process_shared="no" dnl action-if-cross-compiling
+	)
+])
 
 AC_DEFUN([LIBPTHREAD_CHECK_CONFIG],
 [

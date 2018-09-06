@@ -95,7 +95,7 @@ swap_stat_t;
 #	define INFO_FILE_NAME	"/proc/diskstats"
 #	define PARSE(line)								\
 											\
-		if (6 != sscanf(line, "%d %d %*s "					\
+		if (6 != sscanf(line, "%u %u %*s "					\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
 				&rdev_major, 		/* major */			\
@@ -105,7 +105,7 @@ swap_stat_t;
 				&result->wio,		/* wio */			\
 				&result->wsect		/* wsect */			\
 				))							\
-			if (6 != sscanf(line, "%d %d %*s "				\
+			if (6 != sscanf(line, "%u %u %*s "				\
 					ZBX_FS_UI64 " " ZBX_FS_UI64 " "			\
 					ZBX_FS_UI64 " " ZBX_FS_UI64,			\
 					&rdev_major, 		/* major */		\
