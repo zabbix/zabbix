@@ -351,11 +351,11 @@ class CSvgGraph extends CSvg {
 			5 => ['H:i:s', 'H:i:s'],					// 5 seconds
 			10 => ['H:i:s', 'H:i:s'],					// 10 seconds
 			30 => ['H:i:s', 'H:i:s'],					// 30 seconds
-			SEC_PER_MIN => ['H:i:s'],					// 1 minute
-			SEC_PER_MIN * 2 => ['H:i'],					// 2 minutes
-			SEC_PER_MIN * 5 => ['H:i'],					// 5 minutes
-			SEC_PER_MIN * 15 => ['H:i'],				// 15 minutes
-			SEC_PER_MIN * 30 => ['H:i'],				// 30 minutes
+			SEC_PER_MIN => ['H:i:s', 'H:i:s'],			// 1 minute
+			SEC_PER_MIN * 2 => ['H:i','H:i'],			// 2 minutes
+			SEC_PER_MIN * 5 => ['H:i', 'H:i'],			// 5 minutes
+			SEC_PER_MIN * 15 => ['H:i', 'H:i'],			// 15 minutes
+			SEC_PER_MIN * 30 => ['H:i', 'H:i'],			// 30 minutes
 			SEC_PER_HOUR => ['H:i', 'H:i'],				// 1 hours
 			SEC_PER_HOUR * 3 => ['H:i', 'n-d H:i'],		// 3 hours
 			SEC_PER_HOUR * 6 => ['H:i', 'n-d H:i'],		// 6 hours
