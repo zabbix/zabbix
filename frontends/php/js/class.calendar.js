@@ -27,19 +27,12 @@ function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	var $toggle = jQuery(trigger_elmnt),
 		offset = $toggle.offset();
 
-	if (CLNDR && $toggle.is(CLNDR.trigger_elmnt)) {
-		if (CLNDR.is_visible) {
-			CLNDR.clndrhide();
-		}
-		else {
-			CLNDR.clndrshow(offset.top + $toggle.height(), offset.left + $toggle.width());
-		}
+	if (CLNDR && $toggle.is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
+		CLNDR.clndrhide();
+		CLNDR = null;
 	}
 	else {
-		if (CLNDR) {
-			CLNDR.clndrhide();
-		}
-
+		CLNDR && CLNDR.clndrhide();
 		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
 		CLNDR.clndrshow(offset.top + $toggle.height(), offset.left + $toggle.width());
 	}
@@ -388,12 +381,10 @@ calendar.prototype = {
 
 	setDateToOuterObj: function() {
 		var input = jQuery(this.timeobject),
-			changed = input.val() != this.sdt.format(this.date_time_format);
+			new_val = this.sdt.format(this.date_time_format);
 
-		input.val(this.sdt.format(this.date_time_format));
-
-		if (changed) {
-			input.trigger('change');
+		if (input.val() != new_val) {
+			input.val(new_val).trigger('change');
 		}
 	},
 
