@@ -659,6 +659,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(
 			jQuery('<div>', {
 				class: 'overlay-dialogue-body',
+				tabindex: '-1'
 			})
 				.append(params.content)
 				.each(function() {
