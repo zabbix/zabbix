@@ -45,7 +45,7 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int	sleeptime = -1, num = 0, old_num = 0, sync_num, next_sync;
+	int	sleeptime = -1, num = 0, old_num = 0, sync_num, more;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -81,11 +81,11 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		}
 
 		sec = zbx_time();
-		next_sync = sync_history_cache(ZBX_SYNC_PARTIAL, &sync_num);
+		sync_history_cache(ZBX_SYNC_PARTIAL, &sync_num, &more);
 		num += sync_num;
 		total_sec += zbx_time() - sec;
 
-		sleeptime = 0 < next_sync ? 0 : CONFIG_HISTSYNCER_FREQUENCY;
+		sleeptime = (ZBX_SYNC_MORE == more ? 0 : CONFIG_HISTSYNCER_FREQUENCY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

@@ -170,10 +170,11 @@ static size_t		item_values_alloc = 0, item_values_num = 0;
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
-static int	hc_push_items(zbx_vector_ptr_t *history_items);
+static void	hc_push_items(zbx_vector_ptr_t *history_items);
 static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
+static int	hc_queue_get_size();
 
 /******************************************************************************
  *                                                                            *
@@ -2730,9 +2731,9 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
+static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num, int *more)
 {
-	int			history_num, next_sync = 0;
+	int			history_num;
 	time_t			sync_start, now;
 	zbx_vector_ptr_t	history_items;
 
@@ -2743,6 +2744,8 @@ static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total
 
 	do
 	{
+		*more = ZBX_SYNC_DONE;
+
 		LOCK_CACHE;
 
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
@@ -2766,8 +2769,11 @@ static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total
 
 		LOCK_CACHE;
 
-		next_sync = hc_push_items(&history_items);	/* return items to history cache */
+		hc_push_items(&history_items);	/* return items to history cache */
 		cache->history_num -= history_num;
+
+		if (0 != hc_queue_get_size())
+			*more = ZBX_SYNC_MORE;
 
 		UNLOCK_CACHE;
 
@@ -2789,21 +2795,19 @@ static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
+	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && ZBX_SYNC_MORE == *more) || sync_type == ZBX_SYNC_FULL);
 
 	zbx_vector_ptr_destroy(&history_items);
-
-	return next_sync;
 }
 
-static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num)
+static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
-	int				i, history_num, candidate_num, next_sync = 0, history_float_num,
+	int				i, history_num, candidate_num, history_float_num,
 					history_integer_num, history_string_num, history_text_num, history_log_num,
 					txn_error;
 	time_t				sync_start, now;
@@ -2863,6 +2867,8 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		int			*errcodes, trends_num = 0, timers_num = 0, ret = SUCCEED;
 		zbx_vector_uint64_t	itemids;
 		ZBX_DC_TREND		*trends = NULL;
+
+		*more = ZBX_SYNC_DONE;
 
 		LOCK_CACHE;
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
@@ -2938,6 +2944,9 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 			zbx_dc_get_timer_triggerids(&timer_triggerids, time(NULL), ZBX_HC_TIMER_MAX);
 			timers_num = timer_triggerids.values_num;
 
+			if (ZBX_HC_TIMER_MAX == timers_num)
+				*more = ZBX_SYNC_MORE;
+
 			if (0 != history_num || 0 != timers_num)
 			{
 				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
@@ -2977,8 +2986,12 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		if (0 != history_num)
 		{
 			LOCK_CACHE;
-			next_sync = hc_push_items(&history_items);	/* return items to history cache */
+			hc_push_items(&history_items);	/* return items to history cache */
 			cache->history_num -= history_num;
+
+			if (0 != hc_queue_get_size())
+				*more = ZBX_SYNC_MORE;
+
 			UNLOCK_CACHE;
 
 			*total_num += history_num;
@@ -3043,7 +3056,7 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 			/* In this case is better to wait a bit for other syncers to unlock items   */
 			/* rather than trying and failing to sync locked items over and over again. */
 
-			next_sync = 0;
+			*more = ZBX_SYNC_DONE;
 			break;
 		}
 
@@ -3052,7 +3065,7 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
+	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && ZBX_SYNC_MORE == *more) || sync_type == ZBX_SYNC_FULL);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
@@ -3062,8 +3075,6 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 
 	zbx_vector_uint64_destroy(&timer_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
-
-	return next_sync;
 }
 
 /******************************************************************************
@@ -3072,19 +3083,23 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
- * Return value: the timestamp of next history queue value to sync,           *
- *               0 if the queue is empty or most of items are locked by       *
- *               triggers.                                                    *
+ * Parameters: sync_type - [IN] the sync type:                                *
+ *                               ZBX_SYNC_PARTIAL - normal sync               *
+ *                               ZBX_SYNC_FULL - full sync, done at           *
+ *                                              application exit              *
+ *             total_num - [OUT] the number of synced values                  *
+ *             more      - [OUT] a flag indicating the cache emptiness:       *
+ *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
+ *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-int	sync_history_cache(int sync_type, int *total_num)
+void	sync_history_cache(int sync_type, int *total_num, int *more)
 {
 	const char		*__function_name = "sync_history_cache";
 
 	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history  */
 							/* cache are copied into to process triggers, trends */
 							/* etc and finally write into db */
-	int			ret = 0;
 	zbx_binary_heap_t	tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
@@ -3137,9 +3152,9 @@ int	sync_history_cache(int sync_type, int *total_num)
 		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		ret = sync_server_history(history, sync_type, total_num);
+		sync_server_history(history, sync_type, total_num, more);
 	else
-		ret = sync_proxy_history(history, sync_type, total_num);
+		sync_proxy_history(history, sync_type, total_num, more);
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
@@ -3154,8 +3169,6 @@ int	sync_history_cache(int sync_type, int *total_num)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
 }
 
 /******************************************************************************
@@ -4016,19 +4029,16 @@ static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *histor
  * Parameters: history_items - [IN] the history items containing processed    *
  *                                  (available) and busy items                *
  *                                                                            *
- * Return value: time of the next history item to sync                        *
- *                                                                            *
  * Comments: This function removes processed value from history cache.        *
  *           If there is no more data for this item, then the item itself is  *
  *           removed from history index.                                      *
  *                                                                            *
  ******************************************************************************/
-static int	hc_push_items(zbx_vector_ptr_t *history_items)
+void	hc_push_items(zbx_vector_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
 	zbx_hc_data_t	*data_free;
-	int		next_sync;
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
@@ -4052,20 +4062,18 @@ static int	hc_push_items(zbx_vector_ptr_t *history_items)
 				break;
 		}
 	}
+}
 
-	if (FAIL == zbx_binary_heap_empty(&cache->history_queue))
-	{
-		zbx_binary_heap_elem_t	*elem;
-
-		elem = zbx_binary_heap_find_min(&cache->history_queue);
-		item = (zbx_hc_item_t *)elem->data;
-
-		next_sync = item->tail->ts.sec;
-	}
-	else
-		next_sync = 0;
-
-	return next_sync;
+/******************************************************************************
+ *                                                                            *
+ * Function: hc_queue_get_size                                                *
+ *                                                                            *
+ * Purpose: retrieve the size of history queue                                *
+ *                                                                            *
+ ******************************************************************************/
+int	hc_queue_get_size()
+{
+	return cache->history_queue.elems_num;
 }
 
 /******************************************************************************
@@ -4193,11 +4201,11 @@ out:
  ******************************************************************************/
 static void	DCsync_all(void)
 {
-	int	sync_num;
+	int	sync_num, more;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache(ZBX_SYNC_FULL, &sync_num);
+	sync_history_cache(ZBX_SYNC_FULL, &sync_num, &more);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
