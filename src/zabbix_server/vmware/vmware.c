@@ -79,6 +79,7 @@ extern char		*CONFIG_SOURCE_IP;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_DAY
 #define ZBX_XML_DATETIME		26
+#define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
@@ -340,8 +341,6 @@ typedef struct
 }
 ZBX_HTTPPAGE;
 
-static ZBX_HTTPPAGE	page;
-
 static int	zbx_xml_read_values(xmlDoc *xdoc, const char *xpath, zbx_vector_str_t *values);
 static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlDoc **xdoc, char **value,
 		char **error);
@@ -384,6 +383,7 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 {
 	CURLoption	opt;
 	CURLcode	err;
+	ZBX_HTTPPAGE	*resp;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, request)))
 	{
@@ -393,7 +393,15 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 		return FAIL;
 	}
 
-	page.offset = 0;
+	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_PRIVATE, &resp)))
+	{
+		if (NULL != error)
+			*error = zbx_dsprintf(*error, "Cannot get response buffer: %s.", curl_easy_strerror(err));
+
+		return FAIL;
+	}
+
+	resp->offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -403,13 +411,7 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
 		return FAIL;
 	}
 
-	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_PRIVATE, response)))
-	{
-		if (NULL != error)
-			*error = zbx_dsprintf(*error, "Cannot get response buffer: %s.", curl_easy_strerror(err));
-
-		return FAIL;
-	}
+	*response = resp;
 
 	return SUCCEED;
 }
@@ -1460,6 +1462,7 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *                                                                            *
  * Parameters: service    - [IN] the vmware service                           *
  *             easyhandle - [IN] the CURL handle                              *
+ *             page       - [IN] the CURL output buffer                       *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the authentication was completed successfully      *
@@ -1470,7 +1473,8 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *           and vSphere session managers.                                    *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
+static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
+		char **error)
 {
 #	define ZBX_POST_VMWARE_AUTH						\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -1493,8 +1497,8 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, &page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PRIVATE, &page)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, page)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PRIVATE, page)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, curl_header_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
@@ -1808,9 +1812,12 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 
 	/* The counter data uses a lot of memory which is needed only once during initialization. */
 	/* Reset the download buffer afterwards so the memory is not wasted.                      */
-	zbx_free(resp->data);
-	resp->alloc = 0;
-	resp->offset = 0;
+	if (ZBX_INIT_UPD_XML_SIZE < resp->alloc)
+	{
+		zbx_free(resp->data);
+		resp->alloc = 0;
+		resp->offset = 0;
+	}
 
 	xpathCtx = xmlXPathNewContext(doc);
 
@@ -3759,11 +3766,13 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vmware_data_t	*data;
 	zbx_vector_str_t	hvs;
 	int			i, ret = FAIL;
+	ZBX_HTTPPAGE		page;	/* 347K/87K */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	data = (zbx_vmware_data_t *)zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
+	page.alloc = 0;
 
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_ptr_create(&data->clusters);
@@ -3786,7 +3795,10 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &data->error))
+	page.alloc = ZBX_INIT_UPD_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
+
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_NEW) &&
@@ -3828,6 +3840,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
+	zbx_free(page.data);
 
 	zbx_vector_str_clear_ext(&hvs, zbx_ptr_free);
 	zbx_vector_str_destroy(&hvs);
@@ -4236,6 +4249,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
  ******************************************************************************/
 static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 {
+#	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 	const char			*__function_name = "vmware_service_update_perf";
 
 	CURL				*easyhandle = NULL;
@@ -4248,12 +4262,14 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_hashset_iter_t		iter;
 	zbx_vector_ptr_t		perfdata;
+	static ZBX_HTTPPAGE		page;	/* 173K */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, service->username, service->url);
 
 	zbx_vector_ptr_create(&entities);
 	zbx_vector_ptr_create(&hist_entities);
 	zbx_vector_ptr_create(&perfdata);
+	page.alloc = 0;
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -4270,7 +4286,10 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &error))
+	page.alloc = INIT_PERF_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
+
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &error))
 		goto clean;
 
 	/* update performance counter refresh rate for entities */
@@ -4344,6 +4363,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
+	zbx_free(page.data);
 out:
 	zbx_vmware_lock();
 
