@@ -26,7 +26,6 @@ var CLNDR = null,
 function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
 	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
 		CLNDR.clndrhide();
-		CLNDR = null;
 	}
 	else {
 		CLNDR && CLNDR.clndrhide();
