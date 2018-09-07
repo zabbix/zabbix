@@ -174,7 +174,7 @@ static void	hc_push_items(zbx_vector_ptr_t *history_items);
 static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
-static int	hc_queue_get_size();
+static int	hc_queue_get_size(void);
 
 /******************************************************************************
  *                                                                            *
@@ -4100,7 +4100,7 @@ void	hc_push_items(zbx_vector_ptr_t *history_items)
  * Purpose: retrieve the size of history queue                                *
  *                                                                            *
  ******************************************************************************/
-int	hc_queue_get_size()
+int	hc_queue_get_size(void)
 {
 	return cache->history_queue.elems_num;
 }
