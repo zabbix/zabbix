@@ -28,6 +28,10 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['layout.mode.js'];
+
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS', 0);
@@ -40,7 +44,6 @@ $fields = [
 	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
 	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'fullscreen'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -141,7 +144,6 @@ $page_filter = new CPageFilter([
 ]);
 
 $data = [
-	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config,

@@ -32,10 +32,6 @@ function getMenuPopupHistory(options) {
 
 	url.setArgument('itemids[]', options.itemid);
 
-	if (typeof options.fullscreen !== 'undefined' && options.fullscreen) {
-		url.setArgument('fullscreen', '1');
-	}
-
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
@@ -85,7 +81,6 @@ function getMenuPopupHistory(options) {
  * @param bool   options['showScreens']     Link to host screen page.
  * @param bool   options['showTriggers']    Link to Monitoring->Problems page.
  * @param bool   options['hasGoTo']         "Go to" block in popup.
- * @param bool   options['fullscreen']      Fullscreen mode.
  * @param {object} trigger_elmnt            UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -103,9 +98,8 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 	// go to section
 	if (options.hasGoTo) {
-		var fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
-			// inventory
-			host_inventory = {
+		// inventory
+		var	host_inventory = {
 				label: t('Host inventory')
 			},
 			host_inventory_url = new Curl('hostinventories.php'),
@@ -129,17 +123,11 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		// inventory link
 		host_inventory_url.setArgument('hostid', options.hostid);
-		if (fullscreen) {
-			host_inventory_url.setArgument('fullscreen', '1');
-		}
 		host_inventory.url = host_inventory_url.getUrl();
 
 		// latest data link
 		latest_data_url.setArgument('hostids[]', options.hostid);
 		latest_data_url.setArgument('filter_set', '1');
-		if (fullscreen) {
-			latest_data_url.setArgument('fullscreen', '1');
-		}
 		latest_data.url = latest_data_url.getUrl();
 
 		if (!options.showTriggers) {
@@ -150,9 +138,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 			problems.url = url.getUrl();
 		}
 
@@ -163,9 +148,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var graphs_url = new Curl('charts.php');
 
 			graphs_url.setArgument('hostid', options.hostid);
-			if (fullscreen) {
-				graphs_url.setArgument('fullscreen', '1');
-			}
 			graphs.url = graphs_url.getUrl();
 		}
 
@@ -176,9 +158,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var screens_url = new Curl('host_screen.php');
 
 			screens_url.setArgument('hostid', options.hostid);
-			if (fullscreen) {
-				screens_url.setArgument('fullscreen', '1');
-			}
 			screens.url = screens_url.getUrl();
 		}
 
@@ -221,7 +200,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
  * @param {array}  options['urls']                      Local and global map link (optional).
  * @param {string} options['url'][]['label']            Link label.
  * @param {string} options['url'][]['url']              Link url.
- * @param {bool}   options['fullscreen']                Fullscreen mode.
  * @param {object} trigger_elmnt                        UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -242,15 +220,11 @@ function getMenuPopupMap(options, trigger_elmnt) {
 	 */
 	if (typeof options.gotos !== 'undefined') {
 		var gotos = [],
-			fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen),
 			show_suppressed = (typeof options.gotos.show_suppressed !== 'undefined' && options.gotos.show_suppressed);
 
 		// inventory
 		if (typeof options.gotos.inventory !== 'undefined') {
 			var url = new Curl('hostinventories.php');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			jQuery.each(options.gotos.inventory, function(name, value) {
 				if (value !== null) {
@@ -268,9 +242,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 		if (typeof options.gotos.latestData !== 'undefined') {
 			var url = new Curl('latest.php');
 			url.setArgument('filter_set', '1');
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			jQuery.each(options.gotos.latestData, function(name, value) {
 				if (value !== null) {
@@ -300,9 +271,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					url.setArgument('filter_show_suppressed', '1');
 				}
 				url.setArgument('filter_set', '1');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.triggerStatus, function(name, value) {
 					if (value !== null) {
@@ -327,9 +295,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('charts.php');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.graphs, function(name, value) {
 					if (value !== null) {
@@ -354,9 +319,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 			}
 			else {
 				var url = new Curl('host_screen.php');
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
-				}
 
 				jQuery.each(options.gotos.screens, function(name, value) {
 					if (value !== null) {
@@ -380,10 +342,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 					url.setArgument(name, value);
 				}
 			});
-
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			gotos.push({
 				label: t('Submap'),
@@ -424,9 +382,6 @@ function getMenuPopupMap(options, trigger_elmnt) {
 				url.unsetArgument('sid');
 				if (typeof options.gotos.events.severity_min !== 'undefined') {
 					url.setArgument('filter_severity', options.gotos.events.severity_min);
-				}
-				if (fullscreen) {
-					url.setArgument('fullscreen', '1');
 				}
 
 				events.url = url.getUrl();
@@ -631,14 +586,12 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
  * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
  * @param string options['url']                     Trigger url link (optional).
- * @param bool   options['fullscreen']              Fullscreen mode.
  *
  * @return array
  */
 function getMenuPopupTrigger(options) {
 	var sections = [],
-		items = [],
-		fullscreen = (typeof options.fullscreen !== 'undefined' && options.fullscreen);
+		items = [];
 
 	// events
 	var events = {
@@ -651,10 +604,6 @@ function getMenuPopupTrigger(options) {
 		url.setArgument('filter_triggerids[]', options.triggerid);
 		url.setArgument('filter_set', '1');
 		url.unsetArgument('sid');
-
-		if (fullscreen) {
-			url.setArgument('fullscreen', '1');
-		}
 
 		events.url = url.getUrl();
 	}
@@ -730,10 +679,6 @@ function getMenuPopupTrigger(options) {
 			var url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
-
-			if (fullscreen) {
-				url.setArgument('fullscreen', '1');
-			}
 
 			items[items.length] = {
 				label: item.name,

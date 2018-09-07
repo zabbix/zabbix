@@ -37,16 +37,21 @@ $triggersForm = (new CForm())
 	->setName('triggersForm')
 	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
+$url = (new CUrl('trigger_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->getUrl();
+
 // create table
 $triggersTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 		_('Expression'),
-		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Tags')
 	]);
 
 $this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
@@ -137,7 +142,8 @@ foreach ($this->data['triggers'] as $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		$expression,
-		$status
+		$status,
+		$data['tags'][$triggerid]
 	]);
 }
 

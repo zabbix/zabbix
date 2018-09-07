@@ -774,12 +774,10 @@ function getTriggersWithActualSeverity($options, $show_suppressed) {
  * @param string $pageFile                     The page where the element is displayed.
  * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
  * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
- * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
-		$fullscreen = false) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -855,7 +853,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -881,14 +879,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($host_names as $hostId => $host_name) {
 			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true));
 
 			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 			}
@@ -909,11 +907,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
- * @param bool   $fullscreen    Display mode.
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null, $fullscreen = false) {
+function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = null;
@@ -975,7 +972,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled'], 'fullscreen' => $fullscreen];
+		$options = ['description_enabled' => $trigger['description_enabled']];
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
 	}
 
@@ -2257,11 +2254,10 @@ function getTriggersHostsList(array $triggers) {
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
  * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
  * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
- * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
+function makeTriggersHostsList(array $triggers_hosts) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2297,7 +2293,7 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true));
 
 			// Add maintenance icon with hint if host is in maintenance.
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
