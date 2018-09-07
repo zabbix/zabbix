@@ -1,9 +1,20 @@
 Changes for 4.0.0beta2
 
 New features:
+A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
+..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
+........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
 .......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
+.........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+..F....... [ZBX-14797] fixed calendar initialization in graph configuration form (gcalenko, vmurzins)
+........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
+........S. [ZBX-14808] fixed SQL error in user permission check when processing actions for internal item events (wiper)
+........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
+..F....... [ZBXNEXT-4597] fixed date selection fields in maintenance and services: fixed accepted date format, fixed validation and added placeholdrs (vmurzins)
+...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
 ..F....... [ZBX-12217] removed links to templates with no permissions for templated discovery rules and item prototypes (agriscenko)
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
 ........S. [ZBX-14777] increased severity of housekeeper logs in the case of invalid history/trends intervals (wiper)
@@ -467,6 +478,10 @@ New features:
 A.F....... [ZBX-1357] enabled Portuguese (Portugal) translation to be displayed by default (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
+........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
+...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
 ........S. [ZBX-14777] increased severity of housekeeper logs in the case of invalid history/trends intervals (wiper)
 ........S. [ZBX-14778] fixed housekeeper attempting to remove history of discovery rules/prototypes (wiper)
@@ -1806,6 +1821,9 @@ Changes for 3.0.22rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
+........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
+...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
 ..F....... [ZBX-13015] fixed X axis labels with DST transition in the displayed period (Sasha)
 ........S. [ZBX-14778] fixed housekeeper attempting to remove history of discovery rules/prototypes (wiper)
 .......PS. [ZBX-14775] fixed configuration of the maximum available count of aggregated metrics in a single request to vmware vCenter (MVekslers)

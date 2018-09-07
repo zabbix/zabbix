@@ -2329,7 +2329,6 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 
 	zbx_vector_uint64_create(&all_templ_ids);
 	zbx_vector_uint64_pair_create(&dep_list_ids);
-	zbx_vector_uint64_pair_create(&map_ids);
 	zbx_vector_uint64_pair_create(links);
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -2352,6 +2351,15 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
 	}
 	DBfree_result(result);
 
+	if (0 == dep_list_ids.values_num)	/* not all trigger template have a dependency trigger */
+	{
+		zbx_vector_uint64_destroy(&all_templ_ids);
+		zbx_vector_uint64_pair_destroy(&dep_list_ids);
+		zbx_free(sql);
+		return;
+	}
+
+	zbx_vector_uint64_pair_create(&map_ids);
 	zbx_vector_uint64_sort(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 

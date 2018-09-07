@@ -33,3 +33,8 @@ void	zbx_ptr_free(void *data)
 {
 	zbx_free(data);
 }
+
+void	zbx_str_free(char *data)
+{
+	zbx_free(data);
+}

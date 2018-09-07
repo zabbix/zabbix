@@ -27,7 +27,6 @@ class CMapHelper {
 	 * @param array $sysmapids					Map IDs.
 	 * @param array $options					Options used to retrieve actions.
 	 * @param int   $options['severity_min']	Minimum severity.
-	 * @param int   $options['fullscreen']		Fullscreen flag.
 	 *
 	 * @return array
 	 */
@@ -121,7 +120,6 @@ class CMapHelper {
 	 * @param array $sysmap                   Map data.
 	 * @param array $options                  Options used to retrieve actions.
 	 * @param int   $options['severity_min']  Minimum severity.
-	 * @param int   $options['fullscreen']    Fullscreen flag.
 	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
 	 */
 	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {

@@ -19,9 +19,7 @@
 **/
 
 
-$table = getItemsDataOverview($data['groupids'], $data['application'], $data['style'], $data['fullscreen'],
-	$data['show_suppressed']
-);
+$table = getItemsDataOverview($data['groupids'], $data['application'], $data['style'], $data['show_suppressed']);
 
 $output = [
 	'header' => $data['name'],

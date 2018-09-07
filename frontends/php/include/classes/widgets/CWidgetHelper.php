@@ -446,18 +446,12 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldDatePicker $field
 	 *
-	 * @return Array
+	 * @return CDateSelector
 	 */
 	public static function getDatePicker($field) {
-		return [
-			(new CTextBox($field->getName(), $field->getValue()))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field))
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED)),
-			(new CButton($field->getName().'_dp'))
-				->addClass(ZBX_STYLE_ICON_CAL)
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-		];
+		return (new CDateSelector($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
 	}
 
 	/**

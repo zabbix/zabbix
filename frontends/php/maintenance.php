@@ -42,13 +42,13 @@ $fields = [
 	'mname' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
 	'maintenance_type' =>					[T_ZBX_INT, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'description' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'active_since' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
+	'active_since' =>						[T_ZBX_ABS_TIME, O_OPT, null, NOT_EMPTY,
 												'isset({add}) || isset({update})', _('Active since')
 											],
-	'active_till' =>						[T_ZBX_RANGE_TIME, O_OPT, null, NOT_EMPTY,
+	'active_till' =>						[T_ZBX_ABS_TIME, O_OPT, null, NOT_EMPTY,
 												'isset({add}) || isset({update})', _('Active till')
 											],
-	'new_timeperiod_start_date' =>			[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Date')],
+	'new_timeperiod_start_date' =>			[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Date')],
 	'new_timeperiod' =>						[T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'],
 	'timeperiods' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_timeperiodid' =>					[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
@@ -58,7 +58,7 @@ $fields = [
 	// actions
 	'action' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"maintenance.massdelete"'), null],
 	'add_timeperiod' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_timeperiod' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_timeperiod' =>				[T_ZBX_STR, O_OPT, P_SYS, null,	null],
 	'add' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -127,13 +127,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	$result = true;
-	$range_time_parser = new CRangeTimeParser();
+	$absolute_time_parser = new CAbsoluteTimeParser();
 
-	$range_time_parser->parse(getRequest('active_since'));
-	$active_since_date = $range_time_parser->getDateTime(true);
+	$absolute_time_parser->parse(getRequest('active_since'));
+	$active_since_date = $absolute_time_parser->getDateTime(true);
 
-	$range_time_parser->parse(getRequest('active_till'));
-	$active_till_date = $range_time_parser->getDateTime(false);
+	$absolute_time_parser->parse(getRequest('active_till'));
+	$active_till_date = $absolute_time_parser->getDateTime(true);
+
+	if (!validateDateInterval($active_since_date->format('Y'), $active_since_date->format('m'),
+			$active_since_date->format('d'))) {
+		info(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
+		$result = false;
+	}
 
 	if (!validateDateInterval($active_till_date->format('Y'), $active_till_date->format('m'),
 			$active_till_date->format('d'))) {
@@ -143,13 +149,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		$timeperiods = getRequest('timeperiods', []);
-		$range_time_parser = new CRangeTimeParser();
 
 		foreach ($timeperiods as &$timeperiod) {
 			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-				$range_time_parser->parse($timeperiod['start_date']);
-				$timeperiod['start_date'] = $range_time_parser
-					->getDateTime(false)
+				$absolute_time_parser->parse($timeperiod['start_date']);
+				$timeperiod['start_date'] = $absolute_time_parser
+					->getDateTime(true)
 					->getTimestamp();
 			}
 		}
@@ -276,9 +281,10 @@ elseif (hasRequest('add_timeperiod') && hasRequest('new_timeperiod')) {
 		$result = false;
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-		$range_time_parser = new CRangeTimeParser();
-		$range_time_parser->parse($new_timeperiod['start_date']);
-		$start_date = $range_time_parser->getDateTime(false);
+		$absolute_time_parser = new CAbsoluteTimeParser();
+		$absolute_time_parser->parse($new_timeperiod['start_date']);
+		$start_date = $absolute_time_parser->getDateTime(true);
+		$new_timeperiod['start_date'] = $start_date->format(ZBX_DATE_TIME);
 
 		if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('d'))) {
 			error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
@@ -344,7 +350,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
 		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 		$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-		$_REQUEST['new_timeperiod']['start_date'] = $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date'];
+		$_REQUEST['new_timeperiod_start_date'] = $_REQUEST['new_timeperiod']['start_date'];
 	}
 }
 
@@ -406,7 +412,9 @@ if (!empty($data['form'])) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
-		if (getRequest('new_timeperiod', []) != 1 && getRequest('new_timeperiod', [])) {
+
+		if ($data['new_timeperiod'] != 1 && $data['new_timeperiod'] !== []
+				&& hasRequest('new_timeperiod_start_date')) {
 			$data['new_timeperiod']['start_date'] = getRequest('new_timeperiod_start_date');
 		}
 

@@ -26,7 +26,6 @@ $options = [
 	'page' => $data['page'],
 	'data' => [
 		'action' => $data['action'],
-		'fullscreen' => $data['fullscreen'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
 		'page' => $data['page'],
@@ -78,6 +77,7 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
+	$this->addJsFile('layout.mode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
@@ -322,7 +322,6 @@ if ($data['action'] == 'problem.view') {
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
-		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
@@ -331,13 +330,15 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	(new CWidget())
+	$web_layout_mode = CView::getLayoutMode();
+
+	$widget = (new CWidget())
 		->setTitle(_('Problems'))
+		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
-				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
 				->addItem((new CList())
 					->addItem(new CRedirectButton(_('Export to CSV'),
@@ -345,12 +346,17 @@ if ($data['action'] == 'problem.view') {
 							->setArgument('action', 'problem.view.csv')
 							->setArgument('page',  $data['page'])
 					))
-					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+					->addItem(get_icon('fullscreen'))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
-		)
-		->addItem($filter)
+		);
+
+	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		$widget->addItem($filter);
+	}
+
+	$widget
 		->addItem($screen->get())
 		->show();
 
