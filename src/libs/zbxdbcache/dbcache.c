@@ -2807,7 +2807,7 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
-	int				i, history_num, candidate_num, history_float_num,
+	int				i, history_num, history_float_num,
 					history_integer_num, history_string_num, history_text_num, history_log_num,
 					txn_error;
 	time_t				sync_start, now;
@@ -2990,12 +2990,19 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 			cache->history_num -= history_num;
 
 			if (0 != hc_queue_get_size())
-				*more = ZBX_SYNC_MORE;
+			{
+				/* Continue sync if enough of sync candidates were processed       */
+				/* (meaning most of sync candidates are not locked by triggers).   */
+				/* Otherwise better to wait a bit for other syncers to unlock      */
+				/* items rather than trying and failing to sync locked items over  */
+				/* and over again.                                                 */
+				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num)
+					*more = ZBX_SYNC_MORE;
+			}
 
 			UNLOCK_CACHE;
 
 			*total_num += history_num;
-			candidate_num = history_items.values_num;
 		}
 
 		if (FAIL != ret)
@@ -3047,19 +3054,6 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 			zbx_vector_ptr_clear(&history_items);
 			hc_free_item_values(history, history_num);
 		}
-
-		if ((0 == history_num || ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num) &&
-				ZBX_HC_TIMER_MAX != timers_num)
-		{
-			/* Stop sync if only small percentage of sync candidates were processed     */
-			/* (meaning most of sync candidates are locked by triggers).                */
-			/* In this case is better to wait a bit for other syncers to unlock items   */
-			/* rather than trying and failing to sync locked items over and over again. */
-
-			*more = ZBX_SYNC_DONE;
-			break;
-		}
-
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
