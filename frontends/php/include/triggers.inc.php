@@ -2507,6 +2507,77 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag) {
 }
 
 /**
+ * Returns a list of trigger templates.
+ *
+ * @param string $triggerid
+ * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
+ * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ *
+ * @return array
+ */
+function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
+	$list = [];
+
+	while (array_key_exists($triggerid, $parent_templates['links'])) {
+		$list_item = [];
+		$templates = [];
+
+		foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
+			$templates[] = $parent_templates['templates'][$hostid];
+		}
+
+		$show_parentheses = (count($templates) > 1 && $list);
+
+		if ($show_parentheses) {
+			CArrayHelper::sort($templates, ['name']);
+			$list_item[] = '(';
+		}
+
+		foreach ($templates as $template) {
+			if ($template['permission'] == PERM_READ_WRITE) {
+				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$url = (new CUrl('trigger_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+						->setArgument('hostid', $template['hostid']);
+				}
+				// ZBX_FLAG_DISCOVERY_NORMAL
+				else {
+					$url = (new CUrl('triggers.php'))
+						->setArgument('form', 'update')
+						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+						->setArgument('hostid', $template['hostid']);
+				}
+
+				$name = new CLink(CHtml::encode($template['name']), $url);
+			}
+			else {
+				$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			}
+
+			$list_item[] = $name;
+			$list_item[] = ', ';
+		}
+		array_pop($list_item);
+
+		if ($show_parentheses) {
+			$list_item[] = ')';
+		}
+
+		array_unshift($list, $list_item, '&nbsp;&rArr;&nbsp;');
+
+		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
+}
+
+/**
  * Check if user has read permissions for triggers.
  *
  * @param $triggerids
