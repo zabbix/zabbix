@@ -184,37 +184,35 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 
-		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
+		$this->zbxTestClickXpathWait("//button[@class='btn-max']");
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
+		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 		$this->zbxTestCheckFatalErrors();
 	}
 
-	/**
-	 * @depends testPageDashboard_FullScreen
-	 */
 	public function testPageDashboard_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&fullscreen=1', false);
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'object-group')]");
+		$this->zbxTestAssertAttribute("//button[@class='btn-kiosk']", 'title', 'Kiosk mode');
 
-		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
+		$this->zbxTestClickXpathWait("//button[@class='btn-kiosk']");
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'object-group')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-min')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+		$this->zbxTestAssertAttribute("//button[@class='btn-max']", 'title', 'Fullscreen');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
-		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'object-group')]");
 		$this->zbxTestCheckFatalErrors();
 	}
 }

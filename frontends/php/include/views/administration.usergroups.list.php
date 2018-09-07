@@ -56,7 +56,7 @@ $userGroupTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_groups'))->onClick("checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'usergrps.php'),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		'#',
 		_('Members'),
 		_('Frontend access'),

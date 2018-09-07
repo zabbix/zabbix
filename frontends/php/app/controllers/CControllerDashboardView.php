@@ -31,6 +31,8 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 
 	protected function checkInput() {
 		$fields = [
+			'fullscreen' =>			'in 0,1',
+			'kioskmode' =>			'in 0,1',
 			'dashboardid' =>		'db dashboard.dashboardid',
 			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'groupid' =>			'db hstgrp.groupid',
@@ -80,6 +82,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		list($this->dashboard, $error) = $this->getDashboard();
 
 		if ($error !== null) {
@@ -88,7 +93,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			return;
 		}
 		elseif ($this->dashboard === null) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'dashboard.list')
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 			$this->setResponse(new CControllerResponseRedirect($url->getUrl()));
 
 			return;
@@ -105,13 +112,13 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			];
 			updateTimeSelectorPeriod($timeselector_options);
 
-			$widgets = self::getWidgets($this->dashboard['widgets']);
-
 			$data = [
 				'dashboard' => $dashboard,
-				'grid_widgets' => $widgets,
+				'fullscreen' => $fullscreen,
+				'kioskmode' => $kioskmode,
+				'grid_widgets' => self::getWidgets($this->dashboard['widgets']),
 				'widget_defaults' => CWidgetConfig::getDefaults(),
-				'show_timeselector' => self::showTimeSelector($widgets),
+				'show_timeselector' => self::showTimeSelector($this->dashboard['widgets']),
 				'active_tab' => CProfile::get('web.dashbrd.filter.active', 1),
 				'timeline' => getTimeSelectorPeriod($timeselector_options)
 			];
@@ -149,8 +156,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'hostid' => 0
 				];
 			}
-
-			CView::$has_web_layout_mode = true;
 
 			$response = new CControllerResponseData($data);
 			$response->setTitle(_('Dashboard'));
@@ -514,7 +519,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 	 */
 	private static function showTimeSelector(array $widgets) {
 		foreach ($widgets as $widget) {
-			if (CWidgetConfig::usesTimeSelector($widget)) {
+			if (CWidgetConfig::usesTimeline($widget['type'])) {
 				return true;
 			}
 		}

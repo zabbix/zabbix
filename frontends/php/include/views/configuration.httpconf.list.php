@@ -73,26 +73,22 @@ $httpForm = (new CForm())
 	->setName('scenarios')
 	->addVar('hostid', $this->data['hostid']);
 
-$url = (new CUrl('httpconf.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
-
 $httpTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($this->data['hostid'] == 0)
-			? make_sorting_header(_('Host'), 'hostname', $data['sort'], $data['sortorder'], $url)
+			? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
 			: null,
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('Number of steps'),
 		_('Interval'),
 		_('Attempts'),
 		_('Authentication'),
 		_('HTTP proxy'),
 		_('Application'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 

@@ -11,7 +11,7 @@
       <template>
          <template>Template Module HOST-RESOURCES-MIB SNMPv1</template>
          <name>Template Module HOST-RESOURCES-MIB SNMPv1</name>
-         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.15&#13;
+         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.14&#13;
 MIBs used:&#13;
 HOST-RESOURCES-MIB</description>
          <groups>
@@ -21,9 +21,6 @@ HOST-RESOURCES-MIB</description>
          </groups>
          <applications>
             <application>
-               <name>CPU</name>
-            </application>
-            <application>
                <name>Internal Items</name>
             </application>
             <application>
@@ -31,6 +28,9 @@ HOST-RESOURCES-MIB</description>
             </application>
             <application>
                <name>Storage</name>
+            </application>
+            <application>
+               <name>CPU</name>
             </application>
          </applications>
          <items/>
@@ -41,7 +41,7 @@ HOST-RESOURCES-MIB</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]</snmp_oid>
                <key>hrProcessorLoad.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -73,7 +73,7 @@ HOST-RESOURCES-MIB</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -96,8 +96,7 @@ HOST-RESOURCES-MIB</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB&#13;
-The average, over the last minute, of the percentage of time that this processor was not idle.&#13;
-Implementations may approximate this one minute smoothing period if necessary.</description>
+The average, over the last minute, of the percentage of time that this processor was not idle.Implementations may approximate this one minute smoothing period if necessary.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -173,7 +172,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
                <key>memory.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -218,7 +217,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -243,7 +242,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
                      <description>MIB: HOST-RESOURCES-MIB&#13;
 The size, in bytes, of the data objects allocated from this pool.&#13;
 If this entry is monitoring sectors, blocks, buffers, or packets, for example,&#13;
-this number will commonly be greater than one. Otherwise this number will typically be one.</description>
+this number will commonly be greater than one.  Otherwise this number will typically be one.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -263,7 +262,7 @@ this number will commonly be greater than one. Otherwise this number will typica
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -306,7 +305,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.units.total[hrStorageSize.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -329,9 +328,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB&#13;
-The size of the storage represented by this entry, in units of hrStorageAllocationUnits.&#13;
-This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.&#13;
-For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</description>
+The size of the storage represented by this entry, in units of hrStorageAllocationUnits. This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system. For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -351,7 +348,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vm.memory.used[memoryUsed.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -393,7 +390,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vm.memory.total[memoryTotal.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -435,7 +432,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -533,7 +530,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
                <key>storage.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -557,13 +554,14 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                   <conditions>
                      <condition>
                         <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+(4|9)</value>
+                        <value>.+4$</value>
+                        <!-- OID: 1.3.6.1.2.1.25.2.1.4 -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+(hrStorageFixedDisk|hrStorageFlashMemory)</value>
+                        <value>.+hrStorageFixedDisk</value>
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -578,7 +576,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -623,7 +621,7 @@ this number will commonly be greater than one.  Otherwise this number will typic
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -666,7 +664,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -689,9 +687,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <privatekey/>
                      <port/>
                      <description>MIB: HOST-RESOURCES-MIB&#13;
-The size of the storage represented by this entry, in units of hrStorageAllocationUnits.&#13;
-This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.&#13;
-For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</description>
+The size of the storage represented by this entry, in units of hrStorageAllocationUnits. This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system. For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
@@ -711,7 +707,7 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vfs.fs.used[storageUsed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -753,7 +749,7 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vfs.fs.total[storageTotal.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -795,7 +791,7 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -886,6 +882,18 @@ For example, the amount of main storage allocated to a buffer pool might be modi
             <macro>
                <macro>{$MEMORY_UTIL_MAX}</macro>
                <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
             </macro>
             <macro>
                <macro>{$STORAGE_UTIL_CRIT}</macro>

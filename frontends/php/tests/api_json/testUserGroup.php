@@ -38,7 +38,7 @@ class testUserGroup extends CZabbixTest {
 			// Check user group name.
 			[
 				'group' => [
-					'gui_access' => GROUP_GUI_ACCESS_SYSTEM
+					'gui_access' => 0
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
 			],
@@ -80,7 +80,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					'name' => 'Admin in group with disabled GUI access',
-					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
+					'gui_access' => 2,
 					'userids' => 1
 				],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -127,7 +127,7 @@ class testUserGroup extends CZabbixTest {
 				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $group[$key]['name']);
-				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
+				$this->assertEquals($dbRow['gui_access'], 0);
 				$this->assertEquals($dbRow['users_status'], 0);
 				$this->assertEquals($dbRow['debug_mode'], 0);
 			}
@@ -207,7 +207,7 @@ class testUserGroup extends CZabbixTest {
 				'group' => [[
 					'name' => 'Disable group GUI access with admin',
 					'usrgrpid' => '7',
-					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
+					'gui_access' => 2,
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
@@ -215,7 +215,7 @@ class testUserGroup extends CZabbixTest {
 				'group' => [[
 					'usrgrpid' => '14',
 					'name' => 'Admin in group with disabled GUI access',
-					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
+					'gui_access' => 2,
 					'userids' => 1
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
@@ -328,7 +328,7 @@ class testUserGroup extends CZabbixTest {
 				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.zbx_dbstr($id));
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $groups[$key]['name']);
-				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
+				$this->assertEquals($dbRow['gui_access'], 0);
 				$this->assertEquals($dbRow['users_status'], 0);
 				$this->assertEquals($dbRow['debug_mode'], 0);
 
@@ -358,13 +358,9 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					'name' => 'gui_access non existent value',
-					'gui_access' => 65535
+					'gui_access' => 3
 				],
-				'expected_error' => sprintf('Invalid parameter "/1/gui_access": value must be one of %s.',
-					implode(', ', [
-						GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP,
-						GROUP_GUI_ACCESS_DISABLED
-				]))
+				'expected_error' => 'Invalid parameter "/1/gui_access": value must be one of 0, 1, 2.'
 			],
 			[
 				'group' => [
@@ -545,7 +541,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [
 					'name' => 'API user group with users and rights',
-					'gui_access' => GROUP_GUI_ACCESS_INTERNAL,
+					'gui_access' => 1,
 					'users_status' => 1,
 					'debug_mode' => 1,
 					'rights' => [

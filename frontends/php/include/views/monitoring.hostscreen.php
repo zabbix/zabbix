@@ -19,9 +19,9 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
+$screen_widget = new CWidget();
 
-$screen_widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
+$filter = new CFilter();
 
 if (empty($data['screen']) || empty($data['host'])) {
 	$screen_widget
@@ -36,7 +36,8 @@ else {
 
 	$url = (new CUrl('host_screen.php'))
 		->setArgument('hostid', $data['hostid'])
-		->setArgument('screenid', $data['screenid']);
+		->setArgument('screenid', $data['screenid'])
+		->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 	// host screen list
 	if (!empty($data['screens'])) {
@@ -57,7 +58,7 @@ else {
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_combobox)
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
@@ -75,17 +76,16 @@ else {
 		'to' => $data['to']
 	]);
 
-	$filter = (new CFilter())
+	$filter
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
 
-	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-		$filter->addClass(ZBX_STYLE_HIDDEN);
-	}
-	$screen_widget->addItem($filter);
-
-	$screen_widget->addItem((new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
+	$screen_widget
+		->addItem($filter)
+		->addItem(
+			(new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+		);
 
 	CScreenBuilder::insertScreenStandardJs($screen_builder->timeline);
 }

@@ -500,7 +500,7 @@ void	zbx_mutex_destroy(zbx_mutex_t *mutex)
 		return;
 
 	if (0 != pthread_mutex_destroy(*mutex))
-		zbx_error("cannot remove mutex %p: %s", (void *)mutex, zbx_strerror(errno));
+		zbx_error("cannot remove semaphore %d: %s", *mutex, zbx_strerror(errno));
 #else
 	if (0 == --mutexes && -1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 		zbx_error("cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));

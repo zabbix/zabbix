@@ -381,17 +381,41 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 
 		zbx_free(period);
 	}
-	else if (CONDITION_TYPE_SUPPRESSED == condition->conditiontype)
+	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_YES:
-				if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
+			case CONDITION_OPERATOR_IN:
+				result = DBselect(
+						"select count(*)"
+						" from hosts h,items i,functions f,triggers t"
+						" where h.hostid=i.hostid"
+							" and h.maintenance_status=%d"
+							" and i.itemid=f.itemid"
+							" and f.triggerid=t.triggerid"
+							" and t.triggerid=" ZBX_FS_UI64,
+						HOST_MAINTENANCE_STATUS_ON,
+						event->objectid);
+
+				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
 					ret = SUCCEED;
+				DBfree_result(result);
 				break;
-			case CONDITION_OPERATOR_NO:
-				if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
+			case CONDITION_OPERATOR_NOT_IN:
+				result = DBselect(
+						"select count(*)"
+						" from hosts h,items i,functions f,triggers t"
+						" where h.hostid=i.hostid"
+							" and h.maintenance_status=%d"
+							" and i.itemid=f.itemid"
+							" and f.triggerid=t.triggerid"
+							" and t.triggerid=" ZBX_FS_UI64,
+						HOST_MAINTENANCE_STATUS_OFF,
+						event->objectid);
+
+				if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
 					ret = SUCCEED;
+				DBfree_result(result);
 				break;
 			default:
 				ret = NOTSUPPORTED;
@@ -1883,17 +1907,17 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 	if (0 != new_escalations.values_num)
 	{
 		zbx_db_insert_t	db_insert;
-		int		j;
+		int		i;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
 					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
 
-		for (j = 0; j < new_escalations.values_num; j++)
+		for (i = 0; i < new_escalations.values_num; i++)
 		{
 			zbx_uint64_t		triggerid = 0, itemid = 0;
 			zbx_escalation_new_t	*new_escalation;
 
-			new_escalation = (zbx_escalation_new_t *)new_escalations.values[j];
+			new_escalation = (zbx_escalation_new_t *)new_escalations.values[i];
 
 			switch (new_escalation->event->object)
 			{
@@ -2125,7 +2149,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 			actionids->values_num);
 
 	result = DBselect("select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,pause_suppressed,ack_shortdata,ack_longdata"
+				"r_longdata,maintenance_mode,ack_shortdata,ack_longdata"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -2153,7 +2177,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		action->longdata = zbx_strdup(NULL, row[6]);
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
 		action->r_longdata = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(action->pause_suppressed, row[9]);
+		ZBX_STR2UCHAR(action->maintenance_mode, row[9]);
 		action->ack_shortdata = zbx_strdup(NULL, row[10]);
 		action->ack_longdata = zbx_strdup(NULL, row[11]);
 		action->name = zbx_strdup(NULL, row[1]);

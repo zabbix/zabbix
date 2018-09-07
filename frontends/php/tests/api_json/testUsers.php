@@ -31,12 +31,9 @@ class testUsers extends CZabbixTest {
 			// Check user password.
 			[
 				'user' => [
-					'alias' => 'API user create without password',
-					'usrgrps' => [
-						['usrgrpid' => 7]
-					]
+					'alias' => 'API user create without password'
 				],
-				'Incorrect value for field "passwd": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "passwd" is missing.'
 			],
 			// Check user alias.
 			[

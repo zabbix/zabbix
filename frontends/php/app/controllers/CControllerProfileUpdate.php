@@ -47,7 +47,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.items.filter.active':
 				case 'web.item.graph.filter.active':
 				case 'web.latest.filter.active':
-				case 'web.layout.mode':
 				case 'web.maintenance.filter.active':
 				case 'web.media_types.filter.active':
 				case 'web.overview.filter.active':
@@ -114,10 +113,6 @@ class CControllerProfileUpdate extends CController {
 				foreach ($this->getInput('idx2') as $idx2) {
 					CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
 				}
-				break;
-
-			case 'web.layout.mode':
-				CProfile::update($idx, $value_int, PROFILE_TYPE_INT);
 				break;
 
 			default:

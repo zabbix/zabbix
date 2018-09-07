@@ -167,7 +167,7 @@ class testFormAction extends CWebTest {
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Problem is suppressed']
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Maintenance status']
 			],
 			[
 				['eventsource' => 'Discovery']
@@ -549,7 +549,7 @@ class testFormAction extends CWebTest {
 						'Trigger name',
 						'Trigger severity',
 						'Time period',
-						'Problem is suppressed'
+						'Maintenance status'
 				]);
 				break;
 			case 'Discovery':
@@ -653,15 +653,10 @@ class testFormAction extends CWebTest {
 				]);
 				break;
 			case 'Time period':
+			case 'Maintenance status':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'in',
 						'not in'
-				]);
-				break;
-			case 'Problem is suppressed':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'No',
-						'Yes'
 				]);
 				break;
 			case 'Uptime/Downtime':
@@ -841,6 +836,15 @@ class testFormAction extends CWebTest {
 				break;
 			case 'Event type':
 				$this->zbxTestAssertAttribute('//*[@id=\'new_condition_value\']/option[text()=\'Item in "not supported" state\']', 'selected');
+				break;
+		}
+
+		switch ($new_condition_conditiontype) {
+			case 'Maintenance status':
+				$this->zbxTestAssertElementPresentXpath('//td[text()=\'maintenance\']');
+				break;
+			default:
+				$this->zbxTestAssertElementNotPresentXpath('//td[text()=\'maintenance\']');
 				break;
 		}
 
@@ -1694,11 +1698,6 @@ class testFormAction extends CWebTest {
 						'type' => 'Application',
 						'value' => 'application',
 					],
-					[
-						'type' => 'Tag',
-						'operator' => 'not like',
-						'value' => 'Not like Tag',
-					],
 				],
 				'operations' => [
 					[
@@ -1733,11 +1732,6 @@ class testFormAction extends CWebTest {
 					[
 						'type' => 'Service type',
 						'value' => 'FTP',
-					],
-					[
-						'type' => 'Received value',
-						'operator' => 'not like',
-						'value' => 'Received value',
 					]
 				],
 				'operations' => [
@@ -1771,11 +1765,6 @@ class testFormAction extends CWebTest {
 				'conditions' => [
 					[
 						'type' => 'Host name',
-						'value' => 'Zabbix',
-					],
-					[
-						'type' => 'Host metadata',
-						'operator'=> 'not like',
 						'value' => 'Zabbix',
 					]
 				],
@@ -1863,11 +1852,6 @@ class testFormAction extends CWebTest {
 					case 'Host name':
 					case 'Host metadata':
 					case 'Trigger name':
-					case 'Tag':
-					case 'Received value':
-						if (array_key_exists('operator', $condition)) {
-							$this->zbxTestDropdownSelectWait('new_condition_operator', $condition['operator']);
-						}
 						$this->zbxTestInputTypeWait('new_condition_value', $condition['value']);
 						$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
 						switch($condition['type']){
@@ -1880,19 +1864,11 @@ class testFormAction extends CWebTest {
 								$conditionCount++;
 								break;
 							case 'Host metadata':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata not like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata like '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Trigger name':
 								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name like '.$condition['value']);
-								$conditionCount++;
-								break;
-							case 'Tag':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Tag not like '.$condition['value']);
-								$conditionCount++;
-								break;
-							case 'Received value':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value not like '.$condition['value']);
 								$conditionCount++;
 								break;
 						}
@@ -1968,11 +1944,8 @@ class testFormAction extends CWebTest {
 		if (isset($data['esc_period'])){
 			$this->zbxTestTabSwitch('Operations');
 			$this->zbxTestInputTypeOverwrite('esc_period', $data['esc_period']);
-			// Fire onchange event.
-			$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
-				'event.initEvent("change", false, true);'.
-				'document.getElementById("esc_period").dispatchEvent(event);'
-			);
+			$this->zbxTestWaitForPageToLoad();
+			$this->webDriver->findElement(WebDriverBy::id('search'))->click();
 			$this->zbxTestWaitForPageToLoad();
 		}
 
@@ -2106,13 +2079,9 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
 
 		$this->zbxTestInputTypeOverwrite('esc_period', '123');
-		// Fire onchange event.
-		$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
-				'event.initEvent("change", false, true);'.
-				'document.getElementById("esc_period").dispatchEvent(event);'
-		);
 		$this->zbxTestWaitForPageToLoad();
-
+		$this->webDriver->findElement(WebDriverBy::id('search'))->click();
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementValue('esc_period', '123');
 		$this->zbxTestDoubleClickXpath("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]", 'new_operation_esc_step_from');
 

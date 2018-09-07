@@ -257,9 +257,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'label' => _('Proxies')
 				],
 				[
-					'url' => 'zabbix.php',
-					'action' => 'authentication.edit',
-					'active_if' => ['authentication.edit', 'authentication.update'],
+					'url' => 'authentication.php',
 					'label' => _('Authentication')
 				],
 				[

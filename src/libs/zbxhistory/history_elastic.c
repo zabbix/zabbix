@@ -201,8 +201,8 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 		if (0 != page_r.offset)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, HTTP error: %ld, message: %s",
-					http_code, page_r.data);
+			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, HTTP error: %ld,",
+					" message: %s", http_code, page_r.data);
 		}
 		else
 			zabbix_log(LOG_LEVEL_ERR, "cannot get values from elasticsearch, HTTP error: %ld", http_code);
@@ -475,16 +475,17 @@ try_again:
 				if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
 						(char **)&curl_page) && '\0' != *curl_page->errbuf)
 				{
-					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, HTTP error"
-							" message: %s", curl_page->errbuf);
+					zabbix_log(LOG_LEVEL_ERR, "%s: %s",
+							"cannot send data to elasticsearch, HTTP error message",
+							curl_page->errbuf);
 				}
 				else
 				{
 					long int	err;
 
 					curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &err);
-					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, HTTP error code:"
-							" %ld", err);
+					zabbix_log(LOG_LEVEL_ERR, "%s: %d",
+							"cannot send data to elasticsearch, HTTP error code", err);
 				}
 			}
 			else if (CURLE_OK != msg->data.result)
@@ -492,12 +493,12 @@ try_again:
 				if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
 						(char **)&curl_page) && '\0' != *curl_page->errbuf)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "cannot send data to elasticsearch: %s",
+					zabbix_log(LOG_LEVEL_WARNING, "%s: %s", "cannot send data to elasticsearch",
 							curl_page->errbuf);
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "cannot send data to elasticsearch: %s",
+					zabbix_log(LOG_LEVEL_WARNING, "%s: %s", "cannot send data to elasticsearch",
 							curl_easy_strerror(msg->data.result));
 				}
 
@@ -510,8 +511,8 @@ try_again:
 			else if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char **)&curl_page)
 					&& SUCCEED == elastic_is_error_present(&curl_page->page, &error))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s() cannot send data to elasticsearch: %s",
-						__function_name, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s() %s: %s", __function_name,
+						"cannot send data to elasticsearch", error);
 				zbx_free(error);
 
 				/* If the error is due to elastic internal problems (for example an index */

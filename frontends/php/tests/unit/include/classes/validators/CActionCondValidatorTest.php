@@ -127,7 +127,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => DOBJECT_STATUS_UP,
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 				'value' => null,
 			]],
 			[[], [
@@ -343,10 +343,10 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
-					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+					'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 					'value' => 123,
 				],
-				'Action condition value must be empty.'
+				'Maintenance action condition value must be empty.'
 			],
 			[[],
 				[

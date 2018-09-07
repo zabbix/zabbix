@@ -423,22 +423,14 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Open another filter tab
+	 * If 'Filter' tab is closed, then open it
 	 */
-	public function zbxTestExpandFilterTab($string = 'Filter') {
-		if ($string === 'Filter') {
-			$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"))->isDisplayed();
-			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
-			}
-		}
-		else {
-			$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[@class='time-input']"))->isDisplayed();
-			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'btn-time')]");
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='time-input']"));
-			}
+
+	public function zbxTestExpandFilterTab() {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"))->isDisplayed();
+		if (!$element) {
+			$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
 		}
 	}
 

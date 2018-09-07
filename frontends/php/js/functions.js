@@ -585,9 +585,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	var center_overlay_dialog = function() {
 			overlay_dialogue.css({
 				'left': Math.round((jQuery(window).width() - jQuery(overlay_dialogue).outerWidth()) / 2) + 'px',
-				'top': overlay_dialogue.hasClass('sticked-to-top')
-					? ''
-					: Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
+				'top': Math.round((jQuery(window).height() - jQuery(overlay_dialogue).outerHeight()) / 2) + 'px'
 			});
 		},
 		body_mutation_observer = window.MutationObserver || window.WebKitMutationObserver,
@@ -642,8 +640,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	jQuery(overlay_dialogue)
 		.append(
 			jQuery('<button>', {
-				class: 'overlay-close-btn',
-				title: t('Close')
+				class: 'overlay-close-btn'
 			})
 				.click(function() {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');

@@ -1262,8 +1262,7 @@ abstract class CItemGeneral extends CApiService {
 						if (!is_numeric($params)
 								&& (new CUserMacroParser())->parse($params) != CParser::PARSE_SUCCESS
 								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS))) {
+									|| (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
@@ -2075,12 +2074,12 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
-			$ranges_parser = new CRangesParser([
+			$validator = new CStatusCodeRangesValidator([
 				'usermacros' => true,
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);
 
-			if ($ranges_parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
+			if (!$validator->validate($item['status_codes'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
 				);

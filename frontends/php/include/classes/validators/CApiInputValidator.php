@@ -112,17 +112,11 @@ class CApiInputValidator {
 			case API_HG_NAME:
 				return self::validateHostGroupName($rule, $data, $path, $error);
 
-			case API_H_NAME:
-				return self::validateHostName($rule, $data, $path, $error);
-
 			case API_SCRIPT_NAME:
 				return self::validateScriptName($rule, $data, $path, $error);
 
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
-
-			case API_RANGE_TIME:
-				return self::validateRangeTime($rule, $data, $path, $error);
 
 			case API_TIME_PERIOD:
 				return self::validateTimePeriod($rule, $data, $path, $error);
@@ -167,29 +161,17 @@ class CApiInputValidator {
 			case API_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
+			case API_OBJECT:
 			case API_OUTPUT:
 			case API_HG_NAME:
-			case API_H_NAME:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
-			case API_RANGE_TIME:
 			case API_TIME_PERIOD:
 			case API_TIME_UNIT:
 			case API_REGEX:
 			case API_HTTP_POST:
 			case API_VARIABLE_NAME:
 			case API_URL:
-				return true;
-
-			case API_OBJECT:
-				foreach ($rule['fields'] as $field_name => $field_rule) {
-					if ($data !== null && array_key_exists($field_name, $data)) {
-						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
-							return false;
-						}
-					}
-				}
 				return true;
 
 			case API_IDS:
@@ -237,7 +219,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Multiple data types validator.
+	 * Myltiple data types validator.
 	 *
 	 * @param array  $rule
 	 * @param array  $rule['rules']
@@ -581,11 +563,10 @@ class CApiInputValidator {
 	 * Object validator.
 	 *
 	 * @param array  $rul
-	 * @param int    $rule['flags']                                   (optional) API_ALLOW_NULL
+	 * @param int    $rule['flags']                           (optional) API_ALLOW_NULL
 	 * @param array  $rule['fields']
-	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED
-	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
-	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
+	 * @param int    $rule['fields'][<field_name>]['flags']   (optional) API_REQUIRED, API_DEPRECATED
+	 * @param mixed  $rule['fields'][<field_name>]['default'] (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -618,10 +599,6 @@ class CApiInputValidator {
 
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
-			}
-
-			if (array_key_exists('default_source', $field_rule) && !array_key_exists($field_name, $data)) {
-				$data[$field_name] = $data[$field_rule['default_source']];
 			}
 
 			if (array_key_exists($field_name, $data)) {
@@ -784,7 +761,6 @@ class CApiInputValidator {
 	 * Host group name validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -799,68 +775,13 @@ class CApiInputValidator {
 
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-
 			return false;
 		}
 
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		$host_group_name_parser = new CHostGroupNameParser(['lldmacros' => ($flags & API_REQUIRED_LLD_MACRO)]);
+		$host_group_name_validator = new CHostGroupNameValidator();
 
-		if ($host_group_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid host group name'));
-
-			return false;
-		}
-
-		if (($flags & API_REQUIRED_LLD_MACRO) && !$host_group_name_parser->getMacros()) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('must contain at least one low-level discovery macro')
-			);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Host name validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateHostName($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-
-			return false;
-		}
-
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-		$host_name_parser = new CHostNameParser(['lldmacros' => ($flags & API_REQUIRED_LLD_MACRO)]);
-
-		// For example, host prototype name MUST contain macros.
-		if ($host_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid host name'));
-
-			return false;
-		}
-
-		if (($flags & API_REQUIRED_LLD_MACRO) && !$host_name_parser->getMacros()) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-				_('must contain at least one low-level discovery macro')
-			);
-
+		if (!$host_group_name_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $host_group_name_validator->getError());
 			return false;
 		}
 
@@ -925,39 +846,6 @@ class CApiInputValidator {
 
 		if ((new CUserMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a user macro is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Time period validator like "1-7,00:00-24:00".
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateRangeTime($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		if ($range_time_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time range is expected'));
 			return false;
 		}
 

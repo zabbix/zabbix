@@ -25,27 +25,26 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 $page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['class.calendar.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'mode' =>			[T_ZBX_INT,			O_OPT,	P_SYS,			IN('0,1'),	null],
-	'hostgroupid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'tpl_triggerid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'triggerid' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
+	'mode' =>				[T_ZBX_INT,	O_OPT,	P_SYS,			IN('0,1'),	null],
+	'hostgroupid' =>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null],
+	'tpl_triggerid' =>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null],
+	'triggerid' =>			[T_ZBX_INT,	O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
 	// filter
-	'filter_groupid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_hostid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_rst'=>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'filter_set' =>		[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
-	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
-	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
+	'filter_groupid'=>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_hostid' =>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_rst'=>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
+	'filter_set' =>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
+	'filter_timesince' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null],
+	'filter_timetill' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null]
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $availabilityReportMode = getRequest('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
@@ -92,6 +91,8 @@ if (getRequest('triggerid') && !isReadableTriggers([getRequest('triggerid')])) {
 if (hasRequest('filter_rst')) {
 	$_REQUEST['filter_groupid'] = 0;
 	$_REQUEST['filter_hostid'] = 0;
+	$_REQUEST['filter_timesince'] = 0;
+	$_REQUEST['filter_timetill'] = 0;
 
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		$_REQUEST['tpl_triggerid'] = 0;
@@ -105,6 +106,12 @@ if (!hasRequest('filter_rst')) {
 	);
 	$_REQUEST['filter_hostid'] = getRequest('filter_hostid',
 		CProfile::get('web.avail_report.'.$availabilityReportMode.'.hostid', 0)
+	);
+	$_REQUEST['filter_timesince'] = getRequest('filter_timesince',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0)
+	);
+	$_REQUEST['filter_timetill'] = getRequest('filter_timetill',
+		CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0)
 	);
 
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
@@ -121,6 +128,12 @@ if (!hasRequest('filter_rst')) {
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', getRequest('filter_groupid', 0),
 	PROFILE_TYPE_ID
 );
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', getRequest('filter_timesince', 0),
+	PROFILE_TYPE_STR
+);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', getRequest('filter_timetill', 0),
+	PROFILE_TYPE_STR
+);
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', getRequest('filter_hostid', 0),
 	PROFILE_TYPE_ID
 );
@@ -135,15 +148,16 @@ if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	);
 }
 
-$timeselector_options = [
-	'profileIdx' => 'web.avail_report.filter',
-	'profileIdx2' => 0,
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
-];
-updateTimeSelectorPeriod($timeselector_options);
-
 $config = select_config();
+
+if ($_REQUEST['filter_timetill'] > 0 && $_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill']) {
+	zbx_swap($_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
+}
+
+$_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']
+	? $_REQUEST['filter_timesince'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time() - SEC_PER_DAY));
+$_REQUEST['filter_timetill'] = zbxDateToTime($_REQUEST['filter_timetill']
+	? $_REQUEST['filter_timetill'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 
 /*
  * Header
@@ -181,7 +195,7 @@ if ($triggerData) {
 		->addItem($table)
 		->show();
 }
-elseif (hasRequest('filter_hostid')) {
+elseif (isset($_REQUEST['filter_hostid'])) {
 	$reportWidget->setControls((new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
@@ -208,14 +222,8 @@ elseif (hasRequest('filter_hostid')) {
 	/*
 	 * Filter
 	 */
-	$data = [
-		'filter' => [
-			'timeline' => getTimeSelectorPeriod($timeselector_options),
-			'active_tab' => CProfile::get('web.avail_report.filter.active', 1)
-		]
-	];
-
-	$filter_column = new CFormList();
+	$filterColumn1 = new CFormList();
+	$filterColumn2 = new CFormList();
 
 	// report by template
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
@@ -250,7 +258,7 @@ elseif (hasRequest('filter_hostid')) {
 		foreach ($groups as $group) {
 			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
-		$filter_column->addRow(_('Template group'), $groupsComboBox);
+		$filterColumn1->addRow(_('Template group'), $groupsComboBox);
 
 		// filter template
 		$templateComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
@@ -282,7 +290,7 @@ elseif (hasRequest('filter_hostid')) {
 
 			$templateComboBox->addItem($template['templateid'], $template['name']);
 		}
-		$filter_column->addRow(_('Template'), $templateComboBox);
+		$filterColumn1->addRow(_('Template'), $templateComboBox);
 
 		// filter trigger
 		$triggerComboBox = new CComboBox('tpl_triggerid', getRequest('tpl_triggerid', 0), 'javascript: submit()');
@@ -315,7 +323,7 @@ elseif (hasRequest('filter_hostid')) {
 			unset($triggerOptions['filter']['templateid']);
 		}
 
-		$filter_column->addRow(_('Template trigger'), $triggerComboBox);
+		$filterColumn1->addRow(_('Template trigger'), $triggerComboBox);
 
 		// filter host group
 		$hostGroupsComboBox = new CComboBox('hostgroupid', getRequest('hostgroupid', 0), 'javascript: submit()');
@@ -354,13 +362,14 @@ elseif (hasRequest('filter_hostid')) {
 			unset($triggerOptions['groupids']);
 		}
 
-		$filter_column->addRow(_('Host group'), $hostGroupsComboBox);
+		$filterColumn1->addRow(_('Host group'), $hostGroupsComboBox);
 	}
+
 	// report by host
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
 		// filter host group
 		$groupsComboBox = (new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();'))
-			->setAttribute('autofocus', 'autofocus');
+				->setAttribute('autofocus', 'autofocus');
 		$groupsComboBox->addItem(0, _('all'));
 
 		$groups = API::HostGroup()->get([
@@ -376,7 +385,7 @@ elseif (hasRequest('filter_hostid')) {
 		foreach ($groups as $group) {
 			$groupsComboBox->addItem($group['groupid'], $group['name']);
 		}
-		$filter_column->addRow(_('Host group'), $groupsComboBox);
+		$filterColumn1->addRow(_('Host group'), $groupsComboBox);
 
 		// filter host
 		$hostsComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
@@ -406,7 +415,7 @@ elseif (hasRequest('filter_hostid')) {
 		foreach ($hosts as $host) {
 			$hostsComboBox->addItem($host['hostid'], $host['name']);
 		}
-		$filter_column->addRow(_('Host'), $hostsComboBox);
+		$filterColumn1->addRow(_('Host'), $hostsComboBox);
 
 		// trigger options
 		$triggerOptions['groupids'] = $filter_groupids;
@@ -415,13 +424,18 @@ elseif (hasRequest('filter_hostid')) {
 		}
 	}
 
+	// filter period
+	$filterColumn2->addRow(_('From'), createDateSelector('filter_timesince', $_REQUEST['filter_timesince']));
+	$filterColumn2->addRow(_('To'), createDateSelector('filter_timetill', $_REQUEST['filter_timetill']));
+
 	$reportWidget->addItem(
 		(new CFilter())
-			->setProfile($data['filter']['timeline']['profileIdx'])
-			->setActiveTab($data['filter']['active_tab'])
+			->setProfile('web.avail_report.filter')
+			->setActiveTab(CProfile::get('web.avail_report.filter.active', 1))
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
-			->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], ZBX_DATE_TIME)
-			->addFilterTab(_('Filter'), [$filter_column])
+			->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
+			->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']))
+			->addFilterTab(_('Filter'), [$filterColumn1, $filterColumn2])
 	);
 
 	/*
@@ -441,8 +455,8 @@ elseif (hasRequest('filter_hostid')) {
 	$paging = getPagingLine($triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 
 	foreach ($triggers as $trigger) {
-		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
-			$data['filter']['timeline']['to_ts']
+		$availability = calculateAvailability($trigger['triggerid'], getRequest('filter_timesince'),
+			getRequest('filter_timetill')
 		);
 
 		$triggerTable->addRow([
@@ -453,30 +467,12 @@ elseif (hasRequest('filter_hostid')) {
 					->setArgument('filter_triggerids[]', $trigger['triggerid'])
 					->setArgument('filter_set', '1')
 			),
-			($availability['true'] == 0)
-				? ''
-				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
-			($availability['false'] == 0)
-				? ''
-				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
+			$availability['true'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
+			$availability['false'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
-				'&filter_hostid='.$_REQUEST['filter_hostid'].'&triggerid='.$trigger['triggerid']
-			)
+				'&filter_hostid='.$_REQUEST['filter_hostid'].'&triggerid='.$trigger['triggerid'])
 		]);
 	}
-
-	$obj_data = [
-		'id' => 'timeline_1',
-		'domid' => 'avail_report',
-		'loadSBox' => 0,
-		'loadImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1
-	];
-	zbx_add_post_js(
-		'timeControl.addObject("avail_report", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');'
-	);
-	zbx_add_post_js('timeControl.processObjects();');
 
 	$reportWidget
 		->addItem([$triggerTable, $paging])

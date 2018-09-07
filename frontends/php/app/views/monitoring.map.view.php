@@ -23,16 +23,15 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Maps'))
-	->setWebLayoutMode(CView::getLayoutMode())
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CList())
 				->addItem([
@@ -45,6 +44,7 @@ $this->addJsFile('layout.mode.js');
 			->addItem($data['map']['editable']
 				? new CRedirectButton(_('Edit map'), (new CUrl('sysmap.php'))
 					->setArgument('sysmapid', $data['map']['sysmapid'])
+					->setArgument('fullscreen', $data['fullscreen'])
 					->getUrl()
 				)
 				: null
@@ -54,12 +54,14 @@ $this->addJsFile('layout.mode.js');
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']
 			]))
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	]))
-	->setBreadcrumbs(
-		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['severity_min'])
+	->addItem(
+		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['fullscreen'],
+			$data['severity_min']
+		)
 	)
 	->addItem(
 		(new CDiv())
@@ -76,7 +78,8 @@ $this->addJsFile('layout.mode.js');
 						'resourceid' => $data['map']['sysmapid'],
 						'width' => null,
 						'height' => null,
-						'severity_min' => $data['severity_min']
+						'severity_min' => $data['severity_min'],
+						'fullscreen' => $data['fullscreen']
 					]
 				])->get()
 			)

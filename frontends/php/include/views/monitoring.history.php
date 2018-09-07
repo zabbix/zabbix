@@ -19,15 +19,14 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
-
-$historyWidget = (new CWidget())->setWebLayoutMode($web_layout_mode);
+$historyWidget = new CWidget();
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($data['items'])),
 	'right' => (new CForm('get'))
 		->addVar('itemids', getRequest('itemids'))
 		->addVar('page', 1)
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 ];
 $header_row = [];
 $first_item = reset($data['items']);
@@ -94,7 +93,10 @@ if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
 	]));
 }
 
-$action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_icon('fullscreen')]);
+$action_list->addItem([
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])
+]);
 
 $header['right']->addItem($action_list);
 
@@ -104,7 +106,9 @@ $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {
 	if (array_key_exists($data['value_type'], $data['iv_string']) || !$data['itemids']) {
-		$filter_form->addVar('action', $data['action']);
+		$filter_form
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
+			->addVar('action', $data['action']);
 
 		$items_data = [];
 		if ($data['items']) {
@@ -206,16 +210,18 @@ if ($data['plaintext']) {
 else {
 	$historyWidget
 		->setTitle($header['left'])
-		->setControls((new CTag('nav', true, $header['right']))->setAttribute('aria-label', _('Content controls')));
+		->setControls((new CTag('nav', true, $header['right']))
+			->setAttribute('aria-label', _('Content controls'))
+		);
 
-	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST
-		&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-			$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
+	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
+		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {
 		$filter_form
 			->hideFilterButtons()
+			->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 			->addVar('action', $data['action'])
 			->addVar('itemids', $data['itemids']);
 		$filter_tab = [
@@ -239,9 +245,8 @@ else {
 
 
 	if ($data['itemids']) {
-		if ($data['action'] !== HISTORY_LATEST
-			&& in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-				$historyWidget->addItem($filter_form);
+		if ($data['action'] !== HISTORY_LATEST) {
+			$historyWidget->addItem($filter_form);
 		}
 
 		$historyWidget->addItem($screen->get());
@@ -251,7 +256,7 @@ else {
 		}
 	}
 	else {
-		if ($filter_tab && in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
+		if ($filter_tab) {
 			$historyWidget->addItem($filter_form);
 		}
 

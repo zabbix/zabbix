@@ -28,8 +28,7 @@ $table = (new CTableInfo())
 		_('Without problems'),
 		_('With problems'),
 		_('Total')
-	])
-	->setHeadingColumn(0);
+	]);
 
 $url_group = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
@@ -38,10 +37,8 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', $data['filter']['hostids'])
 	->setArgument('filter_name', $data['filter']['problem'])
-	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-		? ZBX_PROBLEM_SUPPRESSED_TRUE
-		: null
-	);
+	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 $url_host = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_set', 1)
@@ -49,10 +46,8 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', null)
 	->setArgument('filter_name', $data['filter']['problem'])
-	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-		? ZBX_PROBLEM_SUPPRESSED_TRUE
-		: null
-	);
+	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
+	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
 
 foreach ($data['groups'] as $group) {
 	$problematic_count_key = ($data['filter']['ext_ack'] == EXTACK_OPTION_UNACK)
@@ -63,15 +58,19 @@ foreach ($data['groups'] as $group) {
 		continue;
 	}
 
+	$group_row = new CRow();
+
 	$url_group->setArgument('filter_groupids', [$group['groupid']]);
 	$url_host->setArgument('filter_groupids', [$group['groupid']]);
-
-	$group_row = [new CLink($group['name'], $url_group->getUrl())];
+	$group_name = new CLink($group['name'], $url_group->getUrl());
+	$group_row->addItem($group_name);
 
 	// Add cell for column 'Without problems'.
-	$group_row[] = ($group['hosts_total_count'] != $group[$problematic_count_key])
+	$group_row->addItem(
+		($group['hosts_total_count'] != $group[$problematic_count_key])
 			? $group['hosts_total_count'] - $group[$problematic_count_key]
-			: '';
+			: ''
+	);
 
 	/**
 	 * Create a CLinkAction element with hint-boxed table that contains hosts of particular host group and number of
@@ -93,47 +92,50 @@ foreach ($data['groups'] as $group) {
 	 * problems for each host, grouped per problem severity.
 	 */
 	if ($data['filter']['ext_ack'] != EXTACK_OPTION_UNACK && $group['hosts_problematic_count'] != 0) {
-		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))
-			->setHint(makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host))
-			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
-				$group['hosts_problematic_count'], getSeverityName($group['highest_severity'], $data['config'])
-			));
+		$problematic_count = (new CLinkAction($group['hosts_problematic_count']))->setHint(
+			makeProblemHostsHintBox($group['hosts_problematic_list'], $data, $url_host)
+		);
 	}
 
 	// Add 'With problems' column with ext_ack specific content.
 	switch ($data['filter']['ext_ack']) {
 		case EXTACK_OPTION_ALL:
 			if ($group['hosts_problematic_count'] != 0) {
-				$group_row[] = (new CCol($problematic_count))->addClass(getSeverityStyle($group['highest_severity']));
+				$group_row->addItem((new CCol($problematic_count))
+					->addClass(getSeverityStyle($group['highest_severity']))
+				);
 			}
 			else {
-				$group_row[] = '';
+				$group_row->addItem('');
 			}
 			break;
 
 		case EXTACK_OPTION_BOTH:
 			if ($group['hosts_problematic_count'] != 0) {
 				$unack_span = ($last_unack_count !== null) ? [$last_unack_count, ' '._('of').' '] : null;
-				$group_row[] = (new CCol([$unack_span, $problematic_count]))
-					->addClass(getSeverityStyle($group['highest_severity']));
+				$group_row->addItem((new CCol([$unack_span, $problematic_count]))
+					->addClass(getSeverityStyle($group['highest_severity']))
+				);
 			}
 			else {
-				$group_row[] = '';
+				$group_row->addItem('');
 			}
 			break;
 
 		case EXTACK_OPTION_UNACK:
 			if ($group['hosts_problematic_unack_count'] != 0) {
-				$group_row[] = (new CCol($last_unack_count))->addClass(getSeverityStyle($group['highest_severity']));
+				$group_row->addItem((new CCol($last_unack_count))
+					->addClass(getSeverityStyle($group['highest_severity']))
+				);
 			}
 			else {
-				$group_row[] = '';
+				$group_row->addItem('');
 			}
 			break;
 	}
 
 	// Add 'Total' column.
-	$group_row[] = $group['hosts_total_count'];
+	$group_row->addItem($group['hosts_total_count']);
 
 	$table->addRow($group_row);
 }

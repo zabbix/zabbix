@@ -30,6 +30,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 			'name' => 'string',
 			'uniqueid' => 'required|string',
 			'initial_load' => 'in 0,1',
+			'fullscreen' => 'in 0,1',
 			'fields' => 'json',
 			'storage' => 'array'
 		]);
@@ -62,7 +63,9 @@ class CControllerWidgetMapView extends CControllerWidget {
 			? $storage['current_sysmapid']
 			: (array_key_exists('sysmapid', $fields) ? $fields['sysmapid'] : null);
 
-		$sysmap_data = CMapHelper::get(($sysmapid === null) ? [] : [$sysmapid]);
+		$sysmap_data = CMapHelper::get(($sysmapid === null) ? [] : [$sysmapid], [
+			'fullscreen' => (bool) $this->getInput('fullscreen', false)
+		]);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to referred object or it does not exist!');

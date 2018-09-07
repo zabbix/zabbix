@@ -27,18 +27,8 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
-$page['scripts'] = [
-	'class.calendar.js',
-	'gtlc.js',
-	'flickerfreescreen.js',
-	'class.svg.canvas.js',
-	'class.svg.map.js',
-	'layout.mode.js'
-];
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'class.svg.canvas.js', 'class.svg.map.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -56,7 +46,8 @@ $fields = [
 	'step' =>		[T_ZBX_INT,			O_OPT, P_SYS,	BETWEEN(0, 65535), null],
 	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
-	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS,	IN('"reset"'), null]
+	'reset' =>		[T_ZBX_STR,			O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>	[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'), null]
 ];
 check_fields($fields);
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -88,7 +79,9 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = [];
+$data = [
+	'fullscreen' => $_REQUEST['fullscreen']
+];
 
 $options = [
 	'output' => ['screenid', 'name']

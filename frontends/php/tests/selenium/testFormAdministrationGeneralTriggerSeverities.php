@@ -103,22 +103,22 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$this->zbxTestInputType('severity_name_5', 'Disaster2');
 
 		$this->zbxTestClick('lbl_severity_color_5');
-		$this->zbxTestClickXpath("//div[@title='\"#880000\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"880000\");']");
 
 		$this->zbxTestClick('lbl_severity_color_4');
-		$this->zbxTestClickXpath("//div[@title='\"#FF3333\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"FF3333\");']");
 
 		$this->zbxTestClick('lbl_severity_color_3');
-		$this->zbxTestClickXpath("//div[@title='\"#FF6666\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"FF6666\");']");
 
 		$this->zbxTestClick('lbl_severity_color_2');
-		$this->zbxTestClickXpath("//div[@title='\"#DDDD00\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"DDDD00\");']");
 
 		$this->zbxTestClick('lbl_severity_color_1');
-		$this->zbxTestClickXpath("//div[@title='\"#00CCCC\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"00CCCC\");']");
 
 		$this->zbxTestClick('lbl_severity_color_0');
-		$this->zbxTestClickXpath("//div[@title='\"#999999\"']");
+		$this->zbxTestClickXpath("//div[@onclick='set_color(\"999999\");']");
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');

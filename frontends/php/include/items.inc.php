@@ -774,230 +774,28 @@ function get_same_item_for_host($item, $dest_hostids) {
 	return false;
 }
 
-/**
- * Get parent templates for each given item.
- *
- * @param array  $items                 An array of items.
- * @param string $items[]['itemid']     ID of an item.
- * @param string $items[]['templateid'] ID of parent template item.
- * @param int    $flag                  Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                      ZBX_FLAG_DISCOVERY_PROTOTYPE).
- *
- * @return array
- */
-function getItemParentTemplates(array $items, $flag) {
-	$parent_itemids = [];
-	$data = [
-		'links' => [],
-		'templates' => []
-	];
-
-	foreach ($items as $item) {
-		if ($item['templateid'] != 0) {
-			$parent_itemids[$item['templateid']] = true;
-			$data['links'][$item['itemid']] = ['itemid' => $item['templateid']];
-		}
+function get_realhost_by_itemid($itemid) {
+	$item = get_item_by_itemid($itemid);
+	if ($item['templateid'] <> 0) {
+		return get_realhost_by_itemid($item['templateid']); // attention recursion!
 	}
-
-	if (!$parent_itemids) {
-		return $data;
-	}
-
-	$all_parent_itemids = [];
-	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-		$lld_ruleids = [];
-	}
-
-	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$db_items = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids)
-			]);
-		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$db_items = API::ItemPrototype()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'selectDiscoveryRule' => ['itemid']
-			]);
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
-		else {
-			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'templateid'],
-				'itemids' => array_keys($parent_itemids),
-				'webitems' => true
-			]);
-		}
-
-		$all_parent_itemids += $parent_itemids;
-		$parent_itemids = [];
-
-		foreach ($db_items as $db_item) {
-			$data['templates'][$db_item['hostid']] = [];
-			$hostids[$db_item['itemid']] = $db_item['hostid'];
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
-			}
-
-			if ($db_item['templateid'] != 0) {
-				if (!array_key_exists($db_item['templateid'], $all_parent_itemids)) {
-					$parent_itemids[$db_item['templateid']] = true;
-				}
-
-				$data['links'][$db_item['itemid']] = ['itemid' => $db_item['templateid']];
-			}
-		}
-	}
-	while ($parent_itemids);
-
-	foreach ($data['links'] as &$parent_item) {
-		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
-			? $hostids[$parent_item['itemid']]
-			: 0;
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
-				? $lld_ruleids[$parent_item['itemid']]
-				: 0;
-		}
-	}
-	unset($parent_item);
-
-	$db_templates = $data['templates']
-		? API::Template()->get([
-			'output' => ['name'],
-			'templateids' => array_keys($data['templates']),
-			'preservekeys' => true
-		])
-		: [];
-
-	$rw_templates = $db_templates
-		? API::Template()->get([
-			'output' => [],
-			'templateids' => array_keys($db_templates),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
-
-	$data['templates'][0] = [];
-
-	foreach ($data['templates'] as $hostid => &$template) {
-		$template = array_key_exists($hostid, $db_templates)
-			? [
-				'hostid' => $hostid,
-				'name' => $db_templates[$hostid]['name'],
-				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
-			]
-			: [
-				'hostid' => $hostid,
-				'name' => _('Inaccessible template'),
-				'permission' => PERM_DENY
-			];
-	}
-	unset($template);
-
-	return $data;
+	return get_host_by_itemid($itemid);
 }
 
-/**
- * Returns a template prefix for selected item.
- *
- * @param string $itemid
- * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
- * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
- *
- * @return CLink|CSpan|null
- */
-function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
-	if (!array_key_exists($itemid, $parent_templates['links'])) {
-		return null;
-	}
-
-	while (array_key_exists($parent_templates['links'][$itemid]['itemid'], $parent_templates['links'])) {
-		$itemid = $parent_templates['links'][$itemid]['itemid'];
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
-
-	if ($template['permission'] == PERM_READ_WRITE) {
-		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-			$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $template['hostid']);
-		}
-		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('disc_prototypes.php'))
-				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
-		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
-		else {
-			$url = (new CUrl('items.php'))
-				->setArgument('hostid', $template['hostid'])
-				->setArgument('filter_set', 1);
-		}
-
-		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
-	}
-	else {
-		$name = new CSpan(CHtml::encode($template['name']));
-	}
-
-	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-}
-
-/**
- * Returns a list of item templates.
- *
- * @param string $itemid
- * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
- * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
- *
- * @return array
- */
-function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
-	$list = [];
-
-	while (array_key_exists($itemid, $parent_templates['links'])) {
-		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
-
-		if ($template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
-				$url = (new CUrl('host_discovery.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
+function fillItemsWithChildTemplates(&$items) {
+	$processSecondLevel = false;
+	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.dbConditionInt('i.itemid', zbx_objectValues($items, 'templateid')));
+	while ($dbItem = DBfetch($dbItems)) {
+		foreach ($items as $itemid => $item) {
+			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
+				$items[$itemid]['templateid'] = $dbItem['templateid'];
+				$processSecondLevel = true;
 			}
-			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid']);
-			}
-			// ZBX_FLAG_DISCOVERY_NORMAL
-			else {
-				$url = (new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
-			}
-
-			$name = new CLink(CHtml::encode($template['name']), $url);
 		}
-		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
-
-		$itemid = $parent_templates['links'][$itemid]['itemid'];
 	}
-
-	if ($list) {
-		array_pop($list);
+	if ($processSecondLevel) {
+		fillItemsWithChildTemplates($items); // attention recursion!
 	}
-
-	return $list;
 }
 
 function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
@@ -1017,10 +815,11 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * @param array  $groupids
  * @param string $application  IDs of applications to filter items by.
  * @param int    $viewMode
+ * @param bool   $fullscreen   Display mode.
  *
  * @return CTableInfo
  */
-function getItemsDataOverview(array $groupids, $application, $viewMode) {
+function getItemsDataOverview(array $groupids, $application, $viewMode, $fullscreen = false) {
 	// application filter
 	if ($application !== '') {
 		$applicationids = array_keys(API::Application()->get([
@@ -1052,7 +851,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	], ZBX_PROBLEM_SUPPRESSED_TRUE);
+	]);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
@@ -1158,7 +957,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 		}
 	}
 
-	$table = (new CTableInfo())->setHeadingColumn(0);
+	$table = new CTableInfo();
 	if (!$host_names) {
 		return $table;
 	}
@@ -1179,7 +978,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			foreach ($item_data as $ithosts) {
 				$tableRow = [nbsp($item_name)];
 				foreach ($host_names as $host_name) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 				$table->addRow($tableRow);
 			}
@@ -1202,12 +1001,12 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 			$host = $hosts[$hostId];
 
 			$name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId], true, $fullscreen));
 
-			$tableRow = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
+			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $item_data) {
 				foreach ($item_data as $ithosts) {
-					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name, $fullscreen);
 				}
 			}
 			$table->addRow($tableRow);
@@ -1217,7 +1016,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode) {
 	return $table;
 }
 
-function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
+function getItemDataOverviewCells($tableRow, $ithosts, $hostName, $fullscreen = false) {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
@@ -1252,7 +1051,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 	if (isset($ithosts[$hostName])) {
 		$column
-			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->setMenuPopup(CMenuPopupHelper::getHistory($item, $fullscreen))
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->addClass(ZBX_STYLE_NOWRAP);
 	}

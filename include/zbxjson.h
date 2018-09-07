@@ -97,8 +97,6 @@
 #define ZBX_PROTO_TAG_MIN		"min"
 #define ZBX_PROTO_TAG_AVG		"avg"
 #define ZBX_PROTO_TAG_MAX		"max"
-#define ZBX_PROTO_TAG_SESSION		"session"
-#define ZBX_PROTO_TAG_ID		"id"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

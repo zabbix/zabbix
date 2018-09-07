@@ -162,30 +162,40 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'fullscreen':
-			switch (CView::getLayoutMode()) {
-				case ZBX_LAYOUT_KIOSKMODE:
-					$icon = (new CButton(null, '&nbsp;'))
+			$fullscreen = (bool) $params['fullscreen'];
+			$kioskmode = array_key_exists('kioskmode', $params) ? (bool) $params['kioskmode'] : null;
+
+			$url = new CUrl();
+
+			if ($fullscreen) {
+				if ($kioskmode === null || $kioskmode) {
+					$url
+						->setArgument('fullscreen', null)
+						->setArgument('kioskmode', null);
+
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Normal view'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
-						->addClass(ZBX_LAYOUT_MODE)
-						->addClass(ZBX_STYLE_BTN_DASHBRD_NORMAL)
-						->addClass(ZBX_STYLE_BTN_MIN);
-					break;
+						->addClass(ZBX_STYLE_BTN_MIN)
+						->addClass($kioskmode ? ZBX_STYLE_BTN_DASHBRD_NORMAL : null);
+				}
+				else {
+					$url
+						->setArgument('fullscreen', '1')
+						->setArgument('kioskmode', '1');
 
-				case ZBX_LAYOUT_FULLSCREEN:
-					$icon = (new CButton(null, '&nbsp;'))
+					$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
 						->setTitle(_('Kiosk mode'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
-						->addClass(ZBX_LAYOUT_MODE)
 						->addClass(ZBX_STYLE_BTN_KIOSK);
-					break;
+				}
+			}
+			else {
+				$url
+					->setArgument('fullscreen', '1')
+					->setArgument('kioskmode', null);
 
-				default:
-					$icon = (new CButton(null, '&nbsp;'))
-						->setTitle(_('Fullscreen'))
-						->setAttribute('data-layout-mode', ZBX_LAYOUT_FULLSCREEN)
-						->addClass(ZBX_LAYOUT_MODE)
-						->addClass(ZBX_STYLE_BTN_MAX);
+				$icon = (new CRedirectButton('&nbsp;', $url->getUrl()))
+					->setTitle(_('Fullscreen'))
+					->addClass(ZBX_STYLE_BTN_MAX);
 			}
 
 			return $icon;
@@ -286,7 +296,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	$breadcrumbs = (new CListItem(null))
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'));
+		->setAttribute('aria-label', _('Breadcrumbs'));
 
 	if ($is_template) {
 		$template = new CSpan(
@@ -514,14 +524,15 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
  *
  * @param int    $sysmapid      Used as value for sysmaid in map link generation.
  * @param string $name          Used as label for map link generation.
+ * @param int    $fullscreen    Used as value for fullscreen in map link generation.
  * @param int    $severity_min  Used as value for severity_min in map link generation.
  *
  * @return object
  */
-function get_header_sysmap_table($sysmapid, $name, $severity_min) {
+function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	$list = (new CList())
 		->setAttribute('role', 'navigation')
-		->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
+		->setAttribute('aria-label', _('Breadcrumbs'))
 		->addClass(ZBX_STYLE_OBJECT_GROUP)
 		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 		->addItem([
@@ -534,6 +545,7 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 						->setArgument('action', 'map.view')
 						->setArgument('sysmapid', $sysmapid)
 						->setArgument('severity_min', $severity_min)
+						->setArgument('fullscreen', $fullscreen ? '1' : null)
 					)
 				)
 		]);
@@ -552,6 +564,7 @@ function get_header_sysmap_table($sysmapid, $name, $severity_min) {
 					->setArgument('action', 'map.view')
 					->setArgument('sysmapid', $parent_sysmap['sysmapid'])
 					->setArgument('severity_min', $severity_min)
+					->setArgument('fullscreen', $fullscreen ? '1' : null)
 				)
 			);
 		}
@@ -737,14 +750,99 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
 }
 
 /**
+ * Create array with all inputs required for date selection and calendar.
+ *
+ * @param string      $name
+ * @param int|array   $date unix timestamp/date array(Y,m,d,H,i)
+ *
+ * @return array
+ */
+function createDateSelector($name, $date) {
+	$onClick = 'dateSelectorOnClick(event, this, "'.$name.'_calendar");';
+
+	if (is_array($date)) {
+		$y = $date['y'];
+		$m = $date['m'];
+		$d = $date['d'];
+		$h = $date['h'];
+		$i = $date['i'];
+	}
+	else {
+		$y = date('Y', $date);
+		$m = date('m', $date);
+		$d = date('d', $date);
+		$h = date('H', $date);
+		$i = date('i', $date);
+	}
+
+	$fields = [
+		(new CNumericBox($name.'_year', $y, 4))
+			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
+			->setAttribute('placeholder', _('yyyy')),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_month', $m, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 1, 12, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_day', $d, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('dd'))
+			->onChange('validateDatePartBox(this, 1, 31, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_hour', $h, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('hh'))
+			->onChange('validateDatePartBox(this, 0, 23, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		':',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_minute', $i, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 0, 59, 2);'),
+		(new CButton())
+			->addClass(ZBX_STYLE_ICON_CAL)
+			->onClick($onClick)
+			->removeId()
+	];
+
+	zbx_add_post_js('create_calendar(null,'.
+		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
+		'"'.$name.'_calendar",'.
+		'"'.$name.'");'
+	);
+
+	return $fields;
+}
+
+/**
  * Renders a page footer.
  *
+ * @param bool $with_logo
  * @param bool $with_version
  *
  * @return CDiv
  */
 function makePageFooter($with_version = true) {
-	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))->setAttribute('role', 'contentinfo');
+	return (new CTag('footer', true, [
+		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
+		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
+		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
+			->addClass(ZBX_STYLE_GREY)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->setAttribute('target', '_blank')
+	]))
+	->setAttribute('role', 'contentinfo');
 }
 
 /**
@@ -796,58 +894,6 @@ function makeInformationIcon($message) {
 }
 
 /**
- * Renders an icon for host in maintenance.
- *
- * @param int    $type         Type of the maintenance.
- * @param string $name         Name of the maintenance.
- * @param string $description  Description of the maintenance.
- *
- * @return CSpan
- */
-function makeMaintenanceIcon($type, $name, $description) {
-	$hint = $name.' ['.($type
-		? _('Maintenance without data collection')
-		: _('Maintenance with data collection')).']';
-
-	if ($description !== '') {
-		$hint .= "\n".$description;
-	}
-
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_MAINT)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint($hint);
-}
-
-/**
- * Renders an icon for suppressed problem.
- *
- * @param array  $icon_data
- * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
- * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
- *
- * @return CSpan
- */
-function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
-
-	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
-
-	return (new CSpan())
-		->addClass(ZBX_STYLE_ICON_INVISIBLE)
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint(
-			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
-				? zbx_date2str(TIME_FORMAT, $suppress_until)
-				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
-			).
-			"\n".
-			_s('Maintenance: %1$s', $maintenance_names)
-		);
-}
-
-/**
  * Renders an action icon.
  *
  * @param array  $icon_data
@@ -872,12 +918,6 @@ function makeActionIcon(array $icon_data) {
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);
-	}
-
-	if (array_key_exists('aria-label', $icon_data)) {
-		$icon
-			->addItem($icon_data['aria-label'])
-			->addClass(ZBX_STYLE_INLINE_SR_ONLY);
 	}
 
 	return $icon;

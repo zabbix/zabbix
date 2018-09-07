@@ -28,7 +28,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 							'formulaid' => 'A'
 						],
 						[
@@ -77,7 +77,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 							'formulaid' => 'A'
 						],
 						[
@@ -102,7 +102,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 							'formulaid' => 'A'
 						],
 						[
@@ -126,7 +126,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 				[
 					'conditions' => [
 						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 							'formulaid' => 'A'
 						],
 						[

@@ -31,6 +31,7 @@ class CControllerReportServices extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'fullscreen' =>	'in 0,1',
 			'serviceid' =>	'fatal|required|db services.serviceid',
 			'period' =>		'in daily,weekly,monthly,yearly',
 			'year' =>		'int32'
@@ -67,6 +68,7 @@ class CControllerReportServices extends CController {
 	protected function doAction() {
 		// default values
 		$data = [
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'period' => $this->getInput('period', 'yearly'),
 			'service' => $this->service,
 			'year' => $this->getInput('year', date('Y')),
@@ -139,8 +141,6 @@ class CControllerReportServices extends CController {
 			'intervals' => $intervals
 		]);
 		$data['sla'] = reset($sla);
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Service availability report'));

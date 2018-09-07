@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 /**
  * controller dashboard list
  *
@@ -33,7 +32,8 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		$fields = [
 			'sort' =>		'in name',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'uncheck' =>	'in 1',
+			'fullscreen' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,6 +55,7 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.dashbrd.list.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.dashbrd.list.sortorder', ZBX_SORT_UP));
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
 
 		CProfile::update('web.dashbrd.list.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.dashbrd.list.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -64,7 +65,8 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sort_field,
-			'sortorder' => $sort_order
+			'sortorder' => $sort_order,
+			'fullscreen' => $fullscreen,
 		];
 
 		// list of dashboards
@@ -77,15 +79,15 @@ class CControllerDashboardList extends CControllerDashboardAbstract {
 		// sorting & paging
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list');
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'dashboard.list')
+			->setArgument('fullscreen', $fullscreen ? '1' : null);
 
 		$data['paging'] = getPagingLine($data['dashboards'], $sort_order, $url);
 
 		if ($data['dashboards']) {
 			$this->prepareEditableFlag($data['dashboards']);
 		}
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

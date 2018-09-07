@@ -647,8 +647,8 @@ static void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *
 		gitem->type = atoi(row[8]);
 		gitem->flags = (unsigned char)atoi(row[9]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() [" ZBX_FS_SIZE_T "] itemid:" ZBX_FS_UI64 " key:'%s'",
-				__function_name, (zbx_fs_size_t)*gitems_num, gitem->itemid, gitem->key);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%d] itemid:" ZBX_FS_UI64 " key:'%s'",
+				__function_name, *gitems_num, gitem->itemid, gitem->key);
 
 		(*gitems_num)++;
 	}
@@ -995,17 +995,17 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose:  adds table and field with specific id to housekeeper list        *
  *                                                                            *
- * Parameters: ids       - [IN] identificators for data removal               *
- *             field     - [IN] field name from table                         *
- *             tables_hk - [IN] table name to delete information from         *
- *             count     - [IN] number of tables in tables array              *
+ * Parameters: ids    - [IN] identificators for data removal                  *
+ *             field  - [IN] field name from table                            *
+ *             tables - [IN] table name to delete information from            *
+ *             count  - [IN] number of tables in tables array                 *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables_hk, int count)
+static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, const char **tables, int count)
 {
 	const char	*__function_name = "DBadd_to_housekeeper";
 	int		i, j;
@@ -1024,7 +1024,7 @@ static void	DBadd_to_housekeeper(zbx_vector_uint64_t *ids, const char *field, co
 	for (i = 0; i < ids->values_num; i++)
 	{
 		for (j = 0; j < count; j++)
-			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables_hk[j], field, ids->values[i]);
+			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables[j], field, ids->values[i]);
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -2301,138 +2301,12 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 /******************************************************************************
  *                                                                            *
- * Function: DBresolve_template_trigger_dependencies                          *
- *                                                                            *
- * Purpose: resolves trigger dependencies for the specified triggers based on *
- *          host and linked templates                                         *
- *                                                                            *
- * Parameters: hostid    - [IN] host identificator from database              *
- *             trids     - [IN] array of trigger identifiers from database    *
- *             trids_num - [IN] trigger count in trids array                  *
- *             links     - [OUT] pairs of trigger dependencies  (down,up)     *
- *                                                                            *
- ******************************************************************************/
-static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zbx_uint64_t *trids,
-		int trids_num, zbx_vector_uint64_pair_t *links)
-{
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_uint64_pair_t		map_id, dep_list_id;
-	char				*sql = NULL;
-	size_t				sql_alloc = 512, sql_offset;
-	zbx_vector_uint64_pair_t	dep_list_ids, map_ids;
-	zbx_vector_uint64_t		all_templ_ids;
-	zbx_uint64_t			templateid_down, templateid_up,
-					triggerid_down, triggerid_up,
-					hst_triggerid, tpl_triggerid;
-	int				i, j;
-
-	zbx_vector_uint64_create(&all_templ_ids);
-	zbx_vector_uint64_pair_create(&dep_list_ids);
-	zbx_vector_uint64_pair_create(links);
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct td.triggerid_down,td.triggerid_up"
-			" from triggers t,trigger_depends td"
-			" where t.templateid in (td.triggerid_up,td.triggerid_down) and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids, trids_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(dep_list_id.first, row[0]);
-		ZBX_STR2UINT64(dep_list_id.second, row[1]);
-		zbx_vector_uint64_pair_append(&dep_list_ids, dep_list_id);
-		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.first);
-		zbx_vector_uint64_append(&all_templ_ids, dep_list_id.second);
-	}
-	DBfree_result(result);
-
-	if (0 == dep_list_ids.values_num)	/* not all trigger template have a dependency trigger */
-	{
-		zbx_vector_uint64_destroy(&all_templ_ids);
-		zbx_vector_uint64_pair_destroy(&dep_list_ids);
-		zbx_free(sql);
-		return;
-	}
-
-	zbx_vector_uint64_pair_create(&map_ids);
-	zbx_vector_uint64_sort(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&all_templ_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.triggerid,t.templateid"
-			" from triggers t,functions f,items i"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64
-				" and",
-				hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.templateid", all_templ_ids.values,
-			all_templ_ids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(map_id.first, row[0]);
-		ZBX_DBROW2UINT64(map_id.second, row[1]);
-		zbx_vector_uint64_pair_append(&map_ids, map_id);
-	}
-	DBfree_result(result);
-
-	zbx_free(sql);
-	zbx_vector_uint64_destroy(&all_templ_ids);
-
-	for (i = 0; i < dep_list_ids.values_num; i++)
-	{
-		templateid_down = dep_list_ids.values[i].first;
-		templateid_up = dep_list_ids.values[i].second;
-
-		/* Convert template ids to corresponding trigger ids.         */
-		/* If template trigger depends on host trigger rather than    */
-		/* template trigger then up id conversion will fail and the   */
-		/* original value (host trigger id) will be used as intended. */
-		triggerid_down = 0;
-		triggerid_up = templateid_up;
-
-		for (j = 0; j < map_ids.values_num; j++)
-		{
-			hst_triggerid = map_ids.values[j].first;
-			tpl_triggerid = map_ids.values[j].second;
-
-			if (tpl_triggerid == templateid_down)
-				triggerid_down = hst_triggerid;
-
-			if (tpl_triggerid == templateid_up)
-				triggerid_up = hst_triggerid;
-		}
-
-		if (0 != triggerid_down)
-		{
-			zbx_uint64_pair_t	link = {triggerid_down, triggerid_up};
-
-			zbx_vector_uint64_pair_append(links, link);
-		}
-	}
-
-	zbx_vector_uint64_pair_destroy(&map_ids);
-	zbx_vector_uint64_pair_destroy(&dep_list_ids);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBadd_template_dependencies_for_new_triggers                     *
  *                                                                            *
  * Purpose: update trigger dependencies for specified host                    *
  *                                                                            *
- * Parameters: hostid    - [IN] host identificator from database              *
- *             trids     - [IN] array of trigger identifiers from database    *
- *             trids_num - [IN] trigger count in trids array                  *
+ * Parameters: trids - array of trigger identifiers from database             *
+ *             trids_num - trigger count in trids array                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2441,17 +2315,92 @@ static void	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const z
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx_uint64_t *trids, int trids_num)
+static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int trids_num)
 {
-	int				i;
-	zbx_uint64_t			triggerdepid;
+	DB_RESULT			result;
+	DB_ROW				row;
+	int				alloc = 16, count = 0, i;
+	zbx_uint64_t			*hst_triggerids = NULL, *tpl_triggerids = NULL,
+					templateid, triggerid,
+					templateid_down, templateid_up,
+					triggerid_down, triggerid_up,
+					triggerdepid;
+	char				*sql = NULL;
+	size_t				sql_alloc = 512, sql_offset;
 	zbx_db_insert_t			db_insert;
 	zbx_vector_uint64_pair_t	links;
+
 
 	if (0 == trids_num)
 		return SUCCEED;
 
-	DBresolve_template_trigger_dependencies(hostid, trids, trids_num, &links);
+	zbx_vector_uint64_pair_create(&links);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+	tpl_triggerids = (uint64_t *)zbx_malloc(tpl_triggerids, alloc * sizeof(zbx_uint64_t));
+	hst_triggerids = (uint64_t *)zbx_malloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select triggerid,templateid"
+			" from triggers"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", trids, trids_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid, row[0]);
+		ZBX_DBROW2UINT64(templateid, row[1]);
+
+		if (alloc == count)
+		{
+			alloc += 16;
+			hst_triggerids = (uint64_t *)zbx_realloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
+			tpl_triggerids = (uint64_t *)zbx_realloc(tpl_triggerids, alloc * sizeof(zbx_uint64_t));
+		}
+
+		hst_triggerids[count] = triggerid;
+		tpl_triggerids[count] = templateid;
+		count++;
+	}
+	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct td.triggerid_down,td.triggerid_up"
+			" from triggers t,trigger_depends td"
+			" where t.templateid in (td.triggerid_up,td.triggerid_down)"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", trids, trids_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(templateid_down, row[0]);
+		ZBX_STR2UINT64(templateid_up, row[1]);
+
+		triggerid_down = 0;
+		triggerid_up = templateid_up;
+
+		for (i = 0; i < count; i++)
+		{
+			if (tpl_triggerids[i] == templateid_down)
+				triggerid_down = hst_triggerids[i];
+			if (tpl_triggerids[i] == templateid_up)
+				triggerid_up = hst_triggerids[i];
+		}
+
+		if (0 != triggerid_down)
+		{
+			zbx_uint64_pair_t	link = {triggerid_down, triggerid_up};
+
+			zbx_vector_uint64_pair_append(&links, link);
+		}
+	}
+	DBfree_result(result);
 
 	if (0 < links.values_num)
 	{
@@ -2469,6 +2418,10 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t hostid, zbx
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
+
+	zbx_free(hst_triggerids);
+	zbx_free(tpl_triggerids);
+	zbx_free(sql);
 
 	zbx_vector_uint64_pair_destroy(&links);
 
@@ -3710,7 +3663,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 	DBfree_result(result);
 
 	if (SUCCEED == res)
-		res = DBadd_template_dependencies_for_new_triggers(hostid, new_triggerids.values, new_triggerids.values_num);
+		res = DBadd_template_dependencies_for_new_triggers(new_triggerids.values, new_triggerids.values_num);
 
 	if (SUCCEED == res)
 		res = DBcopy_template_trigger_tags(&new_triggerids, &cur_triggerids);

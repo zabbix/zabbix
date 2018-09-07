@@ -37,8 +37,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
-			WIDGET_SVG_GRAPH			=> _('Graph'),
-			WIDGET_GRAPH				=> _('Classic Graph'),
+			WIDGET_GRAPH				=> _('Graph'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
@@ -69,7 +68,6 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
 			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
-			WIDGET_SVG_GRAPH			=> ['width' => 6, 'height' => 5],
 			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
@@ -119,7 +117,6 @@ class CWidgetConfig {
 			case WIDGET_DATA_OVER:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GRAPH:
-			case WIDGET_SVG_GRAPH:
 			case WIDGET_PLAIN_TEXT:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
@@ -160,22 +157,16 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Detect if widget uses time selector.
+	 * Does this widget type use timeline
 	 *
-	 * @param array $widget
-	 * @param array $widget[type]
-	 * @param array $widget[fields]
+	 * @param type $type  WIDGET_ constant
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
-	public static function usesTimeSelector(array $widget) {
-		switch ($widget['type']) {
-			case WIDGET_SVG_GRAPH:
-				return !CWidgetFormSvgGraph::hasOverrideTime($widget['fields']);
-
+	public static function usesTimeline($type) {
+		switch ($type) {
 			case WIDGET_GRAPH:
 				return true;
-
 			default:
 				return false;
 		}
@@ -204,9 +195,6 @@ class CWidgetConfig {
 
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
-
-			case WIDGET_SVG_GRAPH:
-				return new CWidgetFormSvgGraph($data);
 
 			case WIDGET_MAP:
 				return new CWidgetFormMap($data);

@@ -48,10 +48,6 @@ if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
-$url = (new CUrl('items.php'))
-	->setArgument('hostid', $data['hostid'])
-	->getUrl();
-
 // create table
 $itemTable = (new CTableInfo())
 	->setHeader([
@@ -60,15 +56,15 @@ $itemTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
 		empty($this->data['filter_hostid']) ? _('Host') : null,
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('Triggers'),
-		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
-		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
 		_('Applications'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
@@ -85,10 +81,23 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
-foreach ($data['items'] as $item) {
+foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
-	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL);
+	if (!empty($item['template_host'])) {
+		if (array_key_exists($item['template_host']['hostid'], $data['writable_templates'])) {
+			$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
+				'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$description[] = (new CSpan(CHtml::encode($item['template_host']['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$description[] = NAME_DELIMITER;
+	}
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
@@ -158,7 +167,8 @@ foreach ($data['items'] as $item) {
 
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$trigger_description[] = (new CSpan('Inaccessible template'))->addClass(ZBX_STYLE_GREY);
+				$trigger_description[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
+				$trigger_description[] = ':';
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
@@ -171,8 +181,9 @@ foreach ($data['items'] as $item) {
 				else {
 					$trigger_description[] = (new CSpan(CHtml::encode($realHost['name'])))->addClass(ZBX_STYLE_GREY);
 				}
+
+				$trigger_description[] = ':';
 			}
-			$trigger_description[] = NAME_DELIMITER;
 		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

@@ -29,10 +29,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['layout.mode.js'];
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -40,6 +36,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// Ajax
 	'widget' =>	[T_ZBX_STR, O_OPT, P_ACT,
 		IN('"'.WIDGET_HAT_EVENTACK.'","'.WIDGET_HAT_EVENTACTIONMSGS.'","'.WIDGET_HAT_EVENTACTIONMCMDS.'","'.
@@ -135,7 +132,8 @@ $mediatypes = API::Mediatype()->get([
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))->setHeader(_('Trigger details')),
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
+				->setHeader(_('Trigger details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
@@ -160,10 +158,9 @@ $eventTab = (new CTable())
 
 $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
-	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(get_icon('fullscreen'))
+			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 		))
 		->setAttribute('aria-label', _('Content controls'))
 	)

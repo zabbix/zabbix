@@ -19,30 +19,22 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
-
-$widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
-
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget
-		->setTitle(_('Slide shows'))
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addItem([
-				(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
-				'/',
-				(new CSpan())
-					->addClass(ZBX_STYLE_SELECTED)
-					->addItem(
-						new CLink($data['screen']['name'], (new CUrl('slides.php'))
-							->setArgument('elementid', $data['screen']['slideshowid'])
-						)
-					)
-			])
-		);
-}
+$widget = (new CWidget())
+	->setTitle(_('Slide shows'))
+	->addItem((new CList())
+	->addClass(ZBX_STYLE_OBJECT_GROUP)
+	->addItem([
+		(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+		'/',
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(
+				new CLink($data['screen']['name'], (new CUrl('slides.php'))
+					->setArgument('elementid', $data['screen']['slideshowid'])
+					->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+				)
+			)
+	]));
 
 $controls = (new CList())
 	->addItem(
@@ -88,6 +80,7 @@ $widget->setControls((new CList([
 	(new CForm('get'))
 		->setAttribute('aria-label', _('Main filter'))
 		->setName('slideHeaderForm')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls),
 	(new CTag('nav', true, (new CList())
 		->addItem($data['screen']['editable']
@@ -97,18 +90,16 @@ $widget->setControls((new CList([
 		)
 		->addItem($favourite_icon)
 		->addItem($refresh_icon)
-		->addItem(get_icon('fullscreen'))
+		->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 	))
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget->addItem((new CFilter())
-		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-	);
-}
+$filter = (new CFilter())
+	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+	->setActiveTab($data['active_tab'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
+$widget->addItem($filter);
 
 $widget->addItem(
 	(new CDiv((new CDiv())->addClass('preloader')))

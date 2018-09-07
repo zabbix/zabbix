@@ -309,8 +309,6 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 		for (i = 0; i < itemids.values_num; i++)
 		{
-			int	delay;
-
 			if (SUCCEED != errcodes[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() Item [" ZBX_FS_UI64 "] was not found in the"
@@ -333,11 +331,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 					continue;
 			}
 
-			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
-				continue;
-
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%d:" ZBX_FS_UI64 "\n",
-					dc_items[i].key_orig, delay, dc_items[i].lastlogsize);
+					dc_items[i].key_orig, dc_items[i].delay, dc_items[i].lastlogsize);
 		}
 
 		zbx_config_clean(&cfg);

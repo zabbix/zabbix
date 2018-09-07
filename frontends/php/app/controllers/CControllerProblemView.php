@@ -38,6 +38,7 @@ class CControllerProblemView extends CController {
 			'sort' =>					'in clock,host,severity,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
+			'fullscreen' =>				'in 0,1',
 			'page' =>					'ge 1',
 			'filter_set' =>				'in 1',
 			'filter_rst' =>				'in 1',
@@ -54,14 +55,12 @@ class CControllerProblemView extends CController {
 			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>			'array',
 			'filter_show_tags' =>		'in '.PROBLEMS_SHOW_TAGS_NONE.','.PROBLEMS_SHOW_TAGS_1.','.PROBLEMS_SHOW_TAGS_2.','.PROBLEMS_SHOW_TAGS_3,
-			'filter_show_suppressed' =>	'in 1',
+			'filter_maintenance' =>		'in 1',
 			'filter_unacknowledged' =>	'in 1',
 			'filter_compact_view' =>	'in 1',
 			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'filter_highlight_row' =>	'in 1',
-			'filter_tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
-			'filter_tag_priority' =>	'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time'
 		];
@@ -174,14 +173,8 @@ class CControllerProblemView extends CController {
 			CProfile::update('web.problem.filter.show_tags', $this->getInput('filter_show_tags', PROBLEMS_SHOW_TAGS_3),
 				PROFILE_TYPE_INT
 			);
-			CProfile::update('web.problem.filter.tag_name_format', $this->getInput('filter_tag_name_format',
-				PROBLEMS_TAG_NAME_FULL), PROFILE_TYPE_INT
-			);
-			CProfile::update('web.problem.filter.tag_priority', $this->getInput('filter_tag_priority', ''),
-				PROFILE_TYPE_STR
-			);
-			CProfile::update('web.problem.filter.show_suppressed',
-				$this->getInput('filter_show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE), PROFILE_TYPE_INT
+			CProfile::update('web.problem.filter.maintenance', $this->getInput('filter_maintenance', 0),
+				PROFILE_TYPE_INT
 			);
 			CProfile::update('web.problem.filter.unacknowledged', $this->getInput('filter_unacknowledged', 0),
 				PROFILE_TYPE_INT
@@ -214,9 +207,7 @@ class CControllerProblemView extends CController {
 			CProfile::deleteIdx('web.problem.filter.tags.value');
 			CProfile::deleteIdx('web.problem.filter.tags.operator');
 			CProfile::delete('web.problem.filter.show_tags');
-			CProfile::delete('web.problem.filter.tag_name_format');
-			CProfile::delete('web.problem.filter.tag_priority');
-			CProfile::delete('web.problem.filter.show_suppressed');
+			CProfile::delete('web.problem.filter.maintenance');
 			CProfile::delete('web.problem.filter.unacknowledged');
 			CProfile::delete('web.problem.filter.compact_view');
 			CProfile::delete('web.problem.filter.show_timeline');
@@ -290,6 +281,7 @@ class CControllerProblemView extends CController {
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'uncheck' => $this->hasInput('uncheck'),
+			'fullscreen' => $this->getInput('fullscreen', 0),
 			'page' => $this->getInput('page', 1),
 			'filter' => [
 				'show' => CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM),
@@ -315,9 +307,7 @@ class CControllerProblemView extends CController {
 				'evaltype' => CProfile::get('web.problem.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 				'tags' => $filter_tags,
 				'show_tags' => CProfile::get('web.problem.filter.show_tags', PROBLEMS_SHOW_TAGS_3),
-				'tag_name_format' => CProfile::get('web.problem.filter.tag_name_format', PROBLEMS_TAG_NAME_FULL),
-				'tag_priority' => CProfile::get('web.problem.filter.tag_priority', ''),
-				'show_suppressed' => CProfile::get('web.problem.filter.show_suppressed', 0),
+				'maintenance' => CProfile::get('web.problem.filter.maintenance', 1),
 				'unacknowledged' => CProfile::get('web.problem.filter.unacknowledged', 0),
 				'compact_view' => CProfile::get('web.problem.filter.compact_view', 0),
 				'show_timeline' => CProfile::get('web.problem.filter.show_timeline', 1),
@@ -341,8 +331,6 @@ class CControllerProblemView extends CController {
 		else {
 			$data['profileIdx'] = 'web.problem.filter';
 		}
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));

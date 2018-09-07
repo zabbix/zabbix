@@ -283,8 +283,6 @@ typedef struct
 							/* above store cumulative statistics for all hosts monitored */
 							/* by a particular proxy. */
 							/* NOTE: On disabled hosts all items are counted as disabled. */
-	zbx_uint64_t	maintenanceid;
-
 	const char	*host;
 	const char	*name;
 	int		maintenance_from;
@@ -618,7 +616,6 @@ typedef struct
 	const char		*name;
 
 	zbx_vector_uint64_t	nested_groupids;
-	zbx_hashset_t		hostids;
 	unsigned char		flags;
 }
 zbx_dc_hostgroup_t;
@@ -635,48 +632,6 @@ zbx_dc_preproc_op_t;
 
 typedef struct
 {
-	zbx_uint64_t		maintenanceid;
-	unsigned char		type;
-	unsigned char		tags_evaltype;
-	unsigned char		state;
-	int			active_since;
-	int			active_until;
-	int			running_since;
-	int			running_until;
-	zbx_vector_uint64_t	groupids;
-	zbx_vector_uint64_t	hostids;
-	zbx_vector_ptr_t	tags;
-	zbx_vector_ptr_t	periods;
-}
-zbx_dc_maintenance_t;
-
-typedef struct
-{
-	zbx_uint64_t	maintenancetagid;
-	zbx_uint64_t	maintenanceid;
-	unsigned char	operator;
-	const char	*tag;
-	const char	*value;
-}
-zbx_dc_maintenance_tag_t;
-
-typedef struct
-{
-	zbx_uint64_t	timeperiodid;
-	zbx_uint64_t	maintenanceid;
-	unsigned char	type;
-	int		every;
-	int		month;
-	int		dayofweek;
-	int		day;
-	int		start_time;
-	int		period;
-	int		start_date;
-}
-zbx_dc_maintenance_period_t;
-
-typedef struct
-{
 	zbx_uint64_t	triggerid;
 	int		nextcheck;
 }
@@ -689,14 +644,6 @@ typedef struct
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
 	int			item_sync_ts;
-
-	/* maintenance processing management */
-	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
-	zbx_uint64_t		*maintenance_update_flags;	/* Array of flags to manage timer maintenance updates.*/
-								/* Each array member contains 0/1 flag for 64 timers  */
-								/* indicating if the timer must process maintenance.  */
-
-	char			*session_token;
 
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
@@ -745,14 +692,10 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name; 	/* host groups sorted by name */
 	zbx_hashset_t		preprocops;
-	zbx_hashset_t		maintenances;
-	zbx_hashset_t		maintenance_periods;
-	zbx_hashset_t		maintenance_tags;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
-	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	timer_queue;
@@ -762,14 +705,6 @@ typedef struct
 	zbx_hashset_t		strpool;
 }
 ZBX_DC_CONFIG;
-
-extern int	sync_in_progress;
-extern ZBX_DC_CONFIG	*config;
-extern zbx_rwlock_t	config_lock;
-
-#define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
-#define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
-#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
@@ -796,33 +731,6 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 void	zbx_dc_get_hostids_by_functionids(const zbx_uint64_t *functionids, int functionids_num,
 		zbx_vector_uint64_t *hostids);
 
-void	DCdump_configuration(void);
-
-/* utility functions */
-void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
-
-/* string pool */
-void	zbx_strpool_release(const char *str);
-int	DCstrpool_replace(int found, const char **curr, const char *new_str);
-
-/* host groups */
-void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids);
-void	dc_hostgroup_cache_nested_groupids(zbx_dc_hostgroup_t *parent_group);
-
-/* synchronization */
-typedef struct zbx_dbsync zbx_dbsync_t;
-
-void	DCsync_maintenances(zbx_dbsync_t *sync);
-void	DCsync_maintenance_tags(zbx_dbsync_t *sync);
-void	DCsync_maintenance_periods(zbx_dbsync_t *sync);
-void	DCsync_maintenance_groups(zbx_dbsync_t *sync);
-void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
-
-/* maintenance support */
-
-/* number of slots to store maintenance update flags */
-#define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
-
+void	DCdump_configuration(ZBX_DC_CONFIG *config);
 
 #endif

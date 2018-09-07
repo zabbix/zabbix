@@ -124,7 +124,6 @@ typedef struct
 	int		logeventid;
 	int		mtime;
 	unsigned char	flags;
-	zbx_uint64_t	id;
 }
 ZBX_ACTIVE_BUFFER_ELEMENT;
 

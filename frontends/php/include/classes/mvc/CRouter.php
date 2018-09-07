@@ -57,8 +57,6 @@ class CRouter {
 		// action							controller								layout					view
 		'acknowledge.create'			=> ['CControllerAcknowledgeCreate',			null,					null],
 		'acknowledge.edit'				=> ['CControllerAcknowledgeEdit',			'layout.htmlpage',		'monitoring.acknowledge.edit'],
-		'authentication.edit'			=> ['CControllerAuthenticationEdit',		'layout.htmlpage',		'administration.authentication.edit'],
-		'authentication.update'			=> ['CControllerAuthenticationUpdate',		null,					null],
 		'dashboard.view'				=> ['CControllerDashboardView',				'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.list'				=> ['CControllerDashboardList',				'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.delete'				=> ['CControllerDashboardDelete',			null,					null],
@@ -109,7 +107,6 @@ class CRouter {
 		'widget.problemhosts.view'		=> ['CControllerWidgetProblemHostsView',	'layout.widget',		'monitoring.widget.problemhosts.view'],
 		'widget.problems.view'			=> ['CControllerWidgetProblemsView',		'layout.widget',		'monitoring.widget.problems.view'],
 		'widget.systeminfo.view'		=> ['CControllerWidgetSystemInfoView',		'layout.widget',		'monitoring.widget.systeminfo.view'],
-		'widget.svggraph.view'			=> ['CControllerWidgetSvgGraphView',		'layout.widget',		'monitoring.widget.svggraph.view'],
 		'widget.problemsbysv.view'		=> ['CControllerWidgetProblemsBySvView',	'layout.widget',		'monitoring.widget.problemsbysv.view'],
 		'widget.web.view'				=> ['CControllerWidgetWebView',				'layout.widget',		'monitoring.widget.web.view'],
 		'widget.clock.view'				=> ['CControllerWidgetClockView',			'layout.widget',		'monitoring.widget.clock.view'],

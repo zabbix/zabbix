@@ -829,15 +829,10 @@ else {
 		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
 	}
 }
-
-if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$valuemapComboBox = [$valuemapComboBox, '&nbsp;',
-		(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
-	];
-}
+$link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank');
 
 $itemFormList
-	->addRow(_('Show value'), $valuemapComboBox, 'row_valuemap')
+	->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], 'row_valuemap')
 	->addRow(
 		new CLabel(_('Enable trapping'), 'allow_traps'),
 		[

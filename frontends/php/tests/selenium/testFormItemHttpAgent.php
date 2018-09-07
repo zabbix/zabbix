@@ -66,7 +66,6 @@ class testFormItemHttpAgent extends CWebTest {
 	 */
 	private function checkFormFields($rows) {
 		$this->zbxTestClickLinkTextWait($rows['Name']);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@name]';
@@ -104,11 +103,9 @@ class testFormItemHttpAgent extends CWebTest {
 					// break is not missing here.
 				case 'update':
 					if (array_key_exists('name', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
 						$this->zbxTestInputType($id_part.'_name_'.$i, $field_pair['name']);
 					}
 					if (array_key_exists('value', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_value_'.$i));
 						$this->zbxTestInputType($id_part.'_value_'.$i, $field_pair['value']);
 					}
 					break;
@@ -350,7 +347,7 @@ class testFormItemHttpAgent extends CWebTest {
 			$this->fillFields($data['fields']);
 		}
 		if (array_key_exists('request_type', $data)) {
-			$this->zbxTestClickXpathWait("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
+			$this->zbxTestClickXpath("//ul[@id='post_type']//label[text()='".$data['request_type']."']");
 		}
 		if (array_key_exists('query', $data)) {
 			$this->processPairFields($data['query'], 'query_fields');
@@ -1063,7 +1060,7 @@ class testFormItemHttpAgent extends CWebTest {
 		if (array_key_exists('check_form', $data) && $data['check_form'] === true) {
 			$this->zbxTestCheckFatalErrors();
 			$defaults = [
-				'Request type' => 'GET',
+				'Request type' => 'POST',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
 				'Follow redirects' => false,

@@ -25,28 +25,33 @@ require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
-$page['scripts'] = ['multiselect.js', 'class.calendar.js', 'gtlc.js'];
+$page['scripts'] = ['multiselect.js', 'class.calendar.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR					TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
-	'hostids' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	DB_ID,	null],
-	'severities' =>	[T_ZBX_INT,			O_OPT,	P_SYS,	null,	null],
-	'from' =>		[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
-	'to' =>			[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,	null,	null],
-	'filter_rst' =>	[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null],
-	'filter_set' =>	[T_ZBX_STR,			O_OPT,	P_SYS,	null,	null]
+	'groupids' =>				[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
+	'hostids' =>				[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
+	'severities'=>				[T_ZBX_INT,	O_OPT,	P_SYS,			null,	null],
+	'filter_from' =>			[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
+	'filter_till' =>			[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
+	'filter_rst' =>				[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null],
+	'filter_set' =>				[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null]
 ];
 check_fields($fields);
-validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $data['config'] = select_config();
 
 /*
  * Filter
  */
+$today = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+$tomorrow = $today + SEC_PER_DAY;
+
+$timeFrom = hasRequest('filter_from') ? zbxDateToTime(getRequest('filter_from')) : $today;
+$timeTill = hasRequest('filter_till') ? zbxDateToTime(getRequest('filter_till')) : $tomorrow;
+
 if (hasRequest('filter_set')) {
 	// prepare severity array
 	$severities = hasRequest('severities') ? array_keys(getRequest('severities')) : [];
@@ -54,22 +59,18 @@ if (hasRequest('filter_set')) {
 	CProfile::updateArray('web.toptriggers.filter.severities', $severities, PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
+	CProfile::update('web.toptriggers.filter.from', $timeFrom, PROFILE_TYPE_STR);
+	CProfile::update('web.toptriggers.filter.till', $timeTill, PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBstart();
 	CProfile::deleteIdx('web.toptriggers.filter.severities');
 	CProfile::deleteIdx('web.toptriggers.filter.groupids');
 	CProfile::deleteIdx('web.toptriggers.filter.hostids');
+	CProfile::delete('web.toptriggers.filter.from');
+	CProfile::delete('web.toptriggers.filter.till');
 	DBend();
 }
-
-$timeselector_options = [
-	'profileIdx' => 'web.toptriggers.filter',
-	'profileIdx2' => 0,
-	'from' => getRequest('from'),
-	'to' => getRequest('to')
-];
-updateTimeSelectorPeriod($timeselector_options);
 
 if (!hasRequest('filter_set')) {
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -82,9 +83,10 @@ else {
 
 $data['filter'] = [
 	'severities' => CProfile::getArray('web.toptriggers.filter.severities', $defaultSeverities),
-	'timeline' => getTimeSelectorPeriod($timeselector_options),
-	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
+	'filter_from' => CProfile::get('web.toptriggers.filter.from', $today),
+	'filter_till' => CProfile::get('web.toptriggers.filter.till', $tomorrow)
 ];
+
 
 // multiselect host groups
 $data['multiSelectHostGroupData'] = [];
@@ -121,8 +123,8 @@ $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' WHERE t.triggerid=e.objectid'.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.clock>='.zbx_dbstr($data['filter']['timeline']['from_ts']).
-			' AND e.clock<='.zbx_dbstr($data['filter']['timeline']['to_ts']).
+			' AND e.clock>='.zbx_dbstr($data['filter']['filter_from']).
+			' AND e.clock<='.zbx_dbstr($data['filter']['filter_till']).
 			' AND '.dbConditionInt('t.priority', $data['filter']['severities']);
 
 if ($hostids) {
@@ -205,6 +207,11 @@ $data['hosts'] = API::Host()->get([
 ]);
 
 $data['scripts'] = API::Script()->getScriptsByHosts($trigger_hostids);
+
+$data += [
+	'profileIdx' => 'web.toptriggers.filter',
+	'active_tab' => CProfile::get('web.toptriggers.filter.active', 1)
+];
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

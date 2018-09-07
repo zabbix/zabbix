@@ -1140,7 +1140,6 @@ class C40XmlValidator {
 					'markelements' =>			['type' => XML_STRING | XML_REQUIRED],
 					'show_unack' =>				['type' => XML_STRING | XML_REQUIRED],
 					'severity_min' =>			['type' => XML_STRING | XML_REQUIRED],
-					'show_suppressed' =>		['type' => XML_STRING | XML_REQUIRED],
 					'grid_size' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_show' =>				['type' => XML_STRING | XML_REQUIRED],
 					'grid_align' =>				['type' => XML_STRING | XML_REQUIRED],

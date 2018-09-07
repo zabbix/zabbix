@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 
-import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -147,14 +146,7 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
-			try
-			{
-				return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
-			}
-			catch (InstanceNotFoundException e)
-			{
-				throw new ZabbixException("Object or attribute not found.");
-			}
+			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
@@ -195,7 +187,7 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 
-	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws Exception
+	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws ZabbixException
 	{
 		logger.trace("drilling down with data object '{}' and field names '{}'", dataObject, fieldNames);
 
@@ -204,17 +196,10 @@ class JMXItemChecker extends ItemChecker
 
 		if (fieldNames.equals(""))
 		{
-			try
-			{
-				if (isPrimitiveAttributeType(dataObject))
-					return dataObject.toString();
-				else
-					throw new NoSuchMethodException();
-			}
-			catch (NoSuchMethodException e)
-			{
-				throw new ZabbixException("Data object type cannot be converted to string.");
-			}
+			if (isPrimitiveAttributeType(dataObject.getClass()))
+				return dataObject.toString();
+			else
+				throw new ZabbixException("data object type is not primitive: %s", dataObject.getClass());
 		}
 
 		if (dataObject instanceof CompositeData)
@@ -308,11 +293,11 @@ class JMXItemChecker extends ItemChecker
 		}
 	}
 
-	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws NoSuchMethodException, JSONException
+	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws JSONException
 	{
 		logger.trace("drilling down with attribute path '{}'", attrPath);
 
-		if (isPrimitiveAttributeType(attribute))
+		if (isPrimitiveAttributeType(attribute.getClass()))
 		{
 			logger.trace("found attribute of a primitive type: {}", attribute.getClass());
 
@@ -343,16 +328,13 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("found attribute of an unknown, unsupported type: {}", attribute.getClass());
 	}
 
-	private boolean isPrimitiveAttributeType(Object obj) throws NoSuchMethodException
+	private boolean isPrimitiveAttributeType(Class<?> clazz)
 	{
 		Class<?>[] clazzez = {Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class,
 			Float.class, Double.class, String.class, java.math.BigDecimal.class, java.math.BigInteger.class,
 			java.util.Date.class, javax.management.ObjectName.class, java.util.concurrent.atomic.AtomicBoolean.class,
 			java.util.concurrent.atomic.AtomicInteger.class, java.util.concurrent.atomic.AtomicLong.class};
 
-		// check if the type is either primitive or overrides toString()
-		return HelperFunctionChest.arrayContains(clazzez, obj.getClass()) ||
-				(!(obj instanceof CompositeData)) && (!(obj instanceof TabularDataSupport)) &&
-				(obj.getClass().getMethod("toString").getDeclaringClass() != Object.class);
+		return HelperFunctionChest.arrayContains(clazzez, clazz);
 	}
 }

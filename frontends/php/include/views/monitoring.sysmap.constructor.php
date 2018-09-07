@@ -80,6 +80,8 @@ zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.CJs::encodeJson
 	'defaultIconName' => $data['defaultIconName']
 ], true).');');
 
+insert_show_color_picker_javascript();
+
 return (new CWidget())
 	->setTitle(_('Network maps'))
 	->addItem($menu)

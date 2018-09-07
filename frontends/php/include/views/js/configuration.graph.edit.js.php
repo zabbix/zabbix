@@ -86,7 +86,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', '#{color}'))->appendColorPickerJs(false)->toString() ?>
+		<?= (new CColor('items[#{number}][color]', ''))->toString() ?>
 	</td>
 	<?php if (!$readonly): ?>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
@@ -114,17 +114,19 @@
 				flags: flags,
 				name: name
 			},
-			itemTpl = new Template(jQuery('#itemTpl').html()),
-			row = jQuery(itemTpl.evaluate(item));
+			itemTpl = new Template(jQuery('#itemTpl').html());
 
-		jQuery('#itemButtonsRow').before(row);
+		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
 		jQuery('#items_' + number + '_type').val(type);
 		jQuery('#items_' + number + '_calc_fnc').val(calc_fnc);
 		jQuery('#items_' + number + '_drawtype').val(drawtype);
 		jQuery('#items_' + number + '_yaxisside').val(yaxisside);
-		row.find('.input-color-picker input').colorpicker();
+		jQuery('#items_' + number + '_color').val(color);
+		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
+		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
 		colorPalette.incrementNextColor();
+		set_color_by_name('items_' + number + '_color', color);
 
 		<?php if (!$readonly): ?>
 			rewriteNameLinks();
@@ -135,8 +137,6 @@
 		if (!isset('object', list) || list.object != 'itemid') {
 			return false;
 		}
-		var itemTpl = new Template(jQuery('#itemTpl').html()),
-			row;
 
 		for (var i = 0; i < list.values.length; i++) {
 			var number = jQuery('#itemsTable tr.sortable').length,
@@ -154,12 +154,14 @@
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
 					color: colorPalette.getNextColor(),
 					name: list.values[i].name
-				};
-			row = jQuery(itemTpl.evaluate(item));
+				},
+				itemTpl = new Template(jQuery('#itemTpl').html());
 
-			jQuery('#itemButtonsRow').before(row);
+			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
 			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?= CALC_FNC_AVG ?>);
-			row.find('.input-color-picker input').colorpicker();
+			jQuery('#items_' + item['number'] + '_color').val(item['color']);
+			jQuery('#lbl_items_' + item['number'] + '_color').attr('title', '#' + item['color']);
+			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
 		}
 
 		<?php if (!$readonly): ?>
@@ -262,6 +264,14 @@
 				// set sortorder
 				if (part2 === 'sortorder') {
 					obj.val(i);
+				}
+
+				// rewrite color action
+				if (part1.substring(0, 3) === 'lbl') {
+					obj.attr('onclick', 'javascript: show_color_picker("items_' + i + '_color", this);');
+				}
+				else if (part2 === 'color') {
+					obj.attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
 				}
 			});
 

@@ -155,6 +155,7 @@ class CScreenHostTriggers extends CScreenBase {
 	 * Render table with host or host group problems.
 	 *
 	 * @param array   $filter                  Array of filter options.
+	 * @param int     $filter['fullscreen']    Full screen option.
 	 * @param int     $filter['limit']         Table rows count.
 	 * @param array   $filter['groupids']      Host group ids.
 	 * @param array   $filter['hostids']       Host ids.
@@ -176,7 +177,8 @@ class CScreenHostTriggers extends CScreenBase {
 			'show_timeline' => 0,
 			'details' => 1,
 			'sort_field' => '',
-			'sort_order' => ZBX_SORT_DOWN
+			'sort_order' => ZBX_SORT_DOWN,
+			'fullscreen' => (bool) getRequest('fullscreen', false)
 		];
 
 		$data = CScreenProblem::getData($filter, $config);
@@ -250,12 +252,25 @@ class CScreenHostTriggers extends CScreenBase {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $maintenances)) {
-				$maintenance = $maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenance_icon = (new CSpan())
+					->addClass(ZBX_STYLE_ICON_MAINT)
+					->addClass(ZBX_STYLE_CURSOR_POINTER);
+
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
+					$maintenance = $maintenances[$host['maintenanceid']];
+
+					$hint = $maintenance['name'].' ['.($host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
+
+					if ($maintenance['description']) {
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$maintenance_icon->setHint($hint);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 
@@ -292,7 +307,7 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url))
+						->setHint(make_popup_eventlist($trigger, $problem['eventid'], $back_url, $filter['fullscreen']))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,
 				zbx_date2age($problem['clock']),

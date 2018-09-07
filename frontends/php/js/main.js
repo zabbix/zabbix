@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
@@ -387,40 +386,65 @@ var AudioControl = {
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
-	interval: 1000, // how fast will they blink (ms)
+	blinkInterval: 1000, // how fast will they blink (ms)
+	secondsSinceInit: 0,
 
 	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		var that = this;
+		// Right after page refresh, all blinking elements should be visible.
+		if (this.secondsSinceInit > 0) {
+			var objects = jQuery('.blink');
 
-		setInterval(function() {
-			var $collection = jQuery('.blink');
+			// maybe some of the objects should not blink any more?
+			objects = this.filterOutNonBlinking(objects);
 
-			$collection.each(function() {
-				var $el = jQuery(this),
-					blink = true;
-
-				if (typeof $el.data('timeToBlink') !== 'undefined') {
-					blink = (($el.data()['timeToBlink']--) > 0);
+			// changing visibility state
+			jQuery.each(objects, function() {
+				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
+					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
 				}
-
-				if (blink) {
-					if (typeof $el.data('toggleClass') !== 'undefined') {
-						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
-					}
-					else {
-						$el.css('visibility', that.shown ? 'visible' : 'hidden');
-					}
-				}
-				else if (that.shown) {
-					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
+				else {
+					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
 				}
 			});
 
-			that.shown = !that.shown;
-		}, this.interval);
+			// reversing the value of indicator attribute
+			this.shown = !this.shown;
+		}
+
+		// I close my eyes only for a moment, and a moment's gone
+		this.secondsSinceInit += this.blinkInterval / 1000;
+
+		// repeating this function with delay
+		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
+	},
+
+	/**
+	 * Check all currently found objects and exclude ones that should stop blinking by now
+	 */
+	filterOutNonBlinking: function(objects) {
+		var that = this;
+
+		return objects.filter(function() {
+			var obj = jQuery(this);
+			if (typeof obj.data('timeToBlink') !== 'undefined') {
+				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
+
+				if (shouldBlink || !that.shown) {
+					return true;
+				}
+				else {
+					obj.removeClass('blink');
+					return false;
+				}
+			}
+			else {
+				// no time-to-blink attribute, should blink forever
+				return true;
+			}
+		});
 	}
 };
 
@@ -436,9 +460,6 @@ var hintBox = {
 	 * - content update using flickerfreeScreen.refreshHtml()
 	 * - widget update by updateWidgetContent()
 	 * - widget remove by deleteWidget().
-	 *
-	 * Triggered events:
-	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
@@ -486,10 +507,9 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
+	createBox: function(e, target, hintText, className, isStatic, styles) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
-			appendTo = appendTo || 'body';
+			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue');
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
@@ -521,17 +541,15 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn',
-					'title': t('Close')
-				}
-			)
+					'class': 'overlay-close-btn'}
+				)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
 		}
 
-		jQuery(appendTo).append(box);
+		jQuery('body').append(box);
 
 		return box;
 	},
@@ -655,7 +673,6 @@ var hintBox = {
 		}
 
 		if (target.hintBoxItem) {
-			target.hintBoxItem.trigger('onDeleteHint.hintBox');
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
 
@@ -674,6 +691,80 @@ var hintBox = {
 		return hintboxid;
 	}
 };
+
+/*
+ * Color picker
+ */
+function hide_color_picker() {
+	if (!color_picker) {
+		return;
+	}
+
+	color_picker.style.zIndex = 1000;
+	color_picker.style.display = 'none';
+	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
+	curr_lbl = null;
+	curr_txt = null;
+
+	removeFromOverlaysStack('color_picker');
+}
+
+function show_color_picker(id, event) {
+	if (!color_picker) {
+		return;
+	}
+
+	curr_txt = document.getElementById(id);
+	if (curr_txt.hasAttribute('disabled')) {
+		return;
+	}
+	curr_lbl = document.getElementById('lbl_' + id);
+	var pos = getPosition(curr_lbl);
+	color_picker.x = pos.left;
+	color_picker.y = pos.top;
+	color_picker.style.left = (color_picker.x + 20) + 'px';
+	color_picker.style.top = color_picker.y + 'px';
+	color_picker.style.display = 'block';
+
+	addToOverlaysStack('color_picker', event.target, 'color_picker');
+	overlayDialogueOnLoad(true, color_picker);
+}
+
+function create_color_picker() {
+	if (color_picker) {
+		return;
+	}
+
+	color_picker = document.createElement('div');
+	color_picker.setAttribute('class', 'overlay-dialogue');
+	color_picker.innerHTML = color_table;
+	document.body.appendChild(color_picker);
+	hide_color_picker();
+}
+
+function set_color(color) {
+	color = color.toString().trim().toUpperCase();
+
+	if (curr_lbl) {
+		var background = /[0-9A-F]{6}/.test(color) ? '#' + color : '';
+
+		curr_lbl.style.color = background;
+		curr_lbl.style.background = background;
+		curr_lbl.title = background;
+	}
+
+	if (curr_txt) {
+		curr_txt.value = color;
+	}
+
+	hide_color_picker();
+}
+
+function set_color_by_name(id, color) {
+	curr_lbl = document.getElementById('lbl_' + id);
+	curr_txt = document.getElementById(id);
+	set_color(color);
+}
 
 /**
  * Add object to the list of favourites.
@@ -707,7 +798,7 @@ function rm4favorites(object, objectid) {
  * @param {object} 	idx2				An array of IDs
  */
 function updateUserProfile(idx, value_int, idx2) {
-	return sendAjaxData('zabbix.php?action=profile.update', {
+	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
 			value_int: value_int,
@@ -755,7 +846,7 @@ function sendAjaxData(url, options) {
 	options.type = 'post';
 	options.url = url.getUrl();
 
-	return jQuery.ajax(options);
+	jQuery.ajax(options);
 }
 
 /**
@@ -885,10 +976,7 @@ function getConditionFormula(conditions, evalType) {
 	 * - dataCallback	- function to generate the data passed to the template
 	 *
 	 * Triggered events:
-	 * - tableupdate.dynamicRows 	- after adding or removing a row.
-	 * - beforeadd.dynamicRows 	    - only before adding a new row.
-	 * - afteradd.dynamicRows 	    - only after adding a new row.
-	 * - afterremove.dynamicRows 	- only after removing a row.
+	 * - tableupdate.dynamicRows 	- after adding or removing a row
 	 *
 	 * @param options
 	 */
@@ -899,7 +987,6 @@ function getConditionFormula(conditions, evalType) {
 			add: '.element-table-add',
 			remove: '.element-table-remove',
 			counter: null,
-			beforeRow: null,
 			dataCallback: function(data) {
 				return {};
 			}
@@ -914,15 +1001,8 @@ function getConditionFormula(conditions, evalType) {
 
 			// add buttons
 			table.on('click', options.add, function() {
-				table.trigger('beforeadd.dynamicRows', options);
-
 				// add the new row before the row with the "Add" button
-				var beforeRow = (options['beforeRow'] !== null)
-					? $(options['beforeRow'], table)
-					:  $(this).closest('tr');
-				addRow(table, beforeRow, options);
-
-				table.trigger('afteradd.dynamicRows', options);
+				addRow(table, $(this).closest('tr'), options);
 			});
 
 			// remove buttons
@@ -964,7 +1044,6 @@ function getConditionFormula(conditions, evalType) {
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
-		table.trigger('afterremove.dynamicRows', options);
 	}
 }(jQuery));
 
@@ -1043,73 +1122,4 @@ jQuery(function ($) {
 	if ((IE || ED) && typeof sessionStorage.scrollTop !== 'undefined') {
 		$(window).scrollTop(sessionStorage.scrollTop);
 	}
-});
-
-
-jQuery(function ($) {
-	"use strict";
-
-	function calcRows($obj, options) {
-		var max_height = (options && 'maxHeight' in options) ? options.maxHeight : null,
-			clone = $obj
-				.clone(false)
-				.css({'position': 'absolute', 'z-index': '-1'})
-				.removeClass('patternselect')
-				.insertAfter($obj),
-			padding = parseInt(clone.css('padding-top'), 10) + parseInt(clone.css('padding-bottom'), 10),
-			line_height = parseInt(clone.css('font-size'), 10) * 1.14,
-			rows = 0;
-
-		do {
-			rows++;
-			clone.height(rows * line_height);
-		}
-		while (clone[0].scrollHeight - padding > clone.innerHeight()
-			&& (max_height === null || rows * line_height + padding <= max_height));
-		clone.remove();
-
-		return rows;
-	}
-
-	$.fn.autoGrowTextarea = function(options) {
-		this.each(function() {
-			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, options);
-
-				$(this)
-					.css({
-						'resize': 'none',
-						'overflow-x': 'hidden',
-						'white-space': 'pre-line'
-					})
-					.on('paste change keyup', function() {
-						var rows = calcRows($(this), options);
-
-						if (options && 'pair' in options) {
-							var pair_rows = calcRows($(options.pair), options);
-							if (pair_rows > rows) {
-								rows = pair_rows;
-							}
-							$(options.pair).attr('rows', rows);
-						}
-
-						$(this).attr('rows', rows);
-					})
-					.data('autogrow', options)
-					.trigger('change');
-			}
-
-			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
-				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
-					if ($(this).val().length > $(this).attr('maxlength')) {
-						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
-					}
-				});
-			}
-
-			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none'});
-			}
-		});
-	};
 });

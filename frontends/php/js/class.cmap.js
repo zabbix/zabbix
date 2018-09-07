@@ -958,6 +958,13 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
+				// changes for color inputs
+				$('.input-color-picker input').on('change', function() {
+					var id = $(this).attr('id');
+
+					set_color_by_name(id, this.value);
+				});
+
 				$('#border_type').on('change', function() {
 					$(this).parent().find('input').prop("disabled", this.value === '0');
 				});
@@ -3342,8 +3349,6 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
-
-			this.domNode.find('.input-color-picker input').colorpicker();
 		}
 
 		ShapeForm.prototype = {
@@ -3460,7 +3465,6 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -3533,8 +3537,6 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 			this.triggerids = {};
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
-
-			this.domNode.find('.input-color-picker input').colorpicker();
 		}
 
 		LinkForm.prototype = {
@@ -3705,17 +3707,15 @@ ZABBIX.apps.map = (function($) {
 			 */
 			addLinkTriggers: function(triggers) {
 				var tpl = new Template($('#linkTriggerRow').html()),
-					linkTrigger,
-					table = $('#linkTriggerscontainer tbody');
+					linkTrigger;
 
 				for (linkTrigger in triggers) {
 					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-					$(tpl.evaluate(triggers[linkTrigger])).appendTo(table);
+					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer tbody');
 					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype')
 						.val(triggers[linkTrigger].drawtype);
 				}
 
-				table.find('.input-color-picker input').colorpicker();
 				$('.input-color-picker input', this.domNode).change();
 			},
 
@@ -3731,8 +3731,7 @@ ZABBIX.apps.map = (function($) {
 					},
 					linktriggerid,
 					i,
-					ln,
-					table = $('#linkTriggerscontainer tbody');
+					ln;
 
 				for (i = 0, ln = triggers.length; i < ln; i++) {
 					if (typeof this.triggerids[triggers[i].triggerid] !== 'undefined') {
@@ -3749,10 +3748,9 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-					$(tpl.evaluate(linkTrigger)).appendTo(table);
+					$(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer tbody');
 				}
 
-				table.find('.input-color-picker input').colorpicker();
 				$('.input-color-picker input', this.domNode).change();
 			},
 

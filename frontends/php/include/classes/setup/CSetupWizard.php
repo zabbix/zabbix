@@ -94,10 +94,7 @@ class CSetupWizard extends CForm {
 
 	protected function bodyToString($destroy = true) {
 		$setup_left = (new CDiv([
-			(new CDiv())
-				->addClass(ZBX_STYLE_SIGNIN_LOGO)
-				->addStyle(CBrandHelper::getLogoStyle()),
-			$this->getList()
+			(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO), $this->getList()
 		]))->addClass(ZBX_STYLE_SETUP_LEFT);
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);

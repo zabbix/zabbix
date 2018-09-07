@@ -85,7 +85,9 @@ function pgettext($context, $msgId) {
 function npgettext($context, $msgId, $msgIdPlural, $num) {
 	$contextString = $context."\004".$msgId;
 	$contextStringp = $context."\004".$msgIdPlural;
-	return ngettext($contextString, $contextStringp, $num);
+	$translation = ngettext($contextString, $contextStringp, $num);
+
+	return ($translation == $contextString || $translation == $contextStringp) ? $msgId : $translation;
 }
 
 /**
@@ -188,7 +190,9 @@ function _xn($message, $messagePlural, $num, $context) {
 	$arguments = array_slice(func_get_args(), 4);
 	array_unshift($arguments, $num);
 
-	return _params(pgettext($context, ngettext($message, $messagePlural, $num)), $arguments);
+	return ($context == '')
+		? _params(ngettext($message, $messagePlural, $num), $arguments)
+		: _params(npgettext($context, $message, $messagePlural, $num), $arguments);
 }
 
 /**

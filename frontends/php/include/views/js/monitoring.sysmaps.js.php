@@ -299,9 +299,9 @@ function getFontComboBox($name) {
 				(new CFormList())
 					->addRow(_('Shape'), [
 						(new CRadioButtonList('type', SYSMAP_SHAPE_TYPE_RECTANGLE))
-							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE, null, 'jQuery.colorpicker("hide")')
-							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE, null, 'jQuery.colorpicker("hide")')
-							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE, null, 'jQuery.colorpicker("hide")')
+							->addValue(_('Rectangle'), SYSMAP_SHAPE_TYPE_RECTANGLE)
+							->addValue(_('Ellipse'), SYSMAP_SHAPE_TYPE_ELLIPSE)
+							->addValue(_('Line'), SYSMAP_SHAPE_TYPE_LINE)
 							->setModern(true),
 						new CVar('', '', 'last_shape_type')
 					])

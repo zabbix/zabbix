@@ -10,8 +10,7 @@ libzbxdbcache_a_SOURCES = \
 	dbsync.h \
 	valuecache.c \
 	valuecache.h \
-	dbconfig_dump.c \
-	dbconfig_maintenance.c
+	dbconfig_dump.c
 
 libzbxdbcache_a_CFLAGS = \
 	-I@top_srcdir@/src/zabbix_server/ \

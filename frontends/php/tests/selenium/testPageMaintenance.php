@@ -47,7 +47,6 @@ class testPageMaintenance extends CWebTest {
 	* @dataProvider allMaintenances
 	*/
 	public function testPageMaintenance_SimpleUpdate($maintenance) {
-		$this->markTestSkipped();
 		$name = $maintenance['name'];
 		$maintenanceid = $maintenance['maintenanceid'];
 

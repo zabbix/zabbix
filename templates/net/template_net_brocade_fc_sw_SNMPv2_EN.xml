@@ -11,8 +11,9 @@
       <template>
          <template>Template Net Brocade FC SNMPv2</template>
          <name>Template Net Brocade FC SNMPv2</name>
-         <description>Template Net Brocade FC version: 0.15&#13;
+         <description>Template Net Brocade FC version: 0.14&#13;
 Overview: https://community.brocade.com/dtscp75322/attachments/dtscp75322/fibre/25235/1/FOS_MIB_Reference_v740.pdf&#13;
+&#13;
 MIBs used:&#13;
 SW-MIB&#13;
 Known Issues:&#13;
@@ -29,22 +30,22 @@ device : all</description>
                <name>CPU</name>
             </application>
             <application>
-               <name>Fans</name>
-            </application>
-            <application>
-               <name>Inventory</name>
-            </application>
-            <application>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Temperature</name>
             </application>
             <application>
                <name>Status</name>
             </application>
             <application>
-               <name>Temperature</name>
+               <name>Power Supply</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
             </application>
          </applications>
          <items>
@@ -54,7 +55,7 @@ device : all</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.26.1.0</snmp_oid>
                <key>system.cpu.util[swCpuUsage.0]</key>
-               <delay>3m</delay>
+               <delay>180</delay>
                <history>30d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -96,7 +97,7 @@ System's CPU usage.</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.26.6.0</snmp_oid>
                <key>vm.memory.pused[swMemUsage.0]</key>
-               <delay>3m</delay>
+               <delay>180</delay>
                <history>30d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -138,8 +139,8 @@ Memory utilization in %</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.7.0</snmp_oid>
                <key>system.status[swOperStatus.0]</key>
-               <delay>30s</delay>
-               <history>2w</history>
+               <delay>30</delay>
+               <history>14d</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>3</value_type>
@@ -162,7 +163,7 @@ Memory utilization in %</description>
                <port/>
                <description>MIB: SW-MIB&#13;
 The current operational status of the switch.The states are as follow:&#13;
-online(1) means the switch is accessible by an external Fibre Channel port&#13;
+online(1) means the switch is accessible by an external  Fibre Channel port&#13;
 offline(2) means the switch is not accessible&#13;
 testing(3) means the switch is in a built-in test mode and is not accessible by an external Fibre Channel port&#13;
 faulty(4) means the switch is not operational.</description>
@@ -186,8 +187,8 @@ faulty(4) means the switch is not operational.</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.10.0</snmp_oid>
                <key>system.hw.serialnumber</key>
-               <delay>1h</delay>
-               <history>2w</history>
+               <delay>3600</delay>
+               <history>14d</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -227,8 +228,8 @@ faulty(4) means the switch is not operational.</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.6.0</snmp_oid>
                <key>system.hw.firmware</key>
-               <delay>1h</delay>
-               <history>2w</history>
+               <delay>3600</delay>
+               <history>14d</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -270,7 +271,7 @@ faulty(4) means the switch is not operational.</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>temperature.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -295,6 +296,7 @@ faulty(4) means the switch is not operational.</description>
                      <condition>
                         <macro>{#SENSOR_TYPE}</macro>
                         <value>1</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -309,7 +311,7 @@ faulty(4) means the switch is not operational.</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[swSensorValue.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -352,8 +354,8 @@ Temperature readings of testpoint: {#SENSOR_INFO}</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.status[swSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>2w</history>
+                     <delay>180</delay>
+                     <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -462,7 +464,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>psu.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -487,6 +489,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <condition>
                         <macro>{#SENSOR_TYPE}</macro>
                         <value>3</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -501,8 +504,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.psu.status[swSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>2w</history>
+                     <delay>180</delay>
+                     <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -592,7 +595,7 @@ Please check the power supply unit for errors</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.1,{#SENSOR_TYPE},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2,{#SENSOR_INFO},1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5]</snmp_oid>
                <key>fan.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -617,6 +620,7 @@ Please check the power supply unit for errors</description>
                      <condition>
                         <macro>{#SENSOR_TYPE}</macro>
                         <value>2</value>
+                        <!-- 1 - temperature, 2 fan, 3 power-supply -->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -631,8 +635,8 @@ Please check the power supply unit for errors</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.status[swSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>2w</history>
+                     <delay>180</delay>
+                     <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -675,7 +679,7 @@ Please check the power supply unit for errors</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.speed[swSensorValue.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -698,6 +702,7 @@ Please check the power supply unit for errors</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: SW-MIB&#13;
+&#13;
 The current value (reading) of the sensor.&#13;
 The value, -2147483648, represents an unknown quantity.&#13;
 The fan value will be in RPM(revolution per minute)</description>
@@ -765,16 +770,12 @@ Please check the fan unit</description>
          <httptests/>
          <macros>
             <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
-               <value>90</value>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>75</value>
             </macro>
             <macro>
-               <macro>{$FAN_CRIT_STATUS}</macro>
-               <value>2</value>
-            </macro>
-            <macro>
-               <macro>{$FAN_OK_STATUS}</macro>
-               <value>4</value>
+               <macro>{$TEMP_WARN}</macro>
+               <value>65</value>
             </macro>
             <macro>
                <macro>{$HEALTH_CRIT_STATUS}</macro>
@@ -789,11 +790,15 @@ Please check the fan unit</description>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
-               <value>90</value>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>5</value>
             </macro>
             <macro>
                <macro>{$PSU_CRIT_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS}</macro>
                <value>2</value>
             </macro>
             <macro>
@@ -801,28 +806,36 @@ Please check the fan unit</description>
                <value>4</value>
             </macro>
             <macro>
+               <macro>{$FAN_OK_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
                <macro>{$TEMP_CRIT_LOW}</macro>
                <value>5</value>
             </macro>
             <macro>
-               <macro>{$TEMP_CRIT}</macro>
-               <value>75</value>
+               <macro>{$STORAGE_UTIL_CRIT}</macro>
+               <value>90</value>
             </macro>
             <macro>
-               <macro>{$TEMP_WARN_STATUS}</macro>
-               <value>5</value>
-            </macro>
-            <macro>
-               <macro>{$TEMP_WARN}</macro>
-               <value>65</value>
+               <macro>{$STORAGE_UTIL_WARN}</macro>
+               <value>80</value>
             </macro>
          </macros>
          <templates>
             <template>
-               <name>Template Module Generic SNMPv2</name>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Interfaces SNMPv2</name>
+               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -928,7 +941,7 @@ Please check the fan unit</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+         <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].last(0)}={$HEALTH_CRIT_STATUS}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>System status is in critical state</name>
@@ -945,7 +958,7 @@ Please check the device for errors</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].count(#1,{$HEALTH_WARN_STATUS:"offline"},eq)}=1 or {Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].count(#1,{$HEALTH_WARN_STATUS:"testing"},eq)}=1</expression>
+         <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].last(0)}={$HEALTH_WARN_STATUS:"offline"} or {Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].last(0)}={$HEALTH_WARN_STATUS:"testing"}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>System status is in warning state</name>
@@ -961,7 +974,7 @@ Please check the device for warnings</description>
          <dependencies>
             <dependency>
                <name>System status is in critical state</name>
-               <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+               <expression>{Template Net Brocade FC SNMPv2:system.status[swOperStatus.0].last(0)}={$HEALTH_CRIT_STATUS}</expression>
                <recovery_expression/>
             </dependency>
          </dependencies>

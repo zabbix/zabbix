@@ -61,7 +61,7 @@ class CAbsoluteTimeParser extends CParser {
 	}
 
 	/**
-	 * Parse absolute time.
+	 * Prse absolute time.
 	 *
 	 * @param string	$source
 	 * @param int		$pos

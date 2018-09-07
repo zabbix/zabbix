@@ -642,8 +642,8 @@ class testUrlUserPermissions extends CWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?action=authentication.edit',
-				'title' =>	'Authentication',
+				'url' => 'authentication.php',
+				'title' =>	'Configuration of authentication',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

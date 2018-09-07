@@ -68,7 +68,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
 /* lld macro context */
-#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
+#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_NUMERIC	(ZBX_MACRO_ANY | ZBX_TOKEN_NUMERIC)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_XML		(ZBX_MACRO_ANY | ZBX_TOKEN_XML)
@@ -85,7 +85,6 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row, char *error,
 		int maxerrlen);
 int	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
-int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
 #endif

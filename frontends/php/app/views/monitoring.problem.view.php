@@ -26,6 +26,7 @@ $options = [
 	'page' => $data['page'],
 	'data' => [
 		'action' => $data['action'],
+		'fullscreen' => $data['fullscreen'],
 		'sort' => $data['sort'],
 		'sortorder' => $data['sortorder'],
 		'page' => $data['page'],
@@ -41,9 +42,7 @@ $options = [
 			'evaltype' => $data['filter']['evaltype'],
 			'tags' => $data['filter']['tags'],
 			'show_tags' => $data['filter']['show_tags'],
-			'tag_name_format' => $data['filter']['tag_name_format'],
-			'tag_priority' => $data['filter']['tag_priority'],
-			'show_suppressed' => $data['filter']['show_suppressed'],
+			'maintenance' => $data['filter']['maintenance'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
@@ -77,7 +76,6 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
-	$this->addJsFile('layout.mode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {
@@ -256,38 +254,19 @@ if ($data['action'] == 'problem.view') {
 				->addClass('element-table-add')
 		))->setColSpan(3)
 	);
-
-	$tag_format_line = (new CHorList())
-		->addItem((new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
+	$filter_column2 = (new CFormList())
+		->addRow(_('Host inventory'), $filter_inventory_table)
+		->addRow(_('Tags'), $filter_tags_table)
+		->addRow(_('Show tags'),
+			(new CRadioButtonList('filter_show_tags', (int) $data['filter']['show_tags']))
 				->addValue(_('None'), PROBLEMS_SHOW_TAGS_NONE)
 				->addValue(PROBLEMS_SHOW_TAGS_1, PROBLEMS_SHOW_TAGS_1)
 				->addValue(PROBLEMS_SHOW_TAGS_2, PROBLEMS_SHOW_TAGS_2)
 				->addValue(PROBLEMS_SHOW_TAGS_3, PROBLEMS_SHOW_TAGS_3)
 				->setModern(true)
 		)
-		->addItem((new CDiv())->setWidth(ZBX_STYLE_FORM_INPUT_MARGIN))
-		->addItem(_('Tag name'))
-		->addItem((new CRadioButtonList('filter_tag_name_format', (int) $data['filter']['tag_name_format']))
-				->addValue(_('Full'), PROBLEMS_TAG_NAME_FULL)
-				->addValue(_('Shortened'), PROBLEMS_TAG_NAME_SHORTENED)
-				->addValue(_('None'), PROBLEMS_TAG_NAME_NONE)
-				->setModern(true)
-				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
-		);
-
-	$filter_column2 = (new CFormList())
-		->addRow(_('Host inventory'), $filter_inventory_table)
-		->addRow(_('Tags'), $filter_tags_table)
-		->addRow(_('Show tags'), $tag_format_line)
-		->addRow(_('Tag display priority'),
-			(new CTextBox('filter_tag_priority', $data['filter']['tag_priority']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('comma-separated list'))
-				->setEnabled((int) $data['filter']['show_tags'] !== PROBLEMS_SHOW_TAGS_NONE)
-		)
-		->addRow(_('Show suppressed problems'), [
-			(new CCheckBox('filter_show_suppressed'))
-				->setChecked($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE),
+		->addRow(_('Show hosts in maintenance'), [
+			(new CCheckBox('filter_maintenance'))->setChecked($data['filter']['maintenance'] == 1),
 			(new CDiv([
 				(new CLabel(_('Show unacknowledged only'), 'filter_unacknowledged'))
 					->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
@@ -322,6 +301,7 @@ if ($data['action'] == 'problem.view') {
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())
+		->addFormItem((new CVar('fullscreen', $data['fullscreen'] ? '1' : null))->removeId())
 		->addFormItem((new CVar('page', $data['page']))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
@@ -330,15 +310,13 @@ if ($data['action'] == 'problem.view') {
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	$web_layout_mode = CView::getLayoutMode();
-
-	$widget = (new CWidget())
+	(new CWidget())
 		->setTitle(_('Problems'))
-		->setWebLayoutMode($web_layout_mode)
 		->setControls((new CTag('nav', true,
 			(new CForm('get'))
 				->cleanItems()
 				->addVar('action', 'problem.view')
+				->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 				->addVar('page', $data['page'])
 				->addItem((new CList())
 					->addItem(new CRedirectButton(_('Export to CSV'),
@@ -346,17 +324,12 @@ if ($data['action'] == 'problem.view') {
 							->setArgument('action', 'problem.view.csv')
 							->setArgument('page',  $data['page'])
 					))
-					->addItem(get_icon('fullscreen'))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 				)
 			))
 				->setAttribute('aria-label', _('Content controls'))
-		);
-
-	if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-		$widget->addItem($filter);
-	}
-
-	$widget
+		)
+		->addItem($filter)
 		->addItem($screen->get())
 		->show();
 

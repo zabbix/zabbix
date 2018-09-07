@@ -476,6 +476,7 @@ else {
 }
 
 // Insert js (depended from some variables inside the file).
+insert_show_color_picker_javascript();
 require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 
 $graphForm->addItem($graphTab);

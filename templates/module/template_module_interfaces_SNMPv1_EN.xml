@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Interfaces SNMPv1</template>
          <name>Template Module Interfaces SNMPv1</name>
-         <description>Template Interfaces version: 0.15&#13;
+         <description>Template Interfaces version: 0.14&#13;
 MIBs used:&#13;
 IF-MIB</description>
          <groups>
@@ -30,9 +30,9 @@ IF-MIB</description>
                <name>Network Interfaces Discovery</name>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]</snmp_oid>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]</snmp_oid>
                <key>net.if.discovery</key>
-               <delay>1h</delay>
+               <delay>3600</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -57,28 +57,21 @@ IF-MIB</description>
                      <condition>
                         <macro>{#IFADMINSTATUS}</macro>
                         <value>(1|3)</value>
-                        <operator>8</operator>
-                        <formulaid>A</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#IFOPERSTATUS}</macro>
-                        <value>(1|2|3|4|5|7)</value>
+                        <!--  ignore interfaces with admin status of down(2) -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#IFNAME}</macro>
                         <value>@Network interfaces for discovery</value>
+                        <!-- should filter out loopbacks and nulls -->
                         <operator>8</operator>
-                        <formulaid>C</formulaid>
+                        <formulaid>B</formulaid>
                      </condition>
                   </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>Discovering interfaces from IF-MIB. Interfaces are not discovered:&#13;
-- with down(2) Administrative status&#13;
-- with notPresent(6) Operational status&#13;
-- loopbacks</description>
+               <description>Discovering interfaces from IF-MIB. Interfaces with down(2) Administrative Status are not discovered.</description>
                <item_prototypes>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Operational status</name>
@@ -86,8 +79,8 @@ IF-MIB</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.status[ifOperStatus.{#SNMPINDEX}]</key>
-                     <delay>1m</delay>
-                     <history>2w</history>
+                     <delay>60</delay>
+                     <history>14d</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -137,7 +130,7 @@ The current operational state of the interface.&#13;
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -189,7 +182,7 @@ The total number of octets received on the interface,including framing character
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
+                     <delay>180</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -241,7 +234,7 @@ The total number of octets transmitted out of the interface, including framing c
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -289,7 +282,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -337,7 +330,7 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -389,7 +382,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -441,7 +434,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.type[ifType.{#SNMPINDEX}]</key>
-                     <delay>1h</delay>
+                     <delay>3600</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -488,7 +481,7 @@ through updating the syntax of the IANAifType textual convention.</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.speed[ifHighSpeed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>300</delay>
                      <history>1w</history>
                      <trends>0d</trends>
                      <status>0</status>
@@ -610,7 +603,8 @@ and (&#13;
 {Template Module Interfaces SNMPv1:net.if.type[ifType.{#SNMPINDEX}].last()}=117&#13;
 )&#13;
 and&#13;
-({Template Module Interfaces SNMPv1:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2)</expression>
+({Template Module Interfaces SNMPv1:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2)&#13;
+</expression>
                      <recovery_mode>1</recovery_mode>
                      <recovery_expression>({Template Module Interfaces SNMPv1:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&gt;0 and {Template Module Interfaces SNMPv1:net.if.speed[ifHighSpeed.{#SNMPINDEX}].prev()}&gt;0) or&#13;
 ({Template Module Interfaces SNMPv1:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2)</recovery_expression>
@@ -739,12 +733,12 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                <value>1</value>
             </macro>
             <macro>
-               <macro>{$IF_ERRORS_WARN}</macro>
-               <value>2</value>
-            </macro>
-            <macro>
                <macro>{$IF_UTIL_MAX}</macro>
                <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$IF_ERRORS_WARN}</macro>
+               <value>2</value>
             </macro>
          </macros>
          <templates/>
@@ -789,6 +783,7 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
       </value_map>
       <value_map>
          <name>IF-MIB::ifType</name>
+         <!-- https://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib LAST-UPDATED "201703300000Z"  March 30, 2017 -->
          <mappings>
             <mapping>
                <value>1</value>
@@ -1734,6 +1729,7 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                <value>236</value>
                <newvalue>mocaVersion1</newvalue>
             </mapping>
+            <!-- as documented in information provided privately to IANA -->
             <mapping>
                <value>237</value>
                <newvalue>ieee80216WMAN</newvalue>

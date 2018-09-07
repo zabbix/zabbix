@@ -27,6 +27,7 @@ class CMapHelper {
 	 * @param array $sysmapids					Map IDs.
 	 * @param array $options					Options used to retrieve actions.
 	 * @param int   $options['severity_min']	Minimum severity.
+	 * @param int   $options['fullscreen']		Fullscreen flag.
 	 *
 	 * @return array
 	 */
@@ -36,7 +37,7 @@ class CMapHelper {
 				'highlight', 'expandproblem', 'markelements', 'show_unack', 'label_format', 'label_type_host',
 				'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
 				'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'iconmapid',
-				'severity_min', 'show_suppressed'
+				'severity_min'
 			],
 			'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 				'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -106,6 +107,7 @@ class CMapHelper {
 			'refresh' => 'map.php?sysmapid='.$map['sysmapid'].'&severity_min='.$map['severity_min'],
 			'background' => $map['backgroundid'],
 			'label_location' => $map['label_location'],
+			'shapes' => array_values($map['shapes']),
 			'elements' => array_values($map['selements']),
 			'links' => array_values($map['links']),
 			'shapes' => array_values($map['shapes']),
@@ -117,12 +119,13 @@ class CMapHelper {
 	/**
 	 * Resolve map element (selements and links) state.
 	 *
-	 * @param array $sysmap                   Map data.
-	 * @param array $options                  Options used to retrieve actions.
-	 * @param int   $options['severity_min']  Minimum severity.
-	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
+	 * @param array $sysmap				Map data.
+	 * @param array $options					Options used to retrieve actions.
+	 * @param int   $options['severity_min']	Minimum severity.
+	 * @param int   $options['fullscreen']		Fullscreen flag.
+	 * @param int   $theme				Theme used to create missing elements (like hostgroup frame).
 	 */
-	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {
+	protected static function resolveMapState(&$sysmap, $options, $theme) {
 		$map_info_options = [
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
@@ -140,7 +143,7 @@ class CMapHelper {
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		// Adding element names and removing inaccessible triggers from readable elements.
-		addElementNames($sysmap['selements']);
+		add_elementNames($sysmap['selements']);
 
 		foreach ($sysmap['selements'] as $id => &$element) {
 			if ($element['permission'] < PERM_READ) {
@@ -284,13 +287,16 @@ class CMapHelper {
 					$id = $link_trigger['linktriggerid'];
 
 					$triggers[$id] = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
+					// Trigger might be with no events yet.
+					$trigger_severity = array_key_exists('severity', $triggers[$id]['lastEvent'])
+							? $triggers[$id]['lastEvent']['severity']
+							: $triggers[$id]['priority'];
 
-					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED
-							&& $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
-							&& $triggers[$id]['priority'] >= $max_severity) {
+					if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE
+							&& $trigger_severity >= $max_severity) {
 						$drawtype = $triggers[$id]['drawtype'];
 						$color = $triggers[$id]['color'];
-						$max_severity = $triggers[$id]['priority'];
+						$max_severity = $trigger_severity;
 					}
 				}
 

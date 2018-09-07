@@ -135,12 +135,6 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'tags_evaltype' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 		],
 	],
 	'hosts' => [
@@ -1628,7 +1622,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			],
 			'output_format' => [
 				'null' => false,
@@ -2047,7 +2041,7 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'pause_suppressed' => [
+			'maintenance_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -2810,42 +2804,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			],
-			'http_auth_enabled' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'http_login_form' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'http_strip_domains' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			],
-			'http_case_sensitive' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
-			'ldap_configured' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'ldap_case_sensitive' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
 			],
 		],
 	],
@@ -3893,12 +3851,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
-			],
-			'show_suppressed' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
 			],
 		],
 	],
@@ -7469,71 +7421,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
-			],
-		],
-	],
-	'event_suppress' => [
-		'key' => 'event_suppressid',
-		'fields' => [
-			'event_suppressid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'eventid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'events',
-				'ref_field' => 'eventid',
-			],
-			'maintenanceid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'maintenances',
-				'ref_field' => 'maintenanceid',
-			],
-			'suppress_until' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-		],
-	],
-	'maintenance_tag' => [
-		'key' => 'maintenancetagid',
-		'fields' => [
-			'maintenancetagid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'maintenanceid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'maintenances',
-				'ref_field' => 'maintenanceid',
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '2',
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
 			],
 		],
 	],

@@ -546,7 +546,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay color picker.
 				case 'color_picker':
-					jQuery.colorpicker('hide');
+					hide_color_picker();
 					break;
 			}
 		}

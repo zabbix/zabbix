@@ -1665,7 +1665,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 		num++;
 	}
 
-	host_name_temp = zbx_dsprintf(host_name_temp, "%s_" ZBX_FS_UI64, host_name_sample, num);
+	host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num);
 clean:
 	zbx_vector_uint64_destroy(&nums);
 
@@ -1850,7 +1850,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 	field_name_esc = DBdyn_escape_string(field_name);
 
 	result = DBselect("show columns from %s like '%s'",
-			table_name, field_name_esc);
+			table_name, field_name_esc, ZBX_SQL_LIKE_ESCAPE_CHAR);
 
 	zbx_free(field_name_esc);
 

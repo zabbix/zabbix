@@ -66,7 +66,6 @@ class CProblem extends CApiService {
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
-			'suppressed'				=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'recent'					=> null,
@@ -79,7 +78,6 @@ class CProblem extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectAcknowledges'		=> null,
-			'selectSuppressionData'		=> null,
 			'selectTags'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
@@ -267,16 +265,6 @@ class CProblem extends CApiService {
 			$sqlParts['where'][] = 'p.acknowledged='.$acknowledged;
 		}
 
-		// suppressed
-		if ($options['suppressed'] !== null) {
-			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-					'EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_suppress es'.
-						' WHERE es.eventid=p.eventid'.
-					')';
-		}
-
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
 			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], false);
@@ -430,57 +418,6 @@ class CProblem extends CApiService {
 				}
 				unset($event);
 			}
-		}
-
-		// Adding suppression data.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
-			$suppression_data = API::getApiService()->select('event_suppress', [
-				'output' => $this->outputExtend($options['selectSuppressionData'], ['eventid', 'maintenanceid']),
-				'filter' => ['eventid' => $eventids],
-				'preservekeys' => true
-			]);
-			$relation_map = $this->createRelationMap($suppression_data, 'eventid', 'event_suppressid');
-			$suppression_data = $this->unsetExtraFields($suppression_data, ['event_suppressid', 'eventid'], []);
-			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
-		}
-
-		// Adding suppressed value.
-		if ($this->outputIsRequested('suppressed', $options['output'])) {
-			$suppressed_eventids = [];
-			foreach ($result as &$problem) {
-				if (array_key_exists('suppression_data', $problem)) {
-					$problem['suppressed'] = $problem['suppression_data']
-						? ZBX_PROBLEM_SUPPRESSED_TRUE
-						: ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				else {
-					$suppressed_eventids[] = $problem['eventid'];
-				}
-			}
-			unset($problem);
-
-			if ($suppressed_eventids) {
-				$suppressed_events = API::getApiService()->select('event_suppress', [
-					'output' => ['eventid'],
-					'filter' => ['eventid' => $suppressed_eventids]
-				]);
-				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
-				foreach ($result as &$problem) {
-					$problem['suppressed'] = array_key_exists($problem['eventid'], $suppressed_eventids)
-						? ZBX_PROBLEM_SUPPRESSED_TRUE
-						: ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				unset($problem);
-			}
-		}
-
-		// Remove "maintenanceid" field if it's not requested.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT
-				&& !$this->outputIsRequested('maintenanceid', $options['selectSuppressionData'])) {
-			foreach ($result as &$row) {
-				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
-			}
-			unset($row);
 		}
 
 		// Adding event tags.

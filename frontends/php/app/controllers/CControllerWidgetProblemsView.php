@@ -29,14 +29,21 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
 			'name' => 'string',
+			'fullscreen' => 'in 0,1',
+			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
+		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
+
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
+
+		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 
 		$data = CScreenProblem::getData([
 			'show' => $fields['show'],
@@ -47,10 +54,11 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'severities' => $fields['severities'],
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
-			'show_suppressed' => $fields['show_suppressed'],
-			'unacknowledged' => $fields['unacknowledged']
+			'maintenance' => $fields['maintenance'],
+			'unacknowledged' => $fields['unacknowledged'],
+			'show_timeline' => ($sortfield === 'clock') ? $fields['show_timeline'] : 0
 		], $config);
-		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
+
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
 
 		$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
@@ -66,9 +74,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags'],
-				$fields['tag_name_format'], $fields['tag_priority']
-			);
+			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags']);
 		}
 
 		if ($data['problems']) {
@@ -81,9 +87,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'show' => $fields['show'],
 				'show_tags' => $fields['show_tags'],
 				'show_timeline' => $fields['show_timeline'],
-				'tags' => $fields['tags'],
-				'tag_name_format' => $fields['tag_name_format'],
-				'tag_priority' => $fields['tag_priority']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],
@@ -100,6 +103,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
+			'fullscreen' => $fullscreen,
+			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

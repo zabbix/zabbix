@@ -289,9 +289,6 @@
 #endif
 
 #ifdef HAVE_LIBPERFSTAT
-#	ifdef HAVE_SYS_PROTOSW_H
-#		include <sys/protosw.h>		/* workaround for /usr/include/netinet/in6_var.h bug, see ZBX-6565 */
-#	endif
 #	include <libperfstat.h>
 #endif
 
@@ -351,8 +348,8 @@
 #	include <math.h>
 #endif
 
-#ifdef HAVE_PCRE_H
-#	include <pcre.h>
+#ifdef HAVE_PCREPOSIX_H
+#	include <pcreposix.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H
@@ -378,6 +375,10 @@
 #ifdef HAVE_PROCINFO_H
 #	undef T_NULL /* to solve definition conflict */
 #	include <procinfo.h>
+#endif
+
+#ifdef HAVE_EVENT_H
+#	include <event.h>
 #endif
 
 #ifdef HAVE_LIBCURL
@@ -418,6 +419,10 @@
 #ifdef HAVE_ZONE_H
 #	include <zone.h>
 #	include <utmpx.h>
+#endif
+
+#ifdef HAVE_LIBEVENT
+#	include <event.h>
 #endif
 
 #endif

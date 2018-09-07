@@ -35,7 +35,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
 			'content_height' => 'int32',
-			'only_footer' => 'in 1'
+			'only_footer' => 'in 1',
+			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -50,6 +51,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 			return;
 		}
+
+		$fullscreen = (bool) $this->getInput('fullscreen', false);
 
 		$fields = $this->getForm()->getFieldsData();
 
@@ -347,7 +350,8 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 			$item_graph_url
 				->setArgument('from', $timeline['from'])
-				->setArgument('to', $timeline['to']);
+				->setArgument('to', $timeline['to'])
+				->setArgument('fullscreen', $fullscreen ? '1' : null);
 		}
 
 		$response = [

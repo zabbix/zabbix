@@ -378,6 +378,12 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uin
  * Parameters: rule  - [IN/OUT] the history housekeeping rule                 *
  *             now   - [IN] the current timestamp                             *
  *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ * Comments: This function is called to release resources allocated by        *
+ *           history housekeeping rule after housekeeping was disabled        *
+ *           for the table referred by this rule.                             *
+ *                                                                            *
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
@@ -388,10 +394,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	result = DBselect(
 			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
 			" from items i,hosts h"
-			" where i.flags in (%d,%d)"
-				" and i.hostid=h.hostid"
+			" where i.hostid=h.hostid"
 				" and h.status in (%d,%d)",
-			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
@@ -415,13 +419,12 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
-							tmp, row[0]);
-				}
-				else if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'",
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid history storage '%s' for itemid '%s'", tmp,
 							row[0]);
+				}
+				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "history storage too low for itemid '%s'", row[0]);
 				}
 				else
 					hk_history_item_update(rule, now, itemid, history);
@@ -443,13 +446,12 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 
 				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
-							tmp, row[0]);
-				}
-				else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'",
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid trends storage '%s' for itemid '%s'", tmp,
 							row[0]);
+				}
+				else if (0 != trends && ZBX_HK_TRENDS_MIN > trends)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "trends storage too low for itemid '%s'", row[0]);
 				}
 				else
 					hk_history_item_update(rule, now, itemid, trends);
@@ -1104,8 +1106,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_config_clean(&cfg);
 
 		DBclose();
-
-		zbx_dc_cleanup_data_sessions();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
 				" %d audit items in " ZBX_FS_DBL " sec, %s]",

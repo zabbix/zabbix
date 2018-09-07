@@ -18,13 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$this->addJsFile('layout.mode.js');
-$web_layout_mode = CView::getLayoutMode();
-
-$widget = (new CWidget())
-	->setTitle(_('Service availability report').': '.$data['service']['name'])
-	->setWebLayoutMode($web_layout_mode);
+$widget = (new CWidget())->setTitle(_('Service availability report').': '.$data['service']['name']);
 
 $controls = (new CList())
 	->addItem([
@@ -56,9 +50,10 @@ $widget->setControls(new CList([
 		->setMethod('get')
 		->addVar('action', 'report.services')
 		->addVar('serviceid', $data['service']['serviceid'])
+		->addVar('fullscreen', $data['fullscreen'])
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls),
-	(new CTag('nav', true, get_icon('fullscreen')))
+	(new CTag('nav', true, get_icon('fullscreen', ['fullscreen' => $data['fullscreen']])))
 		->setAttribute('aria-label', _('Content controls'))
 ]));
 

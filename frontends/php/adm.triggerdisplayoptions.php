@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of trigger displaying options');
 $page['file'] = 'adm.triggerdisplayoptions.php';
-$page['scripts'] = ['colorpicker.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

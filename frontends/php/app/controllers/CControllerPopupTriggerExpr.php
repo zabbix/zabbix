@@ -36,7 +36,6 @@ class CControllerPopupTriggerExpr extends CController {
 	private $allowedTypesLog = [];
 	private $allowedTypesInt = [];
 	private $functions = [];
-	private $operators = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -208,179 +207,461 @@ class CControllerPopupTriggerExpr extends CController {
 		];
 
 		$this->functions = [
-			'abschange' => [
-				'description' => _('abschange() - Absolute difference between last and previous value'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'abschange[<]' => [
+				'description' =>  _('Absolute difference between last and previous value is < N'),
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'avg' => [
-				'description' => _('avg() - Average value of a period T'),
+			'abschange[>]' => [
+				'description' =>  _('Absolute difference between last and previous value is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'abschange[=]' => [
+				'description' =>  _('Absolute difference between last and previous value is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'abschange[<>]' => [
+				'description' =>  _('Absolute difference between last and previous value is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'avg[<]' => [
+				'description' =>  _('Average value of a period T is < N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'delta' => [
-				'description' => _('delta() - Difference between MAX and MIN value of a period T'),
+			'avg[>]' => [
+				'description' =>  _('Average value of a period T is > N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'change' => [
-				'description' => _('change() - Difference between last and previous value'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'avg[=]' => [
+				'description' =>  _('Average value of a period T is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'count' => [
-				'description' => _('count() - Number of successfully retrieved values V (which fulfill operator O) for period T'),
+			'avg[<>]' => [
+				'description' =>  _('Average value of a period T is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'delta[<]' => [
+				'description' =>  _('Difference between MAX and MIN value of a period T is < N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'delta[>]' => [
+				'description' =>  _('Difference between MAX and MIN value of a period T is > N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'delta[=]' => [
+				'description' =>  _('Difference between MAX and MIN value of a period T is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'delta[<>]' => [
+				'description' =>  _('Difference between MAX and MIN value of a period T is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'change[<]' => [
+				'description' =>  _('Difference between last and previous value is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'change[>]' => [
+				'description' =>  _('Difference between last and previous value is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'change[=]' => [
+				'description' =>  _('Difference between last and previous value is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'change[<>]' => [
+				'description' =>  _('Difference between last and previous value is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'count[<]' => [
+				'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is < N'),
 				'params' => $this->param3SecVal,
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'diff' => [
-				'description' => _('diff() - Difference between last and preceding values (1 - true, 0 - false)'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>']
+			'count[>]' => [
+				'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is > N'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'last' => [
-				'description' => _('last() - Last (most recent) T value'),
+			'count[=]' => [
+				'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is = N'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'count[<>]' => [
+				'description' =>  _('Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N'),
+				'params' => $this->param3SecVal,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'diff[=]' => [
+				'description' =>  _('Difference between last and preceding values, then N = 1, 0 - otherwise'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'diff[<>]' => [
+				'description' =>  _('Difference between last and preceding values, then N NOT 1, 0 - otherwise'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'last[<]' => [
+				'description' =>  _('Last (most recent) T value is < N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'max' => [
-				'description' => _('max() - Maximum value for period T'),
+			'last[>]' => [
+				'description' =>  _('Last (most recent) T value is > N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'min' => [
-				'description' => _('min() - Minimum value for period T'),
+			'last[=]' => [
+				'description' =>  _('Last (most recent) T value is = N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'percentile' => [
-				'description' => _('percentile() - Percentile P of a period T'),
+			'last[<>]' => [
+				'description' =>  _('Last (most recent) T value is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'max[<]' => [
+				'description' =>  _('Maximum value for period T is < N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'max[>]' => [
+				'description' =>  _('Maximum value for period T is > N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'max[=]' => [
+				'description' =>  _('Maximum value for period T is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'max[<>]' => [
+				'description' =>  _('Maximum value for period T is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'min[<]' => [
+				'description' =>  _('Minimum value for period T is < N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+				],
+			'min[>]' => [
+				'description' =>  _('Minimum value for period T is > N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+				],
+			'min[=]' => [
+				'description' =>  _('Minimum value for period T is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+				],
+			'min[<>]' => [
+				'description' =>  _('Minimum value for period T is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+				],
+			'percentile[<]' => [
+				'description' =>  _('Percentile P of a period T is < N'),
 				'params' => $this->param3SecPercent,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'prev' => [
-				'description' => _('prev() - Previous value'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'percentile[>]' => [
+				'description' =>  _('Percentile P of a period T is > N'),
+				'params' => $this->param3SecPercent,
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'str' => [
-				'description' => _('str() - Find string V in last (most recent) value (1 - found, 0 - not found)'),
+			'percentile[=]' => [
+				'description' =>  _('Percentile P of a period T is = N'),
+				'params' => $this->param3SecPercent,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'percentile[<>]' => [
+				'description' =>  _('Percentile P of a period T is NOT N'),
+				'params' => $this->param3SecPercent,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'prev[<]' => [
+				'description' =>  _('Previous value is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'prev[>]' => [
+				'description' =>  _('Previous value is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'prev[=]' => [
+				'description' =>  _('Previous value is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'prev[<>]' => [
+				'description' =>  _('Previous value is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'str[=]' => [
+				'description' =>  _('Find string V in last (most recent) value. N = 1 - if found, 0 - otherwise'),
 				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'strlen' => [
-				'description' => _('strlen() - Length of last (most recent) T value in characters'),
+			'str[<>]' => [
+				'description' =>  _('Find string V in last (most recent) value. N NOT 1 - if found, 0 - otherwise'),
+				'params' => $this->param2SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'strlen[<]' => [
+				'description' =>  _('Length of last (most recent) T value in characters is < N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesStr
 			],
-			'sum' => [
-				'description' => _('sum() - Sum of values of a period T'),
+			'strlen[>]' => [
+				'description' =>  _('Length of last (most recent) T value in characters is > N'),
 				'params' => $this->param1SecCount,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesStr
 			],
-			'date' => [
-				'description' => _('date() - Current date'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'strlen[=]' => [
+				'description' =>  _('Length of last (most recent) T value in characters is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesStr
 			],
-			'dayofweek' => [
-				'description' => _('dayofweek() - Day of week'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'strlen[<>]' => [
+				'description' =>  _('Length of last (most recent) T value in characters is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesStr
 			],
-			'dayofmonth' => [
-				'description' => _('dayofmonth() - Day of month'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+			'sum[<]' => [
+				'description' =>  _('Sum of values of a period T is < N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'fuzzytime' => [
-				'description' => _('fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)'),
+			'sum[>]' => [
+				'description' =>  _('Sum of values of a period T is > N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'sum[=]' => [
+				'description' =>  _('Sum of values of a period T is = N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'sum[<>]' => [
+				'description' =>  _('Sum of values of a period T is NOT N'),
+				'params' => $this->param1SecCount,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'date[<]' => [
+				'description' =>  _('Current date is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'date[>]' => [
+				'description' =>  _('Current date is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'date[=]' => [
+				'description' =>  _('Current date is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'date[<>]' => [
+				'description' =>  _('Current date is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofweek[<]' => [
+				'description' =>  _('Day of week is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofweek[>]' => [
+				'description' =>  _('Day of week is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofweek[=]' => [
+				'description' =>  _('Day of week is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofweek[<>]' => [
+				'description' =>  _('Day of week is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofmonth[<]' => [
+				'description' =>  _('Day of month is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofmonth[>]' => [
+				'description' =>  _('Day of month is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofmonth[=]' => [
+				'description' =>  _('Day of month is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'dayofmonth[<>]' => [
+				'description' =>  _('Day of month is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'fuzzytime[=]' => [
+				'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise'),
 				'params' => $this->param1Sec,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'regexp' => [
-				'description' => _('regexp() - Regular expression V matching last value in period T (1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'iregexp' => [
-				'description' => _('iregexp() - Regular expression V matching last value in period T (non case-sensitive; 1 - match, 0 - no match)'),
-				'params' => $this->param2SecCount,
-				'allowed_types' => $this->allowedTypesStr,
-				'operators' => ['=', '<>']
-			],
-			'logeventid' => [
-				'description' => _('logeventid() - Event ID of last log entry matching regular expression T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
-				'allowed_types' => $this->allowedTypesLog,
-				'operators' => ['=', '<>']
-			],
-			'logseverity' => [
-				'description' => _('logseverity() - Log severity of the last log entry'),
-				'allowed_types' => $this->allowedTypesLog,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'logsource' => [
-				'description' => _('logsource() - Log source of the last log entry matching parameter T (1 - match, 0 - no match)'),
-				'params' => $this->param1Str,
-				'allowed_types' => $this->allowedTypesLog,
-				'operators' => ['=', '<>']
-			],
-			'now' => [
-				'description' => _('now() - Number of seconds since the Epoch'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'time' => [
-				'description' => _('time() - Current time'),
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
-			],
-			'nodata' => [
-				'description' => _('nodata() - No data received during period of time T (1 - true, 0 - false)'),
+			'fuzzytime[<>]' => [
+				'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise'),
 				'params' => $this->param1Sec,
-				'allowed_types' => $this->allowedTypesAny,
-				'operators' => ['=', '<>']
+				'allowed_types' => $this->allowedTypesAny
 			],
-			'band' => [
-				'description' => _('band() - Bitwise AND of last (most recent) T value and mask'),
+			'regexp[=]' => [
+				'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise'),
+				'params' => $this->param2SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'regexp[<>]' => [
+				'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise'),
+				'params' => $this->param2SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'iregexp[=]' => [
+				'description' =>  _('Regular expression V matching last value in period T, then N = 1, 0 - otherwise (non case-sensitive)'),
+				'params' => $this->param2SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'iregexp[<>]' => [
+				'description' =>  _('Regular expression V matching last value in period T, then N NOT 1, 0 - otherwise (non case-sensitive)'),
+				'params' => $this->param2SecCount,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'logeventid[=]' => [
+				'description' =>  _('Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise'),
+				'params' => $this->param1Str,
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logeventid[<>]' => [
+				'description' =>  _('Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise'),
+				'params' => $this->param1Str,
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logseverity[<]' => [
+				'description' =>  _('Log severity of the last log entry is < N'),
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logseverity[>]' => [
+				'description' =>  _('Log severity of the last log entry is > N'),
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logseverity[=]' => [
+				'description' =>  _('Log severity of the last log entry is = N'),
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logseverity[<>]' => [
+				'description' =>  _('Log severity of the last log entry is NOT N'),
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logsource[=]' => [
+				'description' =>  _('Log source of the last log entry matching parameter T, then N = 1, 0 - otherwise'),
+				'params' => $this->param1Str,
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'logsource[<>]' => [
+				'description' =>  _('Log source of the last log entry matching parameter T, then N NOT 1, 0 - otherwise'),
+				'params' => $this->param1Str,
+				'allowed_types' => $this->allowedTypesLog
+			],
+			'now[<]' => [
+				'description' =>  _('Number of seconds since the Epoch is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'now[>]' => [
+				'description' =>  _('Number of seconds since the Epoch is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'now[=]' => [
+				'description' =>  _('Number of seconds since the Epoch is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'now[<>]' => [
+				'description' =>  _('Number of seconds since the Epoch is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'time[<]' => [
+				'description' =>  _('Current time is < N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'time[>]' => [
+				'description' =>  _('Current time is > N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'time[=]' => [
+				'description' =>  _('Current time is = N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'time[<>]' => [
+				'description' =>  _('Current time is NOT N'),
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'nodata[=]' => [
+				'description' =>  _('No data received during period of time T, then N = 1, 0 - otherwise'),
+				'params' => $this->param1Sec,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'nodata[<>]' => [
+				'description' =>  _('No data received during period of time T, then N NOT 1, 0 - otherwise'),
+				'params' => $this->param1Sec,
+				'allowed_types' => $this->allowedTypesAny
+			],
+			'band[=]' => [
+				'description' =>  _('Bitwise AND of last (most recent) T value and mask is = N'),
 				'params' => $this->paramSecIntCount,
-				'allowed_types' => $this->allowedTypesInt,
-				'operators' => ['=', '<>']
+				'allowed_types' => $this->allowedTypesInt
 			],
-			'forecast' => [
-				'description' => _('forecast() - Forecast for next t seconds based on period T'),
+			'band[<>]' => [
+				'description' =>  _('Bitwise AND of last (most recent) T value and mask is NOT N'),
+				'params' => $this->paramSecIntCount,
+				'allowed_types' => $this->allowedTypesInt
+			],
+			'forecast[<]' => [
+				'description' => _('Forecast for next t seconds based on period T is < N'),
 				'params' => $this->paramForecast,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesNumeric
 			],
-			'timeleft' => [
-				'description' => _('timeleft() - Time to reach threshold estimated based on period T'),
+			'forecast[>]' => [
+				'description' => _('Forecast for next t seconds based on period T is > N'),
+				'params' => $this->paramForecast,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'forecast[=]' => [
+				'description' => _('Forecast for next t seconds based on period T is = N'),
+				'params' => $this->paramForecast,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'forecast[<>]' => [
+				'description' => _('Forecast for next t seconds based on period T is NOT N'),
+				'params' => $this->paramForecast,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'timeleft[<]' => [
+				'description' => _('Time to reach threshold estimated based on period T is < N'),
 				'params' => $this->paramTimeleft,
-				'allowed_types' => $this->allowedTypesNumeric,
-				'operators' => ['=', '<>', '>', '<', '>=', '<=']
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'timeleft[>]' => [
+				'description' => _('Time to reach threshold estimated based on period T is > N'),
+				'params' => $this->paramTimeleft,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'timeleft[=]' => [
+				'description' => _('Time to reach threshold estimated based on period T is = N'),
+				'params' => $this->paramTimeleft,
+				'allowed_types' => $this->allowedTypesNumeric
+			],
+			'timeleft[<>]' => [
+				'description' => _('Time to reach threshold estimated based on period T is NOT N'),
+				'params' => $this->paramTimeleft,
+				'allowed_types' => $this->allowedTypesNumeric
 			]
 		];
 
 		CArrayHelper::sort($this->functions, ['description']);
-
-		foreach ($this->functions as $function) {
-			foreach ($function['operators'] as $operator) {
-				$this->operators[$operator] = true;
-			}
-		}
 	}
 
 	protected function checkInput() {
@@ -390,8 +671,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'expression' =>			'string',
 			'itemid' =>				'db items.itemid',
 			'parent_discoveryid' =>	'int32',
-			'function' =>			'in '.implode(',', array_keys($this->functions)),
-			'operator' =>			'in '.implode(',', array_keys($this->operators)),
+			'expr_type' =>			'string|not_empty',
 			'params' =>				'',
 			'paramtype' =>			'in '.implode(',', [PARAM_TYPE_TIME, PARAM_TYPE_COUNTS]),
 			'value' =>				'string|not_empty',
@@ -422,8 +702,7 @@ class CControllerPopupTriggerExpr extends CController {
 
 	protected function doAction() {
 		$itemid = $this->getInput('itemid', 0);
-		$function = $this->getInput('function', 'last');
-		$operator = $this->getInput('operator', '=');
+		$expr_type = $this->getInput('expr_type', 'last[=]');
 		$param_type = $this->getInput('paramtype', PARAM_TYPE_TIME);
 		$dstfld1 = $this->getInput('dstfld1');
 		$expression = $this->getInput('expression', '');
@@ -456,6 +735,9 @@ class CControllerPopupTriggerExpr extends CController {
 						$param_type = PARAM_TYPE_TIME;
 					}
 
+					// Define default operator.
+					$operator = '=';
+
 					/*
 					 * Try to find an operator and a numeric value.
 					 * The value and operator can be extracted only if the immediately follow the item function macro.
@@ -465,8 +747,7 @@ class CControllerPopupTriggerExpr extends CController {
 						if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
 							if (array_key_exists($key + 2, $tokens)
 									&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
-									&& array_key_exists($function, $this->functions)
-									&& in_array($tokens[$key + 1]['value'], $this->functions[$function]['operators'])
+									&& array_key_exists($function.'['.$tokens[$key + 1]['value'].']', $this->functions)
 									&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
 
 								$operator = $tokens[$key + 1]['value'];
@@ -477,6 +758,8 @@ class CControllerPopupTriggerExpr extends CController {
 							}
 						}
 					}
+
+					$expr_type = $function.'['.$operator.']';
 
 					// Find the item.
 					$item = API::Item()->get([
@@ -501,6 +784,16 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 		// Opening an empty form or switching a function.
 		else {
+			if (preg_match('/^([a-z]+)\[([=><]{1,2})\]$/i', $expr_type, $matches)) {
+				$function = $matches[1];
+				$operator = $matches[2];
+
+				if (!array_key_exists($expr_type, $this->functions)) {
+					unset($function);
+				}
+			}
+
+			// Fetch item.
 			$item = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 				'selectHosts' => ['host', 'name'],
@@ -527,12 +820,12 @@ class CControllerPopupTriggerExpr extends CController {
 			$item_value_type = null;
 		}
 
-		if ($param_type === null && array_key_exists($function, $this->functions)
-				&& array_key_exists('params', $this->functions[$function])
-				&& array_key_exists('M', $this->functions[$function]['params'])) {
-			$param_type = is_array($this->functions[$function]['params']['M'])
-				? reset($this->functions[$function]['params']['M'])
-				: $this->functions[$function]['params']['M'];
+		if ($param_type === null && array_key_exists($expr_type, $this->functions)
+				&& array_key_exists('params', $this->functions[$expr_type])
+				&& array_key_exists('M', $this->functions[$expr_type]['params'])) {
+			$param_type = is_array($this->functions[$expr_type]['params']['M'])
+				? reset($this->functions[$expr_type]['params']['M'])
+				: $this->functions[$expr_type]['params']['M'];
 		}
 		elseif ($param_type === null) {
 			$param_type = PARAM_TYPE_TIME;
@@ -548,41 +841,34 @@ class CControllerPopupTriggerExpr extends CController {
 			'paramtype' => $param_type,
 			'description' => $description,
 			'functions' => $this->functions,
-			'function' => $function,
-			'operator' => $operator,
 			'item_key' => $item_key,
 			'itemValueType' => $item_value_type,
 			'selectedFunction' => null,
+			'expr_type' => $expr_type,
 			'groupid' => $this->getInput('groupid', 0),
 			'hostid' => $this->getInput('hostid', 0),
 		];
 
 		// Check if submitted function is usable with selected item.
 		foreach ($data['functions'] as $id => $f) {
-			if (($data['itemValueType'] === null || array_key_exists($item_value_type, $f['allowed_types']))
-					&& $id === $function) {
+			if ((!$data['itemValueType'] || array_key_exists($item_value_type, $f['allowed_types']))
+					&& $id == $expr_type) {
 				$data['selectedFunction'] = $id;
 				break;
 			}
 		}
 
-		if (!$this->getInput('add', false) && $data['selectedFunction'] === null) {
+		if ($data['selectedFunction'] === null) {
 			error(_s('Function "%1$s" cannot be used with selected item "%2$s"',
-				$data['functions'][$function]['description'],
+				$data['functions'][$expr_type]['description'],
 				$data['description']
 			));
 		}
 
 		// Remove functions that not correspond to chosen item.
 		foreach ($data['functions'] as $id => $f) {
-			if ($data['itemValueType'] !== null && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
+			if ($data['itemValueType'] && !array_key_exists($data['itemValueType'], $f['allowed_types'])) {
 				unset($data['functions'][$id]);
-
-				// Take first available function from list and change to first available operator for that function.
-				if ($id === $data['function']) {
-					$data['function'] = key($data['functions']);
-					$data['operator'] = reset($data['functions'][$data['function']]['operators']);
-				}
 			}
 		}
 

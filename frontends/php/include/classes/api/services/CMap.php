@@ -58,6 +58,7 @@ class CMap extends CMapElement {
 		'limit'						=> null
 	];
 
+
 	/**
 	 * Get map data.
 	 *
@@ -96,6 +97,8 @@ class CMap extends CMapElement {
 	 *						 parameter has been used.
 	 */
 	public function get(array $options = []) {
+		$user_data = self::$userData;
+
 		$options = zbx_array_merge($this->defOptions, $options);
 
 		$limit = $options['limit'];
@@ -627,9 +630,6 @@ class CMap extends CMapElement {
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
 
-		$show_suppressed_types = [ZBX_PROBLEM_SUPPRESSED_FALSE, ZBX_PROBLEM_SUPPRESSED_TRUE];
-		$show_suppressed_validator = new CLimitedSetValidator(['values' => $show_suppressed_types]);
-
 		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
@@ -666,14 +666,6 @@ class CMap extends CMapElement {
 						_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 					);
 				}
-			}
-
-			// Check for invalid "show_suppressed" values.
-			if (array_key_exists('show_suppressed', $map)
-					&& !$show_suppressed_validator->validate($map['show_suppressed'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'show_suppressed', _s('value must be one of %1$s', implode(', ', $show_suppressed_types))
-				));
 			}
 
 			if (array_key_exists('expandproblem', $map) && !$expandproblem_validator->validate($map['expandproblem'])) {
@@ -1080,9 +1072,6 @@ class CMap extends CMapElement {
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
 
-		$show_suppressed_types = [ZBX_PROBLEM_SUPPRESSED_FALSE, ZBX_PROBLEM_SUPPRESSED_TRUE];
-		$show_suppressed_validator = new CLimitedSetValidator(['values' => $show_suppressed_types]);
-
 		$expandproblem_types = [SYSMAP_PROBLEMS_NUMBER, SYSMAP_SINGLE_PROBLEM, SYSMAP_PROBLEMS_NUMBER_CRITICAL];
 		$expandproblem_validator = new CLimitedSetValidator(['values' => $expandproblem_types]);
 
@@ -1120,14 +1109,6 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 				);
-			}
-
-			// Check for invalid "show_suppressed" values.
-			if (array_key_exists('show_suppressed', $map)
-					&& !$show_suppressed_validator->validate($map['show_suppressed'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'show_suppressed', _s('value must be one of %1$s', implode(', ', $show_suppressed_types))
-				));
 			}
 
 			if (array_key_exists('expandproblem', $map) && !$expandproblem_validator->validate($map['expandproblem'])) {

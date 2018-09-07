@@ -31,7 +31,8 @@ class CControllerMapView extends CController {
 		$fields = [
 			'sysmapid' =>		'db sysmaps.sysmapid',
 			'mapname' =>		'not_empty',
-			'severity_min' =>	'in 0,1,2,3,4,5'
+			'severity_min' =>	'in 0,1,2,3,4,5',
+			'fullscreen' =>		'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -111,12 +112,11 @@ class CControllerMapView extends CController {
 			'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
 		]);
 
-		CView::$has_web_layout_mode = true;
-
 		$response = new CControllerResponseData([
 			'map' => $map,
 			'pageFilter' => $page_filter,
-			'severity_min' => $page_filter->severityMin
+			'severity_min' => $page_filter->severityMin,
+			'fullscreen' => (bool) $this->getInput('fullscreen', false)
 		]);
 		$response->setTitle(_('Network maps'));
 		$this->setResponse($response);

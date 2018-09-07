@@ -225,13 +225,12 @@ class CFilter extends CDiv {
 	 * - time selector range change buttons: back, zoom out, forward.
 	 * - time selector range change form with predefined ranges.
 	 *
-	 * @param string $from    Start date. (can be in relative time format, example: now-1w)
-	 * @param string $to      End date. (can be in relative time format, example: now-1w)
-	 * @param string $format  Date and time format used in CDateSelector.
+	 * @param string $from      Start date. (can be in relative time format, example: now-1w)
+	 * @param string $to        End date. (can be in relative time format, example: now-1w)
 	 *
 	 * @return CFilter
 	 */
-	public function addTimeSelector($from, $to, $format = ZBX_FULL_DATE_TIME) {
+	public function addTimeSelector($from, $to) {
 		$header = relativeDateToText($from, $to);
 
 		$this->addTab(new CDiv([
@@ -267,16 +266,16 @@ class CFilter extends CDiv {
 			(new CDiv([
 				(new CDiv([
 					new CList([
-						new CLabel(_('From'), 'from'),
-						(new CDateSelector('from', $from))->setDateFormat($format)
+						new CLabel(_('From'), 'from'), (new CTextBox('', $from))->setId('from'),
+						(new CButton('from_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
 					]),
 					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
 						->setAttribute('data-error-for', 'from')
 						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
 						->addStyle('display: none'),
 					new CList([
-						new CLabel(_('To'), 'to'),
-						(new CDateSelector('to', $to))->setDateFormat($format)
+						new CLabel(_('To'), 'to'), (new CTextBox('', $to))->setId('to'),
+						(new CButton('to_calendar'))->addClass(ZBX_STYLE_ICON_CAL)
 					]),
 					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
 						->setAttribute('data-error-for', 'to')

@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Network Generic Device SNMPv1</template>
          <name>Template Net Network Generic Device SNMPv1</name>
-         <description>Template Net Network Generic Device version: 0.15&#13;
+         <description>Template Net Network Generic Device version: 0.14&#13;
 Overview: Use this template if you can't find the template for specific vendor or device family.</description>
          <groups>
             <group>
@@ -25,13 +25,13 @@ Overview: Use this template if you can't find the template for specific vendor o
          <macros/>
          <templates>
             <template>
+               <name>Template Module Interfaces Simple SNMPv1</name>
+            </template>
+            <template>
                <name>Template Module EtherLike-MIB SNMPv1</name>
             </template>
             <template>
                <name>Template Module Generic SNMPv1</name>
-            </template>
-            <template>
-               <name>Template Module Interfaces Simple SNMPv1</name>
             </template>
          </templates>
          <screens/>

@@ -56,8 +56,7 @@ function getMessageSettings() {
 		'sounds.'.TRIGGER_SEVERITY_WARNING => 'alarm_warning.wav',
 		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.wav',
 		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.wav',
-		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav',
-		'show_suppressed' => 0
+		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav'
 	];
 
 	$dbProfiles = DBselect(

@@ -32,11 +32,10 @@ foreach ($data['graphs'] as $graph) {
 		: "rm4favorites('graphid','".$graph['graphid']."')";
 
 	$table->addRow([
-		new CLink($graph['label'], $url),
+		new CLink($graph['label'], $url->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)),
 		(new CButton())
 			->onClick($on_click)
 			->addClass(ZBX_STYLE_REMOVE_BTN)
-			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 	]);
 }
 

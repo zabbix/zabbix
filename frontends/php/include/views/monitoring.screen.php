@@ -19,29 +19,24 @@
 **/
 
 
-$web_layout_mode = CView::getLayoutMode();
-
-$widget = (new CWidget())->setWebLayoutMode($web_layout_mode);
-
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget
-		->setTitle(_('Screens'))
-		->addItem((new CList())
-			->setAttribute('role', 'navigation')
-			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
-			->addClass(ZBX_STYLE_OBJECT_GROUP)
-			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
-			->addItem([
-				(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-				'/',
-				(new CSpan())
-					->addClass(ZBX_STYLE_SELECTED)
-					->addItem(
-						new CLink($data['screen']['name'], (new CUrl('screens.php'))
-							->setArgument('elementid', $data['screen']['screenid'])
-					))
-		]));
-}
+$widget = (new CWidget())
+	->setTitle(_('Screens'))
+	->addItem((new CList())
+		->setAttribute('role', 'navigation')
+		->setAttribute('aria-label', _('Breadcrumbs'))
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($data['screen']['name'], (new CUrl('screens.php'))
+						->setArgument('elementid', $data['screen']['screenid'])
+						->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
+				))
+	]));
 
 $controls = (new CList())
 	->addItem(
@@ -93,11 +88,12 @@ $controls
 			'elid' => $data['screen']['screenid']
 		]
 	))
-	->addItem(get_icon('fullscreen'));
+	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
 		->setName('headerForm')
+		->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 		->addItem($controls)
 	)))
 		->setAttribute('aria-label', _('Content controls'))
@@ -115,17 +111,15 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-$filter = (new CFilter())
-	->setProfile($data['profileIdx'], $data['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to']);
-
-if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass(ZBX_STYLE_HIDDEN);
-}
-$widget->addItem($filter);
-
-$widget->addItem((new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
+$widget
+	->addItem((new CFilter())
+		->setProfile($data['profileIdx'], $data['profileIdx2'])
+		->setActiveTab($data['active_tab'])
+		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'])
+	)
+	->addItem(
+		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	);
 
 CScreenBuilder::insertScreenStandardJs($screenBuilder->timeline);
 

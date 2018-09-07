@@ -610,13 +610,8 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 		case ZBX_PREPROC_HEX2DEC:
 			if (SUCCEED != is_uhex(value->data.str))
 			{
-				if (SUCCEED != is_hex_string(value->data.str))
-				{
-					*errmsg = zbx_strdup(NULL, "invalid value format");
-					return FAIL;
-				}
-
-				zbx_remove_chars(value->data.str, " \n");
+				*errmsg = zbx_strdup(NULL, "invalid value format");
+				return FAIL;
 			}
 			ZBX_HEX2UINT64(value_ui64, value->data.str);
 			break;
@@ -753,7 +748,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	if (NULL == new_value)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match");
+		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match", pattern);
 		return FAIL;
 	}
 

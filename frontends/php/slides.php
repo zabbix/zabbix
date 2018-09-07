@@ -28,12 +28,9 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js', 'class.calendar.js', 'gtlc.js',
-	'flickerfreescreen.js', 'layout.mode.js'
+	'flickerfreescreen.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
-CView::$has_web_layout_mode = true;
-$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
@@ -49,6 +46,7 @@ $fields = [
 	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
 	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
 	'reset' =>				[T_ZBX_STR,			O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>			[T_ZBX_INT,			O_OPT, P_SYS,	IN('0,1'), null],
 	// ajax
 	'widgetRefresh' =>		[T_ZBX_STR,			O_OPT, null,	null,	null],
 	'widgetRefreshRate' =>	[T_ZBX_STR,			O_OPT, P_ACT, null,	null],
@@ -182,6 +180,7 @@ updateTimeSelectorPeriod($timeselector_options);
 
 $data['timeline'] = getTimeSelectorPeriod($timeselector_options);
 $data['active_tab'] = CProfile::get('web.slides.filter.active', 1);
+$data['fullscreen'] = getRequest('fullscreen');
 
 if ($data['screen']) {
 	// get groups and hosts

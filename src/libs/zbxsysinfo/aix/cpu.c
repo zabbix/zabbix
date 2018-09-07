@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <sys/dr.h>
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
@@ -26,8 +25,9 @@
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
-	char			*tmp;
-	lpar_info_format2_t	buf;
+	char				*tmp;
+	perfstat_partition_config_t	part_cfg;
+	int				rc;
 
 	if (1 < request->nparam)
 	{
@@ -44,13 +44,15 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != lpar_get_info(LPAR_INFO_FORMAT2, &buf, sizeof(buf)))
+	rc = perfstat_partition_config(NULL, &part_cfg, sizeof(perfstat_partition_config_t), 1);
+
+	if (1 != rc)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, buf.online_lcpus);
+	SET_UI64_RESULT(result, part_cfg.lcpus);
 
 	return SYSINFO_RET_OK;
 #else

@@ -256,40 +256,18 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 		}
 	}
 
-	$maintenanceids = [];
-	foreach ($data['hosts_data'] as $host) {
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenanceids[$host['maintenanceid']] = true;
-		}
-	}
-
-	$db_maintenances = $maintenanceids
-		? API::Maintenance()->get([
-			'output' => ['name', 'description'],
-			'maintenanceids' => array_keys($maintenanceids),
-			'preservekeys' => true
-		])
-		: [];
-
 	$table_inf = (new CTableInfo())->setHeader($header);
 
 	$popup_rows = 0;
 
-	foreach ($hosts as $hostid => $host) {
+	foreach ($hosts as $hostid => $host_name) {
 		$host_data = $data['hosts_data'][$hostid];
 		$url->setArgument('filter_hostids', [$hostid]);
-		$host_name = new CLink($host_data['host'], $url->getUrl());
-
-		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-				&& array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
-			$maintenance = $db_maintenances[$host_data['maintenanceid']];
-			$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], $maintenance['name'],
-				$maintenance['description']
-			);
-			$host_name = [$host_name, $maintenance_icon];
-		}
-
-		$row = new CRow((new CCol($host_name))->addClass(ZBX_STYLE_NOWRAP));
+		$row = new CRow(
+			(new CCol(
+				new CLink($host_data['host'], $url->getUrl())
+			))->addClass(ZBX_STYLE_NOWRAP)
+		);
 
 		foreach (range(TRIGGER_SEVERITY_COUNT - 1, TRIGGER_SEVERITY_NOT_CLASSIFIED) as $severity) {
 			if (in_array($severity, $data['filter']['severities'])) {

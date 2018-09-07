@@ -82,7 +82,6 @@ function user_auth_type2str($authType) {
 	$authUserType = [
 		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
 		GROUP_GUI_ACCESS_INTERNAL => _x('Internal', 'user type'),
-		GROUP_GUI_ACCESS_LDAP => _('LDAP'),
 		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
 	];
 

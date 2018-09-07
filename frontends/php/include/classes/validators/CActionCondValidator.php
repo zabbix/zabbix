@@ -155,9 +155,9 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_SUPPRESSED:
+			case CONDITION_TYPE_MAINTENANCE:
 				if (!zbx_empty($conditionValue)) {
-					$this->setError(_('Action condition value must be empty.'));
+					$this->setError(_('Maintenance action condition value must be empty.'));
 				}
 				break;
 
