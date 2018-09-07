@@ -139,16 +139,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	$newHostPrototype = [
-		'host' => getRequest('host'),
-		'name' => getRequest('name'),
+		'host' => getRequest('host', ''),
+		'name' => (getRequest('name', '') === '') ? getRequest('host', '') : getRequest('name', ''),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 		'groupLinks' => [],
 		'groupPrototypes' => [],
-		'templates' => getRequest('templates', []),
-		'inventory' => [
-			'inventory_mode' => getRequest('inventory_mode')
-		]
+		'templates' => getRequest('templates', [])
 	];
+
+	// If 'inventory' is present, API requires 'inventory_mode' to have a value, but templated prototypes don't have it.
+	if (hasRequest('inventory_mode')) {
+		$newHostPrototype['inventory']['inventory_mode'] = getRequest('inventory_mode');
+	}
+
+	// API requires 'templateid' property.
+	if ($newHostPrototype['templates']) {
+		$newHostPrototype['templates'] = zbx_toObject($newHostPrototype['templates'], 'templateid');
+	}
 
 	// add custom group prototypes
 	foreach (getRequest('group_prototypes', []) as $groupPrototype) {
@@ -156,7 +163,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			unset($groupPrototype['group_prototypeid']);
 		}
 
-		if (!zbx_empty($groupPrototype['name'])) {
+		if ($groupPrototype['name'] !== '') {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
 		}
 	}

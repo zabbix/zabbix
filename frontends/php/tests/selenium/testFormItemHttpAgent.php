@@ -1063,7 +1063,7 @@ class testFormItemHttpAgent extends CWebTest {
 		if (array_key_exists('check_form', $data) && $data['check_form'] === true) {
 			$this->zbxTestCheckFatalErrors();
 			$defaults = [
-				'Request type' => 'POST',
+				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
 				'Follow redirects' => false,
