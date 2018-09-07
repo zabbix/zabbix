@@ -2834,13 +2834,14 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
-	int				i, history_num, history_float_num,
-					history_integer_num, history_string_num, history_text_num, history_log_num,
-					txn_error;
+	int				i, history_num, history_float_num, history_integer_num, history_string_num,
+					history_text_num, history_log_num, txn_error, sync_timeout;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
+
+	sync_timeout = (ZBX_SYNC_FULL != sync_type ? ZBX_HC_SYNC_TIME_MAX : SEC_PER_YEAR);
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -3081,11 +3082,10 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 			hc_free_item_values(history, history_num);
 		}
 
-		/* Exit from sync loop if we have spent too much time here */
-		/* unless we are doing full sync. This is done to allow    */
-		/* syncer process to update their statistics.              */
+		/* Exit from sync loop if we have spent too much time here.       */
+		/* This is done to allow syncer process to update its statistics. */
 	}
-	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && ZBX_SYNC_MORE == *more) || sync_type == ZBX_SYNC_FULL);
+	while (sync_timeout >= now - sync_start && ZBX_SYNC_MORE == *more);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
