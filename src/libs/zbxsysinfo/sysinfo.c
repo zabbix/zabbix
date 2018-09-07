@@ -480,7 +480,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 			if (0 != isprint(*c))
 				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, *c);
 			else
-				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "0x%02x", *c);
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "0x%02x", (unsigned int)(*c));
 		}
 
 		zbx_snprintf(error, max_error_len, "Special characters \"%s\" are not allowed in the parameters.", buf);

@@ -235,6 +235,14 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a time range is expected'));
 		}
 	}
+	elseif ($type == T_ZBX_ABS_TIME) {
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
+		if (!is_string($var) || $absolute_time_parser->parse($var) != CParser::PARSE_SUCCESS) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('an explicit time is expected'));
+		}
+	}
 
 	if ($error) {
 		if ($flags & P_SYS) {
@@ -421,7 +429,7 @@ function check_fields(&$fields, $show_messages = true, $add_messages_to_message_
  * @param string|null to
  */
 function validateTimeSelectorPeriod($from, $to) {
-	if ($from === null || $to == null) {
+	if ($from === null || $to === null) {
 		return;
 	}
 

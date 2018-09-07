@@ -33,17 +33,13 @@ function getCalendarByID(clndr_id) {
 	return ret;
 }
 
-function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
+function create_calendar(timeobject, id, date_time_format) {
 	if (typeof id === 'undefined' || id === null) {
 		id = 'c' + CLNDR.length;
 	}
 
-	if (typeof utime_field_id === 'undefined') {
-		utime_field_id = null;
-	}
-
 	var clndr = new Object;
-	clndr.clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
+	clndr.clndr = new calendar(id, timeobject, date_time_format);
 	CLNDR.push(clndr);
 
 	return clndr;
@@ -61,31 +57,26 @@ function dateSelectorOnClick(event, elmnt, name) {
 }
 
 calendar.prototype = {
-	id: null,					// personal ID
-	cdt: new CDate(),			// Date object of current(viewed) date
-	sdt: new CDate(),			// Date object of a selected date
-	month: 0,					// represents month number
-	year: 2008,					// represents year
-	day: 1,						// represents days
-	hour: 12,					// hours
-	minute: 00,					// minutes
+	id: null,					// Calendar ID. Should be unique on page.
+	sdt: null,					// Date object of a selected date.
+	month: 0,					// Represents currently opened month number.
+	year: 2008,					// Represents currently opened year.
+	day: 1,						// Represents currently opened day.
 	clndr_calendar: null,		// html obj of calendar
 	clndr_month_div: null,		// html obj
 	clndr_year_div: null,		// html obj
 	clndr_days: null,			// html obj
 	clndr_month: null,			// html obj
 	clndr_year: null,			// html obj
-	clndr_selectedday: null,	// html obj, selected day
 	clndr_year_wrap: null,		// html obj
 	clndr_month_wrap: null,		// html obj
 	clndr_monthup: null,		// html bttn obj
 	clndr_monthdown: null,		// html bttn obj
 	clndr_yearup: null,			// html bttn obj
 	clndr_yeardown: null,		// html bttn obj
-	clndr_utime_field: null,	// html obj where unix date representation is saved
-	timeobjects: new Array(),	// object list where will be saved date
-	status: false,				// status of timeobjects
-	visible: 0,					// GMenu style state
+	timeobject: null,			// Input field with selected time. Source and destination of selected date.
+	is_visible: false,			// State of calendar visibility.
+	has_user_time: false,		// Confirms, if time was selected from input field.
 	hl_month: null,				// highlighted month number
 	hl_year: null,				// highlighted year number
 	hl_day: null,				// highlighted days number
@@ -93,62 +84,22 @@ calendar.prototype = {
 	monthname: new Array(locale['S_JANUARY'], locale['S_FEBRUARY'], locale['S_MARCH'], locale['S_APRIL'], locale['S_MAY'], locale['S_JUNE'], locale['S_JULY'], locale['S_AUGUST'], locale['S_SEPTEMBER'], locale['S_OCTOBER'], locale['S_NOVEMBER'], locale['S_DECEMBER']),
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
+	date_time_format: PHP_ZBX_FULL_DATE_TIME,
 
-	initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid) {
+	initialize: function(id, timeobject, date_time_format) {
+		if (!this.checkOuterObj(timeobject)) {
+			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
+		}
+
 		this.id = id;
-		this.timeobjects = new Array();
-		if (!(this.status = this.checkOuterObj(timeobjects))) {
-			throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
-		}
-		this.calendarcreate(parentNodeid);
-
-		addListener(this.clndr_monthdown, 'click', this.monthdown.bindAsEventListener(this));
-		addListener(this.clndr_monthup, 'click', this.monthup.bindAsEventListener(this));
-		addListener(this.clndr_yeardown, 'click', this.yeardown.bindAsEventListener(this));
-		addListener(this.clndr_yearup, 'click', this.yearup.bindAsEventListener(this));
-
-		for (var i = 0; i < this.timeobjects.length; i++) {
-			if (typeof(this.timeobjects[i]) != 'undefined' && !empty(this.timeobjects[i])) {
-				addListener(this.timeobjects[i], 'change', this.setSDateFromOuterObj.bindAsEventListener(this));
-			}
-		}
-
-		if ('undefined' != typeof(stime) && !empty(stime)) {
-			this.sdt.setTime(stime * 1000);
-		}
-		else {
-			this.setSDateFromOuterObj();
-		}
-
-		this.cdt.setTime(this.sdt.getTime());
-		this.cdt.setDate(1);
-		this.syncBSDateBySDT();
-		this.setCDate();
-
-		utime_field_id = $(utime_field_id);
-		if (!is_null(utime_field_id)) {
-			this.clndr_utime_field = utime_field_id;
-		}
-
-		var cal_obj = this;
-		jQuery(this.sections).each(function(index, item) {
-			jQuery(item, cal_obj.clndr_calendar)
-				.attr({'tabindex': '0'})
-				.on('click', function() {
-					cal_obj.active_section = index;
-					cal_obj.focusSection();
-				});
-		});
+		this.date_time_format = date_time_format;
+		this.sdt = new CDate();
+		this.calendarcreate();
 	},
 
 	ondateselected: function() {
 		this.setDateToOuterObj();
 		this.clndrhide();
-		this.onselect(this.sdt.getTime());
-	},
-
-	onselect: function(time) {
-		// place any function;
 	},
 
 	clndrhide: function(e) {
@@ -156,12 +107,7 @@ calendar.prototype = {
 			cancelEvent(e);
 		}
 		this.clndr_calendar.hide();
-		this.visible = 0;
-
-		// Unset higlighted date.
-		this.hl_month = null;
-		this.hl_year = null;
-		this.hl_day = null;
+		this.is_visible = false;
 
 		jQuery(document)
 			.off('click', this.calendarDocumentClickHandler)
@@ -172,34 +118,25 @@ calendar.prototype = {
 	},
 
 	clndrshow: function(top, left, trigger_elmnt) {
-		if (this.visible == 1) {
+		if (this.is_visible) {
 			this.clndrhide();
 		}
 		else {
 			// Close all opened calendars.
 			jQuery(CLNDR).each(function(i, cal) {
-				if (cal.clndr.visible == 1 && cal.clndr.id != this.id) {
+				if (cal.clndr.is_visible) {
 					cal.clndr.clndrhide();
 				}
 			});
 
-			if (this.status) {
-				this.setSDateFromOuterObj();
-				this.cdt.setTime(this.sdt.getTime());
-				this.cdt.setDate(1);
-				this.syncBSDateBySDT();
-				this.setCDate();
-			}
-			if (typeof(top) != 'undefined' && typeof(left) != 'undefined') {
-				var cw = jQuery(this.clndr_calendar).outerWidth();
-				if (document.body.clientWidth < +left + cw) {
-					left = document.body.clientWidth - cw;
-				}
-				this.clndr_calendar.style.top = top + 'px';
-				this.clndr_calendar.style.left = left + 'px';
-			}
+			this.setSDateFromOuterObj();
+			this.syncBSDateBySDT();
+			this.syncHlDate();
+			this.setCDate();
+
+			this.setPosition(top, left);
 			this.clndr_calendar.show();
-			this.visible = 1;
+			this.is_visible = true;
 
 			jQuery(document)
 				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
@@ -213,9 +150,20 @@ calendar.prototype = {
 		}
 	},
 
+	setPosition: function(top, left) {
+		if (typeof(top) != 'undefined' && typeof(left) != 'undefined') {
+			var cw = jQuery(this.clndr_calendar).outerWidth();
+			if (document.body.clientWidth < +left + cw) {
+				left = document.body.clientWidth - cw;
+			}
+			this.clndr_calendar.style.top = top + 'px';
+			this.clndr_calendar.style.left = left + 'px';
+		}
+	},
+
 	calendarDocumentClickHandler: function() {
 		jQuery(CLNDR).each(function(i, cal) {
-			if (cal.clndr.visible == 1) {
+			if (cal.clndr.is_visible) {
 				cal.clndr.clndrhide();
 			}
 		});
@@ -265,12 +213,6 @@ calendar.prototype = {
 			case 40: // arrow down
 				switch (cal.sections[cal.active_section]) {
 					case '.calendar-date':
-						if (cal.hl_month === null || cal.hl_day === null || cal.hl_year === null) {
-							cal.hl_year = cal.year;
-							cal.hl_month = cal.month;
-							cal.hl_day = cal.day;
-						}
-
 						hl_date = new Date(cal.hl_year, cal.hl_month, cal.hl_day, 0, 0, 0, 0);
 
 						switch (event.which) {
@@ -303,7 +245,6 @@ calendar.prototype = {
 							cal.year = cal.hl_year;
 							cal.month = cal.hl_month;
 							cal.day = cal.hl_day;
-							cal.syncCDT();
 							cal.setCDate();
 						}
 
@@ -387,10 +328,6 @@ calendar.prototype = {
 			jQuery(section_to_focus, this.clndr_calendar).addClass('highlighted').focus();
 		}
 		else if (section_to_focus === '.calendar-date') {
-			this.hl_year = this.hl_year || this.year;
-			this.hl_month = this.hl_month || this.month;
-			this.hl_day = this.hl_day || this.day;
-
 			/**
 			 * Switching between months and years, date picker will highlight previously selected date. If
 			 * selected date is in different year or month, the first date of displayed year is highleghted.
@@ -409,121 +346,47 @@ calendar.prototype = {
 		}
 	},
 
-	checkOuterObj: function(timeobjects) {
-		if ('undefined' != typeof(timeobjects) && !empty(timeobjects)) {
-			if (is_array(timeobjects)) {
-				this.timeobjects = timeobjects;
-			}
-			else {
-				this.timeobjects.push(timeobjects);
-			}
-		}
-		else {
+	checkOuterObj: function(timeobject) {
+		if (typeof(timeobject) === 'undefined' || empty(timeobject)) {
 			return false;
 		}
 
-		for (var i = 0; i < this.timeobjects.length; i++) {
-			if ('undefined' != this.timeobjects[i] && !empty(this.timeobjects[i])) {
-				this.timeobjects[i] = $(this.timeobjects[i]);
-				if (empty(this.timeobjects[i])) {
-					return false;
-				}
-			}
+		this.timeobject = $(timeobject);
+
+		if (empty(this.timeobject) || this.timeobject.tagName.toLowerCase() !== 'input') {
+			return false;
 		}
+
 		return true;
 	},
 
 	setSDateFromOuterObj: function() {
-		switch (this.timeobjects.length) {
-			case 1:
-				var val = null;
-				var result = false;
+		var val = this.timeobject.value,
+			// Date and Time separator must be synced with ZBX_FULL_DATE_TIME and ZBX_DATE_TIME in defines.inc.php.
+			datetime = val.split(' '),
+			date = datetime[0].split('-'),
+			time = (datetime.length > 1) ? datetime[1].split(':') : new Array();
 
-				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
-					val = this.timeobjects[0].value;
-				}
-				else {
-					val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
-				}
+		// Open calendar with current time by default.
+		this.sdt = new CDate();
+		this.has_user_time = false;
 
-				// allow unix timestamp 0 (year 1970)
-				if (jQuery(this.timeobjects[0]).attr('data-timestamp') >= 0) {
-					this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
-				}
-				else {
-					if (is_string(val)) {
-						var datetime = val.split(' ');
-						var date = datetime[0].split('.');
-						var time = new Array();
+		if (date.length === 3 && this.setSDateDMY(date[2], date[1], date[0])) {
+			this.sdt.setTimeObject(null, null, null, 0, 0, 0);
 
-						if (datetime.length > 1) {
-							var time = datetime[1].split(':');
-						}
-						if (date.length == 3) {
-							result = this.setSDateDMY(date[0], date[1], date[2]);
-							if (time.length == 2) {
-								if (time[0] > -1 && time[0] < 24) {
-									this.sdt.setHours(time[0]);
-								}
-								if (time[1] > -1 && time[1] < 60) {
-									this.sdt.setMinutes(time[1]);
-								}
-							}
-						}
-					}
-				}
+			// Set time to calendar, so time doesn't change when selecting different date.
+			if ((time.length === 2 || time.length === 3)
+					&& time[0] > -1 && time[0] < 24
+					&& time[1] > -1 && time[1] < 60) {
+				this.has_user_time = true;
+				this.sdt.setHours(time[0]);
+				this.sdt.setMinutes(time[1]);
 
-				if (!result) {
-					return false;
+				if (time.length === 3 && time[2] > -1 && time[2] < 60) {
+					this.sdt.setSeconds(time[2]);
 				}
-				break;
-			case 3:
-			case 5:
-				var val = new Array();
-				var result = true;
-
-				for (var i = 0; i < this.timeobjects.length; i++) {
-					if ('undefined' !== this.timeobjects[i] && !empty(this.timeobjects[i])) {
-						if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
-							val[i] = this.timeobjects[i].value;
-						}
-						else {
-							val[i] = (IE) ? this.timeobjects[i].innerText : this.timeobjects[i].textContent;
-						}
-					}
-					else {
-						result = false;
-					}
-				}
-
-				if (result) {
-					result = this.setSDateDMY(val[0], val[1], val[2]);
-					if (val.length > 4) {
-						val[3] = parseInt(val[3], 10);
-						val[4] = parseInt(val[4], 10);
-						if (val[3] > -1 && val[3] < 24) {
-							this.sdt.setHours(val[3]);
-							result = true;
-						}
-						if (val[4] > -1 && val[4] < 60) {
-							this.sdt.setMinutes(val[4]);
-							result = true;
-						}
-						this.sdt.setSeconds(0);
-					}
-				}
-				if (!result) {
-					return false;
-				}
-				break;
-			default:
-				return false;
+			}
 		}
-
-		if (!is_null(this.clndr_utime_field)) {
-			this.clndr_utime_field.value = this.sdt.getZBXDate();
-		}
-		return true;
 	},
 
 	setSDateDMY: function(d, m, y) {
@@ -538,98 +401,16 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		switch (this.timeobjects.length) {
-			case 1:
-				// uses default format
-				var date = this.sdt.format();
-
-				if (this.timeobjects[0].tagName.toLowerCase() === 'input') {
-					this.timeobjects[0].value = date;
-				}
-				else {
-					if (IE) {
-						this.timeobjects[0].innerText =  date;
-					}
-					else {
-						this.timeobjects[0].textContent = date;
-					}
-				}
-				break;
-
-			case 3:
-			case 5:
-				// custom date format for input fields
-				var date = this.sdt.format('d m Y H i').split(' ');
-
-				for (var i = 0; i < this.timeobjects.length; i++) {
-					if (this.timeobjects[i].tagName.toLowerCase() === 'input') {
-						this.timeobjects[i].value = date[i];
-					}
-					else {
-						if (IE) {
-							this.timeobjects[i].innerText = date[i];
-						}
-						else {
-							this.timeobjects[i].textContent = date[i];
-						}
-					}
-				}
-				break;
-		}
-
-		if (!is_null(this.clndr_utime_field)) {
-			this.clndr_utime_field.value = this.sdt.getZBXDate();
-		}
-	},
-
-	setNow: function(timestamp) {
-		var now = (isNaN(timestamp)) ? new CDate() : new CDate(timestamp * 1000);
-		this.day = now.getDate();
-		this.month = now.getMonth();
-		this.year = now.getFullYear();
-		this.hour = now.getHours();
-		this.minute = now.getMinutes();
-		this.hl_year = this.year;
-		this.hl_month = this.month;
-		this.hl_day = this.day;
-		this.syncSDT();
-		this.syncBSDateBySDT();
-		this.syncCDT();
-		this.setCDate();
-
-		this.active_section = this.sections.indexOf('.calendar-date');
-		this.focusSection();
-	},
-
-	setDone: function() {
-		this.syncBSDateBySDT();
-		this.ondateselected();
+		this.timeobject.value = this.sdt.format(this.date_time_format);
 	},
 
 	setday: function(e, day, month, year) {
-		if (!is_null(this.clndr_selectedday)) {
-			this.clndr_selectedday.removeClassName('selected');
-			this.clndr_selectedday.setAttribute('tabindex', '-1');
-		}
-		var selectedday = Event.element(e);
-		if (selectedday.tagName === 'SPAN') {
-			selectedday = selectedday.parentNode;
-		}
-		Element.extend(selectedday);
-
-		this.clndr_selectedday = selectedday;
-		this.clndr_selectedday.addClassName('selected');
-		this.clndr_selectedday.setAttribute('tabindex', '0');
 		this.day = day;
 		this.month = month;
 		this.year = year;
-		this.hl_day = day;
-		this.hl_month = month;
-		this.hl_year = year;
 		this.syncSDT();
 		this.syncBSDateBySDT();
-		this.syncCDT();
-		this.setDone();
+		this.ondateselected();
 	},
 
 	monthup: function() {
@@ -646,7 +427,6 @@ calendar.prototype = {
 			}
 		}
 		else {
-			this.syncCDT();
 			this.setCDate();
 		}
 
@@ -668,7 +448,6 @@ calendar.prototype = {
 			}
 		}
 		else {
-			this.syncCDT();
 			this.setCDate();
 		}
 
@@ -681,7 +460,6 @@ calendar.prototype = {
 			return ;
 		}
 		this.year++;
-		this.syncCDT();
 		this.setCDate();
 		this.hl_year = this.year;
 	},
@@ -691,25 +469,45 @@ calendar.prototype = {
 			return ;
 		}
 		this.year--;
-		this.syncCDT();
 		this.setCDate();
 		this.hl_year = this.year;
 	},
 
 	syncBSDateBySDT: function() {
-		this.minute = this.sdt.getMinutes();
-		this.hour = this.sdt.getHours();
 		this.day = this.sdt.getDate();
 		this.month = this.sdt.getMonth();
 		this.year = this.sdt.getFullYear();
 	},
 
-	syncSDT: function() {
-		this.sdt.setTimeObject(this.year, this.month, this.day, this.hour, this.minute);
+	syncHlDate: function() {
+		this.hl_day = this.day;
+		this.hl_month = this.month;
+		this.hl_year = this.year;
 	},
 
-	syncCDT: function() {
-		this.cdt.setTimeObject(this.year, this.month, 1, this.hour, this.minute);
+	syncSDT: function() {
+		var hours = 0,
+			minutes = 0,
+			seconds = 0;
+
+		if (this.has_user_time) {
+			// If time was present in input field, use it.
+			hours = this.sdt.getHours();
+			minutes = this.sdt.getMinutes();
+			seconds = this.sdt.getSeconds();
+		}
+		else {
+			var cdt = new CDate();
+
+			// If today was selected, use current time. Otherwise use 00:00:00.
+			if (cdt.getFullYear() === this.year && cdt.getMonth() === this.month && cdt.getDate() === this.day) {
+				hours = cdt.getHours();
+				minutes = cdt.getMinutes();
+				seconds = cdt.getSeconds();
+			}
+		}
+
+		this.sdt.setTimeObject(this.year, this.month, this.day, hours, minutes, seconds);
 	},
 
 	setCDate: function() {
@@ -722,15 +520,20 @@ calendar.prototype = {
 		var tbody = this.clndr_days;
 		tbody.update('');
 
-		var cur_month = this.cdt.getMonth();
+		var cdt = new CDate();
+
+		// Start drawing days from first week of the month.
+		cdt.setTimeObject(this.year, this.month, 1);
 
 		// make 0 - Monday, not Sunday (as default)
-		var prev_days = this.cdt.getDay() - 1;
+		var prev_days = cdt.getDay() - 1;
 		if (prev_days < 0) {
 			prev_days = 6;
 		}
+
+		// Set to first day of the week.
 		if (prev_days > 0) {
-			this.cdt.setTime(this.cdt.getTime() - prev_days * 86400000);
+			cdt.setTime(cdt.getTime() - prev_days * 86400000);
 		}
 
 		for (var y = 0; y < 6; y++) {
@@ -743,31 +546,33 @@ calendar.prototype = {
 				tr.appendChild(td);
 				Element.extend(td);
 
-				if (cur_month != this.cdt.getMonth()) {
+				if (this.month != cdt.getMonth()) {
 					td.addClassName('grey');
 				}
 				else {
-					td.setAttribute('data-date', this.cdt.getDate());
+					td.setAttribute('data-date', cdt.getDate());
 				}
 
-				if (this.sdt.getFullYear() == this.cdt.getFullYear()
-						&& this.sdt.getMonth() == this.cdt.getMonth()
-						&& this.sdt.getDate() == this.cdt.getDate()) {
+				if (this.sdt.getFullYear() == cdt.getFullYear()
+						&& this.sdt.getMonth() == cdt.getMonth()
+						&& this.sdt.getDate() == cdt.getDate()) {
 					td.addClassName('selected');
-					this.clndr_selectedday = td;
 				}
 
-				td.setAttribute('aria-label', this.calendarGetReadableDate(this.cdt));
+				td.setAttribute('aria-label', this.calendarGetReadableDate(cdt));
 				td.setAttribute('tabindex', '-1');
 				td.setAttribute('role', 'button');
 
 				var span = document.createElement('span');
 				span.setAttribute('aria-hidden', 'true');
-				span.appendChild(document.createTextNode(this.cdt.getDate()));
+				span.appendChild(document.createTextNode(cdt.getDate()));
 				td.appendChild(span);
 
-				addListener(td, 'click', this.setday.bindAsEventListener(this, this.cdt.getDate(), this.cdt.getMonth(), this.cdt.getFullYear()));
-				this.cdt.setTime(this.cdt.getTime() + 86400000); // + 1day
+				addListener(td, 'click', this.setday.bindAsEventListener(
+					this, cdt.getDate(), cdt.getMonth(), cdt.getFullYear()
+				));
+
+				cdt.setTime(cdt.getTime() + 86400000); // + 1day
 			}
 		}
 	},
@@ -777,7 +582,7 @@ calendar.prototype = {
 				cdt.getFullYear();
 	},
 
-	calendarcreate: function(parentNodeid) {
+	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'overlay-dialogue calendar';
@@ -790,12 +595,7 @@ calendar.prototype = {
 			event.stopPropagation();
 		});
 
-		if (typeof(parentNodeid) === 'undefined' || !parentNodeid) {
-			document.body.appendChild(this.clndr_calendar);
-		}
-		else {
-			$(parentNodeid).appendChild(this.clndr_calendar);
-		}
+		document.body.appendChild(this.clndr_calendar);
 
 		/*
 		 * Calendar header
@@ -919,5 +719,21 @@ calendar.prototype = {
 		Element.extend(this.clndr_days);
 		this.clndr_days.setAttribute('class', 'calendar-date');
 		table.appendChild(this.clndr_days);
+
+		addListener(this.clndr_monthdown, 'click', this.monthdown.bindAsEventListener(this));
+		addListener(this.clndr_monthup, 'click', this.monthup.bindAsEventListener(this));
+		addListener(this.clndr_yeardown, 'click', this.yeardown.bindAsEventListener(this));
+		addListener(this.clndr_yearup, 'click', this.yearup.bindAsEventListener(this));
+
+		// Active section setter.
+		var cal_obj = this;
+		jQuery(this.sections).each(function(index, item) {
+			jQuery(item, cal_obj.clndr_calendar)
+				.attr({'tabindex': '0'})
+				.on('click', function() {
+					cal_obj.active_section = index;
+					cal_obj.focusSection();
+				});
+		});
 	}
 };

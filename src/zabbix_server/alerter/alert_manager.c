@@ -1967,10 +1967,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
 						ZBX_DB_WAIT_DOWN);
 			}
-			else
+			else if (0 != zbx_db_txn_level() && ZBX_DB_OK > zbx_db_rollback())
 			{
-				if (0 != zbx_db_txn_level())
-					manager.dbstatus = zbx_db_rollback();
+				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
 			}
 
 			if (ZBX_DB_OK == manager.dbstatus)
@@ -1997,7 +1997,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				ret = am_db_queue_alerts(&manager, now);
 
 			if (FAIL == ret)
+			{
 				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
+			}
 
 			time_db = now;
 		}
@@ -2005,7 +2008,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		if (ZBX_DB_OK == manager.dbstatus && now - time_watchdog >= freq_watchdog)
 		{
 			if (FAIL == am_db_sync_watchdog(&manager))
+			{
 				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
+			}
 
 			time_watchdog = now;
 		}

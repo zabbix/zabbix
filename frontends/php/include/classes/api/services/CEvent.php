@@ -52,7 +52,7 @@ class CEvent extends CApiService {
 	/**
 	 * Get events data.
 	 *
-	 * @param _array $options
+	 * @param array $options
 	 * @param array $options['itemids']
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
@@ -86,7 +86,10 @@ class CEvent extends CApiService {
 			'time_till'					=> null,
 			'eventid_from'				=> null,
 			'eventid_till'				=> null,
+			'problem_time_from'			=> null,
+			'problem_time_till'			=> null,
 			'acknowledged'				=> null,
+			'suppressed'				=> null,
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'filter'					=> null,
@@ -101,6 +104,7 @@ class CEvent extends CApiService {
 			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
+			'selectSuppressionData'		=> null,
 			'selectTags'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -120,6 +124,12 @@ class CEvent extends CApiService {
 		if ($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER) {
 			if ($options['value'] === null) {
 				$options['value'] = [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE];
+			}
+
+			if ($options['problem_time_from'] !== null && $options['problem_time_till'] !== null) {
+				$options['eventids'] = $options['eventids']
+					? array_intersect($options['eventids'], $this->getProblemEventsInTimeRange($options))
+					: $this->getProblemEventsInTimeRange($options);
 			}
 
 			$problems = in_array(TRIGGER_VALUE_TRUE, $options['value'])
@@ -177,6 +187,80 @@ class CEvent extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Select problem events that was unresolved at requested time range.
+	 * Function is optimized to work with range, so full time range is mandatory.
+	 *
+	 * @param array   $options
+	 * @param int     $options[problem_time_from]   (mandatory) time from.
+	 * @param int     $options[problem_time_till]   (mandatory) time to.
+	 *
+	 * @return array
+	 */
+	private function getProblemEventsInTimeRange(array $options) {
+		$time_from = $options['problem_time_from'];
+		$time_to = $options['problem_time_till'];
+		$result = [];
+
+		if (!$time_from || !$time_to) {
+			return $result;
+		}
+
+		/**
+		 * Select problem events started later than $time_from but earlier than $time_to.
+		 */
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid')],
+			'from'		=> ['e' => 'events e'],
+			'where'		=> [
+				'e.value = '.TRIGGER_VALUE_TRUE,
+				'e.source = '.EVENT_SOURCE_TRIGGERS,
+				'e.object = '.EVENT_OBJECT_TRIGGER,
+				'e.clock BETWEEN '.zbx_dbstr($time_from).' AND '.zbx_dbstr($time_to)
+			],
+			'limit'		=> null
+		];
+
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		while ($event = DBfetch($res)) {
+			$result[$event['eventid']] = true;
+		}
+
+		// Select problem events started earlier but still in problem state at requested time range.
+		$sqlParts = [
+			'select'	=> [$this->fieldId('eventid'), 'er1.r_eventid'],
+			'from'		=> ['e' => 'events e'],
+			'where'		=> [
+				'e.value = '.TRIGGER_VALUE_TRUE,
+				'e.source = '.EVENT_SOURCE_TRIGGERS,
+				'e.object = '.EVENT_OBJECT_TRIGGER
+			],
+			'left_join' => [['from' => 'event_recovery er1', 'on' => 'er1.eventid = e.eventid']],
+			'left_table' => 'e',
+			'having' => [
+				'EXISTS ('.
+					'SELECT NULL FROM events WHERE eventid = er1.r_eventid AND clock >= '.zbx_dbstr($time_from).
+				') '.
+				'OR er1.r_eventid IS NULL'
+			],
+			'order'		=> [],
+			'group'		=> ['e.eventid', 'er1.r_eventid'],
+			'limit'		=> null
+		];
+
+		// Skip events already selected.
+		if ($result) {
+			$sqlParts['where'][] = dbConditionInt('e.eventid', array_keys($result), true, false, false, false);
+		}
+
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		while ($event = DBfetch($res)) {
+			$result[$event['eventid']] = true;
+		}
+
+		return array_keys($result);
 	}
 
 	/**
@@ -375,9 +459,21 @@ class CEvent extends CApiService {
 			$sqlParts['where'][] = 'e.acknowledged='.$acknowledged;
 		}
 
+		// suppressed
+		if ($options['suppressed'] !== null) {
+			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
+					'EXISTS ('.
+						'SELECT NULL'.
+						' FROM event_suppress es'.
+						' WHERE es.eventid=e.eventid'.
+					')';
+		}
+
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype'], 'event_tag',
+				'et', 'e', 'eventid'
+			);
 		}
 
 		// time_from
@@ -445,16 +541,19 @@ class CEvent extends CApiService {
 	/**
 	 * Returns SQL condition for tag filters.
 	 *
-	 * @param array $tags
-	 * @param int   $evaltype
-	 * @param bool  $is_events
+	 * @param array  $tags
+	 * @param string $tags[]['tag']
+	 * @param int    $tags[]['operator']
+	 * @param string $tags[]['value']
+	 * @param int    $evaltype
+	 * @param string $table
+	 * @param string $alias
+	 * @param string $parent_alias
+	 * @param string $field
 	 *
 	 * @return array
 	 */
-	public static function getTagsWhereCondition(array $tags, $evaltype, $is_events = true) {
-		$alias = $is_events ? 'et' : 'pt';
-		$parent_alias = $is_events ? 'e' : 'p';
-		$table = $is_events ? 'event_tag' : 'problem_tag';
+	public static function getTagsWhereCondition(array $tags, $evaltype, $table, $alias, $parent_alias, $field) {
 		$values_by_tag = [];
 
 		foreach ($tags as $tag) {
@@ -496,7 +595,7 @@ class CEvent extends CApiService {
 			$sql_where[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM '.$table.' '.$alias.
-				' WHERE '.$parent_alias.'.eventid='.$alias.'.eventid'.
+				' WHERE '.$parent_alias.'.'.$field.'='.$alias.'.'.$field.
 					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
 			')';
 		}
@@ -920,7 +1019,7 @@ class CEvent extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$eventIds = array_keys($result);
+		$eventids = array_keys($result);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
@@ -929,7 +1028,7 @@ class CEvent extends CApiService {
 				$query = DBselect(
 					'SELECT e.eventid,i.hostid'.
 						' FROM events e,functions f,items i'.
-						' WHERE '.dbConditionInt('e.eventid', $eventIds).
+						' WHERE '.dbConditionInt('e.eventid', $eventids).
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND e.object='.zbx_dbstr($options['object']).
@@ -941,7 +1040,7 @@ class CEvent extends CApiService {
 				$query = DBselect(
 					'SELECT e.eventid,i.hostid'.
 						' FROM events e,items i'.
-						' WHERE '.dbConditionInt('e.eventid', $eventIds).
+						' WHERE '.dbConditionInt('e.eventid', $eventids).
 						' AND e.objectid=i.itemid'.
 						' AND e.object='.zbx_dbstr($options['object']).
 						' AND e.source='.zbx_dbstr($options['source'])
@@ -1021,7 +1120,7 @@ class CEvent extends CApiService {
 					'output' => $this->outputExtend($options['select_acknowledges'],
 						['acknowledgeid', 'eventid', 'clock', 'userid']
 					),
-					'filter' => ['eventid' => $eventIds]
+					'filter' => ['eventid' => $eventids]
 				]);
 				$sqlParts['order'][] = 'a.clock DESC';
 
@@ -1061,7 +1160,7 @@ class CEvent extends CApiService {
 				$acknowledges = DBFetchArrayAssoc(DBselect(
 					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
 						' FROM acknowledges a'.
-						' WHERE '.dbConditionInt('a.eventid', $eventIds).
+						' WHERE '.dbConditionInt('a.eventid', $eventids).
 						' GROUP BY a.eventid'
 				), 'eventid');
 				foreach ($result as &$event) {
@@ -1076,6 +1175,57 @@ class CEvent extends CApiService {
 			}
 		}
 
+		// Adding suppression data.
+		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
+			$suppression_data = API::getApiService()->select('event_suppress', [
+				'output' => $this->outputExtend($options['selectSuppressionData'], ['eventid', 'maintenanceid']),
+				'filter' => ['eventid' => $eventids],
+				'preservekeys' => true
+			]);
+			$relation_map = $this->createRelationMap($suppression_data, 'eventid', 'event_suppressid');
+			$suppression_data = $this->unsetExtraFields($suppression_data, ['event_suppressid', 'eventid'], []);
+			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
+		}
+
+		// Adding suppressed value.
+		if ($this->outputIsRequested('suppressed', $options['output'])) {
+			$suppressed_eventids = [];
+			foreach ($result as &$event) {
+				if (array_key_exists('suppression_data', $event)) {
+					$event['suppressed'] = $event['suppression_data']
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
+				}
+				else {
+					$suppressed_eventids[] = $event['eventid'];
+				}
+			}
+			unset($event);
+
+			if ($suppressed_eventids) {
+				$suppressed_events = API::getApiService()->select('event_suppress', [
+					'output' => ['eventid'],
+					'filter' => ['eventid' => $suppressed_eventids]
+				]);
+				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
+				foreach ($result as &$event) {
+					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
+						? ZBX_PROBLEM_SUPPRESSED_TRUE
+						: ZBX_PROBLEM_SUPPRESSED_FALSE;
+				}
+				unset($event);
+			}
+		}
+
+		// Remove "maintenanceid" field if it's not requested.
+		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT
+				&& !$this->outputIsRequested('maintenanceid', $options['selectSuppressionData'])) {
+			foreach ($result as &$row) {
+				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
+			}
+			unset($row);
+		}
+
 		// Adding event tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
@@ -1084,7 +1234,7 @@ class CEvent extends CApiService {
 
 			$tags_options = [
 				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
-				'filter' => ['eventid' => $eventIds]
+				'filter' => ['eventid' => $eventids]
 			];
 			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
 

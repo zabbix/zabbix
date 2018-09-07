@@ -30,10 +30,11 @@ foreach ($data['screens'] as $screen) {
 		: "rm4favorites('screenid','".$screen['screenid']."')";
 
 	$table->addRow([
-		new CLink($screen['label'], $url->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)),
+		new CLink($screen['label'], $url),
 		(new CButton())
 			->onClick($on_click)
 			->addClass(ZBX_STYLE_REMOVE_BTN)
+			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $screen['label']))
 	]);
 }
 

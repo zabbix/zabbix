@@ -27,7 +27,6 @@ $config = $this->data['config'];
 $filterForm = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 
@@ -137,9 +136,9 @@ $inventoryFilterTable->addRow(
 );
 $column2->addRow(_('Host inventory'), $inventoryFilterTable);
 
-// maintenance filter
-$column2->addRow(_('Show hosts in maintenance'),
-	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
+// suppressed problem filter
+$column2->addRow(_('Show suppressed problems'),
+	(new CCheckBox('show_suppressed'))->setChecked($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 );
 
 $filterForm->addFilterTab(_('Filter'), [$column1, $column2]);

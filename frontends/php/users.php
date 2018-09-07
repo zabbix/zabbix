@@ -149,8 +149,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$isValid = true;
-
+	$update = hasRequest('userid');
 	$usrgrps = getRequest('user_groups', []);
 
 	// authentication type
@@ -158,51 +157,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
 	}
 	else {
-		$authType = hasRequest('userid')
+		$authType = $update
 			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
 			: $config['authentication_type'];
 	}
 
 	// password validation
-	if ($authType != ZBX_AUTH_INTERNAL) {
-		if (hasRequest('password1')) {
-			show_error_message(_s('Password is unavailable for users with %1$s.', authentication2str($authType)));
-
-			$isValid = false;
-		}
-		else {
-			if (hasRequest('userid')) {
-				$_REQUEST['password1'] = null;
-				$_REQUEST['password2'] = null;
-			}
-			else {
-				$_REQUEST['password1'] = 'zabbix';
-				$_REQUEST['password2'] = 'zabbix';
-			}
-		}
+	if (getRequest('password1', '') != getRequest('password2', '')) {
+		show_error_message($update
+			? _('Cannot update user. Both passwords must be equal.')
+			: _('Cannot add user. Both passwords must be equal.')
+		);
 	}
 	else {
-		$_REQUEST['password1'] = getRequest('password1');
-		$_REQUEST['password2'] = getRequest('password2');
-	}
-
-	if ($_REQUEST['password1'] != $_REQUEST['password2']) {
-		if (isset($_REQUEST['userid'])) {
-			show_error_message(_('Cannot update user. Both passwords must be equal.'));
-		}
-		else {
-			show_error_message(_('Cannot add user. Both passwords must be equal.'));
-		}
-
-		$isValid = false;
-	}
-	elseif (hasRequest('password1') && getRequest('password1') === '') {
-		show_error_message(_('Password should not be empty'));
-
-		$isValid = false;
-	}
-
-	if ($isValid) {
 		$user = [
 			'alias' => getRequest('alias'),
 			'name' => getRequest('name'),
@@ -217,7 +184,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'usrgrps' => zbx_toObject($usrgrps, 'usrgrpid')
 		];
 
-		if (hasRequest('password1')) {
+		if (getRequest('password1', '') !== '') {
 			$user['passwd'] = getRequest('password1');
 		}
 
@@ -235,7 +202,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		if (hasRequest('userid')) {
+		if ($update) {
 			if (bccomp(CWebUser::$data['userid'], getRequest('userid')) != 0) {
 				$user['type'] = getRequest('user_type');
 			}

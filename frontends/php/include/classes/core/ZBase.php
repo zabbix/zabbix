@@ -211,6 +211,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export',
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
+			$this->rootDir.'/include/classes/graph',
 			$this->rootDir.'/include/classes/graphdraw',
 			$this->rootDir.'/include/classes/import',
 			$this->rootDir.'/include/classes/import/converters',
@@ -230,6 +231,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
+			$this->rootDir.'/include/classes/html/svg',
 			$this->rootDir.'/include/classes/html/widget',
 			$this->rootDir.'/include/classes/html/interfaces',
 			$this->rootDir.'/include/classes/parsers',
@@ -242,7 +244,8 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/include/classes/widgetfields',
+			$this->rootDir.'/include/classes/widgets/fields',
+			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
@@ -355,14 +358,20 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionId = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+		$sessionid = CWebUser::getSessionCookie();
 
-		if (!$sessionId) {
+		if ($sessionid === null) {
+			$sessionid = CWebUser::authenticateHttpUser();
+		}
+
+		$sessionid = CWebUser::checkAuthentication($sessionid);
+
+		if (!$sessionid) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionId;
+		API::getWrapper()->auth = $sessionid;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -394,7 +403,6 @@ class ZBase {
 				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
-				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();
 				$data['javascript']['pre'] = $view->getIncludedJS();
 				$data['javascript']['post'] = $view->getPostJS();

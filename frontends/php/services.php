@@ -32,37 +32,31 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'serviceid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'name' => 							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'algorithm' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'showsla' =>						[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
-	'goodsla' => 						[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')],
-	'sortorder' => 						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
-	'times' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
-	'triggerid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'trigger' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time_from_day' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_from_month' =>	[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_from_year' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_from_hour' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_from_minute' =>	[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_to_day' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_to_month' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_to_year' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_to_hour' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'new_service_time_to_minute' =>		[T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	null],
-	'children' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'parentid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'parentname' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'serviceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'name' => 					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'algorithm' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
+	'showsla' =>				[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
+	'goodsla' => 				[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null,
+									_('Calculate SLA, acceptable SLA (in %)')
+								],
+	'sortorder' => 				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
+	'times' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'trigger' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time_from' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
+	'new_service_time_till' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
+	'children' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'parentid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'parentname' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_service_time' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
+	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_service_time' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	// others
-	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,	null,		null]
+	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null]
 ];
 check_fields($fields);
 
@@ -111,167 +105,146 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 	show_messages($result, _('Service deleted'), _('Cannot delete service'));
 }
 
-if (isset($_REQUEST['form'])) {
-	$result = false;
+$service_times = [];
 
-	// save
-	if (hasRequest('add') || hasRequest('update')) {
-		DBstart();
+if (hasRequest('add') || hasRequest('update')) {
+	DBstart();
 
-		$children = getRequest('children', []);
-		$dependencies = [];
-		foreach ($children as $child) {
-			$dependencies[] = [
-				'dependsOnServiceid' => $child['serviceid'],
-				'soft' => (isset($child['soft'])) ? $child['soft'] : 0
-			];
-		}
+	$children = getRequest('children', []);
+	$dependencies = [];
 
-		$request = [
-			'name' => getRequest('name'),
-			'triggerid' => getRequest('triggerid'),
-			'algorithm' => getRequest('algorithm'),
-			'showsla' => getRequest('showsla', SERVICE_SHOW_SLA_OFF),
-			'sortorder' => getRequest('sortorder'),
-			'times' => getRequest('times', []),
-			'parentid' => getRequest('parentid'),
-			'dependencies' => $dependencies
+	foreach ($children as $child) {
+		$dependencies[] = [
+			'dependsOnServiceid' => $child['serviceid'],
+			'soft' => (isset($child['soft'])) ? $child['soft'] : 0
 		];
-		if (hasRequest('goodsla')) {
-			$request['goodsla'] = getRequest('goodsla');
-		}
-
-		if (isset($service['serviceid'])) {
-			$request['serviceid'] = $service['serviceid'];
-
-			$result = API::Service()->update($request);
-
-			$messageSuccess = _('Service updated');
-			$messageFailed = _('Cannot update service');
-			$auditAction = AUDIT_ACTION_UPDATE;
-		}
-		else {
-			$result = API::Service()->create($request);
-
-			$messageSuccess = _('Service created');
-			$messageFailed = _('Cannot add service');
-			$auditAction = AUDIT_ACTION_ADD;
-		}
-
-		if ($result) {
-			$serviceid = (isset($service['serviceid'])) ? $service['serviceid'] : reset($result['serviceids']);
-			add_audit($auditAction, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
-			unset($_REQUEST['form']);
-		}
-
-		$result = DBend($result);
-		show_messages($result, $messageSuccess, $messageFailed);
 	}
-	// validate and get service times
-	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
-		$_REQUEST['times'] = getRequest('times', []);
-		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
-		$result = true;
-		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			if (!validateDateTime($_REQUEST['new_service_time_from_year'],
-					$_REQUEST['new_service_time_from_month'],
-					$_REQUEST['new_service_time_from_day'],
-					$_REQUEST['new_service_time_from_hour'],
-					$_REQUEST['new_service_time_from_minute'])) {
-				$result = false;
-				error(_s('Invalid date "%s".', _('From')));
-			}
-			if (!validateDateInterval($_REQUEST['new_service_time_from_year'],
-					$_REQUEST['new_service_time_from_month'],
-					$_REQUEST['new_service_time_from_day'])) {
-				$result = false;
-				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
-			}
-			if (!validateDateTime($_REQUEST['new_service_time_to_year'],
-					$_REQUEST['new_service_time_to_month'],
-					$_REQUEST['new_service_time_to_day'],
-					$_REQUEST['new_service_time_to_hour'],
-					$_REQUEST['new_service_time_to_minute'])) {
-				$result = false;
-				error(_s('Invalid date "%s".', _('Till')));
-			}
-			if (!validateDateInterval($_REQUEST['new_service_time_to_year'],
-					$_REQUEST['new_service_time_to_month'],
-					$_REQUEST['new_service_time_to_day'])) {
-				$result = false;
-				error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
-			}
-			if ($result) {
-				$new_service_time['ts_from'] = mktime($_REQUEST['new_service_time_from_hour'],
-						$_REQUEST['new_service_time_from_minute'],
-						0,
-						$_REQUEST['new_service_time_from_month'],
-						$_REQUEST['new_service_time_from_day'],
-						$_REQUEST['new_service_time_from_year']);
 
-				$new_service_time['ts_to'] = mktime($_REQUEST['new_service_time_to_hour'],
-						$_REQUEST['new_service_time_to_minute'],
-						0,
-						$_REQUEST['new_service_time_to_month'],
-						$_REQUEST['new_service_time_to_day'],
-						$_REQUEST['new_service_time_to_year']);
+	$request = [
+		'name' => getRequest('name'),
+		'triggerid' => getRequest('triggerid'),
+		'algorithm' => getRequest('algorithm'),
+		'showsla' => getRequest('showsla', SERVICE_SHOW_SLA_OFF),
+		'sortorder' => getRequest('sortorder'),
+		'times' => getRequest('times', []),
+		'parentid' => getRequest('parentid'),
+		'dependencies' => $dependencies
+	];
 
-				$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
-			}
-		}
-		else {
-			$new_service_time['ts_from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
-			$new_service_time['ts_to'] = dowHrMinToSec($_REQUEST['new_service_time']['to_week'], $_REQUEST['new_service_time']['to_hour'], $_REQUEST['new_service_time']['to_minute']);
-			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
-		}
+	if (hasRequest('goodsla')) {
+		$request['goodsla'] = getRequest('goodsla');
+	}
 
-		if ($result) {
-			try {
-				checkServiceTime($new_service_time);
+	if (isset($service['serviceid'])) {
+		$request['serviceid'] = $service['serviceid'];
 
-				// if this time is not already there, adding it for inserting
-				if (!str_in_array($_REQUEST['times'], $new_service_time)) {
-					array_push($_REQUEST['times'], $new_service_time);
+		$result = API::Service()->update($request);
 
-					unset($_REQUEST['new_service_time']['from_week']);
-					unset($_REQUEST['new_service_time']['to_week']);
-					unset($_REQUEST['new_service_time']['from_hour']);
-					unset($_REQUEST['new_service_time']['to_hour']);
-					unset($_REQUEST['new_service_time']['from_minute']);
-					unset($_REQUEST['new_service_time']['to_minute']);
-				}
-			}
-			catch (APIException $e) {
-				error($e->getMessage());
-			}
-		}
-
-		show_messages();
+		$messageSuccess = _('Service updated');
+		$messageFailed = _('Cannot update service');
+		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		unset($_REQUEST['new_service_time']['from_week']);
-		unset($_REQUEST['new_service_time']['to_week']);
-		unset($_REQUEST['new_service_time']['from_hour']);
-		unset($_REQUEST['new_service_time']['to_hour']);
-		unset($_REQUEST['new_service_time']['from_minute']);
-		unset($_REQUEST['new_service_time']['to_minute']);
+		$result = API::Service()->create($request);
+
+		$messageSuccess = _('Service created');
+		$messageFailed = _('Cannot add service');
+		$auditAction = AUDIT_ACTION_ADD;
 	}
+
+	if ($result) {
+		$serviceid = (isset($service['serviceid'])) ? $service['serviceid'] : reset($result['serviceids']);
+		add_audit($auditAction, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
+		unset($_REQUEST['form']);
+	}
+
+	$result = DBend($result);
+	show_messages($result, $messageSuccess, $messageFailed);
+}
+// Validate and get service times.
+elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
+	$new_service_time = getRequest('new_service_time');
+	$_REQUEST['times'] = getRequest('times', []);
+	$result = true;
+
+	if ($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
+		$absolute_time_parser->parse(getRequest('new_service_time_from'));
+		$new_service_time_from = $absolute_time_parser->getDateTime(true);
+
+		if (!validateDateInterval($new_service_time_from->format('Y'), $new_service_time_from->format('m'),
+				$new_service_time_from->format('d'))) {
+			$result = false;
+			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
+		}
+
+		$absolute_time_parser->parse(getRequest('new_service_time_till'));
+		$new_service_time_till = $absolute_time_parser->getDateTime(true);
+
+		if (!validateDateInterval($new_service_time_till->format('Y'), $new_service_time_till->format('m'),
+				$new_service_time_till->format('d'))) {
+			$result = false;
+			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Till')));
+		}
+
+		if ($result) {
+			$new_service_time['ts_from'] = $new_service_time_from->getTimestamp();
+			$new_service_time['ts_to'] = $new_service_time_till->getTimestamp();
+		}
+	}
+	else {
+		$new_service_time['ts_from'] = dowHrMinToSec($new_service_time['from_week'], $new_service_time['from_hour'],
+			$new_service_time['from_minute']
+		);
+		$new_service_time['ts_to'] = dowHrMinToSec($new_service_time['to_week'], $new_service_time['to_hour'],
+			$new_service_time['to_minute']
+		);
+	}
+
+	if ($result) {
+		try {
+			checkServiceTime($new_service_time);
+
+			// If this time is not already there, adding it for inserting.
+			unset($new_service_time['from_week']);
+			unset($new_service_time['to_week']);
+			unset($new_service_time['from_hour']);
+			unset($new_service_time['to_hour']);
+			unset($new_service_time['from_minute']);
+			unset($new_service_time['to_minute']);
+
+			if (!str_in_array($new_service_time, $_REQUEST['times'])) {
+				$_REQUEST['times'][] = $new_service_time;
+			}
+		}
+		catch (APIException $e) {
+			error($e->getMessage());
+		}
+	}
+
+	show_messages();
+}
+else {
+	unset($_REQUEST['new_service_time']['from_week']);
+	unset($_REQUEST['new_service_time']['to_week']);
+	unset($_REQUEST['new_service_time']['from_hour']);
+	unset($_REQUEST['new_service_time']['to_hour']);
+	unset($_REQUEST['new_service_time']['from_minute']);
+	unset($_REQUEST['new_service_time']['to_minute']);
 }
 
-/*
- * Display
- */
-if (isset($_REQUEST['form'])) {
-	$data = [];
-	$data['form'] = getRequest('form');
-	$data['form_refresh'] = getRequest('form_refresh', 0);
-	$data['service'] = !empty($service) ? $service : null;
+if (hasRequest('form')) {
+	$data = [
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh', 0),
+		'service' => (getRequest('serviceid', 0) != 0) ? $service : null,
+		'times' => getRequest('times', []),
+		'new_service_time' => getRequest('new_service_time', ['type' => SERVICE_TIME_TYPE_UPTIME])
+	];
 
-	$data['times'] = getRequest('times', []);
-	$data['new_service_time'] = getRequest('new_service_time', ['type' => SERVICE_TIME_TYPE_UPTIME]);
-
-	// populate the form from the object from the database
-	if (isset($data['service']['serviceid']) && !isset($_REQUEST['form_refresh'])) {
+	// Populate the form from the object from the database.
+	if (getRequest('serviceid', 0) != 0 && !hasRequest('form_refresh')) {
 		$data['name'] = $data['service']['name'];
 		$data['algorithm'] = $data['service']['algorithm'];
 		$data['showsla'] = $data['service']['showsla'];
@@ -314,8 +287,20 @@ if (isset($_REQUEST['form'])) {
 			CArrayHelper::sort($data['children'], ['name', 'serviceid']);
 		}
 	}
-	// populate the form from a submitted request
+	// Populate the form from a submitted request.
 	else {
+		$new_service_time = getRequest('new_service_time');
+
+		if ($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
+			$data['new_service_time_from'] = hasRequest('new_service_time_from')
+				? getRequest('new_service_time_from')
+				: (new DateTime('today'))->format(ZBX_DATE_TIME);
+
+			$data['new_service_time_till'] = hasRequest('new_service_time_till')
+				? getRequest('new_service_time_till')
+				: (new DateTime('tomorrow'))->format(ZBX_DATE_TIME);
+		}
+
 		$data['name'] = getRequest('name', '');
 		$data['algorithm'] = getRequest('algorithm', SERVICE_ALGORITHM_MAX);
 		$data['showsla'] = getRequest('showsla', SERVICE_SHOW_SLA_OFF);

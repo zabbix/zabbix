@@ -38,6 +38,10 @@ $itemForm = (new CForm())
 	->setName('items')
 	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
+$url = (new CUrl('disc_prototypes.php'))
+	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+	->getUrl();
+
 // create table
 $itemTable = (new CTableInfo())
 	->setHeader([
@@ -45,47 +49,41 @@ $itemTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Wizard'),
-		make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'),'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('History'), 'history', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Trends'), 'trends', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
-		make_sorting_header(_('Create enabled'), 'status', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url)
 	]);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 
-foreach ($this->data['items'] as $item) {
+foreach ($data['items'] as $item) {
 	$description = [];
-	if (!empty($item['templateid'])) {
-		$template_host = get_realhost_by_itemid($item['templateid']);
+	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-		$description[] = (new CLink($template_host['name'],
-			(new CUrl('disc_prototypes.php'))
-				->setArgument('parent_discoveryid',
-					get_realrule_by_itemid_and_hostid($data['parent_discoveryid'], $template_host['hostid'])
-				)
-				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
-		$description[] = NAME_DELIMITER;
-	}
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-		$link = ($item['master_item']['source'] === 'itemprototypes')
-			? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
+		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
+			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+		}
+		else {
+			$link = ($item['master_item']['source'] === 'itemprototypes')
+				? (new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+				: (new CUrl('items.php'))->setArgument('hostid', $item['hostid']);
 
-		$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
-			$link
-				->setArgument('form', 'update')
-				->setArgument('itemid', $item['master_item']['itemid'])
-				->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_TEAL);
+			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+				$link
+					->setArgument('form', 'update')
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_TEAL);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 
