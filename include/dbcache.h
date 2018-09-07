@@ -806,7 +806,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_ui
 void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
-void	zbx_dc_clear_timer_queue();
+void	zbx_dc_clear_timer_queue(void);
 
 /* data session support */
 
