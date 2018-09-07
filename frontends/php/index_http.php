@@ -64,18 +64,21 @@ if ($http_user) {
 		}
 	}
 
-	$user = API::getApiService('user')->loginHttp([
-		'user' => $http_user,
-		'password' => ''
-	], false);
+	try {
+		$user = API::getApiService('user')->loginHttp($http_user, false);
 
-	if ($user) {
-		CWebUser::setSessionCookie($user['sessionid']);
-		$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
-		redirect(reset($redirect));
+		if ($user) {
+			CWebUser::setSessionCookie($user['sessionid']);
+			$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+			redirect(reset($redirect));
 
-		exit;
+			exit;
+		}
 	}
+	catch (APIException $e) {
+		error($e->getMessage());
+	}
+
 }
 else {
 	error(_('Login name or password is incorrect.'));

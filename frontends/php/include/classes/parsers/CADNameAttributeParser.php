@@ -82,8 +82,6 @@ class CADNameAttributeParser extends CParser {
 		$this->match = '';
 		$this->name_type = self::ZBX_TYPE_UNKNOWN;
 
-		$p = $pos;
-
 		if (($this->options['type_upn']) && $this->parseUserPrincipalName($source, $pos) == self::PARSE_SUCCESS) {
 			$this->name_type = self::ZBX_TYPE_UPN;
 		}
