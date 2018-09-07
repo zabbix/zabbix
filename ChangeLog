@@ -1,6 +1,7 @@
 Changes for 4.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-4672] added option to show suppressed problems for data overview page and widget (agriscenko)
 A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 ..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
 ........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
