@@ -11,14 +11,14 @@
       <template>
          <template>Template Net HP Enterprise Switch SNMPv2</template>
          <name>Template Net HP Enterprise Switch SNMPv2</name>
-         <description>Template Net HP Enterprise Switch version: 0.14&#13;
+         <description>Template Net HP Enterprise Switch version: 0.15&#13;
 MIBs used:&#13;
-STATISTICS-MIB&#13;
+SEMI-MIB&#13;
 NETSWITCH-MIB&#13;
-ENTITY-SENSORS-MIB&#13;
 HP-ICF-CHASSIS&#13;
+ENTITY-SENSORS-MIB&#13;
 ENTITY-MIB&#13;
-SEMI-MIB</description>
+STATISTICS-MIB</description>
          <groups>
             <group>
                <name>Templates/Network Devices</name>
@@ -29,19 +29,19 @@ SEMI-MIB</description>
                <name>CPU</name>
             </application>
             <application>
-               <name>Memory</name>
-            </application>
-            <application>
-               <name>Temperature</name>
-            </application>
-            <application>
                <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Memory</name>
             </application>
             <application>
                <name>Power Supply</name>
             </application>
             <application>
-               <name>Inventory</name>
+               <name>Temperature</name>
             </application>
          </applications>
          <items>
@@ -51,7 +51,7 @@ SEMI-MIB</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0</snmp_oid>
                <key>system.cpu.util[hpSwitchCpuStat.0]</key>
-               <delay>180</delay>
+               <delay>3m</delay>
                <history>30d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -94,8 +94,8 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.11.2.36.1.1.2.9.0</snmp_oid>
                <key>system.hw.serialnumber</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -135,8 +135,8 @@ Reference: http://h20564.www2.hpe.com/hpsc/doc/public/display?docId=emr_na-c0259
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.3.0</snmp_oid>
                <key>system.hw.firmware</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -181,9 +181,9 @@ A    the function set available in your router&#13;
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
+               <snmp_oid>discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
                <key>temp.precision0.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -206,16 +206,14 @@ A    the function set available in your router&#13;
                   <formula/>
                   <conditions>
                      <condition>
-                        <macro>{#SNMPVALUE}</macro>
+                        <macro>{#SENSOR_TYPE}</macro>
                         <value>8</value>
-                        <!-- celsius -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#SENSOR_PRECISION}</macro>
                         <value>0</value>
-                        <!-- limit only to precision 0 (like 10) -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -230,7 +228,7 @@ A    the function set available in your router&#13;
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
+                     <delay>3m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -338,7 +336,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.1]</snmp_oid>
                <key>memory.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -370,7 +368,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.7.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.used[hpLocalMemAllocBytes.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
+                     <delay>3m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -413,7 +411,7 @@ The number of currently allocated bytes.</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.11.2.14.11.5.1.1.2.1.1.1.6.{#SNMPINDEX}</snmp_oid>
                      <key>vm.memory.free[hpLocalMemFreeBytes.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
+                     <delay>3m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -456,7 +454,7 @@ The number of available (unallocated) bytes.</description>
                      <snmp_community/>
                      <snmp_oid/>
                      <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
+                     <delay>3m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -554,7 +552,7 @@ The number of available (unallocated) bytes.</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
                <key>fan.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -582,7 +580,6 @@ The number of available (unallocated) bytes.</description>
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
-                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
                      <condition>
                         <macro>{#ENT_STATUS}</macro>
                         <value>(1|2|3|4)</value>
@@ -600,8 +597,8 @@ The number of available (unallocated) bytes.</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -692,7 +689,7 @@ Please check the fan unit</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
                <key>psu.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -720,7 +717,6 @@ Please check the fan unit</description>
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
-                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
                      <condition>
                         <macro>{#ENT_STATUS}</macro>
                         <value>(1|2|3|4)</value>
@@ -738,8 +734,8 @@ Please check the fan unit</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -830,7 +826,7 @@ Please check the power supply unit for errors</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.2,{#ENT_DESCR},1.3.6.1.4.1.11.2.14.11.1.2.6.1.7,{#ENT_STATUS},1.3.6.1.4.1.11.2.14.11.1.2.6.1.4]</snmp_oid>
                <key>temp.status.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -858,7 +854,6 @@ Please check the power supply unit for errors</description>
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
-                     <!--1: unknown(1)                      2: bad(2)                      3: warning(3)                      4: good(4)                      5: notPresent(5)-->
                      <condition>
                         <macro>{#ENT_STATUS}</macro>
                         <value>(1|2|3|4)</value>
@@ -876,8 +871,8 @@ Please check the power supply unit for errors</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.status[hpicfSensorStatus.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -927,7 +922,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
                <key>entity.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -952,7 +947,6 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <condition>
                         <macro>{#ENT_CLASS}</macro>
                         <value>3</value>
-                        <!-- 3 - chassis  -->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -967,8 +961,8 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.model[entPhysicalDescr.{#SNMPINDEX}]</key>
-                     <delay>3600</delay>
-                     <history>14d</history>
+                     <delay>1h</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>1</value_type>
@@ -1009,8 +1003,8 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.version[entPhysicalHardwareRev.{#SNMPINDEX}]</key>
-                     <delay>3600</delay>
-                     <history>14d</history>
+                     <delay>1h</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>1</value_type>
@@ -1055,12 +1049,20 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
          <httptests/>
          <macros>
             <macro>
+               <macro>{$CPU_UTIL_MAX}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
                <macro>{$FAN_CRIT_STATUS:"bad"}</macro>
                <value>2</value>
             </macro>
             <macro>
                <macro>{$FAN_WARN_STATUS:"warning"}</macro>
                <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <value>90</value>
             </macro>
             <macro>
                <macro>{$PSU_CRIT_STATUS:"bad"}</macro>
@@ -1071,51 +1073,35 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$TEMP_WARN_STATUS}</macro>
-               <value>3</value>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
             </macro>
             <macro>
                <macro>{$TEMP_CRIT_STATUS}</macro>
                <value>2</value>
             </macro>
             <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
                <macro>{$TEMP_CRIT}</macro>
                <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>3</value>
             </macro>
             <macro>
                <macro>{$TEMP_WARN}</macro>
                <value>50</value>
             </macro>
-            <macro>
-               <macro>{$TEMP_CRIT_LOW}</macro>
-               <value>5</value>
-            </macro>
-            <macro>
-               <macro>{$STORAGE_UTIL_CRIT}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$STORAGE_UTIL_WARN}</macro>
-               <value>80</value>
-            </macro>
          </macros>
          <templates>
-            <template>
-               <name>Template Module Interfaces SNMPv2</name>
-            </template>
             <template>
                <name>Template Module EtherLike-MIB SNMPv2</name>
             </template>
             <template>
                <name>Template Module Generic SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
             </template>
          </templates>
          <screens/>

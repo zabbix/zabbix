@@ -763,6 +763,7 @@ else {
 		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
 	$data['paging'] = getPagingLine($data['items'], $sortOrder, $url);
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);

@@ -170,8 +170,7 @@ static size_t		item_values_alloc = 0, item_values_num = 0;
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
-static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
-static int	hc_push_processed_items(zbx_vector_ptr_t *history_items);
+static int	hc_push_items(zbx_vector_ptr_t *history_items);
 static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
@@ -2767,7 +2766,7 @@ static int	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total
 
 		LOCK_CACHE;
 
-		next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
+		next_sync = hc_push_items(&history_items);	/* return items to history cache */
 		cache->history_num -= history_num;
 
 		UNLOCK_CACHE;
@@ -2866,21 +2865,22 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		ZBX_DC_TREND		*trends = NULL;
 
 		LOCK_CACHE;
-
 		hc_pop_items(&history_items);		/* select and take items out of history cache */
+		UNLOCK_CACHE;
 
 		if (0 != history_items.values_num)
 		{
-			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
-
-			/* if there are unavailable items, push them back in history queue */
-			if (history_num != history_items.values_num)
-				hc_push_busy_items(&history_items);
+			if (0 == (history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids)))
+			{
+				LOCK_CACHE;
+				hc_push_items(&history_items);
+				UNLOCK_CACHE;
+				zbx_vector_ptr_clear(&history_items);
+			}
 		}
 		else
 			history_num = 0;
 
-		UNLOCK_CACHE;
 
 		if (0 != history_num)
 		{
@@ -2977,10 +2977,8 @@ static int	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		if (0 != history_num)
 		{
 			LOCK_CACHE;
-
-			next_sync = hc_push_processed_items(&history_items);	/* return processed items into history cache */
+			next_sync = hc_push_items(&history_items);	/* return items to history cache */
 			cache->history_num -= history_num;
-
 			UNLOCK_CACHE;
 
 			*total_num += history_num;
@@ -3122,7 +3120,13 @@ int	sync_history_cache(int sync_type, int *total_num)
 
 		/* add all items from history index to the new history queue */
 		while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
-			hc_queue_item(item);
+		{
+			if (NULL != item->tail)
+			{
+				item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+				hc_queue_item(item);
+			}
+		}
 
 		UNLOCK_CACHE;
 
@@ -3994,42 +3998,12 @@ static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *histor
 	/* change item's history data until it is pushed back to history queue */
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		/* busy items were replaced with NULL values in hc_push_busy_items() function */
-		if (NULL == (item = (zbx_hc_item_t *)history_items->values[i]))
+		item = (zbx_hc_item_t *)history_items->values[i];
+
+		if (ZBX_HC_ITEM_STATUS_BUSY == item->status)
 			continue;
 
 		hc_copy_history_data(&history[history_num++], item->itemid, item->tail);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: hc_push_busy_items                                               *
- *                                                                            *
- * Purpose: push back the busy (locked by triggers) items into history cache  *
- *                                                                            *
- * Parameters: history_items - [IN] the history items                         *
- *                                                                            *
- ******************************************************************************/
-static void	hc_push_busy_items(zbx_vector_ptr_t *history_items)
-{
-	int		i;
-	zbx_hc_item_t	*item;
-
-	for (i = 0; i < history_items->values_num; i++)
-	{
-		item = (zbx_hc_item_t *)history_items->values[i];
-
-		if (ZBX_HC_ITEM_STATUS_NORMAL == item->status)
-			continue;
-
-		/* reset item status before returning it to queue */
-		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
-		hc_queue_item(item);
-
-		/* After pushing back to queue current syncer has released ownership of this item. */
-		/* To avoid using it further reset the item reference in vector to NULL.           */
-		history_items->values[i] = NULL;
 	}
 }
 
@@ -4049,7 +4023,7 @@ static void	hc_push_busy_items(zbx_vector_ptr_t *history_items)
  *           removed from history index.                                      *
  *                                                                            *
  ******************************************************************************/
-static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
+static int	hc_push_items(zbx_vector_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
@@ -4058,21 +4032,25 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		/* busy items were replaced with NULL values in hc_push_busy_items() function */
-		if (NULL == (item = (zbx_hc_item_t *)history_items->values[i]))
-			continue;
+		item = (zbx_hc_item_t *)history_items->values[i];
 
-		data_free = item->tail;
-		item->tail = item->tail->next;
-		hc_free_data(data_free);
-
-		if (NULL == item->tail)
+		switch (item->status)
 		{
-			zbx_hashset_remove(&cache->history_items, item);
-			continue;
+			case ZBX_HC_ITEM_STATUS_BUSY:
+				/* reset item status before returning it to queue */
+				item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+				hc_queue_item(item);
+				break;
+			case ZBX_HC_ITEM_STATUS_NORMAL:
+				data_free = item->tail;
+				item->tail = item->tail->next;
+				hc_free_data(data_free);
+				if (NULL == item->tail)
+					zbx_hashset_remove(&cache->history_items, item);
+				else
+					hc_queue_item(item);
+				break;
 		}
-
-		hc_queue_item(item);
 	}
 
 	if (FAIL == zbx_binary_heap_empty(&cache->history_queue))
@@ -4102,7 +4080,7 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
+ZBX_MEM_FUNC_IMPL(__trend, trend_mem)
 
 static int	init_trend_cache(char **error)
 {

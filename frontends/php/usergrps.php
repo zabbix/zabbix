@@ -33,18 +33,20 @@ $page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+// Available GUI access rights.
+$gui_access = [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED];
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	// group
 	'usrgrpid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'group_groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'gname' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
-	'gui_access' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
+	'gui_access' =>				[T_ZBX_INT, O_OPT, null,	IN($gui_access), 'isset({add}) || isset({update})'],
 	'users_status' =>			[T_ZBX_INT, O_OPT, null,	IN([GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),	null],
 	'debug_mode' =>				[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
 	'userids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'groups_rights' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'set_gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
+	'set_gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN($gui_access),null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.

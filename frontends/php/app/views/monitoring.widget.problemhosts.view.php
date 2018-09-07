@@ -38,8 +38,10 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', $data['filter']['hostids'])
 	->setArgument('filter_name', $data['filter']['problem'])
-	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+		? ZBX_PROBLEM_SUPPRESSED_TRUE
+		: null
+	);
 $url_host = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_set', 1)
@@ -47,8 +49,10 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_groupids', null)
 	->setArgument('filter_hostids', null)
 	->setArgument('filter_name', $data['filter']['problem'])
-	->setArgument('filter_maintenance', ($data['filter']['maintenance'] == 1) ? 1 : null)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+		? ZBX_PROBLEM_SUPPRESSED_TRUE
+		: null
+	);
 
 foreach ($data['groups'] as $group) {
 	$problematic_count_key = ($data['filter']['ext_ack'] == EXTACK_OPTION_UNACK)

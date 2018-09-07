@@ -1,0 +1,575 @@
+---
+test case: No maintenance and event tags (1)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags: []
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: No maintenance and event tags (2)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags: []
+  tags: []
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with no event tags (1)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: like
+  tags: []
+out:
+  return: FAIL
+---
+test case: Maintenance tags with matching event tags (1)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value:
+        operator: like
+  tags:
+      - tag: a
+        value:
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (2)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value:
+        operator: like
+  tags:
+      - tag: a
+        value:
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (3)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value:
+        operator: equal
+  tags:
+      - tag: a
+        value:
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (4)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value:
+        operator: equal
+  tags:
+      - tag: a
+        value:
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (5)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 123
+        operator: equal
+  tags:
+      - tag: a
+        value: 123
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (6)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 12
+        operator: like
+  tags:
+      - tag: a
+        value: 123
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (7)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 2
+        operator: like
+  tags:
+      - tag: a
+        value: 123
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (8)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 23
+        operator: like
+  tags:
+      - tag: a
+        value: 123
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (9)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+      - tag: c
+        value: 3
+        operator: equal
+  tags:
+      - tag: c
+        value: 3
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (10)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: b
+        value: 2
+      - tag: c
+        value: 3
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (11)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: b
+        value: 1
+      - tag: b
+        value: 2
+      - tag: b
+        value: 3
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (12)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: b
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: like
+  tags:
+      - tag: b
+        value: 123
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (13)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: like
+  tags:
+      - tag: a
+        value: 2
+      - tag: b
+        value: 2
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (14)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: b
+        value: 2
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (15)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: b
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: b
+        value: 2
+      - tag: b
+        value: 3
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (16)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: b
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: b
+        value: 2
+      - tag: b
+        value: 3
+      - tag: c
+        value: 3
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (17)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: a
+        value: 2
+        operator: equal
+      - tag: b
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 2
+      - tag: b
+        value: 1
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (18)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: a
+        value: 2
+        operator: equal
+      - tag: c
+        value: 1
+        operator: equal
+      - tag: c
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 10
+      - tag: a
+        value: 11
+      - tag: a
+        value: 2
+      - tag: a
+        value: 12
+      - tag: a
+        value: 13
+      - tag: b
+        value: 10
+      - tag: b
+        value: 11
+      - tag: b
+        value: 12
+      - tag: b
+        value: 1
+      - tag: c
+        value: 10
+      - tag: c
+        value: 11
+      - tag: c
+        value: 12
+      - tag: c
+        value: 1
+out:
+  return: SUCCEED
+---
+test case: Maintenance tags with matching event tags (17)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: a
+        value: 2
+        operator: equal
+      - tag: b
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 2
+      - tag: b
+        value: 5
+      - tag: b
+        value: 4
+      - tag: b
+        value: 3
+      - tag: b
+        value: 2
+      - tag: b
+        value: 1
+out:
+  return: SUCCEED---
+test case: Maintenance tags with not matching event tags (1)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 123
+        operator: equal
+  tags:
+      - tag: a
+        value: 12
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (2)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: a
+        value: 123
+        operator: equal
+  tags:
+      - tag: a
+        value: 1234
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (3)
+in:
+  maintenance:
+    tags_evaltype: or
+    tags:
+      - tag: b
+        value: 2
+        operator: equal
+      - tag: d
+        value: 4
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: c
+        value: 3
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (4)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: c
+        value: 3
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: c
+        value: 2
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (5)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: a
+        value: 2
+        operator: equal
+      - tag: c
+        value: 1
+        operator: equal
+      - tag: c
+        value: 3
+        operator: equal
+  tags:
+      - tag: a
+        value: 2
+      - tag: b
+        value: 1
+      - tag: b
+        value: 2
+      - tag: b
+        value: 3
+      - tag: b
+        value: 4
+      - tag: c
+        value: 2
+      - tag: d
+        value: 1
+      - tag: d
+        value: 2
+      - tag: d
+        value: 3
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (6)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: c
+        value: 3
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: c
+        value: 1
+      - tag: c
+        value: 2
+      - tag: c
+        value: 2
+      - tag: c
+        value: 6
+      - tag: c
+        value: 2
+      - tag: c
+        value: 1
+      - tag: c
+        value: 2
+      - tag: c
+        value: 4
+      - tag: c
+        value: 5
+out:
+  return: FAIL
+---
+test case: Maintenance tags with not matching event tags (7)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: c
+        value: 3
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+out:
+  return: FAIL
+---
+test case: Maintenance tags with matching event tags (8)
+in:
+  maintenance:
+    tags_evaltype: and/or
+    tags:
+      - tag: a
+        value: 1
+        operator: equal
+      - tag: b
+        value: 2
+        operator: equal
+  tags:
+      - tag: a
+        value: 1
+      - tag: b
+        value: 2
+      - tag: c
+        value: 3
+out:
+  return: SUCCEED
+...
+
+

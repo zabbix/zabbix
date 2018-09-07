@@ -93,19 +93,85 @@ class CWidgetHelper {
 	 * @return CComboBox
 	 */
 	public static function getComboBox($field) {
-		return (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
-			->setAriaRequired(self::isAriaRequired($field));
+		$combo_box = (new CComboBox($field->getName(), $field->getValue(), $field->getAction(), $field->getValues()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
+
+		return $combo_box;
 	}
 
 	/**
-	 * @param CWidgetFieldTextBox|CWidgetFieldUrl $field
+	 * @param CWidgetFieldTextBox $field
 	 *
 	 * @return CTextBox
 	 */
 	public static function getTextBox($field) {
+		$text_box = (new CTextBox($field->getName(), $field->getValue()))
+			->setAriaRequired(self::isAriaRequired($field))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth($field->getWidth());
+
+		if ($field->getPlaceholder() !== '') {
+			$text_box->setAttribute('placeholder', $field->getPlaceholder());
+		}
+
+		return $text_box;
+	}
+
+	/**
+	 * @param CWidgetFieldUrl $field
+	 *
+	 * @return CTextBox
+	 */
+	public static function getUrlBox($field) {
 		return (new CTextBox($field->getName(), $field->getValue()))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+			->setAriaRequired(self::isAriaRequired($field))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	}
+
+	/**
+	 * @param CWidgetFieldRangeControl $field
+	 *
+	 * @return CRangeControl
+	 */
+	public static function getRangeControl($field) {
+		return (new CRangeControl($field->getName(), (int) $field->getValue()))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('maxlength', strlen($field->getMaxValue()))
+			->setStep($field->getStepValue())
+			->setMin($field->getMinValue())
+			->setMax($field->getMaxValue())
+			->addClass('range-control');
+	}
+
+	/**
+	 * @param CWidgetFieldTextArea $field
+	 *
+	 * @return Array
+	 */
+	public static function getHostsPatternTextBox($field, $form_name) {
+		return [
+			(new CTextArea($field->getName(), $field->getValue(), ['rows' => 1]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(self::isAriaRequired($field))
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+				->setAttribute('placeholder', $field->getPlaceholder())
+				->addClass(ZBX_STYLE_PATTERNSELECT),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton($field->getName().'_select', _('Select')))
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic", '.
+					CJs::encodeJson([
+						'srctbl' => 'hosts',
+						'srcfld1' => 'host',
+						'reference' => 'name',
+						'multiselect' => 1,
+						'dstfrm' => $form_name,
+						'dstfld1' => $field->getName()
+					]).', null, this);'
+				)
+		];
 	}
 
 	/**
@@ -114,9 +180,11 @@ class CWidgetHelper {
 	 * @return array
 	 */
 	public static function getCheckBox($field) {
-		return [new CVar($field->getName(), '0'), (new CCheckBox($field->getName()))
+		return [(new CVar($field->getName(), '0'))->removeId(), (new CCheckBox($field->getName()))
 			->setChecked((bool) $field->getValue())
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setLabel($field->getCaption())
+			->onChange($field->getAction())
 		];
 	}
 
@@ -260,7 +328,9 @@ class CWidgetHelper {
 			->setAriaRequired(self::isAriaRequired($field));
 
 		foreach ($field->getValues() as $key => $value) {
-			$radio_button_list->addValue($value, $key, null, $field->getAction());
+			$radio_button_list
+				->addValue($value, $key, null, $field->getAction())
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED));
 		}
 
 		return $radio_button_list;
@@ -273,7 +343,11 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		$class = ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_VERTICAL)
+			? ZBX_STYLE_LIST_CHECK_RADIO
+			: ZBX_STYLE_LIST_HOR_CHECK_RADIO;
+
+		$severities = (new CList())->addClass($class);
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severities->addItem(
@@ -281,6 +355,7 @@ class CWidgetHelper {
 					->setLabel(getSeverityName($severity, $config))
 					->setId($field->getName().'_'.$severity)
 					->setChecked(in_array($severity, $field->getValue()))
+					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			);
 		}
 
@@ -369,11 +444,128 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldDatePicker $field
+	 *
+	 * @return Array
+	 */
+	public static function getDatePicker($field) {
+		return [
+			(new CTextBox($field->getName(), $field->getValue()))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired(self::isAriaRequired($field))
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED)),
+			(new CButton($field->getName().'_dp'))
+				->addClass(ZBX_STYLE_ICON_CAL)
+				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+		];
+	}
+
+	/**
+	 * @param CWidgetFieldGraphOverride $field
+	 *
+	 * @return CList
+	 */
+	public static function getGraphOverride($field, $form_name) {
+		$override_list = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST)->setId('overrides');
+		$overrides = $field->getValue();
+		if (!$overrides) {
+			$overrides = [];
+		}
+		$i = 0;
+		foreach ($overrides as $override) {
+			$options = [
+				'row_num' => $i,
+				'order_num' => $i + 1,
+				'form_name' => $form_name
+			];
+
+			$override_list->addItem($field->getFieldLayout($override, $options), ZBX_STYLE_OVERRIDES_LIST_ITEM);
+			$i++;
+		}
+
+		// Add 'Add' button under the list.
+		$override_list->addItem(
+			(new CDiv(
+				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->setId('override-add')
+			))
+				->addStyle('display: table-cell; padding-top: 10px;'),
+			'overrides-foot'
+		);
+
+		return $override_list;
+	}
+
+	/**
+	 * @param CWidgetFieldGraphDataSet $field
+	 *
+	 * @return CList
+	 */
+	public static function getGraphDataSet($field, $form_name) {
+		$data_set_list = (new CList())->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION)->setId('data_sets');
+
+		$data_sets = $field->getValue();
+		if (!$data_sets) {
+			$data_sets = [$field->getDefault()];
+		}
+
+		$i = 0;
+		foreach ($data_sets as $data_set) {
+			$class = ZBX_STYLE_LIST_ACCORDION_ITEM;
+			$class .= ($i > 0)
+				? ' '.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED
+				: ' '.ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED;
+
+			$options = [
+				'row_num' => $i,
+				'order_num' => $i + 1,
+				'form_name' => $form_name,
+				'is_opened' => ($i == 0)
+			];
+
+			$data_set_list->addItem($field->getFieldLayout($data_set, $options), $class);
+			$i++;
+		}
+
+		// Add 'Add' button under accordion.
+		$data_set_list->addItem(
+			(new CDiv(
+				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->setId('dataset-add')
+			))
+				->addStyle('display: table-cell; padding-top: 10px;'),
+			ZBX_STYLE_LIST_ACCORDION_FOOT
+		);
+
+		return $data_set_list;
+	}
+
+	/**
 	 * @param CWidgetField $field
 	 *
 	 * @return int
 	 */
 	public static function isAriaRequired($field) {
 		return ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
+	}
+
+	/**
+	 * Make array of patterns from given comma separated patterns string.
+	 *
+	 * @param string $patterns  String containing comma separated patterns.
+	 *
+	 * @return array  Returns array of unique patterns.
+	 */
+	public static function splitPatternIntoParts($patterns) {
+		$patterns = explode(',', $patterns);
+
+		foreach ($patterns as &$pattern) {
+			$pattern = trim($pattern);
+		}
+		unset($pattern);
+
+		return array_unique($patterns);
 	}
 }

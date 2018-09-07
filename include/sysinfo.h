@@ -307,7 +307,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #define ZBX_MUTEX_ALL_ALLOW		0
 #define ZBX_MUTEX_THREAD_DENIED		1
 #define ZBX_MUTEX_LOGGING_DENIED	2
-zbx_uint32_t get_thread_global_mutex_flag();
+zbx_uint32_t get_thread_global_mutex_flag(void);
 #endif
 
 #endif
