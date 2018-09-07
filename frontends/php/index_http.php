@@ -78,7 +78,6 @@ if ($http_user) {
 	catch (APIException $e) {
 		error($e->getMessage());
 	}
-
 }
 else {
 	error(_('Login name or password is incorrect.'));
