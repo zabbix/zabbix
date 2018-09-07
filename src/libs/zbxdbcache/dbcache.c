@@ -2731,7 +2731,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num, int *more)
+static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int sync_timeout, int *total_num, int *more)
 {
 	int			history_num;
 	time_t			sync_start, now;
@@ -2795,7 +2795,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && ZBX_SYNC_MORE == *more) || sync_type == ZBX_SYNC_FULL);
+	while (sync_timeout >= now - sync_start && ZBX_SYNC_MORE == *more);
 
 	zbx_vector_ptr_destroy(&history_items);
 }
@@ -2812,6 +2812,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
  *                               ZBX_SYNC_PARTIAL - normal sync               *
  *                               ZBX_SYNC_FULL - full sync, done at           *
  *                                              application exit              *
+ *             sync_timeout - [IN] the timeout in seconds
  *             total_num - [OUT] the number of synced values                  *
  *             more      - [OUT] a flag indicating the cache emptiness:       *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
@@ -2820,14 +2821,14 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
  * Comments: This function loops syncing history values by 1k batches and     *
  *           processing timer triggers by batches of 500 triggers.            *
  *           Unless full sync is being done the loop is aborted if either     *
- *           60 seconds has passed or there are no more data to process.      *
+ *           timeout has passed or there are no more data to process.         *
  *           The last is assumed when the following is true:                  *
  *            a) history cache is empty or less than 10% of batch values were *
  *               processed (the other items were locked by triggers)          *
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num, int *more)
+static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int sync_timeout, int *total_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -2835,13 +2836,11 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, txn_error, sync_timeout;
+					history_text_num, history_log_num, txn_error;
 	time_t				sync_start, now;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
-
-	sync_timeout = (ZBX_SYNC_FULL != sync_type ? ZBX_HC_SYNC_TIME_MAX : SEC_PER_YEAR);
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -3121,6 +3120,7 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 							/* cache are copied into to process triggers, trends */
 							/* etc and finally write into db */
 	zbx_binary_heap_t	tmp_history_queue;
+	int			sync_timeout;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -3141,7 +3141,6 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 		/*     should have quit by this point.                                                                */
 		/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
 		/*     stored in the shared memory.                                                                   */
-
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
@@ -3175,15 +3174,19 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 
 		if (0 == tmp_history_queue.elems_num)
 			goto out;
+
+		sync_timeout = SEC_PER_YEAR;
 	}
+	else
+		sync_timeout = ZBX_HC_SYNC_TIME_MAX;
 
 	if (NULL == history)
 		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		sync_server_history(history, sync_type, total_num, more);
+		sync_server_history(history, sync_type, sync_timeout, total_num, more);
 	else
-		sync_proxy_history(history, sync_type, total_num, more);
+		sync_proxy_history(history, sync_type, sync_timeout, total_num, more);
 out:
 	if (ZBX_SYNC_FULL == sync_type)
 	{
