@@ -1,6 +1,7 @@
 Changes for 4.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-4672] added option to show suppressed problems for data overview page and widget (agriscenko)
 A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 ..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
 ........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
@@ -8,6 +9,7 @@ A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+..F....... [ZBX-14797] fixed calendar initialization in graph configuration form (gcalenko, vmurzins)
 ........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14808] fixed SQL error in user permission check when processing actions for internal item events (wiper)
