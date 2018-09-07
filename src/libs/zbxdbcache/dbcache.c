@@ -3172,6 +3172,9 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 		UNLOCK_CACHE;
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
+
+		if (0 == tmp_history_queue.elems_num)
+			goto out;
 	}
 
 	if (NULL == history)
@@ -3181,7 +3184,7 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 		sync_server_history(history, sync_type, total_num, more);
 	else
 		sync_proxy_history(history, sync_type, total_num, more);
-
+out:
 	if (ZBX_SYNC_FULL == sync_type)
 	{
 		LOCK_CACHE;
