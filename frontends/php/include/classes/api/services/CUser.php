@@ -1157,6 +1157,22 @@ class CUser extends CApiService {
 			$config['authentication_type']
 		);
 
+		// Check if user is blocked.
+		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+			$time_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+
+			if ($time_left > 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
+				);
+			}
+
+			DB::update('users', [
+				'values' => ['attempt_clock' => time()],
+				'where' => ['userid' => $db_user['userid']]
+			]);
+		}
+
 		try {
 			switch ($group_to_auth_map[$db_user['gui_access']]) {
 				case ZBX_AUTH_LDAP:
@@ -1203,12 +1219,12 @@ class CUser extends CApiService {
 
 	/**
 	 * Method is ONLY for internal use!
-	 * Sign in user by alias. Return array with signed in user data.
+	 * Login user by alias. Return array with user data.
 	 *
-	 * @param array  $alias              User authentication data.
-	 * @param string $alias['user']      Authenticated user alias value.
-	 * @param string $alias['password']  Any string. Is used in sessionid generation.
-	 * @param bool   $api_call           Check is method called via API call or from local php file.
+	 * @param array  $user              User authentication data.
+	 * @param string $user['user']      Authenticated user alias value.
+	 * @param string $user['password']  Any string. Is used in sessionid generation.
+	 * @param bool   $api_call          Check is method called via API call or from local php file.
 	 *
 	 * @return array
 	 */
@@ -1503,23 +1519,6 @@ class CUser extends CApiService {
 		}
 
 		$db_user = reset($db_users);
-
-		// Check if user is blocked.
-		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$time_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
-
-			if ($time_left > 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
-				);
-			}
-
-			DB::update('users', [
-				'values' => ['attempt_clock' => time()],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-		}
-
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
 		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
