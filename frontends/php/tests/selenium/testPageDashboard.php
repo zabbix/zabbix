@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
+/**
+ * @backup profiles
+ */
 class testPageDashboard extends CWebTest {
 
 	public $graphCpu = 'CPU load';
@@ -187,6 +190,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
@@ -199,11 +203,12 @@ class testPageDashboard extends CWebTest {
 	 * @depends testPageDashboard_FullScreen
 	 */
 	public function testPageDashboard_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
 		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");

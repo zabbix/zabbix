@@ -191,6 +191,9 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
+// Maximum number of tags to display.
+define('ZBX_TAG_COUNT_DEFAULT', 3);
+
 define('ZBX_TCP_HEADER_DATA',		"ZBXD");
 define('ZBX_TCP_HEADER_VERSION',	"\1");
 define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
@@ -1707,9 +1710,6 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
-
-// Maximum number of tags to display in events list.
-define('EVENTS_LIST_TAGS_COUNT', 3);
 
 // Number of tags to display in Problems widget and Monitoring > Problems.
 define('PROBLEMS_SHOW_TAGS_NONE', 0);

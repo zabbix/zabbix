@@ -62,7 +62,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 */
 		// Checkbox to specify either relative dashboard time or widget's own time.
 		$field_time_mode = (new CWidgetFieldCheckBox('graph_time', _('Set custom time period')))
-			->setAction('jQuery("#time_from, #time_to, #time_from_dp, #time_to_dp")'.
+			->setAction('jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")'.
 							'.prop("disabled", !jQuery(this).is(":checked"));'
 			);
 		if (array_key_exists('graph_time', $this->data)) {
