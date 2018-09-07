@@ -2800,6 +2800,33 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int *tota
 	zbx_vector_ptr_destroy(&history_items);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: sync_server_history                                              *
+ *                                                                            *
+ * Purpose: flush history cache to database, process triggers of flushed      *
+ *          and timer triggers from timer queue                               *
+ *                                                                            *
+ * Parameters: history   - [IN] history buffer                                *
+ *             sync_type - [IN] the sync type:                                *
+ *                               ZBX_SYNC_PARTIAL - normal sync               *
+ *                               ZBX_SYNC_FULL - full sync, done at           *
+ *                                              application exit              *
+ *             total_num - [OUT] the number of synced values                  *
+ *             more      - [OUT] a flag indicating the cache emptiness:       *
+ *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
+ *                                ZBX_SYNC_MORE - more data to sync           *
+ *                                                                            *
+ * Comments: This function loops syncing history values by 1k batches and     *
+ *           processing timer triggers by batches of 500 triggers.            *
+ *           Unless full sync is being done the loop is aborted if either     *
+ *           60 seconds has passed or there are no more data to process.      *
+ *           The last is assumed when the following is true:                  *
+ *            a) history cache is empty or less than 10% of batch values were *
+ *               processed (the other items were locked by triggers)          *
+ *            b) less than 500 (full batch) timer triggers were processed     *
+ *                                                                            *
+ ******************************************************************************/
 static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *total_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
@@ -2886,7 +2913,6 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int *tot
 		}
 		else
 			history_num = 0;
-
 
 		if (0 != history_num)
 		{
