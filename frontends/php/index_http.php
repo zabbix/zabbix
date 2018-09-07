@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 CWebUser::disableSessionCookie();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$http_user = CWebUser::getHttpRemoteUser();
 $config = select_config();
+$redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 
 $request = getRequest('request', '');
 $test_request = [];
@@ -35,27 +35,49 @@ if (!array_key_exists('filename', $test_request) || !file_exists('./'.$test_requ
 	$request = '';
 }
 
-if ($http_user && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED && CWebUser::authenticateHttpUser()
-		&& !CWebUser::isGuest()) {
-	CWebUser::setSessionCookie(CWebUser::$data['sessionid']);
-	$redirect = array_filter([$request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
-	redirect(reset($redirect));
-
-	exit;
-}
-
-$redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
-
 if ($request !== '') {
 	$redirect_to->setArgument('request', $request);
 }
 
-if ($config['http_auth_enabled'] == ZBX_AUTH_HTTP_DISABLED) {
+if ($config['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED) {
 	redirect($redirect_to->toString());
 
 	exit;
 }
-elseif (!$http_user) {
+
+foreach (['PHP_AUTH_USER', 'REMOTE_USER', 'AUTH_USER'] as $key) {
+	if (array_key_exists($key, $_SERVER) && $_SERVER[$key] !== '') {
+		$http_user = $_SERVER[$key];
+		break;
+	}
+}
+
+if ($http_user) {
+	$parser = new CADNameAttributeParser(['strict' => true]);
+
+	if ($parser->parse($http_user) === CParser::PARSE_SUCCESS) {
+		$strip_domain = explode(',', $config['http_strip_domains']);
+		$strip_domain = array_map('trim', $strip_domain);
+
+		if ($strip_domain && in_array($parser->getDomainName(), $strip_domain)) {
+			$http_user = $parser->getUserName();
+		}
+	}
+
+	$user = API::getApiService('user')->loginHttp([
+		'user' => $http_user,
+		'password' => ''
+	], false);
+
+	if ($user) {
+		CWebUser::setSessionCookie($user['sessionid']);
+		$redirect = array_filter([$request, $user['url'], ZBX_DEFAULT_URL]);
+		redirect(reset($redirect));
+
+		exit;
+	}
+}
+else {
 	error(_('Login name or password is incorrect.'));
 }
 
