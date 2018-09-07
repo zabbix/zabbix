@@ -28,6 +28,15 @@ $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
 $page['scripts'] = ['layout.mode.js'];
 
+$hostId = getRequest('hostid', 0);
+
+if ($hostId > 0) {
+	CView::$has_web_layout_mode = true;
+	$page['web_layout_mode'] = CView::getLayoutMode();
+}
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
@@ -46,14 +55,6 @@ $fields = [
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
-
-$hostId = getRequest('hostid', 0);
-
-if ($hostId > 0) {
-	CView::$has_web_layout_mode = true;
-	$page['web_layout_mode'] = CView::getLayoutMode();
-}
-require_once dirname(__FILE__).'/include/page_header.php';
 
 /*
  * Permissions
