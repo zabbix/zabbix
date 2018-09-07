@@ -3142,9 +3142,15 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 		/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
 		/*     stored in the shared memory.                                                                   */
 
-		/* unlock all triggers before full sync so no items are locked by triggers */
+
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
+			/* unlock all triggers before full sync so no items are locked by triggers */
 			DCconfig_unlock_all_triggers();
+
+			/* clear timer trigger queue to avoid processing time triggers at exit */
+			zbx_dc_clear_timer_queue();
+		}
 
 		LOCK_CACHE;
 
