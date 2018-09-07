@@ -26,7 +26,6 @@ foreach ($data['maps'] as $map) {
 		new CLink($map['label'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'map.view')
 			->setArgument('sysmapid', $map['sysmapid'])
-			->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		),
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")

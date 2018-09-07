@@ -29,8 +29,7 @@ $table = (new CTableInfo())
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')
 	->setArgument('groupid', '')
-	->setArgument('hostid', '0')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('hostid', '0');
 
 foreach ($data['groups'] as $group) {
 	$url->setArgument('groupid', $group['groupid']);
