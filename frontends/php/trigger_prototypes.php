@@ -504,7 +504,7 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
-		'hostid' => getRequest('hostid', $discoveryRule['hostid']),
+		'hostid' => $discoveryRule['hostid'],
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
 		'tags' => getRequest('tags', []),

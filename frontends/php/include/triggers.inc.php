@@ -2367,8 +2367,7 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 			$db_triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'templateid'],
 				'selectHosts' => ['hostid'],
-				'triggerids' => array_keys($parent_triggerids),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+				'triggerids' => array_keys($parent_triggerids)
 			]);
 		}
 
@@ -2535,8 +2534,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag) {
 					$url = (new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('hostid', $template['hostid']);
+						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid']);
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {

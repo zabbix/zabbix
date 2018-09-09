@@ -857,6 +857,7 @@ function getItemParentTemplates(array $items, $flag) {
 		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
 			? $hostids[$parent_item['itemid']]
 			: 0;
+
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
 				? $lld_ruleids[$parent_item['itemid']]
@@ -910,7 +911,7 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
- * @return CLink|CSpan|null
+ * @return array|null
  */
 function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
