@@ -59,6 +59,11 @@ class CRangeControl extends CTextBox {
 		return $this;
 	}
 
+	public function setWidth($value) {
+		$this->options['width'] = $value;
+		return $this;
+	}
+
 	public function getPostJS() {
 		return 'jQuery("[name=\''.$this->getName().'\']").rangeControl();';
 	}

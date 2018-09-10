@@ -132,6 +132,7 @@ class CWidgetHelper {
 	public static function getRangeControl($field) {
 		return (new CRangeControl($field->getName(), (int) $field->getValue()))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setStep($field->getStep())
 			->setMin($field->getMin())
 			->setMax($field->getMax());
@@ -936,6 +937,7 @@ class CWidgetHelper {
 							->addRow(_('Width'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -943,6 +945,7 @@ class CWidgetHelper {
 							->addRow(_('Point size'),
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(1)
 									->setMax(10)
@@ -951,6 +954,7 @@ class CWidgetHelper {
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 										(int) $value['transparency'])
 									)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -958,6 +962,7 @@ class CWidgetHelper {
 							->addRow(_('Fill'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
