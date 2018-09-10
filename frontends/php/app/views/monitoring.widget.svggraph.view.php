@@ -43,7 +43,7 @@ if ($data['initial_load']) {
 	];
 }
 
-if (!$data['preview'] && ($messages = getMessages()) !== null) {
+if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }
 

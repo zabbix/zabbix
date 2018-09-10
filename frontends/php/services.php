@@ -44,8 +44,8 @@ $fields = [
 	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'trigger' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'new_service_time' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time_from' =>	[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
-	'new_service_time_till' =>	[T_ZBX_RANGE_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
+	'new_service_time_from' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
+	'new_service_time_till' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
 	'children' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'parentid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'parentname' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -168,10 +168,10 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 	$result = true;
 
 	if ($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-		$range_time_parser = new CRangeTimeParser();
+		$absolute_time_parser = new CAbsoluteTimeParser();
 
-		$range_time_parser->parse(getRequest('new_service_time_from'));
-		$new_service_time_from = $range_time_parser->getDateTime(true);
+		$absolute_time_parser->parse(getRequest('new_service_time_from'));
+		$new_service_time_from = $absolute_time_parser->getDateTime(true);
 
 		if (!validateDateInterval($new_service_time_from->format('Y'), $new_service_time_from->format('m'),
 				$new_service_time_from->format('d'))) {
@@ -179,8 +179,8 @@ elseif (hasRequest('add_service_time') && hasRequest('new_service_time')) {
 			error(_s('"%s" must be between 1970.01.01 and 2038.01.18.', _('From')));
 		}
 
-		$range_time_parser->parse(getRequest('new_service_time_till'));
-		$new_service_time_till = $range_time_parser->getDateTime(true);
+		$absolute_time_parser->parse(getRequest('new_service_time_till'));
+		$new_service_time_till = $absolute_time_parser->getDateTime(true);
 
 		if (!validateDateInterval($new_service_time_till->format('Y'), $new_service_time_till->format('m'),
 				$new_service_time_till->format('d'))) {

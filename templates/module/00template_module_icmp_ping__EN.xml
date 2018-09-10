@@ -11,7 +11,7 @@
       <template>
          <template>Template Module ICMP Ping</template>
          <name>Template Module ICMP Ping</name>
-         <description>Template Module ICMP Ping version: 0.14</description>
+         <description>Template Module ICMP Ping version: 0.15</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -29,7 +29,7 @@
                <snmp_community/>
                <snmp_oid/>
                <key>icmpping</key>
-               <delay>60</delay>
+               <delay>1m</delay>
                <history>1w</history>
                <trends>365d</trends>
                <status>0</status>
@@ -72,7 +72,7 @@
                <snmp_community/>
                <snmp_oid/>
                <key>icmppingloss</key>
-               <delay>60</delay>
+               <delay>1m</delay>
                <history>1w</history>
                <trends>365d</trends>
                <status>0</status>
@@ -113,7 +113,7 @@
                <snmp_community/>
                <snmp_oid/>
                <key>icmppingsec</key>
-               <delay>60</delay>
+               <delay>1m</delay>
                <history>1w</history>
                <trends>365d</trends>
                <status>0</status>
@@ -194,7 +194,7 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description/>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
@@ -216,18 +216,18 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <url/>
          <status>0</status>
          <priority>2</priority>
-         <description/>
+         <description>Last value: {ITEM.LASTVALUE1}.</description>
          <type>0</type>
          <manual_close>0</manual_close>
          <dependencies>
             <dependency>
-               <name>Unavailable by ICMP ping</name>
-               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+               <name>High ICMP ping loss</name>
+               <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
                <recovery_expression/>
             </dependency>
             <dependency>
-               <name>High ICMP ping loss</name>
-               <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+               <name>Unavailable by ICMP ping</name>
+               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
                <recovery_expression/>
             </dependency>
          </dependencies>

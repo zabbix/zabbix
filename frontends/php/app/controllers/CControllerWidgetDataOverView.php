@@ -30,7 +30,6 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'fullscreen' => 'in 0,1'
 		]);
 	}
 
@@ -41,8 +40,8 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
+			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
-			'fullscreen' => (bool) $this->getInput('fullscreen', false),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

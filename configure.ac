@@ -61,8 +61,8 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h)
+  execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
+  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -128,6 +128,11 @@ AC_CHECK_HEADERS(linux/netlink.h, [
 ], [], [
 #ifdef HAVE_SYS_SOCKET_H
 #  include <sys/socket.h>
+#endif
+])
+AC_CHECK_HEADERS(libperfstat.h, [], [], [
+#ifdef HAVE_SYS_PROTOSW_H
+#  include <sys/protosw.h>
 #endif
 ])
 
@@ -939,7 +944,8 @@ dnl *                                                               *
 dnl *****************************************************************
 
 AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
-AC_TRY_COMPILE([#include <libperfstat.h>],
+AC_TRY_COMPILE([#include <sys/protosw.h>
+#include <libperfstat.h>],
 [perfstat_memory_total_t	memstats;
 memstats.virt_active = 0;
 ],
@@ -948,7 +954,8 @@ AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(for libperfstat 5.3.0.60 fileset)
-AC_TRY_COMPILE([#include <libperfstat.h>],
+AC_TRY_COMPILE([#include <sys/protosw.h>
+#include <libperfstat.h>],
 [perfstat_partition_total_t	lparstats;
 lparstats.type.b.donate_enabled = 0;
 lparstats.idle_donated_purr = 0;

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))

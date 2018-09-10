@@ -30,19 +30,19 @@ $output = [
 	'body' => $form->toString()
 ];
 
-if(array_key_exists('jq_templates', $widget_view)) {
+if (array_key_exists('jq_templates', $widget_view)) {
 	foreach ($widget_view['jq_templates'] as $id => $jq_template) {
 		$output['body'] .= '<script type="text/x-jquery-tmpl" id="'.$id.'">'.$jq_template.'</script>';
 	}
 }
 
-if(array_key_exists('js_includes', $widget_view)) {
+if (array_key_exists('js_includes', $widget_view)) {
 	foreach ($widget_view['js_includes'] as $path) {
-		$output['body'] .= '<script src="'.$path.'"></script>'."\n";
+		$output['body'] .= '<script src="'.$path.'"></script>';
 	}
 }
 
-if(array_key_exists('scripts', $widget_view)) {
+if (array_key_exists('scripts', $widget_view)) {
 	$output['body'] .= get_js(implode("\n", $widget_view['scripts']));
 }
 

@@ -41,7 +41,7 @@ $scripts = [$field_itemids->getPostJS()];
 $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));
 
 // Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
 
 // Show text as HTML.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_as_html']),

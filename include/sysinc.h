@@ -289,6 +289,9 @@
 #endif
 
 #ifdef HAVE_LIBPERFSTAT
+#	ifdef HAVE_SYS_PROTOSW_H
+#		include <sys/protosw.h>		/* workaround for /usr/include/netinet/in6_var.h bug, see ZBX-6565 */
+#	endif
 #	include <libperfstat.h>
 #endif
 

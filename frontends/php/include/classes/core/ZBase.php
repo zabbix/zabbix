@@ -358,13 +358,7 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionid = CWebUser::getSessionCookie();
-
-		if ($sessionid === null) {
-			$sessionid = CWebUser::authenticateHttpUser();
-		}
-
-		$sessionid = CWebUser::checkAuthentication($sessionid);
+		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 
 		if (!$sessionid) {
 			CWebUser::setDefault();
@@ -403,7 +397,6 @@ class ZBase {
 				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
-				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();
 				$data['javascript']['pre'] = $view->getIncludedJS();
 				$data['javascript']['post'] = $view->getPostJS();

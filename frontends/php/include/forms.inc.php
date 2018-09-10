@@ -114,16 +114,6 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 	}
 
-	// authentication type
-	if ($data['user_groups']) {
-		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
-	}
-	else {
-		$data['auth_type'] = ($userId == 0)
-			? $config['authentication_type']
-			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
-	}
-
 	// set autologout
 	if ($data['autologin']) {
 		$data['autologout'] = '0';
@@ -2120,24 +2110,15 @@ function getTimeperiodForm(array $data) {
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-		if ($data['new_timeperiod_start_date'] === null) {
-			$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
-		}
-		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			if ($range_time_parser->parse($data['new_timeperiod_start_date']) == CParser::PARSE_SUCCESS) {
-				$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
-			}
-			else {
-				$new_timeperiod['start_date'] = $data['new_timeperiod_start_date'];
-			}
-		}
+		$new_timeperiod['start_date'] = ($data['new_timeperiod_start_date'] === null)
+			? date(ZBX_DATE_TIME, time())
+			: $data['new_timeperiod_start_date'];
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
 			(new CDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date']))
 				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		);
 	}

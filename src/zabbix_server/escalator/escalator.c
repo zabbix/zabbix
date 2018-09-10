@@ -359,8 +359,8 @@ int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 
 	result = DBselect(
 			"select hg.groupid from items i"
-			" join hosts_groups hg on hg.hostid = i.hostid"
-			" where i.utemid=" ZBX_FS_UI64,
+			" join hosts_groups hg on hg.hostid=i.hostid"
+			" where i.itemid=" ZBX_FS_UI64,
 			itemid);
 
 	while (NULL != (row = DBfetch(result)))

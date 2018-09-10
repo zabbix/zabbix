@@ -157,32 +157,6 @@ function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
 }
 
-/**
- * Get group authentication type.
- *
- * @param array $groupIds
- * @param int   $maxGuiAccess
- *
- * @return int
- */
-function getGroupAuthenticationType($groupIds, $maxGuiAccess = null) {
-	$config = select_config();
-
-	switch (getGroupsGuiAccess($groupIds, $maxGuiAccess)) {
-		case GROUP_GUI_ACCESS_SYSTEM:
-			return $config['authentication_type'];
-
-		case GROUP_GUI_ACCESS_INTERNAL:
-			return ZBX_AUTH_INTERNAL;
-
-		case GROUP_GUI_ACCESS_LDAP:
-			return ZBX_AUTH_LDAP;
-
-		default:
-			return $config['authentication_type'];
-	}
-}
-
 /***********************************************
 	GET ACCESSIBLE RESOURCES BY RIGHTS
 ************************************************/

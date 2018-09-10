@@ -73,14 +73,34 @@
 
 	function makeWidgetInfoBtns(btns) {
 		var info_btns = [];
+
 		if (btns.length) {
 			btns.each(function(btn) {
-				info_btns.push($('<button>', {'type': 'button', 'class': btn.icon, 'data-hintbox': 1}));
-				info_btns.push($('<div></div>').html(btn.hint).addClass('hint-box').hide());
+				info_btns.push(
+					$('<button>', {
+						'type': 'button',
+						'data-hintbox': 1,
+						'data-hintbox-static': 1
+					})
+						.addClass(btn.icon)
+				);
+				info_btns.push(
+					$('<div></div>')
+						.html(btn.hint)
+						.addClass('hint-box')
+						.hide()
+				);
 			});
 		}
 
 		return info_btns.length ? info_btns : null;
+	}
+
+	function removeWidgetInfoBtns($content_header) {
+		if ($content_header.find('[data-hintbox=1]').length) {
+			$content_header.find('[data-hintbox=1]').next('.hint-box').remove();
+			$content_header.find('[data-hintbox=1]').trigger('remove');
+		}
 	}
 
 	function resizeDashboardGrid($obj, data, min_rows) {
@@ -459,8 +479,6 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data = {
-			'fullscreen': data['options']['fullscreen'] ? 1 : 0,
-			'kioskmode': data['options']['kioskmode'] ? 1 : 0,
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -514,8 +532,9 @@
 
 				widget['content_footer'].html(resp.footer);
 
-				if (typeof(resp.info) !== 'undefined') {
-					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
+				removeWidgetInfoBtns(widget['content_header']);
+
+				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
 					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
 				}
 
@@ -829,7 +848,6 @@
 		});
 
 		var ajax_data = {
-			fullscreen: data['options']['fullscreen'] ? 1 : 0,
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
@@ -1034,8 +1052,6 @@
 	var	methods = {
 		init: function(options) {
 			var default_options = {
-				'fullscreen': false,
-				'kioskmode': false,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
@@ -1250,9 +1266,6 @@
 
 				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
-				if (data['options']['fullscreen']) {
-					url.setArgument('fullscreen', '1');
-				}
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}

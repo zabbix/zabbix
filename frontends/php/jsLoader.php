@@ -61,6 +61,7 @@ $availableJScripts = [
 	'multiselect.js' => '',
 	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
+	'layout.mode.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',

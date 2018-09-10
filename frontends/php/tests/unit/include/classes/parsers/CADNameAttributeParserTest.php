@@ -127,6 +127,15 @@ class CADNameAttributeParserTest extends PHPUnit_Framework_TestCase {
 				] + $should_be_unknown
 			],
 			[
+				'anna@comp', 0, $only_upn,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'anna@comp',
+					'user' => 'anna',
+					'domain' => 'comp',
+				] + $should_be_upn
+			],
+			[
 				'user@example.com', 0, $only_upn,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
