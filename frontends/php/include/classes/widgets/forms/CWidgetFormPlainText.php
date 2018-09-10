@@ -52,7 +52,7 @@ class CWidgetFormPlainText extends CWidgetForm {
 		$this->fields[$field_style->getName()] = $field_style;
 
 		// Number of records to display.
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
+		$field_lines = (new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
