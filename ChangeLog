@@ -1819,8 +1819,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.22rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
