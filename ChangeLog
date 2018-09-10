@@ -9,6 +9,7 @@ A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+..F....... [ZBXNEXT-4588] Fixed changelog adding more detailed description of features added in 4.0.0beta1; Fixed Data set widget field to be compatible with PHP versions affecting PHP bug #42355 (miks)
 ..F....... [ZBX-14797] fixed calendar initialization in graph configuration form (gcalenko, vmurzins)
 ........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
@@ -30,7 +31,10 @@ Bug fixes:
 Changes for 4.0.0beta1
 
 New features:
-A.F....... [ZBXNEXT-4588] implemented SVG graph widget (ashubin, gcalenko, miks, Sasha)
+..F....... [ZBXNEXT-4588] Implemented SVG graph generation (ashubin, gcalenko, miks, Sasha)
+..F....... [ZBXNEXT-4588] Implemented SVG graph widget with multiple new widget fields; Renamed existing graph widget to 'Classic graph'; Implemented vertical accordion; Added new UI controls for range control and overrides selection (miks, Sasha)
+A.F....... [ZBXNEXT-4588] Added option to store long widget field strings as array of short strings; Created class to resize the height of textarea field automatically (miks)
+A.F....... [ZBXNEXT-4588] Improved API validation; Extended time units functionality to allow negative values (miks, Sasha)
 A.F.I..... [ZBXNEXT-4573] added support of HTTP authentication as optional authentication mechanism (gcalenko, Ivo, vmurzins)
 A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
 ..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
