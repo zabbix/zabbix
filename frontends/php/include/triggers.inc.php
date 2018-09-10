@@ -708,7 +708,7 @@ function replace_template_dependencies($deps, $hostid) {
  * @param array  $trigger_options
  * @param array  $problem_options
  * @param int    $problem_options['min_severity']     (optional) Minimal problem severity.
- * @param int    $problem_options['show_suppressed']  (optional) Whether to show items with suppressed problems.
+ * @param int    $problem_options['show_suppressed']  (optional) Whether to show triggers with suppressed problems.
  * @param int    $problem_options['time_from']        (optional) The time starting from which the problems were created.
  *
  * @return array
@@ -781,7 +781,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param array $trigger_options                     API options. Array 'output' should contain 'value', option
  *                                                   'preservekeys' should be set to true.
  * @param array $problem_options
- * @param int   $problem_options['show_suppressed']  Whether to show items with suppressed problems.
+ * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
  *
