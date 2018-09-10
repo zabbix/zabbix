@@ -649,7 +649,7 @@ class CWidgetHelper {
 				[
 					'name' => _('ADD OVERRIDE'),
 					'options' => [
-						['name' => _('Base color'), 'callback' => 'addOverride', 'args' => ['color', '']],
+						['name' => _('Base colour'), 'callback' => 'addOverride', 'args' => ['color', '']],
 
 						['name' => _('Width').'/0', 'callback' => 'addOverride', 'args' => ['width', 0]],
 						['name' => _('Width').'/1', 'callback' => 'addOverride', 'args' => ['width', 1]],
@@ -922,7 +922,7 @@ class CWidgetHelper {
 					// Left column fields.
 					(new CDiv(
 						(new CFormList())
-							->addRow(_('Base color'),
+							->addRow(_('Base colour'),
 								(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
 									->appendColorPickerJs(false)
 							)
