@@ -479,8 +479,6 @@
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
 		ajax_data = {
-			'fullscreen': data['options']['fullscreen'] ? 1 : 0,
-			'kioskmode': data['options']['kioskmode'] ? 1 : 0,
 			'dashboardid': data['dashboard']['id'],
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
@@ -850,7 +848,6 @@
 		});
 
 		var ajax_data = {
-			fullscreen: data['options']['fullscreen'] ? 1 : 0,
 			dashboardid: data['dashboard']['id'], // can be undefined if dashboard is new
 			name: data['dashboard']['name'],
 			userid: data['dashboard']['userid'],
@@ -1055,8 +1052,6 @@
 	var	methods = {
 		init: function(options) {
 			var default_options = {
-				'fullscreen': false,
-				'kioskmode': false,
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
@@ -1271,9 +1266,6 @@
 
 				url.unsetArgument('sid');
 				url.setArgument('action', 'dashboard.view');
-				if (data['options']['fullscreen']) {
-					url.setArgument('fullscreen', '1');
-				}
 				if (current_url.getArgument('dashboardid')) {
 					url.setArgument('dashboardid', current_url.getArgument('dashboardid'));
 				}

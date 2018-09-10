@@ -41,8 +41,7 @@ $url_group = (new CUrl('zabbix.php'))
 	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 		? ZBX_PROBLEM_SUPPRESSED_TRUE
 		: null
-	)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	);
 $url_host = (new CUrl('zabbix.php'))
 	->setArgument('action', 'problem.view')
 	->setArgument('filter_set', 1)
@@ -53,8 +52,7 @@ $url_host = (new CUrl('zabbix.php'))
 	->setArgument('filter_show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
 		? ZBX_PROBLEM_SUPPRESSED_TRUE
 		: null
-	)
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	);
 
 foreach ($data['groups'] as $group) {
 	$problematic_count_key = ($data['filter']['ext_ack'] == EXTACK_OPTION_UNACK)

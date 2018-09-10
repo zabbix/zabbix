@@ -57,10 +57,10 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_items'))
 				->onClick("checkAll('".$form->getName()."', 'all_items', 'g_correlationid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'correlation.php'),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'])
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], 'correlation.php')
 	]);
 
 if ($data['correlations']) {

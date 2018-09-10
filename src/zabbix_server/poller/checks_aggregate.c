@@ -335,7 +335,7 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 	}
 
 	zbx_dc_get_nested_hostgroupids_by_names(group_names.values, group_names.values_num, &groupids);
-	zbx_vector_str_clear_ext(&group_names, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&group_names, zbx_str_free);
 	zbx_vector_str_destroy(&group_names);
 
 	if (0 == groupids.values_num)

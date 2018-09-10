@@ -17,24 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
 
-#include "zbxalgo.h"
-#include "vectorimpl.h"
+jQuery(function($) {
+	var $layout_mode_btn = $('.layout-mode');
 
-ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
-ZBX_PTR_VECTOR_IMPL(str, char *)
-ZBX_PTR_VECTOR_IMPL(ptr, void *)
-ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t)
-ZBX_VECTOR_IMPL(uint64_pair, zbx_uint64_pair_t)
+	if ($layout_mode_btn.length) {
+		$layout_mode_btn.on('click', function(e) {
+			e.stopPropagation();
+			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
+				location.reload();
+			});
+		});
 
-void	zbx_ptr_free(void *data)
-{
-	zbx_free(data);
-}
-
-void	zbx_str_free(char *data)
-{
-	zbx_free(data);
-}
+		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($layout_mode_btn.data('timer'));
+				$layout_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$layout_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
+		}
+	}
+});

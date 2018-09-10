@@ -193,6 +193,9 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ZBX_SORT_UP',	'ASC');
 define('ZBX_SORT_DOWN',	'DESC');
 
+// Maximum number of tags to display.
+define('ZBX_TAG_COUNT_DEFAULT', 3);
+
 define('ZBX_TCP_HEADER_DATA',		"ZBXD");
 define('ZBX_TCP_HEADER_VERSION',	"\1");
 define('ZBX_TCP_HEADER',			ZBX_TCP_HEADER_DATA.ZBX_TCP_HEADER_VERSION);
@@ -1251,6 +1254,12 @@ define('DAY_IN_YEAR', 365);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+// Layout
+define('ZBX_LAYOUT_NORMAL',     0);
+define('ZBX_LAYOUT_FULLSCREEN', 1);
+define('ZBX_LAYOUT_KIOSKMODE',  2);
+define('ZBX_LAYOUT_MODE', 'layout-mode');
+
 // input fields
 define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
@@ -1704,9 +1713,6 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
-
-// Maximum number of tags to display in events list.
-define('EVENTS_LIST_TAGS_COUNT', 3);
 
 // Number of tags to display in Problems widget and Monitoring > Problems.
 define('PROBLEMS_SHOW_TAGS_NONE', 0);
