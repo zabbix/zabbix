@@ -43,7 +43,7 @@ class CSvgGraphArea extends CSvgGraphLine {
 				'stroke-width' => 0
 			],
 			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'fill-opacity' => $this->options['fill']  * 0.1,
+				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color']
 			]
 		];

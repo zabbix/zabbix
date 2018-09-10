@@ -76,7 +76,6 @@ class CSvgTag extends CTag {
 		return parent::addItem($value);
 	}
 
-
 	/**
 	 * Set axis container size.
 	 *

@@ -29,7 +29,7 @@ class CSvgLine extends CSvgTag {
 		$this->setAttribute('x2', $x2);
 		$this->setAttribute('y2', $y2);
 
-		if ($color) {
+		if ($color !== null) {
 			$this->setAttribute('stroke', $color);
 		}
 	}

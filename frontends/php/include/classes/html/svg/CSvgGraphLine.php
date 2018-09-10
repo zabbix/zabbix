@@ -28,7 +28,6 @@ class CSvgGraphLine extends CSvgPath {
 	protected $units;
 	protected $host;
 	protected $options;
-	protected $line_values;
 	protected $add_label;
 
 	protected $position_x = 0;
@@ -63,7 +62,7 @@ class CSvgGraphLine extends CSvgPath {
 			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE)
 			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
 
-		$line_style = $this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : [];
+		$line_style = ($this->options['type'] == SVG_GRAPH_TYPE_LINE) ? ['stroke-linejoin' => 'round'] : [];
 
 		return [
 			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_LINE => [
@@ -84,10 +83,6 @@ class CSvgGraphLine extends CSvgPath {
 		return $this;
 	}
 
-	public function addLineValue($value) {
-		$this->line_values .= ($this->line_values === '') ? $value : ','.$value;
-	}
-
 	public function setSize($width, $height) {
 		$this->width = $width;
 		$this->height = $height;
@@ -97,21 +92,16 @@ class CSvgGraphLine extends CSvgPath {
 
 	protected function draw() {
 		$last_point = [0, 0];
+
 		foreach ($this->path as $i => $point) {
 			if ($i == 0) {
 				$this->moveTo($point[0], $point[1]);
-				if ($this->add_label) {
-					$this->addLineValue($point[2]);
-				}
 			}
 			else {
 				if ($this->options['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
 					$this->lineTo($point[0], $last_point[1]);
 				}
 				$this->lineTo($point[0], $point[1]);
-				if ($this->add_label) {
-					$this->addLineValue($point[2]);
-				}
 			}
 			$last_point = $point;
 		}
@@ -119,7 +109,16 @@ class CSvgGraphLine extends CSvgPath {
 
 	public function toString($destroy = true) {
 		$this->draw();
-		$this->setAttribute('data-label', $this->line_values !== '' ? $this->line_values : null);
+
+		if ($this->add_label && $this->path) {
+			$line_values = '';
+
+			foreach ($this->path as $point) {
+				$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+			}
+
+			$this->setAttribute('data-label', $line_values);
+		}
 
 		return parent::toString($destroy);
 	}

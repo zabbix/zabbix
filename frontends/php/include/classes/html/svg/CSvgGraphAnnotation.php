@@ -117,11 +117,11 @@ class CSvgGraphAnnotation extends CSvgTag {
 			(new CSvgPolygon([
 				[$this->x, $y + 1],
 				[$this->x - $offset, $y + 5],
-				[$this->x + $offset, $y + 5],
+				[$this->x + $offset, $y + 5]
 			]))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW)
 				->setAttribute('x', $this->x - $offset)
 				->setAttribute('width', $arrow_width)
-				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW)
 				->setAttribute('data-info', $this->data_info)
 		];
 	}
@@ -148,7 +148,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 			(new CSvgRect($this->x, $this->y, $this->width, $this->height))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_BOX),
 			$end_line,
-			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width , 4))
+			(new CSvgRect($this->x, $this->y + $this->height + 1, $this->width, 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_HANDLE)
 				->setAttribute('data-info', $this->data_info)
 		];
