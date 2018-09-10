@@ -1927,12 +1927,35 @@ static int	DBpatch_3050155(void)
 
 static int	DBpatch_3050156(void)
 {
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from widget_field"
+		" where (name like 'ds.order.%%' or name like 'or.order.%%')"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='svggraph'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050157(void)
+{
 	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("users", &field, NULL);
 }
 
-static int	DBpatch_3050157(void)
+static int	DBpatch_3050158(void)
 {
 	int res;
 
@@ -1943,6 +1966,7 @@ static int	DBpatch_3050157(void)
 
 	return SUCCEED;
 }
+
 #endif
 
 DBPATCH_START(3050)
@@ -2103,6 +2127,7 @@ DBPATCH_ADD(3050154, 0, 1)
 DBPATCH_ADD(3050155, 0, 1)
 DBPATCH_ADD(3050156, 0, 1)
 DBPATCH_ADD(3050157, 0, 1)
+DBPATCH_ADD(3050158, 0, 1)
 
 DBPATCH_END()
 

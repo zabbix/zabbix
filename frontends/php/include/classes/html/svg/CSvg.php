@@ -25,7 +25,7 @@ class CSvg extends CSvgTag {
 		parent::__construct('svg', true);
 
 		$this
-			->setAttribute('id', uniqid('svg_'))
+			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
 			->setAttribute('version', '1.1')
 			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
 			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');

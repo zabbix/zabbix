@@ -27,17 +27,18 @@ class CSvgGraphHelper {
 	/**
 	 * Calculate graph data and draw SVG graph based on given graph configuration.
 	 *
-	 * @param array $options					Options for graph.
-	 * @param array $options[data_sets]			Graph data set options.
-	 * @param array $options[problems]			Graph problems options.
-	 * @param array $options[overrides]			Graph problems options.
-	 * @param array $options[data_source]		Data source of graph.
-	 * @param array $options[time_period]		Graph time period used.
-	 * @param bool  $options[dashboard_time]	True if dashboard time is used.
-	 * @param array $options[left_y_axis]		Options for graph left Y axis.
-	 * @param array $options[right_y_axis]		Options for graph right Y axis.
-	 * @param array $options[x_axis]			Options for graph X axis.
-	 * @param array $options[legend]			Options for graph legend.
+	 * @param array  $options                     Options for graph.
+	 * @param array  $options['data_sets']        Graph data set options.
+	 * @param int    $options['data_source']      Data source of graph.
+	 * @param bool   $options['dashboard_time']   True if dashboard time is used.
+	 * @param array  $options['time_period']      Graph time period used.
+	 * @param array  $options['left_y_axis']      Options for graph left Y axis.
+	 * @param array  $options['right_y_axis']     Options for graph right Y axis.
+	 * @param array  $options['x_axis']           Options for graph X axis.
+	 * @param array  $options['legend']           Options for graph legend.
+	 * @param int    $options['legend_lines']     Number of lines in the legend.
+	 * @param array  $options['problems']         Graph problems options.
+	 * @param array  $options['overrides']        Graph override options.
 	 *
 	 * @return array
 	 */
@@ -60,7 +61,7 @@ class CSvgGraphHelper {
 		$problems_options = array_key_exists('problems', $options) ? $options['problems'] : [];
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
-		$legend_height = $options['legend'] ? $options['legend_lines'] * 18 : 0;
+		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
 
 		foreach ($metrics as &$metric) {
 			$resolved = CMacrosResolverHelper::resolveItemNames([[
@@ -81,22 +82,16 @@ class CSvgGraphHelper {
 			->setSize($width, $height - $legend_height)
 			->addMetrics($metrics);
 
-		// SBox available only for graphs without overriten relative time.
-		if (array_key_exists('dashboard_time', $options) && $options['dashboard_time']) {
-			$graph->addSBox();
-		}
-
-		// Add mouse following helper line.
-		$graph->addHelper();
-
 		// Get problems to display in graph.
-		if ($problems_options) {
-			$problems_options['itemids_only'] = (array_key_exists('graph_item_problems_only', $problems_options)
-					&& $problems_options['graph_item_problems_only'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-				? zbx_objectValues($metrics, 'itemid')
-				: null;
+		if ($problems_options['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
+			$problems_options['itemids_only'] =
+				($problems_options['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
+					? zbx_objectValues($metrics, 'itemid')
+					: null;
 
-			$graph->addProblems(self::getProblems($problems_options, $options['time_period']));
+			$problems = self::getProblems($problems_options, $options['time_period']);
+			CArrayHelper::sort($problems, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+			$graph->addProblems($problems);
 		}
 
 		if ($legend_height > 0) {
@@ -117,8 +112,19 @@ class CSvgGraphHelper {
 			$legend = '';
 		}
 
+		// Draw graph.
+		$graph->draw();
+
+		// SBox available only for graphs without overriten relative time.
+		if ($options['dashboard_time']) {
+			$graph->addSBox();
+		}
+
+		// Add mouse following helper line.
+		$graph->addHelper();
+
 		return [
-			'svg' => $graph->draw(),
+			'svg' => $graph,
 			'legend' => $legend,
 			'data' => [
 				'dims' => [
@@ -283,7 +289,7 @@ class CSvgGraphHelper {
 		];
 
 		// Find triggers involved.
-		if (array_key_exists('problemhosts', $problem_options)) {
+		if ($problem_options['problemhosts'] !== '') {
 			$problem_hosts = API::Host()->get([
 				'output' => [],
 				'selectTriggers' => ['triggerid'],
@@ -321,21 +327,22 @@ class CSvgGraphHelper {
 		}
 
 		// Add severity filter.
-		if (array_key_exists('severities', $problem_options)) {
+		$filter_severities = implode(',', $problem_options['severities']);
+		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
+
+		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
 			$options['severities'] = $problem_options['severities'];
 		}
 
 		// Add problem name filter.
-		if (array_key_exists('problem_name', $problem_options)) {
+		if ($problem_options['problem_name'] !== '') {
 			$options['searchWildcardsEnabled'] = true;
 			$options['search']['name'] = $problem_options['problem_name'];
 		}
 
 		// Add tags filter.
-		if (array_key_exists('tags', $problem_options)) {
-			if (array_key_exists('evaltype', $problem_options)) {
-				$options['evaltype'] = $problem_options['evaltype'];
-			}
+		if ($problem_options['tags']) {
+			$options['evaltype'] = $problem_options['evaltype'];
 			$options['tags'] = $problem_options['tags'];
 		}
 
@@ -364,9 +371,8 @@ class CSvgGraphHelper {
 	/**
 	 * Select metrics from given data set options. Apply data set options to each selected metric.
 	 */
-	protected static function getMetrics(array &$metrics = [], array $data_sets = []) {
+	protected static function getMetrics(array &$metrics, array $data_sets = []) {
 		$data_set_num = 0;
-		$metrics = [];
 
 		if (!$data_sets) {
 			return;
@@ -376,8 +382,8 @@ class CSvgGraphHelper {
 			$data_set = $data_sets[$data_set_num];
 			$data_set_num++;
 
-			if ((!array_key_exists('hosts', $data_set) || $data_set['hosts'] === '')
-					|| (!array_key_exists('items', $data_set) || $data_set['items'] === '')) {
+			if ((!array_key_exists('hosts', $data_set) || !$data_set['hosts'])
+					|| (!array_key_exists('items', $data_set) || !$data_set['items'])) {
 				continue;
 			}
 
@@ -449,10 +455,6 @@ class CSvgGraphHelper {
 			}
 		}
 		while (SVG_GRAPH_MAX_NUMBER_OF_METRICS > count($metrics) && array_key_exists($data_set_num, $data_sets));
-
-		CArrayHelper::sort($metrics, ['name']);
-
-		return $metrics;
 	}
 
 	/**
@@ -539,6 +541,24 @@ class CSvgGraphHelper {
 				foreach ($metrics_matched as $i => $metric_num) {
 					$metric = &$metrics[$metric_num];
 					$metric['options'] = $override + $metric['options'] + ($colors ? ['color' => $colors[$i]] : []);
+
+					// Fix missing options if draw type has changed.
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('fill', $metric['options'])) {
+						$metric['options']['fill'] = SVG_GRAPH_DEFAULT_FILL;
+					}
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('missingdatafunc', $metric['options'])) {
+						$metric['options']['missingdatafunc'] = SVG_GRAPH_MISSING_DATA_NONE;
+					}
+					if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('pointsize', $metric['options'])) {
+						$metric['options']['pointsize'] = SVG_GRAPH_DEFAULT_POINTSIZE;
+					}
+					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+							&& !array_key_exists('width', $metric['options'])) {
+						$metric['options']['width'] = SVG_GRAPH_DEFAULT_WIDTH;
+					}
 				}
 				unset($metric);
 			}
@@ -561,14 +581,13 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Make array of patterns from given comma separated patterns string.
+	 * Prepare an array to be used for hosts/items filtering.
 	 *
-	 * @param string   $patterns		String containing comma separated patterns.
+	 * @param array   $patterns  Array containing hosts/items patterns.
 	 *
-	 * @return array   Returns array of patterns or NULL if '*' used, thus all database records are valid.
+	 * @return mixed|array  Returns array of patterns or NULL if all tested hosts/items are valid.
 	 */
-	protected static function processPattern($patterns) {
-		$patterns = explode(',', $patterns);
+	protected static function processPattern(array $patterns) {
 		$patterns = array_keys(array_flip($patterns));
 
 		foreach ($patterns as &$pattern) {
@@ -579,6 +598,10 @@ class CSvgGraphHelper {
 			}
 		}
 		unset($pattern);
+
+		if ($patterns !== null) {
+			$patterns = array_filter($patterns);
+		}
 
 		return $patterns;
 	}

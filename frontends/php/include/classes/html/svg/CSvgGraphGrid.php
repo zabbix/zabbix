@@ -30,6 +30,8 @@ class CSvgGraphGrid extends CSvgTag {
 	protected $width = 0;
 	protected $height = 0;
 
+	protected $color;
+
 	public function __construct(array $points_value = [], array $points_time = []) {
 		parent::__construct('g', true);
 
@@ -43,7 +45,7 @@ class CSvgGraphGrid extends CSvgTag {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_GRID.' path' => [
 				'stroke-dasharray' => '2,2',
-				'stroke' => 'rgba(120,120,120,.5)'
+				'stroke' => $this->color
 			]
 		];
 	}
@@ -51,6 +53,19 @@ class CSvgGraphGrid extends CSvgTag {
 	public function setPosition($x, $y) {
 		$this->position_x = $x;
 		$this->position_y = $y;
+
+		return $this;
+	}
+
+	/**
+	 * Set color.
+	 *
+	 * @param string $color  Color value.
+	 *
+	 * @return CSvgGraphGrid
+	 */
+	public function setColor($color) {
+		$this->color = $color;
 
 		return $this;
 	}
