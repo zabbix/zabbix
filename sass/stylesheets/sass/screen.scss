@@ -5635,7 +5635,7 @@ svg {
 .list-vertical-accordion {
 	display: table;
 	padding-left: 15px;
-	width: 100%;
+	width: calc(100% - 15px);
 
 	.list-accordion-item {
 		display: table-row;
@@ -6239,7 +6239,9 @@ input[type=text].range-control {
 	padding: 10px 0px;
 
 	> .tabs-nav {
-		padding-left: calc(15% + 20px);
+		padding-left: calc(15% + 10px);
+		margin-right: 0;
+		margin-left: 0;
 	}
 }
 

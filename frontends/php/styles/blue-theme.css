@@ -3926,7 +3926,7 @@ svg {
 .list-vertical-accordion {
   display: table;
   padding-left: 15px;
-  width: 100%; }
+  width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
     display: table-row; }
   .list-vertical-accordion .list-accordion-item-closed {
@@ -4441,7 +4441,9 @@ input[type=text].range-control {
 .graph-widget-config-tabs {
   padding: 10px 0px; }
   .graph-widget-config-tabs > .tabs-nav {
-    padding-left: calc(15% + 20px); }
+    padding-left: calc(15% + 10px);
+    margin-right: 0;
+    margin-left: 0; }
 
 .inline-sr-only {
   font-size: 0; }
