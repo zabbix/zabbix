@@ -219,7 +219,7 @@ $form_tabs = (new CTabView())
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea", updateGraphPreview);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea, select", updateGraphPreview);';
 
 return [
 	'form' => $form,

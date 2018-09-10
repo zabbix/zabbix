@@ -293,7 +293,7 @@ class CSvgGraph extends CSvg {
 		if ($options['max'] !== '') {
 			$this->left_y_max = $options['max'];
 		}
-		if ($options['units'] !== '') {
+		if ($options['units'] !== null) {
 			$this->left_y_units = $options['units'];
 		}
 
@@ -320,7 +320,7 @@ class CSvgGraph extends CSvg {
 		if ($options['max'] !== '') {
 			$this->right_y_max = $options['max'];
 		}
-		if ($options['units'] !== '') {
+		if ($options['units'] !== null) {
 			$this->right_y_units = $options['units'];
 		}
 

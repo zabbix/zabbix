@@ -66,7 +66,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'max' => ($fields['lefty_max'] !== '')
 					? convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
 					: '',
-				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) ? $fields['lefty_static_units'] : ''
+				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
+					? $fields['lefty_static_units']
+					: null
 			],
 			'right_y_axis' => [
 				'show' => $fields['righty'],
@@ -78,7 +80,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 					: '',
 				'units' => ($fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
 					? $fields['righty_static_units']
-					: ''
+					: null
 			],
 			'x_axis' => [
 				'show' => $fields['axisx']
