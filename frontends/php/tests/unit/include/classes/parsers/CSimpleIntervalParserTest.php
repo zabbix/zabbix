@@ -77,6 +77,13 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'3550w', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '3550w'
+				]
+			],
+			[
 				'{$M}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -95,6 +102,20 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
+				]
+			],
+			[
+				'-2w', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-2w'
+				]
+			],
+			[
+				'-3600', 0, ['negative' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '-3600'
 				]
 			],
 			// partial success
@@ -213,6 +234,13 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				' 10s', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'-10s', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

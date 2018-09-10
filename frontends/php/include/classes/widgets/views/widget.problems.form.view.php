@@ -114,7 +114,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
 );
 
 // Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
 
 $form->addItem($form_list);
 
