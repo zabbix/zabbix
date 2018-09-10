@@ -152,16 +152,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$update = hasRequest('userid');
 	$usrgrps = getRequest('user_groups', []);
 
-	// authentication type
-	if ($usrgrps) {
-		$authType = getGroupAuthenticationType($usrgrps, GROUP_GUI_ACCESS_INTERNAL);
-	}
-	else {
-		$authType = $update
-			? getUserAuthenticationType(getRequest('userid'), GROUP_GUI_ACCESS_INTERNAL)
-			: $config['authentication_type'];
-	}
-
 	// password validation
 	if (getRequest('password1', '') != getRequest('password2', '')) {
 		show_error_message($update

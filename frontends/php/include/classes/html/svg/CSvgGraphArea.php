@@ -21,9 +21,12 @@
 
 class CSvgGraphArea extends CSvgGraphLine {
 
-	public function __construct($path, $metric) {
+	protected $y_zero;
+
+	public function __construct($path, $metric, $y_zero = 0) {
 		parent::__construct($path, $metric);
 
+		$this->y_zero = $y_zero;
 		$this->add_label = false;
 		$this->options = $metric['options'] + [
 			'fill' => 5
@@ -53,8 +56,8 @@ class CSvgGraphArea extends CSvgGraphLine {
 			$first_point = reset($this->path);
 			$last_point = end($this->path);
 			$this
-				->lineTo($last_point[0], $this->position_y + $this->height)
-				->lineTo($first_point[0], $this->position_y + $this->height)
+				->lineTo($last_point[0], $this->y_zero)
+				->lineTo($first_point[0], $this->y_zero)
 				->closePath();
 		}
 

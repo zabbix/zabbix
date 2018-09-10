@@ -216,6 +216,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-min')]");
+		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");

@@ -472,7 +472,6 @@ var hintBox = {
 							target.data('hintbox-style')
 						);
 					}
-
 					break;
 
 				case 'click':

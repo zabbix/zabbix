@@ -78,7 +78,7 @@ class CSvgGraphPoints extends CSvgGroup {
 			->setAttribute('data-metric', $this->item_name)
 			->setAttribute('data-color', $this->options['color'])
 			->addItem(
-				(new CSvgCircle(-10, -10, $this->options['pointsize'] + 2))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+				(new CSvgCircle(-10, -10, $this->options['pointsize'] + 4))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 			)
 			->draw();
 

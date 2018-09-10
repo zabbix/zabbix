@@ -79,33 +79,40 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Application'), [
-				(new CTextBox('application', $data['filter']['application']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus'),
-				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('application_name', _('Select')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('return PopUp("popup.generic",'.
-						CJs::encodeJson([
-							'srctbl' => 'applications',
-							'srcfld1' => 'name',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'application',
-							'real_hosts' => '1',
-							'with_applications' => '1'
-						]).', null, this);'
+			(new CFormList())
+				->addRow(_('Application'), [
+					(new CTextBox('application', $data['filter']['application']))
+						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+						->setAttribute('autofocus', 'autofocus'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('application_name', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('return PopUp("popup.generic",'.
+							CJs::encodeJson([
+								'srctbl' => 'applications',
+								'srcfld1' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'application',
+								'real_hosts' => '1',
+								'with_applications' => '1'
+							]).', null, this);'
+						)
+				])
+				->addRow(_('Show suppressed problems'),
+					(new CCheckBox('show_suppressed'))->setChecked(
+						$data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE
 					)
-			])
+				)
 		])
 	);
-
 }
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
 	$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
-	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style']);
+	$table = getItemsDataOverview($groupids, $data['filter']['application'], $data['view_style'],
+		$data['filter']['show_suppressed']
+	);
 }
 else {
 	$table = new CTableInfo();
