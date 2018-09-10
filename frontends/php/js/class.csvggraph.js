@@ -159,7 +159,7 @@ jQuery(function ($) {
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				label = formatTimestamp(seconds, false, true)
-					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+					+ (seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
 
 			stxt
 				.text(label)

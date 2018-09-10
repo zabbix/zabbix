@@ -109,19 +109,18 @@ $tranStrings = [
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
 		'Add a new widget' => _('Add a new widget'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
-		'%1$s, selected' => _x('%1$s, selected', 'screen reader'),
-		'time shift' => _('time shift'),
-		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
-		'Close' => _('Close'),
+		'S_CLOSE' => _('Close'),
 		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation')
+		'Execution confirmation' => _('Execution confirmation'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
 	],
 	'class.calendar.js' => [
-		'S_Calendar' => _('Calendar'),
+		'S_CALENDAR' => _('Calendar'),
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
@@ -161,7 +160,6 @@ $tranStrings = [
 		'S_IMAGE' => _('Image'),
 		'S_DEFAULT' => _('Default'),
 		'S_PLEASE_SELECT_TWO_ELEMENTS' => _('Please select two elements'),
-		'S_DOT' => _('Dot'),
 		'S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED' => _('Two map elements should be selected'),
 		'S_DELETE_SELECTED_ELEMENTS_Q' => _('Delete selected elements?'),
 		'S_DELETE_SELECTED_SHAPES_Q' => _('Delete selected shapes?'),
@@ -184,7 +182,6 @@ $tranStrings = [
 	'class.cmessages.js' => [
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
-		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze')
 	],
@@ -194,7 +191,7 @@ $tranStrings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
-		'Close' => _('Close')
+		'S_CLOSE' => _('Close')
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
@@ -214,12 +211,8 @@ $tranStrings = [
 	],
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
-		'Access denied' => _('Access denied'),
-		'Cancel' => _('Cancel'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
-		'Dashboard sharing' => _('Dashboard sharing'),
-		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
 		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
@@ -243,17 +236,16 @@ $tranStrings = [
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
-		'Update' => _('Update'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'No refresh' => _('No refresh'),
-		'You need permission to perform this action!' => _('You need permission to perform this action!'),
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
-		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
+		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
 	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
@@ -271,8 +263,22 @@ $tranStrings = [
 		'Add multiple maps' => _('Add multiple maps')
 	],
 	'colorpicker.js' => [
-		'color' => _('colour'),
-		'Close' => _('Close')
+		'S_CLOSE' => _('Close')
+	],
+	'class.coverride.js' => [
+		'S_COLOR' => _('colour'),
+		'S_TIME_SHIFT' => _('time shift')
+	],
+	'class.cverticalaccordion.js' => [
+		'S_EXPAND' => _('Expand'),
+		'S_COLLAPSE' => _('Collapse')
+	],
+	'class.csvggraph.js' => [
+		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short')
+	],
+	'common.js' => [
+		'Cancel' => _('Cancel')
 	]
 ];
 

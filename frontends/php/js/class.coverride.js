@@ -39,7 +39,7 @@ jQuery(function ($) {
 		if (option === 'color') {
 			var id = field_name.replace(/\]/g, '_').replace(/\[/g, '_'),
 				input = $('<input>')
-					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('color')})
+					.attr({'name': field_name, 'type': 'text', 'maxlength': 6, 'id': id, 'placeholder': t('S_COLOR')})
 					.val(value);
 
 			return $('<div></div>')
@@ -53,7 +53,7 @@ jQuery(function ($) {
 						'name': field_name,
 						'maxlength': 10,
 						'type': 'text',
-						'placeholder': t('time shift')
+						'placeholder': t('S_TIME_SHIFT')
 					})
 					.val(value)
 				)

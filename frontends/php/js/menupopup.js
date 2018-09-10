@@ -514,7 +514,7 @@ function getMenuPopupRefresh(options) {
 						if (link.data('value') == currentRate) {
 							link
 								.addClass('selected')
-								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 						}
 						else {
 							link
@@ -545,7 +545,7 @@ function getMenuPopupRefresh(options) {
 								if (link.data('value') == currentRate) {
 									link
 										.addClass('selected')
-										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 								}
 								else {
 									link
@@ -1310,7 +1310,7 @@ jQuery(function($) {
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {
