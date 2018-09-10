@@ -208,7 +208,7 @@ $form_tabs = (new CTabView())
 	->addTab('display_options',  _('Display options'), $tab_display_opt)
 	->addTab('time_period',  _('Time period'), $tab_time_period)
 	->addTab('axes',  _('Axes'), $tab_axes)
-	->addTab('legend',  _('Legend'), $tab_legend)
+	->addTab('legendtab',  _('Legend'), $tab_legend)
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
