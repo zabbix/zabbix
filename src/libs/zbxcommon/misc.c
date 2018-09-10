@@ -2125,7 +2125,7 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == xdigits && 0 < colons)
 			{
-				/* consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeros are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
 			}

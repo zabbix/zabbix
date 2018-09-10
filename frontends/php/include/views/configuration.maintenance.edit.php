@@ -83,7 +83,7 @@ foreach ($data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
 			? $timeperiod['start_date']
-			: shedule2str($timeperiod),
+			: schedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol(
 			new CHorList([

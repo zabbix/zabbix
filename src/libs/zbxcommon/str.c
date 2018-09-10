@@ -400,7 +400,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 /******************************************************************************
  *                                                                            *
- * Function: del_zeroes                                                       *
+ * Function: del_zeros                                                       *
  *                                                                            *
  * Purpose: delete all right '0' and '.' for the string                       *
  *                                                                            *
@@ -413,7 +413,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void	del_zeroes(char *s)
+void	del_zeros(char *s)
 {
 	int     i;
 
