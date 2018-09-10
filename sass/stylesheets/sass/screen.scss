@@ -5611,6 +5611,14 @@ svg {
 	}
 }
 
+.list-accordion-foot,
+.overrides-foot {
+	& > div {
+		display: table-cell;
+		padding-top: 10px;
+	}
+}
+
 .color-preview-box {
 	height: 24px;
 	width: 24px;

@@ -604,8 +604,7 @@ class CWidgetHelper {
 				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('override-add')
-			))
-				->addStyle('display: table-cell; padding-top: 10px;'),
+			)),
 			'overrides-foot'
 		);
 
@@ -1055,8 +1054,7 @@ class CWidgetHelper {
 				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('dataset-add')
-			))
-				->addStyle('display: table-cell; padding-top: 10px;'),
+			)),
 			ZBX_STYLE_LIST_ACCORDION_FOOT
 		);
 
