@@ -294,7 +294,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_legend->getName()] = $field_legend;
 
 		// Number of lines.
-		$field_legend_lines = (new CWidgetFieldRangeControl('legend_lines', _('Number of lines'),
+		$field_legend_lines = (new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
 			SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
 		))
 			->setDefault(SVG_GRAPH_LEGEND_LINES_MIN);
