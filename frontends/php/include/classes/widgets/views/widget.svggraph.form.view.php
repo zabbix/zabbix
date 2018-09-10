@@ -224,11 +224,5 @@ $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea",
 return [
 	'form' => $form,
 	'scripts' => $scripts,
-	'js_includes' => [
-		'js/class.coverride.js',
-		'js/class.cverticalaccordion.js',
-		'js/class.crangecontrol.js',
-		'js/colorpicker.js'
-	],
 	'jq_templates' => $jq_templates
 ];
