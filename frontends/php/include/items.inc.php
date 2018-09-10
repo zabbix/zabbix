@@ -1055,7 +1055,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	], $show_suppressed);
+	], compact('show_suppressed'));
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {
