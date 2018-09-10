@@ -1969,10 +1969,7 @@ static int	DBpatch_3050158(void)
 
 static int	DBpatch_3050159(void)
 {
-	if (FAIL == DBindex_exists("escalations", "escalations_2"))
-		return DBcreate_index("escalations", "escalations_2", "eventid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("escalations", "escalations_2", "eventid", 0);
 }
 
 #endif
