@@ -658,7 +658,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(params.controls ? jQuery('<div>').addClass('overlay-dialogue-controls').html(params.controls) : null)
 		.append(
 			jQuery('<div>', {
-				class: 'overlay-dialogue-body',
+				class: 'overlay-dialogue-body'
 			})
 				.append(params.content)
 				.each(function() {

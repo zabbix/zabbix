@@ -54,11 +54,18 @@ class CSvgGraphAxis extends CSvgTag {
 	private $arrow_offset = 5;
 
 	/**
-	 * Color for axis and labels.
+	 * Color for labels.
 	 *
 	 * @var string
 	 */
-	private $color = '#787878';
+	private $color;
+
+	/**
+	 * Color for axis.
+	 *
+	 * @var string
+	 */
+	private $line_color;
 
 	/**
 	 * Axis container.
@@ -94,7 +101,7 @@ class CSvgGraphAxis extends CSvgTag {
 	public function getStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' path' => [
-				'stroke' => $this->color,
+				'stroke' => $this->line_color,
 				'fill' => 'transparent'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
@@ -119,10 +126,37 @@ class CSvgGraphAxis extends CSvgTag {
 	 * Set axis line visibility.
 	 *
 	 * @param bool $visible   True if should be visible.
+	 *
 	 * @return CSvgGraphAxis
 	 */
 	public function setAxisVisibility($visible) {
 		$this->axis_visible = $visible;
+
+		return $this;
+	}
+
+	/**
+	 * Set text color.
+	 *
+	 * @param string $color  Color value.
+	 *
+	 * @return CSvgGraphAxis
+	 */
+	public function setTextColor($color) {
+		$this->color = $color;
+
+		return $this;
+	}
+
+	/**
+	 * Set line color.
+	 *
+	 * @param string $color  Color value.
+	 *
+	 * @return CSvgGraphAxis
+	 */
+	public function setLineColor($color) {
+		$this->line_color = $color;
 
 		return $this;
 	}

@@ -30,7 +30,7 @@ class CTabView extends CDiv {
 	/**
 	 * Script for tab change event.
 	 */
-	protected $tab_change_js = '';
+	private $tab_change_js = '';
 
 	/**
 	 * Disabled tabs IDs, tab option
@@ -62,7 +62,8 @@ class CTabView extends CDiv {
 	/**
 	 * Set javascript on tab change event.
 	 *
-	 * @param string $value    Script body.
+	 * @param string $value  Script body.
+	 *
 	 * @return CTabView
 	 */
 	public function onTabChange($value) {
@@ -112,12 +113,12 @@ class CTabView extends CDiv {
 			$this->addItem($this->tabs);
 
 			zbx_add_post_js($this->makeJavascript());
-			}
+		}
 
 		$this->addItem($this->footer);
 
 		return parent::toString($destroy);
-					}
+	}
 
 	public function makeJavascript() {
 		if ($this->selectedTab === null) {
