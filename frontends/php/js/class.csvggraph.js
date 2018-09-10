@@ -432,12 +432,12 @@ jQuery(function ($) {
 
 						if (show_hint && data.hintMaxRows > rows_added) {
 							$('<li></li>')
+								.text(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.append(
 									$('<span></span>')
 										.css('background-color', point.g.getAttribute('data-color'))
 										.addClass('svg-graph-hintbox-item-color')
 								)
-								.append(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.appendTo(html);
 							rows_added++;
 						}

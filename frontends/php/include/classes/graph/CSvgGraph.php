@@ -869,7 +869,7 @@ class CSvgGraph extends CSvg {
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
 				$group = (new CSvgGroup())
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-					->setAttribute('data-metric', $metric['name'])
+					->setAttribute('data-metric', CHtml::encode($metric['name']))
 					->setAttribute('data-color', $metric['options']['color']);
 
 				if ($metric['options']['fill'] > 0) {
