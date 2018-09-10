@@ -64,7 +64,7 @@ extern unsigned char	program_type;
 #define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
 
 /* the maximum time spent synchronizing history */
-#define ZBX_HC_SYNC_TIME_MAX	SEC_PER_MIN
+#define ZBX_HC_SYNC_TIME_MAX	10
 
 /* the maximum number of items in one synchronization batch */
 #define ZBX_HC_SYNC_MAX		1000
