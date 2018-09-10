@@ -18,10 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Get trigger severity full line height css style name.
  *
- * @param  int         $severity Trigger severity.
+ * @param int $severity  Trigger severity.
  *
  * @return string|null
  */
@@ -47,7 +48,7 @@ function getSeverityFlhStyle($severity) {
 /**
  * Get trigger severity status css style name.
  *
- * @param  int         $severity Trigger severity.
+ * @param int $severity  Trigger severity.
  *
  * @return string|null
  */
@@ -96,8 +97,8 @@ function getSeverityStyle($severity, $type = true) {
 /**
  * Get trigger severity name by given state and configuration.
  *
- * @param int   $severity Trigger severity.
- * @param array $config   Array with configuration parameters containing severity names.
+ * @param int   $severity  Trigger severity.
+ * @param array $config    Array with configuration parameters containing severity names.
  *
  * @return string
  */
@@ -697,6 +698,18 @@ function replace_template_dependencies($deps, $hostid) {
 	return $deps;
 }
 
+/**
+ * Creates and returns item data overview table for the given host groups.
+ *
+ * @param array  $groupids
+ * @param string $application
+ * @param int    $style            Table display style: either hosts on top, or host on the left side.
+ * @param array  $host_options
+ * @param array  $trigger_options
+ * @param int    $show_suppressed  Whether to show items with suppressed problems.
+ *
+ * @return array
+ */
 function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
 		array $trigger_options = [], $show_suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE) {
 	// fetch hosts
@@ -818,12 +831,10 @@ function getTriggersWithActualSeverity($options, $show_suppressed) {
  * @param string $pageFile                     The page where the element is displayed.
  * @param int    $viewMode                     Table display style: either hosts on top, or host on the left side.
  * @param string $screenId                     The ID of the screen, that contains the trigger overview table.
- * @param bool   $fullscreen                   Display mode.
  *
  * @return CTableInfo
  */
-function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null,
-		$fullscreen = false) {
+function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = [];
 	$host_names = [];
 	$trcounter = [];
@@ -899,7 +910,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 				$triggerTable->addRow($columns);
@@ -925,14 +936,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 		foreach ($host_names as $hostId => $host_name) {
 			$name = (new CLinkAction($host_name))
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId], true));
 
 			$columns = [(new CColHeader($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($data as $trigger_data) {
 				foreach ($trigger_data as $trigger_hosts) {
 					$columns[] = getTriggerOverviewCells(
 						array_key_exists($host_name, $trigger_hosts) ? $trigger_hosts[$host_name] : null,
-						$dependencies, $pageFile, $screenId, $fullscreen
+						$dependencies, $pageFile, $screenId
 					);
 				}
 			}
@@ -953,11 +964,10 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
  * @param string $pageFile      The page where the element is displayed.
  * @param string $screenid
- * @param bool   $fullscreen    Display mode.
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null, $fullscreen = false) {
+function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = null;
@@ -1019,7 +1029,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$options = ['description_enabled' => $trigger['description_enabled'], 'fullscreen' => $fullscreen];
+		$options = ['description_enabled' => $trigger['description_enabled']];
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, $acknowledge, $options));
 	}
 
@@ -1200,7 +1210,7 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 /**
  * Make trigger info block.
  *
- * @param array $trigger			Trigger described in info block.
+ * @param array $trigger  Trigger described in info block.
  *
  * @return object
  */
@@ -1284,8 +1294,8 @@ function make_trigger_details($trigger) {
 /**
  * Analyze an expression and returns expression html tree.
  *
- * @param string $expression		Trigger expression or recovery expression string.
- * @param int $type					Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param string $expression  Trigger expression or recovery expression string.
+ * @param int $type           Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
  * @return array
  */
@@ -1310,15 +1320,15 @@ function analyzeExpression($expression, $type) {
 /**
  * Builds expression HTML tree.
  *
- * @param array 	$expressionTree 	Output of getExpressionTree() function.
- * @param array 	$next           	Parameter only for recursive call; should be empty array.
- * @param int 		$letterNum      	Parameter only for recursive call; should be 0.
- * @param int 		$level          	Parameter only for recursive call.
- * @param string 	$operator       	Parameter only for recursive call.
- * @param int		$type				Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param array  $expressionTree  Output of getExpressionTree() function.
+ * @param array  $next            Parameter only for recursive call; should be empty array.
+ * @param int    $letterNum       Parameter only for recursive call; should be 0.
+ * @param int    $level           Parameter only for recursive call.
+ * @param string $operator        Parameter only for recursive call.
+ * @param int    $type            Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array	Array containing the trigger expression formula as the first element and an array describing the
- *					expression tree as the second.
+ * @return array  Array containing the trigger expression formula as the first element and an array describing the
+ *                expression tree as the second.
  */
 function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
 		$type) {
@@ -1457,10 +1467,10 @@ function expressionHighLevelErrors($expression) {
 }
 
 /**
- * Draw level for trigger expression builder tree
+ * Draw level for trigger expression builder tree.
  *
  * @param array $next
- * @param int $level
+ * @param int   $level
  *
  * @return array
  */
@@ -2301,11 +2311,10 @@ function getTriggersHostsList(array $triggers) {
  * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
  * @param int    $triggers_hosts[<triggerid>][]['graphs']              The number of graphs.
  * @param int    $triggers_hosts[<triggerid>][]['screens']             The number of screens.
- * @param bool   $fullscreen				                           Fullscreen mode.
  *
  * @return array
  */
-function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
+function makeTriggersHostsList(array $triggers_hosts) {
 	$db_maintenances = [];
 	$scripts_by_hosts = [];
 
@@ -2341,7 +2350,7 @@ function makeTriggersHostsList(array $triggers_hosts, $fullscreen = false) {
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
 			$host_name = (new CLinkAction($host['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true, $fullscreen));
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host, true));
 
 			// Add maintenance icon with hint if host is in maintenance.
 			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON

@@ -295,11 +295,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $config
  * @param string $config['severity_name_*']
  * @param string $backurl
- * @param int    $fullscreen
  *
  * @return CDiv
  */
-function makeSystemStatus(array $filter, array $data, array $config, $backurl, $fullscreen = 0) {
+function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
@@ -335,8 +334,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			(array_key_exists('show_suppressed', $filter) && $filter['show_suppressed'] == 1)
 				? 1
 				: null
-		)
-		->setArgument('fullscreen', $fullscreen ? '1' : null);
+		);
 
 	foreach ($data['groups'] as $group) {
 		if ($filter_hide_empty_groups && !$group['has_problems']) {
@@ -537,7 +535,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$triggers_hosts = getTriggersHostsList($triggers);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
-	$tags = makeEventsTags($problems);
+	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		CScreenProblem::addMaintenanceNames($problems);

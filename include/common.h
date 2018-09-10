@@ -270,7 +270,6 @@ typedef enum
 	ITEM_DATA_TYPE_BOOLEAN
 }
 zbx_item_data_type_t;
-const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* service supported by discoverer */
 typedef enum

@@ -27,7 +27,6 @@ $config = $this->data['config'];
 $filterForm = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('fullscreen', $filter['fullScreen'] ? '1' : null)
 	->addVar('groupid', $filter['groupId'])
 	->addVar('hostid', $filter['hostId']);
 

@@ -30,18 +30,15 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS_BY_SV);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
-			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
-
 		$fields = $this->getForm()->getFieldsData();
+
 		$config = select_config();
+
 		$filter = [
 			'groupids' => getSubGroups($fields['groupids']),
 			'hostids' => $fields['hostids'],
@@ -66,8 +63,6 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 				'severity_name_5' => $config['severity_name_5']
 			],
 			'filter' => $filter,
-			'fullscreen' => $fullscreen,
-			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
