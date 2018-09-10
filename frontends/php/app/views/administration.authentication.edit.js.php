@@ -1,13 +1,17 @@
 <script type="text/javascript">
 	jQuery(function ($) {
 		var form = $('[name=form_auth]'),
-			auth_type = $('[name=authentication_type]:checked').val();
+			warn = true;
 
 		form.submit(function () {
-			return $('[name=authentication_type]:checked').val() == auth_type
-					|| confirm(<?= CJs::encodeJson(
-						_('Switching authentication method will reset all except this session! Continue?')
-					) ?>);
+			var proceed = !warn
+				|| $('[name=authentication_type]:checked').val() == $('[name=db_authentication_type]').val()
+				|| confirm(<?= CJs::encodeJson(
+					_('Switching authentication method will reset all except this session! Continue?')
+				) ?>);
+			warn = true;
+
+			return proceed;
 		});
 
 		form.find('#http_auth_enabled,#ldap_configured').change(function () {
@@ -27,6 +31,10 @@
 				.val(form.find('[name=action_passw_change]').val());
 
 			submitFormWithParam('form_auth', 'change_bind_password', '1');
+		});
+
+		form.find('[name=ldap_test]').click(function () {
+			warn = false;
 		});
 	});
 </script>
