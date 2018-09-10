@@ -39,7 +39,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestTextPresent(
 			[
 				'Trigger displaying options',
-				'Use custom event status colors',
+				'Use custom event status colours',
 				'blinking',
 				'Unacknowledged PROBLEM events',
 				'Acknowledged PROBLEM events',
