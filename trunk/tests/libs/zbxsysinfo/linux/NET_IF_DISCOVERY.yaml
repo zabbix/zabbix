@@ -1,0 +1,43 @@
+---
+test case: parse file /proc/net/dev
+out:
+  json: '{"data":[{"{#IFNAME}":"lo"},{"{#IFNAME}":"eth1"},{"{#IFNAME}":"veth992d5b0"},{"{#IFNAME}":"docker0"}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+    eth1: 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
+    veth992d5b0:       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
+    docker0: 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
+---
+# one entry is missing a delimiter - semicolon
+test case: ignore invalid entries in /proc/net/dev
+out:
+  json: '{"data":[{"{#IFNAME}":"lo"},{"{#IFNAME}":"docker0"}]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo: 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+    eth1| 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
+    veth992d5b0|       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
+    docker0: 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
+---
+# input file is missing delimiter - semicolon
+test case: invalid /proc/net/dev content
+out:
+  json: '{"data":[]}'
+files:
+  /proc/net/dev: |
+    Inter-|   Receive                                                |  Transmit
+    face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo| 938127155 5510432    0    0    0     0          0         0 938127155 5510432    0    0    0     0       0          0
+    eth1| 152319974560 161303225    0    1    0     0          0    838940 10084803503 69799848    0    0    0     0       0          0
+    veth992d5b0|       0       0    0    0    0     0          0         0    67805     765    0    0    0     0       0          0
+    docker0| 12415150  226131    0    0    0     0          0         0 694372013  399033    0    0    0     0       0          0
+---
+test case: missing /proc/net/dev file
+out:
+  error: 'Cannot open /proc/net/dev: [2] No such file or directory'
+...

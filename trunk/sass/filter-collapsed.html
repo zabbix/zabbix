@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Author" content="Zabbix SIA">
+	<title>Filter - Collapsed</title>
+	<link rel="icon" href="favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+	<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	<meta name="csrf-token" content="7999abf544be51a6">
+	<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
+	<meta name="msapplication-TileColor" content="#d40000">
+	<meta name="msapplication-config" content="none">
+	<link rel="stylesheet" href="stylesheets/screen.css">
+	<!-- <link rel="stylesheet" href="stylesheets/dark-theme.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-light.css"> -->
+	<!-- <link rel="stylesheet" href="stylesheets/hc-dark.css"> -->
+	<style type="text/css">.na-bg, .na-bg input[type="radio"]:checked + label, .na-bg:before, .flh-na-bg, .status-na-bg { background-color: #97AAB3 }
+	.info-bg, .info-bg input[type="radio"]:checked + label, .info-bg:before, .flh-info-bg, .status-info-bg { background-color: #7499FF }
+	.warning-bg, .warning-bg input[type="radio"]:checked + label, .warning-bg:before, .flh-warning-bg, .status-warning-bg { background-color: #FFC859 }
+	.average-bg, .average-bg input[type="radio"]:checked + label, .average-bg:before, .flh-average-bg, .status-average-bg { background-color: #FFA059 }
+	.high-bg, .high-bg input[type="radio"]:checked + label, .high-bg:before, .flh-high-bg, .status-high-bg { background-color: #E97659 }
+	.disaster-bg, .disaster-bg input[type="radio"]:checked + label, .disaster-bg:before, .flh-disaster-bg, .status-disaster-bg { background-color: #E45959 }
+	.problem-unack-fg {color: #EE0000;}
+	.problem-ack-fg {color: #EE0000;}
+	.ok-unack-fg {color: #00AA00;}
+	.ok-ack-fg {color: #00AA00;}
+	</style>
+</head>
+<body>
+	<header>
+		<div>
+			<div class="top-nav-container" id="mmenu">
+				<a class="header-logo" href="">
+					<div class="logo"></div>
+				</a>
+				<nav aria-label="Main navigation">
+					<ul class="top-nav">
+						<li class="selected" id="view"><a onclick="javascript: MMenu.mouseOver('view');" onkeyup="javascript: MMenu.keyUp('view', event);" tabindex="0" role="button" href="">Monitoring</a></li>
+						<li id="cm" class=""><a onclick="javascript: MMenu.mouseOver('cm');" onkeyup="javascript: MMenu.keyUp('cm', event);" tabindex="0" role="button" href="">Inventory</a></li>
+						<li id="reports" class=""><a onclick="javascript: MMenu.mouseOver('reports');" onkeyup="javascript: MMenu.keyUp('reports', event);" tabindex="0" role="button" href="">Reports</a></li>
+						<li id="config" class=""><a onclick="javascript: MMenu.mouseOver('config');" onkeyup="javascript: MMenu.keyUp('config', event);" tabindex="0" role="button" href="">Configuration</a></li>
+						<li id="admin" class=""><a onclick="javascript: MMenu.mouseOver('admin');" onkeyup="javascript: MMenu.keyUp('admin', event);" tabindex="0" role="button" href="">Administration</a></li>
+					</ul>
+				</nav>
+				<ul class="top-nav-icons">
+					<li>
+						<form method="get" action="search.php" accept-charset="utf-8" role="search"><input type="text" id="search" name="search" value="" maxlength="255" autocomplete="off" class="search"><button type="submit" class="btn-search">&nbsp;</button></form>
+					</li>
+					<li>
+						<ul role="navigation" aria-label="User menu">
+							<li style="padding-left:0"><a class="top-nav-support" target="_blank" title="Zabbix Technical Support" href="">Support</a></li>
+							<li><a class="top-nav-zbbshare" target="_blank" title="Zabbix Share" href="">Share</a></li>
+							<li><a class="top-nav-help" target="_blank" title="Help" href="">&nbsp;</a></li>
+							<li><a class="top-nav-profile" title="Admin (Zabbix Administrator)" href="">&nbsp;</a></li>
+							<li><a class="top-nav-signout" title="Sign out" onclick="javascript: return redirect('index.php?reconnect=1&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">&nbsp;</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<nav aria-label="Sub navigation" class="top-subnav-container" onmouseover="javascript: MMenu.submenu_mouseOver();" onmouseout="javascript: MMenu.mouseOut();">
+				<ul class="top-subnav" id="sub_view" style="display: block;">
+					<li><a tabindex="0" href="">Dashboard</a></li>
+					<li><a tabindex="0" class="selected" href="">Problems</a></li>
+					<li><a tabindex="0" href="">Overview</a></li>
+					<li><a tabindex="0" href="">Web</a></li>
+					<li><a tabindex="0" href="">Latest data</a></li>
+					<li><a tabindex="0" href="">Graphs</a></li>
+					<li><a tabindex="0" href="">Screens</a></li>
+					<li><a tabindex="0" href="">Maps</a></li>
+					<li><a tabindex="0" href="">Discovery</a></li>
+					<li><a tabindex="0" href="">Services</a></li>
+				</ul>
+				<div class="server-name">ZABBIX SERVER NAME</div>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<div class="header-title table">
+			<div class="cell">
+				<h1 id="page-title-general">Problems</h1>
+			</div>
+			<div class="cell nowrap">
+				<nav aria-label="Content controls">
+					<form method="get" action="zabbix.php" accept-charset="utf-8">
+						<input type="hidden" id="action" name="action" value="problem.view"><input type="hidden" id="page" name="page" value="1">
+						<ul><li><button type="button">Export to CSV</button></li><li><button type="button" class="btn-max">&nbsp;</button></li></ul>
+					</form>
+				</nav>
+			</div>
+		</div>
+		<ul class="object-group filter-breadcrumb">
+	<li role="navigation" aria-label="Breadcrumbs"><span><a href="">All hosts</a></span>/<span><a href="">Zabbix server</a></span></li>
+	<li><span class="green">Enabled</span></li>
+	<li><div class="status-container"><span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span><div class="hint-box" style="display: none;">Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused</div><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li>
+	<li><ul role="navigation" aria-label="Content menu"><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>80</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>57</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>18</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul></li></ul>
+	<div class="filter-space ui-tabs ui-widget ui-widget-content ui-corner-all ui-tabs-collapsible" id="filter_5b0e464e2b127" data-profile-idx="web.templates.filter" data-profile-idx2="0" style="" aria-label="Filter">
+		<ul class="filter-btn-container ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist"><li class="ui-state-default ui-corner-top" role="tab" tabindex="0" aria-controls="tab_0" aria-labelledby="ui-id-1" aria-selected="false"><a class="filter-trigger ui-tabs-anchor" href="#tab_0" role="presentation" tabindex="-1" id="ui-id-1">Filter</a></li></ul>
+		<form method="get" action="templates.php" accept-charset="utf-8" name="zbx_filter" id="id">
+			<div class="filter-container ui-tabs-panel ui-widget-content ui-corner-bottom" id="tab_0" aria-labelledby="ui-id-1" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+				<div class="table filter-forms">
+					<div class="row">
+						<div class="cell">
+							<ul class="table-forms"><li><div class="table-forms-td-left"><label for="filter_name">Name</label></div><div class="table-forms-td-right"><input type="text" id="filter_name" name="filter_name" value="" maxlength="255" style="width: 300px;" autofocus="autofocus"></div></li></ul>
+						</div>
+					</div>
+				</div>
+				<div class="filter-forms"><button type="submit" name="filter_set" value="1" onclick="javascript: chkbxRange.clearSelectedOnFilterChange();">Apply</button><button type="button" data-url="templates.php?filter_rst=1" class="btn-alt" onclick="javascript: chkbxRange.clearSelectedOnFilterChange();">Reset</button></div>
+			</div>
+		</form>
+	</div>
+	</form>
+<form method="post" action="hosts.php" accept-charset="utf-8" name="hosts">
+	<input type="hidden" id="sid" name="sid" value="7999abf544be51a6"><input type="hidden" id="form_refresh" name="form_refresh" value="1">
+	<table class="list-table" id="t5af98b7ecc53c920404749">
+		<thead>
+			<tr>
+				<th class="cell-width"><input type="checkbox" id="all_hosts" name="all_hosts" value="1" class="checkbox-radio" onclick="checkAll('hosts', 'all_hosts', 'hosts');"><label for="all_hosts"><span></span></label></th>
+				<th><a href=""></span></a></th>
+				<th>Applications</th>
+				<th>Items</th>
+				<th>Triggers</th>
+				<th>Graphs</th>
+				<th>Discovery</th>
+				<th>Web</th>
+				<th>Interface</th>
+				<th>Templates</th>
+				<th><a href="">Status</a></th>
+				<th>Availability</th>
+				<th>Agent encryption</th>
+				<th>Info</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="checkbox" id="hosts_10260" name="hosts[10260]" value="10260" class="checkbox-radio"><label for="hosts_10260"><span></span></label></td>
+				<td class="nowrap"><a href="">2</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10260&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10261" name="hosts[10261]" value="10261" class="checkbox-radio"><label for="hosts_10261"><span></span></label></td>
+				<td class="nowrap"><a href="">3</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10261&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10262" name="hosts[10262]" value="10262" class="checkbox-radio"><label for="hosts_10262"><span></span></label></td>
+				<td class="nowrap"><a href="">4</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10262&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10263" name="hosts[10263]" value="10263" class="checkbox-radio"><label for="hosts_10263"><span></span></label></td>
+				<td class="nowrap"><a href="">5</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10263&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10264" name="hosts[10264]" value="10264" class="checkbox-radio"><label for="hosts_10264"><span></span></label></td>
+				<td class="nowrap"><a href="">6</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10264&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10265" name="hosts[10265]" value="10265" class="checkbox-radio"><label for="hosts_10265"><span></span></label></td>
+				<td class="nowrap"><a href="">7</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10265&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10266" name="hosts[10266]" value="10266" class="checkbox-radio"><label for="hosts_10266"><span></span></label></td>
+				<td class="nowrap"><a href="">8</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action red" onclick="javascript: return Confirm(&quot;Enable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10266&amp;action=host.massenable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Disabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-green">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr class="row-selected">
+				<td><input type="checkbox" id="hosts_10252" name="hosts[10252]" value="10252" class="checkbox-radio" checked><label for="hosts_10252"><span></span></label></td>
+				<td class="nowrap">Proxy 1: <a href="">host 1</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a></td>
+				<td><a href="">Triggers</a></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10252&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">PSK</span> <span class="status-green">None</span><span class="status-green">PSK</span><span class="status-grey">CERT</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr class="row-selected">
+				<td><input type="checkbox" id="hosts_10253" name="hosts[10253]" value="10253" class="checkbox-radio" checked><label for="hosts_10253"><span></span></label></td>
+				<td class="nowrap">Proxy 2: <a href="">host 2</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a></td>
+				<td><a href="">Triggers</a></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10253&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10259" name="hosts[10259]" value="10259" class="checkbox-radio"><label for="hosts_10259"><span></span></label></td>
+				<td class="nowrap"><a href="">Host eleven</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">Template 1</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10259&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container">
+						<span class="status-red cursor-pointer" data-hintbox="1" data-hintbox-class="red" data-hintbox-static="1">zbx</span>
+						<span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span>
+					</div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td><div class="rel-container"><span class="icon-info status-dark-grey" title="Information"></span></div></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10268" name="hosts[10268]" value="10268" class="checkbox-radio"><label for="hosts_10268"><span></span></label></td>
+				<td class="nowrap"><a href="">Testing host</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10268&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td><div class="rel-container"><span class="icon-info status-red" title="Information"></span></div></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10257" name="hosts[10257]" value="10257" class="checkbox-radio"><label for="hosts_10257"><span></span></label></td>
+				<td class="nowrap"><a href="">ValueHost</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10257&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td><div class="rel-container"><span class="icon-info status-yellow" title="Information"></span></div></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="hosts_10084" name="hosts[10084]" value="10084" class="checkbox-radio"><label for="hosts_10084"><span></span></label></td>
+				<td class="nowrap">Proxy 2: <a href="">Zabbix server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>88</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>59</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>20</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>2</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.0.1: 10050</td>
+				<td><a class="link-alt grey" href="">ValueTemplate</a></td>
+				<td><a class="link-action green" onclick="javascript: return Confirm(&quot;Disable host?&quot;) &amp;&amp; redirect('hosts.php?hosts[]=10084&amp;action=host.massdisable&amp;groupid=0&amp;sid=7999abf544be51a6', 'post', 'sid', true)" href="">Enabled</a></td>
+				<td>
+					<div class="status-container"><span class="status-grey">zbx</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+				</td>
+				<td>
+					<div class="status-container"><span class="status-green">None</span></div>
+				</td>
+				<td><div class="rel-container"><span class="icon-info status-green" title="Information"></span></div></td>
+			</tr>
+		</tbody>
+	</table>
+	<div class="table-paging">
+		<div class="paging-btn-container">
+			<div class="table-stats">Displaying 13 of 13 found</div>
+		</div>
+	</div>
+	<div id="action_buttons" class="action-buttons"><span id="selected_count" class="selected-item-count">2 selected</span><button type="submit" name="action" value="host.massenable" class="btn-alt" disabled confirm="Enable selected hosts?">Enable</button><button type="submit" name="action" value="host.massdisable" class="btn-alt" confirm="Disable selected hosts?">Disable</button><button type="submit" name="action" value="host.export" class="btn-alt">Export</button><button type="submit" name="action" value="host.massupdateform" class="btn-alt">Mass update</button><button type="submit" name="action" value="host.massdelete" class="btn-alt" confirm="Delete selected hosts?">Delete</button></div>
+</form>
+</main>
+<footer role="contentinfo">© 2001–2018, Zabbix SIA</footer>
+</body>
+</html>

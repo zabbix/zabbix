@@ -1,0 +1,116 @@
+.TH ZABBIX_GET 1 "2015\-08\-06" Zabbix
+.SH NAME
+zabbix_get \- Zabbix get utility
+.SH SYNOPSIS
+.B zabbix_get \-s
+.I host\-name\-or\-IP
+.RB [ \-p
+.IR port\-number ]
+.RB [ \-I
+.IR IP\-address ]
+.BI \-k " item\-key"
+.br
+.B zabbix_get \-s
+.I host\-name\-or\-IP
+.RB [ \-p
+.IR port\-number ]
+.RB [ \-I
+.IR IP\-address ]
+.B \-\-tls\-connect
+.B cert
+.B \-\-tls\-ca\-file
+.IR CA\-file
+.RB [ \-\-tls\-crl\-file
+.IR CRL\-file ]
+.RB [ \-\-tls\-agent\-cert\-issuer
+.IR cert\-issuer ]
+.RB [ \-\-tls\-agent\-cert\-subject
+.IR cert\-subject ]
+.B \-\-tls\-cert\-file
+.IR cert\-file
+.B \-\-tls\-key\-file
+.IR key\-file
+.BI \-k " item\-key"
+.br
+.B zabbix_get \-s
+.I host\-name\-or\-IP
+.RB [ \-p
+.IR port\-number ]
+.RB [ \-I
+.IR IP\-address ]
+.B \-\-tls\-connect
+.B psk
+.B \-\-tls\-psk\-identity
+.IR PSK\-identity
+.B \-\-tls\-psk\-file
+.IR PSK\-file
+.BI \-k " item\-key"
+.br
+.B zabbix_get \-h
+.br
+.B zabbix_get \-V
+.SH DESCRIPTION
+.B zabbix_get
+is a command line utility for getting data from Zabbix agent.
+.SH OPTIONS
+.IP "\fB\-s\fR, \fB\-\-host\fR \fIhost\-name\-or\-IP\fR"
+Specify host name or IP address of a host.
+.IP "\fB\-p\fR, \fB\-\-port\fR \fIport\-number\fR"
+Specify port number of agent running on the host.
+Default is 10050.
+.IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
+Specify source IP address.
+.IP "\fB\-k\fR, \fB\-\-key\fR \fIitem\-key\fR"
+Specify key of item to retrieve value for.
+.IP "\fB\-\-tls\-connect\fR \fIvalue\fR"
+How to connect to agent. Values:\fR
+.SS
+.RS 12
+.TP 12
+.B unencrypted
+connect without encryption (default)
+.RE
+.RS 12
+.TP 12
+.B psk
+connect using TLS and a pre-shared key
+.RE
+.RS 12
+.TP 12
+.B cert
+connect using TLS and a certificate
+.RE
+.RE
+.IP "\fB\-\-tls\-ca\-file\fR \fICA\-file\fR"
+Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
+.IP "\fB\-\-tls\-crl\-file\fR \fICRL\-file\fR"
+Full pathname of a file containing revoked certificates.
+.IP "\fB\-\-tls\-agent\-cert\-issuer\fR \fIcert\-issuer\fR"
+Allowed agent certificate issuer.
+.IP "\fB\-\-tls\-agent\-cert\-subject\fR \fIcert\-subject\fR"
+Allowed agent certificate subject.
+.IP "\fB\-\-tls\-cert\-file\fR \fIcert\-file\fR"
+Full pathname of a file containing the certificate or certificate chain.
+.IP "\fB\-\-tls\-key\-file\fR \fIkey\-file\fR"
+Full pathname of a file containing the private key.
+.IP "\fB\-\-tls\-psk\-identity\fR \fIPSK\-identity\fR"
+PSK\-identity string.
+.IP "\fB\-\-tls\-psk\-file\fR \fIPSK\-file\fR"
+Full pathname of a file containing the pre-shared key.
+.IP "\fB\-h\fR, \fB\-\-help\fR"
+Display this help and exit.
+.IP "\fB\-V\fR, \fB\-\-version\fR"
+Output version information and exit.
+.SH "EXAMPLES"
+\fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]"\fR
+.br
+\fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]" \-\-tls\-connect cert \-\-tls\-ca\-file /home/zabbix/zabbix_ca_file \-\-tls\-agent\-cert\-issuer "CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-agent\-cert\-subject "CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-cert\-file /home/zabbix/zabbix_get.crt \-\-tls\-key\-file /home/zabbix/zabbix_get.key
+.br
+\fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]" \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix agentd" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
+.SH "SEE ALSO"
+.BR zabbix_agentd (8),
+.BR zabbix_proxy (8),
+.BR zabbix_sender (8),
+.BR zabbix_server (8)
+.SH AUTHOR
+Alexei Vladishev <alex@zabbix.com>
