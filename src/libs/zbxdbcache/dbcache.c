@@ -3022,8 +3022,11 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int sync
 				/* Otherwise better to wait a bit for other syncers to unlock      */
 				/* items rather than trying and failing to sync locked items over  */
 				/* and over again.                                                 */
-				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num)
+				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num ||
+						ZBX_SYNC_FULL == sync_type)
+				{
 					*more = ZBX_SYNC_MORE;
+				}
 			}
 
 			UNLOCK_CACHE;
