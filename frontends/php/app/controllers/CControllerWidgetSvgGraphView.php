@@ -23,6 +23,11 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetSvgGraphView extends CControllerWidget {
 
+	const GRAPH_WIDTH_MIN = 100;
+	const GRAPH_WIDTH_MAX = 65535;
+	const GRAPH_HEIGHT_MIN = 100;
+	const GRAPH_HEIGHT_MAX = 65535;
+
 	public function __construct() {
 		parent::__construct();
 
@@ -33,8 +38,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'dashboardid' => 'db dashboard.dashboardid',
 			'initial_load' => 'in 0,1',
 			'edit_mode' => 'in 0,1',
-			'content_width' => 'int32',
-			'content_height' => 'int32',
+			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
+			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'fields' => 'json'
 		]);
@@ -44,8 +49,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
-		$width = (int) $this->getInput('content_width', 100);
-		$height = (int) $this->getInput('content_height', 100);
+		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
+		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
