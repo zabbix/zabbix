@@ -30,12 +30,6 @@ class CSvgGraphLine extends CSvgPath {
 	protected $options;
 	protected $add_label;
 
-	protected $position_x = 0;
-	protected $position_y = 0;
-
-	protected $width = 0;
-	protected $height = 0;
-
 	public function __construct($path, $metric) {
 		parent::__construct();
 
@@ -74,20 +68,6 @@ class CSvgGraphLine extends CSvgPath {
 				'stroke-width' => $this->options['width']
 			] + $line_style
 		];
-	}
-
-	public function setPosition($x, $y) {
-		$this->position_x = $x;
-		$this->position_y = $y;
-
-		return $this;
-	}
-
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
-
-		return $this;
 	}
 
 	protected function draw() {

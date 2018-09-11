@@ -853,10 +853,7 @@ class CSvgGraph extends CSvg {
 		$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) ? $this->right_y_zero : $this->left_y_zero;
 
 		foreach ($paths as $path) {
-			$this->addItem((new CSvgGraphArea($path, $metric, $y_zero))
-				->setPosition($this->canvas_x, $this->canvas_y)
-				->setSize($this->canvas_width, $this->canvas_height)
-			);
+			$this->addItem(new CSvgGraphArea($path, $metric, $y_zero));
 		}
 	}
 
@@ -877,10 +874,7 @@ class CSvgGraph extends CSvg {
 				}
 
 				foreach ($this->paths[$index] as $path) {
-					$group->addItem((new CSvgGraphLine($path, $metric))
-						->setPosition($this->canvas_x, $this->canvas_y)
-						->setSize($this->canvas_width, $this->canvas_height)
-					);
+					$group->addItem(new CSvgGraphLine($path, $metric));
 				}
 
 				$this->addItem($group->addItem(
