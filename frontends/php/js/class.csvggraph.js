@@ -242,7 +242,7 @@ jQuery(function ($) {
 
 					for (var index = 0, len = paths.length; index < len; index++) {
 						direction_string += ' ' + paths[index].getAttribute('d');
-						label.push(paths[index].getAttribute('data-label'));
+						label.push(paths[index].getAttribute('label'));
 					}
 
 					label = label.join(',').split(',');

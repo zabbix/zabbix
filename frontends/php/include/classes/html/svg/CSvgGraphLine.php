@@ -97,7 +97,7 @@ class CSvgGraphLine extends CSvgPath {
 				$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
 			}
 
-			$this->setAttribute('data-label', $line_values);
+			$this->setAttribute('label', $line_values);
 		}
 
 		return parent::toString($destroy);
