@@ -2795,7 +2795,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int sync_
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while (sync_timeout >= now - sync_start && ZBX_SYNC_MORE == *more);
+	while (ZBX_SYNC_MORE == *more && sync_timeout >= now - sync_start);
 
 	zbx_vector_ptr_destroy(&history_items);
 }
@@ -3087,7 +3087,7 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int sync
 		/* Exit from sync loop if we have spent too much time here.       */
 		/* This is done to allow syncer process to update its statistics. */
 	}
-	while (sync_timeout >= now - sync_start && ZBX_SYNC_MORE == *more);
+	while (ZBX_SYNC_MORE == *more && sync_timeout >= now - sync_start);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
