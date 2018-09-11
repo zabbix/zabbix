@@ -32,16 +32,4 @@ class CSvgPolygon extends CSvgTag {
 
 		$this->setAttribute('points', ltrim($p));
 	}
-
-	public function setFillColor($color) {
-		$this->setAttribute('fill', $color);
-
-		return $this;
-	}
-
-	public function setStrokeColor($color) {
-		$this->setAttribute('stroke', $color);
-
-		return $this;
-	}
 }
