@@ -34,6 +34,11 @@ jQuery(function ($) {
 		}
 	}
 
+	// Disable text selection in document when move mouse pressed cursor.
+	function disableSelect(e) {
+		e.preventDefault();
+	}
+
 	// Cancel SBox and unset its variables.
 	function destroySBox(e, graph) {
 		var graph = graph || e.data.graph;
@@ -41,11 +46,12 @@ jQuery(function ($) {
 		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
 		$('.svg-graph-selection-text', graph).text('');
 
-		$(document).off('keydown', {graph: graph}, sBoxKeyboardInteraction);
-
-		graph
+		$(document)
+			.off('selectstart', disableSelect)
+			.off('keydown', {graph: graph}, sBoxKeyboardInteraction)
 			.off('mousemove', moveSBoxMouse)
 			.off('mouseup', destroySBox);
+
 		graph.data('options').boxing = false;
 	}
 
@@ -121,11 +127,11 @@ jQuery(function ($) {
 
 		if (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
-			$(document).on('keydown', {graph: graph}, sBoxKeyboardInteraction);
-
-			graph
+			$(document)
+				.on('selectstart', disableSelect)
+				.on('keydown', {graph: graph}, sBoxKeyboardInteraction)
 				.on('mousemove', {graph: graph}, moveSBoxMouse)
-				.on('mouseup', {graph: graph}, destroySBox);
+				.on('mouseup', {graph: graph}, endSBoxDrag);
 
 			data.start = offsetX - data.dimX;
 		}
@@ -141,39 +147,36 @@ jQuery(function ($) {
 			stxt = $('.svg-graph-selection-text', graph),
 			offsetX = e.clientX - graph.offset().left;
 
-		if ((offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= offsetX) {
-			data.end = offsetX - data.dimX;
-			if (data.start != data.end) {
-				data.isHintBoxFrozen = false;
-				data.boxing = true;
-				destroyHintbox(graph);
-				hideHelper(graph);
-			}
-			else {
-				destroySBox(e, graph);
-				return false;
-			}
+		data.end = offsetX - data.dimX;
 
-			data.end = Math.min(offsetX - data.dimX, data.dimW);
-
-			sbox.attr({
-				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
-				'y': data.dimY + 'px',
-				'width': Math.abs(data.end - data.start) + 'px',
-				'height': data.dimH
-			});
-
-			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
-				label = formatTimestamp(seconds, false, true)
-					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
-
-			stxt
-				.text(label)
-				.attr({
-					'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
-					'y': (data.dimY + 15) + 'px'
-				});
+		// Check if movement has started and destroy hintbox if it is still visible.
+		if (data.start != data.end) {
+			data.isHintBoxFrozen = false;
+			data.boxing = true;
+			destroyHintbox(graph);
+			hideHelper(graph);
 		}
+
+		data.end = Math.min(offsetX - data.dimX, data.dimW);
+		data.end = (data.end > 0) ? data.end : 0;
+
+		sbox.attr({
+			'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
+			'y': data.dimY + 'px',
+			'width': Math.abs(data.end - data.start) + 'px',
+			'height': data.dimH
+		});
+
+		var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
+			label = formatTimestamp(seconds, false, true)
+				+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+
+		stxt
+			.text(label)
+			.attr({
+				'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
+				'y': (data.dimY + 15) + 'px'
+			});
 	}
 
 	// Method to end selection of horizontal area in graph.
@@ -334,7 +337,7 @@ jQuery(function ($) {
 
 	// Show problem or value hintbox.
 	function showHintbox(e, graph) {
-		e.stopPropagation();
+		//e.stopPropagation();
 
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
@@ -530,7 +533,6 @@ jQuery(function ($) {
 					.on('mouseleave', function(e) {
 						var graph = $(this);
 						destroyHintbox(graph);
-						destroySBox(e, graph);
 						hideHelper(graph);
 						return false;
 					})
@@ -541,9 +543,7 @@ jQuery(function ($) {
 					.on('selectstart', false);
 
 				if (options.sbox) {
-					graph
-						.on('mousedown', {graph: graph}, startSBoxDrag)
-						.on('mouseup', {graph: graph}, endSBoxDrag);
+					graph.on('mousedown', {graph: graph}, startSBoxDrag);
 				}
 			});
 		},
@@ -551,9 +551,7 @@ jQuery(function ($) {
 			var graph = $(this);
 
 			destroySBox(e, graph);
-			graph
-				.off('mousedown', startSBoxDrag)
-				.off('mouseup', endSBoxDrag);
+			graph.off('mousedown', startSBoxDrag);
 		}
 	};
 
