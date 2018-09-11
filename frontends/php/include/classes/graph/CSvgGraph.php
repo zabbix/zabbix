@@ -461,7 +461,7 @@ class CSvgGraph extends CSvg {
 		$areaid = uniqid('metric_clip_');
 
 		// CSS styles.
-		$this->styles['.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA]['clip-path'] = 'url(#'.$areaid.')';
+		$this->styles['.'.CSvgTag::ZBX_STYLE_GRAPH_AREA]['clip-path'] = 'url(#'.$areaid.')';
 		$this->styles['[data-metric]']['clip-path'] = 'url(#'.$areaid.')';
 
 		$this->addItem(

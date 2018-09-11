@@ -33,10 +33,10 @@ class CSvgTag extends CTag {
 	const ZBX_STYLE_GRAPH_AXIS_RIGHT = 'svg-graph-axis-right';
 	const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
 
-	const ZBX_STYLE_SVG_GRAPH_AREA = 'svg-graph-area';
-	const ZBX_STYLE_SVG_GRAPH_GRID = 'svg-graph-grid';
-	const ZBX_STYLE_SVG_GRAPH_LINE = 'svg-graph-line';
-	const ZBX_STYLE_SVG_GRAPH_POINTS = 'svg-graph-points';
+	const ZBX_STYLE_GRAPH_AREA = 'svg-graph-area';
+	const ZBX_STYLE_GRAPH_GRID = 'svg-graph-grid';
+	const ZBX_STYLE_GRAPH_LINE = 'svg-graph-line';
+	const ZBX_STYLE_GRAPH_POINTS = 'svg-graph-points';
 
 	const ZBX_STYLE_GRAPH_LEGEND = 'svg-graph-legend';
 
