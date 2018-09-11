@@ -2800,10 +2800,11 @@ static void	sync_proxy_history(time_t sync_timeout, int *total_num, int *more)
  *          and timer triggers from timer queue                               *
  *                                                                            *
  * Parameters: sync_timeout - [IN] the timeout in seconds                     *
- *             total_num - [OUT] the number of synced values                  *
- *             more      - [OUT] a flag indicating the cache emptiness:       *
- *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
- *                                ZBX_SYNC_MORE - more data to sync           *
+ *             values_num   - [IN/OUT] the number of synced values            *
+ *             triggers_num - [IN/OUT] the number of processed timers         *
+ *             more         - [OUT] a flag indicating the cache emptiness:    *
+ *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
+ *                               ZBX_SYNC_MORE - more data to sync            *
  *                                                                            *
  * Comments: This function loops syncing history values by 1k batches and     *
  *           processing timer triggers by batches of 500 triggers.            *
@@ -2815,7 +2816,7 @@ static void	sync_proxy_history(time_t sync_timeout, int *total_num, int *more)
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_server_history(int sync_timeout, int *total_num, int *more)
+static void	sync_server_history(int sync_timeout, int *values_num, int *triggers_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -2993,6 +2994,7 @@ static void	sync_server_history(int sync_timeout, int *total_num, int *more)
 
 		if (0 != triggerids.values_num)
 		{
+			*triggers_num += triggerids.values_num;
 			DCconfig_unlock_triggers(&triggerids);
 			zbx_vector_uint64_clear(&triggerids);
 		}
@@ -3016,7 +3018,7 @@ static void	sync_server_history(int sync_timeout, int *total_num, int *more)
 
 			UNLOCK_CACHE;
 
-			*total_num += history_num;
+			*values_num += history_num;
 		}
 
 		if (FAIL != ret)
@@ -3091,7 +3093,7 @@ void	zbx_sync_history_cache_full()
 {
 	const char		*__function_name = "zbx_sync_history_cache_full";
 
-	int			total_num = 0, more;
+	int			values_num = 0, timers_num = 0, more;
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 	zbx_binary_heap_t	tmp_history_queue;
@@ -3138,12 +3140,12 @@ void	zbx_sync_history_cache_full()
 	while (0 != cache->history_queue.elems_num)
 	{
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			sync_server_history(ZBX_HC_SYNC_TIME_MAX, &total_num, &more);
+			sync_server_history(ZBX_HC_SYNC_TIME_MAX, &values_num, &timers_num, &more);
 		else
-			sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, &total_num, &more);
+			sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, &values_num, &more);
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-				(double)total_num / (cache->history_num + total_num) * 100);
+				(double)values_num / (cache->history_num + values_num) * 100);
 	}
 
 	zbx_binary_heap_destroy(&cache->history_queue);
@@ -3160,24 +3162,25 @@ void	zbx_sync_history_cache_full()
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
- * Parameters: total_num - [OUT] the number of synced values                  *
+ * Parameters: values_num - [OUT] the number of synced values                  *
  *             more      - [OUT] a flag indicating the cache emptiness:       *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_history_cache(int *total_num, int *more)
+void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 {
 	const char		*__function_name = "zbx_sync_history_cache";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
-	*total_num = 0;
+	*values_num = 0;
+	*triggers_num = 0;
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		sync_server_history(ZBX_HC_SYNC_TIME_MAX, total_num, more);
+		sync_server_history(ZBX_HC_SYNC_TIME_MAX, values_num, triggers_num, more);
 	else
-		sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, total_num, more);
+		sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, values_num, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

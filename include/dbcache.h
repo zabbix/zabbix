@@ -547,7 +547,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
 void	zbx_sync_history_cache_full();
-void	zbx_sync_history_cache(int *sync_num, int *more);
+void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 int	init_database_cache(char **error);
 void	free_database_cache(void);
 

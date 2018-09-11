@@ -45,7 +45,8 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int	sleeptime = -1, num = 0, old_num = 0, sync_num, more;
+	int	sleeptime = -1, total_values_num = 0, old_values_num = 0, values_num, more, total_triggers_num = 0,
+			old_triggers_num = 0, triggers_num;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -76,13 +77,15 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		if (0 != sleeptime)
 		{
-			zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, syncing history]",
-					get_process_type_string(process_type), process_num, old_num, old_total_sec);
+			zbx_setproctitle("%s #%d [processed %d values, %d triggers in " ZBX_FS_DBL
+					" sec, syncing history]", get_process_type_string(process_type), process_num,
+					old_values_num, old_triggers_num, old_total_sec);
 		}
 
 		sec = zbx_time();
-		zbx_sync_history_cache(&sync_num, &more);
-		num += sync_num;
+		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		total_values_num += values_num;
+		total_triggers_num += triggers_num;
 		total_sec += zbx_time() - sec;
 
 		sleeptime = (ZBX_SYNC_MORE == more ? 0 : CONFIG_HISTSYNCER_FREQUENCY);
@@ -91,18 +94,20 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		{
 			if (0 == sleeptime)
 			{
-				zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, syncing history]",
-						get_process_type_string(process_type), process_num, num, total_sec);
+				zbx_setproctitle("%s #%d [processed %d values, %d triggers in " ZBX_FS_DBL
+						" sec, syncing history]", get_process_type_string(process_type),
+						process_num, total_values_num, total_triggers_num, total_sec);
 			}
 			else
 			{
-				zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, idle %d sec]",
-						get_process_type_string(process_type), process_num, num, total_sec,
-						sleeptime);
-				old_num = num;
+				zbx_setproctitle("%s #%d [processed %d values, %d triggers " ZBX_FS_DBL
+						" sec, idle %d sec]", get_process_type_string(process_type),
+						process_num, total_values_num, total_triggers_num, total_sec, sleeptime);
+				old_values_num = total_values_num;
 				old_total_sec = total_sec;
 			}
-			num = 0;
+			total_values_num = 0;
+			total_triggers_num = 0;
 			total_sec = 0.0;
 			last_stat_time = time(NULL);
 		}
