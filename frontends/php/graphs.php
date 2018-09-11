@@ -464,46 +464,10 @@ elseif (isset($_REQUEST['form'])) {
 		}
 
 		// templates
-		if (!empty($data['templateid'])) {
-			$parentGraphid = $data['templateid'];
-			do {
-				$parentGraph = getGraphByGraphId($parentGraphid);
-
-				// parent graph prototype link
-				if (getRequest('parent_discoveryid')) {
-					$parentGraphPrototype = API::GraphPrototype()->get([
-						'output' => ['graphid'],
-						'graphids' => $parentGraph['graphid'],
-						'selectTemplates' => API_OUTPUT_EXTEND,
-						'selectDiscoveryRule' => ['itemid']
-					]);
-					if ($parentGraphPrototype) {
-						$parentGraphPrototype = reset($parentGraphPrototype);
-						$parentTemplate = reset($parentGraphPrototype['templates']);
-
-						$link = new CLink($parentTemplate['name'],
-							'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['templateid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
-						);
-					}
-				}
-				// parent graph link
-				else {
-					$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
-					$parentTemplate = DBfetch($parentTemplate);
-
-					$link = new CLink($parentTemplate['name'],
-						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
-					);
-				}
-				if (isset($link)) {
-					$data['templates'][] = $link;
-					$data['templates'][] = ' &rArr; ';
-				}
-				$parentGraphid = $parentGraph['templateid'];
-			} while ($parentGraphid != 0);
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
-		}
+		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
+			$flag
+		);
 
 		// items
 		$data['items'] = API::GraphItem()->get([
@@ -693,6 +657,11 @@ else {
 	}
 
 	order_result($data['graphs'], $sortField, $sortOrder);
+
+	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
+		? ZBX_FLAG_DISCOVERY_NORMAL
+		: ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);

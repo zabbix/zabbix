@@ -838,6 +838,7 @@ function getItemParentTemplates(array $items, $flag) {
 		foreach ($db_items as $db_item) {
 			$data['templates'][$db_item['hostid']] = [];
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
+
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
 			}
