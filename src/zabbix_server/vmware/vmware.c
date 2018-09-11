@@ -3742,7 +3742,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_MAXQUERYMETRICS)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
