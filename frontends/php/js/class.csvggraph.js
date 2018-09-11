@@ -307,7 +307,7 @@ jQuery(function ($) {
 	/**
 	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
-	 * this function. Tolerance is used to find exacly macthed point only.
+	 * this function. Tolerance is used to find exacly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
 		if (ds.getAttribute('data-set') === 'points') {
