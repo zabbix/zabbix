@@ -56,7 +56,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$script_inline = '';
 
 		$graph_data = [
-			'data_sets' => $fields['ds'],
+			'data_sets' => array_values($fields['ds']),
 			'data_source' => $fields['source'],
 			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
 			'time_period' => [
@@ -101,7 +101,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'evaltype' => $fields['evaltype'],
 				'tags' => $fields['tags']
 			],
-			'overrides' => $fields['or']
+			'overrides' => array_values($fields['or'])
 		];
 
 		// Use dashboard time from user profile.
