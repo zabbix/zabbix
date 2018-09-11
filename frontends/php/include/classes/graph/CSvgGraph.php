@@ -897,10 +897,7 @@ class CSvgGraph extends CSvg {
 	protected function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-				$this->addItem((new CSvgGraphPoints(reset($this->paths[$index]), $metric))
-					->setPosition($this->canvas_x, $this->canvas_y)
-					->setSize($this->canvas_width, $this->canvas_height)
-				);
+				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
 			}
 		}
 	}
