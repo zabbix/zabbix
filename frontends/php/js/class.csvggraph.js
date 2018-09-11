@@ -187,7 +187,7 @@ jQuery(function ($) {
 			data = graph.data('options'),
 			offsetX = e.clientX - graph.offset().left;
 
-		if (data.boxing) {
+		if (data && data.boxing) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
 
 			destroySBox(e, graph);
@@ -337,8 +337,6 @@ jQuery(function ($) {
 
 	// Show problem or value hintbox.
 	function showHintbox(e, graph) {
-		//e.stopPropagation();
-
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
 			hbox = graph.data('hintbox') || null,
