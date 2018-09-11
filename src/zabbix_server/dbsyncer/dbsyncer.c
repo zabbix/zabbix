@@ -81,7 +81,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		}
 
 		sec = zbx_time();
-		sync_history_cache(ZBX_SYNC_PARTIAL, &sync_num, &more);
+		zbx_sync_history_cache(&sync_num, &more);
 		num += sync_num;
 		total_sec += zbx_time() - sec;
 

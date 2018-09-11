@@ -2731,11 +2731,12 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sync_timeout, int *total_num, int *more)
+static void	sync_proxy_history(time_t sync_timeout, int *total_num, int *more)
 {
 	int			history_num;
-	time_t			sync_start, now;
+	time_t			sync_start;
 	zbx_vector_ptr_t	history_items;
+	ZBX_DC_HISTORY		history[ZBX_HC_SYNC_MAX];
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
@@ -2779,15 +2780,6 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sy
 
 		*total_num += history_num;
 
-		now = time(NULL);
-
-		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)*total_num / (cache->history_num + *total_num) * 100);
-			sync_start = now;
-		}
-
 		zbx_vector_ptr_clear(&history_items);
 		hc_free_item_values(history, history_num);
 
@@ -2795,7 +2787,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sy
 		/* unless we are doing full sync. This is done to allow    */
 		/* syncer process to update their statistics.              */
 	}
-	while (ZBX_SYNC_MORE == *more && sync_timeout >= now - sync_start);
+	while (ZBX_SYNC_MORE == *more && sync_timeout >= time(NULL) - sync_start);
 
 	zbx_vector_ptr_destroy(&history_items);
 }
@@ -2807,12 +2799,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sy
  * Purpose: flush history cache to database, process triggers of flushed      *
  *          and timer triggers from timer queue                               *
  *                                                                            *
- * Parameters: history   - [IN] history buffer                                *
- *             sync_type - [IN] the sync type:                                *
- *                               ZBX_SYNC_PARTIAL - normal sync               *
- *                               ZBX_SYNC_FULL - full sync, done at           *
- *                                              application exit              *
- *             sync_timeout - [IN] the timeout in seconds
+ * Parameters: sync_timeout - [IN] the timeout in seconds                     *
  *             total_num - [OUT] the number of synced values                  *
  *             more      - [OUT] a flag indicating the cache emptiness:       *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
@@ -2828,7 +2815,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sy
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int sync_timeout, int *total_num, int *more)
+static void	sync_server_history(int sync_timeout, int *total_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -2837,10 +2824,11 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int s
 	static ZBX_HISTORY_LOG		*history_log;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error;
-	time_t				sync_start, now;
+	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids, timer_triggerids;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff;
+	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -3022,11 +3010,8 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int s
 				/* Otherwise better to wait a bit for other syncers to unlock      */
 				/* items rather than trying and failing to sync locked items over  */
 				/* and over again.                                                 */
-				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num ||
-						ZBX_SYNC_FULL == sync_type)
-				{
+				if (ZBX_HC_SYNC_MIN_PCNT <= history_num * 100 / history_items.values_num)
 					*more = ZBX_SYNC_MORE;
-				}
 			}
 
 			UNLOCK_CACHE;
@@ -3060,15 +3045,6 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int s
 			}
 		}
 
-		now = time(NULL);
-
-		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)*total_num / (cache->history_num + *total_num) * 100);
-			sync_start = now;
-		}
-
 		if (0 != history_num || 0 != timers_num)
 			zbx_clean_events();
 
@@ -3087,7 +3063,7 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int s
 		/* Exit from sync loop if we have spent too much time here.       */
 		/* This is done to allow syncer process to update its statistics. */
 	}
-	while (ZBX_SYNC_MORE == *more && sync_timeout >= now - sync_start);
+	while (ZBX_SYNC_MORE == *more && sync_timeout >= time(NULL) - sync_start);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
@@ -3101,107 +3077,107 @@ static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int s
 
 /******************************************************************************
  *                                                                            *
- * Function: sync_history_cache                                               *
+ * Function: zbx_sync_history_cache_full                                      *
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
- * Parameters: sync_type - [IN] the sync type:                                *
- *                               ZBX_SYNC_PARTIAL - normal sync               *
- *                               ZBX_SYNC_FULL - full sync, done at           *
- *                                              application exit              *
- *             total_num - [OUT] the number of synced values                  *
+ * Comments: This function is used to flush history cache at server/proxy     *
+ *           exit.                                                            *
+ *           Other processes are already terminated, so cache locking is      *
+ *           unnecessary.                                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_sync_history_cache_full()
+{
+	const char		*__function_name = "zbx_sync_history_cache_full";
+
+	int			total_num = 0, more;
+	zbx_hashset_iter_t	iter;
+	zbx_hc_item_t		*item;
+	zbx_binary_heap_t	tmp_history_queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
+
+	/* History index cache might be full without any space left for queueing items from history index to  */
+	/* history queue. The solution: replace the shared-memory history queue with heap-allocated one. Add  */
+	/* all items from history index to the new history queue.                                             */
+	/*                                                                                                    */
+	/* Assertions that must be true.                                                                      */
+	/*   * This is the main server or proxy process,                                                      */
+	/*   * There are no other users of history index cache stored in shared memory. Other processes       */
+	/*     should have quit by this point.                                                                */
+	/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
+	/*     stored in the shared memory.                                                                   */
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		/* unlock all triggers before full sync so no items are locked by triggers */
+		DCconfig_unlock_all_triggers();
+
+		/* clear timer trigger queue to avoid processing time triggers at exit */
+		zbx_dc_clear_timer_queue();
+	}
+
+	tmp_history_queue = cache->history_queue;
+
+	zbx_binary_heap_create(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
+	zbx_hashset_iter_reset(&cache->history_items, &iter);
+
+	/* add all items from history index to the new history queue */
+	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL != item->tail)
+		{
+			item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+			hc_queue_item(item);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
+
+	while (0 != cache->history_queue.elems_num)
+	{
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			sync_server_history(ZBX_HC_SYNC_TIME_MAX, &total_num, &more);
+		else
+			sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, &total_num, &more);
+
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+				(double)total_num / (cache->history_num + total_num) * 100);
+	}
+
+	zbx_binary_heap_destroy(&cache->history_queue);
+	cache->history_queue = tmp_history_queue;
+
+	zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_sync_history_cache                                           *
+ *                                                                            *
+ * Purpose: writes updates and new data from history cache to database        *
+ *                                                                            *
+ * Parameters: total_num - [OUT] the number of synced values                  *
  *             more      - [OUT] a flag indicating the cache emptiness:       *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-void	sync_history_cache(int sync_type, int *total_num, int *more)
+void	zbx_sync_history_cache(int *total_num, int *more)
 {
-	const char		*__function_name = "sync_history_cache";
-
-	static ZBX_DC_HISTORY	*history = NULL;	/* array of structures where item data from history  */
-							/* cache are copied into to process triggers, trends */
-							/* etc and finally write into db */
-	zbx_binary_heap_t	tmp_history_queue;
-	time_t			sync_timeout;
+	const char		*__function_name = "zbx_sync_history_cache";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
 	*total_num = 0;
 
-	if (ZBX_SYNC_FULL == sync_type)
-	{
-		zbx_hashset_iter_t	iter;
-		zbx_hc_item_t		*item;
-
-		/* History index cache might be full without any space left for queueing items from history index to  */
-		/* history queue. The solution: replace the shared-memory history queue with heap-allocated one. Add  */
-		/* all items from history index to the new history queue.                                             */
-		/*                                                                                                    */
-		/* Assertions that must be true.                                                                      */
-		/*   * This is the main server or proxy process,                                                      */
-		/*   * There are no other users of history index cache stored in shared memory. Other processes       */
-		/*     should have quit by this point.                                                                */
-		/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
-		/*     stored in the shared memory.                                                                   */
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			/* unlock all triggers before full sync so no items are locked by triggers */
-			DCconfig_unlock_all_triggers();
-
-			/* clear timer trigger queue to avoid processing time triggers at exit */
-			zbx_dc_clear_timer_queue();
-		}
-
-		LOCK_CACHE;
-
-		tmp_history_queue = cache->history_queue;
-
-		zbx_binary_heap_create(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
-		zbx_hashset_iter_reset(&cache->history_items, &iter);
-
-		/* add all items from history index to the new history queue */
-		while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
-		{
-			if (NULL != item->tail)
-			{
-				item->status = ZBX_HC_ITEM_STATUS_NORMAL;
-				hc_queue_item(item);
-			}
-		}
-
-		UNLOCK_CACHE;
-
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
-
-		if (0 == tmp_history_queue.elems_num)
-			goto out;
-
-		sync_timeout = SEC_PER_YEAR;
-	}
-	else
-		sync_timeout = ZBX_HC_SYNC_TIME_MAX;
-
-	if (NULL == history)
-		history = (ZBX_DC_HISTORY *)zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
-
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		sync_server_history(history, sync_type, sync_timeout, total_num, more);
+		sync_server_history(ZBX_HC_SYNC_TIME_MAX, total_num, more);
 	else
-		sync_proxy_history(history, sync_type, sync_timeout, total_num, more);
-out:
-	if (ZBX_SYNC_FULL == sync_type)
-	{
-		LOCK_CACHE;
-
-		zbx_binary_heap_destroy(&cache->history_queue);
-		cache->history_queue = tmp_history_queue;
-
-		UNLOCK_CACHE;
-
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
-	}
+		sync_proxy_history(ZBX_HC_SYNC_TIME_MAX, total_num, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4236,11 +4212,9 @@ out:
  ******************************************************************************/
 static void	DCsync_all(void)
 {
-	int	sync_num, more;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache(ZBX_SYNC_FULL, &sync_num, &more);
+	zbx_sync_history_cache_full();
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
