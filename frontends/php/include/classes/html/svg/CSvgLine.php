@@ -21,22 +21,12 @@
 
 class CSvgLine extends CSvgTag {
 
-	public function __construct($x1, $y1, $x2, $y2, $color = null) {
+	public function __construct($x1, $y1, $x2, $y2) {
 		parent::__construct('line', true);
 
 		$this->setAttribute('x1', $x1);
 		$this->setAttribute('y1', $y1);
 		$this->setAttribute('x2', $x2);
 		$this->setAttribute('y2', $y2);
-
-		if ($color !== null) {
-			$this->setAttribute('stroke', $color);
-		}
-	}
-
-	public function setDashed() {
-		$this->setAttribute('stroke-dasharray', '2, 2');
-
-		return $this;
 	}
 }
