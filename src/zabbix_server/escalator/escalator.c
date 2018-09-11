@@ -2530,8 +2530,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	switch (escalation_source)
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
-			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null and"
-					" itemid is null");
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null and");
 			if (1 < CONFIG_ESCALATOR_FORKS)
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
