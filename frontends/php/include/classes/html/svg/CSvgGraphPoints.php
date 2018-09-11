@@ -22,30 +22,18 @@
 class CSvgGraphPoints extends CSvgGroup {
 
 	protected $path;
-
 	protected $itemid;
 	protected $item_name;
-	protected $units;
 	protected $options;
-
-	protected $position_x = 0;
-	protected $position_y = 0;
-
-	protected $width = 0;
-	protected $height = 0;
 
 	public function __construct($path, $metric) {
 		parent::__construct();
 
 		$this->path = $path;
-
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
-		$this->units = $metric['units'];
-
 		$this->options = $metric['options'] + [
 			'color' => '#b0af07',
-			'fill' => 5,
 			'order' => 1,
 			'pointsize' => 1,
 			'transparency' => 5
