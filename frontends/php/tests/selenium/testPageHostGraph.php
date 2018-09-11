@@ -378,7 +378,7 @@ class testPageHostGraph extends CWebTest {
 					'target_type' => 'Templates',
 					'group' => 'Templates',
 					'targets' => [
-						'Template with item graph[1]'
+						'Template with item graph'
 					]
 				]
 			],
@@ -393,7 +393,7 @@ class testPageHostGraph extends CWebTest {
 					'target_type' => 'Templates',
 					'group' => 'Templates',
 					'targets' => [
-						'Template with item graph[1]'
+						'Template with item graph'
 					],
 					'error' => 'Graph with name "Delete graph 3" already exists in graphs or graph prototypes.'
 				]
@@ -406,7 +406,7 @@ class testPageHostGraph extends CWebTest {
 					'target_type' => 'Templates',
 					'group' => 'Templates',
 					'targets' => [
-						'Template with item graph[1] for copy all graph'
+						'Template with item graph for copy all graph'
 					]
 				]
 			],

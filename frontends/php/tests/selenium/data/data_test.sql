@@ -1887,10 +1887,10 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99021, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99017, 99021, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50033,99021,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99014, 2, 99021, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99022, 'Template with item graph[1]', 'Template with item grap[1]', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99022, 'Template with item graph', 'Template with item graph', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99018, 99022, 1);
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99015, 2, 99022, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (99023, 'Template with item graph[1] for copy all graph', 'Template with item grap[1] for copy all graph', 3, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (99023, 'Template with item graph for copy all graph', 'Template with item graph for copy all graph', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99019, 99023, 1);
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99016, 2, 99023, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99029, 'Template to copy graph to several templates 1', 'Template to copy graph to several templates 1', 3, '');
