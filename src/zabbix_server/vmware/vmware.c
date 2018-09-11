@@ -309,10 +309,6 @@ static void	vmware_shared_strfree(char *str)
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
-#define ZBX_XPATH_DATASTORE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
-	"/*[local-name()='val']"
-
 #define ZBX_XPATH_DATASTORE_MOUNT()									\
 	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
 	"/*[local-name()='mountInfo']/*[local-name()='path']"
@@ -4956,7 +4952,6 @@ void	zbx_vmware_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#define	ZBX_VMWARE_TASK_NONE		0
 #define	ZBX_VMWARE_TASK_IDLE		1
 #define	ZBX_VMWARE_TASK_UPDATE		2
 #define	ZBX_VMWARE_TASK_UPDATE_PERF	3
