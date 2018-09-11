@@ -2731,7 +2731,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
 	}
 }
 
-static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int sync_timeout, int *total_num, int *more)
+static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, time_t sync_timeout, int *total_num, int *more)
 {
 	int			history_num;
 	time_t			sync_start, now;
@@ -2828,7 +2828,7 @@ static void	sync_proxy_history(ZBX_DC_HISTORY *history, int sync_type, int sync_
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_server_history(ZBX_DC_HISTORY *history, int sync_type, int sync_timeout, int *total_num, int *more)
+static void	sync_server_history(ZBX_DC_HISTORY *history, time_t sync_type, int sync_timeout, int *total_num, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -3123,7 +3123,7 @@ void	sync_history_cache(int sync_type, int *total_num, int *more)
 							/* cache are copied into to process triggers, trends */
 							/* etc and finally write into db */
 	zbx_binary_heap_t	tmp_history_queue;
-	int			sync_timeout;
+	time_t			sync_timeout;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
