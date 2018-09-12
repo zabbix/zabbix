@@ -123,10 +123,11 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 
 static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
-	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 	char		*subsys, *prefix = NULL;
-	int		sub_len, ret = FAIL;
+	int		ret = FAIL;
 	unsigned int	addr;
+	ssize_t		sub_len;
+	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
@@ -326,7 +327,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN],
 			device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
 	const char	*subfolder;
-	int		err, dev_len;
+	int		err;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
 
@@ -335,6 +336,8 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 
 	while (NULL != (deviceent = readdir(devicedir)))
 	{
+		ssize_t	dev_len;
+
 		if (0 == strcmp(deviceent->d_name, ".") || 0 == strcmp(deviceent->d_name, ".."))
 			continue;
 
