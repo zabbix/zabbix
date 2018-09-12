@@ -45,10 +45,11 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int	sleeptime = -1, total_values_num = 0, old_values_num = 0, values_num, more, total_triggers_num = 0,
-			old_triggers_num = 0, triggers_num;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
+	int	sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0, triggers_num;
+	double	sec, total_sec = 0.0;
 	time_t	last_stat_time;
+	char	*stats = NULL;
+	size_t	stats_alloc = 0, stats_offset = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -62,6 +63,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
+
+	zbx_strcpy_alloc(&stats, &stats_alloc, &stats_offset, "started");
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -77,9 +80,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		if (0 != sleeptime)
 		{
-			zbx_setproctitle("%s #%d [processed %d values, %d triggers in " ZBX_FS_DBL
-					" sec, syncing history]", get_process_type_string(process_type), process_num,
-					old_values_num, old_triggers_num, old_total_sec);
+			zbx_setproctitle("%s #%d [%s, syncing history]", get_process_type_string(process_type),
+					process_num, stats);
 		}
 
 		sec = zbx_time();
@@ -92,20 +94,28 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
+			stats_offset = 0;
+			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
+
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			{
+				zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, ", %d triggers",
+						total_triggers_num);
+			}
+
+			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, " in " ZBX_FS_DBL " sec", total_sec);
+
 			if (0 == sleeptime)
 			{
-				zbx_setproctitle("%s #%d [processed %d values, %d triggers in " ZBX_FS_DBL
-						" sec, syncing history]", get_process_type_string(process_type),
-						process_num, total_values_num, total_triggers_num, total_sec);
+				zbx_setproctitle("%s #%d [%s, syncing history]", get_process_type_string(process_type),
+						process_num, stats);
 			}
 			else
 			{
-				zbx_setproctitle("%s #%d [processed %d values, %d triggers " ZBX_FS_DBL
-						" sec, idle %d sec]", get_process_type_string(process_type),
-						process_num, total_values_num, total_triggers_num, total_sec, sleeptime);
-				old_values_num = total_values_num;
-				old_total_sec = total_sec;
+				zbx_setproctitle("%s #%d [%s, idle %d sec]", get_process_type_string(process_type),
+						process_num, stats, sleeptime);
 			}
+
 			total_values_num = 0;
 			total_triggers_num = 0;
 			total_sec = 0.0;
@@ -118,6 +128,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
 #endif
 	}
+
+	zbx_free(stats);
 
 #undef STAT_INTERVAL
 }
