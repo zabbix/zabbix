@@ -45,23 +45,24 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int	sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0, triggers_num;
-	double	sec, total_sec = 0.0;
-	time_t	last_stat_time;
-	char	*stats = NULL;
-	size_t	stats_alloc = 0, stats_offset = 0;
+	int		sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0, triggers_num;
+	double		sec, total_sec = 0.0;
+	time_t		last_stat_time;
+	char		*stats = NULL;
+	const char	*process_name;
+	size_t		stats_alloc = 0, stats_offset = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
+			(process_name = get_process_type_string(process_type)), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [connecting to the database]", process_name, process_num);
 	last_stat_time = time(NULL);
 
 	zbx_strcpy_alloc(&stats, &stats_alloc, &stats_offset, "started");
@@ -79,10 +80,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		zbx_handle_log();
 
 		if (0 != sleeptime)
-		{
-			zbx_setproctitle("%s #%d [%s, syncing history]", get_process_type_string(process_type),
-					process_num, stats);
-		}
+			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
 		sec = zbx_time();
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
@@ -106,15 +104,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, " in " ZBX_FS_DBL " sec", total_sec);
 
 			if (0 == sleeptime)
-			{
-				zbx_setproctitle("%s #%d [%s, syncing history]", get_process_type_string(process_type),
-						process_num, stats);
-			}
+				zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 			else
-			{
-				zbx_setproctitle("%s #%d [%s, idle %d sec]", get_process_type_string(process_type),
-						process_num, stats, sleeptime);
-			}
+				zbx_setproctitle("%s #%d [%s, idle %d sec]", process_name, process_num, stats, sleeptime);
 
 			total_values_num = 0;
 			total_triggers_num = 0;
