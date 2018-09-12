@@ -468,7 +468,7 @@ class CSvgGraph extends CSvg {
 			(new CsvgTag('clipPath'))
 				->addItem(
 					(new CSvgPath(implode(' ', [
-						'M'.$this->canvas_x.','.($this->canvas_y - 10),
+						'M'.$this->canvas_x.','.($this->canvas_y - 3),
 						'H'.($this->canvas_width + $this->canvas_x),
 						'V'.($this->canvas_height + $this->canvas_y),
 						'H'.($this->canvas_x)
@@ -745,12 +745,19 @@ class CSvgGraph extends CSvg {
 					continue;
 				}
 
-				$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
-				$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-				$paths[$path_num][] = [$x, $y, convert_units([
-					'value' => $point,
-					'units' => $metric['units']
-				])];
+				/**
+				 * Avoid invisible data point drawing. Data sets of type != SVG_GRAPH_TYPE_POINTS cannot be skipped to
+				 * keep shape unchanged.
+				 */
+				$in_range = ($max_value >= $point && $min_value <= $point);
+				if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
+					$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
+					$paths[$path_num][] = [$x, $y, convert_units([
+						'value' => $point,
+						'units' => $metric['units']
+					])];
+				}
 			}
 
 			$this->paths[$index] = $paths;
