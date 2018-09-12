@@ -29,7 +29,7 @@ class CSvgGraphPoints extends CSvgGroup {
 	public function __construct($path, $metric) {
 		parent::__construct();
 
-		$this->path = $path;
+		$this->path = $path ? : [];
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->options = $metric['options'] + [
