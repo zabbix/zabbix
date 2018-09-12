@@ -3093,7 +3093,7 @@ static void	sync_history_cache_full(void)
 {
 	const char		*__function_name = "sync_history_cache_full";
 
-	int			values_num = 0, timers_num = 0, more;
+	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 	zbx_binary_heap_t	tmp_history_queue;
@@ -3140,7 +3140,7 @@ static void	sync_history_cache_full(void)
 	while (0 != cache->history_queue.elems_num)
 	{
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			sync_server_history(&values_num, &timers_num, &more);
+			sync_server_history(&values_num, &triggers_num, &more);
 		else
 			sync_proxy_history(&values_num, &more);
 
