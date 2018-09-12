@@ -126,7 +126,6 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 	char		*subsys, *prefix = NULL;
 	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
-	short int	bus_spi, bus_i2c;
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
@@ -171,6 +170,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 
 	if ((NULL == subsys || 0 == strcmp(subsys, "i2c")))
 	{
+		short int	bus_i2c;
+
 		if (2 != sscanf(dev_name, "%hd-%x", &bus_i2c, &addr))
 			goto out;
 
@@ -208,6 +209,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "spi"))
 	{
+		short int	bus_spi;
+
 		/* SPI */
 		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &addr))
 			goto out;
