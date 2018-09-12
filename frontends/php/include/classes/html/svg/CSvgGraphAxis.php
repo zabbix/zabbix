@@ -145,25 +145,37 @@ class CSvgGraphAxis extends CSvgTag {
 			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
 			$y = $this->y;
 
-			return (new CSvgPath())
-				->moveTo($this->x, $y)
-				->lineTo($x, $y)
-				->moveTo($x + self::ZBX_ARROW_SIZE, $y)
-				->lineTo($x, $y - $offset)
-				->lineTo($x, $y + $offset)
-				->lineTo($x + self::ZBX_ARROW_SIZE, $y);
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($this->x, $y)
+					->lineTo($x, $y),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x + self::ZBX_ARROW_SIZE, $y)
+					->lineTo($x, $y - $offset)
+					->lineTo($x, $y + $offset)
+					->closePath()
+			];
 		}
 		else {
 			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
 			$y = $this->y - self::ZBX_ARROW_OFFSET;
 
-			return (new CSvgPath())
-				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET)
-				->moveTo($x, $y - self::ZBX_ARROW_SIZE)
-				->lineTo($x - $offset, $y)
-				->lineTo($x + $offset, $y)
-				->lineTo($x, $y - self::ZBX_ARROW_SIZE);
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($x, $y)
+					->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x, $y - self::ZBX_ARROW_SIZE)
+					->lineTo($x - $offset, $y)
+					->lineTo($x + $offset, $y)
+					->closePath()
+			];
 		}
 	}
 
