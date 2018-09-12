@@ -85,7 +85,7 @@ class CSvgGraphAxis extends CSvgTag {
 		$this->css_class = [
 			GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
 			GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT,
-			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM,
+			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM
 		];
 
 		$this->labels = $labels;
@@ -169,29 +169,33 @@ class CSvgGraphAxis extends CSvgTag {
 	private function getAxis() {
 		$path = new CSvgPath();
 		$size = $this->arrow_size;
-		$offset = ceil($size/2);
+		$offset = ceil($size / 2);
 
 		if ($this->type === GRAPH_YAXIS_SIDE_BOTTOM) {
+			$x = $this->x + $this->width + $this->arrow_offset;
 			$y = $this->y;
-			$x = $this->width + $this->x + $this->arrow_offset;
-			$path->moveTo($this->x, $y)
+			$path
+				->moveTo($this->x, $y)
 				->lineTo($x, $y);
 
 			if ($size) {
-				$path->moveTo($x + $size, $y)
+				$path
+					->moveTo($x + $size, $y)
 					->lineTo($x, $y - $offset)
 					->lineTo($x, $y + $offset)
 					->lineTo($x + $size, $y);
 			}
 		}
 		else {
-			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ? $this->x : $this->width + $this->x;
+			$x = ($this->type === GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
 			$y = $this->y - $this->arrow_offset;
-			$path->moveTo($x, $y)
+			$path
+				->moveTo($x, $y)
 				->lineTo($x, $this->height + $y + $this->arrow_offset);
 
 			if ($size) {
-				$path->moveTo($x, $y - $size)
+				$path
+					->moveTo($x, $y - $size)
 					->lineTo($x - $offset, $y)
 					->lineTo($x + $offset, $y)
 					->lineTo($x, $y - $size);
@@ -210,34 +214,33 @@ class CSvgGraphAxis extends CSvgTag {
 		$x = 0;
 		$y = 0;
 		$labels = [];
-		$is_horizontal = $this->type === GRAPH_YAXIS_SIDE_BOTTOM;
 
-		if ($is_horizontal) {
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
 			$axis = 'x';
 			// Label margin from axis.
 			$margin = 7;
 			$y = $this->height - $margin;
 		}
 		else {
+			$axis = 'y';
 			// Label margin from axis.
 			$margin = 5;
-			$axis = 'y';
-			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ?  $margin : $this->width - $margin;
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $margin : $this->width - $margin;
 		}
 
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
 
-			if ($this->type === GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
+			if ($this->type == GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
 				continue;
 			}
 
-			if (!$is_horizontal) {
+			if ($this->type == GRAPH_YAXIS_SIDE_LEFT || $this->type == GRAPH_YAXIS_SIDE_RIGHT) {
 				// Flip upside down.
 				$y = $this->height - $y;
 			}
 
-			$labels[] = (new CSvgText($x + $this->x, $y + $this->y, $label));
+			$labels[] = (new CSvgText($this->x + $x, $this->y + $y, $label));
 		}
 
 		return $labels;

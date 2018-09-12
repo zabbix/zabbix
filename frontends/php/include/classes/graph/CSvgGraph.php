@@ -647,11 +647,12 @@ class CSvgGraph extends CSvg {
 	 * Add X axis with labels to graph.
 	 */
 	protected function drawCanvasXAxis() {
-		$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
-			->setSize($this->canvas_width, $this->xaxis_height)
-			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-			->setTextColor($this->text_color)
-			->setLineColor($this->grid_color)
+		$this->addItem(
+			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+				->setSize($this->canvas_width, $this->xaxis_height)
+				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+				->setTextColor($this->text_color)
+				->setLineColor($this->grid_color)
 		);
 	}
 
