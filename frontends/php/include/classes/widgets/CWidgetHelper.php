@@ -742,7 +742,7 @@ class CWidgetHelper {
 					'},'.
 					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
-					'onUpdate: updateGraphPreview,'.
+					'onUpdate: onGraphConfigChange,'.
 					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
 				'});'.
 			'}',
@@ -772,7 +772,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'updateGraphPreview();'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
@@ -819,9 +819,7 @@ class CWidgetHelper {
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: function() {'.
-					'updateGraphPreview();'.
-				'},'.
+				'stop: onGraphConfigChange,'.
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 				'}'.
@@ -1132,7 +1130,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'updateGraphPreview();'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
@@ -1199,9 +1197,7 @@ class CWidgetHelper {
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: function() {'.
-					'updateGraphPreview();'.
-				'},'.
+				'stop: onGraphConfigChange,'.
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.

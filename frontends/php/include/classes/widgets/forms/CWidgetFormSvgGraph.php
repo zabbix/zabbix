@@ -116,7 +116,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_lefty = (new CWidgetFieldCheckBox('lefty', _('Left Y'), _('Show')))
 			->setDefault(SVG_GRAPH_AXIS_SHOW)
 			->setAction(
-				'var on = jQuery(this).is(":checked");'.
+				'var on = (!jQuery(this).is(":disabled") && jQuery(this).is(":checked"));'.
 				'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
 				'jQuery("#lefty_static_units").prop("disabled",'.
 					'(!on || jQuery("#lefty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'
@@ -193,7 +193,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_righty = (new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))
 			->setDefault(SVG_GRAPH_AXIS_SHOW)
 			->setAction(
-				'var on = jQuery(this).is(":checked");'.
+				'var on = (!jQuery(this).is(":disabled") && jQuery(this).is(":checked"));'.
 				'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
 				'jQuery("#righty_static_units").prop("disabled",'.
 					'(!on || jQuery("#righty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'
