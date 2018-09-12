@@ -123,9 +123,9 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 
 static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
-	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char		*subsys, *prefix = NULL;
-	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
+	char	linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
+	char	*subsys, *prefix = NULL;
+	int	bus, addr, sub_len, ret = FAIL;
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
@@ -221,6 +221,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "pci"))
 	{
+		unsigned int	domain, slot, fn;
+
 		/* PCI */
 		if (4 != sscanf(dev_name, "%x:%x:%x.%x", &domain, &bus, &slot, &fn))
 			goto out;
@@ -250,6 +252,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "hid"))
 	{
+		unsigned int	vendor, product;
+
 		/* As of kernel 2.6.32, the hid device names do not look good */
 		if (4 != sscanf(dev_name, "%x:%x:%x.%x", &bus, &vendor, &product, &addr))
 			goto out;
