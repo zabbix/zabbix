@@ -32,7 +32,7 @@ class CSvgGraphGrid extends CSvgTag {
 
 	protected $color;
 
-	public function __construct(array $points_value = [], array $points_time = []) {
+	public function __construct(array $points_value, array $points_time) {
 		parent::__construct('g', true);
 
 		$this
@@ -89,12 +89,12 @@ class CSvgGraphGrid extends CSvgTag {
 		$path = (new CSvgPath());
 
 		foreach ($this->points_time as $pos => $time) {
-			if (($pos + $this->position_x) <= ($this->position_x + $this->width)) {
+			if (($this->position_x + $pos) <= ($this->position_x + $this->width)) {
 				$path
-					->moveTo($pos + $this->position_x, $this->position_y)
-					->lineTo($pos + $this->position_x, $this->position_y + $this->height);
+					->moveTo($this->position_x + $pos, $this->position_y)
+					->lineTo($this->position_x + $pos, $this->position_y + $this->height);
 			}
-		};
+		}
 
 		foreach ($this->points_value as $pos => $value) {
 			if (($this->position_y + $this->height - $pos) <= ($this->position_y + $this->height)) {
@@ -102,7 +102,7 @@ class CSvgGraphGrid extends CSvgTag {
 					->moveTo($this->position_x, $this->position_y + $this->height - $pos)
 					->lineTo($this->position_x + $this->width, $this->position_y + $this->height - $pos);
 			}
-		};
+		}
 
 		return $path;
 	}
