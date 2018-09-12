@@ -3079,7 +3079,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_sync_history_cache_full                                      *
+ * Function: sync_history_cache_full                                          *
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
@@ -3089,9 +3089,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_history_cache_full(void)
+static void	sync_history_cache_full(void)
 {
-	const char		*__function_name = "zbx_sync_history_cache_full";
+	const char		*__function_name = "sync_history_cache_full";
 
 	int			values_num = 0, timers_num = 0, more;
 	zbx_hashset_iter_t	iter;
@@ -4217,7 +4217,7 @@ static void	DCsync_all(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	zbx_sync_history_cache_full();
+	sync_history_cache_full();
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
