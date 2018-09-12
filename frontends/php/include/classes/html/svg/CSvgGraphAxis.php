@@ -29,7 +29,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var array
 	 */
-	public $css_class;
+	private $css_class;
 
 	/**
 	 * Axis type. One of CSvgGraphAxis::AXIS_* constants.
@@ -50,15 +50,15 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var int
 	 */
-	private $arrow_size = 5;
-	private $arrow_offset = 5;
+	const ZBX_ARROW_SIZE = 5;
+	const ZBX_ARROW_OFFSET = 5;
 
 	/**
 	 * Color for labels.
 	 *
 	 * @var string
 	 */
-	private $color;
+	private $text_color;
 
 	/**
 	 * Color for axis.
@@ -66,13 +66,6 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @var string
 	 */
 	private $line_color;
-
-	/**
-	 * Axis container.
-	 *
-	 * @var CSvgGroup
-	 */
-	private $container;
 
 	/**
 	 * Visibility of axis line with arrow.
@@ -90,7 +83,6 @@ class CSvgGraphAxis extends CSvgTag {
 
 		$this->labels = $labels;
 		$this->type = $type;
-		$this->container = new CSvgGroup();
 	}
 
 	/**
@@ -105,7 +97,7 @@ class CSvgGraphAxis extends CSvgTag {
 				'fill' => 'transparent'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
-				'fill' => $this->color,
+				'fill' => $this->text_color,
 				'font-size' => '11px',
 				'alignment-baseline' => 'middle',
 				'dominant-baseline' => 'middle'
@@ -123,19 +115,6 @@ class CSvgGraphAxis extends CSvgTag {
 	}
 
 	/**
-	 * Set axis line visibility.
-	 *
-	 * @param bool $visible   True if should be visible.
-	 *
-	 * @return CSvgGraphAxis
-	 */
-	public function setAxisVisibility($visible) {
-		$this->axis_visible = $visible;
-
-		return $this;
-	}
-
-	/**
 	 * Set text color.
 	 *
 	 * @param string $color  Color value.
@@ -143,7 +122,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @return CSvgGraphAxis
 	 */
 	public function setTextColor($color) {
-		$this->color = $color;
+		$this->text_color = $color;
 
 		return $this;
 	}
@@ -167,42 +146,32 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @return CSvgPath
 	 */
 	private function getAxis() {
-		$path = new CSvgPath();
-		$size = $this->arrow_size;
-		$offset = ceil($size / 2);
+		$offset = ceil(self::ZBX_ARROW_SIZE / 2);
 
-		if ($this->type === GRAPH_YAXIS_SIDE_BOTTOM) {
-			$x = $this->x + $this->width + $this->arrow_offset;
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
 			$y = $this->y;
-			$path
-				->moveTo($this->x, $y)
-				->lineTo($x, $y);
 
-			if ($size) {
-				$path
-					->moveTo($x + $size, $y)
-					->lineTo($x, $y - $offset)
-					->lineTo($x, $y + $offset)
-					->lineTo($x + $size, $y);
-			}
+			return (new CSvgPath())
+				->moveTo($this->x, $y)
+				->lineTo($x, $y)
+				->moveTo($x + self::ZBX_ARROW_SIZE, $y)
+				->lineTo($x, $y - $offset)
+				->lineTo($x, $y + $offset)
+				->lineTo($x + self::ZBX_ARROW_SIZE, $y);
 		}
 		else {
-			$x = ($this->type === GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
-			$y = $this->y - $this->arrow_offset;
-			$path
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
+			$y = $this->y - self::ZBX_ARROW_OFFSET;
+
+			return (new CSvgPath())
 				->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + $this->arrow_offset);
-
-			if ($size) {
-				$path
-					->moveTo($x, $y - $size)
-					->lineTo($x - $offset, $y)
-					->lineTo($x + $offset, $y)
-					->lineTo($x, $y - $size);
-			}
+				->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET)
+				->moveTo($x, $y - self::ZBX_ARROW_SIZE)
+				->lineTo($x - $offset, $y)
+				->lineTo($x + $offset, $y)
+				->lineTo($x, $y - self::ZBX_ARROW_SIZE);
 		}
-
-		return $path;
 	}
 
 	/**
@@ -247,12 +216,12 @@ class CSvgGraphAxis extends CSvgTag {
 	}
 
 	public function toString($destroy = true) {
-		$this->container->additem([
-			$this->axis_visible ? $this->getAxis() : null,
-			$this->getLabels()
-		])
-			->addClass($this->css_class[$this->type]);
-
-		return $this->container->toString($destroy);
+		return (new CSvgGroup())
+			->additem([
+				$this->axis_visible ? $this->getAxis() : null,
+				$this->getLabels()
+			])
+			->addClass($this->css_class[$this->type])
+			->toString($destroy);
 	}
 }
