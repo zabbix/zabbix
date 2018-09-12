@@ -58,7 +58,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 	public function getStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_DASHED => [
-				'stroke-dasharray' => '2, 2'
+				'stroke-dasharray' => '2,2'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_HANDLE => [
 				'fill' => $this->color,
@@ -68,7 +68,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 				'fill' => $this->color,
 				'opacity' => '0.1'
 			],
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEMS . ' line' => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEMS.' line' => [
 				'stroke' => $this->color
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_PROBLEM_ARROW => [
