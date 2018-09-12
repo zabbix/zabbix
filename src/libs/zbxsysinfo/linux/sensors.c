@@ -123,9 +123,10 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 
 static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
-	char	linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char	*subsys, *prefix = NULL;
-	int	addr, sub_len, ret = FAIL;
+	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
+	char		*subsys, *prefix = NULL;
+	int		sub_len, ret = FAIL;
+	unsigned int	addr;
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
@@ -209,13 +210,14 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "spi"))
 	{
+		int		address;
 		short int	bus_spi;
 
 		/* SPI */
-		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &addr))
+		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &address))
 			goto out;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, address);
 
 		ret = SUCCEED;
 	}
@@ -234,11 +236,13 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	}
 	else if (0 == strcmp(subsys, "platform") || 0 == strcmp(subsys, "of_platform"))
 	{
+		int	address;
+
 		/* must be new ISA (platform driver) */
-		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &addr))
+		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &address))
 			addr = 0;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, address);
 
 		ret = SUCCEED;
 	}
