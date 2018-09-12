@@ -3137,7 +3137,7 @@ static void	sync_history_cache_full(void)
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
-	while (0 != cache->history_queue.elems_num)
+	while (0 != hc_queue_get_size())
 	{
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			sync_server_history(&values_num, &triggers_num, &more);
