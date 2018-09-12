@@ -371,90 +371,69 @@ class CSvgGraphHelper {
 	/**
 	 * Select metrics from given data set options. Apply data set options to each selected metric.
 	 */
-	protected static function getMetrics(array &$metrics, array $data_sets = []) {
-		$data_set_num = 0;
+	protected static function getMetrics(array &$metrics, array $data_sets) {
+		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
-		if (!$data_sets) {
-			return;
-		}
-
-		do {
-			$data_set = $data_sets[$data_set_num];
-			$data_set_num++;
-
-			if ((!array_key_exists('hosts', $data_set) || !$data_set['hosts'])
-					|| (!array_key_exists('items', $data_set) || !$data_set['items'])) {
+		foreach ($data_sets as $data_set) {
+			if (!$data_set['hosts'] || !$data_set['items']) {
 				continue;
 			}
 
+			if ($max_metrics == 0) {
+				break;
+			}
+
 			// Find hosts.
-			$matching_hosts = API::Host()->get([
+			$hosts = API::Host()->get([
 				'output' => [],
-				'searchWildcardsEnabled' => true,
-				'searchByAny' => true,
 				'search' => [
 					'name' => self::processPattern($data_set['hosts'])
 				],
-				'sortfield' => 'name',
-				'sortorder' => ZBX_SORT_UP,
+				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
 				'preservekeys' => true
 			]);
 
-			if ($matching_hosts) {
-				$matching_items = API::Item()->get([
+			if ($hosts) {
+				$items = API::Item()->get([
 					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'],
-					'hostids' => array_keys($matching_hosts),
 					'selectHosts' => ['hostid', 'name'],
-					'searchWildcardsEnabled' => true,
-					'searchByAny' => true,
-					'search' => [
-						'name' => self::processPattern($data_set['items'])
-					],
+					'hostids' => array_keys($hosts),
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
+					'search' => [
+						'name' => self::processPattern($data_set['items'])
+					],
+					'searchWildcardsEnabled' => true,
+					'searchByAny' => true,
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
-					'limit' => SVG_GRAPH_MAX_NUMBER_OF_METRICS - count($metrics),
-					'preservekeys' => true
+					'limit' => $max_metrics
 				]);
 
-				if (!$matching_items) {
+				if (!$items) {
 					continue;
 				}
 
 				unset($data_set['hosts'], $data_set['items']);
 
-				// Add display options and append to $metrics list.
-				if (!array_key_exists('color', $data_set) && $data_set['color'] === '') {
-					$data_set['color'] = '000000';
-				}
-				if (substr($data_set['color'], 0, 1) !== '#') {
-					$data_set['color'] = '#'.$data_set['color'];
-				}
-
-				if (array_key_exists('transparency', $data_set)) {
-					// The bigger transparency level, the less visibile the metric is.
-					$data_set['transparency'] = 10 - (int) $data_set['transparency'];
-				}
+				// The bigger transparency level, the less visibile the metric is.
+				$data_set['transparency'] = 10 - (int) $data_set['transparency'];
 
 				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
 					? (int) timeUnitToSeconds($data_set['timeshift'], true)
 					: 0;
 
-				$colors = (count($matching_items) > 1)
-					? getColorVariations($data_set['color'], count($matching_items))
-					: [$data_set['color']];
+				$colors = getColorVariations('#'.$data_set['color'], count($items));
 
-				$i = 0;
-				foreach ($matching_items as $item) {
-					$data_set['color'] = $colors[$i];
+				foreach ($items as $item) {
+					$data_set['color'] = array_shift($colors);
 					$metrics[] = $item + ['options' => $data_set];
-					$i++;
+					$max_metrics--;
 				}
 			}
 		}
-		while (SVG_GRAPH_MAX_NUMBER_OF_METRICS > count($metrics) && array_key_exists($data_set_num, $data_sets));
 	}
 
 	/**

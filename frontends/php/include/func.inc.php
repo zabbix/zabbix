@@ -380,7 +380,7 @@ function hex2rgb($color) {
 }
 
 function getColorVariations($color, $variations_requested = 1) {
-	if (1 >= $variations_requested) {
+	if ($variations_requested <= 1) {
 		return [$color];
 	}
 
