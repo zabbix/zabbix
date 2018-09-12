@@ -67,13 +67,6 @@ class CSvgGraphAxis extends CSvgTag {
 	 */
 	private $line_color;
 
-	/**
-	 * Visibility of axis line with arrow.
-	 *
-	 * @var bool
-	 */
-	private $axis_visible = true;
-
 	public function __construct(array $labels, $type) {
 		$this->css_class = [
 			GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
@@ -218,7 +211,7 @@ class CSvgGraphAxis extends CSvgTag {
 	public function toString($destroy = true) {
 		return (new CSvgGroup())
 			->additem([
-				$this->axis_visible ? $this->getAxis() : null,
+				$this->getAxis(),
 				$this->getLabels()
 			])
 			->addClass($this->css_class[$this->type])
