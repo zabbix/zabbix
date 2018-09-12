@@ -156,13 +156,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if ($initial_load) {
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_resize_end) !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_resize_end() {'.
+				'if (typeof(zbx_svggraph_widget_resize_end_'.$uniqueid.') !== typeof(Function)) {'.
+					'function zbx_svggraph_widget_resize_end_'.$uniqueid.'() {'.
 						'jQuery(".dashbrd-grid-widget-container").dashboardGrid("refreshWidget", "'.$uniqueid.'");'.
 					'}'.
 				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.
-					'"zbx_svggraph_widget_resize_end", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_resize_end_'.$uniqueid.'", "'.$uniqueid.'", {'.
 						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
 					'});';
 
