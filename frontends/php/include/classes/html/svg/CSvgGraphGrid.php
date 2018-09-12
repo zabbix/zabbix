@@ -35,7 +35,9 @@ class CSvgGraphGrid extends CSvgTag {
 	public function __construct(array $points_value = [], array $points_time = []) {
 		parent::__construct('g', true);
 
-		$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID);
+		$this
+			->setAttribute('shape-rendering', 'crispEdges')
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID);
 
 		$this->points_value = $points_value;
 		$this->points_time = $points_time;
