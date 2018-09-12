@@ -23,9 +23,9 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetSvgGraphView extends CControllerWidget {
 
-	const GRAPH_WIDTH_MIN = 100;
+	const GRAPH_WIDTH_MIN = 1;
 	const GRAPH_WIDTH_MAX = 65535;
-	const GRAPH_HEIGHT_MIN = 100;
+	const GRAPH_HEIGHT_MIN = 1;
 	const GRAPH_HEIGHT_MAX = 65535;
 
 	public function __construct() {
