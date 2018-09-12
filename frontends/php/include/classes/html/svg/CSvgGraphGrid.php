@@ -27,9 +27,6 @@ class CSvgGraphGrid extends CSvgTag {
 	protected $position_x = 0;
 	protected $position_y = 0;
 
-	protected $width = 0;
-	protected $height = 0;
-
 	protected $color;
 
 	public function __construct(array $points_value, array $points_time) {
@@ -68,13 +65,6 @@ class CSvgGraphGrid extends CSvgTag {
 	 */
 	public function setColor($color) {
 		$this->color = $color;
-
-		return $this;
-	}
-
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
 
 		return $this;
 	}
