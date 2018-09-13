@@ -2739,7 +2739,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 	ZBX_DC_HISTORY		history[ZBX_HC_SYNC_MAX];
 
 	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 
 	sync_start = time(NULL);
 
@@ -2867,13 +2867,13 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_pair_create(&trends_diff);
 
 	zbx_vector_uint64_create(&triggerids);
-	zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
 
 	zbx_vector_uint64_create(&timer_triggerids);
 	zbx_vector_uint64_reserve(&timer_triggerids, ZBX_HC_TIMER_MAX);
 
 	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 
 	sync_start = time(NULL);
 
