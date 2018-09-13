@@ -3897,6 +3897,9 @@ svg {
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
+    .overrides-list .overrides-list-item .remove-btn {
+      position: relative;
+      right: -73px; }
 
 .overrides-options-list {
   white-space: normal;
@@ -3950,6 +3953,9 @@ svg {
   width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
     display: table-row; }
+    .list-vertical-accordion .list-accordion-item .remove-btn {
+      position: relative;
+      right: -10px; }
   .list-vertical-accordion .list-accordion-item-closed {
     height: 30px; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {

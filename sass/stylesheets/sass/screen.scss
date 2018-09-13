@@ -5562,6 +5562,11 @@ svg {
 
 	.overrides-list-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -73px;
+		}
 	}
 }
 
@@ -5636,6 +5641,11 @@ svg {
 
 	.list-accordion-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -10px;
+		}
 	}
 
 	.list-accordion-item-closed {
