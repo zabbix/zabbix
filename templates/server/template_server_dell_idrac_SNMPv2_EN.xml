@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Servers Hardware</name>
+         <name>Templates/Server Hardware</name>
       </group>
    </groups>
    <templates>
@@ -19,7 +19,7 @@ MIBs used:&#13;
 IDRAC-MIB-SMIv2</description>
          <groups>
             <group>
-               <name>Templates/Servers Hardware</name>
+               <name>Templates/Server Hardware</name>
             </group>
          </groups>
          <applications>
