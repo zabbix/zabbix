@@ -1002,17 +1002,6 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 	return $list;
 }
 
-function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
-	$item = get_item_by_itemid($itemid);
-	if (bccomp($hostid,$item['hostid']) == 0) {
-		return $item['itemid'];
-	}
-	if ($item['templateid'] <> 0) {
-		return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
-	}
-	return $item['itemid'];
-}
-
 /**
  * Retrieve overview table object for items.
  *

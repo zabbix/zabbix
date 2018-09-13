@@ -278,7 +278,8 @@ if (isset($_REQUEST['form'])) {
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
 		'groups' => [],
-		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
+		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'templates' => []
 	];
 
 	// add already linked and new templates
@@ -334,27 +335,9 @@ if (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		// add parent templates
-		if ($hostPrototype['templateid']) {
-			$data['parents'] = [];
-			$hostPrototypeId = $hostPrototype['templateid'];
-			while ($hostPrototypeId) {
-				$parentHostPrototype = API::HostPrototype()->get([
-					'output' => ['itemid', 'templateid'],
-					'selectParentHost' => ['hostid', 'name'],
-					'selectDiscoveryRule' => ['itemid'],
-					'hostids' => $hostPrototypeId
-				]);
-				$parentHostPrototype = reset($parentHostPrototype);
-				$hostPrototypeId = null;
-
-				if ($parentHostPrototype) {
-					$data['parents'][] = $parentHostPrototype;
-					$hostPrototypeId = $parentHostPrototype['templateid'];
-					$templateids[] = $parentHostPrototype['parentHost']['hostid'];
-				}
-			}
-		}
+		$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
+			getHostPrototypeParentTemplates([$data['host_prototype']])
+		);
 	}
 
 	// Select writable templates
@@ -409,7 +392,10 @@ else {
 		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
 	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder, $url);
-	// fetch templates linked to the prototypes
+
+	$data['parent_templates'] = getHostPrototypeParentTemplates($data['hostPrototypes']);
+
+	// Fetch templates linked to the prototypes.
 	$templateids = [];
 	foreach ($data['hostPrototypes'] as $hostPrototype) {
 		$templateids = array_merge($templateids, zbx_objectValues($hostPrototype['templates'], 'templateid'));
@@ -422,32 +408,6 @@ else {
 		'selectParentTemplates' => ['hostid', 'name']
 	]);
 	$data['linkedTemplates'] = zbx_toHash($linkedTemplates, 'templateid');
-
-	// fetch source templates and LLD rules
-	$hostPrototypeSourceIds = getHostPrototypeSourceParentIds(zbx_objectValues($data['hostPrototypes'], 'hostid'));
-	if ($hostPrototypeSourceIds) {
-		$hostPrototypeSourceTemplates = DBfetchArrayAssoc(DBSelect(
-			'SELECT h.hostid,h2.name,h2.hostid AS parent_hostid'.
-			' FROM hosts h,host_discovery hd,items i,hosts h2'.
-			' WHERE h.hostid=hd.hostid'.
-				' AND hd.parent_itemid=i.itemid'.
-				' AND i.hostid=h2.hostid'.
-				' AND '.dbConditionInt('h.hostid', $hostPrototypeSourceIds)
-		), 'hostid');
-		foreach ($data['hostPrototypes'] as &$hostPrototype) {
-			if ($hostPrototype['templateid']) {
-				$sourceTemplate = $hostPrototypeSourceTemplates[$hostPrototypeSourceIds[$hostPrototype['hostid']]];
-				$hostPrototype['sourceTemplate'] = [
-					'hostid' => $sourceTemplate['parent_hostid'],
-					'name' => $sourceTemplate['name']
-				];
-				$sourceDiscoveryRuleId = get_realrule_by_itemid_and_hostid($discoveryRule['itemid'], $sourceTemplate['hostid']);
-				$hostPrototype['sourceDiscoveryRuleId'] = $sourceDiscoveryRuleId;
-				$templateids[] = $sourceTemplate['parent_hostid'];
-			}
-		}
-		unset($hostPrototype);
-	}
 
 	foreach ($data['linkedTemplates'] as $linked_template) {
 		foreach ($linked_template['parentTemplates'] as $parent_template) {
