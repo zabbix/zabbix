@@ -441,16 +441,15 @@ class CSvgGraphHelper {
 	 */
 	protected static function applyOverrides(array &$metrics = [], array $overrides = []) {
 		foreach ($overrides as $override) {
+			if ($override['hosts'] === '' || $override['items'] === '') {
+				continue;
+			}
+
 			// Convert timeshift to seconds.
 			if (array_key_exists('timeshift', $override)) {
 				$override['timeshift'] = ($override['timeshift'] !== '')
 					? (int) timeUnitToSeconds($override['timeshift'], true)
 					: 0;
-			}
-
-			if ((!array_key_exists('hosts', $override) || $override['hosts'] === '')
-					|| (!array_key_exists('items', $override) || $override['items'] === '')) {
-				continue;
 			}
 
 			$hosts_patterns = self::processPattern($override['hosts']);
@@ -459,6 +458,7 @@ class CSvgGraphHelper {
 			unset($override['hosts'], $override['items']);
 
 			$metrics_matched = [];
+
 			foreach ($metrics as $metric_num => $metric) {
 				// If '*' used, apply options to all metrics.
 				$host_matches = ($hosts_patterns === null);
@@ -470,24 +470,20 @@ class CSvgGraphHelper {
 				 * It currently checks if at least one of host pattern and at least one of item pattern matches,
 				 * without checking relation between matching host and item.
 				 */
-				$host_pattern_num = 0;
-				while (!$host_matches && array_key_exists($host_pattern_num, $hosts_patterns)) {
-					$re = '/^'.str_replace('\*', '.*', preg_quote($hosts_patterns[$host_pattern_num], '/')).'$/i';
-					$host_matches = (strpos($hosts_patterns[$host_pattern_num], '*') === false)
-						? ($metric['hosts'][0]['name'] === $hosts_patterns[$host_pattern_num])
-						: preg_match($re, $metric['hosts'][0]['name']);
-
-					$host_pattern_num++;
+				if ($hosts_patterns !== null) {
+					for ($hosts_pattern = reset($hosts_patterns); !$host_matches && $hosts_pattern !== false;
+							$hosts_pattern = next($hosts_patterns)) {
+						$pattern = '/^'.str_replace('\*', '.*', preg_quote($hosts_pattern, '/')).'$/i';
+						$host_matches = (bool) preg_match($pattern, $metric['hosts'][0]['name']);
+					}
 				}
 
-				$item_pattern_num = 0;
-				while (!$item_matches && array_key_exists($item_pattern_num, $items_patterns)) {
-					$re = '/^'.str_replace('\*', '.*', preg_quote($items_patterns[$item_pattern_num], '/')).'$/i';
-					$item_matches = (strpos($items_patterns[$item_pattern_num], '*') === false)
-						? ($metric['name'] === $items_patterns[$item_pattern_num])
-						: preg_match($re, $metric['name']);
-
-					$item_pattern_num++;
+				if ($items_patterns !== null && $host_matches) {
+					for ($items_pattern = reset($items_patterns); !$item_matches && $items_pattern !== false;
+							$items_pattern = next($items_patterns)) {
+						$pattern = '/^'.str_replace('\*', '.*', preg_quote($items_pattern, '/')).'$/i';
+						$item_matches = (bool) preg_match($pattern, $metric['name']);
+					}
 				}
 
 				/**
@@ -501,42 +497,43 @@ class CSvgGraphHelper {
 
 			// Apply override options to matching metrics.
 			if ($metrics_matched) {
-				if (array_key_exists('color', $override) && $override['color'] !== '') {
-					$override['color'] = (substr($override['color'], 0, 1) === '#') ? $override['color'] : '#'.$override['color'];
-
-					$colors = (count($metrics_matched) > 1)
-						? getColorVariations($override['color'], count($metrics_matched))
-						: [$override['color']];
-				}
-				else {
-					$colors = null;
-				}
+				$colors = (array_key_exists('color', $override) && $override['color'] !== '')
+					? getColorVariations('#'.$override['color'], count($metrics_matched))
+					: null;
 
 				if (array_key_exists('transparency', $override)) {
 					// The bigger transparency level, the less visibile the metric is.
-					$override['transparency'] = 10 - $override['transparency'];
+					$override['transparency'] = 10 - (int) $override['transparency'];
 				}
 
-				foreach ($metrics_matched as $i => $metric_num) {
+				foreach ($metrics_matched as $metric_num) {
 					$metric = &$metrics[$metric_num];
-					$metric['options'] = $override + $metric['options'] + ($colors ? ['color' => $colors[$i]] : []);
+
+					if ($colors !== null) {
+						$override['color'] = array_shift($colors);
+					}
+					$metric['options'] = $override + $metric['options'];
 
 					// Fix missing options if draw type has changed.
-					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
-							&& !array_key_exists('fill', $metric['options'])) {
-						$metric['options']['fill'] = SVG_GRAPH_DEFAULT_FILL;
-					}
-					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
-							&& !array_key_exists('missingdatafunc', $metric['options'])) {
-						$metric['options']['missingdatafunc'] = SVG_GRAPH_MISSING_DATA_NONE;
-					}
-					if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
-							&& !array_key_exists('pointsize', $metric['options'])) {
-						$metric['options']['pointsize'] = SVG_GRAPH_DEFAULT_POINTSIZE;
-					}
-					if ($metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
-							&& !array_key_exists('width', $metric['options'])) {
-						$metric['options']['width'] = SVG_GRAPH_DEFAULT_WIDTH;
+					switch ($metric['options']['type']) {
+						case SVG_GRAPH_TYPE_POINTS:
+							if (!array_key_exists('pointsize', $metric['options'])) {
+								$metric['options']['pointsize'] = SVG_GRAPH_DEFAULT_POINTSIZE;
+							}
+							break;
+
+						case SVG_GRAPH_TYPE_LINE:
+						case SVG_GRAPH_TYPE_STAIRCASE:
+							if (!array_key_exists('fill', $metric['options'])) {
+								$metric['options']['fill'] = SVG_GRAPH_DEFAULT_FILL;
+							}
+							if (!array_key_exists('missingdatafunc', $metric['options'])) {
+								$metric['options']['missingdatafunc'] = SVG_GRAPH_MISSING_DATA_NONE;
+							}
+							if (!array_key_exists('width', $metric['options'])) {
+								$metric['options']['width'] = SVG_GRAPH_DEFAULT_WIDTH;
+							}
+							break;
 					}
 				}
 				unset($metric);
