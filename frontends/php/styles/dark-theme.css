@@ -2962,8 +2962,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-top-color: inherit; }
 
 .svg-graph-hintbox {
-  padding-top: 5px;
-  display: block;
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
