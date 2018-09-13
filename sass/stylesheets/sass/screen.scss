@@ -825,6 +825,13 @@ output {
 				}
 			}
 
+			[class*='icon-depend-'] {
+				&,
+				&:last-of-type {
+					margin-right: 12px;
+				}
+			}
+
 			.rel-container {
 
 				span {

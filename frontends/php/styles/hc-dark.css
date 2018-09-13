@@ -544,6 +544,8 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
+    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
+      margin-right: 12px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -4436,12 +4438,12 @@ input[type=text].range-control {
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
-    background: url(../img/icon-sprite.svg) no-repeat -357px -730px; }
+    background: url(../img/icon-sprite.svg) no-repeat -361px -730px; }
 
 .icon-depend-down {
   margin: 0 18px 0 0; }
   .icon-depend-down::before {
-    background: url(../img/icon-sprite.svg) no-repeat -357px -766px; }
+    background: url(../img/icon-sprite.svg) no-repeat -361px -766px; }
 
 .icon-ackn {
   margin: 0 18px 0 0; }
@@ -5194,7 +5196,7 @@ td.inactive-bg {
   background-position: -349px -325px; }
 
 .icon-action-severity-down::before {
-  background-position: -375px -325px; }
+  background-position: -374px -325px; }
 
 .icon-action-severity-changed::before {
   background-position: -399px -325px; }
