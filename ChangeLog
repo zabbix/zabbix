@@ -3,6 +3,7 @@ Changes for 4.0.0rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14720] added index on escalations table to avoid full table scan during problem recovery (vso)
 .......PS. [ZBX-14821] fixed full sync when only timer triggers are being processed, added trigger statistics to history syncer title (wiper)
 
 --------------------------------------------------------------------------------

@@ -1967,6 +1967,11 @@ static int	DBpatch_3050158(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_3050159(void)
+{
+	return DBcreate_index("escalations", "escalations_2", "eventid", 0);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -2128,6 +2133,7 @@ DBPATCH_ADD(3050155, 0, 1)
 DBPATCH_ADD(3050156, 0, 1)
 DBPATCH_ADD(3050157, 0, 1)
 DBPATCH_ADD(3050158, 0, 1)
+DBPATCH_ADD(3050159, 0, 1)
 
 DBPATCH_END()
 
