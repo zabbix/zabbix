@@ -41,18 +41,20 @@ jQuery(function ($) {
 
 	// Cancel SBox and unset its variables.
 	function destroySBox(e, graph) {
-		var graph = graph || e.data.graph;
-
-		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
-		$('.svg-graph-selection-text', graph).text('');
+		var graph = graph || e.data.graph,
+			data = graph.data('options');
 
 		$(document)
 			.off('selectstart', disableSelect)
-			.off('keydown', {graph: graph}, sBoxKeyboardInteraction)
+			.off('keydown', sBoxKeyboardInteraction)
 			.off('mousemove', moveSBoxMouse)
 			.off('mouseup', destroySBox);
 
-		graph.data('options').boxing = false;
+		if (data) {
+			$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
+			$('.svg-graph-selection-text', graph).text('');
+			graph.data('options').boxing = false;
+		}
 	}
 
 	// Destroy hintbox, unset its variables and event listeners.
@@ -150,33 +152,35 @@ jQuery(function ($) {
 		data.end = offsetX - data.dimX;
 
 		// Check if movement has started and destroy hintbox if it is still visible.
-		if (data.start != data.end) {
+		if (data.start != data.end && !data.boxing) {
 			data.isHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
 			hideHelper(graph);
 		}
 
-		data.end = Math.min(offsetX - data.dimX, data.dimW);
-		data.end = (data.end > 0) ? data.end : 0;
+		if (data.boxing) {
+			data.end = Math.min(offsetX - data.dimX, data.dimW);
+			data.end = (data.end > 0) ? data.end : 0;
 
-		sbox.attr({
-			'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
-			'y': data.dimY + 'px',
-			'width': Math.abs(data.end - data.start) + 'px',
-			'height': data.dimH
-		});
-
-		var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
-			label = formatTimestamp(seconds, false, true)
-				+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
-
-		stxt
-			.text(label)
-			.attr({
-				'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
-				'y': (data.dimY + 15) + 'px'
+			sbox.attr({
+				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
+				'y': data.dimY + 'px',
+				'width': Math.abs(data.end - data.start) + 'px',
+				'height': data.dimH
 			});
+
+			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
+				label = formatTimestamp(seconds, false, true)
+					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+
+			stxt
+				.text(label)
+				.attr({
+					'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
+					'y': (data.dimY + 15) + 'px'
+				});
+		}
 	}
 
 	// Method to end selection of horizontal area in graph.
@@ -185,12 +189,13 @@ jQuery(function ($) {
 
 		var graph = e.data.graph,
 			data = graph.data('options'),
-			offsetX = e.clientX - graph.offset().left;
+			offsetX = e.clientX - graph.offset().left,
+			set_date = data && data.boxing;
 
-		if (data && data.boxing) {
+		destroySBox(e, graph);
+
+		if (set_date) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
-
-			destroySBox(e, graph);
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
@@ -539,6 +544,7 @@ jQuery(function ($) {
 					.on('selectstart', false);
 
 				if (options.sbox) {
+					destroySBox(null, graph);
 					graph.on('mousedown', {graph: graph}, startSBoxDrag);
 				}
 			});
