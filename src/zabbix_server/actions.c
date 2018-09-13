@@ -1820,7 +1820,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		zbx_vector_uint64_t	eventids;
 		DB_ROW			row;
 		DB_RESULT		result;
-		zbx_uint64_t		actionid, r_eventid;
+		zbx_uint64_t		r_eventid;
 		int			j, index;
 
 		zbx_vector_uint64_create(&eventids);
@@ -1832,7 +1832,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		/* 3.2. Select escalations that must be recovered. */
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select actionid,eventid,escalationid"
+				"select eventid,escalationid"
 				" from escalations"
 				" where");
 
@@ -1846,8 +1846,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 			zbx_uint64_t		escalationid;
 			zbx_uint64_pair_t	event_pair;
 
-			ZBX_STR2UINT64(actionid, row[0]);
-			ZBX_STR2UINT64(event_pair.first, row[1]);
+			ZBX_STR2UINT64(event_pair.first, row[0]);
 
 			if (FAIL == (index = zbx_vector_uint64_pair_bsearch(closed_events, event_pair,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -1869,7 +1868,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 				zbx_vector_uint64_create(&rec_escalation->escalationids);
 			}
 
-			ZBX_DBROW2UINT64(escalationid, row[2]);
+			ZBX_DBROW2UINT64(escalationid, row[1]);
 			zbx_vector_uint64_append(&rec_escalation->escalationids, escalationid);
 
 		}
