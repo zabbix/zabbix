@@ -3,6 +3,7 @@ Changes for 4.0.0rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBXNEXT-4573] fixed HTTP authentication page issues, HTTP case sensitive option and moved HTTP authentication from API to HTTP form page (gcalenko)
 ........S. [ZBX-14721] improved escalator performance by replacing previously unused index (vso)
 ........S. [ZBX-14720] improved history syncer performance during problem recovery by adding index on escalations table and avoiding full table scan (vso)
 .......PS. [ZBX-14821] fixed full sync when only timer triggers are being processed, added trigger statistics to history syncer title (wiper)
