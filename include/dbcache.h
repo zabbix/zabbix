@@ -25,8 +25,8 @@
 #include "sysinfo.h"
 #include "zbxalgo.h"
 
-#define ZBX_SYNC_PARTIAL	0
-#define	ZBX_SYNC_FULL		1
+#define ZBX_SYNC_DONE		0
+#define	ZBX_SYNC_MORE		1
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -546,7 +546,7 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
-int	sync_history_cache(int sync_type, int *sync_num);
+void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 int	init_database_cache(char **error);
 void	free_database_cache(void);
 
@@ -803,6 +803,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_ui
 void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
+void	zbx_dc_clear_timer_queue(void);
 
 /* data session support */
 
