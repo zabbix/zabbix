@@ -107,16 +107,29 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
-		? ZBX_FLAG_DISCOVERY_NORMAL
-		: ZBX_FLAG_DISCOVERY_PROTOTYPE
-	);
-	$name[] = (new CLink(CHtml::encode($graph['name']),
+	if ($graph['templateid']) {
+		$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
+			? ZBX_FLAG_DISCOVERY_NORMAL
+			: ZBX_FLAG_DISCOVERY_PROTOTYPE
+		);
+	}
+	elseif ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
+		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+			(new CUrl('host_discovery.php'))
+				->setArgument('form', 'update')
+				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
+		$name[] = NAME_DELIMITER;
+	}
+
+	$name[] = new CLink(CHtml::encode($graph['name']),
 		(new CUrl('graphs.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('graphid', $graphid)
-	));
+	);
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),

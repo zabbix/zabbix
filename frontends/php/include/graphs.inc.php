@@ -140,24 +140,6 @@ function getGraphDims($graphid = null) {
 	return $graphDims;
 }
 
-function get_realhosts_by_graphid($graphid) {
-	$graph = getGraphByGraphId($graphid);
-	if (!empty($graph['templateid'])) {
-		return get_realhosts_by_graphid($graph['templateid']);
-	}
-	return get_hosts_by_graphid($graphid);
-}
-
-function get_hosts_by_graphid($graphid) {
-	return DBselect(
-		'SELECT DISTINCT h.*'.
-		' FROM graphs_items gi,items i,hosts h'.
-		' WHERE h.hostid=i.hostid'.
-			' AND gi.itemid=i.itemid'.
-			' AND gi.graphid='.zbx_dbstr($graphid)
-	);
-}
-
 function getGraphByGraphId($graphId) {
 	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
 
