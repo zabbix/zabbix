@@ -1972,6 +1972,16 @@ static int	DBpatch_3050159(void)
 	return DBcreate_index("escalations", "escalations_2", "eventid", 0);
 }
 
+static int	DBpatch_3050160(void)
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_3050161(void)
+{
+	return DBcreate_index("escalations", "escalations_1", "triggerid,itemid,escalationid", 1);
+}
+
 #endif
 
 DBPATCH_START(3050)
@@ -2134,6 +2144,8 @@ DBPATCH_ADD(3050156, 0, 1)
 DBPATCH_ADD(3050157, 0, 1)
 DBPATCH_ADD(3050158, 0, 1)
 DBPATCH_ADD(3050159, 0, 1)
+DBPATCH_ADD(3050160, 0, 1)
+DBPATCH_ADD(3050161, 0, 1)
 
 DBPATCH_END()
 

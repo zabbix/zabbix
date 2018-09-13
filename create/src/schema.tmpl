@@ -1198,7 +1198,7 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NULL		|0			|-|items
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|-|acknowledges
-UNIQUE		|1		|actionid,triggerid,itemid,escalationid
+UNIQUE		|1		|triggerid,itemid,escalationid
 INDEX		|2		|eventid
 
 TABLE|globalvars|globalvarid|0
@@ -1650,4 +1650,4 @@ INDEX|1|maintenanceid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3050159	|3050159
+ROW		|3050161	|3050161
