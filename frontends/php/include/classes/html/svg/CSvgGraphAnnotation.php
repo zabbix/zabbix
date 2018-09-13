@@ -55,7 +55,7 @@ class CSvgGraphAnnotation extends CSvgTag {
 		$this->type = $type;
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_DASHED => [
 				'stroke-dasharray' => '2,2'

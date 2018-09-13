@@ -51,7 +51,7 @@ class CSvgGraphLine extends CSvgPath {
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE)
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);

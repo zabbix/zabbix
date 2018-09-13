@@ -83,7 +83,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @return array
 	 */
-	public function getStyles() {
+	public function makeStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' path' => [
 				'stroke' => $this->line_color,

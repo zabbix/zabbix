@@ -33,7 +33,7 @@ class CSvgGraphArea extends CSvgGraphLine {
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA)
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);

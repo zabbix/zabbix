@@ -40,7 +40,7 @@ class CSvgGraphPoints extends CSvgGroup {
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_POINTS)
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_POINTS.'-'.$this->itemid.'-'.$this->options['order']);

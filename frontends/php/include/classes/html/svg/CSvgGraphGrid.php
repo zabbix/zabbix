@@ -40,7 +40,7 @@ class CSvgGraphGrid extends CSvgTag {
 		$this->points_time = $points_time;
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_GRID.' path' => [
 				'stroke-dasharray' => '2,2',
