@@ -1,12 +1,17 @@
 Changes for 4.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-4672] added option to show suppressed problems for data overview page and widget (agriscenko)
+A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 ..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
 ........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
 .......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
+..F....... [ZBXNEXT-4588] Fixed changelog adding more detailed description of features added in 4.0.0beta1; Fixed Data set widget field to be compatible with PHP versions affecting PHP bug #42355 (miks)
+..F....... [ZBX-14797] fixed calendar initialization in graph configuration form (gcalenko, vmurzins)
+........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14808] fixed SQL error in user permission check when processing actions for internal item events (wiper)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
@@ -26,7 +31,10 @@ Bug fixes:
 Changes for 4.0.0beta1
 
 New features:
-A.F....... [ZBXNEXT-4588] implemented SVG graph widget (ashubin, gcalenko, miks, Sasha)
+..F....... [ZBXNEXT-4588] Implemented SVG graph generation (ashubin, gcalenko, miks, Sasha)
+..F....... [ZBXNEXT-4588] Implemented SVG graph widget with multiple new widget fields; Renamed existing graph widget to 'Classic graph'; Implemented vertical accordion; Added new UI controls for range control and overrides selection (miks, Sasha)
+A.F....... [ZBXNEXT-4588] Added option to store long widget field strings as array of short strings; Created class to resize the height of textarea field automatically (miks)
+A.F....... [ZBXNEXT-4588] Improved API validation; Extended time units functionality to allow negative values (miks, Sasha)
 A.F.I..... [ZBXNEXT-4573] added support of HTTP authentication as optional authentication mechanism (gcalenko, Ivo, vmurzins)
 A.F.I..PS. [ZBXNEXT-413] added maintenance tag filters to support suppression of individual problems based on their tags (agriscenko, wiper)
 ..F....... [ZBXNEXT-4609] added options Tag display priority and Tag display names in Problems (vasilijs)
@@ -475,6 +483,7 @@ New features:
 A.F....... [ZBX-1357] enabled Portuguese (Portugal) translation to be displayed by default (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-14812] fixed hexadecimal to decimal preprocessing step to allow pairs of hexadecimal digits separated by space or new line (vso)
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)
 ........S. [ZBX-14614] fixed server template linking with triggers having no dependencies (MVekslers)
 ...G...... [ZBX-6565,ZBX-13645,ZBX-14559] fixed agent on AIX 6.1 TL0, 7.1 TL0: system.stat[memory,avm], compilation, crash on net.dns[] items (Andris)
@@ -1813,8 +1822,6 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 
 --------------------------------------------------------------------------------
 Changes for 3.0.22rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-14496] fixed unauthorized request error when sorting list after enabling/disabling elements (agriscenko)

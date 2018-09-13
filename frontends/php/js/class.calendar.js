@@ -18,42 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **
 */
-var CLNDR = new Array();
-var calendar = Class.create();
 
-function getCalendarByID(clndr_id) {
-	var ret = null;
-	jQuery(CLNDR).each(function(i, obj) {
-		if (obj.clndr.id === clndr_id) {
-			ret = obj;
-			return;
-		}
-	});
 
-	return ret;
-}
+var CLNDR = null,
+	calendar = Class.create();
 
-function create_calendar(timeobject, id, date_time_format) {
-	if (typeof id === 'undefined' || id === null) {
-		id = 'c' + CLNDR.length;
+function toggleCalendar(trigger_elmnt, time_input, date_time_format) {
+	if (CLNDR && jQuery(trigger_elmnt).is(CLNDR.trigger_elmnt) && CLNDR.is_visible) {
+		CLNDR.clndrhide();
 	}
-
-	var clndr = new Object;
-	clndr.clndr = new calendar(id, timeobject, date_time_format);
-	CLNDR.push(clndr);
-
-	return clndr;
-}
-
-function dateSelectorOnClick(event, elmnt, name) {
-	var pos = getPosition(elmnt);
-	// This way calendar will never overlap with selector.
-	pos.top += elmnt.offsetHeight;
-	pos.left += elmnt.offsetWidth;
-
-	getCalendarByID(name).clndr.clndrshow(pos.top, pos.left, elmnt);
-
-	event.stopPropagation();
+	else {
+		CLNDR && CLNDR.clndrhide();
+		CLNDR = new calendar(time_input, trigger_elmnt, date_time_format);
+		CLNDR.clndrshow();
+	}
 }
 
 calendar.prototype = {
@@ -85,16 +63,17 @@ calendar.prototype = {
 	dayname: new Array(locale['S_SUNDAY'], locale['S_MONDAY'], locale['S_TUESDAY'], locale['S_WEDNESDAY'], locale['S_THURSDAY'], locale['S_FRIDAY'], locale['S_SATURDAY']),
 	sections: new Array('.calendar-year', '.calendar-month', '.calendar-date'),
 	date_time_format: PHP_ZBX_FULL_DATE_TIME,
+	trigger_elmnt: null,		// Calendar visibility trigger element.
 
-	initialize: function(id, timeobject, date_time_format) {
+	initialize: function(timeobject, trigger_elmnt, date_time_format) {
 		if (!this.checkOuterObj(timeobject)) {
 			throw 'Calendar: constructor expects second parameter to be input form field DOM node.';
 		}
 
-		this.id = id;
+		this.id = jQuery(trigger_elmnt).attr('id');
+		this.trigger_elmnt = trigger_elmnt;
 		this.date_time_format = date_time_format;
 		this.sdt = new CDate();
-		this.calendarcreate();
 	},
 
 	ondateselected: function() {
@@ -102,71 +81,67 @@ calendar.prototype = {
 		this.clndrhide();
 	},
 
-	clndrhide: function(e) {
-		if (typeof(e) != 'undefined') {
-			cancelEvent(e);
-		}
-		this.clndr_calendar.hide();
-		this.is_visible = false;
-
-		jQuery(document)
-			.off('click', this.calendarDocumentClickHandler)
-			.off('keydown', this.calendarKeyDownHandler)
-			.off('keyup', this.calendarKeyUpHandler);
-
-		removeFromOverlaysStack(this.id.toString());
-	},
-
-	clndrshow: function(top, left, trigger_elmnt) {
+	clndrhide: function() {
 		if (this.is_visible) {
-			this.clndrhide();
-		}
-		else {
-			// Close all opened calendars.
-			jQuery(CLNDR).each(function(i, cal) {
-				if (cal.clndr.is_visible) {
-					cal.clndr.clndrhide();
-				}
-			});
+			this.calendardelete();
+			this.is_visible = false;
 
-			this.setSDateFromOuterObj();
-			this.syncBSDateBySDT();
-			this.syncHlDate();
-			this.setCDate();
-
-			this.setPosition(top, left);
-			this.clndr_calendar.show();
-			this.is_visible = true;
+			jQuery(window).off('resize', this.calendarPositionHandler);
 
 			jQuery(document)
-				.on('keydown', {calendar: this}, this.calendarKeyDownHandler)
-				.on('keyup', {calendar: this}, this.calendarKeyUpHandler)
-				.on('click', this.calendarDocumentClickHandler);
+				.off('click', this.calendarDocumentClickHandler)
+				.off('keydown', this.calendarKeyDownHandler)
+				.off('keyup', this.calendarKeyUpHandler);
 
-			addToOverlaysStack(this.id, trigger_elmnt, 'clndr');
-
-			this.active_section = this.sections.indexOf('.calendar-date');
-			this.focusSection();
+			removeFromOverlaysStack(this.id);
 		}
+	},
+
+	clndrshow: function() {
+		this.calendarcreate();
+		this.setSDateFromOuterObj();
+		this.syncBSDateBySDT();
+		this.syncHlDate();
+		this.setCDate();
+
+		this.calendarPositionHandler();
+		this.clndr_calendar.show();
+		this.is_visible = true;
+
+		jQuery(window).on('resize', jQuery.proxy(this.calendarPositionHandler, this));
+		jQuery(this.trigger_elmnt).on('remove', jQuery.proxy(this.clndrhide, this));
+
+		jQuery(document)
+			.on('keydown', jQuery.proxy(this.calendarKeyDownHandler, this))
+			.on('keyup', jQuery.proxy(this.calendarKeyUpHandler, this))
+			.on('click', jQuery.proxy(this.calendarDocumentClickHandler, this));
+
+		addToOverlaysStack(this.id, this.trigger_elmnt, 'clndr');
+
+		this.active_section = this.sections.indexOf('.calendar-date');
+		this.focusSection();
 	},
 
 	setPosition: function(top, left) {
-		if (typeof(top) != 'undefined' && typeof(left) != 'undefined') {
-			var cw = jQuery(this.clndr_calendar).outerWidth();
-			if (document.body.clientWidth < +left + cw) {
-				left = document.body.clientWidth - cw;
-			}
-			this.clndr_calendar.style.top = top + 'px';
-			this.clndr_calendar.style.left = left + 'px';
+		jQuery(this.clndr_calendar).css({
+			top: Math.min(top, jQuery(window).height() - jQuery(this.clndr_calendar).outerHeight()) + 'px',
+			left: Math.min(left, jQuery(window).width() - jQuery(this.clndr_calendar).outerWidth()) + 'px'
+		});
+	},
+
+	calendarDocumentClickHandler: function(e) {
+		var $target = jQuery(e.target);
+
+		if (!$target.is(this.trigger_elmnt) && !$target.closest('.overlay-dialogue.calendar').length) {
+			this.clndrhide();
 		}
 	},
 
-	calendarDocumentClickHandler: function() {
-		jQuery(CLNDR).each(function(i, cal) {
-			if (cal.clndr.is_visible) {
-				cal.clndr.clndrhide();
-			}
-		});
+	calendarPositionHandler: function () {
+		var $anchor = jQuery(this.trigger_elmnt),
+			offset = $anchor.offset();
+
+		this.setPosition(offset.top + $anchor.height(), offset.left + $anchor.width());
 	},
 
 	/**
@@ -181,17 +156,15 @@ calendar.prototype = {
 	 * while other keyboard events are handled by keydown event.
 	 */
 	calendarKeyUpHandler: function(event) {
-		var cal = event.data.calendar;
-
 		if (event.which == 32) { // Space
 			// Enter has special meaning for each Calendar section.
-			var active_section = cal.sections[cal.active_section];
+			var active_section = this.sections[this.active_section];
 			if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
-				cal.active_section++;
-				cal.focusSection();
+				this.active_section++;
+				this.focusSection();
 			}
 			else if (active_section === '.calendar-date') {
-				cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
+				this.setday(event, this.hl_day, this.hl_month, this.hl_year);
 			}
 
 			return false; // Prevent page scrolling when pressing Space.
@@ -199,11 +172,10 @@ calendar.prototype = {
 	},
 
 	calendarKeyDownHandler: function(event) {
-		var cal = event.data.calendar,
-			hl_date;
+		var hl_date;
 
-		if (cal.active_section < 0 || cal.active_section > cal.sections.length) {
-			cal.active_section = 0;
+		if (this.active_section < 0 || this.active_section > this.sections.length) {
+			this.active_section = 0;
 		}
 
 		switch (event.which) {
@@ -211,9 +183,9 @@ calendar.prototype = {
 			case 38: // arrow up
 			case 39: // arrow right
 			case 40: // arrow down
-				switch (cal.sections[cal.active_section]) {
+				switch (this.sections[this.active_section]) {
 					case '.calendar-date':
-						hl_date = new Date(cal.hl_year, cal.hl_month, cal.hl_day, 0, 0, 0, 0);
+						hl_date = new Date(this.hl_year, this.hl_month, this.hl_day, 0, 0, 0, 0);
 
 						switch (event.which) {
 							case 37: // arrow left
@@ -233,22 +205,22 @@ calendar.prototype = {
 								break;
 						}
 
-						cal.hl_year = hl_date.getFullYear();
-						cal.hl_month = hl_date.getMonth();
-						cal.hl_day = hl_date.getDate();
+						this.hl_year = hl_date.getFullYear();
+						this.hl_month = hl_date.getMonth();
+						this.hl_day = hl_date.getDate();
 
-						jQuery('td.highlighted', cal.clndr_calendar)
+						jQuery('td.highlighted', this.clndr_calendar)
 							.removeClass('highlighted')
 							.attr('tabindex', '-1');
 
-						if (cal.hl_year != cal.year || cal.hl_month != cal.month) {
-							cal.year = cal.hl_year;
-							cal.month = cal.hl_month;
-							cal.day = cal.hl_day;
-							cal.setCDate();
+						if (this.hl_year != this.year || this.hl_month != this.month) {
+							this.year = this.hl_year;
+							this.month = this.hl_month;
+							this.day = this.hl_day;
+							this.setCDate();
 						}
 
-						jQuery('td[data-date='+cal.hl_day+']', cal.clndr_calendar)
+						jQuery('td[data-date='+this.hl_day+']', this.clndr_calendar)
 							.addClass('highlighted')
 							.attr('tabindex', '0')
 							.focus();
@@ -257,22 +229,22 @@ calendar.prototype = {
 					case '.calendar-year':
 						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
-							cal.yeardown();
+							this.yeardown();
 						}
 						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
-							cal.yearup();
+							this.yearup();
 						}
 						break;
 
 					case '.calendar-month':
 						// Arrow left or arrow down.
 						if (event.which == 37 || event.which == 40) {
-							cal.monthdown();
+							this.monthdown();
 						}
 						// Arrow right or arrow up.
 						else if (event.which == 38 || event.which == 39) {
-							cal.monthup();
+							this.monthup();
 						}
 						break;
 				}
@@ -286,30 +258,30 @@ calendar.prototype = {
 				event.preventDefault();
 
 				if (event.shiftKey) {
-					cal.active_section--;
-					if (cal.active_section < 0) {
-						cal.active_section = cal.sections.length - 1;
+					this.active_section--;
+					if (this.active_section < 0) {
+						this.active_section = this.sections.length - 1;
 					}
 				}
 				else {
-					cal.active_section++;
-					if (cal.active_section >= cal.sections.length) {
-						cal.active_section = 0;
+					this.active_section++;
+					if (this.active_section >= this.sections.length) {
+						this.active_section = 0;
 					}
 				}
 
-				cal.focusSection();
+				this.focusSection();
 				break;
 
 			case 13: // Enter
 				// Enter has special meaning for each Calendar section.
-				var active_section = cal.sections[cal.active_section];
+				var active_section = this.sections[this.active_section];
 				if (active_section === '.calendar-year' ||  active_section === '.calendar-month') {
-					cal.active_section++;
-					cal.focusSection();
+					this.active_section++;
+					this.focusSection();
 				}
 				else if (active_section === '.calendar-date') {
-					cal.setday(event, cal.hl_day, cal.hl_month, cal.hl_year);
+					this.setday(event, this.hl_day, this.hl_month, this.hl_year);
 				}
 
 				return false;
@@ -401,7 +373,12 @@ calendar.prototype = {
 	},
 
 	setDateToOuterObj: function() {
-		this.timeobject.value = this.sdt.format(this.date_time_format);
+		var $input = jQuery(this.timeobject),
+			new_val = this.sdt.format(this.date_time_format);
+
+		if ($input.val() != new_val) {
+			$input.val(new_val).trigger('change');
+		}
 	},
 
 	setday: function(e, day, month, year) {
@@ -581,7 +558,9 @@ calendar.prototype = {
 		return cdt.getDate() + ', ' + this.dayname[cdt.getDay()] + ' ' + this.monthname[cdt.getMonth()] + ' ' +
 				cdt.getFullYear();
 	},
-
+	/**
+	 * Create and append calendar DOM element to body.
+	 */
 	calendarcreate: function() {
 		this.clndr_calendar = document.createElement('div');
 		Element.extend(this.clndr_calendar);
@@ -590,10 +569,6 @@ calendar.prototype = {
 		this.clndr_calendar.setAttribute('role', 'application');
 		this.clndr_calendar.setAttribute('tabindex', '0');
 		this.clndr_calendar.hide();
-
-		this.clndr_calendar.on('click', function(event) {
-			event.stopPropagation();
-		});
 
 		document.body.appendChild(this.clndr_calendar);
 
@@ -735,5 +710,15 @@ calendar.prototype = {
 					cal_obj.focusSection();
 				});
 		});
+	},
+	/**
+	 * Remove calendar DOM element. Detach event listeners.
+	 */
+	calendardelete: function() {
+		removeListener(this.clndr_monthdown, 'click', this.monthdown);
+		removeListener(this.clndr_monthup, 'click', this.monthup);
+		removeListener(this.clndr_yeardown, 'click', this.yeardown);
+		removeListener(this.clndr_yearup, 'click', this.yearup);
+		jQuery(this.clndr_calendar).remove();
 	}
 };

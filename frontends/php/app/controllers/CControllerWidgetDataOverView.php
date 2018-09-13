@@ -40,6 +40,7 @@ class CControllerWidgetDataOverView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groupids' => getSubGroups($fields['groupids']),
 			'application' => $fields['application'],
+			'show_suppressed' => $fields['show_suppressed'],
 			'style' => $fields['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

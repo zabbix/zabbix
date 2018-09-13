@@ -471,7 +471,9 @@ class CEvent extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype']);
+			$sqlParts['where'][] = self::getTagsWhereCondition($options['tags'], $options['evaltype'], 'event_tag',
+				'et', 'e', 'eventid'
+			);
 		}
 
 		// time_from
@@ -539,16 +541,19 @@ class CEvent extends CApiService {
 	/**
 	 * Returns SQL condition for tag filters.
 	 *
-	 * @param array $tags
-	 * @param int   $evaltype
-	 * @param bool  $is_events
+	 * @param array  $tags
+	 * @param string $tags[]['tag']
+	 * @param int    $tags[]['operator']
+	 * @param string $tags[]['value']
+	 * @param int    $evaltype
+	 * @param string $table
+	 * @param string $alias
+	 * @param string $parent_alias
+	 * @param string $field
 	 *
 	 * @return array
 	 */
-	public static function getTagsWhereCondition(array $tags, $evaltype, $is_events = true) {
-		$alias = $is_events ? 'et' : 'pt';
-		$parent_alias = $is_events ? 'e' : 'p';
-		$table = $is_events ? 'event_tag' : 'problem_tag';
+	public static function getTagsWhereCondition(array $tags, $evaltype, $table, $alias, $parent_alias, $field) {
 		$values_by_tag = [];
 
 		foreach ($tags as $tag) {
@@ -590,7 +595,7 @@ class CEvent extends CApiService {
 			$sql_where[] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM '.$table.' '.$alias.
-				' WHERE '.$parent_alias.'.eventid='.$alias.'.eventid'.
+				' WHERE '.$parent_alias.'.'.$field.'='.$alias.'.'.$field.
 					' AND '.$alias.'.tag='.zbx_dbstr($tag).$values.
 			')';
 		}
