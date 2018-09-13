@@ -218,7 +218,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 		if (2 != sscanf(dev_name, "spi%hd.%d", &bus_spi, &address))
 			goto out;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, address);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, (unsigned int)address);
 
 		ret = SUCCEED;
 	}
@@ -243,7 +243,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &address))
 			addr = 0;
 
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, address);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, (unsigned int)address);
 
 		ret = SUCCEED;
 	}
