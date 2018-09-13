@@ -3928,8 +3928,7 @@ svg {
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 
-.list-accordion-foot > div,
-.overrides-foot > div {
+.list-accordion-foot > div {
   display: table-cell;
   padding-top: 10px; }
 
