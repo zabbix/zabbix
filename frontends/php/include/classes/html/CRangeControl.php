@@ -32,7 +32,8 @@ class CRangeControl extends CTextBox {
 		$this->options = [
 			'min' => 0,
 			'max' => ZBX_MAX_INT32,
-			'step' => 1
+			'step' => 1,
+			'width' => ZBX_TEXTAREA_SMALL_WIDTH
 		];
 		$this->setValue($value);
 		$this->addClass(ZBX_STYLE_RANGE_CONTROL);
