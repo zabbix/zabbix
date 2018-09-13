@@ -7254,6 +7254,20 @@ void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int l
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_clear_timer_queue                                         *
+ *                                                                            *
+ * Purpose: clears timer trigger queue                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_clear_timer_queue(void)
+{
+	WRLOCK_CACHE;
+	zbx_binary_heap_clear(&config->timer_queue);
+	UNLOCK_CACHE;
+}
+
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
 {
 	int	i;
