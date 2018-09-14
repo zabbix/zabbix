@@ -144,19 +144,19 @@ class CSvgGraphHelper {
 	 */
 	protected static function getMetricsData(array &$metrics = [], array &$errors = [], $width) {
 		// To reduce number of requests, group metrics by time range.
-		$same_timerange_metrics = [];
+		$tr_groups = [];
 		foreach ($metrics as $metric_num => &$metric) {
 			$metric['points'] = [];
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
-			if (!array_key_exists($key, $same_timerange_metrics)) {
-				$same_timerange_metrics[$key]['time'] = [
+			if (!array_key_exists($key, $tr_groups)) {
+				$tr_groups[$key]['time'] = [
 					'from' => $metric['time_period']['time_from'],
 					'to' => $metric['time_period']['time_to']
 				];
 			}
 
-			$same_timerange_metrics[$key]['items'][$metric_num] = [
+			$tr_groups[$key]['items'][$metric_num] = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
 				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
@@ -165,25 +165,25 @@ class CSvgGraphHelper {
 		unset($metric);
 
 		// Request data.
-		foreach ($same_timerange_metrics as $tr_group) {
+		foreach ($tr_groups as $tr_group) {
 			$results = Manager::History()->getGraphAggregation($tr_group['items'], $tr_group['time']['from'],
 				$tr_group['time']['to'], $width
 			);
 
 			if ($results) {
-				foreach ($tr_group['items'] as $metric_num => $m) {
+				foreach ($tr_group['items'] as $metric_num => $item) {
 					$metric = &$metrics[$metric_num];
 
 					// Collect and sort data points.
-					if (array_key_exists($m['itemid'], $results)) {
+					if (array_key_exists($item['itemid'], $results)) {
 						$points = [];
-						foreach ($results[$m['itemid']]['data'] as $point) {
+						foreach ($results[$item['itemid']]['data'] as $point) {
 							$points[] = ['clock' => $point['clock'], 'value' => $point['avg']];
 						}
 						usort($points, [__CLASS__, 'sortByClock']);
 						$metric['points'] = $points;
 
-						unset($metric['history'], $metric['source'], $metric['trends']);
+						unset($metric['source'], $metric['history'], $metric['trends']);
 					}
 				}
 				unset($metric);
