@@ -217,6 +217,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->webDriver->executeScript('arguments[0].click();', [$this->webDriver->findElement(WebDriverBy::className('btn-min'))]);
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-max')]"));
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
