@@ -619,7 +619,7 @@
 		url.setArgument('action', 'dashboard.widget.check');
 
 		if (Object.keys(fields).length != 0) {
-			ajax_data['fields'] = JSON.stringify(fields);
+			ajax_data['fields'] = JSON.stringify(chunkify(fields));
 		}
 
 		$.ajax({

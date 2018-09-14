@@ -44,8 +44,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 
 	public function setValue($value) {
 		// Values received from frontend are strings. Values received from database comes as arrays.
-		// TODO: remove hack with modifying of unvalidated data.
-		$this->value = is_array($value) ? $value : CWidgetHelper::splitPatternIntoParts($value);
+		$this->value = $value;
 
 		return $this;
 	}

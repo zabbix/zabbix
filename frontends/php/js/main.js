@@ -1112,3 +1112,48 @@ jQuery(function ($) {
 		});
 	};
 });
+
+/**
+ * Function makes array of strings of defined length.
+ *
+ * @param {string} string   String to split into array of strings.
+ *
+ * @param {array}
+ */
+function chunk_split(string) {
+	return string.replace('\r', '').match(/.{0,255}/mg).slice(0, -1);
+}
+
+/**
+ * Function loops through given fields and converts values of predefined fields to chunks.
+ * Used to split dashboard widget textarea field into array of strings that fits supported length.
+ *
+ * @param {object} data   Widget fields.
+ *
+ * @param {array}
+ */
+function chunkify(data) {
+	jQuery.each(['ds', 'or', 'problemhosts'], function(index, field) {
+		if (field in data) {
+			switch (field) {
+				case 'ds':
+				case 'or':
+					jQuery.each(data[field], function(i, f) {
+						if ('hosts' in f) {
+							data[field][i]['hosts'] = chunk_split(f['hosts']);
+						}
+						if ('items' in f) {
+							data[field][i]['items'] = chunk_split(f['items']);
+						}
+					});
+					break;
+
+				case 'problemhosts':
+					data[field] = chunk_split(data[field]);
+					break;
+			}
+		}
+	});
+
+	return data;
+}

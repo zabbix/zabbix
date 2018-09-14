@@ -71,7 +71,7 @@ $scripts[] =
 				'preview: 1,'.
 				'content_width: $preview.width(),'.
 				'content_height: $preview.height() - 10,'.
-				'fields: JSON.stringify($form.serializeJSON())'.
+				'fields: JSON.stringify(chunkify($form.serializeJSON()))'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 

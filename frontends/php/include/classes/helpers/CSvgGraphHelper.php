@@ -559,12 +559,12 @@ class CSvgGraphHelper {
 	/**
 	 * Prepare an array to be used for hosts/items filtering.
 	 *
-	 * @param array   $patterns  Array containing hosts/items patterns.
+	 * @param string   $patterns  String containing hosts/items patterns.
 	 *
 	 * @return mixed|array  Returns array of patterns or NULL if all tested hosts/items are valid.
 	 */
-	protected static function processPattern(array $patterns) {
-		$patterns = array_keys(array_flip($patterns));
+	protected static function processPattern($patterns) {
+		$patterns = array_keys(array_flip(explode(',', $patterns)));
 
 		foreach ($patterns as &$pattern) {
 			$pattern = trim($pattern);

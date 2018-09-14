@@ -145,7 +145,7 @@ class CWidgetHelper {
 	 */
 	public static function getHostsPatternTextBox($field, $form_name) {
 		return [
-			(new CTextArea($field->getName(), implode(', ', $field->getValue()), ['rows' => 1]))
+			(new CTextArea($field->getName(), self::makeStringFromChunks($field->getValue()), ['rows' => 1]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
@@ -494,7 +494,9 @@ class CWidgetHelper {
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][hosts]', implode(', ', $value['hosts']), ['rows' => 1]))
+						(new CTextArea($field_name.'['.$row_num.'][hosts]', self::makeStringFromChunks($value['hosts']),
+								['rows' => 1]
+							))
 							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
@@ -513,7 +515,9 @@ class CWidgetHelper {
 					]))
 						->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', implode(', ', $value['items']), ['rows' => 1]))
+						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
+								['rows' => 1]
+							))
 							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
@@ -855,7 +859,7 @@ class CWidgetHelper {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),
-						(new CTextArea($field_name.'['.$row_num.'][hosts]', implode(', ', $value['hosts']),
+						(new CTextArea($field_name.'['.$row_num.'][hosts]', self::makeStringFromChunks($value['hosts']),
 								['rows' => 1]))
 							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -874,7 +878,7 @@ class CWidgetHelper {
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', implode(', ', $value['items']),
+						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
 								['rows' => 1]))
 							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1213,20 +1217,17 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Make array of patterns.
+	 * Make string from chunks.
 	 *
-	 * @param array|string $patterns  Comma separated string of patterns or array containing multiple patterns.
+	 * @param array  $chunks          Array of strings.
 	 *
-	 * @return array  Returns array of unique patterns.
+	 * @return string
 	 */
-	public static function splitPatternIntoParts($patterns) {
-		$patterns = is_array($patterns) ? $patterns : explode(',', $patterns);
-
-		foreach ($patterns as &$pattern) {
-			$pattern = is_string($pattern) ? trim($pattern) : '';
+	public static function makeStringFromChunks(array $chunks) {
+		$string = '';
+		foreach ($chunks as $chunk) {
+			$string .= ($chunk === '') ? "\n" : $chunk;
 		}
-		unset($pattern);
-
-		return array_unique(array_filter($patterns));
+		return $string;
 	}
 }
