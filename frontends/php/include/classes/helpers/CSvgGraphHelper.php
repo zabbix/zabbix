@@ -58,38 +58,30 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $errors, $width);
 
-		$problems_options = array_key_exists('problems', $options) ? $options['problems'] : [];
-
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
 
-		foreach ($metrics as &$metric) {
-			$resolved = CMacrosResolverHelper::resolveItemNames([[
-				'itemid' => $metric['itemid'],
-				'name' => $metric['name'],
-				'hostid' => $metric['hosts'][0]['hostid'],
-				'key_' => $metric['key_']
-			]]);
-			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$resolved[0]['name_expanded'];
-		}
-		unset($metric);
-
-		// Clear unneeded data.
-		unset($options['data_sets'], $options['overrides'], $options['problems']);
+		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
+		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
 
 		// Draw SVG graph.
-		$graph = (new CSvgGraph($options))
+		$graph = (new CSvgGraph([
+			'time_period' => $options['time_period'],
+			'x_axis' => $options['x_axis'],
+			'left_y_axis' => $options['left_y_axis'],
+			'right_y_axis' => $options['right_y_axis']
+		]))
 			->setSize($width, $height - $legend_height)
 			->addMetrics($metrics);
 
 		// Get problems to display in graph.
-		if ($problems_options['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			$problems_options['itemids_only'] =
-				($problems_options['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
+		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
+			$options['problems']['itemids_only'] =
+				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
 					? zbx_objectValues($metrics, 'itemid')
 					: null;
 
-			$problems = self::getProblems($problems_options, $options['time_period']);
+			$problems = self::getProblems($options['problems'], $options['time_period']);
 			CArrayHelper::sort($problems, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 			$graph->addProblems($problems);
 		}
@@ -411,7 +403,9 @@ class CSvgGraphHelper {
 
 			if ($hosts) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'],
+					'output' => [
+						'itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type', 'valuemapid', 'key_'
+					],
 					'selectHosts' => ['hostid', 'name'],
 					'hostids' => array_keys($hosts),
 					'filter' => [
