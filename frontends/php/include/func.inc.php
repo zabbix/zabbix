@@ -810,16 +810,11 @@ function convert_units($options = []) {
  *		-10m = -600
  *
  * @param string $time
- * @param bool   $allow_negative   Allow time to be negative.
  *
- * @return int   Integer for valid input. Null otherwise.
+ * @return int
  */
-// TODO: remove $allow_negative and time validation from low-level funtion.
-function timeUnitToSeconds($time, $allow_negative = false) {
-	$re = $allow_negative
-		? '/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/'
-		: '/^(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/';
-	preg_match($re, $time, $matches);
+function timeUnitToSeconds($time) {
+	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
 
 	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 

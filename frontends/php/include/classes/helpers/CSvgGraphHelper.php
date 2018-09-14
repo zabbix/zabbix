@@ -197,53 +197,59 @@ class CSvgGraphHelper {
 	 * Calculate what data source must be used for each metric.
 	 */
 	protected static function getGraphDataSource(array &$metrics = [], array &$errors = [], $data_source) {
-		$simple_interval_parser = new CSimpleIntervalParser();
-		$config = select_config();
-
-		foreach ($metrics as &$metric) {
+		/**
+		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
+		 * $metric.
+		 */
+		if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
 			/**
-			 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
-			 * $metric.
+			 * First, if global configuration setting "Override item history period" is enabled, override globally
+			 * specified "Data storage period" value to each metric's custom history storage duration, converting it
+			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
+			 * later but now we are just storing the field name 'history' in array $to_resolve.
+			 *
+			 * Do the same with trends.
 			 */
-			if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
-				$to_resolve = [];
+			$config = select_config();
+			$to_resolve = [];
 
-				/**
-				 * First, if global configuration setting "Override item history period" is enabled, override globally
-				 * specified "Data storage period" value to each metric's custom history storage duration, converting it
-				 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
-				 * later but now we are just storing the field name 'history' in array $to_resolve.
-				 *
-				 * Do the same with trends.
-				 */
-				if ($config['hk_history_global']) {
+			if ($config['hk_history_global']) {
+				foreach ($metrics as &$metric) {
 					$metric['history'] = timeUnitToSeconds($config['hk_history']);
 				}
-				else {
-					$to_resolve[] = 'history';
-				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'history';
+			}
 
-				if ($config['hk_trends_global']) {
+			if ($config['hk_trends_global']) {
+				foreach ($metrics as &$metric) {
 					$metric['trends'] = timeUnitToSeconds($config['hk_trends']);
 				}
-				else {
-					$to_resolve[] = 'trends';
-				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'trends';
+			}
 
-				/**
-				 * If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given
-				 * $metric and convert its values to seconds.
-				 */
-				if ($to_resolve) {
-					$metric = CMacrosResolverHelper::resolveTimeUnitMacros([$metric], $to_resolve)[0];
+			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
+			if ($to_resolve) {
+				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
+				$simple_interval_parser = new CSimpleIntervalParser();
 
+				foreach ($metrics as $num => &$metric) {
+					// Convert its values to seconds.
 					if (!$config['hk_history_global']) {
 						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
 							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
 								_('invalid history storage period')
 							);
+							unset($metrics[$num]);
 						}
-						$metric['history'] = timeUnitToSeconds($metric['history']);
+						else {
+							$metric['history'] = timeUnitToSeconds($metric['history']);
+						}
 					}
 
 					if (!$config['hk_trends_global']) {
@@ -251,11 +257,17 @@ class CSvgGraphHelper {
 							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
 								_('invalid trend storage period')
 							);
+							unset($metrics[$num]);
 						}
-						$metric['trends'] = timeUnitToSeconds($metric['trends']);
+						else {
+							$metric['trends'] = timeUnitToSeconds($metric['trends']);
+						}
 					}
 				}
+				unset($metric);
+			}
 
+			foreach ($metrics as &$metric) {
 				/**
 				 * History as a data source is used in 2 cases:
 				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
@@ -269,9 +281,13 @@ class CSvgGraphHelper {
 					? SVG_GRAPH_DATA_SOURCE_HISTORY
 					: SVG_GRAPH_DATA_SOURCE_TRENDS;
 			}
-			else {
+			unset($metric);
+		}
+		else {
+			foreach ($metrics as &$metric) {
 				$metric['source'] = $data_source;
 			}
+			unset($metric);
 		}
 	}
 
@@ -421,7 +437,7 @@ class CSvgGraphHelper {
 				$data_set['transparency'] = 10 - (int) $data_set['transparency'];
 
 				$data_set['timeshift'] = ($data_set['timeshift'] !== '')
-					? (int) timeUnitToSeconds($data_set['timeshift'], true)
+					? (int) timeUnitToSeconds($data_set['timeshift'])
 					: 0;
 
 				$colors = getColorVariations('#'.$data_set['color'], count($items));
@@ -447,7 +463,7 @@ class CSvgGraphHelper {
 			// Convert timeshift to seconds.
 			if (array_key_exists('timeshift', $override)) {
 				$override['timeshift'] = ($override['timeshift'] !== '')
-					? (int) timeUnitToSeconds($override['timeshift'], true)
+					? (int) timeUnitToSeconds($override['timeshift'])
 					: 0;
 			}
 
@@ -548,8 +564,10 @@ class CSvgGraphHelper {
 			$metric['time_period'] = $options;
 
 			if ($metric['options']['timeshift'] != 0) {
-				$metric['time_period']['time_from'] = bcadd($metric['time_period']['time_from'], $metric['options']['timeshift'], 0);
-				$metric['time_period']['time_to'] = bcadd($metric['time_period']['time_to'], $metric['options']['timeshift'], 0);
+				$metric['time_period']['time_from'] =
+					bcadd($metric['time_period']['time_from'], $metric['options']['timeshift'], 0);
+				$metric['time_period']['time_to'] =
+					bcadd($metric['time_period']['time_to'], $metric['options']['timeshift'], 0);
 			}
 		}
 		unset($metric);
@@ -586,13 +604,10 @@ class CSvgGraphHelper {
 	 * Do not use this function directly. It serves as value_compare_func function for usort.
 	 */
 	protected static function sortByClock($a, $b) {
-		$a = $a['clock'];
-		$b = $b['clock'];
-
-		if ($a == $b) {
+		if ($a['clock'] == $b['clock']) {
 			return 0;
 		}
 
-		return ($a < $b) ? -1 : 1;
+		return ($a['clock'] < $b['clock']) ? -1 : 1;
 	}
 }
