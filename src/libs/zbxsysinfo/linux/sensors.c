@@ -136,8 +136,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	{
 		/* Virtual device */
 		/* Assuming that virtual devices are unique */
-		addr = 0;
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-virtual-%x", prefix, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-virtual-0", prefix);
 		ret = SUCCEED;
 
 		goto out;
@@ -248,8 +247,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 	else if (0 == strcmp(subsys, "acpi"))
 	{
 		/* Assuming that acpi devices are unique */
-		addr = 0;
-		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-acpi-%x", prefix, addr);
+		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-acpi-0", prefix);
 
 		ret = SUCCEED;
 	}
