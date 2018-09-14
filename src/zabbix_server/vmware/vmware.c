@@ -1799,7 +1799,6 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	int		i, ret = FAIL;
-	ZBX_HTTPPAGE	*resp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1807,17 +1806,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].performance_manager);
 
-	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &doc, &resp, error))
+	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &doc, NULL, error))
 		goto out;
-
-	/* The counter data uses a lot of memory which is needed only once during initialization. */
-	/* Reset the download buffer afterwards so the memory is not wasted.                      */
-	if (ZBX_INIT_UPD_XML_SIZE < resp->alloc)
-	{
-		zbx_free(resp->data);
-		resp->alloc = 0;
-		resp->offset = 0;
-	}
 
 	xpathCtx = xmlXPathNewContext(doc);
 
