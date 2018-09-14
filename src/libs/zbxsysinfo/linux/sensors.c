@@ -238,7 +238,7 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 
 		/* must be new ISA (platform driver) */
 		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &address))
-			addr = 0;
+			address = 0;
 
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, (unsigned int)address);
 
