@@ -669,7 +669,7 @@ void	zbx_dc_maintenance_reset_update_flag(int timer)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_maintenance_reset_update_flag                             *
+ * Function: zbx_dc_maintenance_check_update_flag                             *
  *                                                                            *
  * Purpose: checks if the maintenance update flag is set for the specified    *
  *          timer                                                             *
