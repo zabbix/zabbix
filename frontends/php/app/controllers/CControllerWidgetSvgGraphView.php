@@ -180,15 +180,15 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_edit_start) !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_edit_start() {'.
+				'if (typeof(zbx_svggraph_widget_edit_start_'.$uniqueid.') !== typeof(Function)) {'.
+					'function zbx_svggraph_widget_edit_start_'.$uniqueid.'() {'.
 						'var widget = jQuery(".dashbrd-grid-widget-container")'.
 								'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
 						'jQuery(\'svg\', widget[0]["content_body"]).svggraph("disableSBox");'.
 					'}'.
 				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart",'.
-					'"zbx_svggraph_widget_edit_start", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_edit_start_'.$uniqueid.'", "'.$uniqueid.'", {'.
 						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
 					'});';
 		}
