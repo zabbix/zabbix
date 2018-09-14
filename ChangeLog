@@ -3,6 +3,7 @@ Changes for 4.0.0rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 .........T [ZBX-13377] fixed naming issue for 'Server Hardware' host group (vitaly)
 A.F....... [ZBXNEXT-4573] fixed HTTP authentication page issues, HTTP case sensitive option and moved HTTP authentication from API to HTTP form page (gcalenko)
 ........S. [ZBX-14721] improved escalator performance by replacing previously unused index (vso)
