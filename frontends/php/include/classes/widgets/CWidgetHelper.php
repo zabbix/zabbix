@@ -855,7 +855,7 @@ class CWidgetHelper {
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
-						(new CDiv())
+						(new CButton())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),

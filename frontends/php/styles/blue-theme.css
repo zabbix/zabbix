@@ -3921,12 +3921,9 @@ svg {
   width: 24px;
   float: left;
   margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer; }
+  cursor: pointer;
+  border: none;
+  border-radius: 0px; }
 
 .list-vertical-accordion {
   display: table;
