@@ -536,7 +536,6 @@ jQuery(function ($) {
 						var graph = $(this);
 						destroyHintbox(graph);
 						hideHelper(graph);
-						return false;
 					})
 					.data('options', data)
 					.on('mousemove', {graph: graph}, showHintbox)
