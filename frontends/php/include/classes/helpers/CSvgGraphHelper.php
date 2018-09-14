@@ -284,8 +284,7 @@ class CSvgGraphHelper {
 			'select_acknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
-			'preservekeys' => true,
-			'limit' => 100
+			'preservekeys' => true
 		];
 
 		// Find triggers involved.
