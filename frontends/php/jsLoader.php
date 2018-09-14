@@ -116,7 +116,6 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
 		'%1$s, selected' => _x('%1$s, selected', 'screen reader'),
-		'time shift' => _('time shift'),
 		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found')
 	],
 	'functions.js' => [
@@ -196,9 +195,15 @@ $tranStrings = [
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
-	'main.js' => [
-		'S_EXPAND' => _('Expand'),
+	'class.coverride.js' => [
+		'color' => _('color'),
+		'time shift' => _('time shift')
+	],
+	'class.cverticalaccordion.js' => [
 		'S_COLLAPSE' => _('Collapse'),
+		'S_EXPAND' => _('Expand')
+	],
+	'main.js' => [
 		'Close' => _('Close')
 	],
 	'multiselect.js' => [
@@ -276,7 +281,6 @@ $tranStrings = [
 		'Add multiple maps' => _('Add multiple maps')
 	],
 	'colorpicker.js' => [
-		'color' => _('color'),
 		'Close' => _('Close')
 	]
 ];
