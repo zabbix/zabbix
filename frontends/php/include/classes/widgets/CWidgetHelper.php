@@ -532,7 +532,7 @@ class CWidgetHelper {
 									'multiselect' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
-									'resolve_items' => 0,
+									'orig_names' => 1,
 									'dstfrm' => $form_name
 								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
@@ -896,7 +896,7 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'with_webitems' => 1,
-									'resolve_items' => 0,
+									'orig_names' => 1,
 									'dstfrm' => $form_name
 								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
