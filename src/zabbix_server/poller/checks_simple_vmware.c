@@ -593,7 +593,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 {
 	const char		*__function_name = "check_vcenter_cluster_status";
 
-	char			*url, *name, *status;
+	char			*url, *name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster;
 	int			ret = SYSINFO_RET_FAIL;
@@ -623,23 +623,22 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	if (NULL == (status = zbx_xml_read_value(cluster->status, ZBX_XPATH_LN2("val", "overallStatus"))))
+	if (NULL == cluster->status)
 		goto unlock;
 
 	ret = SYSINFO_RET_OK;
 
-	if (0 == strcmp(status, "gray"))
+	if (0 == strcmp(cluster->status, "gray"))
 		SET_UI64_RESULT(result, 0);
-	else if (0 == strcmp(status, "green"))
+	else if (0 == strcmp(cluster->status, "green"))
 		SET_UI64_RESULT(result, 1);
-	else if (0 == strcmp(status, "yellow"))
+	else if (0 == strcmp(cluster->status, "yellow"))
 		SET_UI64_RESULT(result, 2);
-	else if (0 == strcmp(status, "red"))
+	else if (0 == strcmp(cluster->status, "red"))
 		SET_UI64_RESULT(result, 3);
 	else
 		ret = SYSINFO_RET_FAIL;
 
-	zbx_free(status);
 unlock:
 	zbx_vmware_unlock();
 out:

@@ -3382,7 +3382,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	char		tmp[MAX_STRING_LEN], *clusterid_esc;
 	int		ret = FAIL;
-	ZBX_HTTPPAGE	*resp;
+	xmlDoc		*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __function_name, clusterid);
 
@@ -3392,13 +3392,14 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 
 	zbx_free(clusterid_esc);
 
-	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, NULL, &resp, error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, NULL, error))
 		goto out;
 
-	*status = zbx_strdup(NULL, resp->data);
+	*status = zbx_xml_read_doc_value(doc, ZBX_XPATH_LN2("val", "overallStatus"));
 
 	ret = SUCCEED;
 out:
+	xmlFreeDoc(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
