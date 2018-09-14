@@ -806,8 +806,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fullname:[%s]", __function_name, zbx_sysinfo_ret_string(ret),
-			ZBX_NULL2STR(service->fullname));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
