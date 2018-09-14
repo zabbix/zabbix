@@ -184,9 +184,8 @@ static int	get_device_info(const char *dev_path, const char *dev_name, char *dev
 		}
 		else
 		{
-			char		*bus_attr = NULL;
+			char		*bus_attr = NULL, bus_path[MAX_STRING_LEN];
 			const char	*bus_subfolder;
-			char		bus_path[MAX_STRING_LEN];
 
 			zbx_snprintf(bus_path, sizeof(bus_path), "/sys/class/i2c-adapter/i2c-%d", bus_i2c);
 			bus_subfolder = sysfs_read_attr(bus_path, &bus_attr);
