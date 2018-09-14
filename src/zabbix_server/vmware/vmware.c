@@ -969,8 +969,11 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 	vmware_shared_strfree(service->username);
 	vmware_shared_strfree(service->password);
 
-	if (NULL != service->contents)
-		vmware_shared_strfree(service->contents);
+	if (NULL != service->version)
+		vmware_shared_strfree(service->version);
+
+	if (NULL != service->fullname)
+		vmware_shared_strfree(service->fullname);
 
 	vmware_data_shared_free(service->data);
 
@@ -1655,13 +1658,15 @@ static void	zbx_property_collection_free(zbx_property_collection_iter *iter)
  * Purpose: retrieves vmware service instance contents                        *
  *                                                                            *
  * Parameters: easyhandle - [IN] the CURL handle                              *
+ *             version    - [OUT] the version of the instance                 *
+ *             fullname   - [OUT] the fullname of the instance                *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the contents were retrieved successfully           *
  *               FAIL    - the content retrieval faield                       *
  *                                                                            *
  ******************************************************************************/
-static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char **error)
+static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **fullname, char **error)
 {
 #	define ZBX_POST_VMWARE_CONTENTS 							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -1671,12 +1676,17 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **contents, char *
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_contents";
-	ZBX_HTTPPAGE	*resp;
+	xmlDoc		*doc = NULL;
 
-	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_VMWARE_CONTENTS, NULL, &resp, error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, NULL, error))
+	{
+		xmlFreeDoc(doc);
 		return FAIL;
+	}
 
-	*contents = zbx_strdup(*contents, resp->data);
+	*version = zbx_xml_read_doc_value(doc, ZBX_XPATH_VMWARE_ABOUT("version"));
+	*fullname = zbx_xml_read_doc_value(doc, ZBX_XPATH_VMWARE_ABOUT("fullName"));
+	xmlFreeDoc(doc);
 
 	return SUCCEED;
 
@@ -3576,7 +3586,7 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-	char			*contents = NULL;
+	char			*version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
 	int			ret = FAIL;
 
@@ -3585,19 +3595,21 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	if (SUCCEED != vmware_service_get_perf_counters(service, easyhandle, &counters, error))
 		goto out;
 
-	if (SUCCEED != vmware_service_get_contents(easyhandle, &contents, error))
+	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
 		goto out;
 
 	zbx_vmware_lock();
 
-	service->contents = vmware_shared_strdup(contents);
+	service->version = vmware_shared_strdup(version);
+	service->fullname = vmware_shared_strdup(fullname);
 	vmware_counters_shared_copy(&service->counters, &counters);
 
 	zbx_vmware_unlock();
 
 	ret = SUCCEED;
 out:
-	zbx_free(contents);
+	zbx_free(version);
+	zbx_free(fullname);
 
 	zbx_vector_ptr_clear_ext(&counters, (zbx_mem_free_func_t)vmware_counter_free);
 	zbx_vector_ptr_destroy(&counters);

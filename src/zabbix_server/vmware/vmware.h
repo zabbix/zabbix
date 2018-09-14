@@ -198,8 +198,11 @@ typedef struct
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
 
-	/* the vmware service instance contents */
-	char			*contents;
+	/* the vmware service instance version */
+	char			*version;
+
+	/* the vmware service instance fullname */
+	char			*fullname;
 
 	/* the performance counters */
 	zbx_hashset_t		counters;
