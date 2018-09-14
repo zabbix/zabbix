@@ -123,11 +123,10 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 
 static int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
-	char		*subsys, *prefix = NULL;
+	char		*subsys, *prefix = NULL, linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 	int		ret = FAIL;
 	unsigned int	addr;
 	ssize_t		sub_len;
-	char		linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
 
 	/* ignore any device without name attribute */
 	if (NULL == (*name_subfolder = sysfs_read_attr(dev_path, &prefix)))
