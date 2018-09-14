@@ -1095,7 +1095,7 @@ jQuery(function ($) {
 						$(this).attr('rows', rows);
 					})
 					.data('autogrow', options)
-					.trigger('change');
+					.trigger('keyup');
 			}
 
 			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
