@@ -3778,7 +3778,8 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
-	.msg-bad {
+	.msg-bad,
+	.msg-good {
 		position: sticky;
 		top: 0;
 		z-index: 1000;

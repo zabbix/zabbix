@@ -2628,7 +2628,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.modal-popup {
     max-width: 1024px;
     min-width: 650px; }
-  .overlay-dialogue .msg-bad {
+  .overlay-dialogue .msg-bad,
+  .overlay-dialogue .msg-good {
     position: sticky;
     top: 0;
     z-index: 1000; }
