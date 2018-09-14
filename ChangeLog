@@ -1,6 +1,7 @@
 Changes for 4.0.0rc1
 
 New features:
+....I..... [ZBXNEXT-4736] added index by nextcheck to escalations table (wiper)
 
 Bug fixes:
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
