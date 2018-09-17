@@ -197,8 +197,8 @@ $tranStrings = [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'color' => _('color'),
-		'time shift' => _('time shift')
+		'S_COLOUR' => _('colour'),
+		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
 		'S_COLLAPSE' => _('Collapse'),
