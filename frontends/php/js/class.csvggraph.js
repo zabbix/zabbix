@@ -431,7 +431,7 @@ jQuery(function ($) {
 				var rows_added = 0;
 				points.forEach(function(point) {
 					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
-					if (xy_point === false || xy_point === point) {
+					if (point.v !== null && (xy_point === false || xy_point === point)) {
 						point_highlight.setAttribute('cx', point.x);
 						point_highlight.setAttribute('cy', point.y);
 
