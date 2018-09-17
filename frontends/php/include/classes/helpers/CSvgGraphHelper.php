@@ -76,13 +76,12 @@ class CSvgGraphHelper {
 
 		// Get problems to display in graph.
 		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			$options['problems']['itemids_only'] =
+			$options['problems']['itemids'] =
 				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? zbx_objectValues($metrics, 'itemid')
+					? array_unique(zbx_objectValues($metrics, 'itemid'))
 					: null;
 
 			$problems = self::getProblems($options['problems'], $options['time_period']);
-			CArrayHelper::sort($problems, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 			$graph->addProblems($problems);
 		}
 
@@ -286,7 +285,7 @@ class CSvgGraphHelper {
 	/**
 	 * Find problems at given time period that matches specified problem options.
 	 */
-	protected static function getProblems(array $problem_options = [], array $time_period) {
+	protected static function getProblems(array $problem_options, array $time_period) {
 		$options = [
 			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
 			'select_acknowledges' => ['action'],
@@ -297,40 +296,37 @@ class CSvgGraphHelper {
 
 		// Find triggers involved.
 		if ($problem_options['problemhosts'] !== '') {
-			$problem_hosts = API::Host()->get([
+			$options['hostids'] = array_keys(API::Host()->get([
 				'output' => [],
-				'selectTriggers' => ['triggerid'],
 				'searchWildcardsEnabled' => true,
 				'searchByAny' => true,
 				'search' => [
 					'name' => self::processPattern($problem_options['problemhosts'])
 				],
 				'preservekeys' => true
-			]);
+			]));
 
-			$options['objectids'] = [];
-			foreach ($problem_hosts as $problem_host) {
-				$options['objectids']
-					= zbx_array_merge($options['objectids'], zbx_objectValues($problem_host['triggers'], 'triggerid'));
-			}
-
-			// If searched by hosts but no trieggers found, return no preblems.
-			if (!$options['objectids']) {
+			// Return if no hosts found.
+			if (!$options['hostids']) {
 				return [];
 			}
 		}
 
 		// Filter out only items of selected metrics.
-		if (array_key_exists('itemids_only', $problem_options)) {
-			$triggers = API::Trigger()->get([
+		if ($problem_options['itemids'] !== null) {
+			$options['objectids'] = array_keys(API::Trigger()->get([
 				'output' => [],
-				'itemids' => $problem_options['itemids_only'],
+				'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
+				'itemids' => $problem_options['itemids'],
 				'preservekeys' => true
-			]);
+			]));
 
-			$options['objectids'] = array_key_exists('objectids', $options)
-				? array_intersect($options['objectids'], array_keys($triggers))
-				: array_keys($triggers);
+			// Return if no triggers found.
+			if (!$options['objectids']) {
+				return [];
+			}
+
+			unset($options['hostids']);
 		}
 
 		// Add severity filter.
@@ -353,26 +349,28 @@ class CSvgGraphHelper {
 			$options['tags'] = $problem_options['tags'];
 		}
 
-		$problem_events = API::Event()->get($options);
+		$events = API::Event()->get($options);
 
 		// Find end time for each problem.
-		if ($problem_events) {
-			$recovery_events = API::Event()->get([
+		if ($events) {
+			$r_events = API::Event()->get([
 				'output' => ['clock'],
-				'eventids' => zbx_objectValues($problem_events, 'r_eventid'),
+				'eventids' => zbx_objectValues($events, 'r_eventid'),
 				'preservekeys' => true
 			]);
 		}
 
 		// Add recovery times for each problem event.
-		foreach ($problem_events as &$problem_event) {
-			$problem_event['r_clock'] = array_key_exists($problem_event['r_eventid'], $recovery_events)
-				? $recovery_events[$problem_event['r_eventid']]['clock']
+		foreach ($events as &$event) {
+			$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
+				? $r_events[$event['r_eventid']]['clock']
 				: 0;
 		}
-		unset($problem_event);
+		unset($event);
 
-		return $problem_events;
+		CArrayHelper::sort($events, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+		return $events;
 	}
 
 	/**
