@@ -29,7 +29,7 @@
 function corrConditionOperatorToString($operator) {
 	$operators = [
 		CONDITION_OPERATOR_EQUAL => _('equals'),
-		CONDITION_OPERATOR_NOT_EQUAL => _('does not equal'),
+		CONDITION_OPERATOR_NOT_EQUAL => _('is not equal'),
 		CONDITION_OPERATOR_LIKE => _('contains'),
 		CONDITION_OPERATOR_NOT_LIKE => _('does not contain')
 	];
