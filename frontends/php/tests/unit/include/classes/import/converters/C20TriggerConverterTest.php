@@ -60,8 +60,8 @@ class C20TriggerConverterTest extends PHPUnit_Framework_TestCase {
 
 			['{TRIGGER.VALUE}|{host:item[&].last()}', '{TRIGGER.VALUE} or {host:item[&].last()}'],
 			[
-				'({TRIGGER.VALUE}=0&{Template App Zabbix Server:zabbix[process,alerter,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{Template App Zabbix Server:zabbix[process,alerter,avg,busy].avg(10m)}>65)',
-				'({TRIGGER.VALUE}=0 and {Template App Zabbix Server:zabbix[process,alerter,avg,busy].avg(10m)}>75) or ({TRIGGER.VALUE}=1 and {Template App Zabbix Server:zabbix[process,alerter,avg,busy].avg(10m)}>65)'
+				'({TRIGGER.VALUE}=0&{Template App Zabbix server:zabbix[process,alerter,avg,busy].avg(10m)}>75)|({TRIGGER.VALUE}=1&{Template App Zabbix server:zabbix[process,alerter,avg,busy].avg(10m)}>65)',
+				'({TRIGGER.VALUE}=0 and {Template App Zabbix server:zabbix[process,alerter,avg,busy].avg(10m)}>75) or ({TRIGGER.VALUE}=1 and {Template App Zabbix server:zabbix[process,alerter,avg,busy].avg(10m)}>65)'
 			],
 			[
 				'{host:log["/вар/лог/заббикс/заббикс_сервер.лог"].regexp("\<системная ошибка\>")} # 0',

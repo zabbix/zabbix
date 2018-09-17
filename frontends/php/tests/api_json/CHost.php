@@ -43,8 +43,8 @@ class API_JSON_Host extends CZabbixTest {
 						['groupid' => 5]		/* Discovered hosts */
 					],
 					'templates' => [
-						['templateid' => 10047],	/* Template App Zabbix Server */
-						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10047],	/* Template App Zabbix server */
+						['templateid' => 10050],	/* Template App Zabbix agent */
 						['templateid' => 10093],	/* Template App FTP Service */
 						['templateid' => 10094],	/* Template App HTTP Service */
 						['templateid' => 10095],	/* Template App HTTPS Service */
