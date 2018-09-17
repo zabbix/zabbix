@@ -226,9 +226,12 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }
+
 if ($table->getNumRows() > $data['fields']['show_lines']) {
 	$table->setFooter([
-		(new CCol($data['info']))->setColSpan($table->getNumCols())->addClass(ZBX_STYLE_RIGHT)
+		(new CCol($data['info']))
+			->setColSpan($table->getNumCols())
+			->addClass(ZBX_STYLE_RIGHT)
 	]);
 }
 
