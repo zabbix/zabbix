@@ -166,29 +166,41 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		}
 
 		if ($initial_load) {
+			// Chunkify widget textarea fields before updating widget configuration.
+			$script_inline .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onStartUpdateWidgetConfig", '.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["onStartUpdateWidgetConfig"],'.
+						'grid: {data: 1},'.
+						'trigger_name: "svggraph_widget_on_config_update_start_'.$uniqueid.'"'.
+					'}'.
+				');';
+
+			// Revert chunkify when fields are collected.
+			$script_inline .=
+				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "afterUpdateWidgetConfig", '.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["afterUpdateWidgetConfig"],'.
+						'grid: {data: 1},'.
+						'trigger_name: "svggraph_widget_after_config_update_'.$uniqueid.'"'.
+					'}'.
+				');';
+
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_resize_end_'.$uniqueid.') !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_resize_end_'.$uniqueid.'() {'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid("refreshWidget", "'.$uniqueid.'");'.
-					'}'.
-				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.
-					'"zbx_svggraph_widget_resize_end_'.$uniqueid.'", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["onResizeEnd"],'.
+						'grid: {widget: 1},'.
 						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
 					'});';
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_edit_start_'.$uniqueid.') !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_edit_start_'.$uniqueid.'() {'.
-						'var widget = jQuery(".dashbrd-grid-widget-container")'.
-								'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
-						'jQuery(\'svg\', widget[0]["content_body"]).svggraph("disableSBox");'.
-					'}'.
-				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart",'.
-					'"zbx_svggraph_widget_edit_start_'.$uniqueid.'", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["onEditStart"],'.
+						'grid: {widget: 1},'.
 						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
 					'});';
 		}

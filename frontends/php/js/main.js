@@ -1070,90 +1070,98 @@ jQuery(function ($) {
 		return rows;
 	}
 
-	$.fn.autoGrowTextarea = function(options) {
-		this.each(function() {
-			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, options);
+	/**
+	 * Function makes array of strings no longer than 255 characters.
+	 *
+	 * @param {string} string   String to split into array of strings.
+	 *
+	 * @param {array}
+	 */
+	function chunk_split(string) {
+		return string.replace('\r', '').match(/.{0,255}/mg).slice(0, -1);
+	}
 
-				$(this)
-					.css({
-						'resize': 'none',
-						'overflow-x': 'hidden',
-						'white-space': 'pre-line'
-					})
-					.on('paste change keyup', function() {
-						var rows = calcRows($(this), options);
+	var methods = {
+		init: function(options) {
+			options = $.extend({}, options);
 
-						if (options && 'pair' in options) {
-							var pair_rows = calcRows($(options.pair), options);
-							if (pair_rows > rows) {
-								rows = pair_rows;
+			this.each(function() {
+				if (typeof $(this).data('autogrow') === 'undefined') {
+					$(this)
+						.css({
+							'resize': 'none',
+							'overflow-x': 'hidden',
+							'white-space': 'pre-line'
+						})
+						.on('paste change keyup', function() {
+							var rows = calcRows($(this), options);
+
+							if (options && 'pair' in options) {
+								var pair_rows = calcRows($(options.pair), options);
+								if (pair_rows > rows) {
+									rows = pair_rows;
+								}
+								$(options.pair).attr('rows', rows);
 							}
-							$(options.pair).attr('rows', rows);
-						}
 
-						$(this).attr('rows', rows);
-					})
-					.data('autogrow', options)
-					.trigger('keyup');
-			}
+							$(this).attr('rows', rows);
+						})
+						.data('autogrow', options)
+						.trigger('keyup');
+				}
 
-			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
-				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
-					if ($(this).val().length > $(this).attr('maxlength')) {
-						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
-					}
-				});
-			}
-
-			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none'});
-			}
-		});
-	};
-});
-
-/**
- * Function makes array of strings of defined length.
- *
- * @param {string} string   String to split into array of strings.
- *
- * @param {array}
- */
-function chunk_split(string) {
-	return string.replace('\r', '').match(/.{0,255}/mg).slice(0, -1);
-}
-
-/**
- * Function loops through given fields and converts values of predefined fields to chunks.
- * Used to split dashboard widget textarea field into array of strings that fits supported length.
- *
- * @param {object} data   Widget fields.
- *
- * @param {array}
- */
-function chunkify(data) {
-	jQuery.each(['ds', 'or', 'problemhosts'], function(index, field) {
-		if (field in data) {
-			switch (field) {
-				case 'ds':
-				case 'or':
-					jQuery.each(data[field], function(i, f) {
-						if ('hosts' in f) {
-							data[field][i]['hosts'] = chunk_split(f['hosts']);
-						}
-						if ('items' in f) {
-							data[field][i]['items'] = chunk_split(f['items']);
+				if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+					$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+						if ($(this).val().length > $(this).attr('maxlength')) {
+							$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
 						}
 					});
-					break;
+				}
 
-				case 'problemhosts':
-					data[field] = chunk_split(data[field]);
-					break;
-			}
+				if (options && 'pair' in options) {
+					$(options.pair).css({'resize': 'none'});
+				}
+			});
+		},
+		makeChunks: function() {
+			this.each(function() {
+				var $input = $(this),
+					field_name,
+					chunks;
+
+				if (!$input.is(':disabled')) {
+					field_name = $input.attr('name');
+					chunks = chunk_split($input.val());
+
+					$input
+						.data('disabled', true)
+						.prop('disabled', true);
+
+					$.each(chunks, function(i, chunk) {
+						$('<input>', {'type': 'hidden', 'name': field_name + '[' + i + ']'})
+							.val(chunk)
+							.insertAfter($input);
+					});
+				}
+			});
+		},
+		undoChunks: function() {
+			this.each(function() {
+				if (typeof $(this).data('disabled') !== 'undefined') {
+					$('input[type=hidden]', $(this).parent()).remove();
+					$(this)
+						.prop('disabled', false)
+						.removeData('disabled');
+				}
+			});
 		}
-	});
+	};
 
-	return data;
-}
+	$.fn.autoGrowTextarea = function(method, options) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
+
+		return methods.init.apply(this, arguments);
+	};
+});

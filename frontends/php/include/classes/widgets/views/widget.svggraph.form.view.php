@@ -63,6 +63,8 @@ $scripts[] =
 $scripts[] =
 	'function onGraphConfigChange() {'.
 		// Update graph preview.
+		'jQuery("textarea", $form).autoGrowTextarea("makeChunks");'.
+
 		'var $preview = jQuery("#svg-graph-preview"),'.
 			'$form = jQuery("#'.$form->getId().'"),'.
 			'url = new Curl("zabbix.php"),'.
@@ -71,7 +73,7 @@ $scripts[] =
 				'preview: 1,'.
 				'content_width: $preview.width(),'.
 				'content_height: $preview.height() - 10,'.
-				'fields: JSON.stringify(chunkify($form.serializeJSON()))'.
+				'fields: JSON.stringify($form.serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
@@ -90,6 +92,8 @@ $scripts[] =
 				'}'.
 			'}'.
 		'});'.
+
+		'jQuery("textarea", $form).autoGrowTextarea("undoChunks");'.
 
 		// Enable/disable fields for Y axis.
 		'if (this.id !== "lefty" && this.id !== "righty") {'.

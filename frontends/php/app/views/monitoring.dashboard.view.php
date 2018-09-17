@@ -34,6 +34,7 @@ else {
 	$this->addJsFile('class.crangecontrol.js');
 	$this->addJsFile('colorpicker.js');
 	$this->addJsFile('class.csvggraph.js');
+	$this->addJsFile('csvggraphwidget.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
