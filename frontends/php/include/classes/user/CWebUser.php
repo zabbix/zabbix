@@ -113,11 +113,6 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication($sessionId) {
-		if ($sessionId === null) {
-			self::setDefault();
-			return false;
-		}
-
 		try {
 			if ($sessionId !== null) {
 				self::$data = API::User()->checkAuthentication([
