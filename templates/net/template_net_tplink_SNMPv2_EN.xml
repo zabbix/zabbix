@@ -493,7 +493,7 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                <name>Template Module Generic SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Interfaces simple SNMPv2</name>
+               <name>Template Module Interfaces Simple SNMPv2</name>
             </template>
          </templates>
          <screens/>

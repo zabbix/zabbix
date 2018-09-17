@@ -382,7 +382,7 @@ networking software.</description>
          </macros>
          <templates>
             <template>
-               <name>Template Module ICMP ping</name>
+               <name>Template Module ICMP Ping</name>
             </template>
          </templates>
          <screens/>
