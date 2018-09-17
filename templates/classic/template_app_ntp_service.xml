@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App NTP service</template>
-            <name>Template App NTP service</name>
+            <template>Template App NTP Service</template>
+            <name>Template App NTP Service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App NTP service:net.udp.service[ntp].max(#3)}=0</expression>
+            <expression>{Template App NTP Service:net.udp.service[ntp].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>NTP service is down on {HOST.NAME}</name>

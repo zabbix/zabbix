@@ -43,19 +43,19 @@ class API_JSON_Host extends CZabbixTest {
 						['groupid' => 5]		/* Discovered hosts */
 					],
 					'templates' => [
-						['templateid' => 10047],	/* Template App Zabbix server */
-						['templateid' => 10050],	/* Template App Zabbix agent */
-						['templateid' => 10093],	/* Template App FTP service */
-						['templateid' => 10094],	/* Template App HTTP service */
-						['templateid' => 10095],	/* Template App HTTPS service */
-						['templateid' => 10096],	/* Template App IMAP service */
-						['templateid' => 10097],	/* Template App LDAP service */
-						['templateid' => 10098],	/* Template App NNTP service */
-						['templateid' => 10099],	/* Template App NTP service */
-						['templateid' => 10100],	/* Template App POP service */
-						['templateid' => 10101],	/* Template App SMTP service */
-						['templateid' => 10102],	/* Template App SSH service */
-						['templateid' => 10103]	/* Template App Telnet service */
+						['templateid' => 10047],	/* Template App Zabbix Server */
+						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10093],	/* Template App FTP Service */
+						['templateid' => 10094],	/* Template App HTTP Service */
+						['templateid' => 10095],	/* Template App HTTPS Service */
+						['templateid' => 10096],	/* Template App IMAP Service */
+						['templateid' => 10097],	/* Template App LDAP Service */
+						['templateid' => 10098],	/* Template App NNTP Service */
+						['templateid' => 10099],	/* Template App NTP Service */
+						['templateid' => 10100],	/* Template App POP Service */
+						['templateid' => 10101],	/* Template App SMTP Service */
+						['templateid' => 10102],	/* Template App SSH Service */
+						['templateid' => 10103]	/* Template App Telnet Service */
 					]
 				]
 			],

@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App Telnet service</template>
-            <name>Template App Telnet service</name>
+            <template>Template App Telnet Service</template>
+            <name>Template App Telnet Service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Telnet service:net.tcp.service[telnet].max(#3)}=0</expression>
+            <expression>{Template App Telnet Service:net.tcp.service[telnet].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>Telnet service is down on {HOST.NAME}</name>

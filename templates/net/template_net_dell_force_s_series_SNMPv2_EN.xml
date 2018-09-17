@@ -33,7 +33,7 @@ F10-S-SERIES-CHASSIS-MIB</description>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power supply</name>
+               <name>Power Supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -328,7 +328,7 @@ The status of the power supply {#SNMPVALUE}</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power supply</name>
+                           <name>Power Supply</name>
                         </application>
                      </applications>
                      <valuemap>

@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App FTP service</template>
-            <name>Template App FTP service</name>
+            <template>Template App FTP Service</template>
+            <name>Template App FTP Service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App FTP service:net.tcp.service[ftp].max(#3)}=0</expression>
+            <expression>{Template App FTP Service:net.tcp.service[ftp].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>FTP service is down on {HOST.NAME}</name>

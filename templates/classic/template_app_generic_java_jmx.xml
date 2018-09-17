@@ -25,16 +25,16 @@
                     <name>Compilation</name>
                 </application>
                 <application>
-                    <name>Garbage collector</name>
+                    <name>Garbage Collector</name>
                 </application>
                 <application>
                     <name>Memory</name>
                 </application>
                 <application>
-                    <name>Memory pool</name>
+                    <name>Memory Pool</name>
                 </application>
                 <application>
-                    <name>Operating system</name>
+                    <name>Operating System</name>
                 </application>
                 <application>
                     <name>Runtime</name>
@@ -286,7 +286,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -332,7 +332,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -378,7 +378,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -424,7 +424,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -470,7 +470,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -516,7 +516,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -562,7 +562,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -608,7 +608,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -654,7 +654,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -700,7 +700,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -746,7 +746,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -792,7 +792,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Garbage collector</name>
+                            <name>Garbage Collector</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1125,7 +1125,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1166,7 +1166,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1207,7 +1207,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1248,7 +1248,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1289,7 +1289,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1330,7 +1330,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1371,7 +1371,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1412,7 +1412,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1453,7 +1453,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1494,7 +1494,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1535,7 +1535,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1576,7 +1576,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1617,7 +1617,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1658,7 +1658,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1699,7 +1699,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1740,7 +1740,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1781,7 +1781,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1822,7 +1822,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1863,7 +1863,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1904,7 +1904,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1945,7 +1945,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Memory pool</name>
+                            <name>Memory Pool</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1986,7 +1986,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Operating system</name>
+                            <name>Operating System</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -2027,7 +2027,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Operating system</name>
+                            <name>Operating System</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -2068,7 +2068,7 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>Operating system</name>
+                            <name>Operating System</name>
                         </application>
                     </applications>
                     <valuemap/>

@@ -177,7 +177,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					],
 				'templates' => [
 					[
-						'name' => 'Template App FTP service'
+						'name' => 'Template App FTP Service'
 					],
 					[
 						'name' => 'Template OS Linux'
@@ -279,7 +279,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				],
 				'templates' => [
 					[
-						'name' => 'Template App FTP service'
+						'name' => 'Template App FTP Service'
 					],
 					[
 						'name' => 'Template OS Linux'

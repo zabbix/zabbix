@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App HTTP service</template>
-            <name>Template App HTTP service</name>
+            <template>Template App HTTP Service</template>
+            <name>Template App HTTP Service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App HTTP service:net.tcp.service[http].max(#3)}=0</expression>
+            <expression>{Template App HTTP Service:net.tcp.service[http].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>HTTP service is down on {HOST.NAME}</name>

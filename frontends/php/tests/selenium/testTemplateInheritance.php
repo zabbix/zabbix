@@ -42,7 +42,7 @@ class testTemplateInheritance extends CWebTest {
 	protected $hostName = 'Template inheritance test host';
 
 	public function testTemplateInheritance_linkHost(){
-		$sql = "select hostid from hosts where host='Template App Zabbix agent';";
+		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
 		$this->assertEquals(1, DBcount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
@@ -56,10 +56,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickButtonMultiselect('add_templates_');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickLinkTextWait('Template App Zabbix agent');
+		$this->zbxTestClickLinkTextWait('Template App Zabbix Agent');
 		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
-		$this->zbxTestTextPresent('Template App Zabbix agent');
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');

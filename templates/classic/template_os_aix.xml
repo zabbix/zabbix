@@ -2281,7 +2281,7 @@
             <macros/>
             <templates>
                 <template>
-                    <name>Template App Zabbix agent</name>
+                    <name>Template App Zabbix Agent</name>
                 </template>
             </templates>
             <screens>

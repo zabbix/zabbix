@@ -298,7 +298,7 @@
                             </group_prototypes>
                             <templates>
                                 <template>
-                                    <name>Template VM VMware hypervisor</name>
+                                    <name>Template VM VMware Hypervisor</name>
                                 </template>
                             </templates>
                         </host_prototype>
@@ -364,7 +364,7 @@
                             </group_prototypes>
                             <templates>
                                 <template>
-                                    <name>Template VM VMware guest</name>
+                                    <name>Template VM VMware Guest</name>
                                 </template>
                             </templates>
                         </host_prototype>
@@ -378,8 +378,8 @@
             <screens/>
         </template>
         <template>
-            <template>Template VM VMware guest</template>
-            <name>Template VM VMware guest</name>
+            <template>Template VM VMware Guest</template>
+            <name>Template VM VMware Guest</name>
             <description/>
             <groups>
                 <group>
@@ -1821,8 +1821,8 @@
             <screens/>
         </template>
         <template>
-            <template>Template VM VMware hypervisor</template>
-            <name>Template VM VMware hypervisor</name>
+            <template>Template VM VMware Hypervisor</template>
+            <name>Template VM VMware Hypervisor</name>
             <description/>
             <groups>
                 <group>
