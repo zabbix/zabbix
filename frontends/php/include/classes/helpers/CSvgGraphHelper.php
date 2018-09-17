@@ -91,7 +91,7 @@ class CSvgGraphHelper {
 
 			foreach ($metrics as $metric) {
 				$labels[] = [
-					'name' => $metric['name'],
+					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
 					'color' => $metric['options']['color']
 				];
 			}

@@ -246,7 +246,7 @@ class CSvgGraph extends CSvg {
 				}
 
 				$this->metrics[$i] = [
-					'name' => $metric['name'],
+					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
 					'itemid' => $metric['itemid'],
 					'units' => $metric['units'],
 					'host' => $metric['hosts'][0],
