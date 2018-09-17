@@ -7,7 +7,7 @@
          <name>Templates/Modules</name>
       </group>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -147,7 +147,7 @@ MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -843,7 +843,7 @@ version : Version 08.0.40b and above&#13;
 device : ICX 7750 in stack</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
