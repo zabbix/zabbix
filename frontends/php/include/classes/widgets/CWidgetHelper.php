@@ -382,6 +382,7 @@ class CWidgetHelper {
 		}
 
 		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
+		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 		$i = 0;
 
 		foreach ($tags as $tag) {
@@ -389,19 +390,23 @@ class CWidgetHelper {
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAriaRequired(self::isAriaRequired($field)),
+					->setAriaRequired(self::isAriaRequired($field))
+					->setEnabled($enabled),
 				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
 					->addValue(_('Like'), TAG_OPERATOR_LIKE)
 					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
-					->setModern(true),
+					->setModern(true)
+					->setEnabled($enabled),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAriaRequired(self::isAriaRequired($field)),
+					->setAriaRequired(self::isAriaRequired($field))
+					->setEnabled($enabled),
 				(new CCol(
 					(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
+						->setEnabled($enabled)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			], 'form_row');
 
@@ -413,6 +418,7 @@ class CWidgetHelper {
 				(new CButton('tags_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
+					->setEnabled($enabled)
 			))->setColSpan(3)
 		);
 
