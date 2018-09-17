@@ -270,9 +270,9 @@ if (isset($_REQUEST['form'])) {
 			'templateid' => getRequest('templateid'),
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
-			'status' => getRequest('status', !getRequest('form_refresh')
-				? HOST_STATUS_MONITORED
-				: HOST_STATUS_NOT_MONITORED
+			'status' => getRequest('status', hasRequest('form_refresh')
+				? HOST_STATUS_NOT_MONITORED
+				: HOST_STATUS_MONITORED
 			),
 			'templates' => [],
 			'inventory' => [
