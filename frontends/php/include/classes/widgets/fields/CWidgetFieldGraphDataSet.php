@@ -56,12 +56,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setDefault([]);
 	}
 
-	public function setValue($value) {
-		$this->value = $value;
-
-		return $this;
-	}
-
 	/**
 	 * Set additional flags, which can be used in configuration form.
 	 *

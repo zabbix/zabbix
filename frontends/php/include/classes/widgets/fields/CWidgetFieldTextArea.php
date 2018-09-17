@@ -42,13 +42,6 @@ class CWidgetFieldTextArea extends CWidgetField {
 		$this->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
 
-	public function setValue($value) {
-		// Values received from frontend are strings. Values received from database comes as arrays.
-		$this->value = $value;
-
-		return $this;
-	}
-
 	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget

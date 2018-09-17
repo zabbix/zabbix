@@ -75,12 +75,6 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		return $this;
 	}
 
-	public function setValue($value) {
-		$this->value = $value;
-
-		return $this;
-	}
-
 	/**
 	 * Default values filled in newly created data set or used as unspecified values.
 	 *
