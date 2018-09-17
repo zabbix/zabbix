@@ -575,7 +575,7 @@ class CSvgGraphHelper {
 	 * @return mixed|array  Returns array of patterns or NULL if all tested hosts/items are valid.
 	 */
 	protected static function processPattern($patterns) {
-		$patterns = array_keys(array_flip(explode(',', $patterns)));
+		$patterns = array_keys(array_flip(preg_split('/(\r\n|\n|,)/', $patterns)));
 
 		foreach ($patterns as &$pattern) {
 			$pattern = trim($pattern);
