@@ -60,6 +60,16 @@ class CWidgetFormTrigOver extends CWidgetForm {
 
 		$this->fields[$field_application->getName()] = $field_application;
 
+		// Show suppressed problems.
+		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
+			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
+
+		if (array_key_exists('show_suppressed', $this->data)) {
+			$field_show_suppressed->setValue($this->data['show_suppressed']);
+		}
+
+		$this->fields[$field_show_suppressed->getName()] = $field_show_suppressed;
+
 		// Hosts names location.
 		$field_style = (new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
 			STYLE_LEFT => _('Left'),

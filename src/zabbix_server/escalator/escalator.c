@@ -359,8 +359,8 @@ int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 
 	result = DBselect(
 			"select hg.groupid from items i"
-			" join hosts_groups hg on hg.hostid = i.hostid"
-			" where i.utemid=" ZBX_FS_UI64,
+			" join hosts_groups hg on hg.hostid=i.hostid"
+			" where i.itemid=" ZBX_FS_UI64,
 			itemid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1727,10 +1727,6 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
  *                                     of dependent trigger being in PROBLEM  *
  *                                     state,                                 *
  *                                 0 - otherwise                              *
- *             maintenance - [OUT] HOST_MAINTENANCE_STATUS_ON - if at least   *
- *                                 one of hosts used in expression is in      *
- *                                 maintenance mode,                          *
- *                                 HOST_MAINTENANCE_STATUS_OFF - otherwise    *
  *             error       - [OUT] message in case escalation is cancelled    *
  *                                                                            *
  * Return value: FAIL if dependent trigger is in PROBLEM state                *
@@ -1738,7 +1734,7 @@ static void	escalation_execute_acknowledge_operations(const DB_EVENT *event, con
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, unsigned char *ignore,
-		unsigned char *maintenance, char **error)
+		char **error)
 {
 	DC_TRIGGER		trigger;
 	zbx_vector_uint64_t	functionids, itemids;
@@ -1794,8 +1790,6 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
-	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
-
 	for (i = 0; i < itemids.values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
@@ -1814,9 +1808,6 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 			*error = zbx_dsprintf(*error, "host \"%s\" disabled.", items[i].host.host);
 			break;
 		}
-
-		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status)
-			*maintenance = HOST_MAINTENANCE_STATUS_ON;
 	}
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
@@ -1889,8 +1880,11 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
-		if (SUCCEED != check_escalation_trigger(escalation->triggerid, event->source, &skip, &maintenance, error))
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, event->source, &skip, error))
 			goto out;
+
+		maintenance = (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed ? HOST_MAINTENANCE_STATUS_ON :
+				HOST_MAINTENANCE_STATUS_OFF);
 	}
 	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
@@ -1922,7 +1916,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
-			ACTION_MAINTENANCE_MODE_PAUSE == action->maintenance_mode &&
+			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
 			HOST_MAINTENANCE_STATUS_ON == maintenance &&
 			escalation->acknowledgeid == 0)
 	{
@@ -2545,7 +2539,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_ITEM:
-			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "itemid is not null");
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is null and"
+					" itemid is not null");
 			if (1 < CONFIG_ESCALATOR_FORKS)
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,

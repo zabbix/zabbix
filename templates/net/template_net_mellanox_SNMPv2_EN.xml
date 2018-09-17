@@ -11,7 +11,7 @@
       <template>
          <template>Template Net Mellanox SNMPv2</template>
          <name>Template Net Mellanox SNMPv2</name>
-         <description>Template Net Mellanox version: 0.14&#13;
+         <description>Template Net Mellanox version: 0.15&#13;
 MIBs used:&#13;
 ENTITY-SENSORS-MIB&#13;
 ENTITY-STATE-MIB&#13;
@@ -23,16 +23,16 @@ ENTITY-MIB</description>
          </groups>
          <applications>
             <application>
-               <name>Temperature</name>
+               <name>Fans</name>
             </application>
             <application>
-               <name>Fans</name>
+               <name>Inventory</name>
             </application>
             <application>
                <name>Power Supply</name>
             </application>
             <application>
-               <name>Inventory</name>
+               <name>Temperature</name>
             </application>
          </applications>
          <items/>
@@ -41,9 +41,9 @@ ENTITY-MIB</description>
                <name>Temperature Discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
+               <snmp_oid>discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3]</snmp_oid>
                <key>temp.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -66,16 +66,14 @@ ENTITY-MIB</description>
                   <formula/>
                   <conditions>
                      <condition>
-                        <macro>{#SNMPVALUE}</macro>
+                        <macro>{#SENSOR_TYPE}</macro>
                         <value>8</value>
-                        <!-- celsius -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
                         <macro>{#SENSOR_PRECISION}</macro>
                         <value>1</value>
-                        <!-- limit only to precision 1 (like 10.1) -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -90,7 +88,7 @@ ENTITY-MIB</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
+                     <delay>3m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -140,8 +138,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -250,7 +248,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2]</snmp_oid>
                <key>fan.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -275,7 +273,6 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <condition>
                         <macro>{#SNMPVALUE}</macro>
                         <value>10</value>
-                        <!-- rpm -->
                         <operator>8</operator>
                         <formulaid>B</formulaid>
                      </condition>
@@ -290,7 +287,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}]</key>
-                     <delay>300</delay>
+                     <delay>5m</delay>
                      <history>30d</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -335,8 +332,8 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -404,7 +401,7 @@ Please check the fan unit</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
                <key>entity.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -429,7 +426,6 @@ Please check the fan unit</description>
                      <condition>
                         <macro>{#ENT_CLASS}</macro>
                         <value>3</value>
-                        <!-- 3 - chassis-->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -444,8 +440,8 @@ Please check the fan unit</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.model[entPhysicalModelName.{#SNMPINDEX}]</key>
-                     <delay>3600</delay>
-                     <history>14d</history>
+                     <delay>1h</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>1</value_type>
@@ -486,8 +482,8 @@ Please check the fan unit</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}</snmp_oid>
                      <key>system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]</key>
-                     <delay>3600</delay>
-                     <history>14d</history>
+                     <delay>1h</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>1</value_type>
@@ -552,7 +548,7 @@ Device serial number has changed. Ack to close</description>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7]</snmp_oid>
                <key>psu.discovery</key>
-               <delay>3600</delay>
+               <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
                <snmpv3_contextname/>
@@ -577,7 +573,6 @@ Device serial number has changed. Ack to close</description>
                      <condition>
                         <macro>{#ENT_CLASS}</macro>
                         <value>6</value>
-                        <!-- 3 - chassis-->
                         <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
@@ -592,8 +587,8 @@ Device serial number has changed. Ack to close</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.131.1.1.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.psu.status[entStateOper.{#SNMPINDEX}]</key>
-                     <delay>180</delay>
-                     <history>14d</history>
+                     <delay>3m</delay>
+                     <history>2w</history>
                      <trends>0d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
@@ -658,55 +653,39 @@ Please check the power supply unit for errors</description>
          <httptests/>
          <macros>
             <macro>
-               <macro>{$PSU_CRIT_STATUS}</macro>
-               <value>2</value>
-            </macro>
-            <macro>
                <macro>{$FAN_CRIT_STATUS}</macro>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$TEMP_WARN_STATUS}</macro>
-               <value>3</value>
-            </macro>
-            <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$TEMP_CRIT}</macro>
-               <value>60</value>
-            </macro>
-            <macro>
-               <macro>{$TEMP_WARN}</macro>
-               <value>50</value>
+               <macro>{$PSU_CRIT_STATUS}</macro>
+               <value>2</value>
             </macro>
             <macro>
                <macro>{$TEMP_CRIT_LOW}</macro>
                <value>5</value>
             </macro>
             <macro>
-               <macro>{$STORAGE_UTIL_CRIT}</macro>
-               <value>90</value>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
             </macro>
             <macro>
-               <macro>{$STORAGE_UTIL_WARN}</macro>
-               <value>80</value>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
             </macro>
          </macros>
          <templates>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
             <template>
                <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
             </template>
             <template>
                <name>Template Module Interfaces SNMPv2</name>
-            </template>
-            <template>
-               <name>Template Module Generic SNMPv2</name>
             </template>
          </templates>
          <screens/>
@@ -715,22 +694,7 @@ Please check the power supply unit for errors</description>
    <graphs/>
    <triggers/>
    <value_maps>
-      <value_map><!-- Name:  EntityOperState
-      Type:  TEXTUAL-CONVENTION
-      Module:  ENTITY-STATE-MIB
-
-
-      Base syntax:  INTEGER
-      Numerical syntax:  Integer (32bit)
-      Composed syntax:  INTEGER
-      Value list:   1: unknown(1)
-      2: disabled(2)
-      3: enabled(3)
-      4: testing(4)
-      Status:  current
-      Description:   Represents the possible values of operational states. A value of 'disabled' means the resource is totally inoperable.  A value of 'enabled' means the resourceis partially or fully operable.  A value of 'testing'means the resource is currently being testedand cannot therefore report whether it is operationalor not.  A value of 'unknown' means that this resource is unable to report operational state.
-
-             -->
+      <value_map>
          <name>ENTITY-STATE-MIB::EntityOperState</name>
          <mappings>
             <mapping>

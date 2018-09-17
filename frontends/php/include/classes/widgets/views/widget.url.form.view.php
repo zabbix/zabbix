@@ -31,7 +31,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 );
 
 // URL.
-$form_list->addRow(CWidgetHelper::getLabel($fields['url']), CWidgetHelper::getTextBox($fields['url']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['url']), CWidgetHelper::getUrlBox($fields['url']));
 
 // Dynamic item.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));

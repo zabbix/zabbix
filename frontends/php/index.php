@@ -30,104 +30,67 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'name' =>		[T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')],
-	'password' =>	[T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'],
-	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
-	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null],
-	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
-	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null]
+	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT, null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
+	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
+	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
+	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'form' =>		[T_ZBX_STR, O_OPT, null,	null,	null]
 ];
 check_fields($fields);
 
-// logout
-if (isset($_REQUEST['reconnect'])) {
+if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
-	redirect('index.php');
 }
 
 $config = select_config();
+$autologin = hasRequest('enter') ? getRequest('autologin', 0) : getRequest('autologin', 1);
+$request = getRequest('request', '');
 
-if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (!empty($_SERVER['PHP_AUTH_USER'])) {
-		$_REQUEST['enter'] = _('Sign in');
-		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
-	}
-	else {
-		access_deny(ACCESS_DENY_PAGE);
-	}
+if ($request) {
+	$test_request = [];
+	preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
+
+	$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
+		? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
+		: '';
+}
+
+if (!hasRequest('form') && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+		&& $config['http_login_form'] == ZBX_AUTH_FORM_HTTP && !hasRequest('enter')) {
+	redirect('index_http.php');
+
+	exit;
 }
 
 // login via form
-if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
-	// try to login
-	$autoLogin = getRequest('autologin', 0);
-
-	DBstart();
-	$loginSuccess = CWebUser::login(getRequest('name', ''), getRequest('password', ''));
-	DBend(true);
-
-	if ($loginSuccess) {
-		// save remember login preference
-		if (CWebUser::$data['autologin'] != $autoLogin) {
-			API::User()->update([
-				'userid' => CWebUser::$data['userid'],
-				'autologin' => $autoLogin
-			]);
-		}
-
-		$request = getRequest('request', '');
-
-		if ($request) {
-			preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(?<request>\?.*)?$/i', $request, $test_request);
-
-			$request = (array_key_exists('filename', $test_request) && file_exists('./'.$test_request['filename']))
-				? $test_request['filename'].(array_key_exists('request', $test_request) ? $test_request['request'] : '')
-				: '';
-		}
-
-		if (!zbx_empty($request)) {
-			$url = $request;
-		}
-		elseif (!zbx_empty(CWebUser::$data['url'])) {
-			$url = CWebUser::$data['url'];
-		}
-		else {
-			$url = ZBX_DEFAULT_URL;
-		}
-		redirect($url);
-		exit;
+if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', ''))) {
+	if (CWebUser::$data['autologin'] != $autologin) {
+		API::User()->update([
+			'userid' => CWebUser::$data['userid'],
+			'autologin' => $autologin
+		]);
 	}
-	// login failed, fall back to a guest account
-	else {
-		CWebUser::checkAuthentication(null);
-	}
-}
-else {
-	// login the user from the session, if the session id is empty - login as a guest
-	CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+
+	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], ZBX_DEFAULT_URL]);
+	redirect(reset($redirect));
+
+	exit;
 }
 
-// the user is not logged in, display the login form
-if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
-	switch ($config['authentication_type']) {
-		case ZBX_AUTH_HTTP:
-			echo _('User name does not match with DB');
-			break;
-		case ZBX_AUTH_LDAP:
-		case ZBX_AUTH_INTERNAL:
-			if (isset($_REQUEST['enter'])) {
-				$_REQUEST['autologin'] = getRequest('autologin', 0);
-			}
+if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
+	redirect(CWebUser::$data['url'] ? CWebUser::$data['url'] : ZBX_DEFAULT_URL);
+}
 
-			if ($messages = clear_messages()) {
-				$messages = array_pop($messages);
-				$_REQUEST['message'] = $messages['message'];
-			}
-			$loginForm = new CView('general.login');
-			$loginForm->render();
-	}
-}
-else {
-	redirect(zbx_empty(CWebUser::$data['url']) ? ZBX_DEFAULT_URL : CWebUser::$data['url']);
-}
+$messages = clear_messages();
+
+(new CView('general.login', [
+	'http_login_url' => $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
+		: '',
+	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
+	'autologin' => $autologin == 1,
+	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
+]))->render();
