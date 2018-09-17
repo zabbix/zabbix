@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App LDAP Service</template>
-            <name>Template App LDAP Service</name>
+            <template>Template App LDAP service</template>
+            <name>Template App LDAP service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App LDAP Service:net.tcp.service[ldap].max(#3)}=0</expression>
+            <expression>{Template App LDAP service:net.tcp.service[ldap].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>LDAP service is down on {HOST.NAME}</name>

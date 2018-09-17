@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App IMAP Service</template>
-            <name>Template App IMAP Service</name>
+            <template>Template App IMAP service</template>
+            <name>Template App IMAP service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App IMAP Service:net.tcp.service[imap].max(#3)}=0</expression>
+            <expression>{Template App IMAP service:net.tcp.service[imap].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>IMAP service is down on {HOST.NAME}</name>

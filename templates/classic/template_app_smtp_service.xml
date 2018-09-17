@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template App SMTP Service</template>
-            <name>Template App SMTP Service</name>
+            <template>Template App SMTP service</template>
+            <name>Template App SMTP service</name>
             <description/>
             <groups>
                 <group>
@@ -76,7 +76,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App SMTP Service:net.tcp.service[smtp].max(#3)}=0</expression>
+            <expression>{Template App SMTP service:net.tcp.service[smtp].max(#3)}=0</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>SMTP service is down on {HOST.NAME}</name>
