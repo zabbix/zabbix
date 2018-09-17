@@ -12,9 +12,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module Brocade_Foundry Performance SNMPv2</template>
-         <name>Template Module Brocade_Foundry Performance SNMPv2</name>
-         <description>Template Module Brocade_Foundry Performance version: 0.15&#13;
+         <template>Template Module Brocade_Foundry performance SNMPv2</template>
+         <name>Template Module Brocade_Foundry performance SNMPv2</name>
+         <description>Template Module Brocade_Foundry performance version: 0.15&#13;
 MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB</description>
          <groups>
@@ -134,9 +134,9 @@ For NI platforms, refer to snAgentBrdMemoryUtil100thPercent</description>
          <screens/>
       </template>
       <template>
-         <template>Template Net Brocade_Foundry Nonstackable SNMPv2</template>
-         <name>Template Net Brocade_Foundry Nonstackable SNMPv2</name>
-         <description>Template Net Brocade_Foundry Nonstackable version: 0.15&#13;
+         <template>Template Net Brocade_Foundry nonstackable SNMPv2</template>
+         <name>Template Net Brocade_Foundry nonstackable SNMPv2</name>
+         <description>Template Net Brocade_Foundry nonstackable version: 0.15&#13;
 Overview: For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -&#13;
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.&#13;
 For example:&#13;
@@ -329,7 +329,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>PSU {#PSU_INDEX}: Power supply is in critical state</name>
@@ -346,7 +346,7 @@ Please check the power supply unit for errors</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>PSU {#PSU_INDEX}: Power supply is not in normal state</name>
@@ -362,7 +362,7 @@ Please check the power supply unit for errors</description>
                      <dependencies>
                         <dependency>
                            <name>PSU {#PSU_INDEX}: Power supply is in critical state</name>
-                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.psu.status[snChasPwrSupplyOperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -452,7 +452,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Fan {#FAN_INDEX}: Fan is in critical state</name>
@@ -469,7 +469,7 @@ Please check the fan unit</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Fan {#FAN_INDEX}: Fan is not in normal state</name>
@@ -485,7 +485,7 @@ Please check the fan unit</description>
                      <dependencies>
                         <dependency>
                            <name>Fan {#FAN_INDEX}: Fan is in critical state</name>
-                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.fan.status[snChasFanOperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -579,9 +579,9 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -595,16 +595,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -619,9 +619,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snAgentTempValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -724,9 +724,9 @@ For those non-applicable management module, it returns no-such-name.</descriptio
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -740,16 +740,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -764,9 +764,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry nonstackable SNMPv2:sensor.temp.value[snChasActualTemperature.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -818,7 +818,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
          </macros>
          <templates>
             <template>
-               <name>Template Module Brocade_Foundry Performance SNMPv2</name>
+               <name>Template Module Brocade_Foundry performance SNMPv2</name>
             </template>
             <template>
                <name>Template Module Generic SNMPv2</name>
@@ -830,8 +830,8 @@ This trigger uses temperature sensor values as well as temperature sensor status
          <screens/>
       </template>
       <template>
-         <template>Template Net Brocade_Foundry Stackable SNMPv2</template>
-         <name>Template Net Brocade_Foundry Stackable SNMPv2</name>
+         <template>Template Net Brocade_Foundry stackable SNMPv2</template>
+         <name>Template Net Brocade_Foundry stackable SNMPv2</name>
          <description>Template Brocade_Foundry Stackable version: 0.15&#13;
 Overview: For devices(most of the IronWare Brocade devices) that support Stackable SNMP Tables in FOUNDRY-SN-AGENT-MIB: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table - so objects from all Stack members are provided.&#13;
 MIBs used:&#13;
@@ -984,7 +984,7 @@ The version of the running software in the form 'major.minor.maintenance[letters
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state</name>
@@ -1001,7 +1001,7 @@ Please check the power supply unit for errors</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is not in normal state</name>
@@ -1017,7 +1017,7 @@ Please check the power supply unit for errors</description>
                      <dependencies>
                         <dependency>
                            <name>Unit {#PSU_UNIT} PSU {#PSU_INDEX}: Power supply is in critical state</name>
-                           <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.psu.status[snChasPwrSupply2OperStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -1107,7 +1107,7 @@ Please check the power supply unit for errors</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state</name>
@@ -1124,7 +1124,7 @@ Please check the fan unit</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is not in normal state</name>
@@ -1140,7 +1140,7 @@ Please check the fan unit</description>
                      <dependencies>
                         <dependency>
                            <name>Unit {#FAN_UNIT} Fan {#FAN_INDEX}: Fan is in critical state</name>
-                           <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.fan.status[snChasFan2OperStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -1234,9 +1234,9 @@ Temperature of the sensor represented by this row. Each unit is 0.5 degrees Cels
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -1250,16 +1250,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -1274,9 +1274,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Brocade_Foundry Stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net Brocade_Foundry stackable SNMPv2:sensor.temp.value[snAgentTemp2Value.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_DESCR}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -1453,7 +1453,7 @@ The serial number of the chassis for each unit. If the serial number is unknown 
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net Brocade_Foundry Stackable SNMPv2:system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}].diff()}=1 and {Template Net Brocade_Foundry Stackable SNMPv2:system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Net Brocade_Foundry stackable SNMPv2:system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}].diff()}=1 and {Template Net Brocade_Foundry stackable SNMPv2:system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
                      <name>Unit {#SNMPVALUE}: Device has been replaced (new serial number received)</name>
@@ -1508,7 +1508,7 @@ Device serial number has changed. Ack to close</description>
          </macros>
          <templates>
             <template>
-               <name>Template Module Brocade_Foundry Performance SNMPv2</name>
+               <name>Template Module Brocade_Foundry performance SNMPv2</name>
             </template>
             <template>
                <name>Template Module Generic SNMPv2</name>
@@ -1547,7 +1547,7 @@ Device serial number has changed. Ack to close</description>
                <calc_fnc>2</calc_fnc>
                <type>0</type>
                <item>
-                  <host>Template Module Brocade_Foundry Performance SNMPv2</host>
+                  <host>Template Module Brocade_Foundry performance SNMPv2</host>
                   <key>system.cpu.util[snAgGblCpuUtil1MinAvg.0]</key>
                </item>
             </graph_item>
@@ -1579,7 +1579,7 @@ Device serial number has changed. Ack to close</description>
                <calc_fnc>2</calc_fnc>
                <type>0</type>
                <item>
-                  <host>Template Module Brocade_Foundry Performance SNMPv2</host>
+                  <host>Template Module Brocade_Foundry performance SNMPv2</host>
                   <key>vm.memory.pused[snAgGblDynMemUtil.0]</key>
                </item>
             </graph_item>
@@ -1588,7 +1588,7 @@ Device serial number has changed. Ack to close</description>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Module Brocade_Foundry Performance SNMPv2:system.cpu.util[snAgGblCpuUtil1MinAvg.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Module Brocade_Foundry performance SNMPv2:system.cpu.util[snAgGblCpuUtil1MinAvg.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -1604,7 +1604,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Module Brocade_Foundry Performance SNMPv2:vm.memory.pused[snAgGblDynMemUtil.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+         <expression>{Template Module Brocade_Foundry performance SNMPv2:vm.memory.pused[snAgGblDynMemUtil.0].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High memory utilization</name>
@@ -1620,7 +1620,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net Brocade_Foundry Nonstackable SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net Brocade_Foundry nonstackable SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Device has been replaced (new serial number received)</name>
@@ -1637,7 +1637,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Brocade_Foundry Nonstackable SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Brocade_Foundry Nonstackable SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Brocade_Foundry nonstackable SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Brocade_Foundry nonstackable SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>
@@ -1654,7 +1654,7 @@ Firmware version has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net Brocade_Foundry Stackable SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Brocade_Foundry Stackable SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net Brocade_Foundry stackable SNMPv2:system.hw.firmware.diff()}=1 and {Template Net Brocade_Foundry stackable SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>

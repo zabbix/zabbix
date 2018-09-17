@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net HP Enterprise Switch SNMPv2</template>
-         <name>Template Net HP Enterprise Switch SNMPv2</name>
-         <description>Template Net HP Enterprise Switch version: 0.15&#13;
+         <template>Template Net HP Enterprise switch SNMPv2</template>
+         <name>Template Net HP Enterprise switch SNMPv2</name>
+         <description>Template Net HP Enterprise switch version: 0.15&#13;
 MIBs used:&#13;
 SEMI-MIB&#13;
 NETSWITCH-MIB&#13;
@@ -270,9 +270,9 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -286,16 +286,16 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <dependencies>
                         <dependency>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                         </dependency>
                      </dependencies>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                     <recovery_expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -310,9 +310,9 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                      <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net HP Enterprise Switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                     <recovery_expression>{Template Net HP Enterprise switch SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
@@ -493,7 +493,7 @@ The number of available (unallocated) bytes.</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:vm.memory.pused[vm.memory.pused.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>#{#SNMPVALUE}: High memory utilization</name>
@@ -536,7 +536,7 @@ The number of available (unallocated) bytes.</description>
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Net HP Enterprise Switch SNMPv2</host>
+                              <host>Template Net HP Enterprise switch SNMPv2</host>
                               <key>vm.memory.pused[vm.memory.pused.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
@@ -639,7 +639,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Fan is in critical state</name>
@@ -656,7 +656,7 @@ Please check the fan unit</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"warning"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Fan is in warning state</name>
@@ -672,7 +672,7 @@ Please check the fan unit</description>
                      <dependencies>
                         <dependency>
                            <name>{#ENT_DESCR}: Fan is in critical state</name>
-                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <expression>{Template Net HP Enterprise switch SNMPv2:sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"bad"},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -776,7 +776,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Power supply is in critical state</name>
@@ -793,7 +793,7 @@ Please check the power supply unit for errors</description>
                      <tags/>
                   </trigger_prototype>
                   <trigger_prototype>
-                     <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1</expression>
+                     <expression>{Template Net HP Enterprise switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"warning"},eq)}=1</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_DESCR}: Power supply is in warning state</name>
@@ -809,7 +809,7 @@ Please check the power supply unit for errors</description>
                      <dependencies>
                         <dependency>
                            <name>{#ENT_DESCR}: Power supply is in critical state</name>
-                           <expression>{Template Net HP Enterprise Switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
+                           <expression>{Template Net HP Enterprise switch SNMPv2:sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"bad"},eq)}=1</expression>
                            <recovery_expression/>
                         </dependency>
                      </dependencies>
@@ -1134,7 +1134,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
                <calc_fnc>2</calc_fnc>
                <type>0</type>
                <item>
-                  <host>Template Net HP Enterprise Switch SNMPv2</host>
+                  <host>Template Net HP Enterprise switch SNMPv2</host>
                   <key>system.cpu.util[hpSwitchCpuStat.0]</key>
                </item>
             </graph_item>
@@ -1143,7 +1143,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
    </graphs>
    <triggers>
       <trigger>
-         <expression>{Template Net HP Enterprise Switch SNMPv2:system.cpu.util[hpSwitchCpuStat.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+         <expression>{Template Net HP Enterprise switch SNMPv2:system.cpu.util[hpSwitchCpuStat.0].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High CPU utilization</name>
@@ -1159,7 +1159,7 @@ Actual status indicated by the sensor: {#ENT_DESCR}</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Net HP Enterprise switch SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net HP Enterprise switch SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Device has been replaced (new serial number received)</name>
@@ -1176,7 +1176,7 @@ Device serial number has changed. Ack to close</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.diff()}=1 and {Template Net HP Enterprise Switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <expression>{Template Net HP Enterprise switch SNMPv2:system.hw.firmware.diff()}=1 and {Template Net HP Enterprise switch SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Firmware has changed</name>

@@ -666,9 +666,9 @@ Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-managemen
          <screens/>
       </template>
       <template>
-         <template>Template Module Cisco Inventory SNMPv2</template>
-         <name>Template Module Cisco Inventory SNMPv2</name>
-         <description>Template Cisco Inventory version: 0.15&#13;
+         <template>Template Module Cisco inventory SNMPv2</template>
+         <name>Template Module Cisco inventory SNMPv2</name>
+         <description>Template Cisco inventory version: 0.15&#13;
 MIBs used:&#13;
 ENTITY-MIB&#13;
 SNMPv2-MIB</description>
@@ -904,7 +904,7 @@ SNMPv2-MIB</description>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module Cisco Inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Module Cisco Inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <expression>{Template Module Cisco inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Module Cisco inventory SNMPv2:system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
                      <recovery_mode>2</recovery_mode>
                      <recovery_expression/>
                      <name>{#ENT_NAME}: Device has been replaced (new serial number received)</name>
@@ -1495,7 +1495,7 @@ device : C2911, C7600</description>
                <name>Template Module Cisco CISCO-PROCESS-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMPv2</name>
+               <name>Template Module Cisco inventory SNMPv2</name>
             </template>
             <template>
                <name>Template Module EtherLike-MIB SNMPv2</name>
@@ -1534,7 +1534,7 @@ device : C2911, C7600</description>
                <name>Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMPv2</name>
+               <name>Template Module Cisco inventory SNMPv2</name>
             </template>
             <template>
                <name>Template Module Generic SNMPv2</name>
@@ -1567,7 +1567,7 @@ device : C2911, C7600</description>
                <name>Template Module Cisco CISCO-MEMORY-POOL-MIB SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Cisco Inventory SNMPv2</name>
+               <name>Template Module Cisco inventory SNMPv2</name>
             </template>
             <template>
                <name>Template Module Cisco OLD-CISCO-CPU-MIB SNMPv2</name>
@@ -1631,7 +1631,7 @@ device : C2911, C7600</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Module Cisco Inventory SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Module Cisco Inventory SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <expression>{Template Module Cisco inventory SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Module Cisco inventory SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
          <recovery_mode>2</recovery_mode>
          <recovery_expression/>
          <name>Device has been replaced (new serial number received)</name>

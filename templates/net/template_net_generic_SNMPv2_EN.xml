@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Net Network Generic Device SNMPv2</template>
-         <name>Template Net Network Generic Device SNMPv2</name>
-         <description>Template Net Network Generic Device version: 0.15&#13;
+         <template>Template Net Network Generic device SNMPv2</template>
+         <name>Template Net Network Generic device SNMPv2</name>
+         <description>Template Net Network Generic device version: 0.15&#13;
 Overview: Use this template if you can't find the template for specific vendor or device family.</description>
          <groups>
             <group>
@@ -31,7 +31,7 @@ Overview: Use this template if you can't find the template for specific vendor o
                <name>Template Module Generic SNMPv2</name>
             </template>
             <template>
-               <name>Template Module Interfaces Simple SNMPv2</name>
+               <name>Template Module Interfaces simple SNMPv2</name>
             </template>
          </templates>
          <screens/>
