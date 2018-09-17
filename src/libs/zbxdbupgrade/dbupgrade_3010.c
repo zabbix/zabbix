@@ -1085,7 +1085,7 @@ static int	DBpatch_3010026(void)
 		}
 
 		zbx_free(formula);
-		zbx_vector_str_clear_ext(&filter, zbx_ptr_free);
+		zbx_vector_str_clear_ext(&filter, zbx_str_free);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;

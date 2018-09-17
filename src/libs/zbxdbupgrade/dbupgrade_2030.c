@@ -996,22 +996,22 @@ static int	DBpatch_2030094(void)
 static int	parse_function(char **exp, char **func, char **params)
 {
 	char		*p, *s;
-	int		state;		/* 0 - init
+	int		state_fn;	/* 0 - init
 					 * 1 - function name/params
 					 */
 	unsigned char	flags = 0x00;	/* 0x01 - function OK
 					 * 0x02 - params OK
 					 */
 
-	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
+	for (p = *exp, s = *exp, state_fn = 0; '\0' != *p; p++)	/* check for function */
 	{
 		if (SUCCEED == is_function_char(*p))
 		{
-			state = 1;
+			state_fn = 1;
 			continue;
 		}
 
-		if (0 == state)
+		if (0 == state_fn)
 			goto error;
 
 		if ('(' == *p)	/* key parameters

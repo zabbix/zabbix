@@ -94,7 +94,7 @@ class testGeneric extends CWebTest {
 			['adm.other.php',					'Other configuration parameters'],
 
 			['zabbix.php?action=proxy.list',						'Configuration of proxies'],
-			['authentication.php',				'Configuration of authentication'],
+			['zabbix.php?action=authentication.edit',				'Configuration of authentication'],
 			['usergrps.php',					'Configuration of user groups'],
 			['users.php',						'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],

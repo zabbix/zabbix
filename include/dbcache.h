@@ -25,8 +25,8 @@
 #include "sysinfo.h"
 #include "zbxalgo.h"
 
-#define ZBX_SYNC_PARTIAL	0
-#define	ZBX_SYNC_FULL		1
+#define ZBX_SYNC_DONE		0
+#define	ZBX_SYNC_MORE		1
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -546,7 +546,7 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
-int	sync_history_cache(int sync_type, int *sync_num);
+void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 int	init_database_cache(char **error);
 void	free_database_cache(void);
 
@@ -802,6 +802,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_ui
 void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
+void	zbx_dc_clear_timer_queue(void);
 
 /* data session support */
 
@@ -817,5 +818,51 @@ zbx_data_session_t;
 const char	*zbx_dc_get_session_token(void);
 zbx_data_session_t	*zbx_dc_get_or_create_data_session(zbx_uint64_t hostid, const char *token);
 void	zbx_dc_cleanup_data_sessions(void);
+
+/* maintenance support */
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	maintenanceid;
+	int		maintenance_from;
+	unsigned char	maintenance_type;
+	unsigned char	maintenance_status;
+
+	unsigned int	flags;
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID		0x0001
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM	0x0002
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE	0x0003
+#define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS	0x0004
+}
+zbx_host_maintenance_diff_t;
+
+/* event maintenance query data, used to get event maintenances from cache */
+typedef struct
+{
+	zbx_uint64_t			eventid;		/* [IN] eventid */
+	zbx_uint64_t			r_eventid;		/* [-] recovery eventid */
+	zbx_uint64_t			triggerid;		/* [-] triggerid */
+	zbx_vector_uint64_t		functionids;		/* [IN] associated functionids */
+	zbx_vector_ptr_t		tags;			/* [IN] event tags */
+	zbx_vector_uint64_pair_t	maintenances;		/* [OUT] actual maintenance data for the event in */
+								/* (maintenanceid, suppress_until) pairs */
+}
+zbx_event_suppress_query_t;
+
+#define ZBX_MAINTENANCE_UPDATE_TRUE	1
+#define ZBX_MAINTENANCE_UPDATE_FALSE	0
+
+void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
+int	zbx_dc_update_maintenances(void);
+void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates);
+void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates);
+int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids);
+int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids);
+
+void	zbx_dc_maintenance_set_update_flags(void);
+void	zbx_dc_maintenance_reset_update_flag(int timer);
+int	zbx_dc_maintenance_check_update_flag(int timer);
+int	zbx_dc_maintenance_check_update_flags(void);
 
 #endif

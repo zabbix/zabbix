@@ -74,7 +74,7 @@ function getLocales() {
 		'fa_IR' => ['name' => _('Persian (fa_IR)'),	'display' => false],
 		'pl_PL' => ['name' => _('Polish (pl_PL)'),	'display' => true],
 		'pt_BR' => ['name' => _('Portuguese (pt_BR)'),	'display' => true],
-		'pt_PT' => ['name' => _('Portuguese (pt_PT)'),	'display' => false],
+		'pt_PT' => ['name' => _('Portuguese (pt_PT)'),	'display' => true],
 		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => false],
 		'ru_RU' => ['name' => _('Russian (ru_RU)'),	'display' => true],
 		'sk_SK' => ['name' => _('Slovak (sk_SK)'),	'display' => true],

@@ -29,16 +29,11 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$this->setType(WIDGET_PROBLEMS);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
-			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$config = select_config();
@@ -52,7 +47,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'severities' => $fields['severities'],
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
-			'maintenance' => $fields['maintenance'],
+			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged']
 		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
@@ -71,7 +66,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		], true);
 
 		if ($fields['show_tags']) {
-			$data['tags'] = makeEventsTags($data['problems'], true, $fields['show_tags'], $fields['tags'],
+			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],
 				$fields['tag_name_format'], $fields['tag_priority']
 			);
 		}
@@ -105,8 +100,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'info' => $info,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'fullscreen' => $fullscreen,
-			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -496,6 +496,7 @@ switch ($data['popup_type']) {
 					'id' => $item['itemid'],
 					'itemid' => $item['itemid'],
 					'name' => $host['name'].NAME_DELIMITER.$item['name_expanded'],
+					'name_expanded' => $item['name_expanded'],
 					'key_' => $item['key_'],
 					'flags' => $item['flags'],
 					'type' => $item['type'],

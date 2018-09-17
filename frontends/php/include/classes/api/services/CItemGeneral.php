@@ -1913,8 +1913,8 @@ abstract class CItemGeneral extends CApiService {
 		$rules = [
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-					: API_ALLOW_USER_MACRO,
+					? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 				'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [

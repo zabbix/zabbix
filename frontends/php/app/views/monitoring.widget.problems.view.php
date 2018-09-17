@@ -20,19 +20,15 @@
 
 
 // indicator of sort field
-$sort_div = (new CSpan())
-	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+$sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null)
 	->getUrl();
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
-	->setArgument('eventid', '')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('eventid', '');
 
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -71,7 +67,7 @@ $today = strtotime('today');
 $last_clock = 0;
 
 if ($data['data']['problems']) {
-	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
+	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -148,10 +144,14 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+	}
+
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
 			->setHint(
-				make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen'], $show_timeline,
+				make_popup_eventlist($trigger, $eventid, $backurl, $show_timeline,
 					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
 					$data['fields']['tag_priority']),
 				'',

@@ -36,16 +36,16 @@ INSERT INTO items_applications (itemappid,applicationid,itemid) VALUES (6000,375
 INSERT INTO item_application_prototype (item_application_prototypeid,application_prototypeid,itemid) VALUES (2,2,40067);
 
 -- valuemap
-INSERT INTO valuemaps (valuemapid,name) VALUES (59,'API value map for update');
-INSERT INTO valuemaps (valuemapid,name) VALUES (60,'API value map for update with mappings');
-INSERT INTO valuemaps (valuemapid,name) VALUES (61,'API value map delete');
-INSERT INTO valuemaps (valuemapid,name) VALUES (62,'API value map delete2');
-INSERT INTO valuemaps (valuemapid,name) VALUES (63,'API value map delete3');
-INSERT INTO valuemaps (valuemapid,name) VALUES (64,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (684,60,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (685,60,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (686,62,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (687,63,'Four','Unknown');
+INSERT INTO valuemaps (valuemapid,name) VALUES (99,'API value map for update');
+INSERT INTO valuemaps (valuemapid,name) VALUES (100,'API value map for update with mappings');
+INSERT INTO valuemaps (valuemapid,name) VALUES (101,'API value map delete');
+INSERT INTO valuemaps (valuemapid,name) VALUES (102,'API value map delete2');
+INSERT INTO valuemaps (valuemapid,name) VALUES (103,'API value map delete3');
+INSERT INTO valuemaps (valuemapid,name) VALUES (104,'API value map delete4');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (904,100,'One','Online');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (905,100,'Two','Offline');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (906,102,'Three','Other');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (907,103,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
@@ -125,7 +125,8 @@ INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200012,
 -- scripts
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, 'API disabled host', 'API disabled host', 1, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50024,50013,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50013, 50012);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90000,'API group for disabled host',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50013, 90000);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, 'API Host for read permissions', 'API Host for read permissions', 0, '');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50023,50012,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'API group with read permissions',0);

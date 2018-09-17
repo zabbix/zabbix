@@ -29,7 +29,6 @@ class CControllerWidgetWebView extends CControllerWidget {
 		$this->setType(WIDGET_WEB);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
@@ -128,7 +127,6 @@ class CControllerWidgetWebView extends CControllerWidget {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'groups' => $groups,
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
