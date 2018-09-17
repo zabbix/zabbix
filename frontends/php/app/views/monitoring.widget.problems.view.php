@@ -226,12 +226,16 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$data['fields']['show_tags'] ? $data['data']['tags'][$problem['eventid']] : null
 	]));
 }
+if ($table->getNumRows() > $data['fields']['show_lines']) {
+	$table->setFooter([
+		(new CCol($data['info']))->setColSpan($table->getNumCols())->addClass(ZBX_STYLE_RIGHT)
+	]);
+}
 
 $output = [
 	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

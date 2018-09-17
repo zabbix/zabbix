@@ -79,6 +79,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'fields' => [
 				'show' => $fields['show'],
+				'show_lines' => $fields['show_lines'],
 				'show_tags' => $fields['show_tags'],
 				'show_timeline' => $fields['show_timeline'],
 				'tags' => $fields['tags'],
