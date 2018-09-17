@@ -96,7 +96,7 @@ $expression_form_list->addRow(_('Function'), $function_combo_box);
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	foreach ($data['functions'][$data['selectedFunction']]['params'] as $paramid => $param_function) {
 		$param_value = array_key_exists($paramid, $data['params']) ? $data['params'][$paramid] : null;
-		$label = ($param_function['A']) ? (new CLabel($param_function['C']))->setAsteriskMark() : $param_function['C'];
+		$label = $param_function['A'] ? (new CLabel($param_function['C']))->setAsteriskMark() : $param_function['C'];
 
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
@@ -173,7 +173,7 @@ $output = [
 		'jQuery(function($) {'.
 			'function setReadOnly() {'.
 				'var selected_fn = $("#function option:selected"),'.
-					'$label = $("#params_0").parents("li").find("label");'.
+					'$label = $("label", $("#params_0").closest("li"));'.
 
 				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
 					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.

@@ -46,12 +46,18 @@ class CControllerPopupTriggerExpr extends CController {
 			PARAM_TYPE_COUNTS => _('Count')
 		];
 
+		/*
+		 * C - caption
+		 * T - type
+		 * M - metrics
+		 * A - asterisk
+		 */
 		$this->param1SecCount = [
 			[
-				'C' => _('Last of').' (T)',	// caption
-				'T' => T_ZBX_INT,			// type
-				'M' => $this->metrics,		// metrics
-				'A' => 1                    // need asterisk (mandatory)
+				'C' => _('Last of').' (T)',
+				'T' => T_ZBX_INT,
+				'M' => $this->metrics,
+				'A' => true
 			],
 			[
 				'C' => _('Time shift'),
@@ -63,7 +69,7 @@ class CControllerPopupTriggerExpr extends CController {
 			[
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'A' => 1
+				'A' => true
 			]
 		];
 
@@ -91,7 +97,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => 'V',
@@ -112,7 +118,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Time shift'),
@@ -121,7 +127,7 @@ class CControllerPopupTriggerExpr extends CController {
 			[
 				'C' => _('Percentage').' (P)',
 				'T' => T_ZBX_DBL,
-				'A' => 1
+				'A' => true
 			]
 		];
 
@@ -130,12 +136,12 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Mask'),
 				'T' => T_ZBX_STR,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Time shift'),
@@ -148,7 +154,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Time shift'),
@@ -157,7 +163,7 @@ class CControllerPopupTriggerExpr extends CController {
 			[
 				'C' => _('Time').' (t)',
 				'T' => T_ZBX_INT,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Fit'),
@@ -174,7 +180,7 @@ class CControllerPopupTriggerExpr extends CController {
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
 				'M' => $this->metrics,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Time shift'),
@@ -183,7 +189,7 @@ class CControllerPopupTriggerExpr extends CController {
 			[
 				'C' => _('Threshold'),
 				'T' => T_ZBX_DBL,
-				'A' => 1
+				'A' => true
 			],
 			[
 				'C' => _('Fit'),
