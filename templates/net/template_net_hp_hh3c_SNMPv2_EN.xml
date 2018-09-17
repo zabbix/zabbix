@@ -621,7 +621,7 @@ Please check the fan unit</description>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
 Indicate the error state of this entity object.&#13;
-psuError(51) means that the Power Supply Unit is in the state of fault.&#13;
+psuError(51) means that the power supply unit is in the state of fault.&#13;
 rpsError(61) means the Redundant Power Supply is in the state of fault.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
