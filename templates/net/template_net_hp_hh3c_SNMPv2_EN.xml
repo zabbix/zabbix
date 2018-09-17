@@ -40,7 +40,7 @@ device : HP 1910-48</description>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -626,7 +626,7 @@ rpsError(61) means the Redundant Power Supply is in the state of fault.</descrip
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>

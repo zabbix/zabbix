@@ -21,7 +21,7 @@ IF-MIB</description>
          </groups>
          <applications>
             <application>
-               <name>Network Interfaces</name>
+               <name>Network interfaces</name>
             </application>
          </applications>
          <items/>
@@ -119,7 +119,7 @@ The current operational state of the interface.&#13;
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -164,7 +164,7 @@ The total number of octets received on the interface,including framing character
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -216,7 +216,7 @@ The total number of octets transmitted out of the interface, including framing c
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -268,7 +268,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -316,7 +316,7 @@ For packet-oriented interfaces, the number of outbound packets that contained er
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -368,7 +368,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -420,7 +420,7 @@ and at other times as indicated by the value of ifCounterDiscontinuityTime.</des
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -470,7 +470,7 @@ through updating the syntax of the IANAifType textual convention.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -520,7 +520,7 @@ For a sub-layer which has no concept of bandwidth, this object should be zero.</
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Network Interfaces</name>
+                           <name>Network interfaces</name>
                         </application>
                      </applications>
                      <valuemap/>
