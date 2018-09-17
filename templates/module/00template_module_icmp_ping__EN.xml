@@ -9,9 +9,9 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module ICMP Ping</template>
-         <name>Template Module ICMP Ping</name>
-         <description>Template Module ICMP Ping version: 0.15</description>
+         <template>Template Module ICMP ping</template>
+         <name>Template Module ICMP ping</name>
+         <description>Template Module ICMP ping version: 0.15</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -168,7 +168,7 @@
    <graphs/>
    <triggers>
       <trigger>
-         <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+         <expression>{Template Module ICMP ping:icmpping.max(#3)}=0</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>Unavailable by ICMP ping</name>
@@ -185,7 +185,7 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+         <expression>{Template Module ICMP ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP ping:icmppingloss.min(5m)}&lt;100</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High ICMP ping loss</name>
@@ -200,14 +200,14 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <dependencies>
             <dependency>
                <name>Unavailable by ICMP ping</name>
-               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+               <expression>{Template Module ICMP ping:icmpping.max(#3)}=0</expression>
                <recovery_expression/>
             </dependency>
          </dependencies>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Module ICMP Ping:icmppingsec.avg(5m)}&gt;{$ICMP_RESPONSE_TIME_WARN}</expression>
+         <expression>{Template Module ICMP ping:icmppingsec.avg(5m)}&gt;{$ICMP_RESPONSE_TIME_WARN}</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>High ICMP ping response time</name>
@@ -222,12 +222,12 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <dependencies>
             <dependency>
                <name>High ICMP ping loss</name>
-               <expression>{Template Module ICMP Ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP Ping:icmppingloss.min(5m)}&lt;100</expression>
+               <expression>{Template Module ICMP ping:icmppingloss.min(5m)}&gt;{$ICMP_LOSS_WARN} and {Template Module ICMP ping:icmppingloss.min(5m)}&lt;100</expression>
                <recovery_expression/>
             </dependency>
             <dependency>
                <name>Unavailable by ICMP ping</name>
-               <expression>{Template Module ICMP Ping:icmpping.max(#3)}=0</expression>
+               <expression>{Template Module ICMP ping:icmpping.max(#3)}=0</expression>
                <recovery_expression/>
             </dependency>
          </dependencies>
