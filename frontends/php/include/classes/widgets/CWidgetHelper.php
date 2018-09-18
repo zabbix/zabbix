@@ -393,8 +393,8 @@ class CWidgetHelper {
 					->setAriaRequired(self::isAriaRequired($field))
 					->setEnabled($enabled),
 				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
-					->addValue(_('Like'), TAG_OPERATOR_LIKE)
-					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+					->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+					->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 					->setModern(true)
 					->setEnabled($enabled),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
@@ -439,8 +439,8 @@ class CWidgetHelper {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field)),
 			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))

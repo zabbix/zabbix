@@ -663,7 +663,7 @@ output {
     line-height: 18px;
     vertical-align: top; }
   .list-table tbody th {
-    text-align: inherit; }
+    text-align: left; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);

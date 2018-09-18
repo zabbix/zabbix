@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -24,7 +24,7 @@ version : RotuerOS 6.38.5&#13;
 device : Mikrotik 941-2nD, Mikrotik 951G-2HnD</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
