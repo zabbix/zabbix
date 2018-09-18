@@ -56,6 +56,24 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setDefault([]);
 	}
 
+	public function setValue($value) {
+		foreach ($value as &$val) {
+			// Values received from frontend are strings. Values received from database comes as arrays.
+			// TODO: remove hack with modifying of unvalidated data.
+			if (array_key_exists('hosts', $val)) {
+				$val['hosts'] = CWidgetHelper::splitPatternIntoParts($val['hosts']);
+			}
+			if (array_key_exists('items', $val)) {
+				$val['items'] = CWidgetHelper::splitPatternIntoParts($val['items']);
+			}
+		}
+		unset($val);
+
+		$this->value = $value;
+
+		return $this;
+	}
+
 	/**
 	 * Set additional flags, which can be used in configuration form.
 	 *

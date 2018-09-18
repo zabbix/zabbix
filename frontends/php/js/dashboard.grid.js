@@ -604,8 +604,6 @@
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
-		doAction('onStartUpdateWidgetConfig', $obj, data, null);
-
 		var	url = new Curl('zabbix.php'),
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
@@ -685,7 +683,6 @@
 
 						widget['header'] = name;
 						widget['fields'] = fields;
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}
@@ -693,8 +690,6 @@
 					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
-
-				doAction('afterUpdateWidgetConfig', $obj, data, null);
 			}
 		});
 	}

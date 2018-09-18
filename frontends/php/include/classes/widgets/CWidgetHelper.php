@@ -1230,10 +1230,18 @@ class CWidgetHelper {
 	 * @return string
 	 */
 	public static function makeStringFromChunks(array $chunks) {
-		$string = '';
-		foreach ($chunks as $chunk) {
-			$string .= ($chunk === '') ? "\n" : $chunk;
-		}
-		return $string;
+		return implode('', $chunks);
+	}
+
+	/**
+	 * Make array of patterns.
+	 *
+	 * @param array|string $patterns  Comma separated string of patterns or array containing multiple patterns.
+	 *
+	 * @return array  Returns array of unique patterns.
+	 */
+	public static function splitPatternIntoParts($patterns) {
+		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', $patterns), 255);
+		return array_filter($patterns);
 	}
 }

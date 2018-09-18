@@ -28,14 +28,6 @@ function zbx_svggraph_widget_trigger(hook_name) {
 		grid = grid.length ? grid[0] : null;
 
 	switch (hook_name) {
-		case 'onStartUpdateWidgetConfig':
-			jQuery('textarea', grid.data.dialogue['body']).autoGrowTextarea('makeChunks');
-			break;
-
-		case 'afterUpdateWidgetConfig':
-			jQuery('textarea', grid.data.dialogue['body']).autoGrowTextarea('undoChunks');
-			break;
-
 		case 'onResizeEnd':
 			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
 			break;

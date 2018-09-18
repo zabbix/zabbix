@@ -1070,17 +1070,6 @@ jQuery(function ($) {
 		return rows;
 	}
 
-	/**
-	 * Function makes array of strings no longer than 255 characters.
-	 *
-	 * @param {string} string   String to split into array of strings.
-	 *
-	 * @param {array}
-	 */
-	function chunk_split(string) {
-		return string.replace('\r', '').match(/.{0,255}/mg).slice(0, -1);
-	}
-
 	var methods = {
 		init: function(options) {
 			options = $.extend({}, options);
@@ -1120,38 +1109,6 @@ jQuery(function ($) {
 
 				if (options && 'pair' in options) {
 					$(options.pair).css({'resize': 'none'});
-				}
-			});
-		},
-		makeChunks: function() {
-			this.each(function() {
-				var $input = $(this),
-					field_name,
-					chunks;
-
-				if (!$input.is(':disabled')) {
-					field_name = $input.attr('name');
-					chunks = chunk_split($input.val());
-
-					$input
-						.data('disabled', true)
-						.prop('disabled', true);
-
-					$.each(chunks, function(i, chunk) {
-						$('<input>', {'type': 'hidden', 'name': field_name + '[' + i + ']'})
-							.val(chunk)
-							.insertAfter($input);
-					});
-				}
-			});
-		},
-		undoChunks: function() {
-			this.each(function() {
-				if (typeof $(this).data('disabled') !== 'undefined') {
-					$('input[type=hidden]', $(this).parent()).remove();
-					$(this)
-						.prop('disabled', false)
-						.removeData('disabled');
 				}
 			});
 		}

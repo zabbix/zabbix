@@ -166,26 +166,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		}
 
 		if ($initial_load) {
-			// Chunkify widget textarea fields before updating widget configuration.
-			$script_inline .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onStartUpdateWidgetConfig", '.
-					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
-						'parameters: ["onStartUpdateWidgetConfig"],'.
-						'grid: {data: 1},'.
-						'trigger_name: "svggraph_widget_on_config_update_start_'.$uniqueid.'"'.
-					'}'.
-				');';
-
-			// Revert chunkify when fields are collected.
-			$script_inline .=
-				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "afterUpdateWidgetConfig", '.
-					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
-						'parameters: ["afterUpdateWidgetConfig"],'.
-						'grid: {data: 1},'.
-						'trigger_name: "svggraph_widget_after_config_update_'.$uniqueid.'"'.
-					'}'.
-				');';
-
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.

@@ -63,8 +63,6 @@ $scripts[] =
 $scripts[] =
 	'function onGraphConfigChange() {'.
 		// Update graph preview.
-		'jQuery("textarea", $form).autoGrowTextarea("makeChunks");'.
-
 		'var $preview = jQuery("#svg-graph-preview"),'.
 			'$form = jQuery("#'.$form->getId().'"),'.
 			'url = new Curl("zabbix.php"),'.
@@ -92,8 +90,6 @@ $scripts[] =
 				'}'.
 			'}'.
 		'});'.
-
-		'jQuery("textarea", $form).autoGrowTextarea("undoChunks");'.
 
 		// Enable/disable fields for Y axis.
 		'if (this.id !== "lefty" && this.id !== "righty") {'.
