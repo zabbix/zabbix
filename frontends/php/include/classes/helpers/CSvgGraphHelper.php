@@ -54,7 +54,7 @@ class CSvgGraphHelper {
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
-		self::getGraphDataSource($metrics, $errors, $options['data_source']);
+		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $errors, $width);
 
@@ -187,7 +187,7 @@ class CSvgGraphHelper {
 	/**
 	 * Calculate what data source must be used for each metric.
 	 */
-	protected static function getGraphDataSource(array &$metrics = [], array &$errors = [], $data_source) {
+	protected static function getGraphDataSource(array &$metrics = [], array &$errors = [], $data_source, $width) {
 		/**
 		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
 		 * $metric.
@@ -267,8 +267,13 @@ class CSvgGraphHelper {
 				 *
 				 * Use trends otherwise.
 				 */
-				$metric['source'] = ($metric['trends'] == 0
-						|| (time() - $metric['history']) <= $metric['time_period']['time_from'])
+				$history = $metric['history'];
+				$trends = $metric['trends'];
+				$time_from = $metric['time_period']['time_from'];
+				$period = $metric['time_period']['time_to'] - $time_from;
+
+				$metric['source'] = ($trends == 0 || (time() - $history < $time_from
+						&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
 					? SVG_GRAPH_DATA_SOURCE_HISTORY
 					: SVG_GRAPH_DATA_SOURCE_TRENDS;
 			}
