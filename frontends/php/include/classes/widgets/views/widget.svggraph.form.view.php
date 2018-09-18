@@ -84,8 +84,7 @@ $scripts[] =
 				'uniqueid: 0,'.
 				'preview: 1,'.
 				'content_width: $preview.width(),'.
-				'content_height: $preview.height() - 10,'.
-				'fields: JSON.stringify($form.serializeJSON())'.
+				'content_height: $preview.height() - 10'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
 
@@ -110,6 +109,8 @@ $scripts[] =
 			'onLeftYChange();'.
 			'onRightYChange();'.
 		'}'.
+
+		'data.fields = JSON.stringify($form.serializeJSON());'.
 
 		'jQuery.ajax({'.
 			'url: url.getUrl(),'.
