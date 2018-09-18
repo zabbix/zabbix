@@ -28,7 +28,6 @@
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
 		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
-		widget['content_footer'] = $('<div>').addClass('dashbrd-grid-widget-foot');
 		/*
 		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
 		 * This size will later be passed to widget controller in updateWidgetContent() function.
@@ -66,7 +65,6 @@
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
 					.append(widget['content_header'])
 					.append(widget['content_body'])
-					.append(widget['content_footer'])
 					.append(widget['content_script'])
 			);
 	}
@@ -425,7 +423,6 @@
 
 			showPreloader(widget);
 			widget['content_body'].fadeTo(widget['preloader_fadespeed'], 0.4);
-			widget['content_footer'].fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
@@ -437,7 +434,6 @@
 
 		hidePreloader(widget);
 		widget['content_body'].fadeTo(0, 1);
-		widget['content_footer'].fadeTo(0, 1);
 	}
 
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
@@ -529,9 +525,6 @@
 				if (typeof(resp.debug) !== 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
-
-				widget['content_footer'].html(resp.footer);
-
 				removeWidgetInfoBtns(widget['content_header']);
 
 				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
