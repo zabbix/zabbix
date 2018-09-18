@@ -37,12 +37,6 @@ if (!$data['preview']) {
 	}
 }
 
-if ($data['initial_load']) {
-	$output['script_file'] = [
-		'js/class.csvggraph.js'
-	];
-}
-
 if (($messages = getMessages()) !== null) {
 	$output['messages'] = $messages->toString();
 }

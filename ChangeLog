@@ -1,6 +1,7 @@
 Changes for 4.0.0rc1
 
 New features:
+A.F....... [ZBXNEXT-4588] improved performance of problems selection in graph widget; renamed 'Classic graph' to 'Graph (classic)'; fixed several bugs in graph widget (miks, Sasha)
 ..F....... [ZBXNEXT-4722] made operator names consistent in all interface (Ivo)
 .........T [ZBXNEXT-4739] removed deprecated macros $1-$9 from item names in templates (vso)
 ....I..... [ZBXNEXT-4736] added index by nextcheck to escalations table (wiper)

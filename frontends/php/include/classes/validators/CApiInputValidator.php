@@ -1179,7 +1179,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		$seconds = timeUnitToSeconds($data, true);
+		$seconds = timeUnitToSeconds($data);
 
 		if (bccomp(ZBX_MIN_INT32, $seconds) > 0 || bccomp($seconds, ZBX_MAX_INT32) > 0) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
