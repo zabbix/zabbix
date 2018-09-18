@@ -3264,22 +3264,6 @@ $form-icon-btn: (
 	}
 }
 
-.dashbrd-grid-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	padding: 8px 8px 6px 8px;
-
-	ul {
-		display: flex;
-		justify-content: flex-end;
-
-		li {
-			padding: 0 0 0 13px;
-			@extend %overflow-ellipsis;
-		}
-	}
-}
-
 @-webkit-keyframes zoom-in-out {
 	0% {transform: scale(1);}
 	50% {transform: scale(1.05);}
