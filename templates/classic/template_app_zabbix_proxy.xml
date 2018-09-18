@@ -24,7 +24,7 @@
             </applications>
             <items>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy configuration syncer processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -83,7 +83,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy data sender processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -142,7 +142,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy discoverer processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -201,7 +201,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy heartbeat sender processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -260,7 +260,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy history syncer processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -319,7 +319,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy housekeeper processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -378,7 +378,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy http poller processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -437,7 +437,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy icmp pinger processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -496,7 +496,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy ipmi manager processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -555,7 +555,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy ipmi poller processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -614,7 +614,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy java poller processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -673,7 +673,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy poller processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -732,7 +732,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy self-monitoring processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -791,7 +791,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy snmp trapper processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -850,7 +850,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy task manager processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -909,7 +909,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy trapper processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -968,7 +968,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $4 $2 processes, in %</name>
+                    <name>Zabbix busy unreachable poller processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -1086,7 +1086,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix queue over $2</name>
+                    <name>Zabbix queue over 10 minutes</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -1322,7 +1322,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix $2 write cache, % free</name>
+                    <name>Zabbix history write cache, % free</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
