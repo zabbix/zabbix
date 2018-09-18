@@ -227,7 +227,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	]));
 }
 
-if ($table->getNumRows() > $data['fields']['show_lines']) {
+if ($data['info'] !== '') {
 	$table->setFooter([
 		(new CCol($data['info']))
 			->setColSpan($table->getNumCols())
