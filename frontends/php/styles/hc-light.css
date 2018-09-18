@@ -2204,7 +2204,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   min-width: 8.33333%;
   margin: .25rem;
   background-color: #fff;
-  border: 1px solid #9f9f9f; }
+  border: 1px solid #9f9f9f;
+  padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
   position: relative;
