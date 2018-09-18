@@ -5,6 +5,7 @@ New features:
 ....I..... [ZBXNEXT-4736] added index by nextcheck to escalations table (wiper)
 
 Bug fixes:
+..F....... [ZBX-14783] fixed align of the left column in several widgets and reports (Ivo)
 .........T [ZBX-13377] fixed naming of groups and applications (vitaly)
 ....I..... [ZBX-14335] fixed bug in proxy makefile (Andris)
 .......PS. [ZBX-14850] reverted ZBXNEXT-3848 fix because of broken update interval validation during low-level discovery (vso)
