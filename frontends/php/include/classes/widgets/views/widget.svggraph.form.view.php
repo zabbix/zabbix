@@ -61,6 +61,20 @@ $scripts[] =
 	'})';
 
 $scripts[] =
+	'function onLeftYChange() {'.
+		'var on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));'.
+		'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
+		'jQuery("#lefty_static_units").prop("disabled",'.
+			'(!on || jQuery("#lefty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
+	'}'.
+	'function onRightYChange() {'.
+		'var on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));'.
+		'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
+		'jQuery("#righty_static_units").prop("disabled",'.
+			'(!on || jQuery("#righty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
+	'}';
+
+$scripts[] =
 	'function onGraphConfigChange() {'.
 		// Update graph preview.
 		'var $preview = jQuery("#svg-graph-preview"),'.
@@ -74,6 +88,28 @@ $scripts[] =
 				'fields: JSON.stringify($form.serializeJSON())'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
+
+		// Enable/disable fields for Y axis.
+		'if (this.id !== "lefty" && this.id !== "righty") {'.
+			'var axes_used = {'.GRAPH_YAXIS_SIDE_LEFT.':0, '.GRAPH_YAXIS_SIDE_RIGHT.':0};'.
+
+			'jQuery("[type=radio]", $form).each(function() {'.
+				'if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {'.
+					'axes_used[jQuery(this).val()]++;'.
+				'}'.
+			'});'.
+			'jQuery("[type=hidden]", $form).each(function() {'.
+				'if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {'.
+					'axes_used[jQuery(this).val()]++;'.
+				'}'.
+			'});'.
+
+			'jQuery(lefty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
+			'jQuery(righty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
+
+			'onLeftYChange();'.
+			'onRightYChange();'.
+		'}'.
 
 		'jQuery.ajax({'.
 			'url: url.getUrl(),'.
@@ -90,41 +126,6 @@ $scripts[] =
 				'}'.
 			'}'.
 		'});'.
-
-		// Enable/disable fields for Y axis.
-		'if (this.id !== "lefty" && this.id !== "righty") {'.
-			'var axes_used = {0:0, 1:0};'.
-			'jQuery("[type=radio]", $form).each(function() {'.
-				'if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {'.
-					'axes_used[jQuery(this).val()]++;'.
-				'}'.
-			'});'.
-			'jQuery("[type=hidden]", $form).each(function() {'.
-				'if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {'.
-					'axes_used[jQuery(this).val()]++;'.
-				'}'.
-			'});'.
-
-			'var lefty = "#lefty",'.
-				'lefty_on = jQuery("#lefty").is(":checked");'.
-			'if (!axes_used[0] || lefty_on) {'.
-				'lefty += ", #lefty_min, #lefty_max, #lefty_units";'.
-			'}'.
-			'if (!axes_used[0] || lefty_on && jQuery("#lefty_units").val() == "'.SVG_GRAPH_AXIS_UNITS_STATIC.'") {'.
-				'lefty += ", #lefty_static_units";'.
-			'}'.
-
-			'var righty = "#righty",'.
-				'righty_on = jQuery("#righty").is(":checked");'.
-			'if (!axes_used[1] || righty_on) {'.
-				'righty += ", #righty_min, #righty_max, #righty_units";'.
-			'}'.
-			'if (!axes_used[1] || righty_on && jQuery("#righty_units").val() == "'.SVG_GRAPH_AXIS_UNITS_STATIC.'") {'.
-				'righty += ", #righty_static_units";'.
-			'}'.
-			'jQuery(righty).prop("disabled", !axes_used[1]);'.
-			'jQuery(lefty).prop("disabled", !axes_used[0]);'.
-		'}'.
 	'}'.
 	'onGraphConfigChange();';
 
