@@ -231,7 +231,7 @@ if ($data['info'] !== '') {
 	$table->setFooter([
 		(new CCol($data['info']))
 			->setColSpan($table->getNumCols())
-			->addClass(ZBX_STYLE_RIGHT)
+			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
 	]);
 }
 

@@ -670,6 +670,10 @@ output {
     -moz-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
     transform: rotate(270deg); }
+  .list-table .list-table-footer {
+    border-bottom: none;
+    color: #cacaca;
+    text-align: right; }
 
 .table-paging {
   text-align: center;
@@ -2186,6 +2190,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
       border-bottom: 1px solid #333; }
+      .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+        border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
     margin: 10px 10px 0 10px;
     max-height: 300px;

@@ -1044,6 +1044,12 @@ output {
 		white-space: nowrap;
 		@include rotate(270);
 	}
+
+	.list-table-footer {
+		border-bottom: none;
+		color: $font-alt-color;
+		text-align: right;
+	}
 }
 
 .table-paging {
@@ -3205,6 +3211,10 @@ $form-icon-btn: (
 
 			&:last-child td {
 				border-bottom: 1px solid $table-border-color;
+
+				&.list-table-footer {
+					border-bottom: none;
+				}
 			}
 		}
 	}
