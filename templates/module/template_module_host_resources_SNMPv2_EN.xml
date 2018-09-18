@@ -24,7 +24,7 @@ HOST-RESOURCES-MIB</description>
                <name>CPU</name>
             </application>
             <application>
-               <name>Internal Items</name>
+               <name>Internal items</name>
             </application>
             <application>
                <name>Memory</name>
@@ -247,7 +247,7 @@ this number will commonly be greater than one. Otherwise this number will typica
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -290,7 +290,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -335,7 +335,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -607,7 +607,7 @@ this number will commonly be greater than one.  Otherwise this number will typic
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -650,7 +650,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -695,7 +695,7 @@ For example, the amount of main storage allocated to a buffer pool might be modi
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal Items</name>
+                           <name>Internal items</name>
                         </application>
                      </applications>
                      <valuemap/>
