@@ -128,7 +128,6 @@ jQuery(function($) {
 								widget_data['is_refreshing'] = false;
 								if (+data.mapid > 0) {
 									widget_data['map_instance'].update(data);
-									widget['content_footer'].html(data.map_widget_footer);
 								}
 								else {
 									jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget',
