@@ -510,16 +510,15 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @param int 		$fontsize
  * @param int 		$angle
  * @param string 	$string
- * @param string 	$fontname
  *
  * @return array
  */
-function imageTextSize($fontsize, $angle, $string, $fontname = null) {
+function imageTextSize($fontsize, $angle, $string) {
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
-		$ttf = ZBX_FONTPATH.'/'.($fontname ? : ZBX_FONT_NAME).'.ttf';
+		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
 	else {
-		$ttf = ZBX_FONTPATH.'/'.($fontname ? : ZBX_FONT_NAME).'.ttf';
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 	}
 
 	$ar = imagettfbbox($fontsize, $angle, $ttf, $string);

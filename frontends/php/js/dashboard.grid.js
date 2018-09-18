@@ -624,9 +624,7 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body']
-						.prepend(resp.errors)
-						.scrollTop(0);
+					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
 					// No errors, proceed with update.
@@ -678,7 +676,6 @@
 
 						widget['header'] = name;
 						widget['fields'] = fields;
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}

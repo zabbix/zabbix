@@ -7,7 +7,7 @@
          <name>Templates/Modules</name>
       </group>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -147,7 +147,7 @@ MIBs used:&#13;
 FOUNDRY-SN-AGENT-MIB</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -158,7 +158,7 @@ FOUNDRY-SN-AGENT-MIB</description>
                <name>Inventory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -314,7 +314,7 @@ The version of the running software in the form'major.minor.maintenance[letters]
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -843,7 +843,7 @@ version : Version 08.0.40b and above&#13;
 device : ICX 7750 in stack</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -854,7 +854,7 @@ device : ICX 7750 in stack</description>
                <name>Inventory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -969,7 +969,7 @@ The version of the running software in the form 'major.minor.maintenance[letters
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>

@@ -61,7 +61,22 @@ $scripts[] =
 	'})';
 
 $scripts[] =
-	'function updateGraphPreview() {'.
+	'function onLeftYChange() {'.
+		'var on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));'.
+		'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
+		'jQuery("#lefty_static_units").prop("disabled",'.
+			'(!on || jQuery("#lefty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
+	'}'.
+	'function onRightYChange() {'.
+		'var on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));'.
+		'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
+		'jQuery("#righty_static_units").prop("disabled",'.
+			'(!on || jQuery("#righty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
+	'}';
+
+$scripts[] =
+	'function onGraphConfigChange() {'.
+		// Update graph preview.
 		'var $preview = jQuery("#svg-graph-preview"),'.
 			'$form = jQuery("#'.$form->getId().'"),'.
 			'url = new Curl("zabbix.php"),'.
@@ -69,10 +84,33 @@ $scripts[] =
 				'uniqueid: 0,'.
 				'preview: 1,'.
 				'content_width: $preview.width(),'.
-				'content_height: $preview.height() - 10,'.
-				'fields: JSON.stringify($form.serializeJSON())'.
+				'content_height: $preview.height() - 10'.
 			'};'.
 		'url.setArgument("action", "widget.svggraph.view");'.
+
+		// Enable/disable fields for Y axis.
+		'if (this.id !== "lefty" && this.id !== "righty") {'.
+			'var axes_used = {'.GRAPH_YAXIS_SIDE_LEFT.':0, '.GRAPH_YAXIS_SIDE_RIGHT.':0};'.
+
+			'jQuery("[type=radio]", $form).each(function() {'.
+				'if (jQuery(this).attr("name").match(/ds\[\d+\]\[axisy\]/) && jQuery(this).is(":checked")) {'.
+					'axes_used[jQuery(this).val()]++;'.
+				'}'.
+			'});'.
+			'jQuery("[type=hidden]", $form).each(function() {'.
+				'if (jQuery(this).attr("name").match(/or\[\d+\]\[axisy\]/)) {'.
+					'axes_used[jQuery(this).val()]++;'.
+				'}'.
+			'});'.
+
+			'jQuery(lefty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
+			'jQuery(righty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
+
+			'onLeftYChange();'.
+			'onRightYChange();'.
+		'}'.
+
+		'data.fields = JSON.stringify($form.serializeJSON());'.
 
 		'jQuery.ajax({'.
 			'url: url.getUrl(),'.
@@ -88,9 +126,9 @@ $scripts[] =
 					'$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");'.
 				'}'.
 			'}'.
-		'})'.
+		'});'.
 	'}'.
-	'updateGraphPreview();';
+	'onGraphConfigChange();';
 
 $scripts[] =
 	/**
@@ -208,7 +246,7 @@ $form_tabs = (new CTabView())
 	->addTab('display_options',  _('Display options'), $tab_display_opt)
 	->addTab('time_period',  _('Time period'), $tab_time_period)
 	->addTab('axes',  _('Axes'), $tab_axes)
-	->addTab('legend',  _('Legend'), $tab_legend)
+	->addTab('legendtab',  _('Legend'), $tab_legend)
 	->addTab('problems',  _('Problems'), $tab_problems)
 	->addTab('overrides',  _('Overrides'), $tab_overrides)
 	->addClass('graph-widget-config-tabs') // Add special style used for graph widget tabs only.
@@ -219,16 +257,10 @@ $form_tabs = (new CTabView())
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea", updateGraphPreview);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea, select", onGraphConfigChange);';
 
 return [
 	'form' => $form,
 	'scripts' => $scripts,
-	'js_includes' => [
-		'js/class.coverride.js',
-		'js/class.cverticalaccordion.js',
-		'js/class.crangecontrol.js',
-		'js/colorpicker.js'
-	],
 	'jq_templates' => $jq_templates
 ];

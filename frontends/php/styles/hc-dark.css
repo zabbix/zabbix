@@ -663,7 +663,7 @@ output {
     line-height: 18px;
     vertical-align: top; }
   .list-table tbody th {
-    text-align: inherit; }
+    text-align: left; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
@@ -2606,6 +2606,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.modal-popup {
     max-width: 1024px;
     min-width: 650px; }
+  .overlay-dialogue .msg-bad,
+  .overlay-dialogue .msg-good {
+    position: sticky;
+    top: 0;
+    z-index: 1000; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: none; }
@@ -2916,8 +2921,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-top-color: inherit; }
 
 .svg-graph-hintbox {
-  padding-top: 5px;
-  display: block;
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
@@ -3853,6 +3856,10 @@ svg {
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
+    .overrides-list .overrides-list-item .remove-btn {
+      position: relative;
+      right: -73px;
+      top: 3px; }
 
 .overrides-options-list {
   white-space: normal;
@@ -3884,24 +3891,29 @@ svg {
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 
+.list-accordion-foot > div {
+  display: table-cell;
+  padding-top: 10px; }
+
 .color-preview-box {
   height: 24px;
   width: 24px;
   float: left;
   margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer; }
+  cursor: pointer;
+  border: none;
+  border-radius: 0px; }
 
 .list-vertical-accordion {
   display: table;
   padding-left: 15px;
-  width: 100%; }
+  width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
     display: table-row; }
+    .list-vertical-accordion .list-accordion-item .remove-btn {
+      position: relative;
+      right: -10px;
+      top: 3px; }
   .list-vertical-accordion .list-accordion-item-closed {
     height: 30px; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
@@ -4319,45 +4331,53 @@ svg {
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
 
-[type=range] {
-  cursor: pointer;
-  -webkit-appearance: none;
-  /* Hides the slider so that custom slider can be made */
-  width: 100%;
-  /* Specific width is required for Firefox. */
-  opacity: 0;
-  vertical-align: middle;
-  padding: 0px;
-  height: 24px; }
-
-[type=range]:focus {
-  outline: none; }
-
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-  cursor: pointer;
-  margin-top: 1px;
-  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-  height: 10px;
-  width: 10px;
-  opacity: 0; }
-
-input[type=range]::-webkit-slider-runnable-track {
-  height: 10px;
-  opacity: 0; }
-
 .range-control {
   position: relative;
   display: inline-block;
-  vertical-align: middle;
-  margin: 0 10px 0 0; }
-  .range-control .range-control-track, .range-control .range-control-progress {
+  vertical-align: middle; }
+  .range-control input[type=range] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    width: calc(100% + 10px);
+    opacity: 0;
+    vertical-align: middle;
+    margin: 0 -5px;
+    padding: 0px;
+    height: 20px;
+    /* Special styling for WebKit/Blink */ }
+    .range-control input[type=range]:focus {
+      outline: none; }
+    .range-control input[type=range]::-webkit-slider-thumb {
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+      height: 10px;
+      width: 10px;
+      opacity: 0; }
+    .range-control input[type=range]::-webkit-slider-runnable-track {
+      height: 10px;
+      opacity: 0; }
+  .range-control input[type=text] {
+    width: 31px;
+    float: right; }
+  .range-control > div {
+    position: relative;
+    width: calc(100% - 10px - 31px);
+    margin: 2px 10px 0 0;
+    float: left; }
+  .range-control .range-control-track,
+  .range-control .range-control-progress {
     position: absolute;
     top: 50%;
     margin-top: -1px;
     left: 0;
     height: 2px;
     cursor: pointer; }
+  .range-control .range-control-track {
+    width: 100%;
+    background: silver; }
+  .range-control .range-control-progress {
+    background: #f8f8f8; }
   .range-control .range-control-thumb {
     position: absolute;
     top: 50%;
@@ -4368,14 +4388,14 @@ input[type=range]::-webkit-slider-runnable-track {
     border-radius: 5px;
     box-shadow: 0 0 1px white;
     background: #f8f8f8; }
-  .range-control .range-control-track {
-    width: 100%;
-    background: silver; }
-  .range-control .range-control-progress {
+  .range-control.range-control-focus .range-control-thumb {
+    background: #f8f8f8;
+    box-shadow: 0 0 1px black; }
+  .range-control.range-control-focus .range-control-progress {
     background: #f8f8f8; }
   .range-control.disabled {
     opacity: 1; }
-    .range-control.disabled [type=range] {
+    .range-control.disabled input[type=range] {
       cursor: default; }
     .range-control.disabled .range-control-progress,
     .range-control.disabled .range-control-thumb {
@@ -4393,18 +4413,6 @@ input[type=range]::-webkit-slider-runnable-track {
       height: 2px;
       border-left: 1px solid #111; }
 
-div.range-control {
-  width: 240px; }
-
-input[type=text].range-control {
-  width: 31px; }
-
-.range-control-focus .range-control-thumb {
-  background: #f8f8f8;
-  box-shadow: 0 0 1px black; }
-.range-control-focus .range-control-progress {
-  background: #f8f8f8; }
-
 .graph-legend {
   text-align: left;
   white-space: nowrap;
@@ -4414,7 +4422,9 @@ input[type=text].range-control {
 .graph-widget-config-tabs {
   padding: 10px 0px; }
   .graph-widget-config-tabs > .tabs-nav {
-    padding-left: calc(15% + 20px); }
+    padding-left: calc(15% + 10px);
+    margin-right: 0;
+    margin-left: 0; }
 
 .inline-sr-only {
   font-size: 0; }

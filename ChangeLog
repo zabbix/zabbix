@@ -1,10 +1,18 @@
 Changes for 4.0.0rc1
 
 New features:
+A.F....... [ZBXNEXT-4588] improved performance of problems selection in graph widget; renamed 'Classic graph' to 'Graph (classic)'; fixed several bugs in graph widget (miks, Sasha)
+..F....... [ZBXNEXT-4722] made operator names consistent in all interface (Ivo)
+.........T [ZBXNEXT-4739] removed deprecated macros $1-$9 from item names in templates (vso)
+....I..... [ZBXNEXT-4736] added index by nextcheck to escalations table (wiper)
 
 Bug fixes:
+..F....... [ZBX-14783] fixed align of the left column in several widgets and reports (Ivo)
+.........T [ZBX-13377] fixed naming of groups and applications (vitaly)
+....I..... [ZBX-14335] fixed bug in proxy makefile (Andris)
+.......PS. [ZBX-14850] reverted ZBXNEXT-3848 fix because of broken update interval validation during low-level discovery (vso)
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
-.........T [ZBX-13377] fixed naming issue for 'Server Hardware' host group (vitaly)
+.........T [ZBX-13377] fixed naming issue for "Server Hardware" host group (vitaly)
 A.F....... [ZBXNEXT-4573] fixed HTTP authentication page issues, HTTP case sensitive option and moved HTTP authentication from API to HTTP form page (gcalenko)
 ........S. [ZBX-14721] improved escalator performance by replacing previously unused index (vso)
 ........S. [ZBX-14720] improved history syncer performance during problem recovery by adding index on escalations table and avoiding full table scan (vso)
@@ -488,6 +496,14 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.15rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.4.14
@@ -1837,6 +1853,13 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.23rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 3.0.22
