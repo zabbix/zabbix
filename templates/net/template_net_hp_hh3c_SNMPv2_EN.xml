@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -23,7 +23,7 @@ version : 1910-48 Switch Software Version 5.20.99, Release 1116 Copyright(c)2010
 device : HP 1910-48</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications>
@@ -40,7 +40,7 @@ device : HP 1910-48</description>
                <name>Memory</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -621,12 +621,12 @@ Please check the fan unit</description>
                      <port/>
                      <description>MIB: HH3C-ENTITY-EXT-MIB&#13;
 Indicate the error state of this entity object.&#13;
-psuError(51) means that the Power Supply Unit is in the state of fault.&#13;
-rpsError(61) means the Redundant Power Supply is in the state of fault.</description>
+psuError(51) means that the power supply unit is in the state of fault.&#13;
+rpsError(61) means the redundant power supply is in the state of fault.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>

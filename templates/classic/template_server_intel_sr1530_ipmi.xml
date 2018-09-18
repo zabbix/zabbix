@@ -4,7 +4,7 @@
     <date>2017-08-11T08:50:19Z</date>
     <groups>
         <group>
-            <name>Templates/Server Hardware</name>
+            <name>Templates/Server hardware</name>
         </group>
     </groups>
     <templates>
@@ -14,7 +14,7 @@
             <description/>
             <groups>
                 <group>
-                    <name>Templates/Server Hardware</name>
+                    <name>Templates/Server hardware</name>
                 </group>
             </groups>
             <applications>
