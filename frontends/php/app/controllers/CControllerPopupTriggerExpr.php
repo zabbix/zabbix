@@ -425,9 +425,14 @@ class CControllerPopupTriggerExpr extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
-			);
+			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+				$this->setResponse(
+					(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+				);
+			}
+			else {
+				$ret = true;
+			}
 		}
 
 		return $ret;
