@@ -545,7 +545,12 @@ jQuery(function ($) {
 
 				if (options.sbox) {
 					destroySBox(null, graph);
-					graph.on('mousedown', {graph: graph}, startSBoxDrag);
+					graph
+						.on('dblclick', function() {
+							$.publish('timeselector.zoomout');
+							return false;
+						})
+						.on('mousedown', {graph: graph}, startSBoxDrag);
 				}
 			});
 		},
