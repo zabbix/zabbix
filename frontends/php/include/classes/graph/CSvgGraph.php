@@ -601,6 +601,7 @@ class CSvgGraph extends CSvg {
 		$min_value = $delta_round > 1 ? (int) $min_value : (float) $min_value;
 		$max_value = $delta_round > 1 ? (int) $max_value : (float) $max_value;
 		$grid = $this->getValueGrid($min_value, $max_value);
+		$format = (1 > ($delta / (count($grid) - 1)) || $delta > (count($grid) - 1)) ? '%.2f' : '%d';
 		$grid_values = [];
 
 		foreach ($grid as $value) {
@@ -608,7 +609,7 @@ class CSvgGraph extends CSvg {
 
 			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
 				$grid_values[$relative_pos] = convert_units([
-					'value' => $value,
+					'value' => sprintf($format, $value),
 					'units' => $units
 				]);
 			}
@@ -673,12 +674,11 @@ class CSvgGraph extends CSvg {
 			$min10 = floor($mul * $min) / $mul;
 			$delta = $max10 - $min10;
 			$delta = ceil($mul * $delta) / $mul;
-			$format = 1 > ($delta / 5) ? '%.2f' : '%d';
 
 			if ($mul >= 1) {
 				if ($delta) {
 					for($i = 0; $delta >= $i; $i += $delta / 5) {
-						$res[] = sprintf($format, $i + $min10);
+						$res[] = sprintf('%.2f', $i + $min10);
 					}
 				}
 				else {
