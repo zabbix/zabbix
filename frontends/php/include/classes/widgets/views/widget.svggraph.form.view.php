@@ -103,8 +103,8 @@ $scripts[] =
 				'}'.
 			'});'.
 
-			'jQuery(lefty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
-			'jQuery(righty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
+			'jQuery("#lefty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
+			'jQuery("#righty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
 
 			'onLeftYChange();'.
 			'onRightYChange();'.
