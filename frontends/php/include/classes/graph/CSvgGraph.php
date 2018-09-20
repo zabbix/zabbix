@@ -671,6 +671,9 @@ class CSvgGraph extends CSvg {
 	protected function getValueGrid($min, $max) {
 		$res = [];
 
+		$decimals = strlen(substr(strrchr($max, '.'), 1));
+		$decimals = $decimals > 4 ? 4 : $decimals;
+		$decimals = $decimals < 2 ? 2 : $decimals;
 		for ($base = 10; $base > .01; $base /= 10) {
 			$mul = $max ? 1 / pow($base, floor(log10($max))) : 1;
 			$max10 = ceil($mul * $max) / $mul;
@@ -681,7 +684,7 @@ class CSvgGraph extends CSvg {
 			if ($mul >= 1) {
 				if ($delta) {
 					for($i = 0; $delta >= $i; $i += $delta / 5) {
-						$res[] = sprintf('%.2f', $i + $min10);
+						$res[] = sprintf('%.'.$decimals.'f', $i + $min10);
 					}
 				}
 				else {
