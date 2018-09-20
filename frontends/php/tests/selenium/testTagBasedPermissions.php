@@ -176,8 +176,7 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				'0 of 0 problems are shown');
+		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -284,14 +283,6 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -395,14 +386,6 @@ class testTagBasedPermissions extends CWebTest {
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page

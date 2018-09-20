@@ -683,6 +683,10 @@ output {
     -moz-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
     transform: rotate(270deg); }
+  .list-table .list-table-footer {
+    border-bottom: none;
+    color: #768d99;
+    text-align: right; }
 
 .table-paging {
   text-align: center;
@@ -2199,6 +2203,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
       border-bottom: 1px solid #ebeef0; }
+      .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+        border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
     margin: 10px 10px 0 10px;
     max-height: 300px;
@@ -2217,7 +2223,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   min-width: 8.33333%;
   margin: .25rem;
   background-color: #fff;
-  border: 1px solid #dfe4e7; }
+  border: 1px solid #dfe4e7;
+  padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
   position: relative;
@@ -2236,16 +2243,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0; }
       .dashbrd-grid-widget-head ul li select {
         margin: 4px 0; }
-
-.dashbrd-grid-widget-foot {
-  text-align: right;
-  color: #768d99;
-  padding: 8px 8px 6px 8px; }
-  .dashbrd-grid-widget-foot ul {
-    display: flex;
-    justify-content: flex-end; }
-    .dashbrd-grid-widget-foot ul li {
-      padding: 0 0 0 13px; }
 
 @-webkit-keyframes zoom-in-out {
   0% {
@@ -3770,7 +3767,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
