@@ -1082,7 +1082,7 @@ int	zbx_day_in_month(int year, int mon);
 
 void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);

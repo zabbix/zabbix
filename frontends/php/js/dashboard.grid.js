@@ -28,7 +28,6 @@
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
 		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
-		widget['content_footer'] = $('<div>').addClass('dashbrd-grid-widget-foot');
 		/*
 		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
 		 * This size will later be passed to widget controller in updateWidgetContent() function.
@@ -66,21 +65,40 @@
 				$('<div>', {'class': 'dashbrd-grid-widget-padding'})
 					.append(widget['content_header'])
 					.append(widget['content_body'])
-					.append(widget['content_footer'])
 					.append(widget['content_script'])
 			);
 	}
 
 	function makeWidgetInfoBtns(btns) {
 		var info_btns = [];
+
 		if (btns.length) {
 			btns.each(function(btn) {
-				info_btns.push($('<button>', {'type': 'button', 'class': btn.icon, 'data-hintbox': 1}));
-				info_btns.push($('<div></div>').html(btn.hint).addClass('hint-box').hide());
+				info_btns.push(
+					$('<button>', {
+						'type': 'button',
+						'data-hintbox': 1,
+						'data-hintbox-static': 1
+					})
+						.addClass(btn.icon)
+				);
+				info_btns.push(
+					$('<div></div>')
+						.html(btn.hint)
+						.addClass('hint-box')
+						.hide()
+				);
 			});
 		}
 
 		return info_btns.length ? info_btns : null;
+	}
+
+	function removeWidgetInfoBtns($content_header) {
+		if ($content_header.find('[data-hintbox=1]').length) {
+			$content_header.find('[data-hintbox=1]').next('.hint-box').remove();
+			$content_header.find('[data-hintbox=1]').trigger('remove');
+		}
 	}
 
 	function resizeDashboardGrid($obj, data, min_rows) {
@@ -405,7 +423,6 @@
 
 			showPreloader(widget);
 			widget['content_body'].fadeTo(widget['preloader_fadespeed'], 0.4);
-			widget['content_footer'].fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
@@ -417,7 +434,6 @@
 
 		hidePreloader(widget);
 		widget['content_body'].fadeTo(0, 1);
-		widget['content_footer'].fadeTo(0, 1);
 	}
 
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
@@ -509,11 +525,9 @@
 				if (typeof(resp.debug) !== 'undefined') {
 					widget['content_body'].append(resp.debug);
 				}
+				removeWidgetInfoBtns(widget['content_header']);
 
-				widget['content_footer'].html(resp.footer);
-
-				if (typeof(resp.info) !== 'undefined') {
-					widget['content_header'].find('[data-hintbox=1]').trigger('remove');
+				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
 					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
 				}
 
@@ -610,9 +624,7 @@
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body']
-						.prepend(resp.errors)
-						.scrollTop(0);
+					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
 					// No errors, proceed with update.
@@ -664,7 +676,6 @@
 
 						widget['header'] = name;
 						widget['fields'] = fields;
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					}

@@ -472,7 +472,6 @@ var hintBox = {
 							target.data('hintbox-style')
 						);
 					}
-
 					break;
 
 				case 'click':
@@ -1071,45 +1070,55 @@ jQuery(function ($) {
 		return rows;
 	}
 
-	$.fn.autoGrowTextarea = function(options) {
-		this.each(function() {
-			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, options);
+	var methods = {
+		init: function(options) {
+			options = $.extend({}, options);
 
-				$(this)
-					.css({
-						'resize': 'none',
-						'overflow-x': 'hidden',
-						'white-space': 'pre-line'
-					})
-					.on('paste change keyup', function() {
-						var rows = calcRows($(this), options);
+			this.each(function() {
+				if (typeof $(this).data('autogrow') === 'undefined') {
+					$(this)
+						.css({
+							'resize': 'none',
+							'overflow-x': 'hidden',
+							'white-space': 'pre-line'
+						})
+						.on('paste change keyup', function() {
+							var rows = calcRows($(this), options);
 
-						if (options && 'pair' in options) {
-							var pair_rows = calcRows($(options.pair), options);
-							if (pair_rows > rows) {
-								rows = pair_rows;
+							if (options && 'pair' in options) {
+								var pair_rows = calcRows($(options.pair), options);
+								if (pair_rows > rows) {
+									rows = pair_rows;
+								}
+								$(options.pair).attr('rows', rows);
 							}
-							$(options.pair).attr('rows', rows);
+
+							$(this).attr('rows', rows);
+						})
+						.data('autogrow', options)
+						.trigger('keyup');
+				}
+
+				if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+					$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+						if ($(this).val().length > $(this).attr('maxlength')) {
+							$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
 						}
+					});
+				}
 
-						$(this).attr('rows', rows);
-					})
-					.data('autogrow', options)
-					.trigger('change');
-			}
+				if (options && 'pair' in options) {
+					$(options.pair).css({'resize': 'none'});
+				}
+			});
+		}
+	};
 
-			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
-				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
-					if ($(this).val().length > $(this).attr('maxlength')) {
-						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
-					}
-				});
-			}
+	$.fn.autoGrowTextarea = function(method, options) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
 
-			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none'});
-			}
-		});
+		return methods.init.apply(this, arguments);
 	};
 });

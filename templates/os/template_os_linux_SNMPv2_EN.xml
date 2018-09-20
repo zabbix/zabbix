@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Operating Systems</name>
+         <name>Templates/Operating systems</name>
       </group>
    </groups>
    <templates>
@@ -14,7 +14,7 @@
          <description>Template OS Linux version: 0.15</description>
          <groups>
             <group>
-               <name>Templates/Operating Systems</name>
+               <name>Templates/Operating systems</name>
             </group>
          </groups>
          <applications/>

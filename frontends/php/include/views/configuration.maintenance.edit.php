@@ -182,8 +182,8 @@ foreach ($tags as $tag) {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setEnabled(false),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true)
 				->setEnabled(false),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
@@ -203,8 +203,8 @@ foreach ($tags as $tag) {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
