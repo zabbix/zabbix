@@ -28,12 +28,7 @@
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
 		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
-		/*
-		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
-		 * This size will later be passed to widget controller in updateWidgetContent() function.
-		 */
 		widget['content_script'] = $('<div>');
-
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
 				.append($('<button>', {

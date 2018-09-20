@@ -1734,15 +1734,9 @@ function getEventUpdates(array $event) {
  * @return CCol|string
  */
 function makeEventActionsIcons($eventid, $actions, $mediatypes, $users, $config) {
-	$messages_icon = array_key_exists($eventid, $actions['messages'])
-		? makeEventMessagesIcon($actions['messages'][$eventid], $users)
-		: null;
-	$severities_icon = array_key_exists($eventid, $actions['severities'])
-		? makeEventSeverityChangesIcon($actions['severities'][$eventid], $users, $config)
-		: null;
-	$actions_icon = array_key_exists($eventid, $actions['actions'])
-		? makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes, $config)
-		: null;
+	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
+	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users, $config);
+	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $users, $mediatypes, $config);
 
 	$action_icons = [];
 	if ($messages_icon !== null) {
