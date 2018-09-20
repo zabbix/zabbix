@@ -208,6 +208,7 @@ typedef struct
 	const zbx_lld_row_t	*lld_row;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
+	unsigned char		type;
 }
 zbx_lld_item_t;
 
@@ -642,7 +643,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->key_orig = NULL;
 		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
-		if ((unsigned char)atoi(row[6]) != item_prototype->type)
+
+		if ((item->type = (unsigned char)atoi(row[6])) != item_prototype->type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
 
 		if ((unsigned char)atoi(row[7]) != item_prototype->value_type)
@@ -942,6 +944,12 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						(0 != item->itemid ? "update" : "create"));
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
+				if (ITEM_TYPE_TRAPPER == item->type || ITEM_TYPE_SNMPTRAP == item->type ||
+						item->type == ITEM_TYPE_DEPENDENT)
+				{
+					return;
+				}
+
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
