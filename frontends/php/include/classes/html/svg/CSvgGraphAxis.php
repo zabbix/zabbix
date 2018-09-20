@@ -214,7 +214,14 @@ class CSvgGraphAxis extends CSvgTag {
 				$y = $this->height - $y;
 			}
 
-			$labels[] = (new CSvgText($this->x + $x, $this->y + $y, $label));
+			if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+				$text_tag_x = (count($labels) == 0) ? max($this->x + $x, strlen($label) * 4) : $this->x + $x;
+			}
+			else {
+				$text_tag_x = $this->x + $x;
+			}
+
+			$labels[] = new CSvgText($text_tag_x, $this->y + $y, $label);
 		}
 
 		return $labels;
