@@ -604,7 +604,6 @@ class CSvgGraph extends CSvg {
 			? $max_value - $min_value
 			: (count($grid) > 1 ? end($grid) - $grid[0] : 1);
 		$y_rows = (count($grid) - 1) ? : 1;
-		$format = (1 > ($delta / $y_rows) || $delta > $y_rows) ? '%.2f' : '%d';
 		$grid_values = [];
 
 		foreach ($grid as $value) {
@@ -612,8 +611,9 @@ class CSvgGraph extends CSvg {
 
 			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
 				$grid_values[$relative_pos] = convert_units([
-					'value' => sprintf($format, $value),
-					'units' => $units
+					'value' => $value,
+					'units' => $units,
+					'convert' => ITEM_CONVERT_NO_UNITS
 				]);
 			}
 		}
