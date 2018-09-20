@@ -596,12 +596,14 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$delta = (($max_value - $min_value) ? : 1);
-		$delta_round = (((int) $max_value - (int) $min_value) ? : 1);
+		$delta_round = ((int) $max_value - (int) $min_value) ? : 1;
 		$min_value = $delta_round > 1 ? (int) $min_value : (float) $min_value;
 		$max_value = $delta_round > 1 ? (int) $max_value : (float) $max_value;
 		$grid = $this->getValueGrid($min_value, $max_value);
-		$y_rows = (count($grid) - 1) || 1;
+		$delta = ($max_value != $min_value)
+			? $max_value - $min_value
+			: count($grid) > 1 ? end($grid) - $grid[0]: 1;
+		$y_rows = (count($grid) - 1) ? : 1;
 		$format = (1 > ($delta / $y_rows) || $delta > $y_rows) ? '%.2f' : '%d';
 		$grid_values = [];
 
