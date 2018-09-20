@@ -602,7 +602,7 @@ class CSvgGraph extends CSvg {
 		$grid = $this->getValueGrid($min_value, $max_value);
 		$delta = ($max_value != $min_value)
 			? $max_value - $min_value
-			: count($grid) > 1 ? end($grid) - $grid[0]: 1;
+			: (count($grid) > 1 ? end($grid) - $grid[0] : 1);
 		$y_rows = (count($grid) - 1) ? : 1;
 		$format = (1 > ($delta / $y_rows) || $delta > $y_rows) ? '%.2f' : '%d';
 		$grid_values = [];
