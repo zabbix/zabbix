@@ -6204,7 +6204,7 @@ $range-input-width: 31px;
 	&.range-control-focus {
 		.range-control-thumb {
 			background: $range-thumb-color-focus;
-			box-shadow: 0 0 1px black;
+			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
 		}
 
 		.range-control-progress {

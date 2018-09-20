@@ -4409,7 +4409,7 @@ svg {
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
     background: #0275b8;
-    box-shadow: 0 0 1px black; }
+    box-shadow: 0 0 0 2px #0395ea; }
   .range-control.range-control-focus .range-control-progress {
     background: #0275b8; }
   .range-control.disabled {
