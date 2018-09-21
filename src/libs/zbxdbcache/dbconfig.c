@@ -342,7 +342,7 @@ static void	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, 
 		zbx_custom_interval_t	*custom_intervals;
 		char			*error = NULL;
 
-		if (SUCCEED != zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, &error))
+		if (SUCCEED != zbx_custom_intervals_parse(item->delay, &simple_interval, &custom_intervals, &error))
 		{
 			zbx_timespec_t	ts = {now, 0};
 
@@ -9448,7 +9448,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 				if (dc_host->data_expected_from > (data_expected_from = dc_item->data_expected_from))
 					data_expected_from = dc_host->data_expected_from;
-				if (SUCCEED != zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL))
+				if (SUCCEED != zbx_interval_parse(dc_item->delay, &delay, NULL))
 					continue;
 				if (data_expected_from + delay > now)
 					continue;
@@ -9676,7 +9676,7 @@ static void	dc_status_update(void)
 				{
 					int	delay;
 
-					if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) &&
+					if (SUCCEED == zbx_custom_intervals_parse(dc_item->delay, &delay, NULL, NULL) &&
 							0 != delay)
 					{
 						config->status->required_performance += 1.0 / delay;

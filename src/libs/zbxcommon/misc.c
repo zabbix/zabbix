@@ -1782,11 +1782,25 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	return nextcheck;
 }
 
+int	zbx_interval_parse(const char *interval_str, int *simple_interval, char **error)
+{
+	if (SUCCEED == is_time_suffix(interval_str, simple_interval, ZBX_LENGTH_UNLIMITED) && 0 < *simple_interval &&
+			SEC_PER_DAY >= *simple_interval)
+	{
+		return SUCCEED;
+	}
+
+	if (NULL != error)
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%s\".", interval_str);
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
- * Function: zbx_interval_preproc                                             *
+ * Function: zbx_custom_intervals_parse                                       *
  *                                                                            *
- * Purpose: parses item and low-level discovery rule update interval          *
+ * Purpose: parses item and low-level discovery rule update intervals         *
  *                                                                            *
  * Parameters: interval_str     - [IN] update interval string to parse        *
  *             simple_interval  - [OUT] simple update interval                *
@@ -1801,8 +1815,8 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *             SimpleInterval, {";", FlexibleInterval | SchedulingInterval};  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
-		char **error)
+int	zbx_custom_intervals_parse(const char *interval_str, int *simple_interval,
+		zbx_custom_interval_t **custom_intervals, char **error)
 {
 	zbx_flexible_interval_t		*flexible = NULL;
 	zbx_scheduler_interval_t	*scheduling = NULL;

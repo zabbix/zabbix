@@ -96,7 +96,7 @@ void	zbx_mock_test_entry(void **state)
 
 	delay = zbx_mock_get_parameter_string("in.delay");
 
-	if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, &error))
+	if (SUCCEED != zbx_custom_intervals_parse(delay, &simple_interval, &custom_intervals, &error))
 		fail_msg("Value of 'delay' is not a valid update interval: %s.", error);
 
 	item_type = get_item_type(zbx_mock_get_parameter_string("in['item type']"));
