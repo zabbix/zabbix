@@ -1829,12 +1829,6 @@ int	zbx_custom_intervals_parse(const char *interval_str, int *simple_interval,
 		goto fail;
 	}
 
-	if (SEC_PER_DAY < *simple_interval)
-	{
-		interval_type = "update";
-		goto fail;
-	}
-
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
 		return SUCCEED;
 
@@ -1880,7 +1874,7 @@ int	zbx_custom_intervals_parse(const char *interval_str, int *simple_interval,
 		}
 	}
 
-	if (0 == *simple_interval && NULL == flexible && NULL == scheduling)
+	if ((0 == *simple_interval || SEC_PER_DAY < *simple_interval) && NULL == flexible && NULL == scheduling)
 	{
 		interval_type = "update";
 		goto fail;
