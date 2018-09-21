@@ -771,7 +771,9 @@ class CSvgGraph extends CSvg {
 				}
 			}
 
-			$this->paths[$index] = $paths;
+			if ($paths) {
+				$this->paths[$index] = $paths;
+			}
 		}
 	}
 
