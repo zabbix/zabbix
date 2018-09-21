@@ -596,9 +596,8 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$delta_round = ((int) $max_value - (int) $min_value) ? : 1;
-		$min_value = $delta_round > 1 ? (int) $min_value : (float) $min_value;
-		$max_value = $delta_round > 1 ? (int) $max_value : (float) $max_value;
+		$min_value = (float) $min_value;
+		$max_value = (float) $max_value;
 		$grid = $this->getValueGrid($min_value, $max_value);
 		$delta = ($max_value != $min_value)
 			? $max_value - $min_value
