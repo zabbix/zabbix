@@ -1793,6 +1793,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->parent_itemid = item_prototype->itemid;
 	item->lastcheck = 0;
 	item->ts_delete = 0;
+	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
 
