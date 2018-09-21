@@ -34,6 +34,18 @@ class CSvgGraphLegend extends CDiv {
 			parent::addItem((new CDiv($label['name']))->setAttribute('style', 'border-color: '.$label['color']));
 		}
 
-		$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND);
+		switch (count($labels)) {
+			case 1:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM);
+				break;
+
+			case 2:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS);
+				break;
+
+			default:
+				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND);
+				break;
+		}
 	}
 }
