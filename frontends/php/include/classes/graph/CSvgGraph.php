@@ -244,15 +244,15 @@ class CSvgGraph extends CSvg {
 						$this->max_value_right = $max_value;
 					}
 				}
-
-				$this->metrics[$i] = [
-					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
-					'itemid' => $metric['itemid'],
-					'units' => $metric['units'],
-					'host' => $metric['hosts'][0],
-					'options' => ['order' => $i] + $metric['options']
-				];
 			}
+
+			$this->metrics[$i] = [
+				'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
+				'itemid' => $metric['itemid'],
+				'units' => $metric['units'],
+				'host' => $metric['hosts'][0],
+				'options' => ['order' => $i] + $metric['options']
+			];
 		}
 
 		return $this;
@@ -730,6 +730,10 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function calculatePaths() {
 		foreach ($this->metrics as $index => $metric) {
+			if (!array_key_exists($index, $this->points)) {
+				continue;
+			}
+
 			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
 				$min_value = $this->right_y_min;
 				$max_value = $this->right_y_max;
@@ -782,7 +786,7 @@ class CSvgGraph extends CSvg {
 			 * - SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
 			 *   here.
 			 */
-			if ($this->points[$index]
+			if (array_key_exists($index, $this->points)
 					&& $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
 					&& $metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
 				$points = &$this->points[$index];
@@ -876,8 +880,8 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawMetricsLine() {
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
-					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+			if (array_key_exists($index, $this->paths) && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
+					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
 				$group = (new CSvgGroup())
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 					->setAttribute('data-metric', CHtml::encode($metric['name']))
@@ -904,7 +908,7 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
+			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS && array_key_exists($index, $this->paths)) {
 				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
 			}
 		}
