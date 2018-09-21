@@ -3,6 +3,7 @@ Changes for 4.0.0rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-14874] fixed SQL errors being generated in database log files (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0rc1
