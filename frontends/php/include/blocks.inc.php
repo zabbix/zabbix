@@ -269,6 +269,7 @@ function getSystemStatusData(array $filter) {
  * @param int    $filter['show_suppressed']    (optional)
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
+ * @param int    $filter['show_timeline']      (optional)
  * @param array  $data
  * @param array  $data['groups']
  * @param string $data['groups'][]['groupid']
@@ -496,7 +497,8 @@ function make_status_of_zbx() {
  * @param array  $actions
  * @param array  $config
  * @param array  $filter
- * @param array  $filter['show_timeline']
+ * @param array  $filter['show_suppressed']  (optional)
+ * @param array  $filter['show_timeline']    (optional)
  *
  * @return CTableInfo
  */
@@ -507,7 +509,9 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 	$header_time = new CColHeader([_('Time'), (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN)]);
 
-	if (array_key_exists('show_timeline', $filter) && $filter['show_timeline']) {
+	$show_timeline = (array_key_exists('show_timeline', $filter) && $filter['show_timeline']);
+
+	if ($show_timeline) {
 		$header = [
 			$header_time->addClass(ZBX_STYLE_RIGHT),
 			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
@@ -553,7 +557,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 		$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-		if ($filter['show_timeline']) {
+		if ($show_timeline) {
 			if ($last_clock != 0) {
 				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
 			}
