@@ -795,11 +795,11 @@ class CSvgGraph extends CSvg {
 				// Missing data function can change min value of Y axis.
 				if ($missing_data_points
 						&& $metric['options']['missingdatafunc'] == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
-					if ($this->left_y_min === null && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
-						$this->left_y_min = 0;
+					if ($this->min_value_left > 0 && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+						$this->min_value_left = 0;
 					}
-					elseif ($this->right_y_min === null && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
-						$this->right_y_min = 0;
+					elseif ($this->min_value_right > 0 && $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+						$this->min_value_right = 0;
 					}
 				}
 			}
