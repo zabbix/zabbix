@@ -158,7 +158,10 @@ jQuery(function($) {
 			data.values.forEach(function(val) {
 				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
-					values = values + ', ' + val[data.object];
+					if (values.length != 0) {
+						values = values + ', ';
+					}
+					values = values + val[data.object];
 				}
 			});
 
