@@ -1154,7 +1154,7 @@ class CUser extends CApiService {
 		];
 
 		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
-			$config['authentication_type']
+			$config['authentication_type'], true
 		);
 
 		// Check if user is blocked.
@@ -1233,7 +1233,7 @@ class CUser extends CApiService {
 
 		$config = select_config();
 		$db_user = $this->findByAlias($alias, ($config['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
-			$config['authentication_type']
+			$config['authentication_type'], false
 		);
 
 		unset($db_user['passwd']);
@@ -1471,10 +1471,13 @@ class CUser extends CApiService {
 	 * @param string $alias             User alias to search for.
 	 * @param bool   $case_sensitive    Perform case sensitive search.
 	 * @param int    $default_auth      System default authentication type.
+	 * @param bool   $do_group_check    Is actual only when $case_sensitive equals false. In HTTP authentication case
+	 *                                  user alias string is case insensitive string even for groups with frontend
+	 *                                  access GROUP_GUI_ACCESS_INTERNAL.
 	 *
 	 * @return array
 	 */
-	private function findByAlias($alias, $case_sensitive, $default_auth) {
+	private function findByAlias($alias, $case_sensitive, $default_auth, $do_group_check) {
 		$db_users = [];
 		$group_to_auth_map = [
 			GROUP_GUI_ACCESS_SYSTEM => $default_auth,
@@ -1499,14 +1502,19 @@ class CUser extends CApiService {
 					' WHERE LOWER(alias)='.zbx_dbstr(strtolower($alias))
 			));
 
-			// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
-			foreach($db_users_rows as $db_user_row) {
-				$permissions = $this->getUserGroupsData($db_user_row['userid']);
+			if ($do_group_check) {
+				// Users with ZBX_AUTH_INTERNAL access attribute 'alias' is always case sensitive.
+				foreach($db_users_rows as $db_user_row) {
+					$permissions = $this->getUserGroupsData($db_user_row['userid']);
 
-				if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
-						|| $db_user_row['alias'] === $alias) {
-					$db_users[] = $db_user_row;
+					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
+							|| $db_user_row['alias'] === $alias) {
+						$db_users[] = $db_user_row;
+					}
 				}
+			}
+			else {
+				$db_users = $db_users_rows;
 			}
 		}
 

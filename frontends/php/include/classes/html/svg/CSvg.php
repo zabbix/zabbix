@@ -26,9 +26,7 @@ class CSvg extends CSvgTag {
 
 		$this
 			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
-			->setAttribute('version', '1.1')
-			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-			->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+			->setAttribute('version', '1.1');
 	}
 
 	protected function startToString() {
@@ -45,14 +43,16 @@ class CSvg extends CSvgTag {
 			}
 		}
 
-		return parent::startToString().(new CTag('style', true, $styles));
+		$styles = (new CTag('style', true, $styles))->toString();
+
+		return parent::startToString().$styles;
 	}
 
 	/**
 	 * Set SVG element width and height.
 	 *
-	 * @param int $width     Width.
-	 * @param int $height    Height.
+	 * @param int $width
+	 * @param int $height
 	 */
 	public function setSize($width, $height) {
 		$this->setAttribute('width', $width.'px');

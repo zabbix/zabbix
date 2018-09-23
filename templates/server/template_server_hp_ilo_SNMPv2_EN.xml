@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Servers Hardware</name>
+         <name>Templates/Server hardware</name>
       </group>
    </groups>
    <templates>
@@ -19,12 +19,12 @@ CPQHLTH-MIB&#13;
 CPQIDA-MIB</description>
          <groups>
             <group>
-               <name>Templates/Servers Hardware</name>
+               <name>Templates/Server hardware</name>
             </group>
          </groups>
          <applications>
             <application>
-               <name>Disk Arrays</name>
+               <name>Disk arrays</name>
             </application>
             <application>
                <name>Fans</name>
@@ -33,10 +33,10 @@ CPQIDA-MIB</description>
                <name>Inventory</name>
             </application>
             <application>
-               <name>Physical Disks</name>
+               <name>Physical disks</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Status</name>
@@ -45,7 +45,7 @@ CPQIDA-MIB</description>
                <name>Temperature</name>
             </application>
             <application>
-               <name>Virtual Disks</name>
+               <name>Virtual disks</name>
             </application>
          </applications>
          <items>
@@ -1363,7 +1363,7 @@ failed(4)  A power supply component detects a condition that could  permanently 
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1617,7 +1617,7 @@ and any associated logical drives,physical drives, and array accelerators.</desc
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1662,7 +1662,7 @@ Array Controller Model. The type of controller card.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1787,7 +1787,7 @@ Note that for some controller models, a cache module board that physically attac
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1851,7 +1851,7 @@ Capacitor Failed (7)  The flash backed cache module capacitor is below the suffi
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Disk Arrays</name>
+                           <name>Disk arrays</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2048,7 +2048,7 @@ predictiveFailure(4)  Indicates that the drive has a predictive failure error an
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2096,7 +2096,7 @@ replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  er
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2144,7 +2144,7 @@ but may have been modified due to space limitations.  This can be used for ident
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -2190,7 +2190,7 @@ If a model number is not present, you may not have properly initialized the driv
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -2236,7 +2236,7 @@ solidState(3)  The physical drive media is composed of solid state electronics.<
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2287,7 +2287,7 @@ or if the controller does not support SCSI drives.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Physical Disks</name>
+                           <name>Physical disks</name>
                         </application>
                      </applications>
                      <valuemap/>
@@ -2453,7 +2453,7 @@ Disk serial number has changed. Ack to close</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2498,7 +2498,7 @@ This shows the fault tolerance mode of the logical drive.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -2547,7 +2547,7 @@ differ from the advertised size of a drive.</description>
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Virtual Disks</name>
+                           <name>Virtual disks</name>
                         </application>
                      </applications>
                      <valuemap/>

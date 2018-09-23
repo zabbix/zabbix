@@ -34,19 +34,27 @@ jQuery(function ($) {
 		}
 	}
 
+	// Disable text selection in document when move mouse pressed cursor.
+	function disableSelect(e) {
+		e.preventDefault();
+	}
+
 	// Cancel SBox and unset its variables.
 	function destroySBox(e, graph) {
-		var graph = graph || e.data.graph;
+		var graph = graph || e.data.graph,
+			data = graph.data('options');
 
-		$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
-		$('.svg-graph-selection-text', graph).text('');
-
-		$(document).off('keydown', {graph: graph}, sBoxKeyboardInteraction);
-
-		graph
+		$(document)
+			.off('selectstart', disableSelect)
+			.off('keydown', sBoxKeyboardInteraction)
 			.off('mousemove', moveSBoxMouse)
 			.off('mouseup', destroySBox);
-		graph.data('options').boxing = false;
+
+		if (data) {
+			$('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
+			$('.svg-graph-selection-text', graph).text('');
+			graph.data('options').boxing = false;
+		}
 	}
 
 	// Destroy hintbox, unset its variables and event listeners.
@@ -121,11 +129,11 @@ jQuery(function ($) {
 
 		if (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
-			$(document).on('keydown', {graph: graph}, sBoxKeyboardInteraction);
-
-			graph
+			$(document)
+				.on('selectstart', disableSelect)
+				.on('keydown', {graph: graph}, sBoxKeyboardInteraction)
 				.on('mousemove', {graph: graph}, moveSBoxMouse)
-				.on('mouseup', {graph: graph}, destroySBox);
+				.on('mouseup', {graph: graph}, endSBoxDrag);
 
 			data.start = offsetX - data.dimX;
 		}
@@ -141,20 +149,19 @@ jQuery(function ($) {
 			stxt = $('.svg-graph-selection-text', graph),
 			offsetX = e.clientX - graph.offset().left;
 
-		if ((offsetX - data.dimX) > 0 && (data.dimW + data.dimX) >= offsetX) {
-			data.end = offsetX - data.dimX;
-			if (data.start != data.end) {
-				data.isHintBoxFrozen = false;
-				data.boxing = true;
-				destroyHintbox(graph);
-				hideHelper(graph);
-			}
-			else {
-				destroySBox(e, graph);
-				return false;
-			}
+		data.end = offsetX - data.dimX;
 
+		// Check if movement has started and destroy hintbox if it is still visible.
+		if (data.start != data.end && !data.boxing) {
+			data.isHintBoxFrozen = false;
+			data.boxing = true;
+			destroyHintbox(graph);
+			hideHelper(graph);
+		}
+
+		if (data.boxing) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
+			data.end = (data.end > 0) ? data.end : 0;
 
 			sbox.attr({
 				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
@@ -182,12 +189,13 @@ jQuery(function ($) {
 
 		var graph = e.data.graph,
 			data = graph.data('options'),
-			offsetX = e.clientX - graph.offset().left;
+			offsetX = e.clientX - graph.offset().left,
+			set_date = data && data.boxing;
 
-		if (data.boxing) {
+		destroySBox(e, graph);
+
+		if (set_date) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
-
-			destroySBox(e, graph);
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
@@ -242,7 +250,7 @@ jQuery(function ($) {
 
 					for (var index = 0, len = paths.length; index < len; index++) {
 						direction_string += ' ' + paths[index].getAttribute('d');
-						label.push(paths[index].getAttribute('data-label'));
+						label.push(paths[index].getAttribute('label'));
 					}
 
 					label = label.join(',').split(',');
@@ -266,9 +274,7 @@ jQuery(function ($) {
 					break;
 			}
 
-			if (pv !== null) {
-				data_sets.push({g: nodes[i], x: px, y: py, v: pv});
-			}
+			data_sets.push({g: nodes[i], x: px, y: py, v: pv});
 		}
 
 		return data_sets;
@@ -307,7 +313,7 @@ jQuery(function ($) {
 	/**
 	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
-	 * this function. Tolerance is used to find exacly macthed point only.
+	 * this function. Tolerance is used to find exacly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
 		if (ds.getAttribute('data-set') === 'points') {
@@ -322,20 +328,19 @@ jQuery(function ($) {
 	// Position hintbox near current mouse position.
 	function repositionHintBox(e, graph) {
 		var hbox = $(graph.hintBoxItem),
+			offset = graph.offset(),
+			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
 			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + 20)
-				? e.clientX - graph.offset().left + 20
-				: e.clientX - hbox.outerWidth() - graph.offset().left - 15,
-			t = (window.screen.height >= e.screenY + hbox.outerHeight() + 60)
-				? e.pageY - graph.offset().top + 60
-				: e.pageY - graph.offset().top - hbox.height();
+				? e.clientX - offset.left + 20
+				: e.clientX - hbox.outerWidth() - offset.left - 15,
+			t = e.pageY - offset.top - graph.parent().scrollTop(),
+			t = page_bottom >= t + offset.top + hbox.outerHeight() + 60 ? t + 60 : t - hbox.height();
 
 		hbox.css({'left': l, 'top': t});
 	}
 
 	// Show problem or value hintbox.
 	function showHintbox(e, graph) {
-		e.stopPropagation();
-
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
 			hbox = graph.data('hintbox') || null,
@@ -426,18 +431,18 @@ jQuery(function ($) {
 				var rows_added = 0;
 				points.forEach(function(point) {
 					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
-					if (xy_point === false || xy_point === point) {
+					if (point.v !== null && (xy_point === false || xy_point === point)) {
 						point_highlight.setAttribute('cx', point.x);
 						point_highlight.setAttribute('cy', point.y);
 
 						if (show_hint && data.hintMaxRows > rows_added) {
 							$('<li></li>')
+								.text(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.append(
 									$('<span></span>')
 										.css('background-color', point.g.getAttribute('data-color'))
 										.addClass('svg-graph-hintbox-item-color')
 								)
-								.append(point.g.getAttribute('data-metric') + ': ' + point.v)
 								.appendTo(html);
 							rows_added++;
 						}
@@ -530,9 +535,7 @@ jQuery(function ($) {
 					.on('mouseleave', function(e) {
 						var graph = $(this);
 						destroyHintbox(graph);
-						destroySBox(e, graph);
 						hideHelper(graph);
-						return false;
 					})
 					.data('options', data)
 					.on('mousemove', {graph: graph}, showHintbox)
@@ -541,9 +544,8 @@ jQuery(function ($) {
 					.on('selectstart', false);
 
 				if (options.sbox) {
-					graph
-						.on('mousedown', {graph: graph}, startSBoxDrag)
-						.on('mouseup', {graph: graph}, endSBoxDrag);
+					destroySBox(null, graph);
+					graph.on('mousedown', {graph: graph}, startSBoxDrag);
 				}
 			});
 		},
@@ -551,9 +553,7 @@ jQuery(function ($) {
 			var graph = $(this);
 
 			destroySBox(e, graph);
-			graph
-				.off('mousedown', startSBoxDrag)
-				.off('mouseup', endSBoxDrag);
+			graph.off('mousedown', startSBoxDrag);
 		}
 	};
 

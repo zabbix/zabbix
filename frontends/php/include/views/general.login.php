@@ -21,6 +21,7 @@
 
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
+define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/../page_header.php';
 $error = null;

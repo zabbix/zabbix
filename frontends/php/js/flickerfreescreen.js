@@ -398,10 +398,6 @@
 								screen.isReRefreshRequire = false;
 								window.flickerfreeScreen.refresh(id);
 							}
-
-							if (on_dashboard) {
-								timeControl.updateDashboardFooter(id);
-							}
 						});
 
 					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {

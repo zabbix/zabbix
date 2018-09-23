@@ -4,7 +4,7 @@
     <date>2017-08-11T08:52:24Z</date>
     <groups>
         <group>
-            <name>Templates/Operating Systems</name>
+            <name>Templates/Operating systems</name>
         </group>
     </groups>
     <templates>
@@ -14,7 +14,7 @@
             <description/>
             <groups>
                 <group>
-                    <name>Templates/Operating Systems</name>
+                    <name>Templates/Operating systems</name>
                 </group>
             </groups>
             <applications>
@@ -1627,7 +1627,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Checksum of $1</name>
+                    <name>Checksum of /etc/passwd</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -1791,7 +1791,7 @@
                     <description>Discovery of network interfaces as defined in global regular expression &quot;Network interfaces for discovery&quot;.</description>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Incoming network traffic on $1</name>
+                            <name>Incoming network traffic on {#IFNAME}</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -1842,7 +1842,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Outgoing network traffic on $1</name>
+                            <name>Outgoing network traffic on {#IFNAME}</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -1983,7 +1983,7 @@
                     <description>Discovery of file systems of different types as defined in global regular expression &quot;File systems for discovery&quot;.</description>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Free inodes on $1 (percentage)</name>
+                            <name>Free inodes on {#FSNAME} (percentage)</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2025,7 +2025,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Free disk space on $1</name>
+                            <name>Free disk space on {#FSNAME}</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2067,7 +2067,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Free disk space on $1 (percentage)</name>
+                            <name>Free disk space on {#FSNAME} (percentage)</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2109,7 +2109,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Total disk space on $1</name>
+                            <name>Total disk space on {#FSNAME}</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2151,7 +2151,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Used disk space on $1</name>
+                            <name>Used disk space on {#FSNAME}</name>
                             <type>0</type>
                             <snmp_community/>
                             <snmp_oid/>

@@ -1037,12 +1037,18 @@ output {
 	}
 
 	tbody th {
-		text-align: inherit;
+		text-align: left;
 	}
 
 	.vertical_rotation_inner {
 		white-space: nowrap;
 		@include rotate(270);
+	}
+
+	.list-table-footer {
+		border-bottom: none;
+		color: $font-alt-color;
+		text-align: right;
 	}
 }
 
@@ -3205,6 +3211,10 @@ $form-icon-btn: (
 
 			&:last-child td {
 				border-bottom: 1px solid $table-border-color;
+
+				&.list-table-footer {
+					border-bottom: none;
+				}
 			}
 		}
 	}
@@ -3233,6 +3243,7 @@ $form-icon-btn: (
 	margin: .25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
+	padding-bottom: 8px;
 }
 
 .dashbrd-grid-widget-head {
@@ -3259,22 +3270,6 @@ $form-icon-btn: (
 			select {
 				margin: 4px 0;
 			}
-		}
-	}
-}
-
-.dashbrd-grid-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	padding: 8px 8px 6px 8px;
-
-	ul {
-		display: flex;
-		justify-content: flex-end;
-
-		li {
-			padding: 0 0 0 13px;
-			@extend %overflow-ellipsis;
 		}
 	}
 }
@@ -3778,6 +3773,13 @@ $form-icon-btn: (
 		min-width: 650px;
 	}
 
+	.msg-bad,
+	.msg-good {
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+	}
+
 	.list-table {
 		white-space: normal;
 		border: none;
@@ -4248,8 +4250,6 @@ $form-icon-btn: (
 }
 
 .svg-graph-hintbox {
-	padding-top: 5px;
-	display: block;
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
@@ -5564,6 +5564,12 @@ svg {
 
 	.overrides-list-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -73px;
+			top: 3px;
+		}
 	}
 }
 
@@ -5611,26 +5617,36 @@ svg {
 	}
 }
 
+.list-accordion-foot {
+	& > div {
+		display: table-cell;
+		padding-top: 10px;
+	}
+}
+
 .color-preview-box {
 	height: 24px;
 	width: 24px;
 	float: left;
 	margin-right: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #ffffff;
-	font-weight: bold;
 	cursor: pointer;
+	border: none;
+	border-radius: 0px;
 }
 
 .list-vertical-accordion {
 	display: table;
 	padding-left: 15px;
-	width: 100%;
+	width: calc(100% - 15px);
 
 	.list-accordion-item {
 		display: table-row;
+
+		& .remove-btn {
+			position: relative;
+			right: -10px;
+			top: 3px;
+		}
 	}
 
 	.list-accordion-item-closed {
@@ -6107,49 +6123,70 @@ $range-thumb-color-focus: $link-active-color;
 $range-progress-color-focus: $link-active-color;
 $range-thumb-size: 10px;
 $range-track-height: 2px;
-
-[type=range] {
-	cursor: pointer;
-	-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-	width: 100%; /* Specific width is required for Firefox. */
-	opacity: 0;
-	vertical-align: middle;
-	padding: 0px;
-	height: 24px;
-}
-
-[type=range]:focus {
-	outline: none;
-}
-
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-	cursor: pointer;
-	margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-	height: $range-thumb-size;
-	width: $range-thumb-size;
-	opacity: 0;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-	height: $range-thumb-size;
-	opacity: 0;
-}
-
+$range-input-width: 31px;
 
 .range-control {
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
-	margin: 0 $range-thumb-size 0 0;
 
-	.range-control-track, .range-control-progress {
+	input[type=range] {
+		cursor: pointer;
+		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+		width: calc(100% + 10px);
+		opacity: 0;
+		vertical-align: middle;
+		margin: 0 -5px;
+		padding: 0px;
+		height: 20px;
+
+		&:focus {
+			outline: none;
+		}
+
+		/* Special styling for WebKit/Blink */
+		&::-webkit-slider-thumb {
+			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+			height: $range-thumb-size;
+			width: $range-thumb-size;
+			opacity: 0;
+		}
+
+		&::-webkit-slider-runnable-track {
+			height: $range-thumb-size;
+			opacity: 0;
+		}
+	}
+
+	input[type=text] {
+		width: $range-input-width;
+		float: right;
+	}
+
+	> div {
+		position: relative;
+		width: calc(100% - 10px - #{$range-input-width});
+		margin: 2px $range-thumb-size 0 0;
+		float: left;
+	}
+
+	.range-control-track,
+	.range-control-progress {
 		position: absolute;
 		top: 50%;
 		margin-top: -$range-track-height/2;
 		left: 0;
 		height: $range-track-height;
 		cursor: pointer;
+	}
+
+	.range-control-track {
+		width: 100%;
+		background: $range-track-color;
+	}
+
+	.range-control-progress {
+		background: $range-progress-color;
 	}
 
 	.range-control-thumb {
@@ -6164,19 +6201,21 @@ input[type=range]::-webkit-slider-runnable-track {
 		background: $range-thumb-color;
 	}
 
-	.range-control-track {
-		width: 100%;
-		background: $range-track-color;
-	}
+	&.range-control-focus {
+		.range-control-thumb {
+			background: $range-thumb-color-focus;
+			box-shadow: 0 0 1px black;
+		}
 
-	.range-control-progress {
-		background: $range-progress-color;
+		.range-control-progress {
+			background: $range-progress-color-focus;
+		}
 	}
 
 	&.disabled {
 		opacity: 1;
 
-		[type=range] {
+		input[type=range] {
 			cursor: default;
 		}
 		.range-control-progress,
@@ -6202,24 +6241,6 @@ input[type=range]::-webkit-slider-runnable-track {
 	}
 }
 
-div.range-control {
-	width: 240px;
-}
-input[type=text].range-control {
-	width: 31px;
-}
-
-.range-control-focus {
-	.range-control-thumb {
-		background: $range-thumb-color-focus;
-		box-shadow: 0 0 1px black;
-	}
-
-	.range-control-progress {
-		background: $range-progress-color-focus;
-	}
-}
-
 .graph-legend {
 	text-align: left;
 	white-space: nowrap;
@@ -6231,7 +6252,9 @@ input[type=text].range-control {
 	padding: 10px 0px;
 
 	> .tabs-nav {
-		padding-left: calc(15% + 20px);
+		padding-left: calc(15% + 10px);
+		margin-right: 0;
+		margin-left: 0;
 	}
 }
 

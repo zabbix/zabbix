@@ -44,11 +44,13 @@ jQuery(function ($) {
 		 */
 		init: function() {
 			var tmpl = $('<div class="range-control">' +
-					'<div class="range-control-track"/>' +
-					'<div class="range-control-progress"/>' +
-					'<datalist/>' +
-					'<div class="range-control-thumb"/>' +
-					'<input type="range"/>' +
+					'<div>' +
+						'<div class="range-control-track"/>' +
+						'<div class="range-control-progress"/>' +
+						'<datalist/>' +
+						'<div class="range-control-thumb"/>' +
+						'<input type="range"/>' +
+					'</div>' +
 				'</div>');
 
 			return $(this).each(function(_, input) {
@@ -97,24 +99,28 @@ jQuery(function ($) {
 					$control.addClass('disabled');
 				}
 
+				$control
+					.width(options.width)
+					.insertBefore($input);
+
 				$input
 					.change(function() {$range.val(this.value); updateHandler();})
-					.before($control);
+					.appendTo($control);
 			});
 		},
 		disable: function() {
 			var $input = $(this),
-				$range = $input.prev('.range-control').find('[type=range]');
+				$range = $input.parent().find('[type=range]');
 
-			$input.prev('.range-control').addClass('disabled');
+			$input.parent().addClass('disabled');
 			$input.prop('disabled', true);
 			$range.prop('disabled', true);
 		},
 		enable: function() {
 			var $input = $(this),
-				$range = $input.prev('.range-control').find('[type=range]');
+				$range = $input.parent().find('[type=range]');
 
-			$input.prev('.range-control').removeClass('disabled');
+			$input.parent().removeClass('disabled');
 			$input.prop('disabled', false);
 			$range.prop('disabled', false);
 		}
