@@ -123,13 +123,16 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = new CLink(CHtml::encode($graph['name']),
-		(new CUrl('graphs.php'))
-			->setArgument('form', 'update')
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('graphid', $graphid)
-			->setArgument('hostid', $this->data['hostid'])
-	);
+	$url = (new CUrl('graphs.php'))
+		->setArgument('form', 'update')
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('graphid', $graphid);
+
+	if ($data['parent_discoveryid'] === null) {
+		$url->setArgument('hostid', $this->data['hostid']);
+	}
+
+	$name[] = new CLink(CHtml::encode($graph['name']), $url);
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),

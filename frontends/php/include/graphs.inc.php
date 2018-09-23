@@ -341,6 +341,10 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag) {
 
 			$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
+			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$url->setArgument('hostid', $template['hostid']);
+			}
+
 			$name = new CLink(CHtml::encode($template['name']), $url);
 		}
 		else {
