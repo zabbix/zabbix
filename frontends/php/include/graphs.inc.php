@@ -317,7 +317,6 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag) {
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
 }
 
-
 /**
  * Returns a list of graph templates.
  *

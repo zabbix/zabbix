@@ -107,13 +107,12 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name = [];
-	if ($graph['templateid']) {
-		$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
-			? ZBX_FLAG_DISCOVERY_NORMAL
-			: ZBX_FLAG_DISCOVERY_PROTOTYPE
-		);
-	}
-	elseif ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ($data['parent_discoveryid'] === null)
+		? ZBX_FLAG_DISCOVERY_NORMAL
+		: ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
+
+	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
 		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
@@ -129,6 +128,7 @@ foreach ($data['graphs'] as $graph) {
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('graphid', $graphid)
+			->setArgument('hostid', $this->data['hostid'])
 	);
 
 	$graphTable->addRow([
