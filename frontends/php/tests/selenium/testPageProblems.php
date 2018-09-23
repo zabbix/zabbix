@@ -59,12 +59,12 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 
-		// Check the default tag filter option AND and tag value option Like
+		// Check the default tag filter option AND and tag value option Contains
 		$this->zbxTestClickButtonText('Reset');
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_evaltype_0'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('filter_tags_0_operator_0'));
 
-		// Select "AND" option and two tag names with partial "Like" value match
+		// Select "AND" option and two tag names with partial "Contains" value match
 		$this->zbxTestInputType('filter_tags_0_tag', 'Service');
 		$this->zbxTestClick('filter_tags_add');
 		$this->zbxTestInputTypeWait('filter_tags_1_tag', 'Database');
@@ -84,12 +84,12 @@ class testPageProblems extends CWebTest {
 	/**
 	 * Search problems by partial or exact tag value match
 	 */
-	public function testPageProblems_FilterByTagsOptionLikeEqual() {
+	public function testPageProblems_FilterByTagsOptionContainsEquals() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
-		// Search by partial "Like" tag value match
+		// Search by partial "Contains" tag value match
 		$this->zbxTestInputType('filter_tags_0_tag', 'service');
 		$this->zbxTestInputType('filter_tags_0_value', 'abc');
 		$this->zbxTestClickButtonText('Apply');
@@ -97,7 +97,7 @@ class testPageProblems extends CWebTest {
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestTextNotPresent('Test trigger with tag');
 
-		// Change tag value filter to "Equal"
+		// Change tag value filter to "Equals"
 		$this->zbxTestClickXpath('//label[@for="filter_tags_0_operator_1"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
@@ -107,12 +107,12 @@ class testPageProblems extends CWebTest {
 	/**
 	 * Search problems by partial and exact tag value match and then remove one
 	 */
-	public function testPageProblems_FilterByTagsOptionLikeEqualAndRemoveOne() {
+	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
-		// Select tag option "OR" and exact "Equal" tag value match
+		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="filter_evaltype_1"]');
 		$this->zbxTestClickXpath('//label[@for="filter_tags_0_operator_1"]');
 

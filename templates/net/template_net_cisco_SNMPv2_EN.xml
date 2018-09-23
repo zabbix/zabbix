@@ -7,7 +7,7 @@
          <name>Templates/Modules</name>
       </group>
       <group>
-         <name>Templates/Network Devices</name>
+         <name>Templates/Network devices</name>
       </group>
    </groups>
    <templates>
@@ -947,7 +947,7 @@ CISCO-ENVMON-MIB</description>
                <name>Fans</name>
             </application>
             <application>
-               <name>Power Supply</name>
+               <name>Power supply</name>
             </application>
             <application>
                <name>Temperature</name>
@@ -1213,7 +1213,7 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Power Supply</name>
+                           <name>Power supply</name>
                         </application>
                      </applications>
                      <valuemap>
@@ -1476,7 +1476,7 @@ version : IOS for example: 12.1(22)EA11, 15.4(3)M2&#13;
 device : C2911, C7600</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications/>
@@ -1515,7 +1515,7 @@ device : C2911, C7600</description>
          <description>Cisco IOS Software releases later to 12.0(3)T and prior to 12.2(3.5) version: 0.15</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications/>
@@ -1551,7 +1551,7 @@ device : C2911, C7600</description>
          <description>Cisco IOS Software releases prior to 12.0(3)T version: 0.15</description>
          <groups>
             <group>
-               <name>Templates/Network Devices</name>
+               <name>Templates/Network devices</name>
             </group>
          </groups>
          <applications/>

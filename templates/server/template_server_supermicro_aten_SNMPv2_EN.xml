@@ -4,7 +4,7 @@
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
-         <name>Templates/Servers Hardware</name>
+         <name>Templates/Server hardware</name>
       </group>
    </groups>
    <templates>
@@ -18,7 +18,7 @@ MIBs used:&#13;
 ATEN-IPMI-MIB</description>
          <groups>
             <group>
-               <name>Templates/Servers Hardware</name>
+               <name>Templates/Server hardware</name>
             </group>
          </groups>
          <applications>

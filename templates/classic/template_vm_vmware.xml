@@ -193,7 +193,7 @@
                     <description>Discovery of clusters</description>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Status of &quot;$2&quot; cluster</name>
+                            <name>Status of &quot;{#CLUSTER.NAME}&quot; cluster</name>
                             <type>3</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2765,7 +2765,7 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Average read latency of the datastore $3</name>
+                            <name>Average read latency of the datastore {#DATASTORE}</name>
                             <type>3</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2807,7 +2807,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Free space on datastore $3 (percentage)</name>
+                            <name>Free space on datastore {#DATASTORE} (percentage)</name>
                             <type>3</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2849,7 +2849,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Total size of datastore $3</name>
+                            <name>Total size of datastore {#DATASTORE}</name>
                             <type>3</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -2891,7 +2891,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>Average write latency of the datastore $3</name>
+                            <name>Average write latency of the datastore {#DATASTORE}</name>
                             <type>3</type>
                             <snmp_community/>
                             <snmp_oid/>

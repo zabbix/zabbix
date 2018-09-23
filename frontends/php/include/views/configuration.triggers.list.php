@@ -83,8 +83,8 @@ foreach ($filter_tags as $tag) {
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Like'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 			->setModern(true),
 		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))

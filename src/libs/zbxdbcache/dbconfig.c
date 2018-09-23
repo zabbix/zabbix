@@ -828,7 +828,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == *value)
 		return FAIL;
 
-	if (0 != *value && (value_min > *value || ZBX_HK_PERIOD_MAX < *value))
+	if (0 != *value && value_min > *value)
 		return FAIL;
 
 	return SUCCEED;
@@ -7251,6 +7251,20 @@ void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int l
 		zbx_binary_heap_update_direct(&config->timer_queue, elem);
 	}
 
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_clear_timer_queue                                         *
+ *                                                                            *
+ * Purpose: clears timer trigger queue                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_clear_timer_queue(void)
+{
+	WRLOCK_CACHE;
+	zbx_binary_heap_clear(&config->timer_queue);
 	UNLOCK_CACHE;
 }
 

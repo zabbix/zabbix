@@ -246,7 +246,7 @@ class CSvgGraph extends CSvg {
 				}
 
 				$this->metrics[$i] = [
-					'name' => $metric['name'],
+					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
 					'itemid' => $metric['itemid'],
 					'units' => $metric['units'],
 					'host' => $metric['hosts'][0],
@@ -293,7 +293,7 @@ class CSvgGraph extends CSvg {
 		if ($options['max'] !== '') {
 			$this->left_y_max = $options['max'];
 		}
-		if ($options['units'] !== '') {
+		if ($options['units'] !== null) {
 			$this->left_y_units = $options['units'];
 		}
 
@@ -320,7 +320,7 @@ class CSvgGraph extends CSvg {
 		if ($options['max'] !== '') {
 			$this->right_y_max = $options['max'];
 		}
-		if ($options['units'] !== '') {
+		if ($options['units'] !== null) {
 			$this->right_y_units = $options['units'];
 		}
 
@@ -461,14 +461,14 @@ class CSvgGraph extends CSvg {
 		$areaid = uniqid('metric_clip_');
 
 		// CSS styles.
-		$this->styles['.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA]['clip-path'] = 'url(#'.$areaid.')';
+		$this->styles['.'.CSvgTag::ZBX_STYLE_GRAPH_AREA]['clip-path'] = 'url(#'.$areaid.')';
 		$this->styles['[data-metric]']['clip-path'] = 'url(#'.$areaid.')';
 
 		$this->addItem(
 			(new CsvgTag('clipPath'))
 				->addItem(
 					(new CSvgPath(implode(' ', [
-						'M'.$this->canvas_x.','.($this->canvas_y - 10),
+						'M'.$this->canvas_x.','.($this->canvas_y - 3),
 						'H'.($this->canvas_width + $this->canvas_x),
 						'V'.($this->canvas_height + $this->canvas_y),
 						'H'.($this->canvas_x)
@@ -597,8 +597,9 @@ class CSvgGraph extends CSvg {
 		}
 
 		$delta = (($max_value - $min_value) ? : 1);
-		$min_value = $delta > 1 ? (int) $min_value : (float) $min_value;
-		$max_value = $delta > 1 ? (int) $max_value : (float) $max_value;
+		$delta_round = (((int) $max_value - (int) $min_value) ? : 1);
+		$min_value = $delta_round > 1 ? (int) $min_value : (float) $min_value;
+		$max_value = $delta_round > 1 ? (int) $max_value : (float) $max_value;
 		$grid = $this->getValueGrid($min_value, $max_value);
 		$grid_values = [];
 
@@ -646,11 +647,12 @@ class CSvgGraph extends CSvg {
 	 * Add X axis with labels to graph.
 	 */
 	protected function drawCanvasXAxis() {
-		$this->addItem((new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
-			->setSize($this->canvas_width, $this->xaxis_height)
-			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-			->setTextColor($this->text_color)
-			->setLineColor($this->grid_color)
+		$this->addItem(
+			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+				->setSize($this->canvas_width, $this->xaxis_height)
+				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+				->setTextColor($this->text_color)
+				->setLineColor($this->grid_color)
 		);
 	}
 
@@ -745,12 +747,19 @@ class CSvgGraph extends CSvg {
 					continue;
 				}
 
-				$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
-				$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
-				$paths[$path_num][] = [$x, $y, convert_units([
-					'value' => $point,
-					'units' => $metric['units']
-				])];
+				/**
+				 * Avoid invisible data point drawing. Data sets of type != SVG_GRAPH_TYPE_POINTS cannot be skipped to
+				 * keep shape unchanged.
+				 */
+				$in_range = ($max_value >= $point && $min_value <= $point);
+				if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
+					$x = $this->canvas_x + $this->canvas_width - $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+					$y = $this->canvas_y + $this->canvas_height * ($max_value - $point) / $value_diff;
+					$paths[$path_num][] = [$x, $y, convert_units([
+						'value' => $point,
+						'units' => $metric['units']
+					])];
+				}
 			}
 
 			$this->paths[$index] = $paths;
@@ -853,10 +862,7 @@ class CSvgGraph extends CSvg {
 		$y_zero = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) ? $this->right_y_zero : $this->left_y_zero;
 
 		foreach ($paths as $path) {
-			$this->addItem((new CSvgGraphArea($path, $metric, $y_zero))
-				->setPosition($this->canvas_x, $this->canvas_y)
-				->setSize($this->canvas_width, $this->canvas_height)
-			);
+			$this->addItem(new CSvgGraphArea($path, $metric, $y_zero));
 		}
 	}
 
@@ -869,7 +875,7 @@ class CSvgGraph extends CSvg {
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
 				$group = (new CSvgGroup())
 					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-					->setAttribute('data-metric', $metric['name'])
+					->setAttribute('data-metric', CHtml::encode($metric['name']))
 					->setAttribute('data-color', $metric['options']['color']);
 
 				if ($metric['options']['fill'] > 0) {
@@ -877,10 +883,7 @@ class CSvgGraph extends CSvg {
 				}
 
 				foreach ($this->paths[$index] as $path) {
-					$group->addItem((new CSvgGraphLine($path, $metric))
-						->setPosition($this->canvas_x, $this->canvas_y)
-						->setSize($this->canvas_width, $this->canvas_height)
-					);
+					$group->addItem(new CSvgGraphLine($path, $metric));
 				}
 
 				$this->addItem($group->addItem(
@@ -897,10 +900,7 @@ class CSvgGraph extends CSvg {
 	protected function drawMetricsPoint() {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-				$this->addItem((new CSvgGraphPoints(reset($this->paths[$index]), $metric))
-					->setPosition($this->canvas_x, $this->canvas_y)
-					->setSize($this->canvas_width, $this->canvas_height)
-				);
+				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
 			}
 		}
 	}
@@ -946,7 +946,7 @@ class CSvgGraph extends CSvg {
 				'clock' => ($problem['clock'] >= $today)
 					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
 					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				'r_clock' => ($problem['r_clock'] > 0)
+				'r_clock' => ($problem['r_clock'] != 0)
 					? ($problem['r_clock'] >= $today)
 						? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
 						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])

@@ -34,23 +34,11 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'fields' => 'json',
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
-			'content_height' => 'int32',
-			'only_footer' => 'in 1'
+			'content_height' => 'int32'
 		]);
 	}
 
 	protected function doAction() {
-		if ($this->getInput('only_footer', 0)) {
-			$this->setResponse(new CControllerResponseData([
-				'only_footer' => true,
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
-			]));
-
-			return;
-		}
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$uniqueid = $this->getInput('uniqueid');
@@ -366,7 +354,6 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			'time_control_data' => $time_control_data,
 			'timeline' => $timeline,
 			'fs_data' => $fs_data,
-			'only_footer' => false,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

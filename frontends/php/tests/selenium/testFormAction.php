@@ -520,8 +520,8 @@ class testFormAction extends CWebTest {
 		]);
 
 		if ($eventsource == 'Triggers' && array_key_exists('evaltype', $data)) {
-			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name like TEST1');
-			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name like TEST2');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
@@ -609,9 +609,9 @@ class testFormAction extends CWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Application':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'=',
-						'like',
-						'not like'
+						'equals',
+						'contains',
+						'does not contain'
 				]);
 				break;
 			case 'Host group':
@@ -624,33 +624,31 @@ class testFormAction extends CWebTest {
 			case 'Discovery check':
 			case 'Proxy':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'=',
-						'<>'
+						'equals',
+						'does not equal'
 				]);
 				break;
 			case 'Trigger name':
 			case 'Host name':
 			case 'Host metadata':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'like',
-						'not like'
+						'contains',
+						'does not contain'
 				]);
 				break;
 			case 'Trigger severity':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'=',
-						'<>',
-						'>=',
-						'<='
+						'equals',
+						'does not equal',
+						'is greater than or equals',
+						'is less than or equals'
 				]);
 				break;
 			case 'Trigger value':
 			case 'Discovery object':
 			case 'Discovery status':
 			case 'Event type':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'='
-				]);
+				$this->zbxTestIsElementPresent('//td[@colspan="1" and text()="equals"]');
 				break;
 			case 'Time period':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
@@ -666,18 +664,18 @@ class testFormAction extends CWebTest {
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'>=',
-						'<='
+						'is greater than or equals',
+						'is less than or equals'
 				]);
 				break;
 			case 'Received value':
 				$this->zbxTestDropdownHasOptions('new_condition_operator', [
-						'=',
-						'<>',
-						'>=',
-						'<=',
-						'like',
-						'not like'
+						'equals',
+						'does not equal',
+						'is greater than or equals',
+						'is less than or equals',
+						'contains',
+						'does not contain'
 				]);
 				break;
 		}
@@ -1268,7 +1266,7 @@ class testFormAction extends CWebTest {
 
 				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_operator\']');
 				$this->zbxTestDropdownHasOptions('new_opcondition_operator', [
-						'='
+						'equals'
 				]);
 
 				$this->zbxTestAssertVisibleXpath('//select[@id=\'new_opcondition_value\']');
@@ -1696,8 +1694,8 @@ class testFormAction extends CWebTest {
 					],
 					[
 						'type' => 'Tag',
-						'operator' => 'not like',
-						'value' => 'Not like Tag',
+						'operator' => 'does not contain',
+						'value' => 'Does not contain Tag',
 					],
 				],
 				'operations' => [
@@ -1736,7 +1734,7 @@ class testFormAction extends CWebTest {
 					],
 					[
 						'type' => 'Received value',
-						'operator' => 'not like',
+						'operator' => 'does not contain',
 						'value' => 'Received value',
 					]
 				],
@@ -1775,7 +1773,7 @@ class testFormAction extends CWebTest {
 					],
 					[
 						'type' => 'Host metadata',
-						'operator'=> 'not like',
+						'operator'=> 'does not contain',
 						'value' => 'Zabbix',
 					]
 				],
@@ -1872,27 +1870,27 @@ class testFormAction extends CWebTest {
 						$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
 						switch($condition['type']){
 							case 'Application':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application = '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application equals '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Host name':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host name like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host name contains '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Host metadata':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata not like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata does not contain '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Trigger name':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name like '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name contains '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Tag':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Tag not like '.$condition['value']);
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Tag does not contain '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Received value':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value not like '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Received value does not contain '.$condition['value']);
 								$conditionCount++;
 								break;
 						}
@@ -1904,15 +1902,15 @@ class testFormAction extends CWebTest {
 						$this->zbxTestDoubleClickXpath("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]", "conditions_".$conditionCount);
 						switch($condition['type']){
 							case 'Trigger severity':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity equals '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Service type':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Service type = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Service type equals '.$condition['value']);
 								$conditionCount++;
 								break;
 							case 'Event type':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Event type = '.$condition['value']);
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Event type equals '.$condition['value']);
 								$conditionCount++;
 								break;
 						}
@@ -2006,17 +2004,17 @@ class testFormAction extends CWebTest {
 // adding conditions
 		$this->zbxTestInputTypeWait('new_condition_value', 'trigger');
 		$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name like trigger');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Trigger severity');
 		$this->zbxTestDropdownSelect('new_condition_value', 'Average');
 		$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger severity = Average');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger severity equals Average');
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Application');
 		$this->zbxTestInputTypeWait('new_condition_value', 'app');
 		$this->zbxTestClickXpathWait("//div[@id='actionTab']//button[contains(@onclick, 'add_condition')]");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Application = app');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Application equals app');
 
 // adding operations
 		$this->zbxTestTabSwitch('Operations');
