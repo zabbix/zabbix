@@ -789,6 +789,7 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
 		$parent_host_prototype['parent_hostid'] = array_key_exists($parent_host_prototype['hostid'], $hostids)
 			? $hostids[$parent_host_prototype['hostid']]
 			: 0;
+
 		$parent_host_prototype['lld_ruleid'] = array_key_exists($parent_host_prototype['hostid'], $lld_ruleids)
 			? $lld_ruleids[$parent_host_prototype['hostid']]
 			: 0;

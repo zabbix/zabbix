@@ -819,7 +819,6 @@ else {
 		order_result($httpTests, $sortField, $sortOrder);
 
 		$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
-
 		$data['httpTests'] = $httpTests;
 		$data['httpTestsLastData'] = $httpTestsLastData;
 	}
