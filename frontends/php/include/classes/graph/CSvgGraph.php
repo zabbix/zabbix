@@ -596,9 +596,8 @@ class CSvgGraph extends CSvg {
 			$units = $this->right_y_units;
 		}
 
-		$delta_round = ((int) $max_value - (int) $min_value) ? : 1;
-		$min_value = $delta_round > 1 ? (int) $min_value : (float) $min_value;
-		$max_value = $delta_round > 1 ? (int) $max_value : (float) $max_value;
+		$min_value = (float) $min_value;
+		$max_value = (float) $max_value;
 		$grid = $this->getValueGrid($min_value, $max_value);
 		$delta = ($max_value != $min_value)
 			? $max_value - $min_value
@@ -772,7 +771,9 @@ class CSvgGraph extends CSvg {
 				}
 			}
 
-			$this->paths[$index] = $paths;
+			if ($paths) {
+				$this->paths[$index] = $paths;
+			}
 		}
 	}
 
@@ -850,12 +851,10 @@ class CSvgGraph extends CSvg {
 
 				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
 					$missing_points[$prev_clock + $gap_interval] = null;
-					break;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					$missing_points[$prev_clock + $gap_interval] = 0;
 					$missing_points[$clock - $gap_interval] = 0;
-					break;
 				}
 			}
 
