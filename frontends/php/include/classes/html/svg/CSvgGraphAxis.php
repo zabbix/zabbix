@@ -192,7 +192,7 @@ class CSvgGraphAxis extends CSvgTag {
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
 			$axis = 'x';
 			// Label margin from axis.
-			$margin = 7;
+			$margin = 5;
 			$y = $this->height - $margin;
 		}
 		else {
@@ -214,7 +214,22 @@ class CSvgGraphAxis extends CSvgTag {
 				$y = $this->height - $y;
 			}
 
-			$labels[] = (new CSvgText($this->x + $x, $this->y + $y, $label));
+			if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+				if (count($labels) == 0) {
+					$text_tag_x = max($this->x + $x, strlen($label) * 4);
+				}
+				elseif (end($this->labels) === $label) {
+					$text_tag_x = (strlen($label) * 4 > $this->width - $x) ? $this->x + $x - 10 : $this->x + $x;
+				}
+				else {
+					$text_tag_x = $this->x + $x;
+				}
+			}
+			else {
+				$text_tag_x = $this->x + $x;
+			}
+
+			$labels[] = new CSvgText($text_tag_x, $this->y + $y, $label);
 		}
 
 		return $labels;
