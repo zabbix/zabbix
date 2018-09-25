@@ -964,6 +964,11 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
 						(0 != item->itemid ? "update" : "create"), errmsg);
 				zbx_free(errmsg);
+
+				/* delay alone cannot be rolled back as it depends on item type */
+				if (0 != item->itemid)
+					item->flags &= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
 				if (SUCCEED == is_user_macro(*field))
