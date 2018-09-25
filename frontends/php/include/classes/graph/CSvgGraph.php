@@ -851,12 +851,10 @@ class CSvgGraph extends CSvg {
 
 				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
 					$missing_points[$prev_clock + $gap_interval] = null;
-					break;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					$missing_points[$prev_clock + $gap_interval] = 0;
 					$missing_points[$clock - $gap_interval] = 0;
-					break;
 				}
 			}
 
