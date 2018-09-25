@@ -2407,7 +2407,7 @@ int	is_double_suffix(const char *str, unsigned char flags)
 			continue;
 		}
 
-		if ('.' == str[i] && 0 == dot && 1 == num && '\0' != str[i + 1] && 0 != isdigit(str[i+1]))
+		if ('.' == str[i] && 0 == dot && 1 == num && '\0' != str[i + 1] && 0 != isdigit(str[i + 1]))
 		{
 			dot = 1;
 			continue;
