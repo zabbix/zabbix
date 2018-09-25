@@ -643,8 +643,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->key_orig = NULL;
 		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
-
-		if ((item->type = (unsigned char)atoi(row[6])) != item_prototype->type)
+		item->type = item_prototype->type;
+		if ((unsigned char)atoi(row[6]) != item_prototype->type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
 
 		if ((unsigned char)atoi(row[7]) != item_prototype->value_type)
