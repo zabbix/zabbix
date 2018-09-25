@@ -333,7 +333,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 					continue;
 			}
 
-			if (SUCCEED != zbx_interval_parse(dc_items[i].delay, &delay, NULL))
+			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%d:" ZBX_FS_UI64 "\n",
@@ -561,7 +561,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 					continue;
 			}
 
-			if (SUCCEED != zbx_interval_parse(dc_items[i].delay, &delay, NULL))
+			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);

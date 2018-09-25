@@ -950,23 +950,15 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					case ITEM_TYPE_SNMPTRAP:
 					case ITEM_TYPE_DEPENDENT:
 						return;
-					case ITEM_TYPE_ZABBIX_ACTIVE:
-						if (SUCCEED == is_user_macro(*field))
-							return;
+				}
 
-						if (SUCCEED == zbx_interval_parse(*field, &value, &errmsg))
-							return;
-						break;
-					default:
-						if (SUCCEED == is_user_macro(*field))
-							return;
+				if (SUCCEED == is_user_macro(*field))
+					return;
 
-						if (SUCCEED == zbx_custom_intervals_parse(*field, &value,
-								&custom_intervals, &errmsg))
-						{
-							zbx_custom_interval_free(custom_intervals);
-							return;
-						}
+				if (SUCCEED == zbx_interval_preproc(*field, &value, &custom_intervals, &errmsg))
+				{
+					zbx_custom_interval_free(custom_intervals);
+					return;
 				}
 
 				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
