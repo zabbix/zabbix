@@ -1,7 +1,5 @@
 Changes for 4.0.0rc2
 
-New features:
-
 Bug fixes:
 ..F....... [ZBXNEXT-4588] fixed multiple minor issues in SVG graph widget; fixed dashboard widget height calculation (miks)
 ..F....... [ZBX-14891] fixed undefined index "show_timeline" in screens (agriscenko)
