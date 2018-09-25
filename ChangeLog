@@ -1870,6 +1870,7 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14845] fixed filter in triggers status page not being reset when navigating from dashboard and host inventory (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.22
