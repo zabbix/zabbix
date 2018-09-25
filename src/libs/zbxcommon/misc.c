@@ -2373,81 +2373,113 @@ int	zbx_double_compare(double a, double b)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_double                                                        *
+ * Function: is_double_suffix                                                 *
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - string to check                                        *
  *             flags - extra options including:                               *
  *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Arets Paeglis                                                      *
+ * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-int	is_double(const char* str, unsigned char flags)
+int	is_double_suffix(const char *str, unsigned char flags)
 {
-	int i = 0, digits = 0;
+	size_t	i;
+	char	dot = 0;
 
-	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
-		while (' ' == str[i])	/* trim left spaces */
-			i++;
+	for (i = 0; '\0' != str[i]; i++)
+	{
+		/* negative number? */
+		if ('-' == str[i] && 0 == i)
+			continue;
 
-	if ('-' == str[i] || (0 != (flags & ZBX_FLAG_DOUBLE_UNARY_PLUS) && '+' == str[i]))				/* check leading sign */
+		if (0 != isdigit(str[i]))
+			continue;
+
+		if ('.' == str[i] && 0 == dot)
+		{
+			dot = 1;
+			continue;
+		}
+
+		/* last character is suffix */
+		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]) && '\0' == str[i + 1])
+			continue;
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_double                                                        *
+ *                                                                            *
+ * Purpose: check if the string is double                                     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is double                              *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
+int	is_double(const char *str)
+{
+	int	i = 0, digits = 0;
+
+	while (' ' == str[i])				/* trim left spaces */
 		i++;
 
-	while (0 != isdigit(str[i]))					/* check digits before dot */
+	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
+		i++;
+
+	while (0 != isdigit(str[i]))			/* check digits before dot */
 	{
 		i++;
 		digits = 1;
 	}
 
-	if ('.' == str[i])						/* check decimal dot */
+	if ('.' == str[i])				/* check decimal dot */
 		i++;
 
-	while (0 != isdigit(str[i]))					/* check digits after dot */
+	while (0 != isdigit(str[i]))			/* check digits after dot */
 	{
 		i++;
 		digits = 1;
 	}
 
-	if (0 == digits)						/* 1., .1, and 1.1 are good, just . is not */
+	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
 		return FAIL;
 
-	if ('e' == str[i] || 'E' == str[i])				/* check exponential part */
+	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
 	{
 		i++;
 
-		if ('-' == str[i] || '+' == str[i])			/* check exponent sign */
+		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
 			i++;
 
-		if (0 == isdigit(str[i]))				/* check exponent */
+		if (0 == isdigit(str[i]))		/* check exponent */
 			return FAIL;
 
 		while (0 != isdigit(str[i]))
 			i++;
 	}
 
-	/* check valid suffixes if flag is enabled */
-	if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && ((NULL != strchr(ZBX_UNIT_SYMBOLS, str[i])) && str[i] != '\0'))
+	while (' ' == str[i])				/* trim right spaces */
 		i++;
 
-	if ((0 != (flags & ZBX_FLAG_DOUBLE_SPACES)))
-		while (' ' == str[i])	/* trim right spaces */
-			i++;
-
-	if (i > (int)strlen(str))
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "str '%s' i:%d strlen %d", str, i, strlen(str));
-		exit(1);
-	}
-
-	return ('\0' == str[i]) ? SUCCEED : FAIL;
+	return '\0' == str[i] ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2751,7 +2783,7 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
 {
 	int	res;
 
-	if (SUCCEED == (res = is_double(str, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_SPACES)))
+	if (SUCCEED == (res = is_double(str)))
 		*value = (0 != atof(str));
 	else
 	{

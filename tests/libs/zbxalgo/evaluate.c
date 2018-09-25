@@ -64,7 +64,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'value' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if (SUCCEED != is_double(tmp, ZBX_FLAG_DOUBLE_PLAIN | ZBX_FLAG_DOUBLE_UNARY_PLUS))
+		else if (SUCCEED != is_double(tmp))
 		{
 			fail_msg("func_pos parameter \"%s\" is not double.", tmp);
 		}

@@ -178,7 +178,7 @@ static int	get_function_parameter_float(zbx_uint64_t hostid, const char *paramet
 	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
-		if (SUCCEED != is_double(parameter, flags))
+		if (SUCCEED != is_double_suffix(parameter, flags))
 			goto clean;
 
 		*value = str2double(parameter);
@@ -687,7 +687,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 			}
 			else
 			{
-				if (SUCCEED != is_double(arg2, ZBX_FLAG_DOUBLE_SUFFIX | ZBX_FLAG_DOUBLE_SPACES))
+				if (SUCCEED != is_double_suffix(arg2, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
 							arg2);

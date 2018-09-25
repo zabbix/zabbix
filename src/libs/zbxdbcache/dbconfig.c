@@ -9013,7 +9013,7 @@ out:
  ******************************************************************************/
 static int	dc_expression_user_macro_validator(const char *value)
 {
-	if (SUCCEED == is_double(value, ZBX_FLAG_DOUBLE_SUFFIX))
+	if (SUCCEED == is_double_suffix(value, ZBX_FLAG_DOUBLE_SUFFIX))
 		return SUCCEED;
 
 	return FAIL;

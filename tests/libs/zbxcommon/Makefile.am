@@ -1,6 +1,5 @@
 if SERVER
 SERVER_tests = \
-	is_double \
 	zbx_function_find \
 	parse_key \
 	replace_key_params_dyn \
@@ -81,19 +80,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
-
-is_double_SOURCES = \
-	is_double.c \
-	$(COMMON_SRC_FILES)
-
-is_double_LDADD = \
-	$(COMMON_LIB_FILES)
-
-is_double_LDADD += @SERVER_LIBS@
-
-is_double_LDFLAGS = @SERVER_LDFLAGS@
-
-is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 zbx_function_find_SOURCES = \
 	zbx_function_find.c \
