@@ -107,6 +107,9 @@ switch ($data['method']) {
 		if (!$msgsettings['triggers.recovery']) {
 			$options['value'] = [TRIGGER_VALUE_TRUE];
 		}
+		if (!$msgsettings['show_suppressed']) {
+			$options['suppressed'] = $msgsettings['show_suppressed'];
+		}
 		$events = getLastEvents($options);
 
 		$sortClock = [];

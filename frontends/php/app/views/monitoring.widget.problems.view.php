@@ -20,19 +20,15 @@
 
 
 // indicator of sort field
-$sort_div = (new CSpan())
-	->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+$sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 $backurl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null)
 	->getUrl();
 
 $url_details = (new CUrl('tr_events.php'))
 	->setArgument('triggerid', '')
-	->setArgument('eventid', '')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('eventid', '');
 
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
@@ -71,7 +67,7 @@ $today = strtotime('today');
 $last_clock = 0;
 
 if ($data['data']['problems']) {
-	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts'], $data['fullscreen']);
+	$triggers_hosts = makeTriggersHostsList($data['data']['triggers_hosts']);
 }
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -148,9 +144,22 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
+	if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
+		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+	}
+
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
-			->setHint(make_popup_eventlist($trigger, $eventid, $backurl, $data['fullscreen']), '', true)
+			->setHint(
+				make_popup_eventlist($trigger, $eventid, $backurl, $show_timeline,
+					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
+					$data['fields']['tag_priority']),
+				'',
+				true
+			)
+			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
+				$problem['name'], getSeverityName($problem['severity'], $data['config'])
+			))
 	]));
 
 	$description_style = getSeverityStyle($problem['severity']);
@@ -164,9 +173,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$duration = time() - $problem['clock'];
 
 		if ($data['config']['blink_period'] != 0 && $duration < $data['config']['blink_period']) {
-			$description->addClass('blink');
-			$description->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration);
-			$description->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
+			$description
+				->addClass('blink')
+				->setAttribute('data-time-to-blink', $data['config']['blink_period'] - $duration)
+				->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 	}
 
@@ -205,11 +215,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		(new CCol(
-			($problem['r_eventid'] != 0)
-				? zbx_date2age($problem['clock'], $problem['r_clock'])
-				: zbx_date2age($problem['clock'])
-		))
+		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
 			->addClass($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
@@ -221,10 +227,18 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	]));
 }
 
+if ($data['info'] !== '') {
+	$table->setFooter([
+		(new CCol($data['info']))
+			->setColSpan($table->getNumCols())
+			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
+	]);
+}
+
 $output = [
+	'aria_label' => _xs('%1$s widget', 'screen reader', $data['name']).', '.$data['info'],
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([$data['info'], _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

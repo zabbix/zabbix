@@ -1445,56 +1445,27 @@ static int	DBpatch_3050121(void)
 	return SUCCEED;
 }
 
-static void	DBpatch_3050122_add_anchors(const char *src, char *dst)
+static void	DBpatch_3050122_add_anchors(const char *src, char *dst, size_t src_len)
 {
-	const char	*pin = src;
-	char		*pout = dst;
-	size_t		pos, len, sep;
-	int		quoted = 0;
+	*dst++ = '^';				/* start anchor */
 
-	zbx_function_param_parse(src, &pos, &len, &sep);
-
-	if (0 != pos)		/* copy leading spaces */
+	if (0 != src_len)
 	{
-		memcpy(pout, src, pos);
-		pout += pos;
-		pin += pos;
+		memcpy(dst, src, src_len);	/* parameter body */
+		dst += src_len;
 	}
 
-	if ('"' == *pin)
-	{
-		*pout++ = *pin++;
-		len -= 2;	/* length without starting and ending quotes */
-		quoted = 1;
-	}
-
-	*pout++ = '^';		/* start anchor */
-
-	if (0 != len)
-	{
-		memcpy(pout, pin, len);
-		pout += len;
-		pin += len;
-	}
-
-	*pout++ = '$';		/* end anchor */
-
-	if (0 != quoted)
-	{
-		memcpy(pout, pin, sep - (size_t)(pin - src));
-		pout += sep - (size_t)(pin - src);
-	}
-
-	*pout = '\0';
+	*dst++ = '$';				/* end anchor */
+	*dst = '\0';
 }
 
 static int	DBpatch_3050122(void)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
-	int			ret = FAIL;
-	char			*sql = NULL, *parameter = NULL, *parameter_esc, *parameter_esc_anchored = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = FAIL;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1502,37 +1473,68 @@ static int	DBpatch_3050122(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		size_t	required_len;
+		const char	*orig_param = row[1];
+		char		*processed_parameter = NULL, *unquoted_parameter, *parameter_anchored = NULL,
+				*db_parameter_esc;
+		size_t		param_pos, param_len, sep_pos, param_alloc = 0, param_offset = 0, current_len;
+		int		was_quoted;
 
-		parameter = zbx_strdup(NULL, row[1]);
-		zbx_regexp_escape(&parameter);
+		zbx_function_param_parse(orig_param, &param_pos, &param_len, &sep_pos);
 
-		/* add 2 bytes for prepending ^ and appending $ to the string when converting to regexp */
+		/* copy leading whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
-		if (FUNCTION_PARAM_LEN < (required_len = zbx_strlen_utf8(parameter) + 2))
+		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted);
+
+		zbx_regexp_escape(&unquoted_parameter);
+
+		current_len = strlen(unquoted_parameter);
+
+		/* increasing length by 3 for ^, $, '\0' */
+		parameter_anchored = (char *)zbx_malloc(NULL, current_len + 3);
+		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
+		zbx_free(unquoted_parameter);
+
+		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
+					" logsource (functionid: %s) to regexp during database upgrade. The"
+					" parameter needs to but cannot be quoted after conversion.",
+					row[1], row[0]);
+
+			zbx_free(parameter_anchored);
+			zbx_free(processed_parameter);
+			continue;
+		}
+
+		/* copy the parameter */
+		zbx_strcpy_alloc(&processed_parameter, &param_alloc, &param_offset, parameter_anchored);
+		zbx_free(parameter_anchored);
+
+		/* copy trailing whitespace (if any) or empty string */
+		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param + param_pos + param_len,
+				sep_pos - param_pos - param_len + 1);
+
+		if (FUNCTION_PARAM_LEN < (current_len = zbx_strlen_utf8(processed_parameter)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function logsource"
 					" (functionid: %s) to regexp during database upgrade. The converted"
 					" value is too long for field \"parameter\" - " ZBX_FS_SIZE_T " characters."
 					" Allowed length is %d characters.",
-					row[1], row[0], required_len, FUNCTION_PARAM_LEN);
+					row[1], row[0], (zbx_fs_size_t)current_len, FUNCTION_PARAM_LEN);
 
-			zbx_free(parameter);
+			zbx_free(processed_parameter);
 			continue;
 		}
 
-		parameter_esc = DBdyn_escape_string_len(parameter, FUNCTION_PARAM_LEN);
-
-		parameter_esc_anchored = (char *)zbx_malloc(NULL, strlen(parameter_esc) + 3);	/* 3 for ^, $, '\0' */
-		DBpatch_3050122_add_anchors(parameter_esc, parameter_esc_anchored);
+		db_parameter_esc = DBdyn_escape_string_len(processed_parameter, FUNCTION_PARAM_LEN);
+		zbx_free(processed_parameter);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n",
-				parameter_esc_anchored, row[0]);
+				db_parameter_esc, row[0]);
 
-		zbx_free(parameter);
-		zbx_free(parameter_esc);
-		zbx_free(parameter_esc_anchored);
+		zbx_free(db_parameter_esc);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto out;
@@ -1552,6 +1554,437 @@ out:
 	zbx_free(sql);
 
 	return ret;
+}
+
+static int	DBpatch_3050123(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from profiles where idx in ("
+			"'web.toptriggers.filter.from','web.toptriggers.filter.till','web.avail_report.0.timesince',"
+			"'web.avail_report.0.timetill','web.avail_report.1.timesince','web.avail_report.1.timetill'"
+		")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050124(void)
+{
+	const ZBX_FIELD	field = {"request_method", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_3050125(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_3", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050126(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_1");
+}
+
+static int	DBpatch_3050127(void)
+{
+	return DBdrop_index("problem_tag", "problem_tag_2");
+}
+
+static int	DBpatch_3050128(void)
+{
+	return DBrename_index("problem_tag", "problem_tag_3", "problem_tag_1", "eventid,tag,value", 0);
+}
+
+static int	DBpatch_3050129(void)
+{
+	const ZBX_TABLE table =
+		{"event_suppress", "event_suppressid",	0,
+			{
+				{"event_suppressid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050130(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_1", "eventid,maintenanceid", 1);
+}
+
+static int	DBpatch_3050131(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_2", "suppress_until", 0);
+}
+
+static int	DBpatch_3050132(void)
+{
+	return DBcreate_index("event_suppress", "event_suppress_3", "maintenanceid", 0);
+}
+
+static int	DBpatch_3050133(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 1, &field);
+}
+
+static int	DBpatch_3050134(void)
+{
+	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 2, &field);
+}
+
+static int	DBpatch_3050135(void)
+{
+	const ZBX_TABLE table =
+		{"maintenance_tag", "maintenancetagid", 0,
+			{
+				{"maintenancetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"operator", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3050136(void)
+{
+	return DBcreate_index("maintenance_tag", "maintenance_tag_1", "maintenanceid", 0);
+}
+
+static int	DBpatch_3050137(void)
+{
+	const ZBX_FIELD	field = {"maintenanceid", NULL, "maintenances", "maintenanceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("maintenance_tag", 1, &field);
+}
+
+static int	DBpatch_3050138(void)
+{
+	const ZBX_FIELD	field = {"show_suppressed", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_3050139(void)
+{
+	const ZBX_FIELD	field = {"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("maintenances", &field);
+}
+
+static int	DBpatch_3050140(void)
+{
+	const ZBX_FIELD	field = {"pause_suppressed", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("actions", "maintenance_mode", &field);
+}
+
+static int	DBpatch_3050141(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update profiles"
+			" set idx='web.problem.filter.show_suppressed'"
+			" where idx='web.problem.filter.maintenance'");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050142(void)
+{
+	int		ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update profiles"
+			" set idx='web.overview.filter.show_suppressed'"
+			" where idx='web.overview.filter.show_maintenance'");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050143(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	ret = DBexecute("update widget_field"
+			" set name='show_suppressed'"
+			" where name='maintenance'"
+				" and exists (select null"
+					" from widget"
+					" where widget.widgetid=widget_field.widgetid"
+						" and widget.type in ('problems','problemhosts','problemsbysv'))");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050144(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			NULL);
+
+	/* type : 'problem' - WIDGET_PROBLEMS */
+	result = DBselect("select w.widgetid"
+			" from widget w"
+			" where w.type in ('problems','problemhosts','problemsbysv')"
+				" and not exists (select null"
+					" from widget_field wf"
+					" where w.widgetid=wf.widgetid"
+						" and wf.name='show_suppressed')");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_suppressed", 1);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_3050145(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* CONDITION_OPERATOR_IN (4) -> CONDITION_OPERATOR_YES (10) */
+	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)         */
+	ret = DBexecute("update conditions"
+			" set operator=10"
+			" where conditiontype=16"
+				" and operator=4");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050146(void)
+{
+	int	ret;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* CONDITION_OPERATOR_NOT_IN (7) -> CONDITION_OPERATOR_NO (11) */
+	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)            */
+	ret = DBexecute("update conditions"
+			" set operator=11"
+			" where conditiontype=16"
+				" and operator=7");
+
+	if (ZBX_DB_OK > ret)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050147(void)
+{
+	const ZBX_FIELD	field = {"http_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050148(void)
+{
+	const ZBX_FIELD	field = {"http_login_form", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050149(void)
+{
+	const ZBX_FIELD	field = {"http_strip_domains", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050150(void)
+{
+	const ZBX_FIELD	field = {"http_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050151(void)
+{
+	const ZBX_FIELD	field = {"ldap_configured", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050152(void)
+{
+	const ZBX_FIELD	field = {"ldap_case_sensitive", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_3050153(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
+	res = DBexecute("update config set authentication_type=0,http_auth_enabled=1 where authentication_type=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050154(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* New GUI access type is added GROUP_GUI_ACCESS_LDAP, update value of GROUP_GUI_ACCESS_DISABLED. */
+	/* 2 - old value of GROUP_GUI_ACCESS_DISABLED */
+	/* 3 - new value of GROUP_GUI_ACCESS_DISABLED */
+	res = DBexecute("update usrgrp set gui_access=3 where gui_access=2");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050155(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
+	/* Update ldap_case_sensitive to ZBX_AUTH_CASE_SENSITIVE. */
+	res = DBexecute("update config set ldap_configured=1,ldap_case_sensitive=1 where authentication_type=1");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050156(void)
+{
+	int	res;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	res = DBexecute(
+		"delete from widget_field"
+		" where (name like 'ds.order.%%' or name like 'or.order.%%')"
+			" and exists ("
+				"select null"
+				" from widget w"
+				" where widget_field.widgetid=w.widgetid"
+					" and w.type='svggraph'"
+			")");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050157(void)
+{
+	const ZBX_FIELD	field = {"passwd", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_3050158(void)
+{
+	int res;
+
+	res = DBexecute("update users set passwd=rtrim(passwd)");
+
+	if (ZBX_DB_OK > res)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_3050159(void)
+{
+	return DBcreate_index("escalations", "escalations_2", "eventid", 0);
+}
+
+static int	DBpatch_3050160(void)
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_3050161(void)
+{
+	return DBcreate_index("escalations", "escalations_1", "triggerid,itemid,escalationid", 1);
+}
+
+static int	DBpatch_3050162(void)
+{
+	return DBcreate_index("escalations", "escalations_3", "nextcheck", 0);
 }
 
 #endif
@@ -1679,5 +2112,46 @@ DBPATCH_ADD(3050119, 0, 1)
 DBPATCH_ADD(3050120, 0, 1)
 DBPATCH_ADD(3050121, 0, 1)
 DBPATCH_ADD(3050122, 0, 1)
+DBPATCH_ADD(3050123, 0, 1)
+DBPATCH_ADD(3050124, 0, 1)
+DBPATCH_ADD(3050125, 0, 1)
+DBPATCH_ADD(3050126, 0, 1)
+DBPATCH_ADD(3050127, 0, 1)
+DBPATCH_ADD(3050128, 0, 1)
+DBPATCH_ADD(3050129, 0, 1)
+DBPATCH_ADD(3050130, 0, 1)
+DBPATCH_ADD(3050131, 0, 1)
+DBPATCH_ADD(3050132, 0, 1)
+DBPATCH_ADD(3050133, 0, 1)
+DBPATCH_ADD(3050134, 0, 1)
+DBPATCH_ADD(3050135, 0, 1)
+DBPATCH_ADD(3050136, 0, 1)
+DBPATCH_ADD(3050137, 0, 1)
+DBPATCH_ADD(3050138, 0, 1)
+DBPATCH_ADD(3050139, 0, 1)
+DBPATCH_ADD(3050140, 0, 1)
+DBPATCH_ADD(3050141, 0, 1)
+DBPATCH_ADD(3050142, 0, 1)
+DBPATCH_ADD(3050143, 0, 1)
+DBPATCH_ADD(3050144, 0, 1)
+DBPATCH_ADD(3050145, 0, 1)
+DBPATCH_ADD(3050146, 0, 1)
+DBPATCH_ADD(3050147, 0, 1)
+DBPATCH_ADD(3050148, 0, 1)
+DBPATCH_ADD(3050149, 0, 1)
+DBPATCH_ADD(3050150, 0, 1)
+DBPATCH_ADD(3050151, 0, 1)
+DBPATCH_ADD(3050152, 0, 1)
+DBPATCH_ADD(3050153, 0, 1)
+DBPATCH_ADD(3050154, 0, 1)
+DBPATCH_ADD(3050155, 0, 1)
+DBPATCH_ADD(3050156, 0, 1)
+DBPATCH_ADD(3050157, 0, 1)
+DBPATCH_ADD(3050158, 0, 1)
+DBPATCH_ADD(3050159, 0, 1)
+DBPATCH_ADD(3050160, 0, 1)
+DBPATCH_ADD(3050161, 0, 1)
+DBPATCH_ADD(3050162, 0, 1)
 
 DBPATCH_END()
+

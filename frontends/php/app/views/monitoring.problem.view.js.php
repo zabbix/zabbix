@@ -18,8 +18,8 @@
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('filter_tags[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox('filter_tags[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
@@ -59,6 +59,12 @@
 				$('#filter_show_timeline, #filter_details').removeAttr('disabled');
 				$('#filter_highlight_row').attr('disabled', true);
 			}
+		});
+
+		$('#filter_show_tags').change(function() {
+			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
+			$('#filter_tag_priority').prop('disabled', disabled);
+			$('#filter_tag_name_format input').prop('disabled', disabled);
 		});
 
 		$(document).on({

@@ -919,7 +919,7 @@ int	DBcheck_version(void)
 
 	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
 	{
-		zbx_dbpatch_t	*patches = dbversion->patches;
+		patches = dbversion->patches;
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{

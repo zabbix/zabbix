@@ -22,6 +22,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "dbcache.h"
 
 #include "housekeeper.h"
 
@@ -225,6 +226,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time() - sec;
 
 		DBclose();
+
+		zbx_dc_cleanup_data_sessions();
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);

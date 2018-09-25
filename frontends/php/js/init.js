@@ -145,16 +145,36 @@ jQuery(function($) {
 						item.prefix = data.values[i].prefix;
 					}
 
-					jQuery('#' + data.parentId).multiSelect('addData', item);
+					$('#' + data.parentId).multiSelect('addData', item);
 				}
 			}
+		}
+		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
+			/**
+			 * Pattern select allows enter multiple comma or newline separated values in same editable field. Values
+			 * passed to add.popup should be appended at the and of existing value string. Duplicates are skipped.
+			 */
+			var values = $('[name="'+data.parentId+'"]').val();
+			data.values.forEach(function(val) {
+				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
+					if (values !== '') {
+						values = values + ', ';
+					}
+					values = values + val[data.object];
+				}
+			});
+
+			$('[name="'+data.parentId+'"]')
+				.val(values)
+				.trigger('change');
 		}
 		else if (typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
 			addPopupValues(data);
 		}
 		else {
-			jQuery('#' + data.parentId).val(data.values[0].name);
+			$('#' + data.parentId).val(data.values[0].name);
 		}
 	});
 

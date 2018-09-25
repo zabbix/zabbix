@@ -26,35 +26,40 @@ $user_navigation = (new CList())
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
-					->addClass(ZBX_STYLE_SEARCH),
-				(new CSubmitButton(''))
-					->setEnabled(false)
+					->addClass(ZBX_STYLE_SEARCH)
+					->setAttribute('aria-label', _('type here to search')),
+				(new CSubmitButton('&nbsp;'))
 					->addClass(ZBX_STYLE_BTN_SEARCH)
+					->setTitle(_('Search'))
 			])
 			->setAttribute('role', 'search')
 	);
+
 $user_menu = (new CList())
 	->setAttribute('role', 'navigation')
 	->setAttribute('aria-label', _('User menu'))
-	->addItem((new CListItem(
+	->addItem(CBrandHelper::isRebranded()
+		? null
+		: (new CListItem(
 			(new CLink('Support', 'https://www.zabbix.com/support/'))
 				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
 				->setAttribute('target', '_blank')
 				->setTitle(_('Zabbix Technical Support'))
 		))->addStyle('padding-left:0')
 	)
-	->addItem((new CListItem(
+	->addItem(CBrandHelper::isRebranded()
+		? null
+		: (new CListItem(
 			(new CLink('Share', 'https://share.zabbix.com/'))
 				->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 				->setAttribute('target', '_blank')
 				->setTitle(_('Zabbix Share'))
 		))
 	)
-	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/4.0/'))
-			->addClass(ZBX_STYLE_TOP_NAV_HELP)
-			->setAttribute('target', '_blank')
-			->setTitle(_('Help'))
+	->addItem((new CLink(SPACE, CBrandHelper::getHelpUrl()))
+		->addClass(ZBX_STYLE_TOP_NAV_HELP)
+		->setAttribute('target', '_blank')
+		->setTitle(_('Help'))
 	);
 
 if (!$data['user']['is_guest']) {
@@ -66,7 +71,12 @@ if (!$data['user']['is_guest']) {
 }
 
 $user_menu->addItem(
-	(new CLink(SPACE, 'index.php?reconnect=1'))
+	(new CLink(SPACE,
+		(new CUrl('index.php'))
+			->setArgument('reconnect', 1)
+			->setArgument('form', 'default')
+			->toString()
+	))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
 		->addSID()
@@ -77,7 +87,12 @@ $user_navigation->addItem($user_menu);
 // 1st level menu
 $top_menu = (new CDiv())
 	->addItem(
-		(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+		(new CLink(
+			(new CDiv())
+				->addClass(ZBX_STYLE_LOGO)
+				->addStyle(CBrandHelper::getLogoStyle()),
+			'zabbix.php?action=dashboard.view'
+		))
 			->addClass(ZBX_STYLE_HEADER_LOGO)
 	)
 	->addItem(

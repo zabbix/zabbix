@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $controls = (new CForm('get'))
 	->cleanItems()
 	->setAttribute('aria-label', _('Main filter'))
-	->addVar('fullscreen', $data['fullscreen'] ? '1' : null)
 	->addVar('page', 1)
 	->addItem((new CList())
 		->addItem([
@@ -54,19 +54,25 @@ if ($this->data['graphid']) {
 	);
 }
 
-$content_control->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-$content_control = (new CTag('nav', true, $content_control))
-	->setAttribute('aria-label', _('Content controls'));
+$content_control->addItem(get_icon('fullscreen'));
+$content_control = (new CTag('nav', true, $content_control))->setAttribute('aria-label', _('Content controls'));
+
+$web_layout_mode = CView::getLayoutMode();
 
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
+	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([$controls, $content_control]));
 
-$filterForm = (new CFilter())
+$filter = (new CFilter())
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-$chartsWidget->addItem($filterForm);
+
+if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
+	$filter->addClass(ZBX_STYLE_HIDDEN);
+}
+$chartsWidget->addItem($filter);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget

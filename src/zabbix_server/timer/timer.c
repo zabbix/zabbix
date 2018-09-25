@@ -27,536 +27,659 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "db.h"
 
 #include "timer.h"
 
-#define TIMER_DELAY	30
+#define ZBX_TIMER_DELAY		SEC_PER_MIN
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern int		CONFIG_TIMER_FORKS;
 
+/* trigger -> functions cache */
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	char		*host;
-	time_t		maintenance_from;
-	zbx_uint64_t	maintenanceid;
-	zbx_uint64_t	host_maintenanceid;
-	int		maintenance_type;
-	int		host_maintenance_status;
-	int		host_maintenance_type;
-	int		host_maintenance_from;
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	functionids;
 }
-zbx_host_maintenance_t;
+zbx_trigger_functions_t;
 
-static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_count,
-		zbx_uint64_t hostid, time_t maintenance_from, zbx_uint64_t maintenanceid)
+/* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
+typedef struct
 {
-	int	first_index, last_index, index;
+	zbx_uint64_t			eventid;
+	zbx_vector_uint64_pair_t	maintenances;
+}
+zbx_event_suppress_data_t;
 
-	if (0 == hm_count)
-		return 0;
+/******************************************************************************
+ *                                                                            *
+ * Function: log_host_maintenance_update                                      *
+ *                                                                            *
+ * Purpose: log host maintenance changes                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
+{
+	char	*msg = NULL;
+	size_t	msg_alloc = 0, msg_offset = 0;
+	int	maintenance_off = 0;
 
-	first_index = 0;
-	last_index = hm_count - 1;
-
-	while (1)
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
 	{
-		index = first_index + (last_index - first_index) / 2;
-
-		if (hm[index].hostid == hostid &&
-				hm[index].maintenance_from == maintenance_from &&
-				hm[index].maintenanceid == maintenanceid)
+		if (HOST_MAINTENANCE_STATUS_ON == diff->maintenance_status)
 		{
-			return index;
-		}
-		else if (last_index == first_index)
-		{
-			if (hm[index].hostid < hostid ||
-					(hm[index].hostid == hostid && hm[index].maintenance_from < maintenance_from) ||
-					(hm[index].hostid == hostid && hm[index].maintenance_from == maintenance_from &&
-					 	hm[index].maintenanceid < maintenanceid))
-				index++;
-
-			return index;
-		}
-		else if (hm[index].hostid < hostid ||
-				(hm[index].hostid == hostid && hm[index].maintenance_from < maintenance_from) ||
-				(hm[index].hostid == hostid && hm[index].maintenance_from == maintenance_from &&
-				 	hm[index].maintenanceid < maintenanceid))
-		{
-			first_index = index + 1;
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "putting host (" ZBX_FS_UI64 ") into",
+					diff->hostid);
 		}
 		else
-			last_index = index;
+		{
+			maintenance_off = 1;
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "taking host (" ZBX_FS_UI64 ") out of",
+				diff->hostid);
+		}
 	}
-}
+	else
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "changing host (" ZBX_FS_UI64 ")", diff->hostid);
 
-static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
-		zbx_uint64_t hostid, const char *host, time_t maintenance_from, zbx_uint64_t maintenanceid,
-		int maintenance_type, zbx_uint64_t host_maintenanceid, int host_maintenance_status,
-		int host_maintenance_type, int host_maintenance_from)
-{
-	int	hm_index;
+	zbx_strcpy_alloc(&msg, &msg_alloc, &msg_offset, " maintenance");
 
-	hm_index = get_host_maintenance_nearestindex(*hm, *hm_count, hostid, maintenance_from, maintenanceid);
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID) && 0 != diff->maintenanceid)
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "(" ZBX_FS_UI64 ")", diff->maintenanceid);
 
-	if (hm_index < *hm_count && (*hm)[hm_index].hostid == hostid &&
-			(*hm)[hm_index].maintenance_from == maintenance_from &&
-			(*hm)[hm_index].maintenanceid == maintenanceid)
+
+	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE) && 0 == maintenance_off)
 	{
-		return &(*hm)[hm_index];
+		const char	*desription[] = {"with data collection", "without data collection"};
+
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", desription[diff->maintenance_type]);
 	}
 
-	if (*hm_alloc == *hm_count)
-	{
-		*hm_alloc += 4;
-		*hm = (zbx_host_maintenance_t *)zbx_realloc(*hm, *hm_alloc * sizeof(zbx_host_maintenance_t));
-	}
-
-	memmove(&(*hm)[hm_index + 1], &(*hm)[hm_index], sizeof(zbx_host_maintenance_t) * (*hm_count - hm_index));
-
-	(*hm)[hm_index].hostid = hostid;
-	(*hm)[hm_index].host = zbx_strdup(NULL, host);
-	(*hm)[hm_index].maintenance_from = maintenance_from;
-	(*hm)[hm_index].maintenanceid = maintenanceid;
-	(*hm)[hm_index].maintenance_type = maintenance_type;
-	(*hm)[hm_index].host_maintenanceid = host_maintenanceid;
-	(*hm)[hm_index].host_maintenance_status = host_maintenance_status;
-	(*hm)[hm_index].host_maintenance_type = host_maintenance_type;
-	(*hm)[hm_index].host_maintenance_from = host_maintenance_from;
-	(*hm_count)++;
-
-	return &(*hm)[hm_index];
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+	zbx_free(msg);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: get_maintenance_groups                                           *
+ * Function: db_update_host_maintenances                                      *
  *                                                                            *
- * Purpose: get groups (including nested groups) assigned to a maintenance    *
- *          period                                                            *
- *                                                                            *
- * Parameters: maintenanceid - [IN] the maintenance period id                 *
- *             groupids      - [OUT] the group ids                            *
+ * Purpose: update host maintenance properties in database                    *
  *                                                                            *
  ******************************************************************************/
-static void	get_maintenance_groups(zbx_uint64_t maintenanceid, zbx_vector_uint64_t *groupids)
+static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	parent_groupids;
+	int					i;
+	const zbx_host_maintenance_diff_t	*diff;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zbx_vector_uint64_create(&parent_groupids);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select groupid from maintenances_groups where maintenanceid=" ZBX_FS_UI64, maintenanceid);
+	for (i = 0; i < updates->values_num; i++)
+	{
+		char	delim = ' ';
 
-	DBselect_uint64(sql, &parent_groupids);
+		diff = (const zbx_host_maintenance_diff_t *)updates->values[i];
 
-	zbx_dc_get_nested_hostgroupids(parent_groupids.values, parent_groupids.values_num, groupids);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCEID))
+		{
+			if (0 != diff->maintenanceid)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=" ZBX_FS_UI64, delim,
+						diff->maintenanceid);
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenanceid=null", delim);
+			}
+
+			delim = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_type=%u", delim,
+					diff->maintenance_type);
+			delim = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_status=%u", delim,
+					diff->maintenance_status);
+			delim = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_FROM))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cmaintenance_from=%d", delim,
+					diff->maintenance_from);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", diff->hostid);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			break;
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			log_host_maintenance_update(diff);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&parent_groupids);
 }
 
-static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
-		time_t maintenance_from, zbx_uint64_t maintenanceid, int maintenance_type)
+/******************************************************************************
+ *                                                                            *
+ * Function: db_remove_expired_event_suppress_data                            *
+ *                                                                            *
+ * Purpose: remove expired event_suppress records                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_remove_expired_event_suppress_data(int now)
 {
-	const char		*__function_name = "process_maintenance_hosts";
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		host_hostid, host_maintenanceid;
-	int			host_maintenance_status, host_maintenance_type, host_maintenance_from;
-	zbx_vector_uint64_t	groupids;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	DBbegin();
+	DBexecute("delete from event_suppress where suppress_until<%d", now);
+	DBcommit();
+}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_event_suppress_data_free                                     *
+ *                                                                            *
+ * Purpose: free event suppress data structure                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
+{
+	zbx_vector_uint64_pair_destroy(&data->maintenances);
+	zbx_free(data);
+}
 
-	assert(maintenanceid);
+/******************************************************************************
+ *                                                                            *
+ * Function: db_get_query_events                                              *
+ *                                                                            *
+ * Purpose: get open, recently resolved and resolved problems with suppress   *
+ *          data from database and prepare event query, event data structures *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_event_suppress_query_t	*query;
+	zbx_event_suppress_data_t	*data = NULL;
+	zbx_uint64_t			eventid;
+	zbx_uint64_pair_t		pair;
+	zbx_vector_uint64_t		eventids;
 
-	result = DBselect(
-			"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
-				"h.maintenance_type,h.maintenance_from"
-			" from maintenances_hosts mh,hosts h"
-			" where mh.hostid=h.hostid"
-				" and h.status in (%d,%d)"
-				" and mh.maintenanceid=" ZBX_FS_UI64,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			maintenanceid);
+	/* get open or recently closed problems */
+
+	result = DBselect("select eventid,objectid,r_eventid"
+			" from problem"
+			" where source=%d"
+				" and object=%d"
+				" and " ZBX_SQL_MOD(eventid, %d) "=%d"
+			" order by eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_DBROW2UINT64(host_maintenanceid, row[2]);
-		host_maintenance_status = atoi(row[3]);
-		host_maintenance_type = atoi(row[4]);
-		host_maintenance_from = atoi(row[5]);
-
-		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
-				maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
-				host_maintenance_from);
+		query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
+		ZBX_STR2UINT64(query->eventid, row[0]);
+		ZBX_STR2UINT64(query->triggerid, row[1]);
+		ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+		zbx_vector_uint64_create(&query->functionids);
+		zbx_vector_ptr_create(&query->tags);
+		zbx_vector_uint64_pair_create(&query->maintenances);
+		zbx_vector_ptr_append(event_queries, query);
 	}
 	DBfree_result(result);
 
-	/* get hosts by assigned maintenance groups */
+	/* get event suppress data */
 
-	zbx_vector_uint64_create(&groupids);
-	get_maintenance_groups(maintenanceid, &groupids);
+	zbx_vector_uint64_create(&eventids);
 
-	if (0 != groupids.values_num)
+	result = DBselect("select eventid,maintenanceid,suppress_until"
+			" from event_suppress"
+			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
+			" order by eventid",
+			CONFIG_TIMER_FORKS, process_num - 1);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
-					"h.maintenance_type,h.maintenance_from"
-				" from hosts_groups hg,hosts h"
-				" where hg.hostid=h.hostid"
-					" and h.status in (%d,%d)"
-					" and",
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+		ZBX_STR2UINT64(eventid, row[0]);
 
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
-				groupids.values_num);
+		if (FAIL == zbx_vector_ptr_bsearch(event_queries, &eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+			zbx_vector_uint64_append(&eventids, eventid);
+
+		if (NULL == data || data->eventid != eventid)
+		{
+			data = (zbx_event_suppress_data_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_data_t));
+			data->eventid = eventid;
+			zbx_vector_uint64_pair_create(&data->maintenances);
+			zbx_vector_ptr_append(event_data, data);
+		}
+
+		ZBX_DBROW2UINT64(pair.first, row[1]);
+		pair.second = atoi(row[2]);
+		zbx_vector_uint64_pair_append(&data->maintenances, pair);
+	}
+	DBfree_result(result);
+
+	/* get missing event data */
+
+	if (0 != eventids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select e.eventid,e.objectid,er.r_eventid"
+				" from events e"
+				" left join event_recovery er"
+					" on e.eventid=er.eventid"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids.values, eventids.values_num);
 
 		result = DBselect("%s", sql);
-
 		zbx_free(sql);
-		zbx_vector_uint64_destroy(&groupids);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(host_hostid, row[0]);
-			ZBX_DBROW2UINT64(host_maintenanceid, row[2]);
-			host_maintenance_status = atoi(row[3]);
-			host_maintenance_type = atoi(row[4]);
-			host_maintenance_from = atoi(row[5]);
-
-			get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
-					maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
-					host_maintenance_from);
+			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
+			ZBX_STR2UINT64(query->eventid, row[0]);
+			ZBX_STR2UINT64(query->triggerid, row[1]);
+			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+			zbx_vector_uint64_create(&query->functionids);
+			zbx_vector_ptr_create(&query->tags);
+			zbx_vector_uint64_pair_create(&query->maintenances);
+			zbx_vector_ptr_append(event_queries, query);
 		}
 		DBfree_result(result);
+
+		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
-{
-	const char	*__function_name = "update_maintenance_hosts";
-	int		i;
-	zbx_uint64_t	*ids = NULL, hostid;
-	int		ids_alloc = 0, ids_num = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
-	int		ret = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	DBbegin();
-
-	for (i = 0; i < hm_count; i++)
-	{
-		if (SUCCEED == uint64_array_exists(ids, ids_num, hm[i].hostid))
-			continue;
-
-		if (hm[i].host_maintenanceid != hm[i].maintenanceid ||
-				HOST_MAINTENANCE_STATUS_ON != hm[i].host_maintenance_status ||
-				hm[i].host_maintenance_type != hm[i].maintenance_type ||
-				0 == hm[i].host_maintenance_from)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "putting host '%s' into maintenance (%s)",
-					hm[i].host, MAINTENANCE_TYPE_NORMAL == hm[i].maintenance_type ?
-					"with data collection" : "without data collection");
-
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update hosts"
-					" set maintenanceid=" ZBX_FS_UI64 ","
-						"maintenance_status=%d,"
-						"maintenance_type=%d",
-					hm[i].maintenanceid,
-					HOST_MAINTENANCE_STATUS_ON,
-					hm[i].maintenance_type);
-
-			if (0 == hm[i].host_maintenance_from)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=%d",
-						hm[i].maintenance_from);
-			}
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64,
-					hm[i].hostid);
-
-			DBexecute("%s", sql);
-
-			DCconfig_set_maintenance(&hm[i].hostid, 1, HOST_MAINTENANCE_STATUS_ON,
-					hm[i].maintenance_type, hm[i].maintenance_from);
-
-			ret++;
-		}
-
-		uint64_array_add(&ids, &ids_alloc, &ids_num, hm[i].hostid, 4);
-	}
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,host,maintenance_type,maintenance_from"
-			" from hosts"
-			" where status=%d"
-				" and flags<>%d"
-				" and maintenance_status=%d",
-			HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_MAINTENANCE_STATUS_ON);
-
-	if (NULL != ids && 0 != ids_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
-	}
-
-	result = DBselect("%s", sql);
-
-	ids_num = 0;
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "taking host '%s' out of maintenance", row[1]);
-
-		ZBX_STR2UINT64(hostid, row[0]);
-
-		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 4);
-	}
-	DBfree_result(result);
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"update hosts"
-			" set maintenanceid=null,"
-				"maintenance_status=%d,"
-				"maintenance_type=%d,"
-				"maintenance_from=0"
-			" where",
-			HOST_MAINTENANCE_STATUS_OFF,
-			MAINTENANCE_TYPE_NORMAL);
-
-	if (NULL != ids && 0 != ids_num)
-	{
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
-		DBexecute("%s", sql);
-
-		DCconfig_set_maintenance(ids, ids_num, HOST_MAINTENANCE_STATUS_OFF, 0, 0);
-
-		ret += ids_num;
-	}
-
-	DBcommit();
-
-	zbx_free(sql);
-	zbx_free(ids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
-}
-
-static int	process_maintenance(void)
-{
-	const char			*__function_name = "process_maintenance";
-	DB_RESULT			result;
-	DB_ROW				row;
-	int				day, week, wday, sec;
-	struct tm			*tm;
-	zbx_uint64_t			db_maintenanceid;
-	time_t				now, db_active_since, active_since, db_start_date, maintenance_from;
-	zbx_timeperiod_type_t		db_timeperiod_type;
-	int				db_every, db_month, db_dayofweek, db_day, db_start_time,
-					db_period, db_maintenance_type;
-	static zbx_host_maintenance_t	*hm = NULL;
-	static int			hm_alloc = 4;
-	int				hm_count = 0, ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (NULL == hm)
-		hm = (zbx_host_maintenance_t *)zbx_malloc(hm, sizeof(zbx_host_maintenance_t) * hm_alloc);
-
-	now = time(NULL);
-	tm = localtime(&now);
-	sec = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
-
-	result = DBselect(
-			"select m.maintenanceid,m.maintenance_type,m.active_since,"
-				"tp.timeperiod_type,tp.every,tp.month,tp.dayofweek,"
-				"tp.day,tp.start_time,tp.period,tp.start_date"
-			" from maintenances m,maintenances_windows mw,timeperiods tp"
-			" where m.maintenanceid=mw.maintenanceid"
-				" and mw.timeperiodid=tp.timeperiodid"
-				" and m.active_since<=%d"
-				" and m.active_till>%d",
-			now, now);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(db_maintenanceid, row[0]);
-		db_maintenance_type	= atoi(row[1]);
-		db_active_since		= atoi(row[2]);
-		db_timeperiod_type	= atoi(row[3]);
-		db_every		= atoi(row[4]);
-		db_month		= atoi(row[5]);
-		db_dayofweek		= atoi(row[6]);
-		db_day			= atoi(row[7]);
-		db_start_time		= atoi(row[8]);
-		db_period		= atoi(row[9]);
-		db_start_date		= atoi(row[10]);
-
-		switch (db_timeperiod_type)
-		{
-			case TIMEPERIOD_TYPE_ONETIME:
-				break;
-			case TIMEPERIOD_TYPE_DAILY:
-				db_start_date = now - sec + db_start_time;
-				if (sec < db_start_time)
-					db_start_date -= SEC_PER_DAY;
-
-				if (db_start_date < db_active_since)
-					continue;
-
-				tm = localtime(&db_active_since);
-				active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN
-						+ tm->tm_sec);
-
-				day = (db_start_date - active_since) / SEC_PER_DAY;
-				db_start_date -= SEC_PER_DAY * (day % db_every);
-				break;
-			case TIMEPERIOD_TYPE_WEEKLY:
-				db_start_date = now - sec + db_start_time;
-				if (sec < db_start_time)
-					db_start_date -= SEC_PER_DAY;
-
-				if (db_start_date < db_active_since)
-					continue;
-
-				tm = localtime(&db_active_since);
-				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-				active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR +
-						tm->tm_min * SEC_PER_MIN + tm->tm_sec);
-
-				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-				{
-					/* check for every x week(s) */
-					week = (db_start_date - active_since) / SEC_PER_WEEK;
-					if (0 != week % db_every)
-						continue;
-
-					/* check for day of the week */
-					tm = localtime(&db_start_date);
-					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-					if (0 == (db_dayofweek & (1 << wday)))
-						continue;
-
-					break;
-				}
-				break;
-			case TIMEPERIOD_TYPE_MONTHLY:
-				db_start_date = now - sec + db_start_time;
-				if (sec < db_start_time)
-					db_start_date -= SEC_PER_DAY;
-
-				for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
-				{
-					/* check for month */
-					tm = localtime(&db_start_date);
-					if (0 == (db_month & (1 << tm->tm_mon)))
-						continue;
-
-					if (0 != db_day)
-					{
-						/* check for day of the month */
-						if (db_day != tm->tm_mday)
-							continue;
-					}
-					else
-					{
-						/* check for day of the week */
-						wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
-						if (0 == (db_dayofweek & (1 << wday)))
-							continue;
-
-						/* check for number of day (first, second, third, fourth or last) */
-						day = (tm->tm_mday - 1) / 7 + 1;
-						if (5 == db_every && 4 == day)
-						{
-							if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
-									tm->tm_mon + 1))
-							{
-								continue;
-							}
-						}
-						else if (db_every != day)
-						{
-							continue;
-						}
-					}
-
-					break;
-				}
-				break;
-			default:
-				continue;
-		}
-
-		/* allow one time periods to start before active time */
-		if (db_start_date < db_active_since && TIMEPERIOD_TYPE_ONETIME != db_timeperiod_type)
-			continue;
-
-		if (db_start_date > now || now >= db_start_date + db_period)
-			continue;
-
-		maintenance_from = db_start_date;
-
-		if (maintenance_from < db_active_since)
-			maintenance_from = db_active_since;
-
-		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid,
-				db_maintenance_type);
-	}
-	DBfree_result(result);
-
-	ret = update_maintenance_hosts(hm, hm_count);
-
-	while (0 != hm_count--)
-		zbx_free(hm[hm_count].host);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
+	zbx_vector_uint64_destroy(&eventids);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: main_timer_loop                                                  *
+ * Function: db_get_query_functions                                           *
  *                                                                            *
- * Purpose: periodically updates time-related triggers                        *
+ * Purpose: get event query functionids from database                         *
  *                                                                            *
- * Parameters:                                                                *
+ ******************************************************************************/
+static void	db_get_query_functions(zbx_vector_ptr_t *event_queries)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	int				i;
+	zbx_vector_uint64_t		triggerids;
+	zbx_hashset_t			triggers;
+	zbx_hashset_iter_t		iter;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_trigger_functions_t		*trigger = NULL, trigger_local;
+	zbx_uint64_t			triggerid, functionid;
+	zbx_event_suppress_query_t	*query;
+
+	/* cache functionids by triggerids */
+
+	zbx_hashset_create(&triggers, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_create(&triggerids);
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		zbx_vector_uint64_append(&triggerids, query->triggerid);
+	}
+
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select functionid,triggerid from functions where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
+			triggerids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by triggerid");
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(functionid, row[0]);
+		ZBX_STR2UINT64(triggerid, row[1]);
+
+		if (NULL == trigger || trigger->triggerid != triggerid)
+		{
+			trigger_local.triggerid = triggerid;
+			trigger = (zbx_trigger_functions_t *)zbx_hashset_insert(&triggers, &trigger_local,
+					sizeof(trigger_local));
+			zbx_vector_uint64_create(&trigger->functionids);
+		}
+		zbx_vector_uint64_append(&trigger->functionids, functionid);
+	}
+	DBfree_result(result);
+
+	/*  copy functionids to event queries */
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+
+		if (NULL == (trigger = (zbx_trigger_functions_t *)zbx_hashset_search(&triggers, &query->triggerid)))
+			continue;
+
+		zbx_vector_uint64_append_array(&query->functionids, trigger->functionids.values,
+				trigger->functionids.values_num);
+	}
+
+	zbx_hashset_iter_reset(&triggers, &iter);
+	while (NULL != (trigger = (zbx_trigger_functions_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_destroy(&trigger->functionids);
+	zbx_hashset_destroy(&triggers);
+
+	zbx_vector_uint64_destroy(&triggerids);
+}
+
+/******************************************************************************
  *                                                                            *
- * Return value:                                                              *
+ * Function: db_get_query_tags                                                *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Purpose: get event query tags from database                                *
  *                                                                            *
- * Comments: does update once per 30 seconds (hardcoded)                      *
+ ******************************************************************************/
+static void	db_get_query_tags(zbx_vector_ptr_t *event_queries)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	int				i;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_event_suppress_query_t	*query;
+	zbx_vector_uint64_t		eventids;
+	zbx_uint64_t			eventid;
+	zbx_tag_t			*tag;
+
+	zbx_vector_uint64_create(&eventids);
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
+		zbx_vector_uint64_append(&eventids, query->eventid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
+
+	result = DBselect("%s", sql);
+	zbx_free(sql);
+
+	i = 0;
+	query = (zbx_event_suppress_query_t *)event_queries->values[0];
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		while (query->eventid != eventid)
+			query = (zbx_event_suppress_query_t *)event_queries->values[++i];
+
+		tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+		tag->tag = zbx_strdup(NULL, row[1]);
+		tag->value = zbx_strdup(NULL, row[2]);
+		zbx_vector_ptr_append(&query->tags, tag);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_destroy(&eventids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_update_event_suppress_data                                    *
+ *                                                                            *
+ * Purpose: create/update event suppress data to reflect latest maintenance   *
+ *          changes in cache                                                  *
+ *                                                                            *
+ * Parameters: suppressed_num - [OUT] the number of suppressed events         *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_update_event_suppress_data(int *suppressed_num)
+{
+	zbx_vector_ptr_t	event_queries, event_data;
+
+	*suppressed_num = 0;
+
+	zbx_vector_ptr_create(&event_queries);
+	zbx_vector_ptr_create(&event_data);
+
+	db_get_query_events(&event_queries, &event_data);
+
+	if (0 != event_queries.values_num)
+	{
+		zbx_db_insert_t			db_insert;
+		char				*sql = NULL;
+		size_t				sql_alloc = 0, sql_offset = 0;
+		int				i, j, k;
+		zbx_event_suppress_query_t	*query;
+		zbx_event_suppress_data_t	*data;
+		zbx_vector_uint64_pair_t	del_event_maintenances;
+		zbx_vector_uint64_t		maintenanceids;
+		zbx_uint64_pair_t		pair;
+
+		zbx_vector_uint64_create(&maintenanceids);
+		zbx_vector_uint64_pair_create(&del_event_maintenances);
+
+		db_get_query_functions(&event_queries);
+		db_get_query_tags(&event_queries);
+
+		zbx_dc_get_running_maintenanceids(&maintenanceids);
+
+		DBbegin();
+
+		if (0 != maintenanceids.values_num && SUCCEED == zbx_db_lock_maintenanceids(&maintenanceids))
+			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
+
+		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
+				"suppress_until", NULL);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < event_queries.values_num; i++)
+		{
+			query = (zbx_event_suppress_query_t *)event_queries.values[i];
+			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			k = 0;
+
+			if (FAIL != (j = zbx_vector_ptr_bsearch(&event_data, &query->eventid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				data = (zbx_event_suppress_data_t *)event_data.values[j];
+				zbx_vector_uint64_pair_sort(&data->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+				j = 0;
+
+				while (j < data->maintenances.values_num && k < query->maintenances.values_num)
+				{
+					if (data->maintenances.values[j].first < query->maintenances.values[k].first)
+					{
+						pair.first = query->eventid;
+						pair.second = data->maintenances.values[j].first;
+						zbx_vector_uint64_pair_append(&del_event_maintenances, pair);
+
+						j++;
+						continue;
+					}
+
+					if (data->maintenances.values[j].first > query->maintenances.values[k].first)
+					{
+						if (0 == query->r_eventid)
+						{
+							zbx_db_insert_add_values(&db_insert, __UINT64_C(0),
+									query->eventid,
+									query->maintenances.values[k].first,
+									(int)query->maintenances.values[k].second);
+
+							(*suppressed_num)++;
+						}
+
+						k++;
+						continue;
+					}
+
+					if (data->maintenances.values[j].second != query->maintenances.values[k].second)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+								"update event_suppress"
+								" set suppress_until=%d"
+								" where eventid=" ZBX_FS_UI64
+									" and maintenanceid=" ZBX_FS_UI64 ";\n",
+									(int)query->maintenances.values[k].second,
+									query->eventid,
+									query->maintenances.values[k].first);
+
+						if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+							goto cleanup;
+					}
+					j++;
+					k++;
+				}
+
+				for (;j < data->maintenances.values_num; j++)
+				{
+					pair.first = query->eventid;
+					pair.second = data->maintenances.values[j].first;
+					zbx_vector_uint64_pair_append(&del_event_maintenances, pair);
+				}
+			}
+
+			if (0 == query->r_eventid)
+			{
+				for (;k < query->maintenances.values_num; k++)
+				{
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
+							query->maintenances.values[k].first,
+							(int)query->maintenances.values[k].second);
+
+					(*suppressed_num)++;
+				}
+			}
+		}
+
+		for (i = 0; i < del_event_maintenances.values_num; i++)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"delete from event_suppress"
+					" where eventid=" ZBX_FS_UI64
+						" and maintenanceid=" ZBX_FS_UI64 ";\n",
+						del_event_maintenances.values[i].first,
+						del_event_maintenances.values[i].second);
+
+			if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+				goto cleanup;
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+		{
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				goto cleanup;
+		}
+
+		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
+		zbx_db_insert_execute(&db_insert);
+cleanup:
+		DBcommit();
+
+		zbx_db_insert_clean(&db_insert);
+		zbx_free(sql);
+
+		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
+		zbx_vector_uint64_destroy(&maintenanceids);
+	}
+
+	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
+	zbx_vector_ptr_destroy(&event_data);
+
+	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
+	zbx_vector_ptr_destroy(&event_queries);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_update_host_maintenances                                      *
+ *                                                                            *
+ * Purpose: update host maintenance parameters in cache and database          *
+ *                                                                            *
+ ******************************************************************************/
+static int	update_host_maintenances(void)
+{
+	zbx_vector_uint64_t	maintenanceids;
+	zbx_vector_ptr_t	updates;
+	int			hosts_num = 0;
+	int			tnx_error;
+
+	zbx_vector_uint64_create(&maintenanceids);
+	zbx_vector_ptr_create(&updates);
+	zbx_vector_ptr_reserve(&updates, 100);
+
+	do
+	{
+		DBbegin();
+
+		if (SUCCEED == zbx_dc_get_running_maintenanceids(&maintenanceids))
+			zbx_db_lock_maintenanceids(&maintenanceids);
+
+		/* host maintenance update must be called even with no maintenances running */
+		/* to reset host maintenance status if necessary                            */
+		zbx_dc_get_host_maintenance_updates(&maintenanceids, &updates);
+
+		if (0 != updates.values_num)
+			db_update_host_maintenances(&updates);
+
+		if (ZBX_DB_OK == (tnx_error = DBcommit()) && 0 != (hosts_num = updates.values_num))
+			zbx_dc_flush_host_maintenance_updates(&updates);
+
+		zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_ptr_free);
+		zbx_vector_uint64_clear(&maintenanceids);
+	}
+	while (ZBX_DB_DOWN == tnx_error);
+
+	zbx_vector_ptr_destroy(&updates);
+	zbx_vector_uint64_destroy(&maintenanceids);
+
+	return hosts_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: timer_thread                                                     *
+ *                                                                            *
+ * Purpose: periodically processes maintenance                                *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	int	now, nextcheck, sleeptime = -1, hm_count = 0, old_hm_count = 0;
-	double	sec = 0.0, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	double		sec = 0.0;
+	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
+	char		*info = NULL;
+	size_t		info_alloc = 0, info_offset = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -565,84 +688,90 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
-	/* temporary block other timer processes until trigger based maintenance is merged in */
-	if (1 != process_num)
-	{
-		zbx_setproctitle("%s #%d [idle]", get_process_type_string(process_type), process_num);
-
-		for (;;)
-			zbx_sleep_loop(SEC_PER_DAY);
-	}
-
-
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = time(NULL);
+	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		now = time(NULL);
-		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
-		sleeptime = nextcheck - now;
+		sec = zbx_time();
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		if (1 == process_num)
 		{
-			if (0 == sleeptime)
+			/* start update process only when all timers have finished their updates */
+			if (sec - maintenance_time >= ZBX_TIMER_DELAY && FAIL == zbx_dc_maintenance_check_update_flags())
 			{
-				zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, processing "
-						"maintenance periods]",
-						get_process_type_string(process_type),
-						hm_count, total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, idle %d sec]",
-						get_process_type_string(process_type),
-						hm_count, total_sec, sleeptime);
-				old_hm_count = hm_count;
-				old_total_sec = total_sec;
-			}
+				zbx_setproctitle("%s #%d [%s, processing maintenances]",
+						get_process_type_string(process_type), process_num, info);
 
-			hm_count = 0;
-			total_sec = 0.0;
-			last_stat_time = time(NULL);
+				update = zbx_dc_update_maintenances();
+
+				/* force maintenance updates at server startup */
+				if (0 == maintenance_time)
+					update = SUCCEED;
+
+				/* update hosts if there are modified (stopped, started, changed) maintenances */
+				if (SUCCEED == update)
+					hosts_num = update_host_maintenances();
+				else
+					hosts_num = 0;
+
+				db_remove_expired_event_suppress_data((int)sec);
+
+				if (SUCCEED == update)
+				{
+					zbx_dc_maintenance_set_update_flags();
+					db_update_event_suppress_data(&events_num);
+					zbx_dc_maintenance_reset_update_flag(process_num);
+				}
+				else
+					events_num = 0;
+
+				info_offset = 0;
+				zbx_snprintf_alloc(&info, &info_alloc, &info_offset,
+						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
+						hosts_num, events_num, zbx_time() - sec);
+
+				update_time = (int)sec;
+			}
+		}
+		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
+		{
+			zbx_setproctitle("%s #%d [%s, processing maintenances]", get_process_type_string(process_type),
+					process_num, info);
+
+			db_update_event_suppress_data(&events_num);
+
+			info_offset = 0;
+			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL
+					" sec", events_num, zbx_time() - sec);
+
+			update_time = (int)sec;
+			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
-		zbx_sleep_loop(sleeptime);
+		if (maintenance_time != update_time)
+		{
+			maintenance_time = (int)sec;
+
+			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - sec)))
+				idle = 0;
+
+			zbx_setproctitle("%s #%d [%s, idle %d sec]",
+					get_process_type_string(process_type), process_num, info, idle);
+		}
+
+		if (0 != idle)
+			zbx_sleep_loop(1);
+
+		idle = 1;
 
 		zbx_handle_log();
 
-		if (0 != sleeptime)
-		{
-			zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL " sec, processing time "
-					"functions]",
-					get_process_type_string(process_type),
-					old_hm_count, old_total_sec);
-		}
-
-		/* we process maintenance at every 00 sec */
-		if (0 == nextcheck % SEC_PER_MIN || nextcheck + SEC_PER_MIN - (nextcheck % SEC_PER_MIN) <= time(NULL))
-		{
-			zbx_setproctitle("%s #1 [processed %d maintenances in " ZBX_FS_DBL
-					" sec, processing maintenance periods]",
-					get_process_type_string(process_type),
-					old_hm_count, total_sec);
-
-			sec = zbx_time();
-			hm_count += process_maintenance();
-			total_sec += zbx_time() - sec;
-		}
-
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
 		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#else
-		;
 #endif
 	}
 
-#undef STAT_INTERVAL
 }

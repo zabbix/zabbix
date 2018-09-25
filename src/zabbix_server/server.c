@@ -1049,6 +1049,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	/* update maintenance states */
+	zbx_dc_update_maintenances();
+
 	DBclose();
 
 	zbx_vc_enable();

@@ -534,7 +534,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay time picker.
 				case 'clndr':
-					getCalendarByID(dialog.dialogueid.toString()).clndr.clndrhide();
+					CLNDR.clndrhide();
 					break;
 
 				// Close overlay message.
@@ -546,7 +546,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay color picker.
 				case 'color_picker':
-					hide_color_picker();
+					jQuery.colorpicker('hide');
 					break;
 			}
 		}
