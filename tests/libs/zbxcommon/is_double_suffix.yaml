@@ -41,6 +41,12 @@ in:
 out:
   return: FAIL
 ---
+test case: fail 1.K
+in:
+  num: 1.K
+out:
+  return: FAIL
+---
 test case: fail .1
 in:
   num: .1

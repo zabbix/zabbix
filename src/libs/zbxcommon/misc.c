@@ -2393,7 +2393,7 @@ int	zbx_double_compare(double a, double b)
 int	is_double_suffix(const char *str, unsigned char flags)
 {
 	size_t	i;
-	char	dot = 0;
+	char	dot = 0, num = 0;
 
 	for (i = 0; '\0' != str[i]; i++)
 	{
@@ -2402,9 +2402,12 @@ int	is_double_suffix(const char *str, unsigned char flags)
 			continue;
 
 		if (0 != isdigit(str[i]))
+		{
+			num = 1;
 			continue;
+		}
 
-		if ('.' == str[i] && 0 == dot)
+		if ('.' == str[i] && 0 == dot && 1 == num && '\0' != str[i + 1] && 0 != isdigit(str[i+1]))
 		{
 			dot = 1;
 			continue;
