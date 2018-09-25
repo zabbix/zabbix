@@ -1,0 +1,60 @@
+---
+test case: succeed -1.0K
+in:
+  num: -1.0K
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0
+in:
+  num: -1.0
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0
+in:
+  num: 1.0
+out:
+  return: SUCCEED
+---
+test case: succeed -1
+in:
+  num: -1
+out:
+  return: SUCCEED
+---
+test case: succeed 1
+in:
+  num: 1
+out:
+  return: SUCCEED
+---
+test case: fail +1
+in:
+  num: +1
+out:
+  return: FAIL
+---
+test case: fail 1.
+in:
+  num: 1.
+out:
+  return: FAIL
+---
+test case: fail .1
+in:
+  num: .1
+out:
+  return: FAIL
+---
+test case: fail +.1
+in:
+  num: +.1
+out:
+  return: FAIL
+---
+test case: fail -.1
+in:
+  num: -.1
+out:
+  return: FAIL

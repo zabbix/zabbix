@@ -2387,7 +2387,7 @@ int	zbx_double_compare(double a, double b)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w                                                    *
+ *           s, m, h, d, w. Allowed format of number: [-]N[.N][KGM...]        *
  *                                                                            *
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
