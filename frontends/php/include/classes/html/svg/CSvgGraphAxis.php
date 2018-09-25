@@ -192,7 +192,7 @@ class CSvgGraphAxis extends CSvgTag {
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
 			$axis = 'x';
 			// Label margin from axis.
-			$margin = 7;
+			$margin = 5;
 			$y = $this->height - $margin;
 		}
 		else {
