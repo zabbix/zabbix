@@ -2388,6 +2388,11 @@ int	zbx_double_compare(double a, double b)
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
  *           s, m, h, d, w. Allowed format of number: [-]N[.N][KGM...]        *
+ *           For compatibility with UI trigger parser, allowed values are:    *
+ *           .1                                                               *
+ *           1.                                                               *
+ *           -.1                                                              *
+ *           -1.                                                              *
  *                                                                            *
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
@@ -2407,7 +2412,12 @@ int	is_double_suffix(const char *str, unsigned char flags)
 			continue;
 		}
 
-		if ('.' == str[i] && 0 == dot && 1 == num && '\0' != str[i + 1] && 0 != isdigit(str[i + 1]))
+		if ('.' == str[i] && 0 == dot && 1 == num)
+		{
+			dot = 1;
+			continue;
+		}
+		else if ('.' == str[i] && 0 == dot && '\0' != str[i + 1] && 0 != isdigit(str[i + 1]))
 		{
 			i += 1;
 			dot = 1;
