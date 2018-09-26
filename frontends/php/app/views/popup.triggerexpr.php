@@ -113,14 +113,8 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if ($paramid == 1 && !in_array($data['function'], ['regexp', 'iregexp', 'str'])) {
 				$param_type_element = _('Time');
-				$param_field = (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
-			else {
-				$param_field = ($data['paramtype'] == PARAM_TYPE_COUNTS)
-					? (new CNumericBox('params['.$paramid.']', (int) $param_value, 10))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					: (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-			}
+			$param_field = (new CTextBox('params['.$paramid.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 			$expression_form_list->addRow($label, [
 				$param_field,
