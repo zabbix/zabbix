@@ -425,7 +425,7 @@ class CControllerPopupTriggerExpr extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+			if ($this->hasInput('add')) {
 				$this->setResponse(
 					(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
 				);
