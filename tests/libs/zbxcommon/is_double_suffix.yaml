@@ -281,6 +281,24 @@ in:
 out:
   return: FAIL
 ---
+test case: fail .K
+in:
+  num: .K
+out:
+  return: FAIL
+---
+test case: fail -.K
+in:
+  num: -.K
+out:
+  return: FAIL
+---
+test case: fail +.K
+in:
+  num: +.K
+out:
+  return: FAIL
+---
 test case: fail -1.0k
 in:
   num: -1.0k
