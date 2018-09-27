@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-09-27T15:14:49Z</date>
+    <date>2018-09-27T18:50:23Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -1263,11 +1263,11 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix vmware cache, % free</name>
+                    <name>Zabbix vmware cache, % used</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix[vmware,buffer,pfree]</key>
+                    <key>zabbix[vmware,buffer,pused]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1609,22 +1609,6 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[vmware,buffer,pfree].min(10m)}&lt;25</expression>
-            <recovery_mode>0</recovery_mode>
-            <recovery_expression/>
-            <name>Less than 25% free in the vmware cache</name>
-            <correlation_mode>0</correlation_mode>
-            <correlation_tag/>
-            <url/>
-            <status>0</status>
-            <priority>3</priority>
-            <description/>
-            <type>0</type>
-            <manual_close>0</manual_close>
-            <dependencies/>
-            <tags/>
-        </trigger>
-        <trigger>
             <expression>{Template App Zabbix Proxy:zabbix[rcache,buffer,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
@@ -1661,6 +1645,22 @@
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>More than 75% used in the history index cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Zabbix Proxy:zabbix[vmware,buffer,pused].max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the vmware cache</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
@@ -2041,7 +2041,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Zabbix Proxy</host>
-                        <key>zabbix[vmware,buffer,pfree]</key>
+                        <key>zabbix[vmware,buffer,pused]</key>
                     </item>
                 </graph_item>
             </graph_items>
