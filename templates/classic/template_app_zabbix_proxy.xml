@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-09-17T16:07:31Z</date>
+    <date>2018-09-27T15:14:49Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -24,7 +24,7 @@
             </applications>
             <items>
                 <item>
-                    <name>Zabbix busy configuration syncer processes, in %</name>
+                    <name>Utilization of configuration syncer internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -83,7 +83,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy data sender processes, in %</name>
+                    <name>Utilization of data sender internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -142,7 +142,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy discoverer processes, in %</name>
+                    <name>Utilization of discoverer data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -201,7 +201,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy heartbeat sender processes, in %</name>
+                    <name>Utilization of heartbeat sender internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -260,7 +260,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy history syncer processes, in %</name>
+                    <name>Utilization of history syncer internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -319,7 +319,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy housekeeper processes, in %</name>
+                    <name>Utilization of housekeeper internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -378,7 +378,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy http poller processes, in %</name>
+                    <name>Utilization of http poller data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -437,7 +437,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy icmp pinger processes, in %</name>
+                    <name>Utilization of icmp pinger data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -496,7 +496,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy ipmi manager processes, in %</name>
+                    <name>Utilization of ipmi manager internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -555,7 +555,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy ipmi poller processes, in %</name>
+                    <name>Utilization of ipmi poller data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -614,7 +614,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy java poller processes, in %</name>
+                    <name>Utilization of java poller data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -673,7 +673,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy poller processes, in %</name>
+                    <name>Utilization of poller data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -732,7 +732,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy self-monitoring processes, in %</name>
+                    <name>Utilization of self-monitoring internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -791,7 +791,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy snmp trapper processes, in %</name>
+                    <name>Utilization of snmp trapper data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -850,7 +850,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy task manager processes, in %</name>
+                    <name>Utilization of task manager internal processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -909,7 +909,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy trapper processes, in %</name>
+                    <name>Utilization of trapper data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -968,7 +968,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy unreachable poller processes, in %</name>
+                    <name>Utilization of unreachable poller data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -1027,7 +1027,7 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix busy vmware collector processes, in %</name>
+                    <name>Utilization of vmware data collector processes, in %</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
@@ -1204,11 +1204,11 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix configuration cache, % free</name>
+                    <name>Zabbix configuration cache, % used</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix[rcache,buffer,pfree]</key>
+                    <key>zabbix[rcache,buffer,pused]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1322,11 +1322,11 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix history write cache, % free</name>
+                    <name>Zabbix history write cache, % used</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix[wcache,history,pfree]</key>
+                    <key>zabbix[wcache,history,pused]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1381,11 +1381,11 @@
                     <master_item/>
                 </item>
                 <item>
-                    <name>Zabbix history index cache, % free</name>
+                    <name>Zabbix history index cache, % used</name>
                     <type>5</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix[wcache,index,pfree]</key>
+                    <key>zabbix[wcache,index,pused]</key>
                     <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
@@ -1609,10 +1609,26 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[rcache,buffer,pfree].min(10m)}&lt;25</expression>
+            <expression>{Template App Zabbix Proxy:zabbix[vmware,buffer,pfree].min(10m)}&lt;25</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
-            <name>Less than 25% free in the configuration cache</name>
+            <name>Less than 25% free in the vmware cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Zabbix Proxy:zabbix[rcache,buffer,pused].max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the configuration cache</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
@@ -1625,10 +1641,10 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[wcache,history,pfree].min(10m)}&lt;25</expression>
+            <expression>{Template App Zabbix Proxy:zabbix[wcache,history,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
-            <name>Less than 25% free in the history cache</name>
+            <name>More than 75% used in the history cache</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
@@ -1641,26 +1657,10 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[wcache,index,pfree].min(10m)}&lt;25</expression>
+            <expression>{Template App Zabbix Proxy:zabbix[wcache,index,pused].max(10m)}&gt;75</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
-            <name>Less than 25% free in the history index cache</name>
-            <correlation_mode>0</correlation_mode>
-            <correlation_tag/>
-            <url/>
-            <status>0</status>
-            <priority>3</priority>
-            <description/>
-            <type>0</type>
-            <manual_close>0</manual_close>
-            <dependencies/>
-            <tags/>
-        </trigger>
-        <trigger>
-            <expression>{Template App Zabbix Proxy:zabbix[vmware,buffer,pfree].min(10m)}&lt;25</expression>
-            <recovery_mode>0</recovery_mode>
-            <recovery_expression/>
-            <name>Less than 25% free in the vmware cache</name>
+            <name>More than 75% used in the history index cache</name>
             <correlation_mode>0</correlation_mode>
             <correlation_tag/>
             <url/>
@@ -2005,7 +2005,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Zabbix Proxy</host>
-                        <key>zabbix[rcache,buffer,pfree]</key>
+                        <key>zabbix[rcache,buffer,pused]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -2017,7 +2017,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Zabbix Proxy</host>
-                        <key>zabbix[wcache,index,pfree]</key>
+                        <key>zabbix[wcache,index,pused]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -2029,7 +2029,7 @@
                     <type>0</type>
                     <item>
                         <host>Template App Zabbix Proxy</host>
-                        <key>zabbix[wcache,history,pfree]</key>
+                        <key>zabbix[wcache,history,pused]</key>
                     </item>
                 </graph_item>
                 <graph_item>

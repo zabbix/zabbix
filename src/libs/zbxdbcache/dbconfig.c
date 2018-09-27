@@ -8833,8 +8833,12 @@ void	*DCconfig_get_stats(int request)
 		case ZBX_CONFSTATS_BUFFER_FREE:
 			value_uint = config_mem->free_size;
 			return &value_uint;
+		case ZBX_CONFSTATS_BUFFER_PUSED:
+			value_double = 100 * (double)(config_mem->orig_size - config_mem->free_size) /
+					config_mem->orig_size;
+			return &value_double;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
+			value_double = 100 * (double)config_mem->free_size / config_mem->orig_size;
 			return &value_double;
 		default:
 			return NULL;
@@ -8843,7 +8847,7 @@ void	*DCconfig_get_stats(int request)
 
 static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 {
-	const ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
 	dst_proxy->hostid = src_proxy->hostid;
