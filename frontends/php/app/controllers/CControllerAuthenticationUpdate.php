@@ -108,9 +108,7 @@ class CControllerAuthenticationUpdate extends CController {
 	private function validateLdap() {
 		$is_valid = true;
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_bind_dn', 'ldap_search_attribute',
-			'ldap_bind_password', 'ldap_configured'
-		];
+		$ldap_fields = ['ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_search_attribute', 'ldap_configured'];
 		$config = select_config();
 		$this->getInputs($config, $ldap_fields);
 		$ldap_settings_changed = array_diff_assoc($config, select_config());
