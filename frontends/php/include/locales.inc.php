@@ -90,6 +90,8 @@ function getLocales() {
  * Get URL for support link by language.
  *
  * @param string $language  Language 2 char ISO639-1 code.
+ *
+ * @return string
  */
 function getSupportUrl($language) {
 	$urls = [
