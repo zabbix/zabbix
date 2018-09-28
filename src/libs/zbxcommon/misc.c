@@ -2387,51 +2387,26 @@ int	zbx_double_compare(double a, double b)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w. Allowed format of number: [-]N[.N][KGM...]        *
- *           For compatibility with UI trigger parser, allowed values are:    *
- *           .1                                                               *
- *           1.                                                               *
- *           -.1                                                              *
- *           -1.                                                              *
+ *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
 {
-	size_t	i;
-	char	dot = 0, num = 0;
+	int len;
 
-	for (i = 0; '\0' != str[i]; i++)
-	{
-		/* negative number? */
-		if ('-' == str[i] && 0 == i)
-			continue;
+	if ('-' == *str)		/* check leading sign */
+		str++;
 
-		if (0 != isdigit(str[i]))
-		{
-			num = 1;
-			continue;
-		}
-
-		if ('.' == str[i] && 0 == dot && 1 == num)
-		{
-			dot = 1;
-			continue;
-		}
-		else if ('.' == str[i] && 0 == dot && '\0' != str[i + 1] && 0 != isdigit(str[i + 1]))
-		{
-			i += 1;
-			dot = 1;
-			continue;
-		}
-
-		/* last character is suffix */
-		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]) && '\0' == str[i + 1])
-			continue;
-
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
-	}
 
-	return SUCCEED;
+	str += len;
+
+	/* check valid suffixes if flag is enabled */
+	if (*str != '\0' && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
+		str++;
+
+	return ('\0' == *str) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2450,50 +2425,37 @@ int	is_double_suffix(const char *str, unsigned char flags)
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	int	i = 0, digits = 0;
+	int	len;
 
-	while (' ' == str[i])				/* trim left spaces */
-		i++;
+	while (' ' == *str)				/* trim left spaces */
+		str++;
 
-	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
-		i++;
+	if ('-' == *str || '+' == *str)		/* check leading sign */
+		str++;
 
-	while (0 != isdigit(str[i]))			/* check digits before dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if ('.' == str[i])				/* check decimal dot */
-		i++;
-
-	while (0 != isdigit(str[i]))			/* check digits after dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
+	str += len;
+
+	if ('e' == *str || 'E' == *str)		/* check exponential part */
 	{
-		i++;
+		str++;
 
-		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
-			i++;
+		if ('-' == *str || '+' == *str)	/* check exponent sign */
+			str++;
 
-		if (0 == isdigit(str[i]))		/* check exponent */
+		if (0 == isdigit(*str))		/* check exponent */
 			return FAIL;
 
-		while (0 != isdigit(str[i]))
-			i++;
+		while (0 != isdigit(*str))
+			str++;
 	}
 
-	while (' ' == str[i])				/* trim right spaces */
-		i++;
+	while (' ' == *str)				/* trim right spaces */
+		str++;
 
-	return '\0' == str[i] ? SUCCEED : FAIL;
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************

@@ -3964,23 +3964,6 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_number_parse                                                 *
- *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
- *                                                                            *
- * Parameters: number - [IN] start of number                                  *
- *             len    - [OUT] length of parsed number                         *
- *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - invalid number                                     *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
- *                                                                            *
- ******************************************************************************/
 int	zbx_number_parse(const char *number, int *len)
 {
 	int	digits = 0, dots = 0;
@@ -4006,11 +3989,36 @@ int	zbx_number_parse(const char *number, int *len)
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
-		if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-			(*len)++;
-
 		return SUCCEED;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_suffixed_number_parse                                        *
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_suffixed_number_parse(const char *number, int *len)
+{
+	if (FAIL == zbx_number_parse(number, len))
+		return FAIL;
+
+	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+		(*len)++;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -4050,7 +4058,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		if (SUCCEED != zbx_number_parse(s, &len))
+		if (SUCCEED != zbx_suffixed_number_parse(s, &len))
 			continue;
 
 		/* number found */
