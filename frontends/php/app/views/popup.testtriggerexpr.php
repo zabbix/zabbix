@@ -63,7 +63,12 @@ foreach ($data['eHTMLTree'] as $e) {
 		}
 	}
 
-	$result_table->addRow([$e['list'], (new CCol($result))->addClass($style)]);
+	$result_table->addRow([
+		(new CCol($e['list']))
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+		(new CCol($result))->addClass($style)
+	]);
 }
 
 $result = '';
