@@ -1,6 +1,7 @@
 Changes for 4.0.0rc3
 
 Bug fixes:
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0rc2
@@ -517,6 +518,7 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 
 --------------------------------------------------------------------------------
@@ -1874,6 +1876,7 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 ..F....... [ZBX-14845] fixed filter in triggers status page not being reset when navigating from dashboard and host inventory (agriscenko)
 
 --------------------------------------------------------------------------------
