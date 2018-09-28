@@ -2392,9 +2392,9 @@ int	zbx_double_compare(double a, double b)
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
 {
-	int len;
+	int	len;
 
-	if ('-' == *str)		/* check leading sign */
+	if ('-' == *str)	/* check leading sign */
 		str++;
 
 	if (FAIL == zbx_number_parse(str, &len))
@@ -2406,7 +2406,7 @@ int	is_double_suffix(const char *str, unsigned char flags)
 	if (*str != '\0' && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
 		str++;
 
-	return ('\0' == *str) ? SUCCEED : FAIL;
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
