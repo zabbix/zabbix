@@ -2400,11 +2400,8 @@ int	is_double_suffix(const char *str, unsigned char flags)
 	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	str += len;
-
-	/* check valid suffixes if flag is enabled */
-	if (*str != '\0' && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
-		str++;
+	if (*(str += len) != '\0' && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
+		str++;		/* allow valid suffix if flag is enabled */
 
 	return '\0' == *str ? SUCCEED : FAIL;
 }
