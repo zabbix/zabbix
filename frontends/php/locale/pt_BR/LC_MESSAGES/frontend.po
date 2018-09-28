@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-25 19:00+0300\n"
-"PO-Revision-Date: 2018-09-25 15:50+0300\n"
+"PO-Revision-Date: 2018-09-25 17:50+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1537883429.000000\n"
+"X-POOTLE-MTIME: 1537890607.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1355,7 +1355,7 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:929
 msgid "Base colour"
-msgstr ""
+msgstr "Cor base"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:285
@@ -3356,7 +3356,7 @@ msgstr "Configuração de aplicações"
 
 #: app/controllers/CControllerAuthenticationEdit.php:127
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Configuração de autenticação"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
@@ -3609,7 +3609,7 @@ msgstr "Contato"
 #: include/views/js/configuration.maintenance.edit.js.php:7
 #: include/views/js/configuration.triggers.list.js.php:7
 msgid "Contains"
-msgstr ""
+msgstr "Contêm"
 
 #: app/views/administration.mediatype.list.php:32
 #: app/views/administration.proxy.list.php:32
@@ -5670,7 +5670,7 @@ msgstr "Inglês (en_US)"
 #: include/views/js/configuration.maintenance.edit.js.php:8
 #: include/views/js/configuration.triggers.list.js.php:8
 msgid "Equals"
-msgstr ""
+msgstr "Igual"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -6445,7 +6445,7 @@ msgstr "O gráfico \"%1$s\" contém itens de template, então não pode conter i
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr ""
+msgstr "Gráfico (clássico)"
 
 #: graphs.php:241
 msgid "Graph added"
@@ -6813,7 +6813,7 @@ msgstr "Esconder selecionados"
 #: include/views/monitoring.slides.php:31
 msgctxt "screen reader"
 msgid "Hierarchy"
-msgstr ""
+msgstr "Hierarquicamente"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -9556,7 +9556,7 @@ msgstr "Servidor LDAP"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:96
 msgid "LDAP is not configured"
-msgstr ""
+msgstr "O LDAP não está configurado"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:183
 msgid "LDAP login successful"
@@ -11669,7 +11669,7 @@ msgstr "Número de processadores na máquina virtual VMware, <url> - URL de serv
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
 msgid "Number of rows"
-msgstr ""
+msgstr "Quantidade de linhas"
 
 #: include/views/monitoring.slideconf.list.php:65
 msgid "Number of slides"
@@ -12501,7 +12501,7 @@ msgstr "Senha (novamente)"
 
 #: include/views/administration.users.edit.php:125
 msgid "Password is not mandatory for non internal authentication type."
-msgstr ""
+msgstr "A senha é opcional para autenticação externa."
 
 #: profile.php:119
 msgid "Password should not be empty"
@@ -14501,7 +14501,7 @@ msgstr "Severidade (descedente)"
 #: include/actions.inc.php:1853
 msgctxt "screen reader"
 msgid "Severity changed"
-msgstr ""
+msgstr "Severidade modificada"
 
 #: include/actions.inc.php:1823
 #: include/classes/screens/CScreenProblem.php:1119
@@ -14511,12 +14511,12 @@ msgstr "Mudanças de severidade"
 #: include/actions.inc.php:1845
 msgctxt "screen reader"
 msgid "Severity decreased"
-msgstr ""
+msgstr "Severidade reduzida"
 
 #: include/actions.inc.php:1849
 msgctxt "screen reader"
 msgid "Severity increased"
-msgstr ""
+msgstr "Severidade aumentada"
 
 #: include/views/js/monitoring.sysmaps.js.php:300
 #: include/views/js/monitoring.sysmaps.js.php:450
@@ -14548,7 +14548,7 @@ msgstr "A opção de compartilhamento \"%1$s\" tem um valor ausente na tela \"%2
 #: app/views/monitoring.problem.view.php:272
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
 msgid "Shortened"
-msgstr ""
+msgstr "Encurtado"
 
 #: app/views/monitoring.problem.view.php:88
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
@@ -14591,7 +14591,7 @@ msgstr "Mostrar linhas"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:307
 msgid "Show problems"
-msgstr ""
+msgstr "Exibir incidentes"
 
 #: include/views/monitoring.history.php:152
 msgid "Show selected"
@@ -14608,7 +14608,7 @@ msgstr "Mostrar selecionados"
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
 msgid "Show suppressed problems"
-msgstr ""
+msgstr "Exibir incidentes suprimidos"
 
 #: app/views/monitoring.problem.view.php:281
 #: include/classes/widgets/forms/CWidgetFormProblems.php:116
@@ -14663,7 +14663,7 @@ msgstr "Conectar-se"
 
 #: include/views/general.login.php:39
 msgid "Sign in with HTTP"
-msgstr ""
+msgstr "Entrar com HTTP"
 
 #: app/views/layout.htmlpage.menu.php:81
 msgid "Sign out"
@@ -14906,7 +14906,7 @@ msgstr "Pilha"
 #: include/classes/widgets/CWidgetHelper.php:678
 #: include/classes/widgets/CWidgetHelper.php:937
 msgid "Staircase"
-msgstr ""
+msgstr "Escadaria"
 
 #: app/controllers/CControllerPopupGeneric.php:206
 msgid "Standard items"
@@ -14931,7 +14931,7 @@ msgstr "Status"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
 msgctxt "history source selection method"
 msgid "Static"
-msgstr ""
+msgstr "Estático"
 
 #: app/controllers/CControllerPopupGeneric.php:146
 #: app/controllers/CControllerPopupGeneric.php:160
@@ -17694,7 +17694,7 @@ msgstr "Y2"
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:253
 msgid "YYYY-MM-DD hh:mm"
-msgstr ""
+msgstr "YYYY-MM-DD hh:mm"
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17967,7 +17967,7 @@ msgstr "um texto é esperado"
 
 #: include/classes/validators/CApiInputValidator.php:271
 msgid "a hexadecimal colour code (6 symbols) is expected"
-msgstr ""
+msgstr "é aguardado um código hexadecimal de cor (6 caracteres)"
 
 #: include/classes/validators/CApiInputValidator.php:417
 #: include/classes/validators/CApiInputValidator.php:554
@@ -18079,7 +18079,7 @@ msgstr "é aguardado um par de caracteres hexadecimais"
 
 #: include/validate.inc.php:243
 msgid "an explicit time is expected"
-msgstr ""
+msgstr "um horário explícito é esperado"
 
 #: include/views/monitoring.history.php:163
 msgid "as Blue"
@@ -18106,7 +18106,7 @@ msgstr "ascedente"
 
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:134
 msgid "at least one override option must be specified"
-msgstr ""
+msgstr "ao menos uma opção de sobreposição deve ser especificada"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -18241,7 +18241,7 @@ msgstr "dependência circular entre itens não é permitida"
 
 #: jsLoader.php:200
 msgid "colour"
-msgstr ""
+msgstr "cor"
 
 #: app/views/monitoring.problem.view.php:285
 #: include/classes/widgets/views/widget.problems.form.view.php:92
@@ -18255,7 +18255,7 @@ msgstr "configurar"
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:53
 msgid "contains"
-msgstr ""
+msgstr "contêm"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:234
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
@@ -18336,11 +18336,11 @@ msgstr "regra de descoberta está inativa"
 
 #: include/actions.inc.php:27 include/correlation.inc.php:34
 msgid "does not contain"
-msgstr ""
+msgstr "não contêm"
 
 #: include/actions.inc.php:25 include/correlation.inc.php:32
 msgid "does not equal"
-msgstr ""
+msgstr "não é igual"
 
 #: include/views/configuration.host.discovery.edit.php:633
 #: include/views/js/configuration.host.discovery.edit.js.php:25
@@ -18350,7 +18350,7 @@ msgstr "não corresponde"
 #: include/actions.inc.php:24 include/correlation.inc.php:31
 #: include/views/inventory.host.list.php:54
 msgid "equals"
-msgstr ""
+msgstr "igual"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18510,11 +18510,11 @@ msgstr "iregexp() - Expressão regular V correspondendo o último valor em um pe
 
 #: include/actions.inc.php:29
 msgid "is greater than or equals"
-msgstr ""
+msgstr "é maior ou igual"
 
 #: include/actions.inc.php:30
 msgid "is less than or equals"
-msgstr ""
+msgstr "é menor ou igual"
 
 #: include/classes/validators/CApiInputValidator.php:1365
 msgid "is not enclosed in {} or is malformed"
@@ -18687,7 +18687,7 @@ msgstr "precisa estar entre \"%1$s\" e \"%2$s\""
 #: include/classes/validators/CApiInputValidator.php:862
 #: include/classes/validators/CApiInputValidator.php:906
 msgid "must contain at least one low-level discovery macro"
-msgstr ""
+msgstr "precisa conter ao menos uma macro de descoberta"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:220
@@ -18725,7 +18725,7 @@ msgstr "nodata() - Sem dado recebido em um período T de tempo (1 - verdadeiro, 
 
 #: include/classes/widgets/CWidgetHelper.php:1003
 msgid "none"
-msgstr ""
+msgstr "nenhum"
 
 #: include/classes/api/services/CItemGeneral.php:2047
 #: include/classes/api/services/CItemGeneral.php:2071
