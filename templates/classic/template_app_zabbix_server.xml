@@ -29,7 +29,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix[preprocessing_queue]</key>
-                    <delay>10m</delay>
+                    <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
                     <status>0</status>
