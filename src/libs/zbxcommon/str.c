@@ -3964,6 +3964,23 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_number_parse                                                 *
+ *                                                                            *
+ * Purpose: parse a number like "12.345"                                      *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_number_parse(const char *number, int *len)
 {
 	int	digits = 0, dots = 0;
