@@ -3515,7 +3515,13 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, ZBX_POST_MAXQUERYMETRICS, &doc, error))
-		goto out;
+	{
+		if (NULL == doc)	/* if not SOAP error */
+			goto out;
+
+		zabbix_log(LOG_LEVEL_WARNING, "Error of query maxQueryMetrics: %s.", *error);
+		zbx_free(*error);
+	}
 
 	if (NULL == (val = zbx_xml_read_doc_value(doc, ZBX_XPATH_MAXQUERYMETRICS())))
 	{
