@@ -108,7 +108,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 		if ($param_function['T'] == T_ZBX_INT) {
 			$param_type_element = null;
 
-			if ($paramid == 0 || ($paramid == 1 && in_array($data['function'], ['regexp', 'iregexp', 'str']))) {
+			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
 					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
 				}
@@ -117,8 +117,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 					$param_type_element = _('Time');
 				}
 			}
-
-			if (in_array($param_name, ['shift'])) {
+			elseif (in_array($param_name, ['shift'])) {
 				$param_type_element = _('Time');
 			}
 			$param_field = (new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
@@ -179,11 +178,11 @@ $output = [
 
 				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
 					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
-						'$("#params_0").removeAttr("readonly");'.
+						'$("#params_last").removeAttr("readonly");'.
 						'$label.addClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
 					'}'.
 					'else {'.
-						'$("#params_0").attr("readonly", "readonly");'.
+						'$("#params_last").attr("readonly", "readonly");'.
 						'$label.removeClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
 					'}'.
 				'}'.
