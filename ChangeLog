@@ -1,5 +1,11 @@
 Changes for 4.0.0rc3
 
+New features:
+....I..... [ZBXNEXT-4757] added new dashboard to "Zabbix server health" (Alexei, Sasha, vmurzins)
+....I..... [ZBXNEXT-4757] renamed default dashboard to "Global view" and improved widget layout (Alexei, Sasha, vmurzins)
+.......PS. [ZBXNEXT-4757] added support of "pused" mode for cache-related internal items (Sasha)
+....I..... [ZBXNEXT-4757] added new and renamed existing items in "Template App Zabbix Server" and "Template App Zabbix Proxy" templates (Sasha)
+
 Bug fixes:
 .......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 
