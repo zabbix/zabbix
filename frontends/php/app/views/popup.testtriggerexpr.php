@@ -88,7 +88,7 @@ $result_table->setFooter([$data['outline'], (new CCol($result))->addClass($style
 $form_list->addRow(_('Result'),
 	(new CDiv($result_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addClass('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $output = [
