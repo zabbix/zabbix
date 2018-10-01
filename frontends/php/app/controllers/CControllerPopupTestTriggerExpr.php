@@ -71,7 +71,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 				$row = (new CRow())->addItem(
 					(new CCol($token['value']))
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+						->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				);
 				$fname = 'test_data_'.md5($token['value']);
 				$this->macros_data[$token['value']] = array_key_exists($fname, $_REQUEST) ? $_REQUEST[$fname] : '';
