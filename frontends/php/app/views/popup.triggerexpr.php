@@ -95,6 +95,7 @@ $expression_form_list->addRow(_('Function'), $function_combo_box);
 
 if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 	$paramid = 0;
+
 	foreach ($data['functions'][$data['selectedFunction']]['params'] as $param_name => $param_function) {
 		if (array_key_exists($param_name, $data['params'])) {
 			$param_value = $data['params'][$param_name];
@@ -120,6 +121,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			elseif (in_array($param_name, ['shift'])) {
 				$param_type_element = _('Time');
 			}
+
 			$param_field = (new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 
 			$expression_form_list->addRow($label, [
@@ -134,6 +136,7 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			);
 			$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
 		}
+
 		$paramid++;
 	}
 }
