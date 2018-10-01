@@ -259,7 +259,7 @@ out:
 ---
 test case: succeed -1234567890.0987654321K
 in:
-  num: -1234567890.0987654321
+  num: -1234567890.0987654321K
 out:
   return: SUCCEED
 ---
@@ -449,49 +449,49 @@ in:
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail ..1
 in:
   num: ..1
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail .1.
 in:
   num: .1.
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail 1..
 in:
   num: 1..
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail .1.2
 in:
   num: .1.2
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail 1..2
 in:
   num: 1..2
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail ..
 in:
   num: ..
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail 1e+2
 in:
   num: 1e+2
 out:
   return: FAIL
 ---
-test case: fail
+test case: fail 1E+2
 in:
   num: 1E+2
 out:

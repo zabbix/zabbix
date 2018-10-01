@@ -2424,7 +2424,7 @@ int	is_double(const char *str)
 {
 	int	len;
 
-	while (' ' == *str)				/* trim left spaces */
+	while (' ' == *str)			/* trim left spaces */
 		str++;
 
 	if ('-' == *str || '+' == *str)		/* check leading sign */
@@ -2449,7 +2449,7 @@ int	is_double(const char *str)
 			str++;
 	}
 
-	while (' ' == *str)				/* trim right spaces */
+	while (' ' == *str)			/* trim right spaces */
 		str++;
 
 	return '\0' == *str ? SUCCEED : FAIL;

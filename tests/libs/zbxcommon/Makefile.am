@@ -6,7 +6,8 @@ SERVER_tests = \
 	calculate_item_nextcheck \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
-	is_double_suffix
+	is_double_suffix \
+	is_double
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -179,5 +180,19 @@ is_double_suffix_LDADD += @SERVER_LIBS@
 is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_suffix_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+is_double_SOURCES = \
+	is_double.c \
+	$(COMMON_SRC_FILES)
+
+is_double_LDADD = \
+	$(COMMON_LIB_FILES)
+
+is_double_LDADD += @SERVER_LIBS@
+
+is_double_LDFLAGS = @SERVER_LDFLAGS@
+
+is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
