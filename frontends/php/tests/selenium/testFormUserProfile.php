@@ -32,7 +32,7 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestCheckTitle('User profile');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -47,7 +47,7 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('refresh', '60');
 
 		$this->zbxTestClickWait('cancel');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -102,7 +102,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select passwd from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals(md5($data['password1']), $row['passwd']);
 				break;
@@ -122,7 +122,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		$row = DBfetch(DBselect("select theme from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals('blue-theme', $row['theme']);
@@ -212,7 +212,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select refresh from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
 				$this->zbxTestCheckFatalErrors();
@@ -322,7 +322,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				$row = DBfetch(DBselect("select autologout from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
@@ -473,7 +473,7 @@ class testFormUserProfile extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				break;
 			case TEST_BAD:
@@ -575,7 +575,7 @@ class testFormUserProfile extends CWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@id='overlay_bg']"));
 				$this->zbxTestClickWait('update');
-				$this->zbxTestCheckHeader('Dashboard');
+				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
 				$this->assertEquals(1, DBcount($sql));
