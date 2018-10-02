@@ -169,15 +169,11 @@ class CControllerTimeSelectorUpdate extends CController {
 				break;
 
 			case 'rangechange':
-				/**
-				 * Format only absolute date according ZBX_FULL_DATE_TIME string.
-				 */
-				if ($date_type['from'] === CRangeTimeParser::ZBX_TIME_ABSOLUTE) {
-					$value['from'] = $date->setTimestamp($ts['from'])->format(ZBX_FULL_DATE_TIME);
-				}
-
-				if ($date_type['to'] === CRangeTimeParser::ZBX_TIME_ABSOLUTE) {
-					$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
+				// Format only absolute date according ZBX_FULL_DATE_TIME string.
+				foreach (['from', 'to'] as $field) {
+					if ($date_type[$field] === CRangeTimeParser::ZBX_TIME_ABSOLUTE) {
+						$value[$field] = $date->setTimestamp($ts[$field])->format(ZBX_FULL_DATE_TIME);
+					}
 				}
 				break;
 		}
