@@ -98,16 +98,31 @@ class testPageDashboard extends CWebTest {
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
-		foreach ($FavouriteGraphs as $FavouriteGraph) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+		// Disable debug mode. Debug button overlaps delete graph icon.
+		DBexecute("UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7");
+		$exception = null;
+
+		try {
+			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+			$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
+			foreach ($FavouriteGraphs as $FavouriteGraph) {
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+				$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+			}
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+			$this->zbxTestCheckFatalErrors();
+			$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
+		catch (Exception $e) {
+			$exception = $e;
+		}
+
+		// Enable debug mode.
+		DBexecute("UPDATE usrgrp SET debug_mode=1 WHERE usrgrpid=7");
+		if ($exception !== null) {
+			throw $exception;
+		}
 	}
 
 	public function testPageDashboard_AddFavouriteMap() {
