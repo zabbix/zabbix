@@ -10,7 +10,7 @@ Changes for 4.0.1rc1
 New features:
 
 Bug fixes:
-.....J.... [ZBX-14615] fixed Java gateway to not to make whole interface unsupported in case of invalid username and password (vso)
+.....J.... [ZBX-14615] fixed Java gateway not to mark host unreachable in case of invalid username and password (vso)
 .....J.... [ZBX-14585] fixed JMX endpoint not being included in error message in case of connection errors (vso)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
 .......PS. [ZBX-14764] fixed crash that could occur when OpenIPMI pollers are configured (vso)
