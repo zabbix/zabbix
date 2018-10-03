@@ -39,8 +39,16 @@ class testPageGraphPrototypes extends CWebTest {
 	 * Get all graph prototypes from Discovery rule "testFormDiscoveryRule"
 	 * with item prototype "testFormItemReuse".
 	 */
-	private $sql_graph_prototypes =
-		'SELECT name, graphid, width, height, graphtype FROM graphs WHERE graphid IN (SELECT graphid FROM graphs_items WHERE itemid='.self::ITEM_PROTOTYPE_ID.')';
+	private $sql_graph_prototypes;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function __construct($name = null, array $data = [], $data_name = '') {
+		parent::__construct($name, $data, $data_name);
+
+		$this->sql_graph_prototypes = 'SELECT name, graphid, width, height, graphtype FROM graphs WHERE graphid IN (SELECT graphid FROM graphs_items WHERE itemid='.self::ITEM_PROTOTYPE_ID.')';
+	}
 
 	/**
 	 * Get text of elements by xpath.
