@@ -1644,7 +1644,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  * Purpose: finds daylight saving change time inside specified time period    *
  *                                                                            *
  * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the the time period end                      *
+ *             time_end   - [IN] the time period end                          *
  *                                                                            *
  * Return Value: Time when the daylight saving changes should occur.          *
  *                                                                            *
@@ -2117,7 +2117,7 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == xdigits && 0 < colons)
 			{
-				/* consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeros are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
 			}

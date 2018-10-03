@@ -45,7 +45,7 @@
  *                                                                            *
  * Return value: text after the time component                                *
  *                                                                            *
- * Comments: If the first character is not a digit the the source text is     *
+ * Comments: If the first character is not a digit the source text is         *
  *           returned.                                                        *
  *                                                                            *
  ******************************************************************************/
