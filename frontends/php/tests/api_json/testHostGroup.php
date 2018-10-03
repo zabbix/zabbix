@@ -30,7 +30,7 @@ class testHostGroup extends CZabbixTest {
 		return [
 			[
 				'hostgroup' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'flags' => '4'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
@@ -142,7 +142,7 @@ class testHostGroup extends CZabbixTest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'flags' => '4'
 					]
 				],

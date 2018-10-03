@@ -158,7 +158,7 @@
 				},
 				start: function(event, ui) {
 					jQuery(ui.helper).css({'z-index': '1000'});
-					// Visibility is added to original element to hide it, while helper is beeing moved, but to keep
+					// Visibility is added to original element to hide it, while helper is being moved, but to keep
 					// it's place visually.
 					jQuery(this).css({'visibility': 'hidden'});
 				},
