@@ -71,6 +71,30 @@ in:
 out:
   return: FAIL
 ---
+test case: fail --1
+in:
+  num: --1
+out:
+  return: FAIL
+---
+test case: fail ++1
+in:
+  num: ++1
+out:
+  return: FAIL
+---
+test case: fail "- -1"
+in:
+  num: "- -1"
+out:
+  return: FAIL
+---
+test case: fail "+ +1"
+in:
+  num: "+ +1"
+out:
+  return: FAIL
+---
 test case: fail .K
 in:
   num: .K

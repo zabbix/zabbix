@@ -496,4 +496,16 @@ in:
   num: 1E+2
 out:
   return: FAIL
+---
+test case: fail --1
+in:
+  num: --1
+out:
+  return: FAIL
+---
+test case: fail "- -1"
+in:
+  num: "- -1"
+out:
+  return: FAIL
 
