@@ -391,6 +391,8 @@ tests/libs/zbxcommon/.deps
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
+tests/libs/zbxcommon/is_double
+tests/libs/zbxcommon/is_double_suffix
 tests/libs/zbxcommon/parse_key
 tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find

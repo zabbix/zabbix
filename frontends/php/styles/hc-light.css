@@ -2900,22 +2900,27 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-single-item-graph-legend,
+.svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
   margin: 0 10px; }
+  .svg-single-item-graph-legend div,
+  .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
     line-height: 18px;
     vertical-align: middle;
-    max-width: 30%;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     border: 0 none transparent; }
+  .svg-single-item-graph-legend div:before,
+  .svg-single-two-items-graph-legend div:before,
   .svg-graph-legend div:before {
     content: ' ';
     display: inline-block;
@@ -2927,6 +2932,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-top-width: 4px;
     border-top-style: solid;
     border-top-color: inherit; }
+
+.svg-graph-legend div {
+  max-width: 30%; }
+
+.svg-single-two-items-graph-legend div {
+  max-width: 50%; }
 
 .svg-graph-hintbox {
   font-size: 12px;
@@ -4398,7 +4409,7 @@ svg {
     background: #555; }
   .range-control.range-control-focus .range-control-thumb {
     background: #555;
-    box-shadow: 0 0 1px black; }
+    box-shadow: 0 0 0 2px #6f6f6f; }
   .range-control.range-control-focus .range-control-progress {
     background: #555; }
   .range-control.disabled {

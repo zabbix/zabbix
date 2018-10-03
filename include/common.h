@@ -1264,6 +1264,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 int	zbx_number_parse(const char *number, int *len);
+int	zbx_suffixed_number_parse(const char *number, int *len);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
