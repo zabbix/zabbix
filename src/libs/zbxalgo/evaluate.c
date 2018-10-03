@@ -112,7 +112,7 @@ static double	evaluate_number(int *unknown_idx)
 		return ZBX_INFINITY;
 	}
 
-	if (SUCCEED == zbx_number_parse(ptr, &len) && SUCCEED == is_number_delimiter(*(ptr + len)))
+	if (SUCCEED == zbx_suffixed_number_parse(ptr, &len) && SUCCEED == is_number_delimiter(*(ptr + len)))
 	{
 		result = atof(ptr) * suffix2factor(*(ptr + len - 1));
 		ptr += len;
