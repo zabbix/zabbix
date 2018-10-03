@@ -11,6 +11,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ........S. [ZBX-10784] fixed validation of double/Numeric(float) values (MVekslers)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
 .....J.... [ZBX-14615] fixed Java gateway not to mark host unreachable in case of invalid username and password (vso)
@@ -552,6 +553,7 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
 .......PS. [ZBX-14764] fixed crash that could occur when OpenIPMI pollers are configured (vso)
@@ -1915,6 +1917,7 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview, data overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
 .......PS. [ZBX-14882] fixed crash in vmware collector when receiving invalid xml (vso)
