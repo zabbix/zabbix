@@ -40,19 +40,19 @@ class testPageTriggers extends CWebTest {
 		$this->zbxTestCheckHeader('Triggers');
 
 		$this->zbxTestTextPresent('Displaying');
+		// Get table headers.
+		$result = [];
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath("//thead/tr/th"));
+		foreach ($elements as $element) {
+			$result[] = $element->getText();
+		}
+
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('All hosts');
-			$this->zbxTestTextPresent(
-				[
-					'Severity',
-					'Name',
-					'Expression',
-					'Status',
-					'Info'
-				]
-			);
+			// Check table headers.
+			$this->assertEquals(['', 'Severity', 'Value', 'Name', 'Expression', 'Status', 'Info', 'Tags'], $result);
 
-			// Check Filter.
+			// Check the filter options text.
 			foreach (['Severity', 'State', 'Status', 'Value', 'Tags'] as $label) {
 				$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 			}
@@ -60,116 +60,108 @@ class testPageTriggers extends CWebTest {
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('All templates');
-			$this->zbxTestTextPresent(
-				[
-					'Severity',
-					'Name',
-					'Expression',
-					'Status'
-				]
-			);
-			$this->zbxTestAssertElementNotPresentXpath("//table[@class='list-table']//th[text()='Info']");
+			// Check table headers.
+			$this->assertEquals(['', 'Severity', 'Name', 'Expression', 'Status', 'Tags'], $result);
 
-			// Check Filter.
+			// Check the filter options text.
 			foreach (['Severity', 'State', 'Status','Tags'] as $label) {
 				$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 			}
-
+			$this->zbxTestAssertElementNotPresentXpath('//label[text()="Value"]');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
 	}
 
 
-	public static function getCheckTagsFilterData() {
+	public static function getTagsFilterData() {
 		return [
 			[
 				[
 					'tags_operator' => 'And/Or',
-					'value_operator' => 'Like',
-					'tags' =>
-						[
-							['tag_name' =>'TagA', 'value' => 'A'],
-							['tag_name' =>'TagK', 'value' => 'K']
-						],
-					'results' =>
-						[
-							['Third trigger for tag filtering']
-						],
-					'result_count' => '1',
-					'not_results' =>
-						[
-							['First trigger for tag filtering'],
-							['Second trigger for tag filtering'],
-							['Fourth trigger for tag filtering'],
-							['Fifth trigger for tag filtering (no tags)']
-						]
+					'tags' => [
+						['tag_name' =>'TagA', 'value' => 'a', 'operator' => 'Equal'],
+						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					],
+					'results' => [
+						'Third trigger for tag filtering'
+					],
+					'not_results' => [
+						'First trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Fifth trigger for tag filtering (no tags)'
+					]
+				]
+			],
+			[
+				[
+					'tags_operator' => 'And/Or',
+					'tags' => [
+						['tag_name' =>'TagA', 'value' => 'A', 'operator' => 'Like'],
+						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					],
+					'results' => [
+						'Third trigger for tag filtering'
+					],
+					'not_results' => [
+						'First trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Fifth trigger for tag filtering (no tags)'
+					]
 				]
 			],
 			[
 				[
 					'tags_operator' => 'Or',
-					'value_operator' => 'Like',
-					'tags' =>
-						[
-							['tag_name' =>'TagA', 'value' => 'A'],
-							['tag_name' =>'TagK', 'value' => 'K']
-						],
-					'results' =>
-						[
-							['Third trigger for tag filtering'],
-							['First trigger for tag filtering']
-						],
-					'result_count' => '2',
-					'not_results' =>
-						[
-							['Second trigger for tag filtering'],
-							['Fourth trigger for tag filtering'],
-							['Fifth trigger for tag filtering (no tags)']
-						]
+					'tags' => [
+						['tag_name' =>'TagA', 'value' => 'A', 'operator' => 'Like'],
+						['tag_name' =>'TagK', 'value' => 'K', 'operator' => 'Like']
+					],
+					'results' => [
+						'Third trigger for tag filtering',
+						'First trigger for tag filtering'
+					],
+					'not_results' => [
+						'Second trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Fifth trigger for tag filtering (no tags)'
+					]
 				]
 			],
 			[
 				[
 					'tags_operator' => 'Or',
-					'value_operator' => 'Equal',
-					'tags' =>
-						[
-							['tag_name' =>'TagZ', 'value' => 'Z'],
-							['tag_name' =>'TagI', 'value' => 'I']
-						],
-					'result_count' => '0',
-					'not_results' =>
-						[
-							['First trigger for tag filtering'],
-							['Second trigger for tag filtering'],
-							['Third trigger for tag filtering'],
-							['Fourth trigger for tag filtering'],
-							['Fifth trigger for tag filtering (no tags)']
-						]
+					'tags' => [
+						['tag_name' =>'TagZ', 'value' => 'Z', 'operator' => 'Equal'],
+						['tag_name' =>'TagI', 'value' => 'I', 'operator' => 'Equal']
+					],
+					'not_results' => [
+						'First trigger for tag filtering',
+						'Second trigger for tag filtering',
+						'Third trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Fifth trigger for tag filtering (no tags)'
+					]
 				]
 			],
-						[
+			[
 				[
 					'tags_operator' => 'Or',
-					'value_operator' => 'Equal',
-					'tags' =>
-						[
-							['tag_name' =>'TagZ', 'value' => 'z'],
-							['tag_name' =>'TagI', 'value' => 'i']
-						],
-					'results' =>
-						[
-							['Third trigger for tag filtering'],
-							['Second trigger for tag filtering']
-						],
-					'result_count' => '2',
-					'not_results' =>
-						[
-							['First trigger for tag filtering'],
-							['Fourth trigger for tag filtering'],
-							['Fifth trigger for tag filtering (no tags)']
-						]
+					'tags' => [
+						['tag_name' =>'TagZ', 'value' => 'z', 'operator' => 'Equal'],
+						['tag_name' =>'TagI', 'value' => 'i', 'operator' => 'Equal']
+					],
+					'results' => [
+						'Third trigger for tag filtering',
+						'Second trigger for tag filtering'
+					],
+					'not_results' => [
+						'First trigger for tag filtering',
+						'Fourth trigger for tag filtering',
+						'Fifth trigger for tag filtering (no tags)'
+					]
 				]
 			]
 		];
@@ -177,57 +169,51 @@ class testPageTriggers extends CWebTest {
 
 	/**
 	 *
-	 * @dataProvider getCheckTagsFilterData
+	 * @dataProvider getTagsFilterData
 	 */
-	public function testPageTriggers_CheckTagsFilter($data) {
+	public function testPageTriggers_TagsFilter($data) {
 		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 5 of 5 found');
-
-		$data['value_operator'] == 'Like' ? $operator = 0 : $operator = 1;
 
 		$this->zbxTestClickXpath('//label[text()="'.$data['tags_operator'].'"]');
 
 		foreach ($data['tags'] as $i => $tag) {
 			$this->zbxTestInputTypeWait('filter_tags_'.$i.'_tag', $tag['tag_name']);
-			$this->zbxTestClickXpath('//label[@for="filter_tags_'.$i.'_operator_'.$operator.'"]');
 			$this->zbxTestInputType('filter_tags_'.$i.'_value', $tag['value'] );
+
+			$operator = ($tag['operator'] === 'Like') ?  0 : 1;
+			$this->zbxTestClickXpath('//label[@for="filter_tags_'.$i.'_operator_'.$operator.'"]');
 			$this->zbxTestClick('filter_tags_add');
 		}
 		$this->zbxTestClickButtonText('Apply');
 
-
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying '.$data['result_count'].' of '.$data['result_count'].' found');
-
 		if (array_key_exists('results', $data)) {
-			foreach ($data['results'] as $result) {
-					$this->zbxTestTextPresent($result);
-			}
+			$result_count = count($data['results']);
+			$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying '.$result_count.' of '.$result_count.' found');
+			$this->zbxTestTextPresent($data['results']);
+		}
+		else {
+			$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
 		}
 
-		foreach ($data['not_results'] as $not_result) {
-			$this->zbxTestTextNotPresent($not_result);
-		}
+		$this->zbxTestTextNotPresent($data['not_results']);
 	}
 
-	public function testPageTriggers_CheckTagsResetFilter() {
+	public function testPageTriggers_TagsResetFilter() {
 		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 5 of 5 found');
-		$triggers =
-			[
-				'First trigger for tag filtering',
-				'Second trigger for tag filtering',
-				'Third trigger for tag filtering',
-				'Fourth trigger for tag filtering',
-				'Fifth trigger for tag filtering (no tags)'
-			];
-		foreach ($triggers as $trigger) {
-				$this->zbxTestTextPresent($trigger);
-			}
+		$this->zbxTestTextPresent([
+			'First trigger for tag filtering',
+			'Second trigger for tag filtering',
+			'Third trigger for tag filtering',
+			'Fourth trigger for tag filtering',
+			'Fifth trigger for tag filtering (no tags)'
+		]);
 	}
 }
