@@ -11,6 +11,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14834] fixed icon misplacement in problem view (Ivo)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ........S. [ZBX-10784] fixed validation of double/Numeric(float) values (MVekslers)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
