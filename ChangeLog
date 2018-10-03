@@ -1,3 +1,53 @@
+Changes for 4.2.0alpha1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.1rc1
+
+New features:
+........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
+
+Bug fixes:
+..F....... [ZBX-14834] fixed icon misplacement in problem view (Ivo)
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
+........S. [ZBX-10784] fixed validation of double/Numeric(float) values (MVekslers)
+..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
+.....J.... [ZBX-14615] fixed Java gateway not to mark host unreachable in case of invalid username and password (vso)
+.....J.... [ZBX-14585] fixed JMX endpoint not being included in error message in case of connection errors (vso)
+..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
+.......PS. [ZBX-14764] fixed crash that could occur when OpenIPMI pollers are configured (vso)
+.......PS. [ZBX-14882] fixed crash in vmware collector when receiving invalid xml (vso)
+........S. [ZBX-14908] fixed crash when processing internal trigger events and deleting triggers at the same time (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.0
+
+4.0.0rc3 was released as 4.0.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.0rc3
+
+New features:
+....I..... [ZBXNEXT-4757] added new dashboard to "Zabbix server health" (Alexei, Sasha, vmurzins)
+....I..... [ZBXNEXT-4757] renamed default dashboard to "Global view" and improved widget layout (Alexei, Sasha, vmurzins)
+.......PS. [ZBXNEXT-4757] added support of "pused" mode for cache-related internal items (Sasha)
+....I..... [ZBXNEXT-4757] added new and renamed existing items in "Template App Zabbix Server" and "Template App Zabbix Proxy" templates (Sasha)
+
+Bug fixes:
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.0rc2
+
+Bug fixes:
+..F....... [ZBXNEXT-4588] fixed multiple minor issues in SVG graph widget; fixed dashboard widget height calculation (miks)
+..F....... [ZBX-14891] fixed undefined index "show_timeline" in screens (agriscenko)
+..F....... [ZBX-14874] fixed SQL errors being generated in database log files (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.0rc1
 
 New features:
@@ -504,6 +554,13 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
+..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
+..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
+.......PS. [ZBX-14764] fixed crash that could occur when OpenIPMI pollers are configured (vso)
+.......PS. [ZBX-14882] fixed crash in vmware collector when receiving invalid xml (vso)
+........S. [ZBX-14908] fixed crash when processing internal trigger events and deleting triggers at the same time (vso)
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 
 --------------------------------------------------------------------------------
@@ -1861,6 +1918,12 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
+..F....... [ZBX-14727] fixed selection of data for trigger overview, data overview and graphs if first drop down entry is "none" (Ivo)
+..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
+.......PS. [ZBX-14882] fixed crash in vmware collector when receiving invalid xml (vso)
+.......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
+..F....... [ZBX-14845] fixed filter in triggers status page not being reset when navigating from dashboard and host inventory (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.22
