@@ -538,6 +538,7 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-14764] fixed crash that could occur when OpenIPMI pollers are configured (vso)
 .......PS. [ZBX-14882] fixed crash in vmware collector when receiving invalid xml (vso)
 ........S. [ZBX-14908] fixed crash when processing internal trigger events and deleting triggers at the same time (vso)
 .......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
