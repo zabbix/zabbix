@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-25 19:00+0300\n"
-"PO-Revision-Date: 2018-08-30 12:42+0300\n"
+"PO-Revision-Date: 2018-09-25 16:26+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1535625731.000000\n"
+"X-POOTLE-MTIME: 1537885569.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1353,7 +1353,7 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:929
 msgid "Base colour"
-msgstr ""
+msgstr "Base color"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:285
@@ -3354,7 +3354,7 @@ msgstr "Configuration of applications"
 
 #: app/controllers/CControllerAuthenticationEdit.php:127
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Configuration of authentication"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
@@ -3607,7 +3607,7 @@ msgstr "Contact"
 #: include/views/js/configuration.maintenance.edit.js.php:7
 #: include/views/js/configuration.triggers.list.js.php:7
 msgid "Contains"
-msgstr ""
+msgstr "Contains"
 
 #: app/views/administration.mediatype.list.php:32
 #: app/views/administration.proxy.list.php:32
@@ -5665,7 +5665,7 @@ msgstr "English (en_US)"
 #: include/views/js/configuration.maintenance.edit.js.php:8
 #: include/views/js/configuration.triggers.list.js.php:8
 msgid "Equals"
-msgstr ""
+msgstr "Equals"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -6440,7 +6440,7 @@ msgstr "Graph \"%1$s\" with templated items cannot contain items from other host
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr ""
+msgstr "Graph (classic)"
 
 #: graphs.php:241
 msgid "Graph added"
@@ -6808,7 +6808,7 @@ msgstr "Hide selected"
 #: include/views/monitoring.slides.php:31
 msgctxt "screen reader"
 msgid "Hierarchy"
-msgstr ""
+msgstr "Hierarchy"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -9547,7 +9547,7 @@ msgstr "LDAP host"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:96
 msgid "LDAP is not configured"
-msgstr ""
+msgstr "LDAP is not configured"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:183
 msgid "LDAP login successful"
@@ -11656,7 +11656,7 @@ msgstr "Number of processors on VMware virtual machine, <url> - VMware service U
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
 msgid "Number of rows"
-msgstr ""
+msgstr "Number of rows"
 
 #: include/views/monitoring.slideconf.list.php:65
 msgid "Number of slides"
@@ -17677,7 +17677,7 @@ msgstr "Y2"
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:253
 msgid "YYYY-MM-DD hh:mm"
-msgstr ""
+msgstr "YYYY-MM-DD hh:mm"
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17950,7 +17950,7 @@ msgstr "a character string is expected"
 
 #: include/classes/validators/CApiInputValidator.php:271
 msgid "a hexadecimal colour code (6 symbols) is expected"
-msgstr ""
+msgstr "a hexadecimal color code (6 symbols) is expected"
 
 #: include/classes/validators/CApiInputValidator.php:417
 #: include/classes/validators/CApiInputValidator.php:554
@@ -18062,7 +18062,7 @@ msgstr "an even number of hexadecimal characters is expected"
 
 #: include/validate.inc.php:243
 msgid "an explicit time is expected"
-msgstr ""
+msgstr "an explicit time is expected"
 
 #: include/views/monitoring.history.php:163
 msgid "as Blue"
@@ -18089,7 +18089,7 @@ msgstr "ascending"
 
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:134
 msgid "at least one override option must be specified"
-msgstr ""
+msgstr "at least one override option must be specified"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -18224,7 +18224,7 @@ msgstr "circular item dependency is not allowed"
 
 #: jsLoader.php:200
 msgid "colour"
-msgstr ""
+msgstr "color"
 
 #: app/views/monitoring.problem.view.php:285
 #: include/classes/widgets/views/widget.problems.form.view.php:92
@@ -18238,7 +18238,7 @@ msgstr "configure"
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:53
 msgid "contains"
-msgstr ""
+msgstr "contains"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:234
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
@@ -18319,11 +18319,11 @@ msgstr "discovery rule is disabled"
 
 #: include/actions.inc.php:27 include/correlation.inc.php:34
 msgid "does not contain"
-msgstr ""
+msgstr "does not contain"
 
 #: include/actions.inc.php:25 include/correlation.inc.php:32
 msgid "does not equal"
-msgstr ""
+msgstr "does not equal"
 
 #: include/views/configuration.host.discovery.edit.php:633
 #: include/views/js/configuration.host.discovery.edit.js.php:25
@@ -18333,7 +18333,7 @@ msgstr "does not match"
 #: include/actions.inc.php:24 include/correlation.inc.php:31
 #: include/views/inventory.host.list.php:54
 msgid "equals"
-msgstr ""
+msgstr "equals"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18492,11 +18492,11 @@ msgstr "iregexp() - Regular expression V matching last value in period T (non ca
 
 #: include/actions.inc.php:29
 msgid "is greater than or equals"
-msgstr ""
+msgstr "is greater than or equals"
 
 #: include/actions.inc.php:30
 msgid "is less than or equals"
-msgstr ""
+msgstr "is less than or equals"
 
 #: include/classes/validators/CApiInputValidator.php:1365
 msgid "is not enclosed in {} or is malformed"
