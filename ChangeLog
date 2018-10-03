@@ -10,6 +10,7 @@ Changes for 4.0.1rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14908] fixed crash when processing internal trigger events and deleting triggers at the same time (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.0
@@ -543,6 +544,7 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-14908] fixed crash when processing internal trigger events and deleting triggers at the same time (vso)
 .......PS. [ZBX-14853] fixed error of vmware items caused by misconfigured vmware maxQueryMetrics parameter (MVekslers)
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 
