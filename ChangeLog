@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 4.0.1rc1
 
 New features:
+........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
 .....J.... [ZBX-14615] fixed Java gateway not to mark host unreachable in case of invalid username and password (vso)
