@@ -52,16 +52,8 @@ class testPageReportsTriggerTop extends CWebTest {
 				[
 					'host_group' => 'Zabbix servers',
 					'date' => [
-						'from' => 'now/d',
+						'from' => '2017-10-23 00:00',
 						'to' => 'now/d'
-					]
-				]
-			],
-			[
-				[
-					'host_group' => 'Zabbix servers',
-					'date' => [
-						'from' => '2017-10-23 00:00'
 					],
 					'result' => [
 						'Test trigger to check tag filter on problem page',
@@ -72,7 +64,6 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'host_group' => 'Zabbix servers',
-					'host' => 'Host ZBX6663',
 					'date' => [
 						'from' => 'now/d',
 						'to' => 'now/d'
@@ -94,9 +85,10 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'host_group' => 'Zabbix servers',
-					'host' => 'ЗАББИКС Сервер',
+					'host' => 'Host ZBX6663',
 					'date' => [
-						'from' => '2018-08-18 00:00'
+						'from' => 'now/d',
+						'to' => 'now/d'
 					]
 				]
 			],
@@ -116,23 +108,21 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
+					'host_group' => 'Zabbix servers',
+					'host' => 'ЗАББИКС Сервер',
 					'date' => [
-						'from' => '2017-10-23 12:35',
-						'to' => '2017-10-23 12:36'
-					],
-					'result' => [
-						'Trigger for tag permissions MySQL'
+						'from' => '2018-08-18 00:00',
+						'to' => 'now/d'
 					]
 				]
 			],
 			[
 				[
 					'date' => [
-						'from' => '2017-10-23 12:33',
+						'from' => '2017-10-23 12:35',
 						'to' => '2017-10-23 12:36'
 					],
 					'result' => [
-						'Test trigger to check tag filter on problem page',
 						'Trigger for tag permissions MySQL'
 					]
 				]
@@ -162,6 +152,18 @@ class testPageReportsTriggerTop extends CWebTest {
 						'Warning',
 						'Information',
 						'Average'
+					]
+				]
+			],
+			[
+				[
+					'date' => [
+						'from' => '2017-10-23 12:33',
+						'to' => '2017-10-23 12:36'
+					],
+					'result' => [
+						'Test trigger to check tag filter on problem page',
+						'Trigger for tag permissions MySQL'
 					]
 				]
 			]
