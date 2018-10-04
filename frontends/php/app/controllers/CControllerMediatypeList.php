@@ -52,8 +52,7 @@ class CControllerMediatypeList extends CController {
 	protected function doAction() {
 		$sortField = $this->getInput('sort', CProfile::get('web.media_types.php.sort', 'description'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.media_types.php.sortorder', ZBX_SORT_UP));
-
-		CProfile::update('web.media_type.php.sort', $sortField, PROFILE_TYPE_STR);
+		CProfile::update('web.media_types.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.media_types.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		// filter
