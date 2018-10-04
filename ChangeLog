@@ -4,6 +4,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
 ..F....... [ZBX-14711] fixed triggers in trigger overview being filtered by trigger severity and trigger status change time instead of problem severity and problem creation time (agriscenko)
 ..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-12217] removed links to templates with no permissions for templated triggers, trigger prototypes, graphs, graph prototypes, host prototypes and web scenarios (agriscenko)
@@ -556,6 +557,8 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
+..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
 ..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
@@ -1921,6 +1924,8 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
+..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
 ..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview, data overview and graphs if first drop down entry is "none" (Ivo)
