@@ -5217,7 +5217,7 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
 				config->strpool.num_data, config->strpool.num_slots);
 
-		zbx_mem_dump_stats(config_mem);
+		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 
 	config->status->last_update = 0;
