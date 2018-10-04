@@ -70,6 +70,11 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Problems by severity');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'System information');
 		}
+
+		// Logout.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
