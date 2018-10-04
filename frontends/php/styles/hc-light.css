@@ -653,7 +653,7 @@ output {
     background-color: #fff; }
   .list-table tbody tr.row-selected .timeline-td {
     background-color: #fff; }
-  .list-table tbody tr:last-child td {
+  .list-table tbody tr:last-child th, .list-table tbody tr:last-child td {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #fff; }
@@ -2190,9 +2190,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow-y: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
-    .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
+    .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
       border-bottom: 1px solid #888; }
-      .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+      .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
     margin: 10px 10px 0 10px;
