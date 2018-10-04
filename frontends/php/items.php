@@ -1726,9 +1726,9 @@ else {
 	}
 
 	/*
-	 * Trapper and SNMP trap items contain zeroes in "delay" field and, if no specific type is set, look in item types
-	 * other than trapper and SNMP trap that allow zeroes. For example, when a flexible interval is used. Since trapper
-	 * and SNMP trap items contain zeroes, but those zeroes should not be displayed, they cannot be filtered by entering
+	 * Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
+	 * other than trapper and SNMP trap that allow zeros. For example, when a flexible interval is used. Since trapper
+	 * and SNMP trap items contain zeros, but those zeros should not be displayed, they cannot be filtered by entering
 	 * either zero or any other number in filter field.
 	 */
 	if (hasRequest('filter_delay')) {

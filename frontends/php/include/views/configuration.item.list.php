@@ -243,7 +243,7 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	// Hide zeroes for trapper, SNMP trap and dependent items.
+	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 			|| $item['type'] == ITEM_TYPE_DEPENDENT) {
 		$item['delay'] = '';

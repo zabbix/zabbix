@@ -641,7 +641,7 @@ ImageCache.prototype.handleCallback = function () {
 };
 
 /**
- * Callback for sucessful image load.
+ * Callback for successful image load.
  *
  * @param {string}     id       Image id.
  * @param {object}     image    Loaded image.

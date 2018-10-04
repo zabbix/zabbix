@@ -28,12 +28,7 @@
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			));
 		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
-		/*
-		 * We need to add an example of footer content, for .dashbrd-grid-widget-content div to have propper size.
-		 * This size will later be passed to widget controller in updateWidgetContent() function.
-		 */
-		widget['content_script'] = $('<div>').append($('<ul>').append($('<li>').html('&nbsp;')));
-
+		widget['content_script'] = $('<div>');
 		widget['content_header'].append($('<ul>')
 			.append($('<li>')
 				.append($('<button>', {
@@ -1300,12 +1295,12 @@
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
 					header = $('.dashbrd-widget-head', data.dialogue['div']),
 					form = $('form', body),
-					widget = data.dialogue['widget'], // widget currently beeing edited
+					widget = data.dialogue['widget'], // widget currently being edited
 					url = new Curl('zabbix.php'),
 					ajax_data = {},
 					fields;
 
-				// Disable saving, while form is beeing updated.
+				// Disable saving, while form is being updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashboard.widget.edit');
@@ -1379,7 +1374,7 @@
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// Enable save button after sucessfull form update.
+						// Enable save button after successful form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
