@@ -456,6 +456,10 @@ var hintBox = {
 					break;
 
 				case 'remove':
+					jQuery('[data-menu-popup]', jQuery(this.hintBoxItem)).each(function (_, popup_parent) {
+						jQuery('#'+jQuery(popup_parent).data('menu-popup-id')).menuPopup('close');
+					});
+
 					hintBox.deleteHint(this);
 					break;
 
