@@ -29,9 +29,12 @@ if (empty($data['screen']) || empty($data['host'])) {
 		->addItem(new CTableInfo());
 }
 else {
-	$screen_widget->setTitle([
-		$data['screen']['name'].' '._('on').' ',
-		(new CSpan($data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+	$screenWidget->setTitle([
+		$this->data['screen']['name'],
+		SPACE,
+		_('on'),
+		SPACE,
+		new CSpan($this->data['host']['name'])
 	]);
 
 	$url = (new CUrl('host_screen.php'))
