@@ -340,14 +340,12 @@ if (hasRequest('form')) {
 		}
 	}
 
-	$templateids = [];
-
 	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
 		getHostPrototypeParentTemplates([$data['host_prototype']])
 	);
 
 	// Select writable templates
-	$templateids = array_merge(zbx_objectValues($data['host_prototype']['templates'], 'templateid'), $templateids);
+	$templateids = zbx_objectValues($data['host_prototype']['templates'], 'templateid');
 	$data['host_prototype']['writable_templates'] = [];
 
 	if ($templateids) {
