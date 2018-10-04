@@ -118,48 +118,172 @@ function get_httptests_by_hostid($hostids) {
 }
 
 /**
- * Return parent templates for http tests.
- * Result structure:
- * array(
- *   'httptestid' => array(
- *     'name' => <template name>,
- *     'id' => <template id>
- *   ), ...
- * )
+ * Get parent templates for each given web scenario.
  *
- * @param array $httpTests must have httptestid and templateid fields
+ * @param array  $httptests                  An array of web scenarios.
+ * @param string $httptests[]['httptestid']  ID of a web scenario.
+ * @param string $httptests[]['templateid']  ID of parent template web scenario.
  *
  * @return array
  */
-function getHttpTestsParentTemplates(array $httpTests) {
-	$result = [];
-	$template2testMap = [];
+function getHttpTestParentTemplates(array $httptests) {
+	$parent_httptestids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
-	foreach ($httpTests as $httpTest) {
-		if (!empty($httpTest['templateid'])){
-			$result[$httpTest['httptestid']] = [];
-			$template2testMap[$httpTest['templateid']][$httpTest['httptestid']] = $httpTest['httptestid'];
+	foreach ($httptests as $httptest) {
+		if ($httptest['templateid'] != 0) {
+			$parent_httptestids[$httptest['templateid']] = true;
+			$data['links'][$httptest['httptestid']] = ['httptestid' => $httptest['templateid']];
 		}
 	}
 
+	if (!$parent_httptestids) {
+		return $data;
+	}
+
+	$all_parent_httptestids = [];
+	$hostids = [];
+
 	do {
-		$dbHttpTests = DBselect('SELECT ht.httptestid,ht.templateid,ht.hostid,h.name'.
-				' FROM httptest ht'.
-				' INNER JOIN hosts h ON h.hostid=ht.hostid'.
-				' WHERE '.dbConditionInt('ht.httptestid', array_keys($template2testMap)));
-		while ($dbHttpTest = DBfetch($dbHttpTests)) {
-			foreach ($template2testMap[$dbHttpTest['httptestid']] as $testId => $data) {
-				$result[$testId] = ['name' => $dbHttpTest['name'], 'id' => $dbHttpTest['hostid']];
+		$db_httptests = API::HttpTest()->get([
+			'output' => ['httptestid', 'hostid', 'templateid'],
+			'httptestids' => array_keys($parent_httptestids)
+		]);
 
-				if (!empty($dbHttpTest['templateid'])) {
-					$template2testMap[$dbHttpTest['templateid']][$testId] = $testId;
+		$all_parent_httptestids += $parent_httptestids;
+		$parent_httptestids = [];
+
+		foreach ($db_httptests as $db_httptest) {
+			$data['templates'][$db_httptest['hostid']] = [];
+			$hostids[$db_httptest['httptestid']] = $db_httptest['hostid'];
+
+			if ($db_httptest['templateid'] != 0) {
+				if (!array_key_exists($db_httptest['templateid'], $all_parent_httptestids)) {
+					$parent_httptestids[$db_httptest['templateid']] = true;
 				}
-			}
-			unset($template2testMap[$dbHttpTest['httptestid']]);
-		}
-	} while (!empty($template2testMap));
 
-	return $result;
+				$data['links'][$db_httptest['httptestid']] = ['httptestid' => $db_httptest['templateid']];
+			}
+		}
+	}
+	while ($parent_httptestids);
+
+	foreach ($data['links'] as &$parent_httptest) {
+		$parent_httptest['hostid'] = array_key_exists($parent_httptest['httptestid'], $hostids)
+			? $hostids[$parent_httptest['httptestid']]
+			: 0;
+	}
+	unset($parent_httptest);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected web scenario.
+ *
+ * @param string $httptestid
+ * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
+ *
+ * @return array|null
+ */
+function makeHttpTestTemplatePrefix($httptestid, array $parent_templates) {
+	if (!array_key_exists($httptestid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$httptestid]['httptestid'], $parent_templates['links'])) {
+		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
+
+	if ($template['permission'] == PERM_READ_WRITE) {
+		$name = (new CLink(CHtml::encode($template['name']),
+			(new CUrl('httpconf.php'))
+				->setArgument('hostid', $template['hostid'])
+				->setArgument('filter_set', 1)
+		))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(CHtml::encode($template['name']));
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of web scenario templates.
+ *
+ * @param string $httptestid
+ * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
+ *
+ * @return array
+ */
+function makeHttpTestTemplatesHtml($httptestid, array $parent_templates) {
+	$list = [];
+
+	while (array_key_exists($httptestid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
+
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = new CLink(CHtml::encode($template['name']),
+				(new CUrl('httpconf.php'))
+					->setArgument('form', 'update')
+					->setArgument('hostid', $template['hostid'])
+					->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
+			);
+		}
+		else {
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**
