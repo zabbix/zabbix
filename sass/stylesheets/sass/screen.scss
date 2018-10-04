@@ -500,23 +500,35 @@ ul.top-nav-icons {
 	@include transform(scale(.9999));
 }
 
-.header-title {
+.header-title,
+.object-group {
+	height: 24px;
+	line-height: 24px;
+	padding: 6px 0;
 	position: relative;
-	width: 100%;
-	padding: 0 0 6px 0;
-	margin: 0 0 10px 0;
-	text-align: right;
-	border-bottom: 1px solid $ui-border-color;
+}
 
-	.cell:first-child {
-		max-width: calc(100vw - 370px);
+.header-title {
+	border-bottom: 1px solid $ui-border-color;
+	margin: -5px 0 10px;
+	width: 100%;
+
+	.cell {
+
+		&:first-child {
+			max-width: calc(100vw - 370px);
+		}
+
+		&:last-child {
+			text-align: right;
+		}
 	}
 
 	h1 {
-		text-align: left;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		line-height: 24px;
 		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	form {
@@ -578,9 +590,7 @@ article {
 
 // Object Group Navigation
 .object-group {
-	min-height: 24px;
-	line-height: 24px;
-	margin-bottom: 5px;
+	margin: -6px 0;
 
 	li {
 		float: left;
@@ -634,10 +644,12 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	position: relative;
-	top: 0;
 	z-index: 3;
-	margin-bottom: 0;
+
+	li {
+		line-height: 14px;
+		vertical-align: top;
+	}
 
 	& > li:first-child {
 		float: left;
@@ -645,11 +657,10 @@ article {
 
 		& > span {
 			display: inline-block;
-			line-height: 1;
-			padding: 4px 7px;
+			height: 18px;
+			padding: 4px 7px 0;
 
 			a {
-				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -659,7 +670,7 @@ article {
 	}
 
 	& + .filter-space {
-		margin-top: -28px;
+		margin-top: -29px;
 	}
 }
 
@@ -2497,6 +2508,7 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
+	margin-top: -1px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
