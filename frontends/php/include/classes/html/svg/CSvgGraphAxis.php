@@ -29,7 +29,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var array
 	 */
-	public $css_class;
+	private $css_class;
 
 	/**
 	 * Axis type. One of CSvgGraphAxis::AXIS_* constants.
@@ -50,15 +50,15 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @var int
 	 */
-	private $arrow_size = 5;
-	private $arrow_offset = 5;
+	const ZBX_ARROW_SIZE = 5;
+	const ZBX_ARROW_OFFSET = 5;
 
 	/**
 	 * Color for labels.
 	 *
 	 * @var string
 	 */
-	private $color;
+	private $text_color;
 
 	/**
 	 * Color for axis.
@@ -67,30 +67,15 @@ class CSvgGraphAxis extends CSvgTag {
 	 */
 	private $line_color;
 
-	/**
-	 * Axis container.
-	 *
-	 * @var CSvgGroup
-	 */
-	private $container;
-
-	/**
-	 * Visibility of axis line with arrow.
-	 *
-	 * @var bool
-	 */
-	private $axis_visible = true;
-
 	public function __construct(array $labels, $type) {
 		$this->css_class = [
 			GRAPH_YAXIS_SIDE_RIGHT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_RIGHT,
 			GRAPH_YAXIS_SIDE_LEFT => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_LEFT,
-			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM,
+			GRAPH_YAXIS_SIDE_BOTTOM => CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM
 		];
 
 		$this->labels = $labels;
 		$this->type = $type;
-		$this->container = new CSvgGroup();
 	}
 
 	/**
@@ -98,14 +83,14 @@ class CSvgGraphAxis extends CSvgTag {
 	 *
 	 * @return array
 	 */
-	public function getStyles() {
+	public function makeStyles() {
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' path' => [
 				'stroke' => $this->line_color,
 				'fill' => 'transparent'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
-				'fill' => $this->color,
+				'fill' => $this->text_color,
 				'font-size' => '11px',
 				'alignment-baseline' => 'middle',
 				'dominant-baseline' => 'middle'
@@ -123,19 +108,6 @@ class CSvgGraphAxis extends CSvgTag {
 	}
 
 	/**
-	 * Set axis line visibility.
-	 *
-	 * @param bool $visible   True if should be visible.
-	 *
-	 * @return CSvgGraphAxis
-	 */
-	public function setAxisVisibility($visible) {
-		$this->axis_visible = $visible;
-
-		return $this;
-	}
-
-	/**
 	 * Set text color.
 	 *
 	 * @param string $color  Color value.
@@ -143,7 +115,7 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @return CSvgGraphAxis
 	 */
 	public function setTextColor($color) {
-		$this->color = $color;
+		$this->text_color = $color;
 
 		return $this;
 	}
@@ -167,38 +139,44 @@ class CSvgGraphAxis extends CSvgTag {
 	 * @return CSvgPath
 	 */
 	private function getAxis() {
-		$path = new CSvgPath();
-		$size = $this->arrow_size;
-		$offset = ceil($size/2);
+		$offset = ceil(self::ZBX_ARROW_SIZE / 2);
 
-		if ($this->type === GRAPH_YAXIS_SIDE_BOTTOM) {
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+			$x = $this->x + $this->width + self::ZBX_ARROW_OFFSET;
 			$y = $this->y;
-			$x = $this->width + $this->x + $this->arrow_offset;
-			$path->moveTo($this->x, $y)
-				->lineTo($x, $y);
 
-			if ($size) {
-				$path->moveTo($x + $size, $y)
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($this->x, $y)
+					->lineTo($x, $y),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x + self::ZBX_ARROW_SIZE, $y)
 					->lineTo($x, $y - $offset)
 					->lineTo($x, $y + $offset)
-					->lineTo($x + $size, $y);
-			}
+					->closePath()
+			];
 		}
 		else {
-			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ? $this->x : $this->width + $this->x;
-			$y = $this->y - $this->arrow_offset;
-			$path->moveTo($x, $y)
-				->lineTo($x, $this->height + $y + $this->arrow_offset);
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $this->x : $this->x + $this->width;
+			$y = $this->y - self::ZBX_ARROW_OFFSET;
 
-			if ($size) {
-				$path->moveTo($x, $y - $size)
+			return [
+				// Draw axis line.
+				(new CSvgPath())
+					->setAttribute('shape-rendering', 'crispEdges')
+					->moveTo($x, $y)
+					->lineTo($x, $this->height + $y + self::ZBX_ARROW_OFFSET),
+				// Draw arrow.
+				(new CSvgPath())
+					->moveTo($x, $y - self::ZBX_ARROW_SIZE)
 					->lineTo($x - $offset, $y)
 					->lineTo($x + $offset, $y)
-					->lineTo($x, $y - $size);
-			}
+					->closePath()
+			];
 		}
-
-		return $path;
 	}
 
 	/**
@@ -210,46 +188,60 @@ class CSvgGraphAxis extends CSvgTag {
 		$x = 0;
 		$y = 0;
 		$labels = [];
-		$is_horizontal = $this->type === GRAPH_YAXIS_SIDE_BOTTOM;
 
-		if ($is_horizontal) {
+		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
 			$axis = 'x';
 			// Label margin from axis.
-			$margin = 7;
+			$margin = 5;
 			$y = $this->height - $margin;
 		}
 		else {
+			$axis = 'y';
 			// Label margin from axis.
 			$margin = 5;
-			$axis = 'y';
-			$x = $this->type === GRAPH_YAXIS_SIDE_RIGHT ?  $margin : $this->width - $margin;
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $margin : $this->width - $margin;
 		}
 
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
 
-			if ($this->type === GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
+			if ($this->type == GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
 				continue;
 			}
 
-			if (!$is_horizontal) {
+			if ($this->type == GRAPH_YAXIS_SIDE_LEFT || $this->type == GRAPH_YAXIS_SIDE_RIGHT) {
 				// Flip upside down.
 				$y = $this->height - $y;
 			}
 
-			$labels[] = (new CSvgText($x + $this->x, $y + $this->y, $label));
+			if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
+				if (count($labels) == 0) {
+					$text_tag_x = max($this->x + $x, strlen($label) * 4);
+				}
+				elseif (end($this->labels) === $label) {
+					$text_tag_x = (strlen($label) * 4 > $this->width - $x) ? $this->x + $x - 10 : $this->x + $x;
+				}
+				else {
+					$text_tag_x = $this->x + $x;
+				}
+			}
+			else {
+				$text_tag_x = $this->x + $x;
+			}
+
+			$labels[] = new CSvgText($text_tag_x, $this->y + $y, $label);
 		}
 
 		return $labels;
 	}
 
 	public function toString($destroy = true) {
-		$this->container->additem([
-			$this->axis_visible ? $this->getAxis() : null,
-			$this->getLabels()
-		])
-			->addClass($this->css_class[$this->type]);
-
-		return $this->container->toString($destroy);
+		return (new CSvgGroup())
+			->additem([
+				$this->getAxis(),
+				$this->getLabels()
+			])
+			->addClass($this->css_class[$this->type])
+			->toString($destroy);
 	}
 }

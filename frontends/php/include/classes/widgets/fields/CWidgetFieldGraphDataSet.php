@@ -41,8 +41,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
+			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
 			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],

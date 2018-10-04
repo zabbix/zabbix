@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -18,17 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockutil.h"
 
-class CSvgPolyline extends CSvgTag {
+#include "common.h"
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
+void	zbx_mock_test_entry(void **state)
+{
+	int		expected_result, actual_result;
+	const char	*is_number;
 
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
-		}
+	ZBX_UNUSED(state);
 
-		$this->setAttribute('points', trim($p));
+	is_number = zbx_mock_get_parameter_string("in.num");
+	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+
+	if (expected_result != (actual_result = is_double_suffix(is_number, ZBX_FLAG_DOUBLE_SUFFIX)))
+	{
+		fail_msg("Got %s instead of %s as a result validation [%s].", zbx_result_string(actual_result),
+			zbx_result_string(expected_result), is_number);
 	}
 }

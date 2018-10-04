@@ -973,7 +973,7 @@ void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
-void	del_zeroes(char *s);
+void	del_zeros(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
@@ -993,9 +993,9 @@ char	*get_param_dyn(const char *param, int num);
  *      cb_data   - [IN] callback function custom data                        *
  *      param     - [OUT] replaced item key string                            *
  *                                                                            *
- * Return value: SUCEED - if parameter doesn't change or has been changed     *
- *                        successfully                                        *
- *               FAIL   - otherwise                                           *
+ * Return value: SUCCEED - if parameter doesn't change or has been changed    *
+ *                         successfully                                       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: The new string should be quoted if it contains special           *
  *           characters                                                       *
@@ -1082,7 +1082,7 @@ int	zbx_day_in_month(int year, int mon);
 
 void	__zbx_zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
-size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
@@ -1264,6 +1264,7 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 int	zbx_number_parse(const char *number, int *len);
+int	zbx_suffixed_number_parse(const char *number, int *len);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 

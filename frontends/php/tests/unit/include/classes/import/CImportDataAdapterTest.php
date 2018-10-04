@@ -2091,7 +2091,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 								'name' => 'Availability'
 							]
 						],
-						'name' => 'Free disk space on $1 in %',
+						'name' => 'Free disk space on / in %',
 						'key_' => 'vfs.fs.size[/,pfree]',
 						'jmx_endpoint' => '',
 						'master_item' => [],

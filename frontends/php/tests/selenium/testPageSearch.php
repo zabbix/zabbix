@@ -57,12 +57,12 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestInputTypeWait('search', '');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
 		// Do not search if search string consists only of whitespace characters.
 		$this->zbxTestInputTypeWait('search', '   ');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 	}
 }
