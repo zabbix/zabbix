@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.0\n"
+"Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-25 19:00+0300\n"
-"PO-Revision-Date: 2018-09-26 05:07+0300\n"
+"PO-Revision-Date: 2018-10-02 16:49+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1537931244.000000\n"
+"X-POOTLE-MTIME: 1538491776.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -6377,7 +6377,7 @@ msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他の�
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr "等しい"
+msgstr "グラフ (クラシック)"
 
 #: graphs.php:241
 msgid "Graph added"
