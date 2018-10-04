@@ -1141,7 +1141,7 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket)
  *                                                                            *
  * Purpose: writes a message to IPC service                                   *
  *                                                                            *
- * Parameters: csocket - [IN] an opened IPC socket to the servic              *
+ * Parameters: csocket - [IN] an opened IPC socket to the service             *
  *             code    - [IN] the message code                                *
  *             data    - [IN] the data                                        *
  *             size    - [IN] the data size                                   *

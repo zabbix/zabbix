@@ -462,7 +462,7 @@ class testWebScenario extends CZabbixTest {
 			// Check  unexpected parameter.
 			[
 				'httptest' => [
-					'name' => 'Api web scenario with readonly parametr',
+					'name' => 'Api web scenario with readonly parameter',
 					'templateid' => '1'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "templateid".'

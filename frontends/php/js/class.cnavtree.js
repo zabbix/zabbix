@@ -1150,7 +1150,7 @@ jQuery(function($) {
 			};
 
 			/*
-			 * Grouping a seperate widget fields into objects of items. Each items consists of its name, parent, id etc.
+			 * Grouping a separate widget fields into objects of items. Each items consists of its name, parent, id etc.
 			 *
 			 * @returns {Array} - an array of item objects.
 			 */

@@ -544,6 +544,8 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
+    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
+      margin-right: 12px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -4454,12 +4456,12 @@ svg {
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
-    background: url(../img/icon-sprite.svg) no-repeat -203px -730px; }
+    background: url(../img/icon-sprite.svg) no-repeat -208px -730px; }
 
 .icon-depend-down {
   margin: 0 18px 0 0; }
   .icon-depend-down::before {
-    background: url(../img/icon-sprite.svg) no-repeat -203px -766px; }
+    background: url(../img/icon-sprite.svg) no-repeat -208px -766px; }
 
 .icon-ackn {
   margin: 0 18px 0 0; }
