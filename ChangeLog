@@ -3,6 +3,7 @@ Changes for 4.2.0alpha1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.1rc1
@@ -11,6 +12,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
 ..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
 ..F....... [ZBX-14711] fixed triggers in trigger overview being filtered by trigger severity and trigger status change time instead of problem severity and problem creation time (agriscenko)
