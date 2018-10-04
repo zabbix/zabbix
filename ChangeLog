@@ -4,6 +4,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14723] fixed zoom button for time selector in IE browser (ashubin)
 ..F....... [ZBX-14888] fixed table markup on overview and system info pages (agriscenko)
 ..F....... [ZBX-14652] fixed plain text Latest data when selecting more then 1 item (vasilijs)
 ..F....... [ZBX-14618] fixed host prototype status checkbox resets after adding template (vasilijs)
