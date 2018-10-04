@@ -1,0 +1,2717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Server hardware</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Server Dell iDRAC SNMPv2</template>
+         <name>Template Server Dell iDRAC SNMPv2</name>
+         <description>Template Server iDRAC version: 0.15&#13;
+Overview: for Dell servers with iDRAC controllers&#13;
+http://www.dell.com/support/manuals/us/en/19/dell-openmanage-server-administrator-v8.3/snmp_idrac8/idrac-mib?guid=guid-e686536d-bc8e-4e09-8e8b-de8eb052efee&#13;
+Supported systems: http://www.dell.com/support/manuals/us/en/04/dell-openmanage-server-administrator-v8.3/snmp_idrac8/supported-systems?guid=guid-f72b75ba-e686-4e8a-b8c5-ca11c7c21381&#13;
+MIBs used:&#13;
+IDRAC-MIB-SMIv2</description>
+         <groups>
+            <group>
+               <name>Templates/Server hardware</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Disk arrays</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Physical disks</name>
+            </application>
+            <application>
+               <name>Power supply</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Virtual disks</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>Overall system health status</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.674.10892.5.2.1.0</snmp_oid>
+               <key>system.status[globalSystemStatus.0]</key>
+               <delay>30s</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>3</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: IDRAC-MIB-SMIv2&#13;
+This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+               </valuemap>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware model name</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.674.10892.5.1.3.12.0</snmp_oid>
+               <key>system.hw.model</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: IDRAC-MIB-SMIv2&#13;
+This attribute defines the model name of the system.</description>
+               <inventory_link>29</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Operating system</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.674.10892.5.1.3.6.0</snmp_oid>
+               <key>system.sw.os</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: IDRAC-MIB-SMIv2&#13;
+This attribute defines the name of the operating system that the hostis running.</description>
+               <inventory_link>5</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.674.10892.5.1.3.2.0</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: IDRAC-MIB-SMIv2&#13;
+This attribute defines the service tag of the system.</description>
+               <inventory_link>8</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Firmware version</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.674.10892.5.1.1.8.0</snmp_oid>
+               <key>system.hw.firmware</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: IDRAC-MIB-SMIv2&#13;
+This attribute defines the firmware version of a remote access card.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Temperature CPU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]</snmp_oid>
+               <key>temp.cpu.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>.*CPU.*</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_LOCALE}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>0.1</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SENSOR_LOCALE}: Temperature status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Ambient Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]</snmp_oid>
+               <key>temp.ambient.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>.*Inlet Temp.*</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_LOCALE}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0020.0001.0006 This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete.  When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete,the value returned for this attribute is the temperature that the probeis reading in tenths of degrees Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>0.1</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SENSOR_LOCALE}: Temperature status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Ambient"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_WARN_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                           <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_CRIT_STATUS}&#13;
+or&#13;
+{Template Server Dell iDRAC SNMPv2:sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}].last(0)}={$TEMP_DISASTER_STATUS}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server Dell iDRAC SNMPv2:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
+                     <name>{#SENSOR_LOCALE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.12.1.5,{#PSU_DESCR},1.3.6.1.4.1.674.10892.5.4.600.12.1.8]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::powerSupplyTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#PSU_DESCR}: Power supply status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0600.0012.0001.0005 This attribute defines the status of the power supply.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Power supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#PSU_DESCR}: Power supply is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS:"nonCritical"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#PSU_DESCR}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#PSU_DESCR}: Power supply is in critical state</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.12.1.5,{#FAN_DESCR},1.3.6.1.4.1.674.10892.5.4.700.12.1.8,{#TYPE},1.3.6.1.4.1.674.10892.5.4.700.12.1.7]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#TYPE}</macro>
+                        <value>3</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::coolingDeviceTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#FAN_DESCR}: Fan status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0012.0001.0005 This attribute defines the probe status of the cooling device.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#FAN_DESCR}: Fan speed</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>rpm</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+0700.0012.0001.0006 This attribute defines the reading for a cooling device&#13;
+of subtype other than coolingDeviceSubTypeIsDiscrete.  When the value&#13;
+for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the&#13;
+value returned for this attribute is the speed in RPM or the OFF/ON value&#13;
+of the cooling device.  When the value for coolingDeviceSubType is&#13;
+coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#FAN_DESCR}: Fan is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"nonCriticalUpper"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS:"nonCriticalLower"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#FAN_DESCR}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#FAN_DESCR}: Fan is in critical state</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalUpper"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableUpper"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"criticalLower"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"nonRecoverableLower"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS:"failed"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Physical Disk Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.2]</snmp_oid>
+               <key>physicaldisk.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::physicalDiskTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The status of the physical disk itself without the propagation of any contained component status.&#13;
+Possible values:&#13;
+1: Other&#13;
+2: Unknown&#13;
+3: OK&#13;
+4: Non-critical&#13;
+5: Critical&#13;
+6: Non-recoverable</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk serial number</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]</key>
+                     <delay>1d</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The physical disk's unique identification number from the manufacturer.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk S.M.A.R.T. status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+Indicates whether the physical disk has received a predictive failure alert.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::BooleanType</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk model name</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The model number of the physical disk.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk part number</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.27.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.part_number[physicalDiskPartNumber.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The part number of the disk.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Physical disk media type</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The media type of the physical disk. Possible Values:&#13;
+1: The media type could not be determined.&#13;
+2: Hard Disk Drive (HDD).&#13;
+3: Solid State Drive (SSD).</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_NAME}: Disk size</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The size of the physical disk in megabytes.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>1048576</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_NAME}: Physical disk failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check physical disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_WARN_STATUS:"nonCritical"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_NAME}: Physical disk is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check physical disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#DISK_NAME}: Physical disk failed</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}].diff()}=1 and {Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <recovery_mode>2</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_NAME}: Disk has been replaced (new serial number received)</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Disk serial number has changed. Ack to close</description>
+                     <type>0</type>
+                     <manual_close>1</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}].count(#1,{$DISK_SMART_FAIL_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_NAME}: Physical disk S.M.A.R.T. failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Disk probably requires replacement.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#DISK_NAME}: Physical disk failed</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"critical"},eq)}=1 or {Template Server Dell iDRAC SNMPv2:system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Virtual Disk Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.2]</snmp_oid>
+               <key>virtualdisk.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::virtualDiskTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Layout type</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The virtual disk's RAID type.&#13;
+Possible values:&#13;
+1: Not one of the following&#13;
+2: RAID-0&#13;
+3: RAID-1&#13;
+4: RAID-5&#13;
+5: RAID-6&#13;
+6: RAID-10&#13;
+7: RAID-50&#13;
+8: RAID-60&#13;
+9: Concatenated RAID 1&#13;
+10: Concatenated RAID 5</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Current state</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The state of the virtual disk when there are progressive operations ongoing.&#13;
+Possible values:&#13;
+1: There is no active operation running.&#13;
+2: The virtual disk configuration has changed. The physical disks included in the virtual disk are being modified to support the new configuration.&#13;
+3: A Consistency Check (CC) is being performed on the virtual disk.&#13;
+4: The virtual disk is being initialized.&#13;
+5: BackGround Initialization (BGI) is being performed on the virtual disk.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Read policy</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The read policy used by the controller for read operations on this virtual disk.&#13;
+Possible values:&#13;
+1: No Read Ahead.&#13;
+2: Read Ahead.&#13;
+3: Adaptive Read Ahead.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Write policy</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The write policy used by the controller for write operations on this virtual disk.&#13;
+Possible values:&#13;
+1: Write Through.&#13;
+2: Write Back.&#13;
+3: Force Write Back.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Disk size</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The size of the virtual disk in megabytes.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>1048576</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The current state of this virtual disk (which includes any member physical disks.)&#13;
+Possible states:&#13;
+1: The current state could not be determined.&#13;
+2: The virtual disk is operating normally or optimally.&#13;
+3: The virtual disk has encountered a failure. The data on disk is lost or is about to be lost.&#13;
+4: The virtual disk encounterd a failure with one or all of the constituent redundant physical disks.&#13;
+The data on the virtual disk might no longer be fault tolerant.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check virtual disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_WARN_STATUS:"degraded"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check virtual disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS:"failed"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Array Controller Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38,{#CNTLR_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.79]</snmp_oid>
+               <key>physicaldisk.arr.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::controllerTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#CNTLR_NAME}: Disk array controller status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The status of the controller itself without the propagation of any contained component status.&#13;
+Possible values:&#13;
+1: Other&#13;
+2: Unknown&#13;
+3: OK&#13;
+4: Non-critical&#13;
+5: Critical&#13;
+6: Non-recoverable</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#CNTLR_NAME}: Disk array controller model</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.model[controllerName.{#SNMPINDEX}]</key>
+                     <delay>1d</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+The controller's name as represented in Storage Management.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>5</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#CNTLR_NAME}: Disk array controller is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_WARN_STATUS:"nonCritical"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#CNTLR_NAME}: Disk array controller is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#CNTLR_NAME}: Disk array controller is in critical state</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                        <dependency>
+                           <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Array Controller Cache Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#BATTERY_NUM},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.1]</snmp_oid>
+               <key>array.cache.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>IDRAC-MIB-SMIv2::batteryTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Battery {#BATTERY_NUM}: Disk array cache controller battery status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: IDRAC-MIB-SMIv2&#13;
+Current state of battery.&#13;
+Possible values:&#13;
+1: The current state could not be determined.&#13;
+2: The battery is operating normally.&#13;
+3: The battery has failed and needs to be replaced.&#13;
+4: The battery temperature is high or charge level is depleting.&#13;
+5: The battery is missing or not detected.&#13;
+6: The battery is undergoing the re-charge phase.&#13;
+7: The battery voltage or charge level is below the threshold.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>IDRAC-MIB-SMIv2::batteryState</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is not in optimal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                        <dependency>
+                           <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state</name>
+                           <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server Dell iDRAC SNMPv2:system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CRIT_STATUS:"critical"}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_WARN_STATUS:"nonCritical"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_FAIL_STATUS:"critical"}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_FAIL_STATUS:"nonRecoverable"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_SMART_FAIL_STATUS}</macro>
+               <value>1</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_WARN_STATUS:"nonCritical"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"criticalLower"}</macro>
+               <value>8</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"criticalUpper"}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"failed"}</macro>
+               <value>10</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"nonRecoverableLower"}</macro>
+               <value>9</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS:"nonRecoverableUpper"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"nonCriticalLower"}</macro>
+               <value>7</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS:"nonCriticalUpper"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_CRIT_STATUS}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_DISASTER_STATUS}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_WARN_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS:"critical"}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS:"nonRecoverable"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS:"nonCritical"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT:"Ambient"}</macro>
+               <value>35</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT:"CPU"}</macro>
+               <value>75</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_STATUS}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_DISASTER_STATUS}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN:"Ambient"}</macro>
+               <value>30</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN:"CPU"}</macro>
+               <value>70</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$VDISK_CRIT_STATUS:"failed"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$VDISK_WARN_STATUS:"degraded"}</macro>
+               <value>4</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+   </templates>
+   <graphs/>
+   <triggers>
+      <trigger>
+         <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System is in unrecoverable state!</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in critical state</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for errors</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>System is in unrecoverable state!</name>
+               <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_WARN_STATUS},eq)}=1</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in warning state</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for warnings</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>System is in unrecoverable state!</name>
+               <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
+               <recovery_expression/>
+            </dependency>
+            <dependency>
+               <name>System status is in critical state</name>
+               <expression>{Template Server Dell iDRAC SNMPv2:system.status[globalSystemStatus.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server Dell iDRAC SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Server Dell iDRAC SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Device has been replaced (new serial number received)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Device serial number has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server Dell iDRAC SNMPv2:system.hw.firmware.diff()}=1 and {Template Server Dell iDRAC SNMPv2:system.hw.firmware.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Firmware has changed</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Firmware version has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::StatusProbeEnum</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCriticalUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>criticalUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverableUpper</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>nonCriticalLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>criticalLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>nonRecoverableLower</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::BooleanType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>HDD</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>SSD</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::batteryState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ready</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Charging</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Below threshold</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskLayout</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>RAID-0</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>RAID-1</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>RAID-5</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>RAID-6</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>RAID-10</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>RAID-50</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>RAID-60</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>Concatenated RAID 1</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>Concatenated RAID 5</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskOperationalState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Not applicable</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Reconstructing</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Resynching</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Initializing</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Background init</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Write Through</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Write Back</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Force Write Back</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>No Read Ahead</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Read Ahead</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Adaptive Read Ahead</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Online</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

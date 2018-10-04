@@ -131,9 +131,9 @@ $ok-ack-fg-color: #00ff00;
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -357px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -357px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -357px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -357px -693px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -361px -730px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -361px -766px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -357px -693px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -190,7 +190,8 @@ $icon-widget-btn: (
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -318px -546px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -318px -582px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -318px -474px,
-	sound-off: url(../img/icon-sprite.svg) no-repeat -318px -510px
+	sound-off: url(../img/icon-sprite.svg) no-repeat -318px -510px,
+	info-clock: url(../img/icon-sprite.svg) no-repeat -399px -762px
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
@@ -659,6 +660,10 @@ ul.top-nav-icons {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
+			.icon-maint::before {
+				background-position: -360px -804px;
+			}
+
 			.icon-wzrd-action {
 				background: transparent url(../img/icon-sprite.svg) no-repeat -318px -624px;
 			}
@@ -1082,6 +1087,11 @@ td.inactive-bg {
 	border: none;
 	outline: 2px solid rgba($font-color,0.6);
 }
+.svg-graph-selection {
+	fill: rgba($font-color,0.2);
+	stroke: rgba($font-color,0.6);
+	stroke-width: 2px;
+}
 
 .ui-selectable-helper {
 	background-color: rgba($font-color,0.2);
@@ -1222,7 +1232,7 @@ td.inactive-bg {
 	background-position: -349px -325px;
 }
 .icon-action-severity-down::before {
-	background-position: -375px -325px;
+	background-position: -374px -325px;
 }
 .icon-action-severity-changed::before {
 	background-position: -399px -325px;
@@ -1232,6 +1242,9 @@ td.inactive-bg {
 }
 .icon-action-ack::before {
 	background-position: -323px -325px;
+}
+.icon-invisible::before {
+	background-position: -401px -803px,
 }
 .icon-problem-generated::before {
 	background-position: -449px -325px;
@@ -1257,5 +1270,18 @@ td.inactive-bg {
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -325px;
+	}
+}
+
+// OVERRIDES
+.overrides-options-list {
+	> li > div {
+		border: 1px solid $ui-tab-bg-selected-color;
+		background-color: transparent !important;
+
+		> .subfilter-disable-btn {
+			border: none !important;
+			top: 0;
+		}
 	}
 }

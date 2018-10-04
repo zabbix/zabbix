@@ -28,14 +28,14 @@ else {
 			_('Discovery rule'),
 			_x('Up', 'discovery results in dashboard'),
 			_x('Down', 'discovery results in dashboard')
-		]);
+		])
+		->setHeadingColumn(0);
 
 	foreach ($data['drules'] as $drule) {
 		$table->addRow([
 			new CLink($drule['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'discovery.view')
 				->setArgument('druleid', $drule['druleid'])
-				->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 			),
 			($drule['up'] != 0) ? (new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN) : '',
 			($drule['down'] != 0) ? (new CSpan($drule['down']))->addClass(ZBX_STYLE_RED) : ''
@@ -45,8 +45,7 @@ else {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

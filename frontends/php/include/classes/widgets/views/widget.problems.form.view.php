@@ -80,20 +80,41 @@ $jq_templates['tag-row'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 // Show tags.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_tags']), CWidgetHelper::getRadioButtonList($fields['show_tags']));
 
-// Show hosts in maintenance.
-$form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']), CWidgetHelper::getCheckBox($fields['maintenance']));
+// Tag name.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tag_name_format']),
+	CWidgetHelper::getRadioButtonList($fields['tag_name_format'])
+		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
+);
+
+// Tag display priority.
+$form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
+	CWidgetHelper::getTextBox($fields['tag_priority'])
+		->setAttribute('placeholder', _('comma-separated list'))
+		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
+);
+
+// Show suppressed problems.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
+);
 
 // Show unacknowledged only.
-$form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']), CWidgetHelper::getCheckBox($fields['unacknowledged']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
+	CWidgetHelper::getCheckBox($fields['unacknowledged'])
+);
 
 // Sort entries by.
-$form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']), CWidgetHelper::getComboBox($fields['sort_triggers']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
+	CWidgetHelper::getComboBox($fields['sort_triggers'])
+);
 
 // Show timeline.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']), CWidgetHelper::getCheckBox($fields['show_timeline']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
+	CWidgetHelper::getCheckBox($fields['show_timeline'])
+);
 
 // Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getNumericBox($fields['show_lines']));
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
 
 $form->addItem($form_list);
 

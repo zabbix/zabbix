@@ -107,9 +107,12 @@ class CWebUser {
 	 */
 	public static function logout() {
 		self::$data['sessionid'] = self::getSessionCookie();
-		self::$data = API::User()->logout([]);
-		CSession::destroy();
-		zbx_unsetcookie(ZBX_SESSION_NAME);
+
+		if (API::User()->logout([])) {
+			self::$data = null;
+			CSession::destroy();
+			zbx_unsetcookie(ZBX_SESSION_NAME);
+		}
 	}
 
 	public static function checkAuthentication($sessionId) {
@@ -221,6 +224,20 @@ class CWebUser {
 	 */
 	public static function isGuest() {
 		return (self::$data['alias'] == ZBX_GUEST_USER);
+	}
+
+	/**
+	 * Return true if guest user has access to frontend.
+	 *
+	 * @return bool
+	 */
+	public static function isGuestAllowed() {
+		$guest = DB::select('users', [
+			'output' => ['userid'],
+			'filter' => ['alias' => ZBX_GUEST_USER]
+		]);
+
+		return getUserGuiAccess($guest[0]['userid']) != GROUP_GUI_ACCESS_DISABLED;
 	}
 
 	/**

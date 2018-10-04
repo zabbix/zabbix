@@ -1711,6 +1711,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'markelements' => '0',
 				'show_unack' => '0',
 				'severity_min' => '0',
+				'show_suppressed' => '0',
 				'grid_size' => '50',
 				'grid_show' => '1',
 				'grid_align' => '1',
@@ -1762,6 +1763,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'markelements' => '0',
 				'show_unack' => '0',
 				'severity_min' => '0',
+				'show_suppressed' => '0',
 				'grid_size' => '50',
 				'grid_show' => '1',
 				'grid_align' => '1',
@@ -2089,7 +2091,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 								'name' => 'Availability'
 							]
 						],
-						'name' => 'Free disk space on $1 in %',
+						'name' => 'Free disk space on / in %',
 						'key_' => 'vfs.fs.size[/,pfree]',
 						'jmx_endpoint' => '',
 						'master_item' => [],

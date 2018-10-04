@@ -26,11 +26,13 @@ class CSimpleIntervalParser extends CParser {
 
 	private $options = [
 		'usermacros' => false,
-		'lldmacros' => false
+		'lldmacros' => false,
+		'negative' => false
 	];
 
 	private $user_macro_parser;
 	private $lld_macro_parser;
+	private $lld_macro_function_parser;
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
@@ -39,19 +41,23 @@ class CSimpleIntervalParser extends CParser {
 		if (array_key_exists('lldmacros', $options)) {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
+		if (array_key_exists('negative', $options)) {
+			$this->options['negative'] = $options['negative'];
+		}
 
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
 		}
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 	}
 
 	/**
 	 * Parse the given source string.
 	 *
-	 * 0..N[smhdw]|{$M}|{#M}
+	 * 0..N[smhdw]|{$M}|{#M}|{{#M}.func()}
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -60,9 +66,10 @@ class CSimpleIntervalParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 
+		$minus = $this->options['negative'] ? '-?' : '';
 		$p = $pos;
 
-		if (preg_match('/^((0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
+		if (preg_match('/^('.$minus.'(0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
 			$p += strlen($matches[0]);
 		}
 		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
@@ -70,6 +77,10 @@ class CSimpleIntervalParser extends CParser {
 		}
 		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->lld_macro_parser->getLength();
+		}
+		elseif ($this->options['lldmacros']
+				&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_function_parser->getLength();
 		}
 		else {
 			return self::PARSE_FAIL;

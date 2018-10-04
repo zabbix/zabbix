@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $hostInventoryWidget = (new CWidget())
 	->setTitle(_('Host inventory'))
 	->setControls((new CForm('get'))
@@ -49,8 +50,8 @@ $hostInventoryWidget->addItem(
 				$inventoryFieldsComboBox,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				new CComboBox('filter_exact', $this->data['filterExact'], null, [
-					0 => _('like'),
-					1 => _('exactly')
+					0 => _('contains'),
+					1 => _('equals')
 				]),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CTextBox('filter_field_value', $this->data['filterFieldValue']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

@@ -28,6 +28,10 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['layout.mode.js'];
+
+CView::$has_web_layout_mode = true;
+$page['web_layout_mode'] = CView::getLayoutMode();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS', 0);
@@ -40,14 +44,13 @@ $fields = [
 	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
 	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'fullscreen'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'ack_status' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'show_severity' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
-	'show_maintenance' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'show_suppressed' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
 	'status_change_days' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null],
 	'status_change' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -68,7 +71,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.show_triggers', getRequest('show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM),
 		PROFILE_TYPE_INT
 	);
-	CProfile::update('web.overview.filter.show_maintenance', getRequest('show_maintenance', 0), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.show_suppressed', getRequest('show_suppressed', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.overview.filter.show_severity', getRequest('show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		PROFILE_TYPE_INT
 	);
@@ -99,7 +102,7 @@ if (hasRequest('filter_set')) {
 elseif (hasRequest('filter_rst')) {
 	DBStart();
 	CProfile::delete('web.overview.filter.show_triggers');
-	CProfile::delete('web.overview.filter.show_maintenance');
+	CProfile::delete('web.overview.filter.show_suppressed');
 	CProfile::delete('web.overview.filter.ack_status');
 	CProfile::delete('web.overview.filter.show_severity');
 	CProfile::delete('web.overview.filter.txt_select');
@@ -141,7 +144,6 @@ $page_filter = new CPageFilter([
 ]);
 
 $data = [
-	'fullscreen' => (bool) getRequest('fullscreen', false),
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config,
@@ -163,7 +165,7 @@ if ($type == SHOW_TRIGGERS) {
 		'statusChangeDays' => CProfile::get('web.overview.filter.status_change_days', 14),
 		'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
 		'application' => CProfile::get('web.overview.filter.application', ''),
-		'showMaintenance' => CProfile::get('web.overview.filter.show_maintenance', 1),
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0),
 		'inventory' => []
 	];
 	foreach (CProfile::getArray('web.overview.filter.inventory.field', []) as $i => $field) {
@@ -173,31 +175,42 @@ if ($type == SHOW_TRIGGERS) {
 		];
 	}
 
-	$host_options = [];
+	if ($data['pageFilter']->groupsSelected) {
+		$host_options = [];
 
-	// fetch hosts
-	if ($filter['inventory']) {
-		$host_options['searchInventory'] = [];
-		foreach ($filter['inventory'] as $field) {
-			$host_options['searchInventory'][$field['field']][] = $field['value'];
+		if ($filter['inventory']) {
+			$host_options['searchInventory'] = [];
+
+			foreach ($filter['inventory'] as $field) {
+				$inventoryFilter[$field['field']][] = $field['value'];
+				$host_options['searchInventory'][$field['field']][] = $field['value'];
+			}
 		}
+
+		$trigger_options = [
+			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
+			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'filter' => [
+				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
+			],
+			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
+			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
+				'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED)
+					? $filter['showSeverity']
+					: null,
+			'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null
+		];
+
+		$groupids = ($data['pageFilter']->groupids === null) ? [] : $data['pageFilter']->groupids;
+
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
+			$host_options, $trigger_options, $filter['show_suppressed']
+		);
 	}
-
-	$trigger_options = [
-		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
-		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-		'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null],
-		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
-		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
-		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null,
-		'maintenance' => !$filter['showMaintenance'] ? false : null
-	];
-
-	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
-	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-		$host_options, $trigger_options
-	);
+	else {
+		$hosts = [];
+		$triggers = [];
+	}
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
@@ -208,7 +221,8 @@ if ($type == SHOW_TRIGGERS) {
 // fetch item data
 else {
 	$data['filter'] = [
-		'application' => CProfile::get('web.overview.filter.application', '')
+		'application' => CProfile::get('web.overview.filter.application', ''),
+		'show_suppressed' => CProfile::get('web.overview.filter.show_suppressed', 0)
 	];
 
 	$overviewView = new CView('monitoring.overview.items', $data);

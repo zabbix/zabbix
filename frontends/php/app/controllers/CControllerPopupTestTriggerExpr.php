@@ -38,7 +38,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 	protected function init() {
 		$this->disableSIDvalidation();
 
-		define('ZBX_PAGE_NO_MENU', 1);
+		define('ZBX_PAGE_NO_MENU', true);
 		define('COMBO_PATTERN', 'str_in_array({},array(');
 		define('COMBO_PATTERN_LENGTH', strlen(COMBO_PATTERN));
 		define('NO_LINK_IN_TESTING', true);

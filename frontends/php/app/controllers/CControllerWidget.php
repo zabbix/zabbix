@@ -112,8 +112,7 @@ abstract class CControllerWidget extends CController {
 
 		if (!$ret) {
 			$output = [
-				'header' => $this->getDefaultHeader(),
-				'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+				'header' => $this->getDefaultHeader()
 			];
 
 			if (($messages = getMessages()) !== null) {

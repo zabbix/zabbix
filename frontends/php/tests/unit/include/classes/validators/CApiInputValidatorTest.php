@@ -24,6 +24,61 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 	public function dataProviderInput() {
 		return [
 			[
+				['type' => API_COLOR],
+				'ffffff',
+				'/1/color',
+				'ffffff'
+			],
+			[
+				['type' => API_COLOR],
+				'037ACF',
+				'/1/color',
+				'037ACF'
+			],
+			[
+				['type' => API_COLOR],
+				'000000',
+				'/1/color',
+				'000000'
+			],
+			[
+				['type' => API_COLOR],
+				'',
+				'/1/color',
+				''
+			],
+			[
+				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/color',
+				'Invalid parameter "/1/color": cannot be empty.'
+			],
+			[
+				['type' => API_COLOR],
+				[],
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				true,
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				null,
+				'/1/color',
+				'Invalid parameter "/1/color": a character string is expected.'
+			],
+			[
+				['type' => API_COLOR],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/color',
+				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_STRING_UTF8, 'length' => 16],
 				'Zabbix server',
 				'/1/name',
@@ -474,6 +529,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				0,
 				'/1/id',
 				'0'
+			],
+			[
+				['type' => API_ID, 'flags' => API_NOT_EMPTY],
+				0,
+				'/1/id',
+				'Invalid parameter "/1/id": cannot be empty.'
 			],
 			[
 				['type' => API_ID],
@@ -1128,6 +1189,27 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Incorrect validation rules.'
 			],
 			[
+				['type' => API_OBJECTS, 'fields' => [
+					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+				]],
+				[
+					['host' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2'],
+					['host' => 'host 3'],
+					['host' => 'host 4']
+				],
+				'/',
+				[
+					['host' => 'host 0', 'name' => 'host 0'],
+					['host' => 'host 1', 'name' => 'visible name 1'],
+					['host' => 'host 2', 'name' => 'host 2'],
+					['host' => 'host 3', 'name' => 'host 3'],
+					['host' => 'host 4', 'name' => 'host 4']
+				]
+			],
+			[
 				['type' => API_HG_NAME, 'length' => 16],
 				'Zabbix servers',
 				'/1/name',
@@ -1180,7 +1262,290 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_HG_NAME],
 				'/Latvia/Riga',
 				'/1/name',
-				'Invalid parameter "/1/name": invalid group name "/Latvia/Riga".'
+				'Invalid parameter "/1/name": invalid host group name.'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Latvia/Riga',
+				'/1/name',
+				'Invalid parameter "/1/name": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Latvia/Riga/{#DC.NAME}',
+				'/1/name',
+				'Latvia/Riga/{#DC.NAME}'
+			],
+			[
+				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{{#DC}.regsub(".*", "//\1")}',
+				'/1/name',
+				'{{#DC}.regsub(".*", "//\1")}'
+			],
+			[
+				['type' => API_H_NAME, 'length' => 16],
+				'Zabbix server',
+				'/1/name',
+				'Zabbix server'
+			],
+			[
+				['type' => API_H_NAME, 'length' => 16],
+				'Zabbix server++++',
+				'/1/name',
+				'Invalid parameter "/1/name": value is too long.'
+			],
+			[
+				['type' => API_H_NAME],
+				'',
+				'/1/name',
+				'Invalid parameter "/1/name": cannot be empty.'
+			],
+			[
+				['type' => API_H_NAME],
+				[],
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				true,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				null,
+				'/1/name',
+				'Invalid parameter "/1/name": a character string is expected.'
+			],
+			[
+				['type' => API_H_NAME],
+				// broken UTF-8 byte sequence
+				'Zabbix '."\xd1".'server',
+				'/1/name',
+				'Invalid parameter "/1/name": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'Linux server',
+				'/1/name',
+				'Invalid parameter "/1/name": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{#PREFIX}-server',
+				'/1/name',
+				'{#PREFIX}-server'
+			],
+			[
+				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO],
+				'{{#HOST}.regsub("^[a-z]+", "\1")}',
+				'/1/name',
+				'{{#HOST}.regsub("^[a-z]+", "\1")}'
+			],
+			[
+				['type' => API_NUMERIC],
+				'',
+				'/1/numeric',
+				''
+			],
+			[
+				['type' => API_NUMERIC, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": cannot be empty.'
+			],
+			[
+				['type' => API_NUMERIC],
+				0,
+				'/1/numeric',
+				'0'
+			],
+			[
+				['type' => API_NUMERIC, 'length' => 5],
+				12345,
+				'/1/numeric',
+				'12345'
+			],
+			[
+				['type' => API_NUMERIC, 'length' => 5],
+				123456,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": value is too long.'
+			],
+			[
+				['type' => API_NUMERIC],
+				-12345,
+				'/1/numeric',
+				'-12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'00',
+				'/1/numeric',
+				'0'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-00',
+				'/1/numeric',
+				'-0'
+			],
+			[
+				['type' => API_NUMERIC],
+				'0001.15',
+				'/1/numeric',
+				'1.15'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-0000.0125',
+				'/1/numeric',
+				'-0.0125'
+			],
+			[
+				['type' => API_NUMERIC],
+				'012345',
+				'/1/numeric',
+				'12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-012345',
+				'/1/numeric',
+				'-12345'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775808',
+				'/1/numeric',
+				'-9223372036854775808'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775807',
+				'/1/numeric',
+				'9223372036854775807'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775809',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775808',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'-9223372036854775808.000001',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'9223372036854775807.000001',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'.124',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'foo',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				[],
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				true,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				null,
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a character string is expected.'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5s',
+				'/1/numeric',
+				'5s'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5m',
+				'/1/numeric',
+				'5m'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5h',
+				'/1/numeric',
+				'5h'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5d',
+				'/1/numeric',
+				'5d'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5w',
+				'/1/numeric',
+				'5w'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5K',
+				'/1/numeric',
+				'5K'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5M',
+				'/1/numeric',
+				'5M'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5G',
+				'/1/numeric',
+				'5G'
+			],
+			[
+				['type' => API_NUMERIC],
+				'5T',
+				'/1/numeric',
+				'5T'
+			],
+			[
+				['type' => API_NUMERIC],
+				'8388607T',
+				'/1/numeric',
+				'8388607T'
+			],
+			[
+				['type' => API_NUMERIC],
+				'8388608T',
+				'/1/numeric',
+				'Invalid parameter "/1/numeric": a number is too large.'
 			],
 			[
 				['type' => API_SCRIPT_NAME, 'length' => 23],
@@ -1303,6 +1668,61 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/macro',
 				'Invalid parameter "/1/macro": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_RANGE_TIME, 'length' => 6],
+				'now-1d',
+				'/1/time',
+				'now-1d'
+			],
+			[
+				['type' => API_RANGE_TIME, 'length' => 8],
+				'now-1d-1h',
+				'/1/time',
+				'Invalid parameter "/1/time": value is too long.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				'{$MACRO}',
+				'/1/time',
+				'Invalid parameter "/1/time": a time range is expected.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				'',
+				'/1/time',
+				'Invalid parameter "/1/time": cannot be empty.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				[],
+				'/1/time',
+				'Invalid parameter "/1/time": a character string is expected.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				true,
+				'/1/time',
+				'Invalid parameter "/1/time": a character string is expected.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				null,
+				'/1/time',
+				'Invalid parameter "/1/time": a character string is expected.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				'now-5x',
+				'/1/time',
+				'Invalid parameter "/1/time": a time range is expected.'
+			],
+			[
+				['type' => API_RANGE_TIME],
+				// broken UTF-8 byte sequence
+				'now-'."\xd1".'d',
+				'/1/time',
+				'Invalid parameter "/1/time": invalid byte sequence in UTF-8.'
 			],
 			[
 				['type' => API_TIME_PERIOD, 'length' => 16],
@@ -1682,15 +2102,45 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				['type' => API_TIME_UNIT],
+				'-2147483649s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'-2147483648s',
+				'/1/time_unit',
+				'-2147483648s'
+			],
+			[
+				['type' => API_TIME_UNIT],
 				'2147483647s',
 				'/1/time_unit',
 				'2147483647s'
 			],
 			[
 				['type' => API_TIME_UNIT],
+				'2147483648s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": a number is too large.'
+			],
+			[
+				['type' => API_TIME_UNIT],
 				'3550w',
 				'/1/time_unit',
 				'3550w'
+			],
+			[
+				['type' => API_TIME_UNIT],
+				'',
+				'/1/time_unit',
+				''
+			],
+			[
+				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": cannot be empty.'
 			],
 			[
 				['type' => API_TIME_UNIT],
@@ -1709,6 +2159,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'30mm',
 				'/1/time_unit',
 				'Invalid parameter "/1/time_unit": a time unit is expected.'
+			],
+			[
+				['type' => API_TIME_UNIT, 'in' => '-100:100'],
+				'-101s',
+				'/1/time_unit',
+				'Invalid parameter "/1/time_unit": value must be one of -100-100.'
 			],
 			[
 				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:100'],
@@ -1878,6 +2334,12 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'',
 				'/1/url',
 				''
+			],
+			[
+				['type' => API_URL, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/url',
+				'Invalid parameter "/1/url": cannot be empty.'
 			],
 			[
 				['type' => API_URL],

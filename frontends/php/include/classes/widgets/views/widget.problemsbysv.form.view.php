@@ -65,8 +65,10 @@ $form_list->addRow(
 	CWidgetHelper::getSeverities($fields['severities'], $data['config'])
 );
 
-// Show hosts in maintenance.
-$form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']), CWidgetHelper::getCheckBox($fields['maintenance']));
+// Show suppressed problems.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
+	CWidgetHelper::getCheckBox($fields['show_suppressed'])
+);
 
 // Hide groups without problems.
 $form_list->addRow(
@@ -76,6 +78,11 @@ $form_list->addRow(
 
 // Problem display.
 $form_list->addRow(CWidgetHelper::getLabel($fields['ext_ack']), CWidgetHelper::getRadioButtonList($fields['ext_ack']));
+
+// Show timeline.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_timeline']),
+	CWidgetHelper::getCheckBox($fields['show_timeline'])
+);
 
 $form->addItem($form_list);
 

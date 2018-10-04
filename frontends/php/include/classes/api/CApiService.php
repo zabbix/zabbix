@@ -938,7 +938,7 @@ class CApiService {
 	}
 
 	/**
-	 * Check if a set of parameters contains a deprecated parameter or a a parameter with a deprecated value.
+	 * Check if a set of parameters contains a deprecated parameter or a parameter with a deprecated value.
 	 * If $value is not set, the method will trigger a deprecated notice if $params contains the $paramName key.
 	 * If $value is set, the method will trigger a notice if the value of the parameter is equal to the deprecated value
 	 * or the parameter is an array and contains a deprecated value.

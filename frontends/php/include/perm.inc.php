@@ -46,8 +46,7 @@ function permission2str($permission) {
 function authentication2str($type) {
 	$authentications = [
 		ZBX_AUTH_INTERNAL => _('Zabbix internal authentication'),
-		ZBX_AUTH_LDAP => _('LDAP authentication'),
-		ZBX_AUTH_HTTP => _('HTTP authentication')
+		ZBX_AUTH_LDAP => _('LDAP authentication')
 	];
 
 	return $authentications[$type];
@@ -129,7 +128,10 @@ function getUserAuthenticationType($userId, $maxGuiAccess = null) {
 			return $config['authentication_type'];
 
 		case GROUP_GUI_ACCESS_INTERNAL:
-			return ($config['authentication_type'] == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
+			return ZBX_AUTH_INTERNAL;
+
+		case GROUP_GUI_ACCESS_LDAP:
+			return ZBX_AUTH_LDAP;
 
 		default:
 			return $config['authentication_type'];
@@ -153,29 +155,6 @@ function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
 	));
 
 	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
-}
-
-/**
- * Get group authentication type.
- *
- * @param array $groupIds
- * @param int   $maxGuiAccess
- *
- * @return int
- */
-function getGroupAuthenticationType($groupIds, $maxGuiAccess = null) {
-	$config = select_config();
-
-	switch (getGroupsGuiAccess($groupIds, $maxGuiAccess)) {
-		case GROUP_GUI_ACCESS_SYSTEM:
-			return $config['authentication_type'];
-
-		case GROUP_GUI_ACCESS_INTERNAL:
-			return ($config['authentication_type'] == ZBX_AUTH_HTTP) ? ZBX_AUTH_HTTP : ZBX_AUTH_INTERNAL;
-
-		default:
-			return $config['authentication_type'];
-	}
 }
 
 /***********************************************
