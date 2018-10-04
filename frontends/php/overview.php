@@ -182,7 +182,6 @@ if ($type == SHOW_TRIGGERS) {
 			$host_options['searchInventory'] = [];
 
 			foreach ($filter['inventory'] as $field) {
-				$inventoryFilter[$field['field']][] = $field['value'];
 				$host_options['searchInventory'][$field['field']][] = $field['value'];
 			}
 		}
