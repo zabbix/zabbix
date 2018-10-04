@@ -703,7 +703,8 @@ class CControllerPopupGeneric extends CController {
 			case 'host_groups':
 				$options = [
 					'output' => ['groupid', 'name'],
-					'preservekeys' => true
+					'preservekeys' => true,
+					'real_hosts' => true
 				];
 
 				if (array_key_exists('normal_only', $page_options)) {
