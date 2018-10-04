@@ -49,7 +49,7 @@ $widget = (new CWidget())
 	]));
 
 // filter
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('hosts.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [

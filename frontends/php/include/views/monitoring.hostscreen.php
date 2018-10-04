@@ -75,7 +75,7 @@ else {
 		'to' => $data['to']
 	]);
 
-	$filter = (new CFilter())
+	$filter = (new CFilter(new CUrl()))
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
