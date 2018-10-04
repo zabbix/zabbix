@@ -391,11 +391,19 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestMultiselectNew($id, $string) {
-		$this->webDriver->findElement(
+		$element = $this->webDriver->findElement(
 			WebDriverBy::xpath("//div[contains(@class, 'multiselect') and @id='$id']/input")
-		)
-			->clear()
-			->sendKeys($string);
+		);
+
+		$element->clear()->sendKeys($string);
+
+		// Fire onchange event.
+		$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
+				'event.initEvent("change", false, true);'.
+				'arguments[0].dispatchEvent(event);',
+				[$element]
+		);
+
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
 			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
