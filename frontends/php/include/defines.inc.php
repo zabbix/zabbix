@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0rc3');
-define('ZABBIX_API_VERSION',	'4.0.0');
+define('ZABBIX_VERSION',		'4.2.0alpha1');
+define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050162);
+define('ZABBIX_DB_VERSION',		4000000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -1122,7 +1122,7 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 			\s*? #matches spaces
 		)
 	\] # match closing bracket
-))*? # matches non comma seperated brackets with parameters zero or more times
+))*? # matches non comma separated brackets with parameters zero or more times
 )');
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
