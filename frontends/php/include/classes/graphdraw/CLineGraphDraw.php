@@ -230,7 +230,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$to_resolve[] = 'trends';
 			}
 
-			// Otherwise, resolve user macro and parse the string. If successfull, convert to seconds.
+			// Otherwise, resolve user macro and parse the string. If successful, convert to seconds.
 			if ($to_resolve) {
 				$item = CMacrosResolverHelper::resolveTimeUnitMacros([$item], $to_resolve)[0];
 

@@ -939,7 +939,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected preprocessing worker              *
- *             message - [IN] message recieved by preprocessing manager       *
+ *             message - [IN] message received by preprocessing manager       *
  *                                                                            *
  ******************************************************************************/
 static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, zbx_ipc_client_t *client,

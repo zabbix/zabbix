@@ -64,10 +64,6 @@ $options = [
 	'timestamp' => $map_data['timestamp']
 ];
 
-if (getRequest('used_in_widget', 0)) {
-	$options['map_widget_footer'] = (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString();
-}
-
 if ($map_data['id'] == -1) {
 	$options['timestamp'] = null;
 }
