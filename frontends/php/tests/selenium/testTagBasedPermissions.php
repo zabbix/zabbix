@@ -76,7 +76,10 @@ class testTagBasedPermissions extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 		}
 
-		// Logout as super admin and login as simple user
+		// Logout as super admin and login as simple user.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE alias='. zbx_dbstr($this->user)));
 		$this->assertFalse(empty($userid));
 		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b54f', $userid['userid']);
