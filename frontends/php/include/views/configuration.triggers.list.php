@@ -183,32 +183,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// description
 	$description = [];
+	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_NORMAL
+	);
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-
-	if ($trigger['templateid'] > 0) {
-		if (!isset($data['realHosts'][$triggerid])) {
-			$description[] = (new CSpan(_('Host')))->addClass(ZBX_STYLE_GREY);
-			$description[] = NAME_DELIMITER;
-		}
-		else {
-			$real_hosts = $data['realHosts'][$triggerid];
-			$real_host = reset($real_hosts);
-
-			if (array_key_exists($real_host['hostid'], $data['writable_templates'])) {
-				$description[] = (new CLink(CHtml::encode($real_host['name']),
-					'triggers.php?hostid='.$real_host['hostid']
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-			}
-			else {
-				$description[] = (new CSpan(CHtml::encode($real_host['name'])))->addClass(ZBX_STYLE_GREY);
-			}
-
-			$description[] = NAME_DELIMITER;
-		}
-	}
 
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
