@@ -274,7 +274,7 @@ class CHttpTest extends CApiService {
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'applicationid' =>		['type' => API_ID],
-			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
+			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
@@ -314,7 +314,7 @@ class CHttpTest extends CApiService {
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
-				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
+				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
 			]]
@@ -369,7 +369,7 @@ class CHttpTest extends CApiService {
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'applicationid' =>		['type' => API_ID],
-			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
+			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
 			'agent' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'agent')],
 			'http_proxy' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_proxy')],
@@ -410,7 +410,7 @@ class CHttpTest extends CApiService {
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
-				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
+				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
 			]]
@@ -777,10 +777,7 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the status code range is invalid.
 	 */
 	private function checkStatusCodes(array $httptests) {
-		$validator = new CStatusCodeRangesValidator([
-			'usermacros' => true,
-			'messageInvalid' => _('Invalid response code "%1$s".')
-		]);
+		$ranges_parser = new CRangesParser(['usermacros' => true]);
 
 		foreach ($httptests as $httptest) {
 			if (!array_key_exists('steps', $httptest)) {
@@ -792,8 +789,10 @@ class CHttpTest extends CApiService {
 					continue;
 				}
 
-				if (!$validator->validate($httpstep['status_codes'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
+				if ($ranges_parser->parse($httpstep['status_codes']) != CParser::PARSE_SUCCESS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid response code "%1$s".', $httpstep['status_codes'])
+					);
 				}
 			}
 		}

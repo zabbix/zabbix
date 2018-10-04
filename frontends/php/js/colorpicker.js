@@ -39,26 +39,70 @@
 				['891515','660A3B','370F69','24146D','131A5E','093578','044174','00484B','003930','144618','264E16','615911','B75F11','BF5300','AC3C00','8F2809','2E1D1A','1C252A'],
 				['5B0E0E','440727','250A46','180D49','0D113F','062350','002B4D','003032','002620','0D2F10','19340F','413B0B','7A3F0B','7F3700','732800','5F1B06','1F1311','13191C'],
 				['2D0707','220313','120523','0C0624','06081F','031128','001526','001819','00131D','061708','0C1A07','201D05','3D1F05','3F1B00','391400','2F0D03','0F0908','090C0E'],
-			]
+			],
+			'appendTo': 'body'
 		},
 		/**
 		 * Click handler for every colorpicker cell.
 		 */
 		setColorHandler = function() {
 			methods.set_color($(this).attr('title').substr(1));
+			input.trigger('change');
 			methods.hide();
+		},
+		/**
+		 * Calculates top and left position for colorpicker overlay element.
+		 */
+		getOverlayPosition = function(id) {
+			var colorbox = $('#lbl_' + id),
+				pos = colorbox.offset(),
+				dialog = colorbox.closest('.overlay-dialogue'),
+				overlay = $('#color_picker'),
+				min_outline = 10,
+				frame_dims = {
+					top: 0,
+					left: 0,
+					bottom: window.screen.height,
+					right: window.screen.width
+				},
+				left = pos.left + colorbox.outerWidth(),
+				top = pos.top;
+
+			// If colorpicker is located in dialog, use dialog as a frame.
+			if (overlay.parents('.overlay-dialogue').length) {
+				frame_dims.left = dialog.offset().left;
+				frame_dims.top = dialog.offset().top;
+				frame_dims.bottom = dialog.outerHeight() + frame_dims.top;
+				frame_dims.right = dialog.outerWidth() + frame_dims.left;
+			}
+
+			// Make sure that overlay is inside frame.
+			if (top + overlay.outerHeight() + min_outline > frame_dims.bottom) {
+				top = frame_dims.bottom - overlay.outerHeight() - min_outline;
+			}
+
+			if (left + overlay.outerWidth() + min_outline > frame_dims.right) {
+				left = frame_dims.right - overlay.outerWidth() - min_outline;
+			}
+
+			return {
+				top: top - frame_dims.top,
+				left: left - frame_dims.left
+			};
 		},
 		methods = {
 			/**
 			 * Initialization of colorpicker overlay.
 			 *
-			 * @param object options
-			 * @param array  options.palette    Array of arrays. Every nested array contains hex color for one cell.
+			 * @param object         options
+			 * @param array          options.palette   Array of arrays. Every nested array contains hex color for one
+			 *                                         cell.
+			 * @param string|object  options.appendTo  Target element where overlay should be appended.
+			 * @param function       options.onUpdate  Callback function to execute once color has changed.
 			 */
 			init: function(options) {
-				var close = $('<button type="button" class="overlay-close-btn"/>').click(methods.hide);
-
-				options = $.extend(options||{}, defaults);
+				var close = $('<button type="button" class="overlay-close-btn" title="' + t('Close') + '"/>').click(methods.hide);
+				options = $.extend(defaults, options||{});
 				overlay = $('<div class="overlay-dialogue" id="color_picker"/>').append(close).append(
 					$.map(options.palette, function(colors) {
 						return $('<div class="color-picker"/>').append(
@@ -69,7 +113,13 @@
 					})
 				).on('click', '.color-picker div', setColorHandler);
 
-				overlay.appendTo("body");
+				overlay.appendTo($(options.appendTo));
+				if ($(options.appendTo).prop('tagName') !== 'BODY') {
+					$(options.appendTo).on('remove', function() {
+						overlay.remove();
+						overlay = null;
+					});
+				}
 				methods.hide();
 			},
 			/**
@@ -81,8 +131,8 @@
 					'display': 'none',
 					'left': '-' + (overlay.width() ? overlay.width() : 100) + 'px'
 				});
-				selected_label = null;
-				selected_text = null;
+				colorbox = null;
+				input = null;
 			},
 			/**
 			 * Show colorpicker for specific element.
@@ -92,16 +142,16 @@
 			 */
 			show: function(id, target) {
 				input = $('#' + id);
+				colorbox = $('#lbl_' + id);
 
 				if (input.is(':disabled,[readonly]')) {
 					return;
 				}
 
-				colorbox = $('#lbl_' + id);
-				var pos = colorbox.offset();
+				var pos = getOverlayPosition(id);
 
 				overlay.css({
-					'left': (pos.left + colorbox.outerWidth()) + 'px',
+					'left': pos.left + 'px',
 					'top': pos.top + 'px',
 					'display': 'block'
 				});
@@ -125,7 +175,6 @@
 					'title': background
 				});
 				input.val(color);
-				methods.hide();
 			},
 			/**
 			 * Set desired color to input element and colorbox associated with input element.
@@ -165,7 +214,8 @@
 		}
 
 		return this.each(function(_, element) {
-			var id = $(element).attr('id');
+			var id = $(element).attr('id'),
+				callback = (options && 'onUpdate' in options) ? options.onUpdate : null;
 			if ($('#lbl_' + id).length) {
 				// Prevent multiple initialization on same element.
 				return;
@@ -187,6 +237,7 @@
 				 * is sorted in graph configuration form.
 				 */
 				methods.set_color_by_id($(element).attr('id'), this.value);
+				callback && callback.call(element, this.value);
 			});
 
 			methods.set_color_by_id(id, element.value);

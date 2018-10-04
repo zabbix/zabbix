@@ -296,8 +296,8 @@ function zbx_date2str($format, $value = null) {
 /**
  * Calculates and converts timestamp to string represenation.
  *
- * @param int|string $start_date Start date timestamp.
- * @param int|string $end_date   End date timestamp.
+ * @param int|string $start_date  Start date timestamp.
+ * @param int|string $end_date    End date timestamp.
  *
  * @return string
  */
@@ -377,6 +377,40 @@ function hex2rgb($color) {
 	}
 
 	return [hexdec($r), hexdec($g), hexdec($b)];
+}
+
+function getColorVariations($color, $variations_requested = 1) {
+	if ($variations_requested <= 1) {
+		return [$color];
+	}
+
+	$change = hex2rgb('#ffffff'); // Color which is increased/decreased in variations.
+	$max = 50;
+
+	$color = hex2rgb($color);
+	$variations = [];
+
+	$range = range(-1 * $max, $max, $max * 2 / $variations_requested);
+
+	// Remove redundant values.
+	while (count($range) > $variations_requested) {
+		(count($range) % 2) ? array_shift($range) : array_pop($range);
+	}
+
+	// Calculate colors.
+	foreach ($range as $var) {
+		$r = $color[0] + ($change[0] / 100 * $var);
+		$g = $color[1] + ($change[1] / 100 * $var);
+		$b = $color[2] + ($change[2] / 100 * $var);
+
+		$variations[] = '#' . rgb2hex([
+			$r < 0 ? 0 : ($r > 255 ? 255 : (int) $r),
+			$g < 0 ? 0 : ($g > 255 ? 255 : (int) $g),
+			$b < 0 ? 0 : ($b > 255 ? 255 : (int) $b)
+		]);
+	}
+
+	return $variations;
 }
 
 function zbx_num2bitstr($num, $rev = false) {
@@ -482,8 +516,8 @@ function convertUnitsUptime($value) {
  * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
- * @param int $value	time period in seconds
- * @param bool $ignore_millisec	without ms (1s 200 ms = 1.2s)
+ * @param int  $value            Time period in seconds.
+ * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
  *
  * @return string
  */
@@ -574,15 +608,21 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		}
 	}
 
-	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
-	$str .= isset($values['m']) ? $values['m']._x('m', 'month short').' ' : '';
-	$str .= isset($values['d']) ? $values['d']._x('d', 'day short').' ' : '';
-	$str .= isset($values['h']) ? $values['h']._x('h', 'hour short').' ' : '';
-	$str .= isset($values['mm']) ? $values['mm']._x('m', 'minute short').' ' : '';
-	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
-	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
+	$units = [
+		'y' => _x('y', 'year short'),
+		'm' => _x('m', 'month short'),
+		'd' => _x('d', 'day short'),
+		'h' => _x('h', 'hour short'),
+		'mm' => _x('m', 'minute short'),
+		's' => _x('s', 'second short'),
+		'ms' => _x('ms', 'millisecond short')
+	];
 
-	return $str ? rtrim($str) : '0';
+	foreach (array_filter($values) as $unit => $value) {
+		$str .= ' '.$value.$units[$unit];
+	}
+
+	return $str ? trim($str) : '0';
 }
 
 /**
@@ -767,19 +807,24 @@ function convert_units($options = []) {
  * Examples:
  *		10m = 600
  *		3d = 10800
+ *		-10m = -600
  *
  * @param string $time
  *
  * @return int
  */
 function timeUnitToSeconds($time) {
-	preg_match('/^((\d)+)(['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
 
-	if (array_key_exists(3, $matches)) {
-		$suffix = $matches[3];
-		$time = $matches[1];
+	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
-		switch ($suffix) {
+	if (!array_key_exists('number', $matches)) {
+		return null;
+	}
+	elseif (array_key_exists('suffix', $matches)) {
+		$time = $matches['number'];
+
+		switch ($matches['suffix']) {
 			case 's':
 				$sec = $time;
 				break;
@@ -798,10 +843,10 @@ function timeUnitToSeconds($time) {
 		}
 	}
 	else {
-		$sec = $matches[0];
+		$sec = $matches['number'];
 	}
 
-	return $sec;
+	return $is_negative ? bcmul($sec, -1) : $sec;
 }
 
 /**
@@ -810,45 +855,48 @@ function timeUnitToSeconds($time) {
  * Supported metric suffixes: K, M, G, T
  *
  * @param string $value
+ * @param int    $scale  The number of digits after the decimal place in the result.
  *
  * @return string
  */
-function convertFunctionValue($value) {
-	$suffix = $value[strlen($value) - 1];
-	if (!ctype_digit($suffix)) {
-		$value = substr($value, 0, strlen($value) - 1);
+function convertFunctionValue($value, $scale = 0) {
+	$suffix = substr($value, -1);
 
-		switch ($suffix) {
-			case 's':
-				break;
-			case 'm':
-				$value = bcmul($value, '60');
-				break;
-			case 'h':
-				$value = bcmul($value, '3600');
-				break;
-			case 'd':
-				$value = bcmul($value, '86400');
-				break;
-			case 'w':
-				$value = bcmul($value, '604800');
-				break;
-			case 'K':
-				$value = bcmul($value, '1024');
-				break;
-			case 'M':
-				$value = bcmul($value, '1048576');
-				break;
-			case 'G':
-				$value = bcmul($value, '1073741824');
-				break;
-			case 'T':
-				$value = bcmul($value, '1099511627776');
-				break;
-		}
+	if (ctype_digit($suffix)) {
+		return $value;
 	}
 
-	return $value;
+	$value = substr($value, 0, -1);
+
+	switch ($suffix) {
+		case 'm':
+			return bcmul($value, '60', $scale);
+
+		case 'h':
+			return bcmul($value, '3600', $scale);
+
+		case 'd':
+			return bcmul($value, '86400', $scale);
+
+		case 'w':
+			return bcmul($value, '604800', $scale);
+
+		case 'K':
+			return bcmul($value, '1024', $scale);
+
+		case 'M':
+			return bcmul($value, '1048576', $scale);
+
+		case 'G':
+			return bcmul($value, '1073741824', $scale);
+
+		case 'T':
+			return bcmul($value, '1099511627776', $scale);
+
+		case 's':
+		default:
+			return $value;
+	}
 }
 
 /************* ZBX MISC *************/
@@ -1430,17 +1478,27 @@ function zbx_str2links($text) {
 	foreach (explode("\n", $text) as $line) {
 		$line = rtrim($line, "\r ");
 
-		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches);
 
 		$start = 0;
+
 		foreach ($matches[0] as $match) {
-			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = new CLink($match[0], $match[0]);
-			$start = $match[1] + mb_strlen($match[0]);
+			if (($pos = mb_strpos($line, $match, $start)) !== false) {
+				if ($pos != $start) {
+					$result[] = mb_substr($line, $start, $pos - $start);
+				}
+				$result[] = new CLink(CHTML::encode($match), $match);
+				$start = $pos + mb_strlen($match);
+			}
 		}
-		$result[] = mb_substr($line, $start);
+
+		if (mb_strlen($line) != $start) {
+			$result[] = mb_substr($line, $start);
+		}
+
 		$result[] = BR();
 	}
+
 	array_pop($result);
 
 	return $result;
@@ -1734,6 +1792,16 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
+		$config = select_config();
+
+		if ($config['http_login_form'] == ZBX_AUTH_FORM_HTTP && $config['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED
+				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
+			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
+			redirect($redirect_to->toString());
+
+			exit;
+		}
+
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message

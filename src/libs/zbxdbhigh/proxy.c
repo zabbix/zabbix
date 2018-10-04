@@ -1529,12 +1529,12 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	int			i, ret = SUCCEED;
 
 	table_ids_t		*table_ids;
-	zbx_vector_ptr_t	tables;
+	zbx_vector_ptr_t	tables_proxy;
 	const ZBX_TABLE		*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&tables);
+	zbx_vector_ptr_create(&tables_proxy);
 
 	DBbegin();
 
@@ -1558,7 +1558,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		table_ids = (table_ids_t *)zbx_malloc(NULL, sizeof(table_ids_t));
 		table_ids->table = table;
 		zbx_vector_uint64_create(&table_ids->ids);
-		zbx_vector_ptr_append(&tables, table_ids);
+		zbx_vector_ptr_append(&tables_proxy, table_ids);
 
 		ret = process_proxyconfig_table(table, &jp_obj, &table_ids->ids, &error);
 	}
@@ -1572,9 +1572,9 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = tables.values_num - 1; 0 <= i; i--)
+		for (i = tables_proxy.values_num - 1; 0 <= i; i--)
 		{
-			table_ids = (table_ids_t *)tables.values[i];
+			table_ids = (table_ids_t *)tables_proxy.values[i];
 
 			if (0 == table_ids->ids.values_num)
 				continue;
@@ -1597,14 +1597,14 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		zbx_free(sql);
 	}
 
-	for (i = 0; i < tables.values_num; i++)
+	for (i = 0; i < tables_proxy.values_num; i++)
 	{
-		table_ids = (table_ids_t *)tables.values[i];
+		table_ids = (table_ids_t *)tables_proxy.values[i];
 
 		zbx_vector_uint64_destroy(&table_ids->ids);
 		zbx_free(table_ids);
 	}
-	zbx_vector_ptr_destroy(&tables);
+	zbx_vector_ptr_destroy(&tables_proxy);
 
 	DBend(ret);
 
@@ -1757,7 +1757,6 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
 	{
-		int	i;
 		char	*sql = NULL;
 		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
@@ -1990,7 +1989,8 @@ try_again:
 		*more = ZBX_PROXY_DATA_MORE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64 " more:%d size:" ZBX_FS_SIZE_T,
-			__function_name, *records_num - records_num_last, *lastid, *more, j->buffer_offset);
+			__function_name, *records_num - records_num_last, *lastid, *more,
+			(zbx_fs_size_t)j->buffer_offset);
 }
 
 /******************************************************************************
@@ -2203,9 +2203,9 @@ try_again:
 	if (ZBX_MAX_HRECORDS == data_num)
 		*more = ZBX_PROXY_DATA_MORE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d selected:%d lastid:" ZBX_FS_UI64 " more:%d size:"
-			ZBX_FS_SIZE_T, __function_name, *records_num - records_num_last, data_num, *lastid, *more,
-			(int)j->buffer_offset);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d selected:" ZBX_FS_SIZE_T " lastid:" ZBX_FS_UI64 " more:%d size:"
+			ZBX_FS_SIZE_T, __function_name, *records_num - records_num_last, (zbx_fs_size_t)data_num,
+			*lastid, *more, (zbx_fs_size_t)j->buffer_offset);
 }
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)

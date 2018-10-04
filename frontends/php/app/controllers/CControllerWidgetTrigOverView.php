@@ -29,23 +29,16 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		$this->setType(WIDGET_TRIG_OVER);
 		$this->setValidationRules([
 			'name' => 'string',
-			'fullscreen' => 'in 0,1',
-			'kioskmode' => 'in 0,1',
 			'fields' => 'json'
 		]);
 	}
 
 	protected function doAction() {
-		$fullscreen = (bool) $this->getInput('fullscreen', false);
-		$kioskmode = $fullscreen && (bool) $this->getInput('kioskmode', false);
-
 		$fields = $this->getForm()->getFieldsData();
 
 		$data = [
 			'name' => $this->getInput('name', $this->getDefaultHeader()),
 			'style' => $fields['style'],
-			'fullscreen' => $fullscreen,
-			'kioskmode' => $kioskmode,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -57,7 +50,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		];
 
 		list($data['hosts'], $data['triggers']) = getTriggersOverviewData(getSubGroups($fields['groupids']),
-			$fields['application'], $fields['style'], [], $trigger_options
+			$fields['application'], $fields['style'], [], $trigger_options, $fields['show_suppressed']
 		);
 
 		$this->setResponse(new CControllerResponseData($data));

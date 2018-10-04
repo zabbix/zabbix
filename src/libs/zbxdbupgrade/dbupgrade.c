@@ -773,6 +773,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(3020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(3030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(3040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(3050)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(4000)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -786,6 +787,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(3030), "3.4 development"},
 	{DBPATCH_VERSION(3040), "3.4 maintenance"},
 	{DBPATCH_VERSION(3050), "4.0 development"},
+	{DBPATCH_VERSION(4000), "4.0 maintenance"},
 	{NULL}
 };
 
@@ -919,7 +921,7 @@ int	DBcheck_version(void)
 
 	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
 	{
-		zbx_dbpatch_t	*patches = dbversion->patches;
+		patches = dbversion->patches;
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{

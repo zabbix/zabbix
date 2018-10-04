@@ -89,6 +89,8 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 /* the range synchronization period in hours */
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
+#define ZBX_VC_ITEM_EXPIRE_PERIOD	SEC_PER_DAY
+
 /* the data chunk used to store data fragment */
 typedef struct zbx_vc_chunk
 {
@@ -225,8 +227,8 @@ typedef struct
 }
 zbx_vc_item_weight_t;
 
-ZBX_VECTOR_DECL(vc_itemweight, zbx_vc_item_weight_t);
-ZBX_VECTOR_IMPL(vc_itemweight, zbx_vc_item_weight_t);
+ZBX_VECTOR_DECL(vc_itemweight, zbx_vc_item_weight_t)
+ZBX_VECTOR_IMPL(vc_itemweight, zbx_vc_item_weight_t)
 
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;
@@ -309,7 +311,7 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
  *              range_start - [IN] the interval start time                          *
  *              count       - [IN] the number of values to read                     *
  *              range_end   - [IN] the interval end time                            *
- *              ts          - [IN] the requested timestmap                          *
+ *              ts          - [IN] the requested timestamp                          *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *
@@ -712,7 +714,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	size_t				freed = 0;
 	zbx_vector_vc_itemweight_t	items;
 
-	timestamp = time(NULL) - SEC_PER_DAY;
+	timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
 	/* reserve at least min_free_request bytes to avoid spamming with free space requests */
 	if (space < vc_cache->min_free_request)
@@ -2445,12 +2447,15 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 	zbx_vc_item_t		*item;
 	int 			i;
 	ZBX_DC_HISTORY		*h;
+	time_t			expire_timestamp;
 
 	if (FAIL == zbx_history_add_values(history))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
 		return SUCCEED;
+
+	expire_timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
 	vc_try_lock();
 
@@ -2473,7 +2478,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history)
 				/* Also mark it for removal if the value adding failed. In this case we    */
 				/* won't have the latest data in cache - so the requests must go directly  */
 				/* to the database.                                                        */
-				if (item->value_type != h->value_type ||
+				if (item->value_type != h->value_type || item->last_accessed < expire_timestamp ||
 						FAIL == vch_item_add_value_at_head(item, &record))
 				{
 					item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
