@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-25 19:00+0300\n"
-"PO-Revision-Date: 2018-09-17 07:26+0300\n"
+"PO-Revision-Date: 2018-09-26 05:07+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1537161985.000000\n"
+"X-POOTLE-MTIME: 1537931244.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -321,7 +321,7 @@ msgstr[0] "アカウントは%1$s秒間ブロックされています。"
 #: include/classes/screens/CScreenProblem.php:1082 include/events.inc.php:250
 #: include/events.inc.php:462 include/views/configuration.action.edit.php:1217
 msgid "Ack"
-msgstr "確認済み"
+msgstr "確認済"
 
 #: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:227
 msgid "Acknowledge"
@@ -333,17 +333,17 @@ msgstr "障害確認のステータス"
 
 #: include/actions.inc.php:2138 include/events.inc.php:175
 msgid "Acknowledged"
-msgstr "確認済み"
+msgstr "確認済"
 
 #: adm.triggerdisplayoptions.php:36
 #: include/views/administration.general.trigger.options.edit.php:51
 msgid "Acknowledged PROBLEM events"
-msgstr "確認済み障害イベント"
+msgstr "確認済障害イベント"
 
 #: adm.triggerdisplayoptions.php:42
 #: include/views/administration.general.trigger.options.edit.php:71
 msgid "Acknowledged RESOLVED events"
-msgstr "確認済み解決済イベント"
+msgstr "確認済の解決済イベント"
 
 #: app/views/administration.mediatype.edit.php:101
 #: app/views/dashboard.sharing.edit.php:24
@@ -1333,7 +1333,7 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:929
 msgid "Base colour"
-msgstr ""
+msgstr "基本色"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:285
@@ -3299,7 +3299,7 @@ msgstr "アプリケーションの設定"
 
 #: app/controllers/CControllerAuthenticationEdit.php:127
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "認証の設定"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
@@ -3552,7 +3552,7 @@ msgstr "連絡先"
 #: include/views/js/configuration.maintenance.edit.js.php:7
 #: include/views/js/configuration.triggers.list.js.php:7
 msgid "Contains"
-msgstr ""
+msgstr "含む"
 
 #: app/views/administration.mediatype.list.php:32
 #: app/views/administration.proxy.list.php:32
@@ -5603,7 +5603,7 @@ msgstr "英語 (en_US)"
 #: include/views/js/configuration.maintenance.edit.js.php:8
 #: include/views/js/configuration.triggers.list.js.php:8
 msgid "Equals"
-msgstr ""
+msgstr "等しい"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -6377,7 +6377,7 @@ msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他の�
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr ""
+msgstr "等しい"
 
 #: graphs.php:241
 msgid "Graph added"
@@ -6743,7 +6743,7 @@ msgstr "選択を非表示"
 #: include/views/monitoring.slides.php:31
 msgctxt "screen reader"
 msgid "Hierarchy"
-msgstr ""
+msgstr "階層"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -9474,7 +9474,7 @@ msgstr "LDAPホスト"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:96
 msgid "LDAP is not configured"
-msgstr ""
+msgstr "LDAPは設定されていません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:183
 msgid "LDAP login successful"
@@ -11501,7 +11501,7 @@ msgstr "通知レポート"
 #: include/actions.inc.php:819 include/actions.inc.php:1134
 #: include/actions.inc.php:1135
 msgid "Notify all involved"
-msgstr "障害通知送信済みのユーザーすべてにメッセージを送信"
+msgstr "障害通知送信済のユーザーすべてにメッセージを送信"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -11572,7 +11572,7 @@ msgstr "VMware仮想マシン上のプロセッサ数、<url> - VMwareサービ�
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
 msgid "Number of rows"
-msgstr ""
+msgstr "行数"
 
 #: include/views/monitoring.slideconf.list.php:65
 msgid "Number of slides"
@@ -17578,7 +17578,7 @@ msgstr "Y2"
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:253
 msgid "YYYY-MM-DD hh:mm"
-msgstr ""
+msgstr "YYYY-MM-DD hh:mm"
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17851,7 +17851,7 @@ msgstr "文字列で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:271
 msgid "a hexadecimal colour code (6 symbols) is expected"
-msgstr ""
+msgstr "16進数のカラーコード（6桁）を指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:417
 #: include/classes/validators/CApiInputValidator.php:554
@@ -17963,7 +17963,7 @@ msgstr "16進文字列で指定してください"
 
 #: include/validate.inc.php:243
 msgid "an explicit time is expected"
-msgstr ""
+msgstr "具体的な時間を指定してください"
 
 #: include/views/monitoring.history.php:163
 msgid "as Blue"
@@ -17990,7 +17990,7 @@ msgstr "昇順"
 
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:134
 msgid "at least one override option must be specified"
-msgstr ""
+msgstr "少なくとも1つのオーバーライドオプションを指定する必要があります"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -18125,7 +18125,7 @@ msgstr "循環するアイテムの依存関係は許可されていません"
 
 #: jsLoader.php:200
 msgid "colour"
-msgstr ""
+msgstr "色"
 
 #: app/views/monitoring.problem.view.php:285
 #: include/classes/widgets/views/widget.problems.form.view.php:92
@@ -18139,7 +18139,7 @@ msgstr "グローバルマクロ設定"
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:53
 msgid "contains"
-msgstr ""
+msgstr "含む"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:234
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
@@ -18220,11 +18220,11 @@ msgstr "ディスカバリルールが無効"
 
 #: include/actions.inc.php:27 include/correlation.inc.php:34
 msgid "does not contain"
-msgstr ""
+msgstr "含まない"
 
 #: include/actions.inc.php:25 include/correlation.inc.php:32
 msgid "does not equal"
-msgstr ""
+msgstr "等しくない"
 
 #: include/views/configuration.host.discovery.edit.php:633
 #: include/views/js/configuration.host.discovery.edit.js.php:25
@@ -18234,7 +18234,7 @@ msgstr "一致しない"
 #: include/actions.inc.php:24 include/correlation.inc.php:31
 #: include/views/inventory.host.list.php:54
 msgid "equals"
-msgstr ""
+msgstr "等しい"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18393,11 +18393,11 @@ msgstr "iregexp() - 期間T内の最新値の正規表現Vチェック (大文�
 
 #: include/actions.inc.php:29
 msgid "is greater than or equals"
-msgstr ""
+msgstr "以上"
 
 #: include/actions.inc.php:30
 msgid "is less than or equals"
-msgstr ""
+msgstr "以下"
 
 #: include/classes/validators/CApiInputValidator.php:1365
 msgid "is not enclosed in {} or is malformed"

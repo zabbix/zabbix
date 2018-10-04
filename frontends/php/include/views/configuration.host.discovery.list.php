@@ -99,7 +99,7 @@ foreach ($data['discoveries'] as $discovery) {
 		];
 	}
 
-	// hide zeroes for trapper and SNMP trap items
+	// Hide zeros for trapper and SNMP trap items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
 		$discovery['delay'] = '';
 	}

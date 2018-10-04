@@ -139,7 +139,7 @@ class testUserGroup extends CZabbixTest {
 			[
 				'group' => [[
 					'usrgrpid' => '13',
-					'name' => 'API update with non existent parametr',
+					'name' => 'API update with non existent parameter',
 					'value' => '4'
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'

@@ -484,7 +484,7 @@ class CConfigurationExport {
 			$valuemapids[$item['valuemapid']] = true;
 		}
 
-		// Value map IDs that are zeroes, should be skipped.
+		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {
@@ -619,7 +619,7 @@ class CConfigurationExport {
 		}
 		unset($item_prototype);
 
-		// Value map IDs that are zeroes, should be skipped.
+		// Value map IDs that are zeros, should be skipped.
 		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {
