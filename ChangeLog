@@ -11,6 +11,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14711] fixed triggers in trigger overview being filtered by trigger severity and trigger status change time instead of problem severity and problem creation time (agriscenko)
 ..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-12217] removed links to templates with no permissions for templated triggers, trigger prototypes, graphs, graph prototypes, host prototypes and web scenarios (agriscenko)
 ..F....... [ZBX-14861] fixed trigger evaluation result not visible in test dialogue when expression is too long (agriscenko)
