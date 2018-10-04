@@ -695,7 +695,7 @@ function getTopLevelTemplates($applicationid, array $parent_templates) {
  * @param string $applicationid
  * @param array  $parent_templates  The list of the templates, prepared by getApplicationParentTemplates() function.
  *
- * @return array
+ * @return array|null
  */
 function makeApplicationTemplatePrefix($applicationid, array $parent_templates) {
 	if (!array_key_exists($applicationid, $parent_templates['links'])) {
@@ -728,52 +728,179 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 }
 
 /**
- * Returns the farthest host prototype ancestor for each given host prototype.
+ * Get parent templates for each given host prototype.
  *
- * @param array $hostPrototypeIds
- * @param array $templateHostPrototypeIds	array with parent host prototype IDs as keys and arrays of child host
- * 											prototype IDs as values
+ * @param array  $host_prototypes                  An array of host prototypes.
+ * @param string $host_prototypes[]['hostid']      ID of host prototype.
+ * @param string $host_prototypes[]['templateid']  ID of parent template host prototype.
  *
- * @return array	an array of child ID - ancestor ID pairs
+ * @return array
  */
-function getHostPrototypeSourceParentIds(array $hostPrototypeIds, array $templateHostPrototypeIds = []) {
-	$query = DBSelect(
-		'SELECT h.hostid,h.templateid'.
-		' FROM hosts h'.
-		' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
-			' AND h.templateid>0'
-	);
+function getHostPrototypeParentTemplates(array $host_prototypes) {
+	$parent_host_prototypeids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
-	$hostPrototypeIds = [];
-	while ($hostPrototype = DBfetch($query)) {
-		// check if we already have host prototype inherited from the current host prototype
-		// if we do - move all of its child prototypes to the parent template
-		if (isset($templateHostPrototypeIds[$hostPrototype['hostid']])) {
-			$templateHostPrototypeIds[$hostPrototype['templateid']] = $templateHostPrototypeIds[$hostPrototype['hostid']];
-			unset($templateHostPrototypeIds[$hostPrototype['hostid']]);
-		}
-		// if no - just add the prototype
-		else {
-			$templateHostPrototypeIds[$hostPrototype['templateid']][] = $hostPrototype['hostid'];
-			$hostPrototypeIds[] = $hostPrototype['templateid'];
+	foreach ($host_prototypes as $host_prototype) {
+		if ($host_prototype['templateid'] != 0) {
+			$parent_host_prototypeids[$host_prototype['templateid']] = true;
+			$data['links'][$host_prototype['hostid']] = ['hostid' => $host_prototype['templateid']];
 		}
 	}
 
-	// continue while we still have new host prototypes to check
-	if ($hostPrototypeIds) {
-		return getHostPrototypeSourceParentIds($hostPrototypeIds, $templateHostPrototypeIds);
+	if (!$parent_host_prototypeids) {
+		return $data;
 	}
-	else {
-		// return an inverse hash with prototype IDs as keys and parent prototype IDs as values
-		$result = [];
-		foreach ($templateHostPrototypeIds as $templateId => $hostIds) {
-			foreach ($hostIds as $hostId) {
-				$result[$hostId] = $templateId;
+
+	$all_parent_host_prototypeids = [];
+	$hostids = [];
+	$lld_ruleids = [];
+
+	do {
+		$db_host_prototypes = API::HostPrototype()->get([
+			'output' => ['hostid', 'templateid'],
+			'selectDiscoveryRule' => ['itemid'],
+			'selectParentHost' => ['hostid'],
+			'hostids' => array_keys($parent_host_prototypeids)
+		]);
+
+		$all_parent_host_prototypeids += $parent_host_prototypeids;
+		$parent_host_prototypeids = [];
+
+		foreach ($db_host_prototypes as $db_host_prototype) {
+			$data['templates'][$db_host_prototype['parentHost']['hostid']] = [];
+			$hostids[$db_host_prototype['hostid']] = $db_host_prototype['parentHost']['hostid'];
+			$lld_ruleids[$db_host_prototype['hostid']] = $db_host_prototype['discoveryRule']['itemid'];
+
+			if ($db_host_prototype['templateid'] != 0) {
+				if (!array_key_exists($db_host_prototype['templateid'], $all_parent_host_prototypeids)) {
+					$parent_host_prototypeids[$db_host_prototype['templateid']] = true;
+				}
+
+				$data['links'][$db_host_prototype['hostid']] = ['hostid' => $db_host_prototype['templateid']];
 			}
 		}
-
-		return $result;
 	}
+	while ($parent_host_prototypeids);
+
+	foreach ($data['links'] as &$parent_host_prototype) {
+		$parent_host_prototype['parent_hostid'] = array_key_exists($parent_host_prototype['hostid'], $hostids)
+			? $hostids[$parent_host_prototype['hostid']]
+			: 0;
+
+		$parent_host_prototype['lld_ruleid'] = array_key_exists($parent_host_prototype['hostid'], $lld_ruleids)
+			? $lld_ruleids[$parent_host_prototype['hostid']]
+			: 0;
+	}
+	unset($parent_host_prototype);
+
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
+}
+
+/**
+ * Returns a template prefix for selected host prototype.
+ *
+ * @param string $host_prototypeid
+ * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ *
+ * @return array|null
+ */
+function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates) {
+	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$host_prototypeid]['hostid'], $parent_templates['links'])) {
+		$host_prototypeid = $parent_templates['links'][$host_prototypeid]['hostid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
+
+	if ($template['permission'] == PERM_READ_WRITE) {
+		$name = (new CLink(CHtml::encode($template['name']),
+			(new CUrl('host_prototypes.php'))
+				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+		))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(CHtml::encode($template['name']));
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of host prototype templates.
+ *
+ * @param string $host_prototypeid
+ * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
+ *
+ * @return array
+ */
+function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates) {
+	$list = [];
+
+	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
+
+		if ($template['permission'] == PERM_READ_WRITE) {
+			$name = new CLink(CHtml::encode($template['name']),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
+			);
+		}
+		else {
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$host_prototypeid = $parent_templates['links'][$host_prototypeid]['hostid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**

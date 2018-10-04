@@ -11,6 +11,10 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
+..F....... [ZBX-12217] removed links to templates with no permissions for templated triggers, trigger prototypes, graphs, graph prototypes, host prototypes and web scenarios (agriscenko)
+..F....... [ZBX-14861] fixed trigger evaluation result not visible in test dialogue when expression is too long (agriscenko)
+..F....... [ZBX-14723] fixed zoom button for time selector in IE browser (ashubin)
 ..F....... [ZBX-14888] fixed table markup on overview and system info pages (agriscenko)
 ..F....... [ZBX-14652] fixed plain text Latest data when selecting more then 1 item (vasilijs)
 ..F....... [ZBX-14618] fixed host prototype status checkbox resets after adding template (vasilijs)
@@ -558,6 +562,7 @@ Changes for 3.4.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
@@ -1922,6 +1927,7 @@ Changes for 3.0.23rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview, data overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
