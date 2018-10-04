@@ -319,7 +319,7 @@ check_fill:
 	if (ZBX_IPRANGE_GROUPS_V6 < index)
 		return FAIL;
 
-	/* expand the :: construct to the required number of zeroes */
+	/* expand the :: construct to the required number of zeros */
 	if (ZBX_IPRANGE_GROUPS_V6 > index)
 	{
 		/* fail if the address contains less than 8 groups and no :: construct was used */
@@ -332,7 +332,7 @@ check_fill:
 		while (--index > fill)
 			iprange->range[target--] = iprange->range[index];
 
-		/* fill the middle with zeroes */
+		/* fill the middle with zeros */
 		while (target > fill)
 		{
 			iprange->range[target].from = 0;

@@ -25,8 +25,8 @@
 #include "sysinfo.h"
 #include "zbxalgo.h"
 
-#define ZBX_SYNC_PARTIAL	0
-#define	ZBX_SYNC_FULL		1
+#define ZBX_SYNC_DONE		0
+#define	ZBX_SYNC_MORE		1
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -546,7 +546,7 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
-int	sync_history_cache(int sync_type, int *sync_num);
+void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
 int	init_database_cache(char **error);
 void	free_database_cache(void);
 
@@ -560,15 +560,18 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_TOTAL		7
 #define ZBX_STATS_HISTORY_USED		8
 #define ZBX_STATS_HISTORY_FREE		9
-#define ZBX_STATS_HISTORY_PFREE		10
-#define ZBX_STATS_TREND_TOTAL		11
-#define ZBX_STATS_TREND_USED		12
-#define ZBX_STATS_TREND_FREE		13
-#define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
-#define ZBX_STATS_HISTORY_INDEX_USED	16
-#define ZBX_STATS_HISTORY_INDEX_FREE	17
-#define ZBX_STATS_HISTORY_INDEX_PFREE	18
+#define ZBX_STATS_HISTORY_PUSED		10
+#define ZBX_STATS_HISTORY_PFREE		11
+#define ZBX_STATS_TREND_TOTAL		12
+#define ZBX_STATS_TREND_USED		13
+#define ZBX_STATS_TREND_FREE		14
+#define ZBX_STATS_TREND_PUSED		15
+#define ZBX_STATS_TREND_PFREE		16
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	17
+#define ZBX_STATS_HISTORY_INDEX_USED	18
+#define ZBX_STATS_HISTORY_INDEX_FREE	19
+#define ZBX_STATS_HISTORY_INDEX_PUSED	20
+#define ZBX_STATS_HISTORY_INDEX_PFREE	21
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -641,7 +644,8 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
 #define ZBX_CONFSTATS_BUFFER_FREE	3
-#define ZBX_CONFSTATS_BUFFER_PFREE	4
+#define ZBX_CONFSTATS_BUFFER_PUSED	4
+#define ZBX_CONFSTATS_BUFFER_PFREE	5
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);
@@ -802,6 +806,7 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int now, zbx_ui
 void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int limit);
 void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_vector_uint64_t *triggerids, const zbx_timespec_t *ts);
+void	zbx_dc_clear_timer_queue(void);
 
 /* data session support */
 

@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageTriggers extends CWebTest {
-	public $hostid = 99020;
+	public $hostid = 99050;
 
 	public static function data() {
 		return DBdata(

@@ -83,8 +83,8 @@ foreach ($filter_tags as $tag) {
 			->setAttribute('placeholder', _('tag'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
-			->addValue(_('Like'), TAG_OPERATOR_LIKE)
-			->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 			->setModern(true),
 		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
 			->setAttribute('placeholder', _('value'))
@@ -153,18 +153,22 @@ $triggers_form = (new CForm())
 	->setName('triggersForm')
 	->addVar('hostid', $data['hostid']);
 
+$url = (new CUrl('triggers.php'))
+	->setArgument('hostid', $data['hostid'])
+	->getUrl();
+
 // create table
 $triggers_table = (new CTableInfo())->setHeader([
 	(new CColHeader(
 		(new CCheckBox('all_triggers'))
 			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 	$data['show_value_column'] ? _('Value') : null,
 	($data['hostid'] == 0) ? _('Host') : null,
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder']),
+	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 	$data['showInfoColumn'] ? _('Info') : null,
 	_('Tags')
 ]);

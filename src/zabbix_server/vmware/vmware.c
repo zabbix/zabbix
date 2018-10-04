@@ -309,10 +309,6 @@ static void	vmware_shared_strfree(char *str)
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
-#define ZBX_XPATH_DATASTORE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
-	"/*[local-name()='val']"
-
 #define ZBX_XPATH_DATASTORE_MOUNT()									\
 	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
 	"/*[local-name()='mountInfo']/*[local-name()='path']"
@@ -328,6 +324,9 @@ static void	vmware_shared_strfree(char *str)
 #define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
 		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_MAXQUERYMETRICS()									\
+	"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
 
 typedef struct
 {
@@ -345,7 +344,6 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 {
 	size_t	r_size = size * nmemb;
 
-	ZBX_UNUSED(ptr);
 	ZBX_UNUSED(userdata);
 
 	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, (char *)ptr, r_size);
@@ -1160,6 +1158,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 			zbx_hashset_insert(&data->vms_index, &vmi_local, sizeof(vmi_local));
 		}
 	}
+
+	data->max_query_metrics = src->max_query_metrics;
 
 	return data;
 }
@@ -2121,13 +2121,10 @@ out:
  *                                                                            *
  * Function: vmware_vm_get_file_systems                                       *
  *                                                                            *
- * Purpose: gets virtual machine network interface devices                    *
+ * Purpose: gets the parameters of virtual machine disks                      *
  *                                                                            *
  * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] a xml string containing virtual machine data    *
- *                                                                            *
- * Comments: The network interface devices are taken from vm device list      *
- *           filtered by macAddress key.                                      *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, const char *details)
@@ -2317,7 +2314,8 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vm->uuid = value;
 	vm->id = zbx_strdup(NULL, id);
 
-	vm->props = xml_read_props(details, (char **)vm_propmap, ZBX_VMWARE_VMPROPS_NUM);
+	if (NULL == (vm->props = xml_read_props(details, (char **)vm_propmap, ZBX_VMWARE_VMPROPS_NUM)))
+		goto out;
 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
@@ -2732,7 +2730,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &details, error))
 		goto out;
 
-	hv->props = xml_read_props(details, (char **)hv_propmap, ZBX_VMWARE_HVPROPS_NUM);
+	if (NULL == (hv->props = xml_read_props(details, (char **)hv_propmap, ZBX_VMWARE_HVPROPS_NUM)))
+		goto out;
 
 	if (NULL == hv->props[ZBX_VMWARE_HVPROP_HW_UUID])
 		goto out;
@@ -2770,10 +2769,10 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 out:
 	zbx_free(details);
 
-	zbx_vector_str_clear_ext(&vms, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&vms, zbx_str_free);
 	zbx_vector_str_destroy(&vms);
 
-	zbx_vector_str_clear_ext(&datastores, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&datastores, zbx_str_free);
 	zbx_vector_str_destroy(&datastores);
 
 	if (SUCCEED != ret)
@@ -3259,7 +3258,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		zbx_vector_uint64_append(&ids, key);
 	}
 
-	zbx_vector_str_clear_ext(&keys, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&keys, zbx_str_free);
 
 	if (0 != ids.values_num)
 	{
@@ -3695,7 +3694,7 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 	ret = SUCCEED;
 out:
 	zbx_free(cluster_data);
-	zbx_vector_str_clear_ext(&ids, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
@@ -3704,6 +3703,79 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_get_maxquerymetrics                               *
+ *                                                                            *
+ * Purpose: get vpxd.stats.maxquerymetrics parameter from vcenter only        *
+ *                                                                            *
+ * Parameters: easyhandle   - [IN] the CURL handle                            *
+ *             max_qm       - [OUT] max count of Datastore metrics in one     *
+ *                                  request                                   *
+ *             error        - [OUT] the error message in the case of failure  *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, char **error)
+{
+#	define ZBX_POST_MAXQUERYMETRICS								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:QueryOptions>"								\
+			"<ns0:_this type=\"OptionManager\">VpxSettings</ns0:_this>"		\
+			"<ns0:name>config.vpxd.stats.maxQueryMetrics</ns0:name>"		\
+		"</ns0:QueryOptions>"								\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_get_maxquerymetrics";
+
+	CURLoption	opt;
+	CURLcode	err;
+	int		ret = FAIL;
+	char		*val;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_MAXQUERYMETRICS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "%s() SOAP response: %s", __function_name, page.data);
+
+	if (NULL != (*error = zbx_xml_read_value(page.data, ZBX_XPATH_FAULTSTRING())))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Error of query maxQueryMetrics: %s.", *error);
+		zbx_free(*error);
+	}
+
+	if (NULL == (val = zbx_xml_read_value(page.data, ZBX_XPATH_MAXQUERYMETRICS())))
+	{
+		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics used default value %d", ZBX_VPXD_STATS_MAXQUERYMETRICS);
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != (ret = is_uint31(val, max_qm)))
+		*error = zbx_dsprintf(*error, "Cannot convert maxQueryMetrics from %s.",  val);
+
+	zbx_free(val);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
 /******************************************************************************
  *                                                                            *
  * Function: vmware_counters_add_new                                          *
@@ -3991,12 +4063,17 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
+	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
+		data->max_query_metrics = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, &data->max_query_metrics, &data->error))
+		goto clean;
+
 	ret = SUCCEED;
 clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 
-	zbx_vector_str_clear_ext(&hvs, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&hvs, zbx_str_free);
 	zbx_vector_str_destroy(&hvs);
 out:
 	zbx_vmware_lock();
@@ -4282,7 +4359,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 	int				i, j, err, opt, start_counter = 0;
 	zbx_vmware_perf_entity_t	*entity;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counters_max:%d", __function_name, counters_max);
 
 	if (0 == counters_max)
 		counters_max = INT_MAX;
@@ -4532,7 +4609,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	zbx_vmware_unlock();
 
 	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, 0, &perfdata);
-	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, ZBX_VPXD_STATS_MAXQUERYMETRICS,
+	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, service->data->max_query_metrics,
 			&perfdata);
 
 	ret = SUCCEED;
@@ -4879,7 +4956,6 @@ void	zbx_vmware_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#define	ZBX_VMWARE_TASK_NONE		0
 #define	ZBX_VMWARE_TASK_IDLE		1
 #define	ZBX_VMWARE_TASK_UPDATE		2
 #define	ZBX_VMWARE_TASK_UPDATE_PERF	3

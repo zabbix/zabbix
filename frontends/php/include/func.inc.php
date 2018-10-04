@@ -380,7 +380,7 @@ function hex2rgb($color) {
 }
 
 function getColorVariations($color, $variations_requested = 1) {
-	if (1 >= $variations_requested) {
+	if ($variations_requested <= 1) {
 		return [$color];
 	}
 
@@ -810,15 +810,11 @@ function convert_units($options = []) {
  *		-10m = -600
  *
  * @param string $time
- * @param bool   $allow_negative   Allow time to be negative.
  *
- * @return int   Integer for valid input. Null otherwise.
+ * @return int
  */
-function timeUnitToSeconds($time, $allow_negative = false) {
-	$re = $allow_negative
-		? '/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/'
-		: '/^(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/';
-	preg_match($re, $time, $matches);
+function timeUnitToSeconds($time) {
+	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
 
 	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
@@ -859,45 +855,48 @@ function timeUnitToSeconds($time, $allow_negative = false) {
  * Supported metric suffixes: K, M, G, T
  *
  * @param string $value
+ * @param int    $scale  The number of digits after the decimal place in the result.
  *
  * @return string
  */
-function convertFunctionValue($value) {
-	$suffix = $value[strlen($value) - 1];
-	if (!ctype_digit($suffix)) {
-		$value = substr($value, 0, strlen($value) - 1);
+function convertFunctionValue($value, $scale = 0) {
+	$suffix = substr($value, -1);
 
-		switch ($suffix) {
-			case 's':
-				break;
-			case 'm':
-				$value = bcmul($value, '60');
-				break;
-			case 'h':
-				$value = bcmul($value, '3600');
-				break;
-			case 'd':
-				$value = bcmul($value, '86400');
-				break;
-			case 'w':
-				$value = bcmul($value, '604800');
-				break;
-			case 'K':
-				$value = bcmul($value, '1024');
-				break;
-			case 'M':
-				$value = bcmul($value, '1048576');
-				break;
-			case 'G':
-				$value = bcmul($value, '1073741824');
-				break;
-			case 'T':
-				$value = bcmul($value, '1099511627776');
-				break;
-		}
+	if (ctype_digit($suffix)) {
+		return $value;
 	}
 
-	return $value;
+	$value = substr($value, 0, -1);
+
+	switch ($suffix) {
+		case 'm':
+			return bcmul($value, '60', $scale);
+
+		case 'h':
+			return bcmul($value, '3600', $scale);
+
+		case 'd':
+			return bcmul($value, '86400', $scale);
+
+		case 'w':
+			return bcmul($value, '604800', $scale);
+
+		case 'K':
+			return bcmul($value, '1024', $scale);
+
+		case 'M':
+			return bcmul($value, '1048576', $scale);
+
+		case 'G':
+			return bcmul($value, '1073741824', $scale);
+
+		case 'T':
+			return bcmul($value, '1099511627776', $scale);
+
+		case 's':
+		default:
+			return $value;
+	}
 }
 
 /************* ZBX MISC *************/
@@ -1479,17 +1478,27 @@ function zbx_str2links($text) {
 	foreach (explode("\n", $text) as $line) {
 		$line = rtrim($line, "\r ");
 
-		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches);
 
 		$start = 0;
+
 		foreach ($matches[0] as $match) {
-			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = new CLink($match[0], $match[0]);
-			$start = $match[1] + mb_strlen($match[0]);
+			if (($pos = mb_strpos($line, $match, $start)) !== false) {
+				if ($pos != $start) {
+					$result[] = mb_substr($line, $start, $pos - $start);
+				}
+				$result[] = new CLink(CHTML::encode($match), $match);
+				$start = $pos + mb_strlen($match);
+			}
 		}
-		$result[] = mb_substr($line, $start);
+
+		if (mb_strlen($line) != $start) {
+			$result[] = mb_substr($line, $start);
+		}
+
 		$result[] = BR();
 	}
+
 	array_pop($result);
 
 	return $result;

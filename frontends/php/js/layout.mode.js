@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -19,16 +18,26 @@
 **/
 
 
-class CSvgPolyline extends CSvgTag {
+jQuery(function($) {
+	var $layout_mode_btn = $('.layout-mode');
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
+	if ($layout_mode_btn.length) {
+		$layout_mode_btn.on('click', function(e) {
+			e.stopPropagation();
+			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
+				location.reload();
+			});
+		});
 
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
+		if ($layout_mode_btn.hasClass('btn-dashbrd-normal')) {
+			$(window).on('mousemove keyup scroll', function() {
+				clearTimeout($layout_mode_btn.data('timer'));
+				$layout_mode_btn
+					.removeClass('hidden')
+					.data('timer', setTimeout(function() {
+						$layout_mode_btn.addClass('hidden');
+					}, 2000));
+			}).trigger('mousemove');
 		}
-
-		$this->setAttribute('points', trim($p));
 	}
-}
+});

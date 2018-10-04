@@ -218,7 +218,7 @@ class CWidgetFormProblems extends CWidgetForm {
 		$this->fields[$field_show_timeline->getName()] = $field_show_timeline;
 
 		// Show lines.
-		$field_lines = (new CWidgetFieldNumericBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
+		$field_lines = (new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 			ZBX_MAX_WIDGET_LINES
 		))
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)

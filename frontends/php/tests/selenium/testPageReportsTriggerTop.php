@@ -217,7 +217,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
 			foreach ($data['result'] as $result) {
-				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a'));
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a[text()="'.$result.'"]'));
 				$this->zbxTestAssertElementPresentXpath('//tbody//td[2]//a[text()="'.$result.'"]');
 			}
 		}

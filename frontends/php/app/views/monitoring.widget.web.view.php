@@ -29,8 +29,7 @@ $table = (new CTableInfo())
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'web.view')
 	->setArgument('groupid', '')
-	->setArgument('hostid', '0')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null);
+	->setArgument('hostid', '0');
 
 foreach ($data['groups'] as $group) {
 	$url->setArgument('groupid', $group['groupid']);
@@ -45,8 +44,7 @@ foreach ($data['groups'] as $group) {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

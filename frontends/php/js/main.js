@@ -387,65 +387,40 @@ var AudioControl = {
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
-	blinkInterval: 1000, // how fast will they blink (ms)
-	secondsSinceInit: 0,
+	interval: 1000, // how fast will they blink (ms)
 
 	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
-		// Right after page refresh, all blinking elements should be visible.
-		if (this.secondsSinceInit > 0) {
-			var objects = jQuery('.blink');
+		var that = this;
 
-			// maybe some of the objects should not blink any more?
-			objects = this.filterOutNonBlinking(objects);
+		setInterval(function() {
+			var $collection = jQuery('.blink');
 
-			// changing visibility state
-			jQuery.each(objects, function() {
-				if (typeof jQuery(this).data('toggleClass') !== 'undefined') {
-					jQuery(this)[jqBlink.shown ? 'removeClass' : 'addClass'](jQuery(this).data('toggleClass'));
+			$collection.each(function() {
+				var $el = jQuery(this),
+					blink = true;
+
+				if (typeof $el.data('timeToBlink') !== 'undefined') {
+					blink = (($el.data()['timeToBlink']--) > 0);
 				}
-				else {
-					jQuery(this).css('visibility', jqBlink.shown ? 'hidden' : 'visible');
+
+				if (blink) {
+					if (typeof $el.data('toggleClass') !== 'undefined') {
+						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
+					}
+					else {
+						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+					}
+				}
+				else if (that.shown) {
+					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
 				}
 			});
 
-			// reversing the value of indicator attribute
-			this.shown = !this.shown;
-		}
-
-		// I close my eyes only for a moment, and a moment's gone
-		this.secondsSinceInit += this.blinkInterval / 1000;
-
-		// repeating this function with delay
-		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
-	},
-
-	/**
-	 * Check all currently found objects and exclude ones that should stop blinking by now
-	 */
-	filterOutNonBlinking: function(objects) {
-		var that = this;
-
-		return objects.filter(function() {
-			var obj = jQuery(this);
-			if (typeof obj.data('timeToBlink') !== 'undefined') {
-				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
-
-				if (shouldBlink || !that.shown) {
-					return true;
-				}
-				else {
-					obj.removeClass('blink');
-					return false;
-				}
-			}
-			else {
-				// no time-to-blink attribute, should blink forever
-				return true;
-			}
-		});
+			that.shown = !that.shown;
+		}, this.interval);
 	}
 };
 
@@ -497,7 +472,6 @@ var hintBox = {
 							target.data('hintbox-style')
 						);
 					}
-
 					break;
 
 				case 'click':
@@ -732,7 +706,7 @@ function rm4favorites(object, objectid) {
  * @param {object} 	idx2				An array of IDs
  */
 function updateUserProfile(idx, value_int, idx2) {
-	sendAjaxData('zabbix.php?action=profile.update', {
+	return sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
 			value_int: value_int,
@@ -780,7 +754,7 @@ function sendAjaxData(url, options) {
 	options.type = 'post';
 	options.url = url.getUrl();
 
-	jQuery.ajax(options);
+	return jQuery.ajax(options);
 }
 
 /**
@@ -1096,45 +1070,55 @@ jQuery(function ($) {
 		return rows;
 	}
 
-	$.fn.autoGrowTextarea = function(options) {
-		this.each(function() {
-			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, options);
+	var methods = {
+		init: function(options) {
+			options = $.extend({}, options);
 
-				$(this)
-					.css({
-						'resize': 'none',
-						'overflow-x': 'hidden',
-						'white-space': 'pre-line'
-					})
-					.on('paste change keyup', function() {
-						var rows = calcRows($(this), options);
+			this.each(function() {
+				if (typeof $(this).data('autogrow') === 'undefined') {
+					$(this)
+						.css({
+							'resize': 'none',
+							'overflow-x': 'hidden',
+							'white-space': 'pre-line'
+						})
+						.on('paste change keyup', function() {
+							var rows = calcRows($(this), options);
 
-						if (options && 'pair' in options) {
-							var pair_rows = calcRows($(options.pair), options);
-							if (pair_rows > rows) {
-								rows = pair_rows;
+							if (options && 'pair' in options) {
+								var pair_rows = calcRows($(options.pair), options);
+								if (pair_rows > rows) {
+									rows = pair_rows;
+								}
+								$(options.pair).attr('rows', rows);
 							}
-							$(options.pair).attr('rows', rows);
+
+							$(this).attr('rows', rows);
+						})
+						.data('autogrow', options)
+						.trigger('keyup');
+				}
+
+				if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+					$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+						if ($(this).val().length > $(this).attr('maxlength')) {
+							$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
 						}
+					});
+				}
 
-						$(this).attr('rows', rows);
-					})
-					.data('autogrow', options)
-					.trigger('change');
-			}
+				if (options && 'pair' in options) {
+					$(options.pair).css({'resize': 'none'});
+				}
+			});
+		}
+	};
 
-			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
-				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
-					if ($(this).val().length > $(this).attr('maxlength')) {
-						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
-					}
-				});
-			}
+	$.fn.autoGrowTextarea = function(method, options) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
 
-			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none'});
-			}
-		});
+		return methods.init.apply(this, arguments);
 	};
 });

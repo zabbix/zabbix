@@ -1876,7 +1876,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: substitute_host_interface_macros                                 *
  *                                                                            *
- * Purpose: trying to resolve the macros in host inteface                     *
+ * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
@@ -7254,6 +7254,20 @@ void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int l
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_clear_timer_queue                                         *
+ *                                                                            *
+ * Purpose: clears timer trigger queue                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_clear_timer_queue(void)
+{
+	WRLOCK_CACHE;
+	zbx_binary_heap_clear(&config->timer_queue);
+	UNLOCK_CACHE;
+}
+
 void	DCfree_triggers(zbx_vector_ptr_t *triggers)
 {
 	int	i;
@@ -8819,8 +8833,12 @@ void	*DCconfig_get_stats(int request)
 		case ZBX_CONFSTATS_BUFFER_FREE:
 			value_uint = config_mem->free_size;
 			return &value_uint;
+		case ZBX_CONFSTATS_BUFFER_PUSED:
+			value_double = 100 * (double)(config_mem->orig_size - config_mem->free_size) /
+					config_mem->orig_size;
+			return &value_double;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
+			value_double = 100 * (double)config_mem->free_size / config_mem->orig_size;
 			return &value_double;
 		default:
 			return NULL;
@@ -8829,7 +8847,7 @@ void	*DCconfig_get_stats(int request)
 
 static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 {
-	const ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
 	dst_proxy->hostid = src_proxy->hostid;
