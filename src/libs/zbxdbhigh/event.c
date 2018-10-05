@@ -97,12 +97,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	/* read event_suppress data */
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select eventid,max(suppress_until)"
-			" from event_suppress"
-			" where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct eventid from event_suppress where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " group by eventid");
 
 	result = DBselect("%s", sql);
 
@@ -119,9 +115,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		}
 
 		event = (DB_EVENT *)events->values[index];
-
-		event->suppressed = (SUCCEED == DBis_null(row[1]) ? ZBX_PROBLEM_SUPPRESSED_FALSE :
-				ZBX_PROBLEM_SUPPRESSED_TRUE);
+		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 	}
 	DBfree_result(result);
 
