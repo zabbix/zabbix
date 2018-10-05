@@ -263,17 +263,6 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #	endif
 
 #endif	/* HAVE_SYS_UCONTEXT_H */
-
-#ifdef	HAVE_EXECINFO_H
-
-#	define	ZBX_BACKTRACE_SIZE	60
-
-	char	**bcktrc_syms;
-	void	*bcktrc[ZBX_BACKTRACE_SIZE];
-	int	bcktrc_sz;
-
-#endif	/* HAVE_EXECINFO_H */
-
 	int	i;
 	FILE	*fd;
 
