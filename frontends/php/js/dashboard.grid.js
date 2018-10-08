@@ -503,7 +503,8 @@
 			dataType: 'json',
 			success: function(resp) {
 				stopPreloader(widget);
-				var $content_header = $('h4', widget['content_header']);
+				var $content_header = $('h4', widget['content_header']),
+					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
 
 				$content_header.text(resp.header);
 
@@ -518,7 +519,7 @@
 				}
 				widget['content_body'].append(resp.body);
 				if (typeof(resp.debug) !== 'undefined') {
-					widget['content_body'].append(resp.debug);
+					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 				}
 				removeWidgetInfoBtns(widget['content_header']);
 
