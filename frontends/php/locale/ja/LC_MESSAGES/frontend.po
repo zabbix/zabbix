@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 16:00+0300\n"
+"POT-Creation-Date: 2018-10-07 18:07+0300\n"
 "PO-Revision-Date: 2018-09-26 05:07+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -3354,7 +3354,7 @@ msgid "Configuration of maintenance periods"
 msgstr "メンテナンス期間の設定"
 
 #: app/controllers/CControllerMediatypeEdit.php:212
-#: app/controllers/CControllerMediatypeList.php:140
+#: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "メディアタイプの設定"
 
@@ -6377,7 +6377,7 @@ msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他の�
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr "等しい"
+msgstr "グラフ (クラシック)"
 
 #: graphs.php:241
 msgid "Graph added"
@@ -12317,7 +12317,7 @@ msgid "Parameters"
 msgstr "パラメータ"
 
 #: include/views/configuration.host.discovery.edit.php:42
-#: include/views/configuration.host.prototype.edit.php:48
+#: include/views/configuration.host.prototype.edit.php:52
 msgid "Parent discovery rules"
 msgstr "親ディスカバリルール"
 

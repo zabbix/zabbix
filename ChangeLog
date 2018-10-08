@@ -5,6 +5,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14757] fixed incorrect translation string in en_US locale (zalex_ua)
 ..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
 ..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)

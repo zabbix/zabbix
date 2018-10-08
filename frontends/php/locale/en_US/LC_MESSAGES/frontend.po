@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 16:00+0300\n"
+"POT-Creation-Date: 2018-10-07 18:07+0300\n"
 "PO-Revision-Date: 2018-10-04 14:18+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
@@ -3409,7 +3409,7 @@ msgid "Configuration of maintenance periods"
 msgstr "Configuration of maintenance periods"
 
 #: app/controllers/CControllerMediatypeEdit.php:212
-#: app/controllers/CControllerMediatypeList.php:140
+#: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Configuration of media types"
 
@@ -12402,7 +12402,7 @@ msgid "Parameters"
 msgstr "Parameters"
 
 #: include/views/configuration.host.discovery.edit.php:42
-#: include/views/configuration.host.prototype.edit.php:48
+#: include/views/configuration.host.prototype.edit.php:52
 msgid "Parent discovery rules"
 msgstr "Parent discovery rules"
 

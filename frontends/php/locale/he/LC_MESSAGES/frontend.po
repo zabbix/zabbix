@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 16:00+0300\n"
-"PO-Revision-Date: 2018-09-03 20:03+0300\n"
+"POT-Creation-Date: 2018-10-07 18:07+0300\n"
+"PO-Revision-Date: 2018-10-07 10:12+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1535997783.000000\n"
+"X-POOTLE-MTIME: 1538899939.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -89,8 +89,8 @@ msgstr "%1$s [שורה: %2$s | עמודה: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "משימה אחת"
+msgstr[1] "%1$s משימות"
 
 #: app/views/monitoring.acknowledge.edit.php:51
 #: app/views/monitoring.acknowledge.edit.php:56
@@ -113,8 +113,8 @@ msgstr[1] "%1$s פריטים"
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "הודעה אחת"
+msgstr[1] "%1$s הודעות"
 
 #: include/classes/widgets/CWidgetConfig.php:155
 #: include/classes/widgets/CWidgetConfig.php:156
@@ -1353,7 +1353,7 @@ msgstr "DN בסיס"
 #: include/classes/widgets/CWidgetHelper.php:662
 #: include/classes/widgets/CWidgetHelper.php:929
 msgid "Base colour"
-msgstr ""
+msgstr "צבע בסיס"
 
 #: include/httptest.inc.php:28
 #: include/views/configuration.host.discovery.edit.php:285
@@ -3354,7 +3354,7 @@ msgstr "הגדרת יישומים"
 
 #: app/controllers/CControllerAuthenticationEdit.php:127
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "הגדרת האימות"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
@@ -3409,7 +3409,7 @@ msgid "Configuration of maintenance periods"
 msgstr "הגדרת תקופות תחזוקה"
 
 #: app/controllers/CControllerMediatypeEdit.php:212
-#: app/controllers/CControllerMediatypeList.php:140
+#: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "הגדרת סוגי מדיה"
 
@@ -3607,7 +3607,7 @@ msgstr "פרטי קשר"
 #: include/views/js/configuration.maintenance.edit.js.php:7
 #: include/views/js/configuration.triggers.list.js.php:7
 msgid "Contains"
-msgstr ""
+msgstr "מכיל"
 
 #: app/views/administration.mediatype.list.php:32
 #: app/views/administration.proxy.list.php:32
@@ -5665,7 +5665,7 @@ msgstr "אנגלית (en_US)"
 #: include/views/js/configuration.maintenance.edit.js.php:8
 #: include/views/js/configuration.triggers.list.js.php:8
 msgid "Equals"
-msgstr ""
+msgstr "שווה"
 
 #: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:571
@@ -6440,7 +6440,7 @@ msgstr "התרשים „%1$s” עם הפריטים שבתבנית לא יכול
 
 #: include/classes/widgets/CWidgetConfig.php:47
 msgid "Graph (classic)"
-msgstr ""
+msgstr "תרשים (קלסי)"
 
 #: graphs.php:241
 msgid "Graph added"
@@ -6808,7 +6808,7 @@ msgstr "הסתרת הנבחרים"
 #: include/views/monitoring.slides.php:31
 msgctxt "screen reader"
 msgid "Hierarchy"
-msgstr ""
+msgstr "היררכיה"
 
 #: adm.triggerseverities.php:39 adm.triggerseverities.php:40
 #: include/views/administration.general.triggerSeverity.edit.php:70
@@ -6851,7 +6851,7 @@ msgstr "מחיקת ההיסטוריה עשויה לארוך זמן רב. להמ�
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
 msgid "History data selection"
-msgstr ""
+msgstr "בחירת נתונים היסטוריים"
 
 #: adm.housekeeper.php:57
 msgid "History data storage period"
@@ -9548,7 +9548,7 @@ msgstr "מארח LDAP"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:96
 msgid "LDAP is not configured"
-msgstr ""
+msgstr "לא מוגדר LDAP"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:183
 msgid "LDAP login successful"
@@ -10287,7 +10287,7 @@ msgstr "פריט אב"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
 msgid "Max"
-msgstr ""
+msgstr "מרבי"
 
 #: include/views/monitoring.screen.constructor.edit.php:230
 #: include/views/monitoring.screen.constructor.edit.php:360 screenedit.php:72
@@ -10467,7 +10467,7 @@ msgstr "אמצעי"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 msgid "Min"
-msgstr ""
+msgstr "מזערי"
 
 #: include/classes/setup/CFrontendSetup.php:128
 #, c-format
@@ -11654,7 +11654,7 @@ msgstr "מספר המעבדים במכונה וירטואלית של VMware,‏ 
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
 msgid "Number of rows"
-msgstr ""
+msgstr "מספר שורות"
 
 #: include/views/monitoring.slideconf.list.php:65
 msgid "Number of slides"
@@ -12402,7 +12402,7 @@ msgid "Parameters"
 msgstr "פרמטרים"
 
 #: include/views/configuration.host.discovery.edit.php:42
-#: include/views/configuration.host.prototype.edit.php:48
+#: include/views/configuration.host.prototype.edit.php:52
 msgid "Parent discovery rules"
 msgstr "כללי גילוי הורה"
 
@@ -12502,7 +12502,7 @@ msgstr "הדבקה ללא קישורים חיצוניים"
 
 #: actionconf.php:93 include/views/configuration.action.edit.php:430
 msgid "Pause operations for suppressed problems"
-msgstr ""
+msgstr "השהיית פעולות לתקלות מוסתרות"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -12836,11 +12836,11 @@ msgstr "מארחים בתקלה"
 
 #: include/actions.inc.php:362
 msgid "Problem is not suppressed"
-msgstr ""
+msgstr "התקלה אינה מוסתרת"
 
 #: include/actions.inc.php:41 include/actions.inc.php:361
 msgid "Problem is suppressed"
-msgstr ""
+msgstr "התקלה מוסתרת"
 
 #: jsrpc.php:132
 msgid "Problem on"
@@ -14593,7 +14593,7 @@ msgstr "הצגת הנבחרים"
 #: include/views/monitoring.overview.items.php:101
 #: include/views/monitoring.sysmap.edit.php:223
 msgid "Show suppressed problems"
-msgstr ""
+msgstr "הצגת תקלות מוסתרות"
 
 #: app/views/monitoring.problem.view.php:281
 #: include/classes/widgets/forms/CWidgetFormProblems.php:116
@@ -15111,7 +15111,7 @@ msgstr "תמיכה"
 #: include/html.inc.php:841
 #, c-format
 msgid "Suppressed till: %1$s"
-msgstr ""
+msgstr "מוסתרת עד: %1$s"
 
 #: app/controllers/CControllerPopupGeneric.php:186
 #: include/views/administration.users.edit.php:64
@@ -17674,7 +17674,7 @@ msgstr "Y2"
 #: include/views/configuration.services.edit.php:246
 #: include/views/configuration.services.edit.php:253
 msgid "YYYY-MM-DD hh:mm"
-msgstr ""
+msgstr "YYYY-MM-DD hh:mm"
 
 #: include/classes/import/validators/C20XmlValidator.php:833
 #: include/classes/import/validators/C30XmlValidator.php:896
@@ -17947,7 +17947,7 @@ msgstr "אמור להיות מחרוזת תווים"
 
 #: include/classes/validators/CApiInputValidator.php:271
 msgid "a hexadecimal colour code (6 symbols) is expected"
-msgstr ""
+msgstr "אמור להיות קוד צבע הקסדצימלי (6 תווים)"
 
 #: include/classes/validators/CApiInputValidator.php:417
 #: include/classes/validators/CApiInputValidator.php:554
@@ -18059,7 +18059,7 @@ msgstr "אמור להיות מספר זוגי או תווים הקסדצימלי
 
 #: include/validate.inc.php:243
 msgid "an explicit time is expected"
-msgstr ""
+msgstr "אמורה להיות שעה מפורשת"
 
 #: include/views/monitoring.history.php:163
 msgid "as Blue"
@@ -18086,7 +18086,7 @@ msgstr "עולה"
 
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:134
 msgid "at least one override option must be specified"
-msgstr ""
+msgstr "יש לציין אפשרות שכתוב אחת לפחות"
 
 #: include/events.inc.php:36
 msgid "auto registration"
@@ -18221,7 +18221,7 @@ msgstr "תלות מעגלית לפריט אסורה"
 
 #: jsLoader.php:200
 msgid "colour"
-msgstr ""
+msgstr "צבע"
 
 #: app/views/monitoring.problem.view.php:285
 #: include/classes/widgets/views/widget.problems.form.view.php:92
@@ -18235,7 +18235,7 @@ msgstr "הגדרה"
 #: include/actions.inc.php:26 include/correlation.inc.php:33
 #: include/views/inventory.host.list.php:53
 msgid "contains"
-msgstr ""
+msgstr "מכיל"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:234
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
@@ -18316,11 +18316,11 @@ msgstr "כלל הגילוי מושבת"
 
 #: include/actions.inc.php:27 include/correlation.inc.php:34
 msgid "does not contain"
-msgstr ""
+msgstr "אינו מכיל"
 
 #: include/actions.inc.php:25 include/correlation.inc.php:32
 msgid "does not equal"
-msgstr ""
+msgstr "אינו שווה"
 
 #: include/views/configuration.host.discovery.edit.php:633
 #: include/views/js/configuration.host.discovery.edit.js.php:25
@@ -18330,7 +18330,7 @@ msgstr "לא תואם"
 #: include/actions.inc.php:24 include/correlation.inc.php:31
 #: include/views/inventory.host.list.php:54
 msgid "equals"
-msgstr ""
+msgstr "שווה"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18489,11 +18489,11 @@ msgstr "iregexp()‎ - הביטוי הרגולרי V תואם לערך האחר�
 
 #: include/actions.inc.php:29
 msgid "is greater than or equals"
-msgstr ""
+msgstr "גדול או שווה"
 
 #: include/actions.inc.php:30
 msgid "is less than or equals"
-msgstr ""
+msgstr "קטן או שווה"
 
 #: include/classes/validators/CApiInputValidator.php:1365
 msgid "is not enclosed in {} or is malformed"
@@ -18666,7 +18666,7 @@ msgstr "חייב להיות בין „%1$s“ לבין „%2$s“"
 #: include/classes/validators/CApiInputValidator.php:862
 #: include/classes/validators/CApiInputValidator.php:906
 msgid "must contain at least one low-level discovery macro"
-msgstr ""
+msgstr "חייב להכיל לפחות מאקרו אחד של זיהוי ברמה נמוכה"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:220
@@ -18992,7 +18992,7 @@ msgstr "שלישי"
 
 #: jsLoader.php:201
 msgid "time shift"
-msgstr ""
+msgstr "הפרש זמן"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:347
 msgid "time() - Current time"

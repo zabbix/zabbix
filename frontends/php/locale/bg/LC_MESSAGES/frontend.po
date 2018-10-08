@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 16:00+0300\n"
-"PO-Revision-Date: 2013-01-12 23:52+0300\n"
-"Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
+"POT-Creation-Date: 2018-10-07 18:07+0300\n"
+"PO-Revision-Date: 2018-10-04 12:49+0300\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: \n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1358027539.000000\n"
+"X-POOTLE-MTIME: 1538650192.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -3420,7 +3420,7 @@ msgid "Configuration of maintenance periods"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeEdit.php:212
-#: app/controllers/CControllerMediatypeList.php:140
+#: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Конфигурация на методи на уведомление"
 
@@ -12425,7 +12425,7 @@ msgid "Parameters"
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:42
-#: include/views/configuration.host.prototype.edit.php:48
+#: include/views/configuration.host.prototype.edit.php:52
 msgid "Parent discovery rules"
 msgstr "Родителски правила за откриване."
 

@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 16:00+0300\n"
-"PO-Revision-Date: 2013-10-10 08:26+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2018-10-07 18:07+0300\n"
+"PO-Revision-Date: 2018-10-04 12:50+0300\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1381386369.000000\n"
+"X-POOTLE-MTIME: 1538650235.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -3358,7 +3358,7 @@ msgid "Configuration of maintenance periods"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeEdit.php:212
-#: app/controllers/CControllerMediatypeList.php:140
+#: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Konfigurasi tipe media"
 
@@ -12324,7 +12324,7 @@ msgid "Parameters"
 msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:42
-#: include/views/configuration.host.prototype.edit.php:48
+#: include/views/configuration.host.prototype.edit.php:52
 msgid "Parent discovery rules"
 msgstr "Aturan discovery induk"
 
