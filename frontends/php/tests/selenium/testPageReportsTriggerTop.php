@@ -50,7 +50,9 @@ class testPageReportsTriggerTop extends CWebTest {
 		return [
 			[
 				[
-					'host_group' => 'Zabbix servers',
+					'filter' => [
+						'host_group' => 'Zabbix servers'
+					],
 					'date' => [
 						'from' => '2017-10-23 00:00',
 						'to' => 'now/d'
@@ -63,7 +65,9 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'host_group' => 'Zabbix servers',
+					'filter' => [
+						'host_group' => 'Zabbix servers'
+					],
 					'date' => [
 						'from' => 'now/d',
 						'to' => 'now/d'
@@ -72,8 +76,10 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'host_group' => 'Zabbix servers',
-					'host' => 'ЗАББИКС Сервер',
+					'filter' => [
+						'host_group' => 'Zabbix servers',
+						'host' => 'ЗАББИКС Сервер'
+					],
 					'date' => [
 						'from' => '2017-10-23 14:00'
 					],
@@ -84,8 +90,10 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'host_group' => 'Zabbix servers',
-					'host' => 'Host ZBX6663',
+					'filter' => [
+						'host_group' => 'Zabbix servers',
+						'host' => 'Host ZBX6663'
+					],
 					'date' => [
 						'from' => 'now/d',
 						'to' => 'now/d'
@@ -94,8 +102,10 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'host_group' => 'Zabbix servers',
-					'host' => 'ЗАББИКС Сервер',
+					'filter' => [
+						'host_group' => 'Zabbix servers',
+						'host' => 'ЗАББИКС Сервер'
+					],
 					'date' => [
 						'from' => '2017-10-22 01:01',
 						'to' => '2017-10-24 01:01'
@@ -108,8 +118,10 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
-					'host_group' => 'Zabbix servers',
-					'host' => 'ЗАББИКС Сервер',
+					'filter' => [
+						'host_group' => 'Zabbix servers',
+						'host' => 'ЗАББИКС Сервер'
+					],
 					'date' => [
 						'from' => '2018-08-18 00:00',
 						'to' => 'now/d'
@@ -129,13 +141,15 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
+					'filter' => [
+						'severities' => [
+							'Not classified',
+							'Information',
+							'Warning'
+						]
+					],
 					'date' => [
 						'from' => '2017-10-22 00:00'
-					],
-					'severities' => [
-						'Not classified',
-						'Information',
-						'Warning'
 					],
 					'result' => [
 						'Test trigger to check tag filter on problem page'
@@ -144,14 +158,16 @@ class testPageReportsTriggerTop extends CWebTest {
 			],
 			[
 				[
+					'filter' => [
+						'severities' => [
+							'Not classified',
+							'Warning',
+							'Information',
+							'Average'
+						]
+					],
 					'date' => [
 						'from' => '2017-10-22 00:00'
-					],
-					'severities' => [
-						'Not classified',
-						'Warning',
-						'Information',
-						'Average'
 					]
 				]
 			],
@@ -177,46 +193,56 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->zbxTestLogin('toptriggers.php');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestWaitForPageToLoad();
 
-		if (array_key_exists('host_group', $data)) {
-			$this->zbxTestClickButtonMultiselect('groupids_');
-			$this->zbxTestLaunchOverlayDialog('Host groups');
-			$this->zbxTestClickLinkTextWait($data['host_group']);
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
-			$this->zbxTestMultiselectAssertSelected('groupids_', $data['host_group']);
-		}
+		if (array_key_exists('filter', $data)) {
+			$filter = $data['filter'];
 
-		if (array_key_exists('host', $data)) {
-			$this->zbxTestClickButtonMultiselect('hostids_');
-			$this->zbxTestLaunchOverlayDialog('Hosts');
-			$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers',
-				'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
-			);
-			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
-			$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="'.$data['host'].'"]');
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
-			$this->zbxTestMultiselectAssertSelected('hostids_', $data['host']);
-		}
-
-		if (array_key_exists('severities', $data)) {
-			foreach ($data['severities'] as $severity) {
-				$severity_id = $this->zbxTestGetAttributeValue('//label[text()="'.$severity.'"]', 'for');
-				$this->zbxTestClick($severity_id);
+			if (array_key_exists('host_group', $filter)) {
+				$this->zbxTestClickButtonMultiselect('groupids_');
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->zbxTestClickLinkTextWait($filter['host_group']);
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+				$this->zbxTestMultiselectAssertSelected('groupids_', $filter['host_group']);
 			}
+
+			if (array_key_exists('host', $filter)) {
+				$this->zbxTestClickButtonMultiselect('hostids_');
+				$this->zbxTestLaunchOverlayDialog('Hosts');
+				$this->zbxTestDropdownHasOptions('groupid', ['Host group for tag permissions', 'Zabbix servers',
+					'ZBX6648 All Triggers', 'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers']
+				);
+				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
+				$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="'.$filter['host'].'"]');
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@id="overlay_dialogue"]'));
+				$this->zbxTestMultiselectAssertSelected('hostids_', $filter['host']);
+			}
+
+			if (array_key_exists('severities', $filter)) {
+				foreach ($filter['severities'] as $severity) {
+					$severity_id = $this->zbxTestGetAttributeValue('//label[text()="'.$severity.'"]', 'for');
+					$this->zbxTestClick($severity_id);
+				}
+			}
+
+			$this->zbxTestClickXpathWait('//button[@name="filter_set"][text()="Apply"]');
+			$this->zbxTestWaitForPageToLoad();
 		}
 
-		$this->zbxTestClickXpathWait('//button[@name="filter_set"][text()="Apply"]');
-
-		// Fill in the date in filter
+		// Fill in the date in filter.
 		if (array_key_exists('date', $data)) {
 			$this->zbxTestExpandFilterTab('Time');
+			// Reset the date in filter on Today.
+			$this->zbxTestClickXpathWait('//div[@id="tab_1"]//a[text()="Today"]');
+			$this->zbxTestWaitForPageToLoad();
+
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);
 			}
 			$this->zbxTestClickWait('apply');
+			$this->zbxTestWaitForPageToLoad();
 		}
 
-		$this->zbxTestWaitForPageToLoad();
 		if (array_key_exists('result', $data)) {
 			foreach ($data['result'] as $result) {
 				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//td[2]//a[text()="'.$result.'"]'));
