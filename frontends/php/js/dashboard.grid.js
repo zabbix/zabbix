@@ -434,9 +434,14 @@
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
 		if (rf_rate != 0) {
 			widget['rf_timeoutid'] = setTimeout(function () {
-				if (doAction('timer_refresh', $obj, data, widget) == 0) {
-					// widget was not updated, update it's content
-					updateWidgetContent($obj, data, widget);
+				// Do not update widget content if there are active popup or hintbox.
+				var active = widget['content_body'].find('[data-expanded="true"]');
+
+				widget['div'][active.length ? 'addClass' : 'removeClass']('dashbrd-grid-widget-no-refresh');
+
+				if (doAction('timer_refresh', $obj, data, widget) == 0 && active.length == 0) {
+						// widget was not updated, update it's content
+						updateWidgetContent($obj, data, widget);
 				}
 				else {
 					// widget was updated, start next timeout.

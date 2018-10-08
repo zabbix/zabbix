@@ -410,15 +410,16 @@ function getMenuPopupMap(options, trigger_elmnt) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string   options['widgetName']   Widget name.
- * @param string   options['currentRate']  Current rate value.
- * @param bool     options['multiplier']   Multiplier or time mode.
- * @param array    options['params']       Url parameters (optional).
- * @param callback options['callback']     Callback function on success (optional).
+ * @param {string}   options['widgetName']   Widget name.
+ * @param {string}   options['currentRate']  Current rate value.
+ * @param {bool}     options['multiplier']   Multiplier or time mode.
+ * @param {array}    options['params']       Url parameters (optional).
+ * @param {callback} options['callback']     Callback function on success (optional).
+ * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupRefresh(options) {
+function getMenuPopupRefresh(options, trigger_elmnt) {
 	var items = [],
 		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
 		intervals = options.multiplier
@@ -478,7 +479,7 @@ function getMenuPopupRefresh(options) {
 						}
 					});
 
-					obj.closest('.action-menu').menuPopup('close', null);
+					obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -509,13 +510,13 @@ function getMenuPopupRefresh(options) {
 								}
 							});
 
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -882,7 +883,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, null);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 					};
@@ -932,10 +933,12 @@ jQuery(function($) {
 				target = event;
 			}
 
-			// Close other action menus.
-			$('.action-menu-top').not('#' + id).menuPopup('close');
+			opener.attr('data-expanded', 'true');
 
 			if (menuPopup.length > 0) {
+				// Close other action menus.
+				$('.action-menu-top').not('#' + id).menuPopup('close');
+
 				var display = menuPopup.css('display');
 
 				// Hide current action menu sub-levels.
@@ -943,6 +946,7 @@ jQuery(function($) {
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
+					$(opener).removeAttr('data-expanded');
 				}
 				else {
 					menuPopup.fadeIn(50);
@@ -1045,7 +1049,7 @@ jQuery(function($) {
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
 			$(document)
-				.on('click', {menu: menuPopup}, menuPopupDocumentCloseHandler)
+				.on('click', {menu: menuPopup, opener: opener}, menuPopupDocumentCloseHandler)
 				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
 
 			menuPopup.focus();
@@ -1054,6 +1058,7 @@ jQuery(function($) {
 			var menuPopup = $(this);
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
+				$(trigger_elmnt||return_focus).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
 				$('.highlighted', menuPopup).removeClass('highlighted');
@@ -1127,6 +1132,7 @@ jQuery(function($) {
 	};
 
 	function menuPopupDocumentCloseHandler(event) {
+		event.data.opener.removeAttr('data-expanded');
 		$(event.data.menu[0]).menuPopup('close');
 	}
 

@@ -456,10 +456,6 @@ var hintBox = {
 					break;
 
 				case 'remove':
-					jQuery('[data-menu-popup]', jQuery(this.hintBoxItem)).each(function (_, popup_parent) {
-						jQuery('#'+jQuery(popup_parent).data('menu-popup-id')).menuPopup('close');
-					});
-
 					hintBox.deleteHint(this);
 					break;
 
@@ -521,6 +517,7 @@ var hintBox = {
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
+			jQuery(target).attr('data-expanded', 'true');
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
@@ -654,6 +651,7 @@ var hintBox = {
 
 	deleteHint: function(target) {
 		if (typeof target.hintboxid !== 'undefined') {
+			jQuery(target).removeAttr('data-expanded');
 			removeFromOverlaysStack(target.hintboxid);
 		}
 
