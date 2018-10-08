@@ -232,14 +232,13 @@ class testPageReportsTriggerTop extends CWebTest {
 		// Fill in the date in filter.
 		if (array_key_exists('date', $data)) {
 			$this->zbxTestExpandFilterTab('Time');
-			// Reset the date in filter on Today.
-			$this->zbxTestClickXpathWait('//div[@id="tab_1"]//a[text()="Today"]');
-			$this->zbxTestWaitForPageToLoad();
-
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);
 			}
+			// Wait till table id will be changed after filter apply.
+			$tabel_id = $this->zbxTestGetAttributeValue('//table[@class="list-table"]', 'id');
 			$this->zbxTestClickWait('apply');
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//table[@class="list-table"][not(@id="'.$tabel_id.'")]'));
 			$this->zbxTestWaitForPageToLoad();
 		}
 
