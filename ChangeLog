@@ -3,7 +3,6 @@ Changes for 4.2.0alpha1
 New features:
 
 Bug fixes:
-..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.1rc1
