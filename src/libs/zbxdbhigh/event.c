@@ -53,12 +53,11 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	/* read event data */
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select e.eventid,e.source,e.object,e.objectid,e.clock,e.value,e.acknowledged,e.ns,e.name,"
-				"e.severity"
-			" from events e"
+			"select eventid,source,object,objectid,clock,value,acknowledged,ns,name,severity"
+			" from events"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids->values, eventids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
 
 	result = DBselect("%s", sql);
 
@@ -104,7 +103,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_EVENT	*event = NULL;
+		DB_EVENT	*event;
 		zbx_uint64_t	eventid;
 
 		ZBX_STR2UINT64(eventid, row[0]);
