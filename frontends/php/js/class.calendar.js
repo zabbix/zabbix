@@ -663,33 +663,19 @@ calendar.prototype = {
 		var tr = document.createElement('tr');
 		thead.appendChild(tr);
 
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_MONDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_TUESDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_WEDNESDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_THURSDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_FRIDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_SATURDAY_SHORT_BIG')));
-
-		var td = document.createElement('th');
-		tr.appendChild(td);
-		td.appendChild(document.createTextNode(t('S_SUNDAY_SHORT_BIG')));
+		[
+			t('S_MONDAY_SHORT_BIG'),
+			t('S_TUESDAY_SHORT_BIG'),
+			t('S_WEDNESDAY_SHORT_BIG'),
+			t('S_THURSDAY_SHORT_BIG'),
+			t('S_FRIDAY_SHORT_BIG'),
+			t('S_SATURDAY_SHORT_BIG'),
+			t('S_SUNDAY_SHORT_BIG')
+		].forEach(function(str) {
+			var td = document.createElement('th');
+			td.appendChild(document.createTextNode(str));
+			tr.appendChild(td);
+		});
 
 		/*
 		 * Days calendar

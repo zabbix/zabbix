@@ -3573,10 +3573,7 @@ ZABBIX.apps.map = (function($) {
 
 					if (linkTrigger !== null) {
 						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(
-								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
-								values[i].value
-							);
+							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
 						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
@@ -3587,10 +3584,7 @@ ZABBIX.apps.map = (function($) {
 					}
 					else {
 						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(
-								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
-								values[i].value
-							);
+							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
 						data[values[i].name] = values[i].value.toString();

@@ -667,7 +667,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	sections[sections.length] = {
-		label: t('Trigger'),
+		label: t('S_TRIGGER'),
 		items: items
 	};
 

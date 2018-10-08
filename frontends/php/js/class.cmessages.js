@@ -21,9 +21,9 @@
 var ZBX_MESSAGES = [];
 
 // use this function to initialize Messaging system
-function initMessages(args) {
+function initMessages() {
 	var messagesListId = ZBX_MESSAGES.length;
-	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId, args);
+	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId);
 	return messagesListId;
 }
 
@@ -52,7 +52,7 @@ var CMessageList = Class.create({
 		'time': 0				// Message timestamp.
 	},
 
-	initialize: function(messagesListId, args) {
+	initialize: function(messagesListId) {
 		this.messageListId = messagesListId;
 		this.dom = {};
 		this.messageList = {};

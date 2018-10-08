@@ -496,7 +496,7 @@ jQuery(function ($) {
 					.addClass('paging-btn-container')
 					.append(
 						$('<div></div>')
-							.text(sprintf(t('Displaying %1$s of %2$s found'), num_displayed, num_total))
+							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
 							.addClass('table-stats')
 					)
 		);

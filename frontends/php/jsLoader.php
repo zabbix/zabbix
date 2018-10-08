@@ -92,10 +92,6 @@ $availableJScripts = [
 
 $tranStrings = [
 	'gtlc.js' => [
-		'S_YEAR_SHORT' => _x('y', 'year short'),
-		'S_MONTH_SHORT' => _x('m', 'month short'),
-		'S_DAY_SHORT' => _x('d', 'day short'),
-		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'dashboard.grid.js' => [
@@ -117,6 +113,10 @@ $tranStrings = [
 		'S_CLOSE' => _('Close'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
+		'S_YEAR_SHORT' => _x('y', 'year short'),
+		'S_MONTH_SHORT' => _x('m', 'month short'),
+		'S_DAY_SHORT' => _x('d', 'day short'),
+		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
 	],
@@ -178,7 +178,7 @@ $tranStrings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
+		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
 	'class.cmessages.js' => [
 		'S_MUTE' => _('Mute'),
@@ -236,7 +236,7 @@ $tranStrings = [
 		'Refresh interval multiplier' => _('Refresh interval multiplier'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
-		'Trigger' => _('Trigger'),
+		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'No refresh' => _('No refresh'),
@@ -275,7 +275,7 @@ $tranStrings = [
 		'S_COLLAPSE' => _('Collapse')
 	],
 	'class.csvggraph.js' => [
-		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found'),
+		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
 	'common.js' => [
