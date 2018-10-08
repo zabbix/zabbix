@@ -1876,7 +1876,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: substitute_host_interface_macros                                 *
  *                                                                            *
- * Purpose: trying to resolve the macros in host inteface                     *
+ * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
@@ -5217,7 +5217,7 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
 				config->strpool.num_data, config->strpool.num_slots);
 
-		zbx_mem_dump_stats(config_mem);
+		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 
 	config->status->last_update = 0;
@@ -8833,8 +8833,12 @@ void	*DCconfig_get_stats(int request)
 		case ZBX_CONFSTATS_BUFFER_FREE:
 			value_uint = config_mem->free_size;
 			return &value_uint;
+		case ZBX_CONFSTATS_BUFFER_PUSED:
+			value_double = 100 * (double)(config_mem->orig_size - config_mem->free_size) /
+					config_mem->orig_size;
+			return &value_double;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
+			value_double = 100 * (double)config_mem->free_size / config_mem->orig_size;
 			return &value_double;
 		default:
 			return NULL;
@@ -8843,7 +8847,7 @@ void	*DCconfig_get_stats(int request)
 
 static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 {
-	const ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
 	dst_proxy->hostid = src_proxy->hostid;

@@ -54,7 +54,6 @@ class CSvgPath extends CSvgTag {
 
 	public function toString($destroy = true) {
 		$this->setAttribute('d', trim($this->directions));
-		$this->setAttribute('label', $this->getAttribute('label'));
 
 		return parent::toString($destroy);
 	}

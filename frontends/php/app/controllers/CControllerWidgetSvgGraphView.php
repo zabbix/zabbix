@@ -23,6 +23,11 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetSvgGraphView extends CControllerWidget {
 
+	const GRAPH_WIDTH_MIN = 1;
+	const GRAPH_WIDTH_MAX = 65535;
+	const GRAPH_HEIGHT_MIN = 1;
+	const GRAPH_HEIGHT_MAX = 65535;
+
 	public function __construct() {
 		parent::__construct();
 
@@ -33,8 +38,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'dashboardid' => 'db dashboard.dashboardid',
 			'initial_load' => 'in 0,1',
 			'edit_mode' => 'in 0,1',
-			'content_width' => 'int32',
-			'content_height' => 'int32',
+			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
+			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'fields' => 'json'
 		]);
@@ -44,14 +49,26 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$fields = $this->getForm()->getFieldsData();
 		$uniqueid = $this->getInput('uniqueid');
 		$edit_mode = $this->getInput('edit_mode', 0);
-		$width = (int) $this->getInput('content_width', 100);
-		$height = (int) $this->getInput('content_height', 100);
+		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
+		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
+		foreach ($fields['ds'] as &$ds) {
+			$ds['hosts'] = CWidgetHelper::makeStringFromChunks($ds['hosts']);
+			$ds['items'] = CWidgetHelper::makeStringFromChunks($ds['items']);
+		}
+		unset($ds);
+
+		foreach ($fields['or'] as &$or) {
+			$or['hosts'] = CWidgetHelper::makeStringFromChunks($or['hosts']);
+			$or['items'] = CWidgetHelper::makeStringFromChunks($or['items']);
+		}
+		unset($or);
+
 		$graph_data = [
-			'data_sets' => $fields['ds'],
+			'data_sets' => array_values($fields['ds']),
 			'data_source' => $fields['source'],
 			'dashboard_time' => !CWidgetFormSvgGraph::hasOverrideTime($fields),
 			'time_period' => [
@@ -66,7 +83,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'max' => ($fields['lefty_max'] !== '')
 					? convertFunctionValue($fields['lefty_max'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT)
 					: '',
-				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC) ? $fields['lefty_static_units'] : ''
+				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
+					? $fields['lefty_static_units']
+					: null
 			],
 			'right_y_axis' => [
 				'show' => $fields['righty'],
@@ -78,7 +97,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 					: '',
 				'units' => ($fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
 					? $fields['righty_static_units']
-					: ''
+					: null
 			],
 			'x_axis' => [
 				'show' => $fields['axisx']
@@ -88,13 +107,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'problems' => [
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
 				'graph_item_problems' => $fields['graph_item_problems'],
-				'problemhosts' => $fields['problemhosts'],
+				'problemhosts' => CWidgetHelper::makeStringFromChunks($fields['problemhosts']),
 				'severities' => $fields['severities'],
 				'problem_name' => $fields['problem_name'],
 				'evaltype' => $fields['evaltype'],
 				'tags' => $fields['tags']
 			],
-			'overrides' => $fields['or']
+			'overrides' => array_values($fields['or'])
 		];
 
 		// Use dashboard time from user profile.
@@ -149,27 +168,19 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		if ($initial_load) {
 			// Register widget auto-refresh when resizing widget.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_resize_end) !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_resize_end() {'.
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid("refreshWidget", "'.$uniqueid.'");'.
-					'}'.
-				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onResizeEnd",'.
-					'"zbx_svggraph_widget_resize_end", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["onResizeEnd"],'.
+						'grid: {widget: 1},'.
 						'trigger_name: "svggraph_widget_resize_end_'.$uniqueid.'"'.
 					'});';
 
 			// Disable SBox when switch to edit mode.
 			$script_inline .=
-				'if (typeof(zbx_svggraph_widget_edit_start) !== typeof(Function)) {'.
-					'function zbx_svggraph_widget_edit_start() {'.
-						'var widget = jQuery(".dashbrd-grid-widget-container")'.
-								'.dashboardGrid(\'getWidgetsBy\', \'uniqueid\', "'.$uniqueid.'");'.
-						'jQuery(\'svg\', widget[0]["content_body"]).svggraph("disableSBox");'.
-					'}'.
-				'}'.
 				'jQuery(".dashbrd-grid-widget-container").dashboardGrid("addAction", "onEditStart",'.
-					'"zbx_svggraph_widget_edit_start", "'.$uniqueid.'", {'.
+					'"zbx_svggraph_widget_trigger", "'.$uniqueid.'", {'.
+						'parameters: ["onEditStart"],'.
+						'grid: {widget: 1},'.
 						'trigger_name: "svggraph_widget_edit_start_'.$uniqueid.'"'.
 					'});';
 		}

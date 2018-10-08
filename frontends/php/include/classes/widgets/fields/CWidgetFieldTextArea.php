@@ -39,7 +39,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.
 		 * Save type is set in self::toApi method for each string field separately.
 		 */
-		$this->setValidationRules(['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE]);
+		$this->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
 
 	public function setValue($value) {

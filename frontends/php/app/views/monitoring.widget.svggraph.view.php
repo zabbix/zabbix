@@ -26,8 +26,7 @@ $output = [
 if (!$data['preview']) {
 	$output += [
 		'header' => $data['name'],
-		'script_inline' => $data['script_inline'],
-		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+		'script_inline' => $data['script_inline']
 	];
 
 	if ($data['info']) {
@@ -35,12 +34,6 @@ if (!$data['preview']) {
 			'info' => $data['info']
 		];
 	}
-}
-
-if ($data['initial_load']) {
-	$output['script_file'] = [
-		'js/class.csvggraph.js'
-	];
 }
 
 if (($messages = getMessages()) !== null) {

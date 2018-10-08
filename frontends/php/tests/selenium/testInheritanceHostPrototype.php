@@ -66,9 +66,8 @@ class testInheritanceHostPrototype extends CWebTest {
 		);
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "?form=update&hostid='.$host_prototype.
-				'&parent_discoveryid='.$discovery_id.'")]'
-		);
+		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
+				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
@@ -94,7 +93,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
 		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
