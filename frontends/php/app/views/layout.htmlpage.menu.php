@@ -41,7 +41,7 @@ $user_menu = (new CList())
 	->addItem(CBrandHelper::isRebranded()
 		? null
 		: (new CListItem(
-			(new CLink('Support', 'https://www.zabbix.com/support/'))
+			(new CLink(_('Support'), $data['support_url']))
 				->addClass(ZBX_STYLE_TOP_NAV_SUPPORT)
 				->setAttribute('target', '_blank')
 				->setTitle(_('Zabbix Technical Support'))
