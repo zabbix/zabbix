@@ -1128,6 +1128,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 {
 	double		sec = 0.0;
 	zbx_socket_t	s;
+	int		ret;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -1148,8 +1149,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
-
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
@@ -1158,7 +1157,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Trapper has to accept all types of connections it can accept with the specified configuration. */
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
-		if (SUCCEED == zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED))
+		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED);
+		sec = zbx_time();
+		zbx_update_env(sec);
+
+		if (SUCCEED == ret)
 		{
 			zbx_timespec_t	ts;
 
@@ -1170,7 +1173,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
-			sec = zbx_time();
 			process_trapper_child(&s, &ts);
 			sec = zbx_time() - sec;
 
@@ -1181,9 +1183,5 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
 		}
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }
