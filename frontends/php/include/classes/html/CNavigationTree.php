@@ -21,7 +21,6 @@
 
 class CNavigationTree extends CDiv {
 		private $error;
-		private $script_file;
 		private $data;
 
 		public function __construct(array $data = []) {
@@ -29,7 +28,6 @@ class CNavigationTree extends CDiv {
 
 			$this->data = $data;
 			$this->error = null;
-			$this->script_file = 'js/class.cnavtree.js';
 
 			$this->setId(uniqid());
 			$this->addClass(ZBX_STYLE_NAVIGATIONTREE);
@@ -38,10 +36,6 @@ class CNavigationTree extends CDiv {
 		public function setError($value) {
 			$this->error = $value;
 			return $this;
-		}
-
-		public function getScriptFile() {
-			return $this->script_file;
 		}
 
 		public function getScriptRun() {
