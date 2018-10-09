@@ -39,7 +39,8 @@ class testPageDashboard extends CWebTest {
 		foreach ($users as $user) {
 			switch ($user) {
 				case 'super-admin' :
-					$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
@@ -57,7 +58,7 @@ class testPageDashboard extends CWebTest {
 			}
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
-			if ($user != 'super-admin'){
+			if ($user != 'super-admin') {
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
@@ -69,6 +70,11 @@ class testPageDashboard extends CWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Local');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Problems by severity');
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'System information');
+
+			// Logout.
+			$this->zbxTestLogout();
+			$this->zbxTestWaitForPageToLoad();
+			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}
 
@@ -162,6 +168,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
@@ -180,6 +187,7 @@ class testPageDashboard extends CWebTest {
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
