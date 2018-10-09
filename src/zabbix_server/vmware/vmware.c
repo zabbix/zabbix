@@ -4991,7 +4991,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 		{
@@ -4999,8 +5000,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 					"querying VMware services]", get_process_type_string(process_type), process_num,
 					old_updated_services, old_removed_services, old_total_sec);
 		}
-
-		sec = zbx_time();
 
 		do
 		{
@@ -5109,10 +5108,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 #undef STAT_INTERVAL
 #else
