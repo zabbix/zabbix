@@ -503,6 +503,7 @@ ul.top-nav-icons {
 .header-title,
 .object-group {
 	height: 24px;
+	line-height: 24px;
 	padding: 6px 0;
 	position: relative;
 }
@@ -516,10 +517,6 @@ ul.top-nav-icons {
 
 		&:first-child {
 			max-width: calc(100vw - 370px);
-		}
-
-		&:last-child {
-			text-align: right;
 		}
 	}
 
@@ -536,6 +533,8 @@ ul.top-nav-icons {
 	}
 
 	ul {
+		text-align: right;
+
 		li {
 			display: inline-block;
 			vertical-align: top;
@@ -545,6 +544,10 @@ ul.top-nav-icons {
 
 		ul li:first-child {
 			padding-left: 0;
+		}
+
+		button {
+			line-height: 22px;
 		}
 	}
 
@@ -622,6 +625,14 @@ article {
 	.arrow-right {
 		border-left-color: $font-color;
 	}
+
+	button {
+		line-height: 22px;
+	}
+
+	.btn-link {
+		line-height: 14px;
+	}
 }
 
 .hor-list {
@@ -647,6 +658,7 @@ article {
 
 	li {
 		line-height: 14px;
+		padding: 1px 0;
 		vertical-align: top;
 	}
 
@@ -2469,7 +2481,7 @@ $icon-widget-btn: (
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
 			margin: 0 0 0 6px;
-			padding: 0 34px 7px 10px;
+			padding: 1px 34px 6px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
@@ -5555,6 +5567,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
+	margin: 4px 0;
 
 	.map-container {
 		display: table;
