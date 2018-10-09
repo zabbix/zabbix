@@ -5,6 +5,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14925] added support of user language specific url link in support icon, supported languages: english as default, japanese, russian (gcalenko)
 ........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
 ..F....... [ZBX-14798] fixed incorrect zero rounding in date and time fields (gcalenko, Ivo)
 ........S. [ZBX-14954] fixed sql error in escalator when working with Oracle, PostgreSQL (less than v9.4) databases (wiper)
