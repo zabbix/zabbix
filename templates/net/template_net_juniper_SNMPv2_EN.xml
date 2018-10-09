@@ -769,7 +769,7 @@ Please check the fan unit</description>
                      <privatekey/>
                      <port/>
                      <description>MIB: JUNIPER-MIB&#13;
-If they are using DC power supplies there is a a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.&#13;
+If they are using DC power supplies there is a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.&#13;
 This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122</description>
                      <inventory_link>0</inventory_link>
                      <applications>

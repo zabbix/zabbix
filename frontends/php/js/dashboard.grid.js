@@ -1295,12 +1295,12 @@
 					footer = $('.overlay-dialogue-footer', data.dialogue['div']),
 					header = $('.dashbrd-widget-head', data.dialogue['div']),
 					form = $('form', body),
-					widget = data.dialogue['widget'], // widget currently beeing edited
+					widget = data.dialogue['widget'], // widget currently being edited
 					url = new Curl('zabbix.php'),
 					ajax_data = {},
 					fields;
 
-				// Disable saving, while form is beeing updated.
+				// Disable saving, while form is being updated.
 				$('.dialogue-widget-save', footer).prop('disabled', true);
 
 				url.setArgument('action', 'dashboard.widget.edit');
@@ -1374,7 +1374,7 @@
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// Enable save button after sucessfull form update.
+						// Enable save button after successful form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {

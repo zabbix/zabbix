@@ -825,6 +825,13 @@ output {
 				}
 			}
 
+			[class*='icon-depend-'] {
+				&,
+				&:last-of-type {
+					margin-right: 12px;
+				}
+			}
+
 			.rel-container {
 
 				span {
@@ -1018,7 +1025,7 @@ output {
 			@extend %nothing-to-show;
 		}
 
-		&:last-child td {
+		&:last-child th, &:last-child td {
 			border-bottom: none;
 		}
 
@@ -2570,6 +2577,7 @@ $icon-widget-btn: (
 	border: 1px solid transparent;
 	color: $font-color;
 	height: 24px;
+	line-height: 22px;
 	margin: 0 5px;
 	vertical-align: top;
 
@@ -3209,7 +3217,7 @@ $form-icon-btn: (
 
 		tbody tr {
 
-			&:last-child td {
+			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
 				&.list-table-footer {

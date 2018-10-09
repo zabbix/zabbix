@@ -25,7 +25,6 @@ class CConfigFile {
 	const CONFIG_ERROR = 2;
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
-	const BRAND_CONFIG_FILE_PATH = '/conf/brand.conf.php';
 
 	private static $supported_db_types = [
 		ZBX_DB_DB2 => true,

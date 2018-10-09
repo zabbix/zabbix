@@ -581,6 +581,8 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
+    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
+      margin-right: 12px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -688,7 +690,7 @@ output {
     background-color: #2b2b2b; }
   .list-table tbody tr.row-selected .timeline-td {
     background-color: #2b2b2b; }
-  .list-table tbody tr:last-child td {
+  .list-table tbody tr:last-child th, .list-table tbody tr:last-child td {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #2b2b2b; }
@@ -1777,6 +1779,7 @@ button {
   border: 1px solid transparent;
   color: #f2f2f2;
   height: 24px;
+  line-height: 22px;
   margin: 0 5px;
   vertical-align: top; }
   .btn-time-out:disabled {
@@ -2225,9 +2228,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow-y: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
-    .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
+    .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
-      .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+      .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
     margin: 10px 10px 0 10px;

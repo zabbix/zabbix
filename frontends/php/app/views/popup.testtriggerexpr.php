@@ -23,7 +23,7 @@ $allowed_testing = $data['allowed_testing'];
 $test = $data['test'];
 
 $data_table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([
 		_('Expression Variable Elements'),
 		_('Result type'),
@@ -38,11 +38,11 @@ $form_list = (new CFormList())
 	->addRow(_('Test data'),
 		(new CDiv($data_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 $result_table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([
 		_('Expression'),
 		_('Result')
@@ -63,7 +63,12 @@ foreach ($data['eHTMLTree'] as $e) {
 		}
 	}
 
-	$result_table->addRow([$e['list'], (new CCol($result))->addClass($style)]);
+	$result_table->addRow([
+		(new CCol($e['list']))
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+		(new CCol($result))->addClass($style)
+	]);
 }
 
 $result = '';
@@ -83,7 +88,7 @@ $result_table->setFooter([$data['outline'], (new CCol($result))->addClass($style
 $form_list->addRow(_('Result'),
 	(new CDiv($result_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $output = [
