@@ -439,7 +439,7 @@
 
 				widget['div'][active.length ? 'addClass' : 'removeClass']('dashbrd-grid-widget-no-refresh');
 
-				if (doAction('timer_refresh', $obj, data, widget) == 0 && active.length == 0) {
+				if (active.length == 0 && doAction('timer_refresh', $obj, data, widget) == 0) {
 					// widget was not updated, update it's content
 					updateWidgetContent($obj, data, widget);
 				}
