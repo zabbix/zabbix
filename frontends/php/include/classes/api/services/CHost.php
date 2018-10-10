@@ -1302,19 +1302,39 @@ class CHost extends CHostGeneral {
 		return ['hostids' => $hostIds];
 	}
 
+	/**
+	 * Retrieves and adds additional requested data to result set.
+	 *
+	 * @param array  $options
+	 * @param array  $result
+	 *
+	 * @return array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$hostids = array_keys($result);
 
-		// adding inventories
+		// adding inventory
 		if ($options['selectInventory'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],
 				'filter' => ['hostid' => $hostids]
 			]);
-			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
+			$inventory = zbx_toHash($inventory, 'hostid');
+
+			foreach ($hostids as $hostid) {
+				// Only HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC values are stored in DB.
+				if (!array_key_exists($hostid, $inventory)) {
+					$inventory[$hostid] = [
+						'hostid' => (string) $hostid,
+						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
+					];
+				}
+			}
+
+			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
+			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
 		// adding hostinterfaces

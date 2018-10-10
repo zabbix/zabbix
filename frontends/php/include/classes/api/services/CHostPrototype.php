@@ -1119,6 +1119,14 @@ class CHostPrototype extends CHostBase {
 		return $sqlParts;
 	}
 
+	/**
+	 * Retrieves and adds additional requested data to result set.
+	 *
+	 * @param array  $options
+	 * @param array  $result
+	 *
+	 * @return array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
@@ -1227,21 +1235,35 @@ class CHostPrototype extends CHostBase {
 
 		// adding inventory
 		if ($options['selectInventory'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
-
-			// only allow to retrieve the hostid and inventory_mode fields
-			$output = [];
-			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
-				$output[] = 'hostid';
-			}
-			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
-				$output[] = 'inventory_mode';
-			}
 			$inventory = API::getApiService()->select('host_inventory', [
-				'output' => $output,
+				'output' => ['hostid', 'inventory_mode'],
 				'filter' => ['hostid' => $hostPrototypeIds]
 			]);
-			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
+			$inventory = zbx_toHash($inventory, 'hostid');
+
+			$output = [];
+			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
+				$output['hostid'] = true;
+			}
+			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
+				$output['inventory_mode'] = true;
+			}
+
+			foreach ($hostPrototypeIds as $host_prototypeid) {
+				// Only HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC values are stored in DB.
+				if (!array_key_exists($host_prototypeid, $inventory)) {
+					$inventory[$host_prototypeid] = [
+						'hostid' => (string) $host_prototypeid,
+						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
+					];
+				}
+
+				// Remove "hostid" and "inventory_mode" fields if not requested.
+				$inventory[$host_prototypeid] = array_intersect_key($inventory[$host_prototypeid], $output);
+			}
+
+			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
+			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
 		return $result;
