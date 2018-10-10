@@ -913,8 +913,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return;
 
-	/* only new items or items with changed data will be validated */
-	if (0 != item->itemid && 0 == (item->flags & flag))
+	/* only new items or items with changed data or item type will be validated */
+	if (0 != item->itemid && 0 == (item->flags & flag) && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
 		return;
 
 	if (SUCCEED != zbx_is_utf8(*field))
@@ -965,10 +965,12 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						(0 != item->itemid ? "update" : "create"), errmsg);
 				zbx_free(errmsg);
 
-				/* delay alone cannot be rolled back as it depends on item type */
+				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
 				if (0 != item->itemid)
+				{
 					item->flags &= ZBX_FLAG_LLD_ITEM_DISCOVERED;
-
+					return;
+				}
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
 				if (SUCCEED == is_user_macro(*field))
