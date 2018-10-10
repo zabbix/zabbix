@@ -575,21 +575,22 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerid']               Trigger ID.
- * @param object options['items']                   Link to trigger item history page (optional).
- * @param string options['items'][]['name']         Item name.
- * @param object options['items'][]['params']       Item url parameters ("name" => "value").
- * @param object options['acknowledge']             Link to acknowledge page (optional).
- * @param string options['acknowledge']['eventid']  Event ID
- * @param string options['acknowledge']['backurl']  Return url.
- * @param object options['configuration']           Link to trigger configuration page (optional).
- * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
- * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
- * @param string options['url']                     Trigger url link (optional).
+ * @param {string} options['triggerid']               Trigger ID.
+ * @param {object} options['items']                   Link to trigger item history page (optional).
+ * @param {string} options['items'][]['name']         Item name.
+ * @param {object} options['items'][]['params']       Item url parameters ("name" => "value").
+ * @param {object} options['acknowledge']             Link to acknowledge page (optional).
+ * @param {string} options['acknowledge']['eventid']  Event ID
+ * @param {string} options['acknowledge']['backurl']  Return url.
+ * @param {object} options['configuration']           Link to trigger configuration page (optional).
+ * @param {bool}	 options['show_description']      Show Description item in context menu. Default: true.
+ * @param {bool}	 options['description_enabled']	  Show Description item enabled. Default: true.
+ * @param {string} options['url']                     Trigger url link (optional).
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTrigger(options) {
+function getMenuPopupTrigger(options, trigger_elmnt) {
 	var sections = [],
 		items = [];
 
@@ -634,12 +635,12 @@ function getMenuPopupTrigger(options) {
 		};
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
-			trigger_descr.clickCallback = function(event) {
+			trigger_descr.clickCallback = function() {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 				return PopUp('popup.trigdesc.view', {
 					triggerid: options.triggerid
-				}, null, event.target);
+				}, null, trigger_elmnt);
 			}
 		}
 		else {

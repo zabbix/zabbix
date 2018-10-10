@@ -95,7 +95,7 @@ jQuery(function($) {
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data);
+				data = getMenuPopupTrigger(data, obj);
 				break;
 
 			case 'triggerLog':
