@@ -388,8 +388,6 @@ ul.top-nav-icons {
   width: 100%; }
   .header-title .cell:first-child {
     max-width: calc(100vw - 370px); }
-  .header-title .cell:last-child {
-    text-align: right; }
   .header-title h1 {
     line-height: 24px;
     overflow: hidden;
@@ -398,13 +396,17 @@ ul.top-nav-icons {
   .header-title form {
     display: flex;
     justify-content: flex-end; }
-  .header-title ul li {
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    padding: 0 0 0 10px; }
-  .header-title ul ul li:first-child {
-    padding-left: 0; }
+  .header-title ul {
+    text-align: right; }
+    .header-title ul li {
+      display: inline-block;
+      vertical-align: top;
+      position: relative;
+      padding: 0 0 0 10px; }
+    .header-title ul ul li:first-child {
+      padding-left: 0; }
+    .header-title ul button {
+      line-height: 22px; }
   .header-title .dashbrd-edit {
     position: relative;
     display: inline-block;
@@ -456,6 +458,10 @@ article, main {
     border-radius: 2px; }
   .object-group .arrow-right {
     border-left-color: #000; }
+  .object-group button {
+    line-height: 22px; }
+  .object-group .btn-link {
+    line-height: 14px; }
 
 .hor-list li {
   display: inline-block;
@@ -470,6 +476,7 @@ article, main {
   z-index: 3; }
   .filter-breadcrumb li {
     line-height: 14px;
+    padding: 1px 0;
     vertical-align: top; }
   .filter-breadcrumb > li:first-child {
     float: left;
@@ -1670,7 +1677,7 @@ button {
   border: 1px solid #9f9f9f;
   border-bottom: none;
   margin: 0 0 0 6px;
-  padding: 0 34px 7px 10px;
+  padding: 1px 34px 6px 10px;
   -webkit-border-radius: 2px 2px 0 0;
   -moz-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0; }
@@ -3853,7 +3860,8 @@ svg {
   width: calc(100% - 20px);
   border: 10px solid #fff;
   background: #fff;
-  display: block; }
+  display: block;
+  margin: 4px 0; }
   .sysmap-scroll-container .map-container {
     display: table; }
   .sysmap-scroll-container .table-forms-container, .sysmap-scroll-container .browser-warning-container {
