@@ -574,6 +574,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
 ........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
 ..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
