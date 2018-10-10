@@ -1352,56 +1352,41 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	const char	*__function_name = "escalation_execute_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		next_esc_period = 0, esc_period;
+	int		next_esc_period = 0, esc_period, default_esc_period;
 	ZBX_USER_MSG	*user_msg = NULL;
 	zbx_uint64_t	operationid;
 	unsigned char	operationtype, evaltype, operations = 0;
-	char		*tmp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 == action->esc_period)
-	{
-		result = DBselect(
-				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
-				" from operations o"
-					" left join opmessage m"
-						" on m.operationid=o.operationid"
-				" where o.actionid=" ZBX_FS_UI64
-					" and o.operationtype in (%d,%d)"
-					" and o.recovery=%d",
-				action->actionid,
-				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, ZBX_OPERATION_MODE_NORMAL);
-	}
-	else
-	{
-		escalation->esc_step++;
+	default_esc_period = 0 == action->esc_period ? SEC_PER_HOUR : action->esc_period;
+	escalation->esc_step++;
 
-		result = DBselect(
-				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
-				" from operations o"
-					" left join opmessage m"
-						" on m.operationid=o.operationid"
-				" where o.actionid=" ZBX_FS_UI64
-					" and o.operationtype in (%d,%d)"
-					" and o.esc_step_from<=%d"
-					" and (o.esc_step_to=0 or o.esc_step_to>=%d)"
-					" and o.recovery=%d",
-				action->actionid,
-				OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
-				escalation->esc_step,
-				escalation->esc_step,
-				ZBX_OPERATION_MODE_NORMAL);
-	}
+	result = DBselect(
+			"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
+				"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
+			" from operations o"
+				" left join opmessage m"
+					" on m.operationid=o.operationid"
+			" where o.actionid=" ZBX_FS_UI64
+				" and o.operationtype in (%d,%d)"
+				" and o.esc_step_from<=%d"
+				" and (o.esc_step_to=0 or o.esc_step_to>=%d)"
+				" and o.recovery=%d",
+			action->actionid,
+			OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+			escalation->esc_step,
+			escalation->esc_step,
+			ZBX_OPERATION_MODE_NORMAL);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		char	*tmp;
+
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
 
-		tmp = zbx_strdup(tmp, row[2]);
+		tmp = zbx_strdup(NULL, row[2]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON,
 				NULL, 0);
 		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
@@ -1414,7 +1399,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		evaltype = (unsigned char)atoi(row[3]);
 
 		if (0 == esc_period)
-			esc_period = action->esc_period;
+			esc_period = default_esc_period;
 
 		if (0 == next_esc_period || next_esc_period > esc_period)
 			next_esc_period = esc_period;
@@ -1460,17 +1445,13 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 
 		operations = 1;
+		zbx_free(tmp);
 	}
 	DBfree_result(result);
 
 	flush_user_msg(&user_msg, escalation->esc_step, event, NULL, action->actionid);
 
-	if (0 == action->esc_period)
-	{
-		escalation->status = (ZBX_ACTION_RECOVERY_OPERATIONS == action->recovery ? ESCALATION_STATUS_SLEEP :
-				ESCALATION_STATUS_COMPLETED);
-	}
-	else
+	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
 	{
 		if (0 == operations)
 		{
@@ -1489,21 +1470,19 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 		if (1 == operations)
 		{
-			next_esc_period = (0 != next_esc_period) ? next_esc_period : action->esc_period;
+			next_esc_period = (0 != next_esc_period) ? next_esc_period : default_esc_period;
 			escalation->nextcheck = time(NULL) + next_esc_period;
 		}
-		else
+		else if (ZBX_ACTION_RECOVERY_OPERATIONS == action->recovery)
 		{
-			escalation->status = (ZBX_ACTION_RECOVERY_OPERATIONS == action->recovery ?
-					ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED);
+			escalation->status = ESCALATION_STATUS_SLEEP;
+			escalation->nextcheck = time(NULL) + default_esc_period;
 		}
+		else
+			escalation->status = ESCALATION_STATUS_COMPLETED;
 	}
-
-	/* schedule nextcheck for sleeping escalations */
-	if (ESCALATION_STATUS_SLEEP == escalation->status)
-		escalation->nextcheck = time(NULL) + (0 == action->esc_period ? SEC_PER_HOUR : action->esc_period);
-
-	zbx_free(tmp);
+	else
+		escalation->status = ESCALATION_STATUS_COMPLETED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
