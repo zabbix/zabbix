@@ -452,7 +452,7 @@ var hintBox = {
 					break;
 
 				case 'mouseleave':
-					hintBox.hideHint(e, this);
+					hintBox.hideHint(this);
 					break;
 
 				case 'remove':
@@ -517,7 +517,11 @@ var hintBox = {
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
-			jQuery(target).attr('data-expanded', 'true');
+			jQuery(target)
+				.attr('data-expanded', 'true')
+				.on('remove', function() {
+					hintBox.hideHint(target, true);
+				});
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
@@ -526,7 +530,7 @@ var hintBox = {
 				}
 			)
 				.click(function() {
-					hintBox.hideHint(e, target, true);
+					hintBox.hideHint(target, true);
 				});
 			box.prepend(close_link);
 		}
@@ -538,7 +542,7 @@ var hintBox = {
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
-		hintBox.hideHint(e, target, true);
+		hintBox.hideHint(target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
@@ -641,7 +645,7 @@ var hintBox = {
 		});
 	},
 
-	hideHint: function(e, target, hideStatic) {
+	hideHint: function(target, hideStatic) {
 		if (target.isStatic && !hideStatic) {
 			return;
 		}
