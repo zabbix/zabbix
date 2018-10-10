@@ -5,6 +5,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
 ..F....... [ZBX-14925] added support of user language specific url link in support icon, supported languages: english as default, japanese, russian (gcalenko)
 ........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
@@ -568,6 +569,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
 ........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
@@ -1939,6 +1941,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
 ..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
 ..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
