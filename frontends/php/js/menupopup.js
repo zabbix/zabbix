@@ -479,7 +479,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						}
 					});
 
-					obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
+					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -510,13 +510,13 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 								}
 							});
 
-							obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').menuPopup('close', trigger_elmnt, null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -883,7 +883,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, null);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, false);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 					};
@@ -1058,7 +1058,7 @@ jQuery(function($) {
 			var menuPopup = $(this);
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
-				$(trigger_elmnt||return_focus).removeAttr('data-expanded');
+				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
 				$('.highlighted', menuPopup).removeClass('highlighted');
