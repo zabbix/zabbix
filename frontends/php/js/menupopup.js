@@ -578,14 +578,15 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {string} options['triggerid']               Trigger ID.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
- * @param {object} options['items'][]['params']       Item url parameters ("name" => "value").
+ * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
  * @param {object} options['acknowledge']             Link to acknowledge page (optional).
  * @param {string} options['acknowledge']['eventid']  Event ID
- * @param {string} options['acknowledge']['backurl']  Return url.
+ * @param {string} options['acknowledge']['backurl']  Return URL.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
- * @param {bool}	 options['show_description']      Show Description item in context menu. Default: true.
- * @param {bool}	 options['description_enabled']	  Show Description item enabled. Default: true.
- * @param {string} options['url']                     Trigger url link (optional).
+ * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
+ * @param {bool}   options['show_description']        Show Description item in context menu. Default: true.
+ * @param {bool}   options['description_enabled']     Show Description item enabled. Default: true.
+ * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
