@@ -1354,7 +1354,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	DB_ROW		row;
 	int		next_esc_period = 0, esc_period, default_esc_period;
 	ZBX_USER_MSG	*user_msg = NULL;
-	unsigned char	operationtype, evaltype, operations = 0;
+	unsigned char	operations = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1384,7 +1384,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		zbx_uint64_t	operationid;
 
 		ZBX_STR2UINT64(operationid, row[0]);
-		operationtype = (unsigned char)atoi(row[1]);
 
 		tmp = zbx_strdup(NULL, row[2]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON,
@@ -1396,32 +1395,28 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 			esc_period = 0;
 		}
 
-		evaltype = (unsigned char)atoi(row[3]);
-
 		if (0 == esc_period)
 			esc_period = default_esc_period;
 
 		if (0 == next_esc_period || next_esc_period > esc_period)
 			next_esc_period = esc_period;
 
-		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
+		if (SUCCEED == check_operation_conditions(event, operationid, (unsigned char)atoi(row[3])))
 		{
-			unsigned char	default_msg;
 			char		*subject, *message;
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
-			switch (operationtype)
+			switch (atoi(row[1]))
 			{
 				case OPERATION_TYPE_MESSAGE:
 					if (SUCCEED == DBis_null(row[4]))
 						break;
 
-					default_msg = (unsigned char)atoi(row[5]);
 					ZBX_DBROW2UINT64(mediatypeid, row[8]);
 
-					if (0 == default_msg)
+					if (0 == atoi(row[5]))
 					{
 						subject = row[6];
 						message = row[7];
