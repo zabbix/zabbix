@@ -1354,7 +1354,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	DB_ROW		row;
 	int		next_esc_period = 0, esc_period, default_esc_period;
 	ZBX_USER_MSG	*user_msg = NULL;
-	zbx_uint64_t	operationid;
 	unsigned char	operationtype, evaltype, operations = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1381,7 +1380,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char	*tmp;
+		char		*tmp;
+		zbx_uint64_t	operationid;
 
 		ZBX_STR2UINT64(operationid, row[0]);
 		operationtype = (unsigned char)atoi(row[1]);
