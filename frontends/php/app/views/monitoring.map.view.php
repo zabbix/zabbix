@@ -23,6 +23,7 @@ $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
+$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Maps'))

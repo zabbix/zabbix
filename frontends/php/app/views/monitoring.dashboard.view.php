@@ -28,6 +28,7 @@ else {
 	$this->addJsFile('dashboard.grid.js');
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('multiselect.js');
+	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.coverride.js');
 	$this->addJsFile('class.cverticalaccordion.js');
 	$this->addJsFile('class.crangecontrol.js');

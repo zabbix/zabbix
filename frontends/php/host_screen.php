@@ -26,7 +26,8 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Host screens');
 $page['file'] = 'screens.php';
-$page['scripts'] = ['effects.js', 'dragdrop.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
+$page['scripts'] = ['effects.js', 'dragdrop.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js',
+	'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 CView::$has_web_layout_mode = true;

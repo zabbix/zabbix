@@ -21,6 +21,7 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('layout.mode.js');
 
 (new CWidget())
 	->setTitle(_('Web monitoring'))

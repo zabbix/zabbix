@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'layout.mode.js'];
 
 CView::$has_web_layout_mode = true;
 $page['web_layout_mode'] = CView::getLayoutMode();

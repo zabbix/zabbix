@@ -77,6 +77,7 @@ if ($data['action'] == 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
+	$this->addJsFile('layout.mode.js');
 	require_once dirname(__FILE__).'/monitoring.problem.view.js.php';
 
 	if ($data['uncheck']) {

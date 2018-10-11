@@ -40,21 +40,4 @@ jQuery(function($) {
 			}).trigger('mousemove');
 		}
 	}
-
-	// Set layout mode according 'fullscreen' or 'kiosk' URL argument value. Store layout mode in user profile.
-	var url = new Curl('', false),
-		args = url.getArguments(),
-		layout;
-
-	if ('fullscreen' in args || ('kiosk' in args && args.kiosk === '1')) {
-		// 0 - ZBX_LAYOUT_NORMAL, 1 - ZBX_LAYOUT_FULLSCREEN, 2 - ZBX_LAYOUT_KIOSKMODE
-		layout = 'kiosk' in args ? 2 : (args.fullscreen === '1' ? 1 : 0);
-
-		updateUserProfile('web.layout.mode', layout).complete(function() {
-			url.unsetArgument('fullscreen');
-			url.unsetArgument('kiosk');
-			history.replaceState(history.state, '', url.getUrl());
-			location.reload();
-		});
-	}
 });
