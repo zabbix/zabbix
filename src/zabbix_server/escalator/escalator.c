@@ -1363,8 +1363,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	escalation->esc_step++;
 
 	result = DBselect(
-			"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-				"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
+			"select o.operationid,o.operationtype,o.esc_period,o.evaltype,m.operationid,m.default_msg,"
+				"m.subject,m.message,m.mediatypeid"
 			" from operations o"
 				" left join opmessage m"
 					" on m.operationid=o.operationid"
