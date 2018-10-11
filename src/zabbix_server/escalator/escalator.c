@@ -1383,6 +1383,8 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		char		*tmp;
 		zbx_uint64_t	operationid;
 
+		operations = 1;
+
 		ZBX_STR2UINT64(operationid, row[0]);
 
 		tmp = zbx_strdup(NULL, row[2]);
@@ -1394,6 +1396,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 					" using default operation step duration of the action", tmp, action->name);
 			esc_period = 0;
 		}
+		zbx_free(tmp);
 
 		if (0 == esc_period)
 			esc_period = default_esc_period;
@@ -1438,9 +1441,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
-
-		operations = 1;
-		zbx_free(tmp);
 	}
 	DBfree_result(result);
 
