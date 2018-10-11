@@ -127,6 +127,7 @@ class ZBase {
 				$this->initDB();
 				$this->authenticateUser();
 				$this->initLocales();
+				$this->setLayoutByUrl();
 				break;
 
 			case self::EXEC_MODE_API:
@@ -444,6 +445,27 @@ class ZBase {
 			CSession::setValue('messages', $response->getMessages());
 
 			redirect('zabbix.php?action=system.warning');
+		}
+	}
+
+	/**
+	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 */
+	private function setLayoutByUrl() {
+		$layout = null;
+
+		if (array_key_exists('fullscreen', $_GET)) {
+			$layout = $_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL;
+		}
+
+		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
+			$layout = ZBX_LAYOUT_KIOSKMODE;
+		}
+
+		if ($layout !== null) {
+			// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
+			unset($_GET['fullscreen'], $_GET['kiosk']);
+			CProfile::update('web.layout.mode', $layout, PROFILE_TYPE_INT);
 		}
 	}
 }
