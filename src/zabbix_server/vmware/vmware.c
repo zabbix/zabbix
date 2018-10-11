@@ -1595,7 +1595,7 @@ static int	zbx_property_collection_init(CURL *easyhandle, const char *property_c
 	(*iter)->easyhandle = easyhandle;
 	(*iter)->token = NULL;
 
-	if (SUCCEED != zbx_soap_post(NULL, (*iter)->easyhandle, property_collection_query, xdoc, error))
+	if (SUCCEED != zbx_soap_post("zbx_property_collection_init", (*iter)->easyhandle, property_collection_query, xdoc, error))
 		return FAIL;
 
 	(*iter)->token = zbx_xml_read_doc_value(*xdoc, ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN);
@@ -1811,7 +1811,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].performance_manager);
 
-	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, &doc, error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -2924,7 +2924,7 @@ static int	vmware_service_reset_event_history_collector(CURL *easyhandle, const 
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, NULL, error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -3021,7 +3021,7 @@ static int	vmware_service_destroy_event_session(CURL *easyhandle, const char *ev
 
 	zbx_free(event_session_esc);
 
-	if (SUCCEED != zbx_soap_post(NULL, easyhandle, tmp, NULL, error))
+	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, NULL, error))
 		goto out;
 
 	ret = SUCCEED;
