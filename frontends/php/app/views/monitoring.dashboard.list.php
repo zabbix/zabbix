@@ -22,7 +22,6 @@
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
-$this->addJsFile('layout.mode.js');
 
 $web_layout_mode = CView::getLayoutMode();
 

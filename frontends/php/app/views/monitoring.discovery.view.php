@@ -21,7 +21,6 @@
 
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('layout.mode.js');
 
 $widget = (new CWidget())
 	->setTitle(_('Status of discovery'))

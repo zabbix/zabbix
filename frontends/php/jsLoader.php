@@ -303,7 +303,8 @@ if (empty($_GET['files'])) {
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',
-		'init.js'
+		'init.js',
+		'layout.mode.js'
 	];
 
 	// load frontend messaging only for some pages

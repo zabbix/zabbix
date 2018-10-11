@@ -19,7 +19,6 @@
 **/
 
 
-$this->addJsFile('layout.mode.js');
 $web_layout_mode = CView::getLayoutMode();
 
 $widget = (new CWidget())

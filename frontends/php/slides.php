@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.pmaster.js', 'class.calendar.js', 'gtlc.js',
-	'flickerfreescreen.js', 'layout.mode.js'
+	'flickerfreescreen.js'
 ];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
