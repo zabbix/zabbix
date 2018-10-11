@@ -12,6 +12,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
 ..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
@@ -577,6 +578,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
 ..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
@@ -1950,6 +1952,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
 ..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
