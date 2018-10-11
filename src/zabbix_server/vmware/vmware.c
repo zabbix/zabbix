@@ -5007,7 +5007,7 @@ static int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpat
 
 	if (NULL != (val = xmlNodeListGetString(*xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 	{
-		*value = zbx_strdup(NULL, (const char *)val);
+		*value = zbx_strdup(*value, (const char *)val);
 		xmlFree(val);
 	}
 clean:
@@ -5019,30 +5019,6 @@ clean:
 	xmlResetLastError();
 out:
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_xml_read_value                                               *
- *                                                                            *
- * Purpose: retrieve a value from xml data                                    *
- *                                                                            *
- * Parameters: data   - [IN] XML data                                         *
- *             xpath  - [IN] XML XPath                                        *
- *                                                                            *
- * Return: The allocated value string or NULL if the xml data does not        *
- *         contain the value specified by xpath.                              *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_xml_read_value(const char *data, const char *xpath)
-{
-	char	*value = NULL;
-	xmlDoc	*doc = NULL;
-
-	zbx_xml_try_read_value(data, 0, xpath, &doc, &value, NULL);
-	xmlFreeDoc(doc);
-
-	return value;
 }
 
 /******************************************************************************
