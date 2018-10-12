@@ -92,7 +92,6 @@
 	function removeWidgetInfoBtns($content_header) {
 		if ($content_header.find('[data-hintbox=1]').length) {
 			$content_header.find('[data-hintbox=1]').next('.hint-box').remove();
-			$content_header.find('[data-hintbox=1]').trigger('remove');
 		}
 	}
 
@@ -517,7 +516,6 @@
 					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
 				}
 
-				widget['content_body'].find('[data-hintbox=1]').trigger('remove');
 				widget['content_body'].empty();
 				if (typeof(resp.messages) !== 'undefined') {
 					widget['content_body'].append(resp.messages);
@@ -799,7 +797,6 @@
 		var index = widget['div'].data('widget-index');
 
 		// remove div from the grid
-		widget['div'].find('[data-hintbox=1]').trigger('remove');
 		widget['div'].remove();
 		data['widgets'].splice(index, 1);
 
