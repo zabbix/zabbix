@@ -127,7 +127,7 @@ class ZBase {
 				$this->initDB();
 				$this->authenticateUser();
 				$this->initLocales();
-				$this->setLayoutByUrl();
+				$this->setLayoutModeByUrl();
 				break;
 
 			case self::EXEC_MODE_API:
@@ -451,21 +451,15 @@ class ZBase {
 	/**
 	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
 	 */
-	private function setLayoutByUrl() {
-		$layout = null;
-
-		if (array_key_exists('fullscreen', $_GET)) {
-			$layout = $_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL;
-		}
-
+	private function setLayoutModeByUrl() {
 		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
-			$layout = ZBX_LAYOUT_KIOSKMODE;
+			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+		}
+		elseif (array_key_exists('fullscreen', $_GET)) {
+			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
 		}
 
-		if ($layout !== null) {
-			// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
-			unset($_GET['fullscreen'], $_GET['kiosk']);
-			CProfile::update('web.layout.mode', $layout, PROFILE_TYPE_INT);
-		}
+		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
+		unset($_GET['fullscreen'], $_GET['kiosk']);
 	}
 }
