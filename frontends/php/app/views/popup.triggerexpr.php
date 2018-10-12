@@ -111,7 +111,17 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 
 			if (in_array($param_name, ['last'])) {
 				if (array_key_exists('M', $param_function)) {
-					$param_type_element = new CComboBox('paramtype', $data['paramtype'], null, $param_function['M']);
+					if (in_array($data['selectedFunction'], ['last', 'band', 'strlen'])) {
+						$param_type_element = $param_function['M'][PARAM_TYPE_COUNTS];
+						$label = $param_function['C'];
+						$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_COUNTS))->removeId());
+					}
+					else {
+						$param_type_element = new CComboBox('paramtype',
+							$param_value === '' ? PARAM_TYPE_TIME : $data['paramtype'],
+							null, $param_function['M']
+						);
+					}
 				}
 				else {
 					$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
@@ -134,7 +144,9 @@ if (array_key_exists('params', $data['functions'][$data['selectedFunction']])) {
 			$expression_form_list->addRow($label,
 				(new CTextBox('params['.$param_name.']', $param_value))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			);
-			$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
+			if ($paramid === 0) {
+				$expression_form->addItem((new CVar('paramtype', PARAM_TYPE_TIME))->removeId());
+			}
 		}
 
 		$paramid++;
@@ -172,31 +184,7 @@ $output = [
 			'action' => 'return validate_trigger_expression("expression", '.
 					'jQuery(window.document.forms["expression"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
 		]
-	],
-	'script_inline' =>
-		'jQuery(function($) {'.
-			'function setReadOnly() {'.
-				'var selected_fn = $("#function option:selected"),'.
-					'$label = $("label", $("#params_0").closest("li"));'.
-
-				'if (selected_fn.val() === "last" || selected_fn.val() === "strlen" || selected_fn.val() === "band") {'.
-					'if ($("#paramtype option:selected").val() == '.PARAM_TYPE_COUNTS.') {'.
-						'$("#params_last").removeAttr("readonly");'.
-						'$label.addClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
-					'}'.
-					'else {'.
-						'$("#params_last").attr("readonly", "readonly");'.
-						'$label.removeClass("'.ZBX_STYLE_FIELD_LABEL_ASTERISK.'");'.
-					'}'.
-				'}'.
-			'}'.
-
-			'setReadOnly();'.
-
-			'$("#paramtype").change(function() {'.
-				'setReadOnly();'.
-			'});'.
-		'});'
+	]
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
