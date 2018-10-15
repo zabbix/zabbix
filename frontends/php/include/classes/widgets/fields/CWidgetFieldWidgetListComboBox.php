@@ -47,20 +47,23 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var widgets, filters_box, dashboard_data;'.
+			'var widgets, filters_box, dashboard_data, edited_widget;'.
 			'widgets = jQuery(".dashbrd-grid-widget-container")'.
 				'.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
 			'dashboard_data = jQuery(".dashbrd-grid-widget-container").data("dashboardGrid"),'.
+			'edited_widget = dashboard_data["dialogue"]["widget"],'. // Widget currently edited or null for new widgets.
 			'filters_box = jQuery("#'.$this->getName().'");'.
 			'jQuery("<option>'._('Select widget').'</option>").val("").appendTo(filters_box);'.
 			'if (widgets.length) {'.
 				'jQuery.each(widgets, function(i, widget) {'.
-					'jQuery("<option></option>")'.
-						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
-						'.text(widget["header"].length ? widget["header"] : '.
-							'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
-						'.val(widget["fields"]["reference"])'.
-						'.appendTo(filters_box);'.
+					'if (widget !== edited_widget) {'.
+						'jQuery("<option></option>")'.
+							'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
+							'.text(widget["header"].length ? widget["header"] : '.
+								'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
+							'.val(widget["fields"]["reference"])'.
+							'.appendTo(filters_box);'.
+					'}'.
 				'});'.
 			'}';
 	}
