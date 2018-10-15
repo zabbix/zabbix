@@ -262,4 +262,4 @@ class CDashboardWidgetMap extends CDiv {
 
 		return parent::toString($destroy);
 	}
-	}
+}
