@@ -703,9 +703,12 @@ class CControllerPopupGeneric extends CController {
 			case 'host_groups':
 				$options = [
 					'output' => ['groupid', 'name'],
-					'preservekeys' => true,
-					'real_hosts' => true
+					'preservekeys' => true
 				];
+
+				if (array_key_exists('real_hosts', $page_options)) {
+					$options['real_hosts'] = $page_options['real_hosts'];
+				}
 
 				if (array_key_exists('normal_only', $page_options)) {
 					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
