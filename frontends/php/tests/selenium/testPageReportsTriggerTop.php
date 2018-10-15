@@ -24,9 +24,9 @@ class testPageReportsTriggerTop extends CWebTest {
 
 	public function testPageReportsTriggerTop_FilterLayout() {
 		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
 
@@ -191,6 +191,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
 		$this->zbxTestLogin('toptriggers.php');
+		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();

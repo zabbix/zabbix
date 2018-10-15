@@ -58,7 +58,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestInputType('new_condition_tag', $data['tag']);
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
