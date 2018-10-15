@@ -88,6 +88,10 @@ class CControllerMediatypeCreate extends CController {
 
 		$this->getInputs($mediatype, ['type', 'description', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
 
+		$mediatype += [
+			'status' => MEDIA_TYPE_STATUS_DISABLED,
+		];
+
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
