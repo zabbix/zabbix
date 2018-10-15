@@ -1648,7 +1648,14 @@ FIELD		|operator	|t_integer	|'2'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX|1|maintenanceid
 
+TABLE|host_tag|hosttagid|ZBX_TEMPLATE
+FIELD		|hosttagid|t_id		|	|NOT NULL	|0
+FIELD		|hostid	|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX|1|hostid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4000000	|4000000
+ROW		|4010002	|4010002
