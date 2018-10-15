@@ -397,6 +397,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		$element->clear()->sendKeys($string);
 
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath(
+			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
+			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+		));
+
+		$this->webDriver->getKeyboard()->sendKeys(WebDriverKeys::ENTER);
+
 		// Fire onchange event.
 		$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
 				'event.initEvent("change", false, true);'.
@@ -404,10 +411,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 				[$element]
 		);
 
-		$this->zbxTestClickXpathWait(
-			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
-			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
-		);
 		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');
 	}
 
