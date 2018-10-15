@@ -923,7 +923,7 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parameter as integer either
+// Check if every character in given string value is a decimal digit.
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
