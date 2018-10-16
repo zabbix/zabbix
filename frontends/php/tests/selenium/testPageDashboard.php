@@ -203,4 +203,33 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestCheckFatalErrors();
 	}
+
+	public function testPageDashboard_KioskModeUrlParameter() {
+		// Set layout mode to kiosk view.
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
+		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
+		$this->zbxTestCheckFatalErrors();
+
+		//  Set layout mode to full screen.
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
+		$this->zbxTestCheckHeader('Global view');
+		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
+		$this->zbxTestCheckFatalErrors();
+
+		// Set layout mode to default layout.
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=0');
+		$this->zbxTestCheckHeader('Global view');
+		$this->zbxTestAssertElementPresentXpath("//header");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+	}
 }
