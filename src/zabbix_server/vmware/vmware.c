@@ -77,7 +77,7 @@ extern char		*CONFIG_SOURCE_IP;
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_DAY
+#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 #define ZBX_XML_DATETIME		26
 #define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 
@@ -309,10 +309,6 @@ static void	vmware_shared_strfree(char *str)
 
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
-
-#define ZBX_XPATH_DATASTORE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
-	"/*[local-name()='val']"
 
 #define ZBX_XPATH_DATASTORE_MOUNT()									\
 	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
@@ -2223,7 +2219,8 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vm->uuid = value;
 	vm->id = zbx_strdup(NULL, id);
 
-	vm->props = xml_read_props(details, (char **)vm_propmap, ZBX_VMWARE_VMPROPS_NUM);
+	if (NULL == (vm->props = xml_read_props(details, (char **)vm_propmap, ZBX_VMWARE_VMPROPS_NUM)))
+		goto out;
 
 	vmware_vm_get_nic_devices(vm, details);
 	vmware_vm_get_disk_devices(vm, details);
@@ -2604,7 +2601,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &details, error))
 		goto out;
 
-	hv->props = xml_read_props(details, (char **)hv_propmap, ZBX_VMWARE_HVPROPS_NUM);
+	if (NULL == (hv->props = xml_read_props(details, (char **)hv_propmap, ZBX_VMWARE_HVPROPS_NUM)))
+		goto out;
 
 	if (NULL == hv->props[ZBX_VMWARE_HVPROP_HW_UUID])
 		goto out;
@@ -2642,10 +2640,10 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 out:
 	xmlFreeDoc(details);
 
-	zbx_vector_str_clear_ext(&vms, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&vms, zbx_str_free);
 	zbx_vector_str_destroy(&vms);
 
-	zbx_vector_str_clear_ext(&datastores, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&datastores, zbx_str_free);
 	zbx_vector_str_destroy(&datastores);
 
 	if (SUCCEED != ret)
@@ -3067,7 +3065,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		zbx_vector_uint64_append(&ids, key);
 	}
 
-	zbx_vector_str_clear_ext(&keys, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&keys, zbx_str_free);
 
 	if (0 != ids.values_num)
 	{
@@ -3472,7 +3470,7 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 	ret = SUCCEED;
 out:
 	xmlFreeDoc(cluster_data);
-	zbx_vector_str_clear_ext(&ids, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found:%d", __function_name, zbx_result_string(ret),
@@ -3846,7 +3844,7 @@ clean:
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
 
-	zbx_vector_str_clear_ext(&hvs, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&hvs, zbx_str_free);
 	zbx_vector_str_destroy(&hvs);
 out:
 	zbx_vmware_lock();
@@ -4419,7 +4417,7 @@ static void	vmware_service_remove(zbx_vmware_service_t *service)
 
 	zbx_vmware_lock();
 
-	if (FAIL != (index = zbx_vector_ptr_search(&vmware->services, &service, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+	if (FAIL != (index = zbx_vector_ptr_search(&vmware->services, service, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 	{
 		zbx_vector_ptr_remove(&vmware->services, index);
 		vmware_service_shared_free(service);
@@ -4708,7 +4706,6 @@ void	zbx_vmware_destroy(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#define	ZBX_VMWARE_TASK_NONE		0
 #define	ZBX_VMWARE_TASK_IDLE		1
 #define	ZBX_VMWARE_TASK_UPDATE		2
 #define	ZBX_VMWARE_TASK_UPDATE_PERF	3
@@ -4744,7 +4741,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 		{
@@ -4752,8 +4750,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 					"querying VMware services]", get_process_type_string(process_type), process_num,
 					old_updated_services, old_removed_services, old_total_sec);
 		}
-
-		sec = zbx_time();
 
 		do
 		{
@@ -4862,10 +4858,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 #undef STAT_INTERVAL
 #else

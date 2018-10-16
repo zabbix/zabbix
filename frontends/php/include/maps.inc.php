@@ -69,7 +69,6 @@ function sysmapElementLabel($label = null) {
  * @param int   $sysmap['show_suppressed']  Whether suppressed problems are shown.
  * @param array $options                    Options used to retrieve actions.
  * @param int   $options['severity_min']    Minimal severity used.
- * @param int   $options['fullscreen']      Fullscreen flag.
  *
  * @return array
  */
@@ -143,8 +142,6 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 		'preservekeys' => true
 	]);
 
-	$fullscreen = array_key_exists('fullscreen', $options) ? $options['fullscreen'] : false;
-
 	foreach ($sysmap['selements'] as $selementid => $elem) {
 		$hostid = null;
 		$scripts = null;
@@ -191,9 +188,6 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 					'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
 
-				if ($fullscreen) {
-					$gotos['submap']['fullscreen'] = true;
-				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -234,7 +228,7 @@ function getActionsBySysmap(array $sysmap, array $options = []) {
 
 		order_result($elem['urls'], 'name');
 
-		$map = CMenuPopupHelper::getMap($hostid, $scripts, $gotos, $elem['urls'], $fullscreen);
+		$map = CMenuPopupHelper::getMap($hostid, $scripts, $gotos, $elem['urls']);
 		if ($map == ['type' => 'map']) {
 			$map = null;
 		}
@@ -2185,7 +2179,7 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		'preservekeys' => true
 	];
 
-	return getTriggersWithActualSeverity($trigger_options, $sysmap['show_suppressed']);
+	return getTriggersWithActualSeverity($trigger_options, ['show_suppressed' => $sysmap['show_suppressed']]);
 }
 
 /**

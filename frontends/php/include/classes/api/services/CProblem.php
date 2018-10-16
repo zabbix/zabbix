@@ -279,7 +279,9 @@ class CProblem extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], false);
+			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], 'problem_tag',
+				'pt', 'p', 'eventid'
+			);
 		}
 
 		// recent

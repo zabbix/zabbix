@@ -101,7 +101,7 @@ class testFormLogin extends CWebTest {
 
 		if ($data['success_expected']) {
 			$this->zbxTestTextNotPresent('Login name or password is incorrect.');
-			$this->zbxTestCheckHeader('Dashboard');
+			$this->zbxTestCheckHeader('Global view');
 			$this->zbxTestTextNotPresent('Password');
 			$this->zbxTestTextNotPresent('Username');
 
@@ -148,7 +148,7 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 		$this->zbxTestInputTypeWait('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', '5 failed login attempts logged.');
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');

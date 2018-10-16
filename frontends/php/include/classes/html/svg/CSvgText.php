@@ -24,23 +24,8 @@ class CSvgText extends CSvgTag {
 	public function __construct($x, $y, $text) {
 		parent::__construct('text', true);
 
-		$this->x = $x;
-		$this->y = $y;
-
-		$this->setAttribute('x', $this->x);
-		$this->setAttribute('y', $this->y);
+		$this->setAttribute('x', $x);
+		$this->setAttribute('y', $y);
 		$this->addItem($text);
-	}
-
-	public function setAngle($angle) {
-		$this->setAttribute('transform', 'rotate('.$angle.','.$this->x.','.$this->y.')');
-
-		return $this;
-	}
-
-	public function setFontSize($font_size) {
-		$this->setAttribute('font-size', $font_size);
-
-		return $this;
 	}
 }

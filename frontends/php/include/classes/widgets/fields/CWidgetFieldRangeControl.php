@@ -69,15 +69,15 @@ class CWidgetFieldRangeControl extends CWidgetField {
 		return $this;
 	}
 
-	public function getMinValue() {
+	public function getMin() {
 		return $this->min;
 	}
 
-	public function getMaxValue() {
+	public function getMax() {
 		return $this->max;
 	}
 
-	public function getStepValue() {
+	public function getStep() {
 		return $this->step;
 	}
 }

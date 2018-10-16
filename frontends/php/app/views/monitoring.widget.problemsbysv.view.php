@@ -19,17 +19,13 @@
 **/
 
 
-$backurl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'dashboard.view')
-	->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
-	->setArgument('kioskmode', $data['kioskmode'] ? '1' : null);
+$backurl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
 
-$table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl(), $data['fullscreen']);
+$table = makeSystemStatus($data['filter'], $data['data'], $data['config'], $backurl->getUrl());
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -958,7 +958,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	zbx_ipmi_manager_t	ipmi_manager;
 	zbx_ipmi_poller_t	*poller;
 	int			ret, nextcheck, timeout, nextcleanup, polled_num = 0, scheduled_num = 0, now;
-	double			time_stat, time_idle = 0, time_now, time_file = 0;
+	double			time_stat, time_idle = 0, time_now, sec;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1021,19 +1021,11 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&ipmi_service, timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
-		/* handle /etc/resolv.conf update and log rotate less often than once a second */
-		if (1.0 < time_now - time_file)
-		{
-			time_file = time_now;
-			zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-			zbx_update_resolver_conf();
-#endif
-		}
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += zbx_time() - time_now;
+			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{

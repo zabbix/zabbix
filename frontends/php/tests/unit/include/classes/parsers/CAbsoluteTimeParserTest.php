@@ -27,6 +27,38 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 	public static function testProvider() {
 		return [
 			[
+				'2018-04-15 12:0', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12:0'
+				],
+				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:59']]
+			],
+			[
+				'2018-04-15 12:0:0', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 12:0:0'
+				],
+				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:00']]
+			],
+			[
+				'2018-04-15 0:0:0', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 0:0:0'
+				],
+				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']]
+			],
+			[
+				'texttexttext2018-04-15 0:0:0', 12,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-15 0:0:0'
+				],
+				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']]
+			],
+			[
 				'2018-04-15 12:45:34', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -59,10 +91,26 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 23:59:59']]
 			],
 			[
+				'2018-04-9', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-04-9'
+				],
+				'datetime' => ['values' => ['2018-04-09 00:00:00', '2018-04-09 23:59:59']]
+			],
+			[
 				'2018-04', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '2018-04'
+				],
+				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
+			],
+			[
+				'2018-4', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '2018-4'
 				],
 				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
 			],
@@ -89,6 +137,22 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '2018-04-15 12:45:34'
 				],
 				'datetime' => ['values' => ['2018-04-15 12:45:34', '2018-04-15 12:45:34']]
+			],
+			[
+				'2018-', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '2018'
+				],
+				'datetime' => ['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']]
+			],
+			[
+				'2018-04-', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '2018-04'
+				],
+				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
 			],
 			[
 				'text', 0,
@@ -138,6 +202,38 @@ class CAbsoluteTimeParserTest extends PHPUnit_Framework_TestCase {
 				],
 				'datetime' => ['values' => [null, null]]
 			],
+			[
+				'201', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'20', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'2', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			],
+			[
+				'', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				],
+				'datetime' => ['values' => [null, null]]
+			]
 		];
 	}
 

@@ -927,13 +927,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $hostids) {
+		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
 					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $hostids).
+					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
 			);
 
@@ -1913,8 +1913,8 @@ abstract class CItemGeneral extends CApiService {
 		$rules = [
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-					: API_ALLOW_USER_MACRO,
+					? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 				'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [

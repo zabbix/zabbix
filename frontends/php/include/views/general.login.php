@@ -21,6 +21,7 @@
 
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
+define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/../page_header.php';
 $error = null;
@@ -38,6 +39,7 @@ $http_login_link = $data['http_login_url']
 	? (new CListItem(new CLink(_('Sign in with HTTP'), $data['http_login_url'])))->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 
+
 global $ZBX_SERVER_NAME;
 
 (new CTag('main', true, [
@@ -45,7 +47,9 @@ global $ZBX_SERVER_NAME;
 		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
 		: null,
 	(new CDiv([
-		(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),
+		(new CDiv())
+			->addClass(ZBX_STYLE_SIGNIN_LOGO)
+			->addStyle(CBrandHelper::getLogoStyle()),
 		(new CForm())
 			->cleanItems()
 			->setAttribute('aria-label', _('Sign in'))
@@ -69,15 +73,17 @@ global $ZBX_SERVER_NAME;
 			)
 	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
 	(new CDiv([
-		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/4.0/'))
+		(new CLink(_('Help'), CBrandHelper::getHelpUrl()))
 			->setTarget('_blank')
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT),
-		'&nbsp;&nbsp;•&nbsp;&nbsp;',
-		(new CLink(_('Support'), 'http://www.zabbix.com/support.php'))
-			->setTarget('_blank')
-			->addClass(ZBX_STYLE_GREY)
-			->addClass(ZBX_STYLE_LINK_ALT)
+		CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
+		CBrandHelper::isRebranded()
+			? null
+			: (new CLink(_('Support'), 'http://www.zabbix.com/support.php'))
+				->setTarget('_blank')
+				->addClass(ZBX_STYLE_GREY)
+				->addClass(ZBX_STYLE_LINK_ALT)
 	]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
 ]))->show();
 

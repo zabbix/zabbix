@@ -36,6 +36,6 @@ class testAPIInfo extends CZabbixTest {
 		$this->disableAuthorization();
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('4.0.0', $result['result']);
+		$this->assertSame('4.2.0', $result['result']);
 	}
 }
