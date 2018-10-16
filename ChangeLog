@@ -12,6 +12,7 @@ New features:
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
@@ -579,6 +580,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
@@ -1954,6 +1956,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
