@@ -135,6 +135,11 @@ $fields = [
 									null
 								],
 	'filter_proxyids' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'filter_evaltype' =>		[T_ZBX_INT, O_OPT, null,
+									IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
+									null
+								],
+	'filter_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -192,6 +197,23 @@ if (hasRequest('filter_set')) {
 		PROFILE_TYPE_INT
 	);
 	CProfile::updateArray('web.hosts.filter_proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
+	CProfile::update('web.hosts.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+		PROFILE_TYPE_INT
+	);
+
+	$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+	foreach (getRequest('filter_tags', []) as $filter_tag) {
+		if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+			continue;
+		}
+
+		$filter_tags['tags'][] = $filter_tag['tag'];
+		$filter_tags['values'][] = $filter_tag['value'];
+		$filter_tags['operators'][] = $filter_tag['operator'];
+	}
+	CProfile::updateArray('web.hosts.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+	CProfile::updateArray('web.hosts.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+	CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -201,6 +223,10 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_port');
 	CProfile::delete('web.hosts.filter_monitored_by');
 	CProfile::deleteIdx('web.hosts.filter_proxyids');
+	CProfile::delete('web.hosts.filter.evaltype');
+	CProfile::deleteIdx('web.hosts.filter.tags.tag');
+	CProfile::deleteIdx('web.hosts.filter.tags.value');
+	CProfile::deleteIdx('web.hosts.filter.tags.operator');
 	DBend();
 }
 
@@ -210,6 +236,15 @@ $filter['host'] = CProfile::get('web.hosts.filter_host', '');
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
 $filter['monitored_by'] = CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY);
 $filter['proxyids'] = CProfile::getArray('web.hosts.filter_proxyids', []);
+$filter['evaltype'] = CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
+$filter['tags'] = [];
+foreach (CProfile::getArray('web.hosts.filter.tags.tag', []) as $i => $tag) {
+	$filter['tags'][] = [
+		'tag' => $tag,
+		'value' => CProfile::get('web.hosts.filter.tags.value', null, $i),
+		'operator' => CProfile::get('web.hosts.filter.tags.operator', null, $i)
+	];
+}
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 $macros = cleanInheritedMacros(getRequest('macros', []));
@@ -924,6 +959,7 @@ elseif (hasRequest('form')) {
 		'visiblename' => getRequest('visiblename', ''),
 		'interfaces' => getRequest('interfaces', []),
 		'mainInterfaces' => getRequest('mainInterfaces', []),
+		'tags' => getRequest('tags', []),
 		'description' => getRequest('description', ''),
 		'proxy_hostid' => getRequest('proxy_hostid', 0),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -972,6 +1008,7 @@ elseif (hasRequest('form')) {
 				'selectMacros' => ['hostmacroid', 'macro', 'value'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectInventory' => true,
+				'selectTags' => ['tag', 'value'],
 				'hostids' => [$data['hostid']]
 			]);
 			$dbHost = reset($dbHosts);
@@ -1235,6 +1272,8 @@ else {
 
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sortField],
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
 			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,
@@ -1258,7 +1297,6 @@ else {
 	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
 
 	$hosts = API::Host()->get([
-		'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectParentTemplates' => ['hostid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -1269,7 +1307,10 @@ else {
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectHostDiscovery' => ['ts_delete']
+		'selectHostDiscovery' => ['ts_delete'],
+		'selectTags' => ['tag', 'value'],
+		'hostids' => zbx_objectValues($hosts, 'hostid'),
+		'preservekeys' => true
 	]);
 	order_result($hosts, $sortField, $sortOrder);
 
@@ -1284,8 +1325,9 @@ else {
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'templateids' => $templateids,
 		'selectParentTemplates' => ['hostid', 'name'],
+		'selectTags' => ['tag', 'value'],
+		'templateids' => $templateids,
 		'preservekeys' => true
 	]);
 
@@ -1352,7 +1394,8 @@ else {
 		'proxies' => $proxies,
 		'proxies_ms' => $proxies_ms,
 		'profileIdx' => 'web.hosts.filter',
-		'active_tab' => CProfile::get('web.hosts.filter.active', 1)
+		'active_tab' => CProfile::get('web.hosts.filter.active', 1),
+		'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
 	];
 
 	$hostView = new CView('configuration.host.list', $data);

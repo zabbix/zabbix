@@ -25,11 +25,5 @@
 		$('#filter-tags').dynamicRows({
 			template: '#filter-tag-row'
 		});
-
-		$('#filter_state')
-			.on('change', function() {
-				$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-			})
-			.trigger('change', false);
 	});
 </script>

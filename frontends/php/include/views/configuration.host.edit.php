@@ -53,7 +53,7 @@ $hostList = new CFormList('hostlist');
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow(_('Discovered by'),
 		new CLink($data['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
 		)
 	);
 }
@@ -260,6 +260,44 @@ else {
 			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 }
+
+// Append tags to form list.
+$tags_table = (new CTable())->setId('tbl_tags');
+
+foreach ($data['tags'] as $tag_key => $tag) {
+	$tags = [
+		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 255))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 255))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('value'))
+	];
+
+	if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		$tags[] = (new CCol(
+			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP);
+	}
+
+	$tags_table->addRow($tags, 'form_row');
+}
+
+if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+	$tags_table->setFooter(new CCol(
+		(new CButton('tag_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	));
+}
+
+$hostList->addRow(_('Tags'),
+	(new CDiv($tags_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+);
 
 $hostList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

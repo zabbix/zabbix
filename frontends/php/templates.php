@@ -77,6 +77,11 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
+	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
+								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
+								null
+							],
+	'filter_tags'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -572,14 +577,44 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			PROFILE_TYPE_INT
+		);
+
+		$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+		foreach (getRequest('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+				continue;
+			}
+
+			$filter_tags['tags'][] = $filter_tag['tag'];
+			$filter_tags['values'][] = $filter_tag['value'];
+			$filter_tags['operators'][] = $filter_tag['operator'];
+		}
+		CProfile::updateArray('web.templates.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
+		CProfile::delete('web.templates.filter.evaltype');
+		CProfile::deleteIdx('web.templates.filter.tags.tag');
+		CProfile::deleteIdx('web.templates.filter.tags.value');
+		CProfile::deleteIdx('web.templates.filter.tags.operator');
 	}
 
 	$filter = [
-		'name' => CProfile::get('web.templates.filter_name', '')
+		'name' => CProfile::get('web.templates.filter_name', ''),
+		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR)
 	];
+	$filter['tags'] = [];
+	foreach (CProfile::getArray('web.templates.filter.tags.tag', []) as $i => $tag) {
+		$filter['tags'][] = [
+			'tag' => $tag,
+			'value' => CProfile::get('web.templates.filter.tags.value', null, $i),
+			'operator' => CProfile::get('web.templates.filter.tags.operator', null, $i)
+		];
+	}
 
 	$config = select_config();
 
@@ -589,6 +624,8 @@ else {
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
@@ -617,8 +654,10 @@ else {
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
+		'selectTags' => ['tag', 'value'],
 		'templateids' => zbx_objectValues($templates, 'templateid'),
-		'editable' => true
+		'editable' => true,
+		'preservekeys' => true
 	]);
 
 	order_result($templates, $sortField, $sortOrder);
@@ -673,7 +712,8 @@ else {
 		'writable_templates' => $writable_templates,
 		'writable_hosts' => $writable_hosts,
 		'profileIdx' => 'web.templates.filter',
-		'active_tab' => CProfile::get('web.templates.filter.active', 1)
+		'active_tab' => CProfile::get('web.templates.filter.active', 1),
+		'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags'])
 	];
 
 	$view = new CView('configuration.template.list', $data);

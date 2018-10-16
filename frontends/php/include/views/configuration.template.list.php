@@ -19,6 +19,53 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.template.list.js.php';
+
+$filter_tags = $data['filter']['tags'];
+if (!$filter_tags) {
+	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
+$filter_tags_table = (new CTable())
+	->setId('filter-tags')
+	->addRow((new CCol(
+		(new CRadioButtonList('filter_evaltype', (int) $data['filter']['evaltype']))
+			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+			->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+			->setModern(true)
+		))->setColSpan(4)
+	);
+
+$i = 0;
+foreach ($filter_tags as $tag) {
+	$filter_tags_table->addRow([
+		(new CTextBox('filter_tags['.$i.'][tag]', $tag['tag']))
+			->setAttribute('placeholder', _('tag'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CRadioButtonList('filter_tags['.$i.'][operator]', (int) $tag['operator']))
+			->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+			->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+			->setModern(true),
+		(new CTextBox('filter_tags['.$i.'][value]', $tag['value']))
+			->setAttribute('placeholder', _('value'))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CCol(
+			(new CButton('filter_tags['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+
+	$i++;
+}
+$filter_tags_table->addRow(
+	(new CCol(
+		(new CButton('filter_tags_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(3)
+);
+
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
 	->setControls(new CList([
@@ -53,7 +100,8 @@ $widget = (new CWidget())
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
-			)
+			),
+			(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 		])
 	);
 
@@ -73,7 +121,8 @@ $table = (new CTableInfo())
 		_('Discovery'),
 		_('Web'),
 		_('Linked templates'),
-		_('Linked to')
+		_('Linked to'),
+		_('Tags')
 	]);
 
 foreach ($data['templates'] as $template) {
@@ -191,7 +240,8 @@ foreach ($data['templates'] as $template) {
 			CViewHelper::showNum($template['httpTests'])
 		],
 		$linkedTemplatesOutput,
-		$linkedToOutput
+		$linkedToOutput,
+		$data['tags'][$template['templateid']]
 	]);
 }
 
