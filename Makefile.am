@@ -29,11 +29,11 @@ dist-hook:
 	while read -r line; do										\
 		pos=$$((pos+1));									\
 		case "$$line" in									\
-			"AM_COND_IF([ZBXCMOCKA]"*) 	fspos=$$pos; flag=1;;				\
+			"if test -d tests;"*) 		fspos=$$pos; flag=1;;				\
 			"AC_CONFIG_FILES"*)		if [ 1 -eq "$$flag" ]; then flag=2; fi;;	\
 			"tests/Makefile") 		if [ 2 -eq "$$flag" ]; then flag=3; fi;;	\
 			"AC_DEFINE([HAVE_TESTS]"*) 	if [ 3 -eq "$$flag" ]; then flag=4; fi;;	\
-			"])") 				if [ 4 -eq "$$flag" ]; then 			\
+			"fi") 				if [ 4 -eq "$$flag" ]; then 			\
 				cat $(top_distdir)/configure.ac | sed -e "$${fspos},$${pos}d" > 	\
 				$(top_distdir)/configure.ac.new; break; fi;;				\
 		esac											\

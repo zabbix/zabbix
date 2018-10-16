@@ -1714,7 +1714,7 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-AM_COND_IF([ZBXCMOCKA],[
+if test -d tests; then
 	AC_CONFIG_FILES([
 	tests/Makefile
 	tests/libs/Makefile
@@ -1731,7 +1731,7 @@ AM_COND_IF([ZBXCMOCKA],[
 	tests/libs/zbxalgo/Makefile
 	])
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
-])
+fi
 
 AC_OUTPUT([
 	Makefile
