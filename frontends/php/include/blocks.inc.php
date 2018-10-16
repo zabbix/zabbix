@@ -224,6 +224,32 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		]);
 
+		// Remove problems which resolved between requests.
+		foreach ($data['groups'] as $groupid => &$group) {
+			$severity_count = 0;
+
+			foreach ($group['stats'] as $severity => &$stat) {
+				$severity_count += $stat['count'];
+				foreach (['problems', 'problems_unack'] as $key) {
+					foreach ($stat[$key] as $event_no => &$problem) {
+						if (!array_key_exists($problem['eventid'], $problems_data)) {
+							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
+							if (!$data['groups'][$groupid]['stats'][$severity][$key]) {
+								$data['groups'][$groupid]['stats'][$severity]['count']--;
+								$severity_count--;
+							}
+						}
+					}
+					unset($problem);
+				}
+			}
+			unset($stat);
+			if ($severity_count === 0) {
+				unset($data['groups'][$groupid]);
+			}
+		}
+		unset($group);
+
 		// actions
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($problems_data, $data['triggers']);
