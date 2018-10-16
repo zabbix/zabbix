@@ -170,10 +170,11 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        pid                      Process identifier",
 	"        process-type             All processes of specified type (e.g.,",
 	"                                 listener)",
 	"        process-type,N           Process type and number (e.g., listener,3)",
+	"        pid                      Process identifier, up to 65535. For larger",
+	"                                 values specify target as \"process-type,N\"",
 #endif
 	"",
 	"  -h --help                      Display this help message",
