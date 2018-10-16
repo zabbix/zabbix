@@ -90,9 +90,10 @@
 	}
 
 	function removeWidgetInfoBtns($content_header) {
-		if ($content_header.find('[data-hintbox=1]').length) {
-			$content_header.find('[data-hintbox=1]').next('.hint-box').remove();
-		}
+		$content_header.find('[data-hintbox=1]')
+			.trigger('remove')
+			.next('.hint-box')
+			.remove();
 	}
 
 	function resizeDashboardGrid($obj, data, min_rows) {
