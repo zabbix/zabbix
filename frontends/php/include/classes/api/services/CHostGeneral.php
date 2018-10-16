@@ -936,7 +936,9 @@ abstract class CHostGeneral extends CHostBase {
 
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach ($result as $hostid => $host) {
-					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
+					$result[$hostid]['applications'] = array_key_exists($hostid, $applications)
+						? $applications[$hostid]['rowscount']
+						: 0;
 				}
 			}
 		}
@@ -953,6 +955,32 @@ abstract class CHostGeneral extends CHostBase {
 
 			$macros = $this->unsetExtraFields($macros, ['hostid', 'hostmacroid'], $options['selectMacros']);
 			$result = $relationMap->mapMany($result, $macros, 'macros', $options['limitSelects']);
+		}
+
+		// adding tags
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			$tags_options = [
+				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
+				'filter' => ['hostid' => $hostids]
+			];
+			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+
+			foreach ($result as &$host) {
+				$host['tags'] = [];
+			}
+			unset($host);
+
+			while ($tag = DBfetch($tags)) {
+				$host = &$result[$tag['hostid']];
+
+				unset($tag['hosttagid'], $tag['hostid']);
+				$host['tags'][] = $tag;
+			}
+			unset($event);
 		}
 
 		return $result;
@@ -1047,6 +1075,34 @@ abstract class CHostGeneral extends CHostBase {
 					));
 				}
 			}
+		}
+	}
+
+	/**
+	 * Validates tags.
+	 *
+	 * @param array  $host
+	 * @param int    $host['evaltype']
+	 * @param array  $host['tags']
+	 * @param string $host['tags'][]['tag']
+	 * @param string $host['tags'][]['value']
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateTags(array $host) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]]
+		]];
+
+		// Keep values only for fields with defined validation rules.
+		$host = array_intersect_key($host, $api_input_rules['fields']);
+
+		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 }

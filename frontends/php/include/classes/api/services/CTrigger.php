@@ -414,9 +414,9 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], 'trigger_tag',
-				'tt', 't', 'triggerid'
+		if (is_array($options['tags']) && $options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 't',
+				'trigger_tag', 'triggerid'
 			);
 		}
 

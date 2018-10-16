@@ -81,8 +81,8 @@ class CApiTagHelper {
 				'SELECT NULL'.
 				' FROM '.$table.
 				' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.
-				' AND '.$table.'.tag='.zbx_dbstr($tag).$values.
-				')';
+					' AND '.$table.'.tag='.zbx_dbstr($tag).$values.
+			')';
 		}
 
 		$sql_where = implode(($evaltype == TAG_EVAL_TYPE_OR) ? ' OR ' : ' AND ', $sql_where);

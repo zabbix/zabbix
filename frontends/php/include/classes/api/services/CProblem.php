@@ -278,14 +278,14 @@ class CProblem extends CApiService {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], 'problem_tag',
-				'pt', 'p', 'eventid'
+		if ($options['tags']) {
+			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
+				'problem_tag', 'eventid'
 			);
 		}
 
 		// recent
-		if ($options['recent'] !== null && $options['recent']) {
+		if ($options['recent']) {
 			$config = select_config();
 			$ok_events_from = time() - timeUnitToSeconds($config['ok_period']);
 
@@ -520,7 +520,7 @@ class CProblem extends CApiService {
 	 * @param array $usrgrpids
 	 * @param array $sqlParts
 	 *
-	 * @return string
+	 * @return array
 	 */
 	protected static function addTagFilterSqlParts(array $usrgrpids, array $sqlParts) {
 		$tag_filters = CEvent::getTagFilters($usrgrpids);
