@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/APITest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup icon_map
