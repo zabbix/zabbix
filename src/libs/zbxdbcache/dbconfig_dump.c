@@ -20,11 +20,12 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "mutexs.h"
 
 #define ZBX_DBCONFIG_IMPL
 #include "dbconfig.h"
 
-static void	DCdump_config(ZBX_DC_CONFIG *config)
+static void	DCdump_config(void)
 {
 	const char	*__function_name = "DCdump_config";
 
@@ -69,7 +70,7 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_hosts(ZBX_DC_CONFIG *config)
+static void	DCdump_hosts(void)
 {
 	const char		*__function_name = "DCdump_hosts";
 
@@ -96,7 +97,7 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u", host->hostid,
 				host->host, host->name, host->status);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:%d", host->proxy_hostid);
+		zabbix_log(LOG_LEVEL_TRACE, "  proxy_hostid:" ZBX_FS_UI64, host->proxy_hostid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  zabbix:[available:%u, errors_from:%d disable_until:%d error:'%s']",
@@ -113,8 +114,9 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 		/* timestamp of last availability status (available/error) field change on any interface */
 		zabbix_log(LOG_LEVEL_TRACE, "  availability_ts:%d", host->availability_ts);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  maintenance_status:%u maintenance_type:%u maintenance_from:%d",
-				host->maintenance_status, host->maintenance_type, host->maintenance_from);
+		zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64 " maintenance_status:%u maintenance_type:%u"
+				" maintenance_from:%d", host->maintenanceid, host->maintenance_status,
+				host->maintenance_type, host->maintenance_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  number of items: zabbix:%d snmp:%d ipmi:%d jmx:%d", host->items_num,
 				host->snmp_items_num, host->ipmi_items_num, host->jmx_items_num);
@@ -144,7 +146,7 @@ static void	DCdump_hosts(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_proxies(ZBX_DC_CONFIG *config)
+static void	DCdump_proxies(void)
 {
 	const char		*__function_name = "DCdump_proxies";
 
@@ -177,7 +179,7 @@ static void	DCdump_proxies(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_ipmihosts(ZBX_DC_CONFIG *config)
+static void	DCdump_ipmihosts(void)
 {
 	const char		*__function_name = "DCdump_ipmihosts";
 
@@ -209,7 +211,7 @@ static void	DCdump_ipmihosts(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
+static void	DCdump_host_inventories(void)
 {
 	const char			*__function_name = "DCdump_host_inventories";
 
@@ -246,7 +248,7 @@ static void	DCdump_host_inventories(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "  End of %s()", __function_name);
 }
 
-static void	DCdump_htmpls(ZBX_DC_CONFIG *config)
+static void	DCdump_htmpls(void)
 {
 	const char		*__function_name = "DCdump_htmpls";
 
@@ -280,7 +282,7 @@ static void	DCdump_htmpls(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_gmacros(ZBX_DC_CONFIG *config)
+static void	DCdump_gmacros(void)
 {
 	const char		*__function_name = "DCdump_gmacro";
 
@@ -312,7 +314,7 @@ static void	DCdump_gmacros(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_hmacros(ZBX_DC_CONFIG *config)
+static void	DCdump_hmacros(void)
 {
 	const char	*__function_name = "DCdump_hmacros";
 
@@ -344,7 +346,7 @@ static void	DCdump_hmacros(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_interfaces(ZBX_DC_CONFIG *config)
+static void	DCdump_interfaces(void)
 {
 	const char	*__function_name = "DCdump_interfaces";
 
@@ -503,7 +505,7 @@ typedef struct
 }
 zbx_trace_item_t;
 
-static void	DCdump_items(ZBX_DC_CONFIG *config)
+static void	DCdump_items(void)
 {
 	const char		*__function_name = "DCdump_items";
 
@@ -581,7 +583,7 @@ static void	DCdump_items(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_interface_snmpitems(ZBX_DC_CONFIG *config)
+static void	DCdump_interface_snmpitems(void)
 {
 	const char			*__function_name = "DCdump_interface_snmpitems";
 
@@ -614,7 +616,7 @@ static void	DCdump_interface_snmpitems(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_functions(ZBX_DC_CONFIG *config)
+static void	DCdump_functions(void)
 {
 	const char		*__function_name = "DCdump_functions";
 
@@ -670,7 +672,7 @@ static void	DCdump_trigger_tags(const ZBX_DC_TRIGGER *trigger)
 	zbx_vector_ptr_destroy(&index);
 }
 
-static void	DCdump_triggers(ZBX_DC_CONFIG *config)
+static void	DCdump_triggers(void)
 {
 	const char		*__function_name = "DCdump_triggers";
 
@@ -714,7 +716,7 @@ static void	DCdump_triggers(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_trigdeps(ZBX_DC_CONFIG *config)
+static void	DCdump_trigdeps(void)
 {
 	const char		*__function_name = "DCdump_trigdeps";
 
@@ -752,7 +754,7 @@ static void	DCdump_trigdeps(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_expressions(ZBX_DC_CONFIG *config)
+static void	DCdump_expressions(void)
 {
 	const char		*__function_name = "DCdump_expressions";
 
@@ -785,7 +787,7 @@ static void	DCdump_expressions(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_actions(ZBX_DC_CONFIG *config)
+static void	DCdump_actions(void)
 {
 	const char		*__function_name = "DCdump_actions";
 
@@ -891,7 +893,7 @@ static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 	zbx_vector_ptr_destroy(&index);
 }
 
-static void	DCdump_correlations(ZBX_DC_CONFIG *config)
+static void	DCdump_correlations(void)
 {
 	const char		*__function_name = "DCdump_correlations";
 
@@ -926,7 +928,30 @@ static void	DCdump_correlations(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_host_groups(ZBX_DC_CONFIG *config)
+static void	DCdump_host_group_hosts(zbx_dc_hostgroup_t *group)
+{
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_uint64_t	index;
+	zbx_uint64_t		*phostid;
+
+	zbx_vector_uint64_create(&index);
+	zbx_hashset_iter_reset(&group->hostids, &iter);
+
+	while (NULL != (phostid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append_ptr(&index, phostid);
+
+	zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  hosts:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
+static void	DCdump_host_groups(void)
 {
 	const char		*__function_name = "DCdump_host_groups";
 
@@ -949,6 +974,9 @@ static void	DCdump_host_groups(ZBX_DC_CONFIG *config)
 	{
 		group = (zbx_dc_hostgroup_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "groupid:" ZBX_FS_UI64 " name:'%s'", group->groupid, group->name);
+
+		if (0 != group->hostids.num_data)
+			DCdump_host_group_hosts(group);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -956,7 +984,7 @@ static void	DCdump_host_groups(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-static void	DCdump_host_group_index(ZBX_DC_CONFIG *config)
+static void	DCdump_host_group_index(void)
 {
 	const char		*__function_name = "DCdump_host_group_index";
 
@@ -976,25 +1004,173 @@ static void	DCdump_host_group_index(ZBX_DC_CONFIG *config)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-void	DCdump_configuration(ZBX_DC_CONFIG *config)
+static void	DCdump_maintenance_groups(zbx_dc_maintenance_t *maintenance)
 {
-	DCdump_config(config);
-	DCdump_hosts(config);
-	DCdump_proxies(config);
-	DCdump_ipmihosts(config);
-	DCdump_host_inventories(config);
-	DCdump_htmpls(config);
-	DCdump_gmacros(config);
-	DCdump_hmacros(config);
-	DCdump_interfaces(config);
-	DCdump_items(config);
-	DCdump_interface_snmpitems(config);
-	DCdump_triggers(config);
-	DCdump_trigdeps(config);
-	DCdump_functions(config);
-	DCdump_expressions(config);
-	DCdump_actions(config);
-	DCdump_correlations(config);
-	DCdump_host_groups(config);
-	DCdump_host_group_index(config);
+	int			i;
+	zbx_vector_uint64_t	index;
+
+	zbx_vector_uint64_create(&index);
+
+	if (0 != maintenance->groupids.values_num)
+	{
+		zbx_vector_uint64_append_array(&index, maintenance->groupids.values, maintenance->groupids.values_num);
+		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  groups:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    groupid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
+static void	DCdump_maintenance_hosts(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_uint64_t	index;
+
+	zbx_vector_uint64_create(&index);
+
+	if (0 != maintenance->hostids.values_num)
+	{
+		zbx_vector_uint64_append_array(&index, maintenance->hostids.values, maintenance->hostids.values_num);
+		zbx_vector_uint64_sort(&index, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  hosts:");
+
+	for (i = 0; i < index.values_num; i++)
+		zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64, index.values[i]);
+
+	zbx_vector_uint64_destroy(&index);
+}
+
+static int	maintenance_tag_compare(const void *v1, const void *v2)
+{
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)v1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)v2;
+	int				ret;
+
+	if (0 != (ret = (strcmp(tag1->tag, tag2->tag))))
+		return ret;
+
+	if (0 != (ret = (strcmp(tag1->value, tag2->value))))
+		return ret;
+
+	ZBX_RETURN_IF_NOT_EQUAL(tag1->operator, tag2->operator);
+
+	return 0;
+}
+
+static void	DCdump_maintenance_tags(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zbx_vector_ptr_create(&index);
+
+	if (0 != maintenance->tags.values_num)
+	{
+		zbx_vector_ptr_append_array(&index, maintenance->tags.values, maintenance->tags.values_num);
+		zbx_vector_ptr_sort(&index, maintenance_tag_compare);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "  tags:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_tag_t	*tag = (zbx_dc_maintenance_tag_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    maintenancetagid:" ZBX_FS_UI64 " operator:%u tag:'%s' value:'%s'",
+				tag->maintenancetagid, tag->operator, tag->tag, tag->value);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+}
+
+static void	DCdump_maintenance_periods(zbx_dc_maintenance_t *maintenance)
+{
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zbx_vector_ptr_create(&index);
+
+	zbx_vector_ptr_append_array(&index, maintenance->periods.values, maintenance->periods.values_num);
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_TRACE, "  periods:");
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		zbx_dc_maintenance_period_t	*period = (zbx_dc_maintenance_period_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "    timeperiodid:" ZBX_FS_UI64 " type:%u every:%d month:%d dayofweek:%d"
+				" day:%d start_time:%d period:%d start_date:%d",
+				period->timeperiodid, period->type, period->every, period->month, period->dayofweek,
+				period->day, period->start_time, period->period, period->start_date);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+}
+
+static void	DCdump_maintenances(void)
+{
+	const char		*__function_name = "DCdump_maintenances";
+
+	zbx_dc_maintenance_t	*maintenance;
+	zbx_hashset_iter_t	iter;
+	int			i;
+	zbx_vector_ptr_t	index;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&index);
+	zbx_hashset_iter_reset(&config->maintenances, &iter);
+
+	while (NULL != (maintenance = (zbx_dc_maintenance_t *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&index, maintenance);
+
+	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < index.values_num; i++)
+	{
+		maintenance = (zbx_dc_maintenance_t *)index.values[i];
+		zabbix_log(LOG_LEVEL_TRACE, "maintenanceid:" ZBX_FS_UI64 " type:%u tag_evaltype:%u active_since:%d"
+				" active_until:%d", maintenance->maintenanceid, maintenance->type,
+				maintenance->tags_evaltype, maintenance->active_since, maintenance->active_until);
+		zabbix_log(LOG_LEVEL_TRACE, "  state:%u running_since:%d running_until:%d",
+				maintenance->state, maintenance->running_since, maintenance->running_until);
+
+		DCdump_maintenance_groups(maintenance);
+		DCdump_maintenance_hosts(maintenance);
+		DCdump_maintenance_tags(maintenance);
+		DCdump_maintenance_periods(maintenance);
+	}
+
+	zbx_vector_ptr_destroy(&index);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+}
+
+void	DCdump_configuration()
+{
+	DCdump_config();
+	DCdump_hosts();
+	DCdump_proxies();
+	DCdump_ipmihosts();
+	DCdump_host_inventories();
+	DCdump_htmpls();
+	DCdump_gmacros();
+	DCdump_hmacros();
+	DCdump_interfaces();
+	DCdump_items();
+	DCdump_interface_snmpitems();
+	DCdump_triggers();
+	DCdump_trigdeps();
+	DCdump_functions();
+	DCdump_expressions();
+	DCdump_actions();
+	DCdump_correlations();
+	DCdump_host_groups();
+	DCdump_host_group_index();
+	DCdump_maintenances();
 }

@@ -5,7 +5,9 @@ SERVER_tests = \
 	replace_key_params_dyn \
 	calculate_item_nextcheck \
 	zbx_function_get_param_dyn \
-	zbx_token_find
+	zbx_token_find \
+	is_double_suffix \
+	is_double
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -48,12 +50,12 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
@@ -164,5 +166,33 @@ zbx_token_find_LDADD += @SERVER_LIBS@
 zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_token_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+is_double_suffix_SOURCES = \
+	is_double_suffix.c \
+	$(COMMON_SRC_FILES)
+
+is_double_suffix_LDADD = \
+	$(COMMON_LIB_FILES)
+
+is_double_suffix_LDADD += @SERVER_LIBS@
+
+is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@
+
+is_double_suffix_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+is_double_SOURCES = \
+	is_double.c \
+	$(COMMON_SRC_FILES)
+
+is_double_LDADD = \
+	$(COMMON_LIB_FILES)
+
+is_double_LDADD += @SERVER_LIBS@
+
+is_double_LDFLAGS = @SERVER_LDFLAGS@
+
+is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

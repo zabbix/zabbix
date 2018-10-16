@@ -396,7 +396,9 @@ class CHttpTestManager {
 				elseif (isset($hostHttpTest['byName'][$httpTest['name']])) {
 					$exHttpTest = $hostHttpTest['byName'][$httpTest['name']];
 
-					if (bccomp($exHttpTest['templateid'], $httpTestId) == 0 || !$this->compareHttpSteps($httpTest, $exHttpTest)) {
+					if (bccomp($exHttpTest['templateid'], $httpTestId) == 0
+							|| $exHttpTest['templateid'] != 0
+							|| !$this->compareHttpSteps($httpTest, $exHttpTest)) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
 						throw new Exception(
 							_s('Web scenario "%1$s" already exists on host "%2$s".', $exHttpTest['name'], $host['name'])

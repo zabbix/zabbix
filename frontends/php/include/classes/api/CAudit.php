@@ -94,6 +94,12 @@ class CAudit {
 				$table_name = 'graphs';
 				break;
 
+			case AUDIT_RESOURCE_HOST_PROTOTYPE:
+				$field_name_resourceid = 'hostid';
+				$field_name_resourcename = 'host';
+				$table_name = 'hosts';
+				break;
+
 			case AUDIT_RESOURCE_HOST_GROUP:
 				$field_name_resourceid = 'groupid';
 				$field_name_resourcename = 'name';

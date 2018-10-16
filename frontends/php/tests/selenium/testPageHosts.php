@@ -93,8 +93,8 @@ class testPageHosts extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 		$sqlApplications = "select * from applications where hostid=$hostid order by applicationid";
 		$oldHashApplications = DBhash($sqlApplications);
-		$sqlInteraface = "select * from interface where hostid=$hostid order by interfaceid";
-		$oldHashInterface = DBhash($sqlInteraface);
+		$sqlInterface = "select * from interface where hostid=$hostid order by interfaceid";
+		$oldHashInterface = DBhash($sqlInterface);
 		$sqlHostMacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
 		$oldHashHostMacro = DBhash($sqlHostMacro);
 		$sqlHostsGroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
@@ -121,7 +121,7 @@ class testPageHosts extends CWebTest {
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 		$this->assertEquals($oldHashApplications, DBhash($sqlApplications));
-		$this->assertEquals($oldHashInterface, DBhash($sqlInteraface));
+		$this->assertEquals($oldHashInterface, DBhash($sqlInterface));
 		$this->assertEquals($oldHashHostMacro, DBhash($sqlHostMacro));
 		$this->assertEquals($oldHashHostsGroups, DBhash($sqlHostsGroups));
 		$this->assertEquals($oldHashHostsTemplates, DBhash($sqlHostsTemplates));

@@ -51,7 +51,6 @@ function parse_schema($path) {
 						$length = 16;
 						break;
 					case 't_varchar':
-					case 't_char':
 						$type = 'DB::FIELD_TYPE_CHAR';
 						$length = $type_data['length'];
 						break;

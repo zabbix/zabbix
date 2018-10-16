@@ -66,9 +66,8 @@ class testInheritanceHostPrototype extends CWebTest {
 		);
 
 		// Check layout at Host tab.
-		$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "?form=update&hostid='.$host_prototype.
-				'&parent_discoveryid='.$discovery_id.'")]'
-		);
+		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
+				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
@@ -94,7 +93,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
 		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
 
 		// Check layout at IPMI tab.
 		$this->zbxTestTabSwitch('IPMI');
@@ -265,7 +264,7 @@ class testInheritanceHostPrototype extends CWebTest {
 	 *
 	 * @dataProvider getSimpleUpdateData
 	 */
-	public function testInheritanceHost_SimpleUpdate($data) {
+	public function testInheritanceHostPrototype_SimpleUpdate($data) {
 		if ($data['update'] === 'host') {
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype']);
 		}
@@ -310,7 +309,7 @@ class testInheritanceHostPrototype extends CWebTest {
 	 *
 	 * @dataProvider getUpdateTemplateData
 	 */
-	public function testInheritanceHost_Update($data) {
+	public function testInheritanceHostPrototype_Update($data) {
 		$this->selectHostPrototypeForUpdate('template', $data);
 
 		// Host tab.
@@ -392,7 +391,7 @@ class testInheritanceHostPrototype extends CWebTest {
 	/**
 	 * @dataProvider getDeleteData
 	 */
-	public function testInheritanceHost_Delete($data) {
+	public function testInheritanceHostPrototype_Delete($data) {
 		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS '.
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);

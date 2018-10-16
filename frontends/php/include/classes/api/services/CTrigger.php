@@ -85,6 +85,8 @@ class CTrigger extends CTriggerGeneral {
 			'host'							=> null,
 			'only_true'						=> null,
 			'min_severity'					=> null,
+			'evaltype'						=> TAG_EVAL_TYPE_AND_OR,
+			'tags'							=> null,
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
@@ -409,6 +411,13 @@ class CTrigger extends CTriggerGeneral {
 		// min_severity
 		if (!is_null($options['min_severity'])) {
 			$sqlParts['where'][] = 't.priority>='.zbx_dbstr($options['min_severity']);
+		}
+
+		// tags
+		if ($options['tags'] !== null && $options['tags']) {
+			$sqlParts['where'][] = CEvent::getTagsWhereCondition($options['tags'], $options['evaltype'], 'trigger_tag',
+				'tt', 't', 'triggerid'
+			);
 		}
 
 		// limit

@@ -154,8 +154,10 @@ typedef off_t	zbx_offset_t;
 
 #define ZBX_FS_SIZE_T		ZBX_FS_UI64
 #define ZBX_FS_SSIZE_T		ZBX_FS_I64
+#define ZBX_FS_TIME_T		ZBX_FS_I64
 #define zbx_fs_size_t		zbx_uint64_t	/* use this type only in calls to printf() for formatting size_t */
 #define zbx_fs_ssize_t		zbx_int64_t	/* use this type only in calls to printf() for formatting ssize_t */
+#define zbx_fs_time_t		zbx_int64_t	/* use this type only in calls to printf() for formatting time_t */
 
 #ifndef S_ISREG
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)

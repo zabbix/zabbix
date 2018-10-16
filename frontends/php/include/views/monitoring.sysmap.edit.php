@@ -220,6 +220,10 @@ $map_tab->addRow(_('Minimum severity'),
 	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
 );
 
+$map_tab->addRow(_('Show suppressed problems'),
+	(new CCheckBox('show_suppressed'))->setChecked($data['sysmap']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+);
+
 // Create url table.
 $url_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')

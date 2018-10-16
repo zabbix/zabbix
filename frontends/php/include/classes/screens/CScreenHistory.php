@@ -148,10 +148,6 @@ class CScreenHistory extends CScreenBase {
 			ITEM_VALUE_TYPE_LOG => 1,
 			ITEM_VALUE_TYPE_TEXT => 1
 		];
-		$iv_numeric = [
-			ITEM_VALUE_TYPE_FLOAT => 1,
-			ITEM_VALUE_TYPE_UINT64 => 1
-		];
 
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
 			$options = [
@@ -196,8 +192,21 @@ class CScreenHistory extends CScreenBase {
 						$options['excludeSearch'] = true;
 					}
 				}
+				$history_data = [];
 
-				$history_data = API::History()->get($options);
+				if (count($items) > 1) {
+					foreach ($items as $item) {
+						$options['itemids'] = [$item['itemid']];
+						$options['history'] = $item['value_type'];
+						$item_data = API::History()->get($options);
+						if ($item_data) {
+							$history_data = array_merge($history_data, $item_data);
+						}
+					}
+				}
+				else {
+					$history_data = API::History()->get($options);
+				}
 
 				CArrayHelper::sort($history_data, [
 					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
@@ -207,15 +216,23 @@ class CScreenHistory extends CScreenBase {
 				foreach ($history_data as $history_row) {
 					$value = $history_row['value'];
 
-					if ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+					if (in_array($items[$history_row['itemid']]['value_type'],
+							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
+						$value = rtrim($value, " \t\r\n");
+						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
+					}
+					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
 					}
-					else {
-						$value = rtrim($value, " \t\r\n");
-					}
 
-					$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
-						' '.htmlspecialchars($value);
+					$row = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock']).' '.$history_row['clock'].
+						' '.$value;
+
+					if (count($items) > 1) {
+						$row .= ' "'.str_replace('"', '""', $items[$history_row['itemid']]['hosts'][0]['name'].
+							NAME_DELIMITER.$items[$history_row['itemid']]['name_expanded']).'"';
+					}
+					$output[] = $row;
 				}
 
 				// Return values as array of formatted strings.

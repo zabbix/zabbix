@@ -400,7 +400,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 /******************************************************************************
  *                                                                            *
- * Function: del_zeroes                                                       *
+ * Function: del_zeros                                                       *
  *                                                                            *
  * Purpose: delete all right '0' and '.' for the string                       *
  *                                                                            *
@@ -413,7 +413,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void	del_zeroes(char *s)
+void	del_zeros(char *s)
 {
 	int     i;
 
@@ -1300,23 +1300,6 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Numeric (unsigned)";
 		case ITEM_VALUE_TYPE_TEXT:
 			return "Text";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type)
-{
-	switch (data_type)
-	{
-		case ITEM_DATA_TYPE_DECIMAL:
-			return "Decimal";
-		case ITEM_DATA_TYPE_OCTAL:
-			return "Octal";
-		case ITEM_DATA_TYPE_HEXADECIMAL:
-			return "Hexadecimal";
-		case ITEM_DATA_TYPE_BOOLEAN:
-			return "Boolean";
 		default:
 			return "unknown";
 	}
@@ -3163,7 +3146,7 @@ static int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r,
 		{
 			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
 				"Check expression part starting from: %.*s",
-				*par_l, expr, lpp_len, expr + lpp_offset);
+				(int)*par_l, expr, (int)lpp_len, expr + lpp_offset);
 
 			return FAIL;
 		}
@@ -3985,7 +3968,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
  *                                                                            *
  * Function: zbx_number_parse                                                 *
  *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
+ * Purpose: parse a number like "12.345"                                      *
  *                                                                            *
  * Parameters: number - [IN] start of number                                  *
  *             len    - [OUT] length of parsed number                         *
@@ -4023,11 +4006,36 @@ int	zbx_number_parse(const char *number, int *len)
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
-		if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-			(*len)++;
-
 		return SUCCEED;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_suffixed_number_parse                                        *
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_suffixed_number_parse(const char *number, int *len)
+{
+	if (FAIL == zbx_number_parse(number, len))
+		return FAIL;
+
+	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+		(*len)++;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -4067,7 +4075,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		if (SUCCEED != zbx_number_parse(s, &len))
+		if (SUCCEED != zbx_suffixed_number_parse(s, &len))
 			continue;
 
 		/* number found */

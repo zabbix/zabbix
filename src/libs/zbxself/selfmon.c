@@ -271,7 +271,7 @@ int	init_selfmon_collector(char **error)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __function_name, collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector:%p", __function_name, (void *)collector);
 
 	return ret;
 }
@@ -289,7 +289,7 @@ void	free_selfmon_collector(void)
 {
 	const char	*__function_name = "free_selfmon_collector";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __function_name, collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __function_name, (void *)collector);
 
 	if (NULL == collector)
 		return;

@@ -25,6 +25,7 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
 		AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
 		AUDIT_RESOURCE_HOST => _('Host'),
+		AUDIT_RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
 		AUDIT_RESOURCE_ACTION => _('Action'),
 		AUDIT_RESOURCE_GRAPH => _('Graph'),
 		AUDIT_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),

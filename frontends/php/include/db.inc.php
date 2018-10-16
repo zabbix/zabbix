@@ -523,7 +523,7 @@ function DBexecute($query, $skip_error_messages = 0) {
  * Returns the next data set from a DB resource or false if there are no more results.
  *
  * @param resource $cursor
- * @param bool $convertNulls	convert all null values to string zeroes
+ * @param bool     $convertNulls  Convert all null values to string zeros.
  *
  * @return array|bool
  */

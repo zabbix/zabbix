@@ -188,6 +188,7 @@ class CConfigurationExportBuilder {
 				'markelements' => $map['markelements'],
 				'show_unack' => $map['show_unack'],
 				'severity_min' => $map['severity_min'],
+				'show_suppressed' => $map['show_suppressed'],
 				'grid_size' => $map['grid_size'],
 				'grid_show' => $map['grid_show'],
 				'grid_align' => $map['grid_align'],
