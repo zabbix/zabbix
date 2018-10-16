@@ -115,7 +115,7 @@ class CItemManager {
 		}
 
 		if ($del_graphids) {
-			CGraphManager::delete(array_keys($del_graphids));
+			CGraphManager::delete($del_graphids);
 		}
 
 		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
@@ -150,11 +150,11 @@ class CItemManager {
 		}
 
 		if (array_key_exists(ZBX_FLAG_DISCOVERY_NORMAL, $del_triggerids)) {
-			CTriggerManager::delete(array_keys($del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL]));
+			CTriggerManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL]);
 		}
 
 		if (array_key_exists(ZBX_FLAG_DISCOVERY_PROTOTYPE, $del_triggerids)) {
-			CTriggerPrototypeManager::delete(array_keys($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
+			CTriggerPrototypeManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 
 		DB::delete('screens_items', [
@@ -181,10 +181,17 @@ class CItemManager {
 					'field' => 'itemid',
 					'value' => $del_itemid
 				];
+
+				if (count($ins_housekeeper) == ZBX_DB_MAX_INSERTS) {
+					DB::insertBatch('housekeeper', $ins_housekeeper);
+					$ins_housekeeper = [];
+				}
 			}
 		}
 
-		DB::insertBatch('housekeeper', $ins_housekeeper);
+		if ($ins_housekeeper) {
+			DB::insertBatch('housekeeper', $ins_housekeeper);
+		}
 
 		DB::delete('items', ['itemid' => $del_itemids]);
 	}

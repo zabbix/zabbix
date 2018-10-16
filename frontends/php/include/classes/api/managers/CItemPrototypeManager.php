@@ -95,7 +95,7 @@ class CItemPrototypeManager {
 		}
 
 		if ($del_graphids) {
-			CGraphPrototypeManager::delete(array_keys($del_graphids));
+			CGraphPrototypeManager::delete($del_graphids);
 		}
 
 		// Cleanup ymin_itemid and ymax_itemid fields for graphs and graph prototypes.
