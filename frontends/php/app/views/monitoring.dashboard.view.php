@@ -29,6 +29,12 @@ else {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
+	$this->addJsFile('class.coverride.js');
+	$this->addJsFile('class.cverticalaccordion.js');
+	$this->addJsFile('class.crangecontrol.js');
+	$this->addJsFile('colorpicker.js');
+	$this->addJsFile('class.csvggraph.js');
+	$this->addJsFile('csvggraphwidget.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 

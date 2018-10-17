@@ -615,11 +615,6 @@ var timeControl = {
 			.on('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
-
-				// Update dashboard widget footer.
-				if (obj.onDashboard) {
-					timeControl.updateDashboardFooter(id);
-				}
 			});
 
 		var async = (obj.loadSBox == 0)
@@ -652,44 +647,6 @@ var timeControl = {
 		graphUrl.setArgument('to', obj.timeline.to);
 
 		container.attr('href', graphUrl.getUrl());
-	},
-
-	/**
-	 * Updates dashboard widget footer for specified graph
-	 *
-	 * @param {string} id  Id of img tag with graph.
-	 */
-	updateDashboardFooter: function (id) {
-		var widgets = jQuery(".dashbrd-grid-widget-container")
-				.dashboardGrid("getWidgetsBy", "uniqueid", id.replace('graph_', ''));
-
-		if (widgets.length !== 1) {
-			return;
-		}
-
-		var widget = widgets[0],
-			obj = this.objectList[id],
-			url = new Curl('zabbix.php'),
-			post_args = {
-				uniqueid: widget['uniqueid'],
-				only_footer: 1
-			};
-
-		if (widget.type === 'graph') {
-			post_args.from = obj.timeline.from;
-			post_args.to = obj.timeline.to;
-		}
-
-		url.setArgument('action', 'widget.graph.view');
-		jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: post_args,
-			dataType: 'json',
-			success: function(resp) {
-				widget['content_footer'].html(resp.footer);
-			}
-		});
 	},
 
 	refreshObject: function(id) {

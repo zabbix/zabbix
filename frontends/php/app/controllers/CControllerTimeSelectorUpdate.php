@@ -90,12 +90,14 @@ class CControllerTimeSelectorUpdate extends CController {
 		$method = $this->getInput('method');
 		$date = new DateTime();
 		$value = [];
+		$date_type = [];
 		$ts = [];
 		$ts['now'] = time();
 
 		foreach (['from', 'to'] as $field) {
 			$value[$field] = $this->getInput($field);
 			$this->range_time_parser->parse($value[$field]);
+			$date_type[$field] = $this->range_time_parser->getTimeType();
 			$ts[$field] = $this->range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
@@ -163,6 +165,15 @@ class CControllerTimeSelectorUpdate extends CController {
 				if ($to_offset > 0) {
 					$ts['to'] -= $to_offset;
 					$value['to'] = $date->setTimestamp($ts['to'])->format(ZBX_FULL_DATE_TIME);
+				}
+				break;
+
+			case 'rangechange':
+				// Format only absolute date according ZBX_FULL_DATE_TIME string.
+				foreach (['from', 'to'] as $field) {
+					if ($date_type[$field] === CRangeTimeParser::ZBX_TIME_ABSOLUTE) {
+						$value[$field] = $date->setTimestamp($ts[$field])->format(ZBX_FULL_DATE_TIME);
+					}
 				}
 				break;
 		}

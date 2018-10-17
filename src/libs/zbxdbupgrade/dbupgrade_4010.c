@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -18,10 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
+#include "log.h"
 
-class CSvgForeignObject extends CSvgTag {
+/*
+ * 4.2 development database patches
+ */
 
-	public function __construct() {
-		parent::__construct('foreignObject', true);
-	}
-}
+#ifndef HAVE_SQLITE3
+
+/*static int	DBpatch_4010000(void)
+{
+}*/
+
+#endif
+
+DBPATCH_START(4010)
+
+/* version, duplicates flag, mandatory flag */
+
+/*DBPATCH_ADD(4010000, 0, 1)*/
+
+DBPATCH_END()

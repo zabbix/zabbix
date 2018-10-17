@@ -132,6 +132,7 @@ class CWidgetHelper {
 	public static function getRangeControl($field) {
 		return (new CRangeControl($field->getName(), (int) $field->getValue()))
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setStep($field->getStep())
 			->setMin($field->getMin())
 			->setMax($field->getMax());
@@ -144,7 +145,7 @@ class CWidgetHelper {
 	 */
 	public static function getHostsPatternTextBox($field, $form_name) {
 		return [
-			(new CTextArea($field->getName(), implode(', ', $field->getValue()), ['rows' => 1]))
+			(new CTextArea($field->getName(), self::makeStringFromChunks($field->getValue()), ['rows' => 1]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field))
 				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
@@ -381,6 +382,7 @@ class CWidgetHelper {
 		}
 
 		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
+		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 		$i = 0;
 
 		foreach ($tags as $tag) {
@@ -388,19 +390,23 @@ class CWidgetHelper {
 				(new CTextBox($field->getName().'['.$i.'][tag]', $tag['tag']))
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAriaRequired(self::isAriaRequired($field)),
+					->setAriaRequired(self::isAriaRequired($field))
+					->setEnabled($enabled),
 				(new CRadioButtonList($field->getName().'['.$i.'][operator]', (int) $tag['operator']))
-					->addValue(_('Like'), TAG_OPERATOR_LIKE)
-					->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
-					->setModern(true),
+					->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+					->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
+					->setModern(true)
+					->setEnabled($enabled),
 				(new CTextBox($field->getName().'['.$i.'][value]', $tag['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAriaRequired(self::isAriaRequired($field)),
+					->setAriaRequired(self::isAriaRequired($field))
+					->setEnabled($enabled),
 				(new CCol(
 					(new CButton($field->getName().'['.$i.'][remove]', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
+						->setEnabled($enabled)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			], 'form_row');
 
@@ -412,6 +418,7 @@ class CWidgetHelper {
 				(new CButton('tags_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-add')
+					->setEnabled($enabled)
 			))->setColSpan(3)
 		);
 
@@ -432,8 +439,8 @@ class CWidgetHelper {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired(self::isAriaRequired($field)),
 			(new CRadioButtonList($field->getName().'[#{rowNum}][operator]', TAG_OPERATOR_LIKE))
-				->addValue(_('Like'), TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox($field->getName().'[#{rowNum}][value]'))
 				->setAttribute('placeholder', _('value'))
@@ -493,7 +500,9 @@ class CWidgetHelper {
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][hosts]', implode(', ', $value['hosts']), ['rows' => 1]))
+						(new CTextArea($field_name.'['.$row_num.'][hosts]', self::makeStringFromChunks($value['hosts']),
+								['rows' => 1]
+							))
 							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
@@ -512,7 +521,9 @@ class CWidgetHelper {
 					]))
 						->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', implode(', ', $value['items']), ['rows' => 1]))
+						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
+								['rows' => 1]
+							))
 							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							->addClass(ZBX_STYLE_PATTERNSELECT),
@@ -527,7 +538,7 @@ class CWidgetHelper {
 									'multiselect' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
-									'resolve_items' => 0,
+									'orig_names' => 1,
 									'dstfrm' => $form_name
 								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
@@ -540,7 +551,7 @@ class CWidgetHelper {
 				(new CDiv(
 					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_WIDGET_DELETE)
+						->addClass(ZBX_STYLE_REMOVE_BTN)
 				))
 					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
@@ -604,8 +615,7 @@ class CWidgetHelper {
 				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('override-add')
-			))
-				->addStyle('display: table-cell; padding-top: 10px;'),
+			)),
 			'overrides-foot'
 		);
 
@@ -742,7 +752,7 @@ class CWidgetHelper {
 					'},'.
 					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
 					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
-					'onUpdate: updateGraphPreview,'.
+					'onUpdate: onGraphConfigChange,'.
 					'menu: '.CJs::encodeJson(self::getGraphOverrideMenu()).
 				'});'.
 			'}',
@@ -752,7 +762,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#overrides-row",'.
 					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_BTN_WIDGET_DELETE.'",'.
+					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
 					'add: "#override-add",'.
 					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
 				'})'.
@@ -772,7 +782,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'updateGraphPreview();'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
@@ -813,15 +823,13 @@ class CWidgetHelper {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
-				'disable: function() {'.
+				'disabled: function() {'.
 					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
-				'},'.
+				'}(),'.
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: function() {'.
-					'updateGraphPreview();'.
-				'},'.
+				'stop: onGraphConfigChange,'.
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
 				'}'.
@@ -853,11 +861,11 @@ class CWidgetHelper {
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
-						(new CDiv())
+						(new CButton())
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),
-						(new CTextArea($field_name.'['.$row_num.'][hosts]', implode(', ', $value['hosts']),
+						(new CTextArea($field_name.'['.$row_num.'][hosts]', self::makeStringFromChunks($value['hosts']),
 								['rows' => 1]))
 							->setAttribute('placeholder', _('host pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -876,7 +884,7 @@ class CWidgetHelper {
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', implode(', ', $value['items']),
+						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
 								['rows' => 1]))
 							->setAttribute('placeholder', _('item pattern'))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -894,7 +902,7 @@ class CWidgetHelper {
 									'real_hosts' => 1,
 									'numeric' => 1,
 									'with_webitems' => 1,
-									'resolve_items' => 0,
+									'orig_names' => 1,
 									'dstfrm' => $form_name
 								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
@@ -904,13 +912,9 @@ class CWidgetHelper {
 					->addClass(ZBX_STYLE_COLUMNS),
 				(new CDiv([
 					(new CButton())
-						->setAttribute('title', $is_opened ? _('Collapse') : _('Expand'))
-						->addClass(ZBX_STYLE_BTN_WIDGET_EDIT),
-					(new CButton())
 						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_WIDGET_DELETE)
+						->addClass(ZBX_STYLE_REMOVE_BTN)
 				]))
-					->addStyle('margin-left: -25px;')
 					->addClass(ZBX_STYLE_COLUMN_5)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
@@ -937,6 +941,7 @@ class CWidgetHelper {
 							->addRow(_('Width'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -944,6 +949,7 @@ class CWidgetHelper {
 							->addRow(_('Point size'),
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(1)
 									->setMax(10)
@@ -952,6 +958,7 @@ class CWidgetHelper {
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 										(int) $value['transparency'])
 									)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -959,6 +966,7 @@ class CWidgetHelper {
 							->addRow(_('Fill'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -1055,8 +1063,7 @@ class CWidgetHelper {
 				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('dataset-add')
-			))
-				->addStyle('display: table-cell; padding-top: 10px;'),
+			)),
 			ZBX_STYLE_LIST_ACCORDION_FOOT
 		);
 
@@ -1095,7 +1102,7 @@ class CWidgetHelper {
 				'.dynamicRows({'.
 					'template: "#dataset-row",'.
 					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_BTN_WIDGET_DELETE.'",'.
+					'remove: ".'.ZBX_STYLE_REMOVE_BTN.'",'.
 					'add: "#dataset-add",'.
 					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
 					'dataCallback: function(data) {'.
@@ -1129,7 +1136,7 @@ class CWidgetHelper {
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'updateGraphPreview();'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("tableupdate.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
@@ -1146,7 +1153,7 @@ class CWidgetHelper {
 
 			// Intialize vertical accordion.
 			'jQuery("#data_sets").zbx_vertical_accordion({'.
-				'handler: ".'.ZBX_STYLE_BTN_WIDGET_EDIT.', .'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
+				'handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"'.
 			'});',
 
 			// Initialize rangeControl UI elements.
@@ -1190,15 +1197,13 @@ class CWidgetHelper {
 				'cursor: "move",'.
 				'opacity: 0.6,'.
 				'axis: "y",'.
-				'disable: function() {'.
+				'disabled: function() {'.
 					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
-				'},'.
+				'}(),'.
 				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
 					'jQuery(this).sortable("refreshPositions");'.
 				'},'.
-				'stop: function() {'.
-					'updateGraphPreview();'.
-				'},'.
+				'stop: onGraphConfigChange,'.
 				'update: function() {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
 				'}'.
@@ -1218,6 +1223,17 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Make string from chunks.
+	 *
+	 * @param array  $chunks          Array of strings.
+	 *
+	 * @return string
+	 */
+	public static function makeStringFromChunks(array $chunks) {
+		return implode('', $chunks);
+	}
+
+	/**
 	 * Make array of patterns.
 	 *
 	 * @param array|string $patterns  Comma separated string of patterns or array containing multiple patterns.
@@ -1225,13 +1241,7 @@ class CWidgetHelper {
 	 * @return array  Returns array of unique patterns.
 	 */
 	public static function splitPatternIntoParts($patterns) {
-		$patterns = is_array($patterns) ? $patterns : explode(',', $patterns);
-
-		foreach ($patterns as &$pattern) {
-			$pattern = is_string($pattern) ? trim($pattern) : '';
-		}
-		unset($pattern);
-
-		return array_unique(array_filter($patterns));
+		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', $patterns), 255);
+		return array_filter($patterns, 'strlen');
 	}
 }

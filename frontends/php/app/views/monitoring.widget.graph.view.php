@@ -19,18 +19,12 @@
 **/
 
 
-if ($data['only_footer']) {
-	$output = [
-		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
-	];
-}
-elseif ($data['graph']['unavailable_object']) {
+if ($data['graph']['unavailable_object']) {
 	$item = (new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'));
 
 	$output = [
 		'header' => $data['name'],
-		'body' => $item->toString(),
-		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+		'body' => $item->toString()
 	];
 }
 else {
@@ -94,7 +88,6 @@ if ($data['widget']['initial_load'] == 1) {
 	$output = [
 		'header' => $data['name'],
 		'body' => $flickerfree_item->toString(),
-		'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString(),
 		'script_inline' => $script
 	];
 }

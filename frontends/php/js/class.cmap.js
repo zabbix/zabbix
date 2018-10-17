@@ -1097,7 +1097,7 @@ ZABBIX.apps.map = (function($) {
 			 * Handler for drag event.
 			 *
 			 * @param {object} data						jQuery UI draggable data.
-			 * @param {object} draggable				Element where drag event occured.
+			 * @param {object} draggable				Element where drag event occurred.
 			 */
 			dragGroupDrag: function(data, draggable) {
 				var cmap = draggable.sysmap,
@@ -1136,7 +1136,7 @@ ZABBIX.apps.map = (function($) {
 			/**
 			 * Final tasks for dragged element on drag stop event.
 			 *
-			 * @param {object} draggable				Element where drag stop event occured.
+			 * @param {object} draggable				Element where drag stop event occurred.
 			 */
 			dragGroupStop: function(draggable) {
 				var cmap = draggable.sysmap,

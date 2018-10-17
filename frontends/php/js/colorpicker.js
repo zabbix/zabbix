@@ -115,6 +115,12 @@
 				).on('click', '.color-picker div', setColorHandler);
 
 				overlay.appendTo($(options.appendTo));
+				if ($(options.appendTo).prop('tagName') !== 'BODY') {
+					$(options.appendTo).on('remove', function() {
+						overlay.remove();
+						overlay = null;
+					});
+				}
 				methods.hide();
 			},
 			/**

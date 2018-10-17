@@ -581,6 +581,8 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
+    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
+      margin-right: 12px; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -688,7 +690,7 @@ output {
     background-color: #2b2b2b; }
   .list-table tbody tr.row-selected .timeline-td {
     background-color: #2b2b2b; }
-  .list-table tbody tr:last-child td {
+  .list-table tbody tr:last-child th, .list-table tbody tr:last-child td {
     border-bottom: none; }
   .list-table tbody tr.hover-nobg {
     background-color: #2b2b2b; }
@@ -700,13 +702,17 @@ output {
     line-height: 18px;
     vertical-align: top; }
   .list-table tbody th {
-    text-align: inherit; }
+    text-align: left; }
   .list-table .vertical_rotation_inner {
     white-space: nowrap;
     -webkit-transform: rotate(270deg);
     -moz-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
     transform: rotate(270deg); }
+  .list-table .list-table-footer {
+    border-bottom: none;
+    color: #737373;
+    text-align: right; }
 
 .table-paging {
   text-align: center;
@@ -1773,6 +1779,7 @@ button {
   border: 1px solid transparent;
   color: #f2f2f2;
   height: 24px;
+  line-height: 22px;
   margin: 0 5px;
   vertical-align: top; }
   .btn-time-out:disabled {
@@ -2221,8 +2228,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   overflow-y: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
-    .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
+    .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
+      .dashbrd-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+        border-bottom: none; }
   .dashbrd-grid-widget-content .debug-output {
     margin: 10px 10px 0 10px;
     max-height: 300px;
@@ -2241,7 +2250,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   min-width: 8.33333%;
   margin: .25rem;
   background-color: #2b2b2b;
-  border: 1px solid #303030; }
+  border: 1px solid #303030;
+  padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
   position: relative;
@@ -2260,16 +2270,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0; }
       .dashbrd-grid-widget-head ul li select {
         margin: 4px 0; }
-
-.dashbrd-grid-widget-foot {
-  text-align: right;
-  color: #737373;
-  padding: 8px 8px 6px 8px; }
-  .dashbrd-grid-widget-foot ul {
-    display: flex;
-    justify-content: flex-end; }
-    .dashbrd-grid-widget-foot ul li {
-      padding: 0 0 0 13px; }
 
 @-webkit-keyframes zoom-in-out {
   0% {
@@ -2652,6 +2652,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .overlay-dialogue.modal-popup {
     max-width: 1024px;
     min-width: 650px; }
+  .overlay-dialogue .msg-bad,
+  .overlay-dialogue .msg-good {
+    position: sticky;
+    top: 0;
+    z-index: 1000; }
   .overlay-dialogue .list-table {
     white-space: normal;
     border: none; }
@@ -2933,22 +2938,27 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     top: 0;
     z-index: 999; }
 
+.svg-single-item-graph-legend,
+.svg-single-two-items-graph-legend,
 .svg-graph-legend {
   overflow-y: hidden;
   white-space: normal;
   margin: 0 10px; }
+  .svg-single-item-graph-legend div,
+  .svg-single-two-items-graph-legend div,
   .svg-graph-legend div {
     display: inline-block;
     margin: 0 4px;
     font-size: 12px;
     line-height: 18px;
     vertical-align: middle;
-    max-width: 30%;
     min-width: 120px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     border: 0 none transparent; }
+  .svg-single-item-graph-legend div:before,
+  .svg-single-two-items-graph-legend div:before,
   .svg-graph-legend div:before {
     content: ' ';
     display: inline-block;
@@ -2961,9 +2971,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-top-style: solid;
     border-top-color: inherit; }
 
+.svg-graph-legend div {
+  max-width: 30%; }
+
+.svg-single-two-items-graph-legend div {
+  max-width: 50%; }
+
 .svg-graph-hintbox {
-  padding-top: 5px;
-  display: block;
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
@@ -3791,7 +3805,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-widget-foot ul li, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.dashbrd-grid-widget-head h4, .action-menu .action-menu-item, .action-menu h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -3899,6 +3913,10 @@ svg {
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
+    .overrides-list .overrides-list-item .remove-btn {
+      position: relative;
+      right: -73px;
+      top: 3px; }
 
 .overrides-options-list {
   white-space: normal;
@@ -3930,24 +3948,29 @@ svg {
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 
+.list-accordion-foot > div {
+  display: table-cell;
+  padding-top: 10px; }
+
 .color-preview-box {
   height: 24px;
   width: 24px;
   float: left;
   margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer; }
+  cursor: pointer;
+  border: none;
+  border-radius: 0px; }
 
 .list-vertical-accordion {
   display: table;
   padding-left: 15px;
-  width: 100%; }
+  width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
     display: table-row; }
+    .list-vertical-accordion .list-accordion-item .remove-btn {
+      position: relative;
+      right: -10px;
+      top: 3px; }
   .list-vertical-accordion .list-accordion-item-closed {
     height: 30px; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
@@ -4365,45 +4388,53 @@ svg {
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
 
-[type=range] {
-  cursor: pointer;
-  -webkit-appearance: none;
-  /* Hides the slider so that custom slider can be made */
-  width: 100%;
-  /* Specific width is required for Firefox. */
-  opacity: 0;
-  vertical-align: middle;
-  padding: 0px;
-  height: 24px; }
-
-[type=range]:focus {
-  outline: none; }
-
-/* Special styling for WebKit/Blink */
-input[type=range]::-webkit-slider-thumb {
-  cursor: pointer;
-  margin-top: 1px;
-  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-  height: 10px;
-  width: 10px;
-  opacity: 0; }
-
-input[type=range]::-webkit-slider-runnable-track {
-  height: 10px;
-  opacity: 0; }
-
 .range-control {
   position: relative;
   display: inline-block;
-  vertical-align: middle;
-  margin: 0 10px 0 0; }
-  .range-control .range-control-track, .range-control .range-control-progress {
+  vertical-align: middle; }
+  .range-control input[type=range] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    width: calc(100% + 10px);
+    opacity: 0;
+    vertical-align: middle;
+    margin: 0 -5px;
+    padding: 0px;
+    height: 20px;
+    /* Special styling for WebKit/Blink */ }
+    .range-control input[type=range]:focus {
+      outline: none; }
+    .range-control input[type=range]::-webkit-slider-thumb {
+      margin-top: 1px;
+      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+      height: 10px;
+      width: 10px;
+      opacity: 0; }
+    .range-control input[type=range]::-webkit-slider-runnable-track {
+      height: 10px;
+      opacity: 0; }
+  .range-control input[type=text] {
+    width: 31px;
+    float: right; }
+  .range-control > div {
+    position: relative;
+    width: calc(100% - 10px - 31px);
+    margin: 2px 10px 0 0;
+    float: left; }
+  .range-control .range-control-track,
+  .range-control .range-control-progress {
     position: absolute;
     top: 50%;
     margin-top: -1px;
     left: 0;
     height: 2px;
     cursor: pointer; }
+  .range-control .range-control-track {
+    width: 100%;
+    background: silver; }
+  .range-control .range-control-progress {
+    background: #4796c4; }
   .range-control .range-control-thumb {
     position: absolute;
     top: 50%;
@@ -4414,14 +4445,14 @@ input[type=range]::-webkit-slider-runnable-track {
     border-radius: 5px;
     box-shadow: 0 0 1px white;
     background: #4796c4; }
-  .range-control .range-control-track {
-    width: 100%;
-    background: silver; }
-  .range-control .range-control-progress {
+  .range-control.range-control-focus .range-control-thumb {
+    background: #4796c4;
+    box-shadow: 0 0 0 2px #8599a4; }
+  .range-control.range-control-focus .range-control-progress {
     background: #4796c4; }
   .range-control.disabled {
     opacity: 1; }
-    .range-control.disabled [type=range] {
+    .range-control.disabled input[type=range] {
       cursor: default; }
     .range-control.disabled .range-control-progress,
     .range-control.disabled .range-control-thumb {
@@ -4439,18 +4470,6 @@ input[type=range]::-webkit-slider-runnable-track {
       height: 2px;
       border-left: 1px solid #0e1012; }
 
-div.range-control {
-  width: 240px; }
-
-input[type=text].range-control {
-  width: 31px; }
-
-.range-control-focus .range-control-thumb {
-  background: #4796c4;
-  box-shadow: 0 0 1px black; }
-.range-control-focus .range-control-progress {
-  background: #4796c4; }
-
 .graph-legend {
   text-align: left;
   white-space: nowrap;
@@ -4460,7 +4479,9 @@ input[type=text].range-control {
 .graph-widget-config-tabs {
   padding: 10px 0px; }
   .graph-widget-config-tabs > .tabs-nav {
-    padding-left: calc(15% + 20px); }
+    padding-left: calc(15% + 10px);
+    margin-right: 0;
+    margin-left: 0; }
 
 .inline-sr-only {
   font-size: 0; }

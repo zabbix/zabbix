@@ -107,17 +107,15 @@ class CWebUser {
 	 */
 	public static function logout() {
 		self::$data['sessionid'] = self::getSessionCookie();
-		self::$data = API::User()->logout([]);
-		CSession::destroy();
-		zbx_unsetcookie(ZBX_SESSION_NAME);
+
+		if (API::User()->logout([])) {
+			self::$data = null;
+			CSession::destroy();
+			zbx_unsetcookie(ZBX_SESSION_NAME);
+		}
 	}
 
 	public static function checkAuthentication($sessionId) {
-		if ($sessionId === null) {
-			self::setDefault();
-			return false;
-		}
-
 		try {
 			if ($sessionId !== null) {
 				self::$data = API::User()->checkAuthentication([

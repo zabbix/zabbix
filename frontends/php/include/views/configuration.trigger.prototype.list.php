@@ -65,28 +65,9 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	// description
 	$description = [];
-
-	if ($trigger['templateid'] > 0) {
-		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = (new CSpan(_('Template')))->addClass(ZBX_STYLE_GREY);
-			$description[] = NAME_DELIMITER;
-		}
-		else {
-			$real_hosts = $this->data['realHosts'][$triggerid];
-			$real_host = reset($real_hosts);
-
-			$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'],
-				$real_host['hostid']
-			);
-			$description[] = (new CLink(
-				CHtml::encode($real_host['name']),
-				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
-
-			$description[] = NAME_DELIMITER;
-		}
-	}
+	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
+		ZBX_FLAG_DISCOVERY_PROTOTYPE
+	);
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),
