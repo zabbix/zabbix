@@ -28,9 +28,19 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4010000(void)
+static int	DBpatch_4010000(void)
 {
-}*/
+	const ZBX_FIELD	field = {"error_handler", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_preproc", &field);
+}
+
+static int	DBpatch_4010001(void)
+{
+	const ZBX_FIELD	field = {"error_handler_params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_preproc", &field);
+}
 
 #endif
 
@@ -38,6 +48,7 @@ DBPATCH_START(4010)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(4010000, 0, 1)*/
+DBPATCH_ADD(4010000, 0, 1)
+DBPATCH_ADD(4010001, 0, 1)
 
 DBPATCH_END()
