@@ -1,9 +1,5 @@
 <script type="text/javascript">
 	jQuery(function($) {
-		$('input[name=filter_monitored_by]').on('click', function() {
-			$('#filter_proxyids_').multiSelect('resize');
-		});
-
 		$('#filter_monitored_by').change(function() {
 			var	filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
