@@ -100,7 +100,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
-	char		name[HOST_HOST_LEN_MAX];
+	char		name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
@@ -164,7 +164,7 @@ typedef struct
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
 	unsigned char		allow_traps;
-	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
+	char			key_orig[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			*units;
 	char			*delay;
 	int			history_sec;
