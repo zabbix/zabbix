@@ -1,0 +1,375 @@
+#data:
+#  1484035201.2
+#      value: value 1.2
+#         ts: 2017-01-10 10:00:01.200000000 +02:00
+#  1484035201.5
+#      value: value 1.5
+#         ts: 2017-01-10 10:00:01.500000000 +02:00
+#  1484035201.7
+#      value: value 1.7
+#         ts: 2017-01-10 10:00:01.700000000 +02:00
+#  1484035202.2
+#      value: value 2.2
+#         ts: 2017-01-10 10:00:02.200000000 +02:00
+#  1484035202.5
+#      value: value 2.5
+#         ts: 2017-01-10 10:00:02.500000000 +02:00
+#  1484035202.7
+#      value: value 2.7
+#         ts: 2017-01-10 10:00:02.700000000 +02:00
+#  1484035203.2
+#      value: value 3.2
+#         ts: 2017-01-10 10:00:03.200000000 +02:00
+#  1484035203.5
+#      value: value 3.5
+#         ts: 2017-01-10 10:00:03.500000000 +02:00
+#  1484035203.7
+#      value: value 3.7
+#         ts: 2017-01-10 10:00:03.700000000 +02:00
+#  1484035204.2
+#      value: value 4.2
+#         ts: 2017-01-10 10:00:04.200000000 +02:00
+#  1484035204.5
+#      value: value 4.5
+#         ts: 2017-01-10 10:00:04.500000000 +02:00
+#  1484035204.7
+#      value: value 4.7
+#         ts: 2017-01-10 10:00:04.700000000 +02:00
+#  1484035205.2
+#      value: value 5.2
+#         ts: 2017-01-10 10:00:05.200000000 +02:00
+#  1484035205.5
+#      value: value 5.5
+#         ts: 2017-01-10 10:00:05.500000000 +02:00
+#  1484035205.7
+#      value: value 5.7
+#         ts: 2017-01-10 10:00:05.700000000 +02:00
+#  1484035207.0
+#      value: value 7.0
+#         ts: 2017-01-10 10:00:07.000000000 +02:00
+#  1484035209.0
+#      value: value 9.0
+#         ts: 2017-01-10 10:00:09.000000000 +02:00
+#  1484035210.0
+#      value: value 10.0
+#         ts: 2017-01-10 10:00:10.000000000 +02:00
+#  1484035210.5
+#      value: value 10.5
+#         ts: 2017-01-10 10:00:10.500000000 +02:00
+#  1484121600
+#      value: value 01-11 10:00:00
+#         ts: 2017-01-11 10:00:00.000000000 +02:00
+#  1486800000
+#      value: value 02-11 10:00:00
+#         ts: 2017-02-11 10:00:00.000000000 +02:00
+#  1487404800
+#      value: value 02-18 10:00:00
+#         ts: 2017-02-18 10:00:00.000000000 +02:00
+#  1487491200
+#      value: value 02-19 10:00:00
+#         ts: 2017-02-19 10:00:00.000000000 +02:00
+#  1487494800
+#      value: value 02-19 11:00:00
+#         ts: 2017-02-19 11:00:00.000000000 +02:00
+#  1487496600
+#      value: value 02-19 11:30:00
+#         ts: 2017-02-19 11:30:00.000000000 +02:00
+---
+test case: Test count based request spanning over month+
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 7
+    end: 2017-02-19 12:15:00.000000000 +02:00
+out:
+  values:
+  - value: value 02-19 11:30:00
+    ts: 2017-02-19 11:30:00.000000000 +02:00
+  - value: value 02-19 11:00:00
+    ts: 2017-02-19 11:00:00.000000000 +02:00
+  - value: value 02-19 10:00:00
+    ts: 2017-02-19 10:00:00.000000000 +02:00
+  - value: value 02-18 10:00:00
+    ts: 2017-02-18 10:00:00.000000000 +02:00
+  - value: value 02-11 10:00:00
+    ts: 2017-02-11 10:00:00.000000000 +02:00
+  - value: value 01-11 10:00:00
+    ts: 2017-01-11 10:00:00.000000000 +02:00
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+db data:
+  history_str: 
+  - [1487496600, 0, 'value 02-19 11:30:00']
+  history_str (2):
+  - [1487494800, 0, 'value 02-19 11:00:00']
+  - [1487491200, 0, 'value 02-19 10:00:00']
+  history_str (3):
+  - [1487404800, 0, 'value 02-18 10:00:00']
+  history_str (4):
+  - [1486800000, 0, 'value 02-11 10:00:00']
+  history_str (5):
+  - [1484121600, 0, 'value 01-11 10:00:00']
+  - [1484035210, 500000000, 'value 10.5']
+  history_str (6):
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+---
+test case: Test count based request over short period
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 3
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  history_str (2):
+  - [1484035209, 0, 'value 9.0']
+---
+test case: Test time based request
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 5
+    count: 0
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+---
+test case: Test time and count based request with data less than requested number
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 6
+    count: 10
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +02:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +02:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  - [1484035205, 700000000, 'value 5.7']
+---
+test case: Test time and count based request with data matching the requested number
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 6
+    count: 7
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +02:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +02:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  - [1484035205, 700000000, 'value 5.7']
+  history_str (2):
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  - [1484035205, 700000000, 'value 5.7']
+---
+test case: Test time and count based request with data less by one than requested number
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 6
+    count: 6
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +02:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +02:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  history_str (2):
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  - [1484035205, 700000000, 'value 5.7']
+---
+test case: Test time and count based request with data less by one than requested number and different ns ordering
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 6
+    count: 6
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+  - value: value 5.7
+    ts: 2017-01-10 10:00:05.700000000 +02:00
+  - value: value 5.5
+    ts: 2017-01-10 10:00:05.500000000 +02:00
+  - value: value 5.2
+    ts: 2017-01-10 10:00:05.200000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+  - [1484035205, 700000000, 'value 5.7']
+  - [1484035205, 200000000, 'value 5.2']
+  history_str (2):
+  - [1484035205, 200000000, 'value 5.2']
+  - [1484035205, 500000000, 'value 5.5']
+  - [1484035205, 700000000, 'value 5.7']
+---
+test case: Test time and count based request with data less by 3 than requested number
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 6
+    count: 4
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: value 10.5
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: value 10.0
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: value 9.0
+    ts: 2017-01-10 10:00:09.000000000 +02:00
+  - value: value 7.0
+    ts: 2017-01-10 10:00:07.000000000 +02:00
+db data:
+  history_str: 
+  - [1484035210, 0, 'value 10.0']
+  - [1484035210, 500000000, 'value 10.5']
+  - [1484035209, 0, 'value 9.0']
+  - [1484035207, 0, 'value 7.0']
+  history_str (2):
+  - [1484035207, 0, 'value 7.0']
+---
+test case: Test count based request on empty data
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 10
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_str: [] 
+  history_str (2): []
+  history_str (3): []
+  history_str (4): []
+  history_str (5): []
+---
+test case: Test time based request on empty data
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 10
+    count: 0
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_str: [] 
+---
+test case: Test time and count based request on empty data
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 10
+    count: 10
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_str: [] 
+...
+
