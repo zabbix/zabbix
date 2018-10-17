@@ -1132,8 +1132,7 @@ jQuery(function($) {
 	};
 
 	function menuPopupDocumentCloseHandler(event) {
-		event.data.opener.removeAttr('data-expanded');
-		$(event.data.menu[0]).menuPopup('close');
+		$(event.data.menu[0]).menuPopup('close', event.data.opener);
 	}
 
 	function menuPopupKeyDownHandler(event) {
