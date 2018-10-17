@@ -2047,7 +2047,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			return NULL;
 		}
 
-		if (result->values_alloc[i] < (alloc = amount * 4 + 1))
+		if (result->values_alloc[i] < (alloc = amount * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1))
 		{
 			result->values_alloc[i] = alloc;
 			result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
