@@ -263,6 +263,10 @@ jQuery(function($) {
 		return this.each(function() {
 			var obj = $(this);
 
+			options = $.extend({}, {
+				required: (typeof obj.attr('aria-required') !== 'undefined') ? obj.attr('aria-required') : false
+			}, options);
+
 			var ms = {
 				options: options,
 				values: {
@@ -276,6 +280,8 @@ jQuery(function($) {
 					available: {}
 				}
 			};
+
+			obj.removeAttr('aria-required');
 
 			// store the configuration in the elements data
 			obj.data('multiSelect', ms);
@@ -384,7 +390,8 @@ jQuery(function($) {
 				'class': 'input',
 				'type': 'text',
 				'placeholder': options.labels['type here to search'],
-				'aria-label': ($label.length ? $label.text() + '. ' : '') + options.labels['type here to search']
+				'aria-label': ($label.length ? $label.text() + '. ' : '') + options.labels['type here to search'],
+				'aria-required': options.required
 			})
 			.on('keyup change', function(e) {
 
