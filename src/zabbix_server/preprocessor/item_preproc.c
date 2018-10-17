@@ -1000,50 +1000,91 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
  *                                                                            *
- * Parameters: value_type    - [IN] the item value type                       *
+ * Parameters: index         - [IN] the preprocessing step index              *
+ *             value_type    - [IN] the item value type                       *
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op            - [IN] the preprocessing operation to execute    *
  *             history_value - [IN/OUT] last historical data of items with    *
  *                                      delta type preprocessing operation    *
- *             errmsg        - [OUT] error message                            *
+ *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing step finished successfully       *
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_op_t *op, zbx_item_history_value_t *history_value, char **errmsg)
+int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		const zbx_preproc_op_t *op, zbx_item_history_value_t *history_value, char **error)
 {
+	int	ret;
+	char	*errmsg = NULL;
+
 	switch (op->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			return item_preproc_multiplier(value_type, value, op->params, errmsg);
+			ret = item_preproc_multiplier(value_type, value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_RTRIM:
-			return item_preproc_rtrim(value, op->params, errmsg);
+			ret = item_preproc_rtrim(value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_LTRIM:
-			return item_preproc_ltrim(value, op->params, errmsg);
+			ret = item_preproc_ltrim(value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_TRIM:
-			return item_preproc_lrtrim(value, op->params, errmsg);
+			ret = item_preproc_lrtrim(value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_REGSUB:
-			return item_preproc_regsub(value, op->params, errmsg);
+			ret = item_preproc_regsub(value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_BOOL2DEC:
-			return item_preproc_bool2dec(value, errmsg);
+			ret = item_preproc_bool2dec(value, &errmsg);
+			break;
 		case ZBX_PREPROC_OCT2DEC:
-			return item_preproc_oct2dec(value, errmsg);
+			ret = item_preproc_oct2dec(value, &errmsg);
+			break;
 		case ZBX_PREPROC_HEX2DEC:
-			return item_preproc_hex2dec(value, errmsg);
+			ret = item_preproc_hex2dec(value, &errmsg);
+			break;
 		case ZBX_PREPROC_DELTA_VALUE:
-			return item_preproc_delta_value(value_type, value, ts, history_value, errmsg);
+			ret = item_preproc_delta_value(value_type, value, ts, history_value, &errmsg);
+			break;
 		case ZBX_PREPROC_DELTA_SPEED:
-			return item_preproc_delta_speed(value_type, value, ts, history_value, errmsg);
+			ret = item_preproc_delta_speed(value_type, value, ts, history_value, &errmsg);
+			break;
 		case ZBX_PREPROC_XPATH:
-			return item_preproc_xpath(value, op->params, errmsg);
+			ret = item_preproc_xpath(value, op->params, &errmsg);
+			break;
 		case ZBX_PREPROC_JSONPATH:
-			return item_preproc_jsonpath(value, op->params, errmsg);
+			ret = item_preproc_jsonpath(value, op->params, &errmsg);
+			break;
+		default:
+			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");
+			ret = FAIL;
 	}
 
-	*errmsg = zbx_dsprintf(*errmsg, "unknown preprocessing operation");
+	if (SUCCEED == ret)
+		return SUCCEED;
 
-	return FAIL;
+	switch (op->error_handler)
+	{
+		case ZBX_PREPROC_FAIL_DEFAULT:
+			*error = zbx_dsprintf(*error, "Item preprocessing step #%d failed: %s", index, errmsg);
+			break;
+		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
+			zbx_variant_clear(value);
+			ret = SUCCEED;
+			break;
+		case ZBX_PREPROC_FAIL_SET_VALUE:
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, op->error_handler_params));
+			ret = SUCCEED;
+			break;
+		case ZBX_PREPROC_FAIL_SET_ERROR:
+			*error = zbx_strdup(NULL, op->error_handler_params);
+			break;
+	}
+
+	zbx_free(errmsg);
+
+	return ret;
 }

@@ -75,16 +75,8 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			break;
 		}
 
-		if (SUCCEED != zbx_item_preproc(value_type, &value, ts, op, history_value, &error))
-		{
-			char	*errmsg_full;
-
-			errmsg_full = zbx_dsprintf(NULL, "Item preprocessing step #%d failed: %s", i + 1, error);
-			zbx_free(error);
-			error = errmsg_full;
-
+		if (SUCCEED != zbx_item_preproc(i + 1, value_type, &value, ts, op, history_value, &error))
 			break;
-		}
 
 		if (ZBX_VARIANT_NONE == value.type)
 			break;

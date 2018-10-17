@@ -1468,6 +1468,11 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_XPATH		11
 #define ZBX_PREPROC_JSONPATH		12
 
+#define ZBX_PREPROC_FAIL_DEFAULT	0
+#define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
+#define ZBX_PREPROC_FAIL_SET_VALUE	2
+#define ZBX_PREPROC_FAIL_SET_ERROR	3
+
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
 #define ZBX_HTTPFIELD_POST_FIELD	2

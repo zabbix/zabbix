@@ -522,7 +522,9 @@ zbx_counter_type_t;
 typedef struct
 {
 	unsigned char	type;
+	unsigned char	error_handler;
 	char		*params;
+	char		*error_handler_params;
 }
 zbx_preproc_op_t;
 

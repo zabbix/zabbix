@@ -201,7 +201,7 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 	zbx_ipc_message_t	message;
 
 	/* 14 is a max field count (without preprocessing step fields) */
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (14 + steps_num * 2) * sizeof(zbx_packed_field_t));
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (14 + steps_num * 4) * sizeof(zbx_packed_field_t));
 
 	offset = fields;
 	ts_marker = (NULL != ts);
@@ -267,6 +267,8 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 	{
 		*offset++ = PACKED_FIELD(&steps[i].type, sizeof(char));
 		*offset++ = PACKED_FIELD(steps[i].params, 0);
+		*offset++ = PACKED_FIELD(&steps[i].error_handler, sizeof(char));
+		*offset++ = PACKED_FIELD(steps[i].error_handler_params, 0);
 	}
 
 	zbx_ipc_message_init(&message);
@@ -519,6 +521,8 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 		{
 			offset += zbx_deserialize_char(offset, &(*steps)[i].type);
 			offset += zbx_deserialize_str_ptr(offset, (*steps)[i].params, value_len);
+			offset += zbx_deserialize_char(offset, &(*steps)[i].error_handler);
+			offset += zbx_deserialize_str_ptr(offset, (*steps)[i].error_handler_params, value_len);
 		}
 	}
 	else

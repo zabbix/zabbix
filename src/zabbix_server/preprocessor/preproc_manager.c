@@ -108,7 +108,10 @@ static void	preproc_item_clear(zbx_preproc_item_t *item)
 	zbx_free(item->dep_itemids);
 
 	for (i = 0; i < item->preproc_ops_num; i++)
+	{
 		zbx_free(item->preproc_ops[i].params);
+		zbx_free(item->preproc_ops[i].error_handler_params);
+	}
 
 	zbx_free(item->preproc_ops);
 }
@@ -116,7 +119,10 @@ static void	preproc_item_clear(zbx_preproc_item_t *item)
 static void	request_free_steps(zbx_preprocessing_request_t *request)
 {
 	while (0 < request->steps_num--)
+	{
 		zbx_free(request->steps[request->steps_num].params);
+		zbx_free(request->steps[request->steps_num].error_handler_params);
+	}
 
 	zbx_free(request->steps);
 }
@@ -292,8 +298,8 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 		THIS_SHOULD_NEVER_HAPPEN;
 
 	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
-			(zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, &request->value.itemid), request->steps,
-			request->steps_num);
+			(zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, &request->value.itemid),
+			request->steps, request->steps_num);
 
 	return size;
 }
@@ -556,7 +562,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	zbx_preprocessing_states_t	state;
 	unsigned char			priority = ZBX_PREPROC_PRIORITY_NONE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: %" PRIu64, __function_name, value->itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: %" ZBX_FS_UI64, __function_name, value->itemid);
 
 	item_local.itemid = value->itemid;
 	item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local);
@@ -598,6 +604,9 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		{
 			request->steps[i].type = item->preproc_ops[i].type;
 			request->steps[i].params = zbx_strdup(NULL, item->preproc_ops[i].params);
+			request->steps[i].error_handler = item->preproc_ops[i].error_handler;
+			request->steps[i].error_handler_params = zbx_strdup(NULL,
+					item->preproc_ops[i].error_handler_params);
 		}
 
 		manager->preproc_num++;

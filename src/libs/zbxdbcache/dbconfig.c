@@ -4329,6 +4329,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
 		op->step = atoi(row[4]);
+		op->error_handler = atoi(row[6]);
+		DCstrpool_replace(found, &op->error_handler_params, row[7]);
 
 		if (0 == found)
 		{
@@ -4362,6 +4364,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 					zbx_vector_ptr_append(&items, preprocitem);
 			}
 		}
+
+		zbx_strpool_release(op->params);
+		zbx_strpool_release(op->error_handler_params);
 
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
@@ -6678,6 +6683,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			op = &item->preproc_ops[i];
 			op->type = dc_op->type;
 			op->params = zbx_strdup(NULL, dc_op->params);
+			op->error_handler = dc_op->error_handler;
+			op->error_handler_params = zbx_strdup(NULL, dc_op->error_handler_params);
 		}
 	}
 

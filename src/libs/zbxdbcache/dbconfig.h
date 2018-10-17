@@ -628,8 +628,10 @@ typedef struct
 	zbx_uint64_t	item_preprocid;
 	zbx_uint64_t	itemid;
 	int		step;
+	int		error_handler;
 	unsigned char	type;
 	const char	*params;
+	const char	*error_handler_params;
 }
 zbx_dc_preproc_op_t;
 
