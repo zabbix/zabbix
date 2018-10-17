@@ -5530,6 +5530,8 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	else
 		return FAIL;
 #elif defined(HAVE_OPENSSL)
+	ZBX_UNUSED(s);
+
 	/* SSL_get_psk_identity() is not used here. It works with TLS 1.2, */
 	/* but returns NULL with TLS 1.3 in OpenSSL 1.1.1 */
 	if ('\0' != incoming_connection_psk_id[0])
