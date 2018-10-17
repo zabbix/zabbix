@@ -206,7 +206,7 @@ class testPageDashboard extends CWebTest {
 
 	public function testPageDashboard_KioskModeUrlParameter() {
 		// Set layout mode to kiosk view.
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
@@ -216,7 +216,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		//  Set layout mode to full screen.
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1');
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1', false);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
 		$this->zbxTestCheckHeader('Global view');
