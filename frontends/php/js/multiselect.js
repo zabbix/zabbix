@@ -165,10 +165,9 @@ jQuery(function($) {
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button > button', $wrapper).attr('disabled', 'disabled');
 					$('input[type=text]', $wrapper).remove();
+					cleanAvailable($obj, ms.values);
 					$('.available', $wrapper).remove();
 
-					cleanAvailable($obj, ms.values);
-					cleanLastSearch($obj);
 					ms.options.disabled = true;
 				}
 			});
@@ -189,12 +188,13 @@ jQuery(function($) {
 					var $input = makeMultiSelectInput($obj);
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
-					if ($obj.attr('aria-required')) {
-						$input.attr('aria-required', $obj.attr('aria-required'));
-						$obj.removeAttr('aria-required');
-					}
 					$obj.append($input);
 					makeSuggsetionsBlock($obj);
+
+					// set readonly
+					if (ms.options.selectedLimit != 0 && $('.selected li', $obj).length >= ms.options.selectedLimit) {
+						setSearchFieldVisibility(false, $obj, ms.options);
+					}
 
 					ms.values.isAvailableOpened = true;
 					ms.options.disabled = false;
@@ -308,12 +308,7 @@ jQuery(function($) {
 				selected_ul.addClass('disabled');
 			}
 			else {
-				var $input = makeMultiSelectInput(obj);
-				if (obj.attr('aria-required')) {
-					$input.attr('aria-required', obj.attr('aria-required'));
-					obj.removeAttr('aria-required');
-				}
-				obj.append($input);
+				obj.append(makeMultiSelectInput(obj));
 			}
 
 			// available
