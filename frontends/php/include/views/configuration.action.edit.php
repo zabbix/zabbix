@@ -135,7 +135,7 @@ foreach ($data['allowedConditions'] as $key => $condition) {
 		'type' => $condition
 	];
 }
-order_result($data['allowedConditions'], 'name');
+
 foreach ($data['allowedConditions'] as $condition) {
 	$conditionTypeComboBox->addItem($condition['type'], $condition['name']);
 }
