@@ -470,7 +470,8 @@ class CControllerPopupTriggerExpr extends CController {
 					$params = $function_macro_token['data']['functionParams'];
 					$param_number = in_array($function, ['regexp', 'iregexp', 'str']) ? 1 : 0;
 					if (array_key_exists($param_number, $params) && is_string($params[$param_number])
-							&& $params[$param_number] !== '' && $params[$param_number][0] === '#') {
+							&& $params[$param_number] !== '' && $params[$param_number][0] === '#'
+							&& !in_array($function, ['fuzzytime', 'nodata'])) {
 						$param_type = PARAM_TYPE_COUNTS;
 						$params[$param_number] = substr($params[$param_number], 1);
 					}
