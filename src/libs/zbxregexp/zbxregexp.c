@@ -46,7 +46,9 @@ zbx_regmatch_t;
  *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
  *                      PCRE_CASELESS, PCRE_NO_AUTO_CAPTURE, PCRE_MULTILINE.  *
  *     regexp    - [OUT] output regexp.                                       *
- *     error     - [OUT] error message if any.                                *
+ *     error     - [OUT] error message if any. Note that rather than          *
+ *                      allocating new error string it returns reference to   *
+ *                      to static buffer and must not be freed by caller.     *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *

@@ -387,7 +387,9 @@ tests/libs/zbxalgo/.deps
 tests/libs/zbxalgo/Makefile
 tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
+tests/libs/zbxcommon/..........[!!-~][ZBXNEXT-4724]
 tests/libs/zbxcommon/.deps
+tests/libs/zbxcommon/ADFGIJLPST
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
@@ -398,6 +400,7 @@ tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_token_find
+tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in

@@ -996,6 +996,166 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_validate_range                                      *
+ *                                                                            *
+ * Purpose: validates value to be within the specified range                  *
+ * Parameters: value_type - [IN] the item type                                *
+ *             value      - [IN/OUT] the value to process                     *
+ *             params     - [IN] the operation parameters                     *
+ *             errmsg     - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step finished successfully       *
+ *               FAIL - otherwise, errmsg contains the error message          *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_validate_range(unsigned char value_type, zbx_variant_t *value, const char *params,
+		char **errmsg)
+{
+	zbx_variant_t	value_num;
+	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
+	zbx_variant_t	range_min, range_max;
+	int		ret = FAIL;
+
+	if (FAIL == zbx_item_preproc_convert_value_to_numeric(&value_num, value, value_type, errmsg))
+		return FAIL;
+
+	zbx_variant_set_none(&range_min);
+	zbx_variant_set_none(&range_max);
+
+	zbx_strlcpy(min, params, sizeof(min));
+	if (NULL == (max = strchr(min, '\n')))
+	{
+		*errmsg = zbx_strdup(*errmsg, "validation range is not specified");
+		goto out;
+	}
+
+	*max++ = '\0';
+
+	if ('\0' != *min && FAIL == zbx_variant_set_numeric(&range_min, min))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "validation range minimum value is invalid: %s", min);
+		goto out;
+	}
+
+	if ('\0' != *max && FAIL == zbx_variant_set_numeric(&range_max, max))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "validation range maximum value is invalid: %s", max);
+		goto out;
+	}
+
+	if (ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "value must be less or equal to %s",
+				zbx_variant_value_desc(&range_min));
+		goto out;
+	}
+
+	if (ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "value must be greater or equal to %s",
+				zbx_variant_value_desc(&range_min));
+		goto out;
+	}
+	ret = SUCCEED;
+out:
+	zbx_variant_clear(&value_num);
+	zbx_variant_clear(&range_min);
+	zbx_variant_clear(&range_max);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_validate_regex                                      *
+ *                                                                            *
+ * Purpose: validates value to match regular expression                       *
+ * Parameters: value_type - [IN] the item type                                *
+ *             value      - [IN/OUT] the value to process                     *
+ *             params     - [IN] the operation parameters                     *
+ *             errmsg     - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step finished successfully       *
+ *               FAIL - otherwise, errmsg contains the error message          *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_validate_regex(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	zbx_variant_t	value_str;
+	int		ret = FAIL;
+	zbx_regexp_t	*regex;
+	const char	*errptr = NULL;
+
+	zbx_variant_set_variant(&value_str, value);
+
+	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot convert value to string");
+		goto out;
+	}
+
+	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression pattern: %s", errptr);
+		goto out;
+	}
+
+	if (0 != zbx_regexp_match_precompiled(value_str.data.str, regex))
+		*errmsg = zbx_strdup(*errmsg, "value must match the specified regular expression");
+	else
+		ret = SUCCEED;
+
+	zbx_regexp_free(regex);
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_validate_not_regex                                  *
+ *                                                                            *
+ * Purpose: validates value to not match regular expression                   *
+ * Parameters: value_type - [IN] the item type                                *
+ *             value      - [IN/OUT] the value to process                     *
+ *             params     - [IN] the operation parameters                     *
+ *             errmsg     - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step finished successfully       *
+ *               FAIL - otherwise, errmsg contains the error message          *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_validate_not_regex(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	zbx_variant_t	value_str;
+	int		ret = FAIL;
+	zbx_regexp_t	*regex;
+	const char	*errptr = NULL;
+
+	zbx_variant_set_variant(&value_str, value);
+
+	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot convert value to string");
+		goto out;
+	}
+
+	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression pattern: %s", errptr);
+		goto out;
+	}
+
+	if (0 == zbx_regexp_match_precompiled(value_str.data.str, regex))
+		*errmsg = zbx_strdup(*errmsg, "value must not match the specified regular expression");
+	else
+		ret = SUCCEED;
+
+	zbx_regexp_free(regex);
+out:
+	return ret;}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -1056,6 +1216,15 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 			break;
 		case ZBX_PREPROC_JSONPATH:
 			ret = item_preproc_jsonpath(value, op->params, &errmsg);
+			break;
+		case ZBX_PREPROC_VALIDATE_RANGE:
+			ret = item_preproc_validate_range(value_type, value, op->params, &errmsg);
+			break;
+		case ZBX_PREPROC_VALIDATE_REGEX:
+			ret = item_preproc_validate_regex(value, op->params, &errmsg);
+			break;
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			ret = item_preproc_validate_not_regex(value, op->params, &errmsg);
 			break;
 		default:
 			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");
