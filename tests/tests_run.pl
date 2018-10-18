@@ -93,8 +93,12 @@ sub launch($$$)
 }
 
 my $xml;
+my $target_suite;
 
-die("Bad command-line arguments") unless(GetOptions(('xml:s' => \$xml)));
+die("Bad command-line arguments") unless(GetOptions((
+		'xml:s' => \$xml,
+		'suite=s' => \$target_suite
+		)));
 
 my $iter = path(".")->iterator({
 	'recurse'		=> 1,
@@ -107,6 +111,7 @@ while (my $path = $iter->())
 {
 	next unless ($path->is_file());
 	next unless ($path->basename =~ qr/^(.+)\.yaml$/);
+	next unless (not defined $target_suite or $1 eq $target_suite);
 
 	my $test_suite = {
 		'name'		=> $1,

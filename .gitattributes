@@ -353,6 +353,7 @@ src/zabbix_server/taskmanager/taskmanager.h -text
 tests/libs/zbxcommon/calculate_item_nextcheck.yaml -text
 tests/libs/zbxcommon/replace_key_params_dyn.yaml -text
 tests/libs/zbxcommon/zbx_token_find.yaml -text
+tests/libs/zbxcommon/zbx_variant_compare.yaml -text
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext.yaml -text
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext_zlib.yaml -text
 tests/libs/zbxdbcache/dc_maintenance_match_tags.yaml -text
