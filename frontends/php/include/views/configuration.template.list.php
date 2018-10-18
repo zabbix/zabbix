@@ -28,7 +28,8 @@ $filter->setProfile($data['profileIdx'])
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 		),
-		(new CFormList())->addRow(_('Linked templates'),
+		(new CFormList())->addRow(
+			(new CLabel(_('Linked templates'), 'filter_templates__ms')),
 			(new CMultiSelect([
 				'name' => 'filter_templates[]',
 				'object_name' => 'templates',

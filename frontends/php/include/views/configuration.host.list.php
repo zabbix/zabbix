@@ -61,7 +61,8 @@ $filter
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			)
-			->addRow(_('Templates'),
+			->addRow(
+				(new CLabel(_('Templates'), 'filter_templates__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_templates[]',
 					'object_name' => 'templates',
