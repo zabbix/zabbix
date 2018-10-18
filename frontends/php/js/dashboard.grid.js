@@ -200,37 +200,64 @@
 		return ret;
 	}
 
+	/**
+	 * Check is there collision between two position objects.
+	 *
+	 * @param {object} pos1   Object with position and dimension.
+	 * @param {object} pos2   Object with position and dimension.
+	 * @returns {boolean}
+	 */
 	function rectOverlap(pos1, pos2) {
-		return ((pos1['x'] >= pos2['x'] && pos2['x'] + pos2['width'] - 1 >= pos1['x'])
-			|| (pos2['x'] >= pos1['x'] && pos1['x'] + pos1['width'] - 1 >= pos2['x'])) &&
-			((pos1['y'] >= pos2['y'] && pos2['y'] + pos2['height'] - 1 >= pos1['y'])
-			|| (pos2['y'] >= pos1['y'] && pos1['y'] + pos1['height'] - 1 >= pos2['y']));
+		return pos1.x < (pos2.x + pos2.width) &&
+			(pos1.x + pos1.width) > pos2.x &&
+			pos1.y < (pos2.y + pos2.height) &&
+			(pos1.y + pos1.height) > pos2.y;
 	}
 
-	function realignWidget($obj, data, widget) {
-		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
-			overlapped_widgets = [];
+	/**
+	 * Rearrange widgets on drag or resize operation.
+	 *
+	 * @param {array}  data    Array of widgets objects.
+	 * @param {object} widget  Moved widget object.
+	 */
+	function realignWidget(data, widget) {
+		var realignDrag = function (widget) {
+			var pos = widget.current_pos,
+				to_row = pos.y + pos.height;
 
-		$.each(data['widgets'], function() {
-			if (widget != this && rectOverlap(widget['current_pos'], this['current_pos'])) {
-				overlapped_widgets.push(this);
-			}
-		});
+			$.map(data.widgets, function (box) {
+				return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
+					? box : null
+			})
+			.sort(function (box1, box2) {
+				return box2.current_pos.y - box1.current_pos.y;
+			})
+			.each(function (box) {
+				if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0) {
+					var free;
+					box.current_pos.y = pos.y - box.current_pos.height;
 
-		overlapped_widgets.sort(function (widget1, widget2) {
-			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
-		});
+					$.each(data.widgets, function() {
+						free = !(box.uniqueid != this.uniqueid && rectOverlap(box.current_pos, this.current_pos));
+						return free;
+					});
 
-		for (var i = 0; i < overlapped_widgets.length; i++) {
-			overlapped_widgets[i]['current_pos']['y'] = to_row;
+					if (free) {
+						return true;
+					}
+				}
+				box.current_pos.y = to_row;
 
-			realignWidget($obj, data, overlapped_widgets[i]);
+				realignDrag(box);
+			});
 		}
+
+		realignDrag(widget);
 	}
 
 	function checkWidgetOverlap($obj, data, widget) {
 		resetCurrentPositions(data['widgets']);
-		realignWidget($obj, data, widget);
+		realignWidget(data, widget);
 
 		$.each(data['widgets'], function() {
 			if (!posEquals(this['pos'], this['current_pos'])) {
@@ -252,7 +279,7 @@
 			resetCurrentPositions(data['widgets']);
 			widget['current_pos'] = pos;
 
-			realignWidget($obj, data, widget);
+			realignWidget(data, widget);
 
 			$.each(data['widgets'], function() {
 				if (widget != this) {
