@@ -187,7 +187,23 @@ class testTaskCreate extends CZabbixTest {
 					'itemids' => ['23279']
 				],
 				'expected_error' => null
-			]
+			],
+			// Item (ID: 110001): Zabbix agent (active)
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110001', '110002']
+				],
+				'expected_error' => 'Cannot send request: wrong item type.'
+			],
+			// Item (ID: 110002): Zabbix agent (passive)
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110002']
+				],
+				'expected_error' => null
+			],
 		];
 	}
 
