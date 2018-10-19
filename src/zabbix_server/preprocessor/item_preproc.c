@@ -918,7 +918,6 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 				for (i = 0; i < nodeset->nodeNr; i++)
 					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 			}
-
 			zbx_variant_clear(value);
 			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
 
@@ -950,10 +949,10 @@ static int	item_preproc_xpath_op(zbx_variant_t *value, const char *params, char 
 				ret = SUCCEED;
 			}
 			else
-				*errmsg = zbx_dsprintf(*errmsg, "Invalid numeric value");
+				*errmsg = zbx_strdup(*errmsg, "Invalid numeric value");
 			break;
 		default:
-			*errmsg = zbx_dsprintf(*errmsg, "Unknown result");
+			*errmsg = zbx_strdup(*errmsg, "Unknown result");
 			break;
 	}
 out:
@@ -1107,6 +1106,8 @@ static int	item_preproc_validate_regex(zbx_variant_t *value, const char *params,
 
 	zbx_regexp_free(regex);
 out:
+	zbx_variant_clear(&value_str);
+
 	return ret;
 }
 
@@ -1152,7 +1153,212 @@ static int	item_preproc_validate_not_regex(zbx_variant_t *value, const char *par
 
 	zbx_regexp_free(regex);
 out:
-	return ret;}
+	zbx_variant_clear(&value_str);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_get_error_from_json                                 *
+ *                                                                            *
+ * Purpose: checks for presence of error field in json data                   *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message part                              *
+ *             error  - [OUT] direct error message                            *
+ *                                                                            *
+ * Return value: FAIL - the specified error field exists                      *
+ *               SUCCEED - otherwise                                          *
+ *                                                                            *
+ * Comments: This preprocessing step is used to check if the returned data    *
+ *           contains explicit (API related) error message and sets it as     *
+ *           error.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_get_error_from_json(zbx_variant_t *value, const char *params, char **errmsg, char **error)
+{
+	zbx_variant_t		value_str;
+	char			err[MAX_STRING_LEN];
+	int			ret = SUCCEED;
+	struct zbx_json_parse	jp, jp_out;
+	size_t			data_alloc = 0;
+
+	if (FAIL == zbx_json_path_check(params, err, sizeof(err)))
+	{
+		*errmsg = zbx_strdup(*errmsg, err);
+		return FAIL;
+	}
+
+	zbx_variant_set_variant(&value_str, value);
+
+	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+		goto out;
+
+	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+		goto out;
+
+	zbx_free(*error);
+	zbx_json_value_dyn(&jp_out, error, &data_alloc);
+	ret = FAIL;
+out:
+	zbx_variant_clear(&value_str);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_get_error_from_xml                                  *
+ *                                                                            *
+ * Purpose: checks for presence of error field in XML data                    *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: FAIL - the specified error field exists                      *
+ *               SUCCEED - otherwise                                          *
+ *                                                                            *
+ * Comments: This preprocessing step is used to check if the returned data    *
+ *           contains explicit (API related) error message and sets it as     *
+ *           error.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_get_error_from_xml(zbx_variant_t *value, const char *params, char **errmsg, char **error)
+{
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(value);
+	ZBX_UNUSED(params);
+	*error = zbx_dsprintf(*error, "Zabbix was compiled without libxml2 support");
+	return FAIL;
+#else
+	zbx_variant_t		value_str;
+	int			ret = SUCCEED, i;
+	xmlDoc			*doc = NULL;
+	xmlXPathContext		*xpathCtx = NULL;
+	xmlXPathObject		*xpathObj = NULL;
+	xmlErrorPtr		pErr;
+	xmlBufferPtr		xmlBufferLocal;
+
+	zbx_variant_set_variant(&value_str, value);
+
+	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+		goto out;
+
+	if (NULL == (doc = xmlReadMemory(value_str.data.str, strlen(value_str.data.str), "noname.xml", NULL, 0)))
+		goto out;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
+	{
+		pErr = xmlGetLastError();
+		*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
+		ret = FAIL;
+		goto out;
+	}
+
+	switch (xpathObj->type)
+	{
+		case XPATH_NODESET:
+			if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+				goto out;
+
+			xmlBufferLocal = xmlBufferCreate();
+
+			for (i = 0; i < xpathObj->nodesetval->nodeNr; i++)
+				xmlNodeDump(xmlBufferLocal, doc, xpathObj->nodesetval->nodeTab[i], 0, 0);
+
+			*error = zbx_strdup(*error, (const char *)xmlBufferLocal->content);
+			xmlBufferFree(xmlBufferLocal);
+			break;
+		case XPATH_STRING:
+			*error = zbx_strdup(*error, (const char *)xpathObj->stringval);
+			break;
+		case XPATH_BOOLEAN:
+			*error = zbx_dsprintf(*error, "%d", xpathObj->boolval);
+			break;
+		case XPATH_NUMBER:
+			*error = zbx_dsprintf(*error, ZBX_FS_DBL, xpathObj->floatval);
+			break;
+		default:
+			*error = zbx_strdup(*error, "Unknown error");
+			break;
+	}
+
+	ret = FAIL;
+out:
+	zbx_variant_clear(&value_str);
+
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	if (NULL != xpathCtx)
+		xmlXPathFreeContext(xpathCtx);
+
+	if (NULL != doc)
+		xmlFreeDoc(doc);
+
+	return ret;
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_get_error_from_regex                                *
+ *                                                                            *
+ * Purpose: checks for presence of error pattern matching regular expression  *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message part                              *
+ *             error  - [OUT] direct error message                            *
+ *                                                                            *
+ * Return value: FAIL - the specified error field exists                      *
+ *               SUCCEED - otherwise                                          *
+ *                                                                            *
+ * Comments: This preprocessing step is used to check if the returned data    *
+ *           contains explicit (API related) error message and sets it as     *
+ *           error.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_get_error_from_regex(zbx_variant_t *value, const char *params, char **errmsg, char **error)
+{
+	zbx_variant_t	value_str;
+	int		ret = SUCCEED;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+
+	zbx_variant_set_variant(&value_str, value);
+
+	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+		goto out;
+
+	zbx_strlcpy(pattern, params, sizeof(pattern));
+	if (NULL == (output = strchr(pattern, '\n')))
+	{
+		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+		ret = FAIL;
+		goto out;
+	}
+
+	*output++ = '\0';
+
+	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, error))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL != *error)
+		ret = FAIL;
+out:
+	zbx_variant_clear(&value_str);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1176,7 +1382,7 @@ out:
 int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_preproc_op_t *op, zbx_item_history_value_t *history_value, char **error)
 {
-	int	ret;
+	int	ret, error_handler = op->error_handler;
 	char	*errmsg = NULL;
 
 	switch (op->type)
@@ -1226,6 +1432,15 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 			ret = item_preproc_validate_not_regex(value, op->params, &errmsg);
 			break;
+		case ZBX_PREPROC_ERROR_FIELD_JSON:
+			ret = item_preproc_get_error_from_json(value, op->params, &errmsg, error);
+			break;
+		case ZBX_PREPROC_ERROR_FIELD_XML:
+			ret = item_preproc_get_error_from_xml(value, op->params, &errmsg, error);
+			break;
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			ret = item_preproc_get_error_from_regex(value, op->params, &errmsg, error);
+			break;
 		default:
 			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");
 			ret = FAIL;
@@ -1234,10 +1449,12 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 	if (SUCCEED == ret)
 		return SUCCEED;
 
-	switch (op->error_handler)
+	switch (error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DEFAULT:
-			*error = zbx_dsprintf(*error, "Item preprocessing step #%d failed: %s", index, errmsg);
+			/* if errmsg is NULL then error was set directly by preprocessing step */
+			if (NULL != errmsg)
+				*error = zbx_dsprintf(*error, "Item preprocessing step #%d failed: %s", index, errmsg);
 			break;
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
 			zbx_variant_clear(value);
@@ -1249,7 +1466,7 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 			ret = SUCCEED;
 			break;
 		case ZBX_PREPROC_FAIL_SET_ERROR:
-			*error = zbx_strdup(NULL, op->error_handler_params);
+			*error = zbx_strdup(*error, op->error_handler_params);
 			break;
 	}
 

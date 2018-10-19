@@ -1127,6 +1127,154 @@ in:
 out:
   return: FAIL
   error: custom error
+---
+test case: jsonerror(x, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: x
+---
+test case: jsonerror({"error":"error message"}, $error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"error":"error message"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $error
+out:
+  return: FAIL
+---
+test case: jsonerror({"data":"123"}, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"data":"123"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: |-
+    {"data":"123"}
+---
+test case: jsonerror({"error":"error message"}, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"error":"error message"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: FAIL
+  error: error message
+---
+test case: xmlerror(x, //error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error
+out:
+  return: SUCCEED
+  value: x
+---
+test case: xmlerror(<a><error>custom error</error></a>, "//text(")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><error>custom error</error></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //text(
+out:
+  return: FAIL
+---
+test case: xmlerror(<a><error>custom error</error></a>, "//error/text()")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><error>custom error</error></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error/text()
+out:
+  return: FAIL
+  error: custom error
+---
+test case: xmlerror(<a><value>1</value></a>, "//error/text()")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><value>1</value></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error/text()
+out:
+  return: SUCCEED
+  value: <a><value>1</value></a>
+---
+test case: regexerror("error:123, "error:([0-9+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: error:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: ([0-9+)
+out:
+  return: FAIL
+---
+test case: regexerror("error:123, "error:([0-9]+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: error:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: |- 
+      error:([0-9]+)
+      \1
+out:
+  return: FAIL
+  error: 123
+---
+test case: regexerror("value:123, "error:([0-9]+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: value:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: |- 
+      error:([0-9]+)
+      \1
+out:
+  return: SUCCEED
+  value: value:123
 ...
 
 

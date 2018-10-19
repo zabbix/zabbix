@@ -562,7 +562,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	zbx_preprocessing_states_t	state;
 	unsigned char			priority = ZBX_PREPROC_PRIORITY_NONE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: %" ZBX_FS_UI64, __function_name, value->itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __function_name, value->itemid);
 
 	item_local.itemid = value->itemid;
 	item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local);
@@ -672,7 +672,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 	zbx_preproc_item_t		*item, item_local;
 	zbx_preproc_item_value_t	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: %" PRIu64, __function_name, source_value->itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __function_name, source_value->itemid);
 
 	if (NULL != source_value->result && ISSET_VALUE(source_value->result))
 	{
