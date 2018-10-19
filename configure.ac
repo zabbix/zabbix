@@ -1729,6 +1729,8 @@ if test -d tests; then
 	tests/libs/zbxsysinfo/common/Makefile
 	tests/libs/zbxcommshigh/Makefile
 	tests/libs/zbxalgo/Makefile
+	tests/zabbix_server/Makefile
+	tests/zabbix_server/preprocessor/Makefile
 	)
 	AC_DEFINE([HAVE_TESTS], [1], ["Define to 1 if tests directory is present"])
 fi
