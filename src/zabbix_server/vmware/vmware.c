@@ -599,6 +599,9 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 	int			i;
 	zbx_vmware_counter_t	*csrc, *cdst;
 
+	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
+		return;
+
 	for (i = 0; i < src->values_num; i++)
 	{
 		csrc = (zbx_vmware_counter_t *)src->values[i];
