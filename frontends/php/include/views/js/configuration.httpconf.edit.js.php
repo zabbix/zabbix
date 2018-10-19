@@ -132,7 +132,7 @@
 
 		return {
 			/**
-			 * Add pair when form is beeing created.
+			 * Add pair when form is being created.
 			 *
 			 * @param {string}	formid	Id of current form HTML form element.
 			 * @param {object}	pairs	Object with pair objects.

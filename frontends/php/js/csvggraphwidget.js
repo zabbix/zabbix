@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2018 Zabbix SIA
@@ -19,16 +18,22 @@
 **/
 
 
-class CSvgPolyline extends CSvgTag {
+/**
+ * Call SVG graph widget internal processes.
+ *
+ * @param {string} hook_name - trigger name.
+ */
+function zbx_svggraph_widget_trigger(hook_name) {
+	var grid = Array.prototype.slice.call(arguments, -1),
+		grid = grid.length ? grid[0] : null;
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
+	switch (hook_name) {
+		case 'onResizeEnd':
+			jQuery('.dashbrd-grid-widget-container').dashboardGrid('refreshWidget', grid.widget['uniqueid']);
+			break;
 
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
-		}
-
-		$this->setAttribute('points', trim($p));
+		case 'onEditStart':
+			jQuery('svg', grid.widget['content_body']).svggraph('disableSBox');
+			break;
 	}
 }

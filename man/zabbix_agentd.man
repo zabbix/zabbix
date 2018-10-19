@@ -1,4 +1,4 @@
-.TH ZABBIX_AGENTD 8 "2016\-01\-13" Zabbix
+.TH ZABBIX_AGENTD 8 "2018\-10\-11" Zabbix
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon
 .SH SYNOPSIS
@@ -55,11 +55,6 @@ Decrease log level, affects all processes if target is not specified
 Log level control targets
 .RS 4
 .TP 4
-.I pid
-Process identifier
-.RE
-.RS 4
-.TP 4
 .I process\-type
 All processes of specified type (e.g., listener)
 .RE
@@ -67,6 +62,11 @@ All processes of specified type (e.g., listener)
 .TP 4
 .I process\-type,N
 Process type and number (e.g., listener,3)
+.RE
+.RS 4
+.TP 4
+.I pid
+Process identifier, up to 65535. For larger values specify target as "process\-type,N"
 .RE
 .RE
 .IP "\fB\-p\fR, \fB\-\-print\fR"

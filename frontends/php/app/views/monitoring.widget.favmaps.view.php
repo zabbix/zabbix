@@ -36,10 +36,7 @@ foreach ($data['maps'] as $map) {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([
-		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-	]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -304,7 +304,7 @@ class testMaintenance extends CZabbixTest {
 				] + $def_options,
 				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
 			],
-			// Fail. Possible values for "operator" are 0 (Equal) and 2 (Like).
+			// Fail. Possible values for "operator" are 0 (Equals) and 2 (Contains).
 			[
 				'request_data' => [
 					'name' => 'M'.++$n,

@@ -64,7 +64,7 @@ void	__zbx_mem_free(const char *file, int line, zbx_mem_info_t *info, void *ptr)
 
 void	zbx_mem_clear(zbx_mem_info_t *info);
 
-void	zbx_mem_dump_stats(zbx_mem_info_t *info);
+void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info);
 
 size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param);
 

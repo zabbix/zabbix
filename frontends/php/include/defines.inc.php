@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.0beta2');
-define('ZABBIX_API_VERSION',	'4.0.0');
+define('ZABBIX_VERSION',		'4.2.0alpha1');
+define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
-define('ZABBIX_DB_VERSION',		3050155);
+define('ZABBIX_DB_VERSION',		4000000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -36,6 +36,8 @@ define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63158400); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400) + 86400
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
+define('ZBX_MIN_INT64',			'-9223372036854775808');
+define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
@@ -959,7 +961,7 @@ define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 
 define('SVG_GRAPH_MISSING_DATA_NONE',			 0);
 define('SVG_GRAPH_MISSING_DATA_CONNECTED',		 1);
-define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERRO', 2);
+define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	 2);
 
 define('SVG_GRAPH_DATA_SOURCE_AUTO',	0);
 define('SVG_GRAPH_DATA_SOURCE_HISTORY',	1);
@@ -972,14 +974,12 @@ define('SVG_GRAPH_LEGEND_TYPE_SHORT', 1);
 
 define('SVG_GRAPH_LEGEND_LINES_MIN', 1);
 define('SVG_GRAPH_LEGEND_LINES_MAX', 5);
-define('SVG_GRAPH_LEGEND_LINES_DEFAULT', 1);
 
 define('SVG_GRAPH_PROBLEMS_SHOW', 1);
 
 define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
-define('SVG_GRAPH_AXIS_Y_SHOW', 1);
-define('SVG_GRAPH_AXIS_X_SHOW', 1);
+define('SVG_GRAPH_AXIS_SHOW', 1);
 
 define('SVG_GRAPH_AXIS_UNITS_AUTO', 0);
 define('SVG_GRAPH_AXIS_UNITS_STATIC', 1);
@@ -1122,7 +1122,7 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 			\s*? #matches spaces
 		)
 	\] # match closing bracket
-))*? # matches non comma seperated brackets with parameters zero or more times
+))*? # matches non comma separated brackets with parameters zero or more times
 )');
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
@@ -1208,6 +1208,8 @@ define('API_TIME_UNIT',			19);
 define('API_URL',				20);
 define('API_H_NAME',			21);
 define('API_RANGE_TIME',		22);
+define('API_COLOR',				23);
+define('API_NUMERIC',			24);
 
 // flags
 define('API_REQUIRED',				0x0001);
@@ -1424,7 +1426,6 @@ define('ZBX_STYLE_BTN_ACTION', 'btn-action');
 define('ZBX_STYLE_BTN_DASHBRD_CONF', 'btn-dashbrd-conf');
 define('ZBX_STYLE_BTN_DASHBRD_NORMAL', 'btn-dashbrd-normal');
 define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
-define('ZBX_STYLE_BTN_GEAR', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
@@ -1432,7 +1433,6 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
-define('ZBX_STYLE_BTN_TRASH', 'btn-widget-delete');
 define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
 define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
@@ -1440,6 +1440,8 @@ define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
 define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
+define('ZBX_STYLE_BTN_WIDGET_DELETE', 'btn-widget-delete');
+define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
@@ -1551,6 +1553,7 @@ define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LIST_TABLE_FOOTER', 'list-table-footer');
 define('ZBX_STYLE_LIST_VERTICAL_ACCORDION', 'list-vertical-accordion');
 define('ZBX_STYLE_LIST_ACCORDION_FOOT', 'list-accordion-foot');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM', 'list-accordion-item');
@@ -1593,6 +1596,7 @@ define('ZBX_STYLE_PROGRESS_BAR_BG', 'progress-bar-bg');
 define('ZBX_STYLE_PROGRESS_BAR_CONTAINER', 'progress-bar-container');
 define('ZBX_STYLE_PROGRESS_BAR_LABEL', 'progress-bar-label');
 define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');
+define('ZBX_STYLE_RANGE_CONTROL', 'range-control');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_RED_BG', 'red-bg');
 define('ZBX_STYLE_REL_CONTAINER', 'rel-container');

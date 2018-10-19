@@ -327,8 +327,6 @@ class CProfile {
 	}
 
 	private static function updateDB($idx, $value, $type, $idx2) {
-		$sqlIdx2 = ($idx2 > 0) ? ' AND idx2='.zbx_dbstr($idx2) : '';
-
 		$valueType = self::getFieldByType($type);
 
 		return DBexecute(
@@ -336,8 +334,8 @@ class CProfile {
 			$valueType.'='.zbx_dbstr($value).','.
 			' type='.$type.
 			' WHERE userid='.self::$userDetails['userid'].
-			' AND idx='.zbx_dbstr($idx).
-			$sqlIdx2
+				' AND idx='.zbx_dbstr($idx).
+				' AND idx2='.zbx_dbstr($idx2)
 		);
 	}
 
