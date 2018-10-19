@@ -680,13 +680,12 @@ class testPageHostGraph extends CWebTest {
 					]
 				]
 			],
-			// TODO add test case after ZBX-14689 will be resolve
-//			[
-//				[
-//					'host' => 'Host to check graph 1',
-//					'change_group' => 'Empty group'
-//				]
-//			]
+			[
+				[
+					'host' => 'Host to check graph 1',
+					'change_group' => 'Empty group'
+				]
+			]
 		];
 	}
 

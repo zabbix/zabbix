@@ -777,11 +777,11 @@ function get_same_item_for_host($item, $dest_hostids) {
 /**
  * Get parent templates for each given item.
  *
- * @param array  $items                 An array of items.
- * @param string $items[]['itemid']     ID of an item.
- * @param string $items[]['templateid'] ID of parent template item.
- * @param int    $flag                  Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
- *                                      ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param array  $items                  An array of items.
+ * @param string $items[]['itemid']      ID of an item.
+ * @param string $items[]['templateid']  ID of parent template item.
+ * @param int    $flag                   Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                       ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */
@@ -838,6 +838,7 @@ function getItemParentTemplates(array $items, $flag) {
 		foreach ($db_items as $db_item) {
 			$data['templates'][$db_item['hostid']] = [];
 			$hostids[$db_item['itemid']] = $db_item['hostid'];
+
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
 			}
@@ -857,6 +858,7 @@ function getItemParentTemplates(array $items, $flag) {
 		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
 			? $hostids[$parent_item['itemid']]
 			: 0;
+
 		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
 				? $lld_ruleids[$parent_item['itemid']]
@@ -910,7 +912,7 @@ function getItemParentTemplates(array $items, $flag) {
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
  *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
- * @return CLink|CSpan|null
+ * @return array|null
  */
 function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 	if (!array_key_exists($itemid, $parent_templates['links'])) {
@@ -1000,17 +1002,6 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 	return $list;
 }
 
-function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
-	$item = get_item_by_itemid($itemid);
-	if (bccomp($hostid,$item['hostid']) == 0) {
-		return $item['itemid'];
-	}
-	if ($item['templateid'] <> 0) {
-		return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
-	}
-	return $item['itemid'];
-}
-
 /**
  * Retrieve overview table object for items.
  *
@@ -1055,7 +1046,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		'applicationids' => $applicationids,
 		'monitored' => true,
 		'preservekeys' => true
-	], $show_suppressed);
+	], ['show_suppressed' => $show_suppressed]);
 
 	foreach ($db_triggers as $db_trigger) {
 		foreach ($db_trigger['items'] as $item) {

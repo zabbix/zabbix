@@ -77,12 +77,12 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
-		sec = zbx_time();
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
@@ -115,10 +115,6 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 
 	zbx_free(stats);

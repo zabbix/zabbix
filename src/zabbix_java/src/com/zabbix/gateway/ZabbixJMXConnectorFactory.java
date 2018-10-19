@@ -110,6 +110,10 @@ class ZabbixJMXConnectorFactory
 			else
 				logger.trace("connector acquired");
 		}
+		catch (SecurityException e)
+		{
+			throw e;
+		}
 		catch (InterruptedException e)
 		{
 			InterruptedIOException e2 = new InterruptedIOException(e.getMessage());
@@ -120,7 +124,7 @@ class ZabbixJMXConnectorFactory
 		}
 
 		if (null == result)
-			throw new SocketTimeoutException("connection timed out: " + url);
+			throw new SocketTimeoutException("Connection timed out");
 
 		if (result instanceof JMXConnector)
 			return (JMXConnector)result;

@@ -175,30 +175,43 @@ if ($type == SHOW_TRIGGERS) {
 		];
 	}
 
-	$host_options = [];
+	if ($data['pageFilter']->groupsSelected) {
+		$host_options = [];
 
-	// fetch hosts
-	if ($filter['inventory']) {
-		$host_options['searchInventory'] = [];
-		foreach ($filter['inventory'] as $field) {
-			$host_options['searchInventory'][$field['field']][] = $field['value'];
+		if ($filter['inventory']) {
+			$host_options['searchInventory'] = [];
+
+			foreach ($filter['inventory'] as $field) {
+				$host_options['searchInventory'][$field['field']][] = $field['value'];
+			}
 		}
+
+		$trigger_options = [
+			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
+			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'filter' => [
+				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
+			],
+			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
+			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null
+		];
+
+		$problem_options = [
+			'show_suppressed' => $filter['show_suppressed'],
+			'min_severity' => $filter['showSeverity'],
+			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
+		];
+
+		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
+			$host_options, $trigger_options, $problem_options
+		);
 	}
-
-	$trigger_options = [
-		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
-		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-		'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null],
-		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
-		'min_severity' => ($filter['showSeverity'] > TRIGGER_SEVERITY_NOT_CLASSIFIED) ? $filter['showSeverity'] : null,
-		'lastChangeSince' => $filter['statusChange'] ? time() - $filter['statusChangeDays'] * SEC_PER_DAY : null
-	];
-
-	$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
-	list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-		$host_options, $trigger_options, $filter['show_suppressed']
-	);
+	else {
+		$hosts = [];
+		$triggers = [];
+	}
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;

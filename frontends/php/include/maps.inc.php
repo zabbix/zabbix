@@ -2179,7 +2179,7 @@ function getMapLinktriggerInfo($sysmap, $options) {
 		'preservekeys' => true
 	];
 
-	return getTriggersWithActualSeverity($trigger_options, $sysmap['show_suppressed']);
+	return getTriggersWithActualSeverity($trigger_options, ['show_suppressed' => $sysmap['show_suppressed']]);
 }
 
 /**

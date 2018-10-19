@@ -87,6 +87,22 @@ function getLocales() {
 }
 
 /**
+ * Get URL for support link by language.
+ *
+ * @param string $language  Language 2 char ISO639-1 code.
+ *
+ * @return string
+ */
+function getSupportUrl($language) {
+	$urls = [
+		'ru' => 'https://www.zabbix.com/ru/support/',
+		'ja' => 'https://www.zabbix.com/jp/support/'
+	];
+
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support/';
+}
+
+/**
  * Returns an array of locale name variants based on language.
  *
  * @param string $language Language in format 'ru_RU', 'en_EN' and so on.

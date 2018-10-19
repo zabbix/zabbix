@@ -1501,7 +1501,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	/* schedule nextcheck for sleeping escalations */
 	if (ESCALATION_STATUS_SLEEP == escalation->status)
-		escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+		escalation->nextcheck = time(NULL) + (0 == action->esc_period ? SEC_PER_HOUR : action->esc_period);
 
 	zbx_free(tmp);
 
@@ -2265,7 +2265,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 		event = (DB_EVENT *)events.values[index];
 
-		if (EVENT_SOURCE_TRIGGERS == event->source && 0 == event->trigger.triggerid)
+		if ((EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source) &&
+				EVENT_OBJECT_TRIGGER == event->object && 0 == event->trigger.triggerid)
 		{
 			error = zbx_dsprintf(error, "trigger id:" ZBX_FS_UI64 " deleted.", event->objectid);
 			goto cancel_warning;
@@ -2352,7 +2353,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
-				escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+				escalation->nextcheck = time(NULL) + (0 == action->esc_period ? SEC_PER_HOUR :
+						action->esc_period);
 			}
 			else
 			{
@@ -2563,21 +2565,19 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,nextcheck,esc_step,status,itemid,"
 					"acknowledgeid"
 				" from escalations"
-				" where %s"
-				" order by actionid,triggerid,itemid,escalationid", filter);
+				" where %s and nextcheck<=%d"
+				" order by actionid,triggerid,itemid,escalationid", filter,
+				now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int		esc_nextcheck;
-		zbx_uint64_t	esc_r_eventid;
+		int	esc_nextcheck;
 
 		esc_nextcheck = atoi(row[5]);
-		ZBX_DBROW2UINT64(esc_r_eventid, row[4]);
 
-		/* Skip escalations that must be checked later and that are not recovered */
-		/* (corresponding OK event hasn't occurred yet, see process_actions()).   */
-		if (esc_nextcheck > now && 0 == esc_r_eventid)
+		/* skip escalations that must be checked in next CONFIG_ESCALATOR_FREQUENCY period */
+		if (esc_nextcheck > now)
 		{
 			if (esc_nextcheck < *nextcheck)
 				*nextcheck = esc_nextcheck;
@@ -2587,7 +2587,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 		escalation = (DB_ESCALATION *)zbx_malloc(NULL, sizeof(DB_ESCALATION));
 		escalation->nextcheck = esc_nextcheck;
-		escalation->r_eventid = esc_r_eventid;
+		ZBX_DBROW2UINT64(escalation->r_eventid, row[4]);
 		ZBX_STR2UINT64(escalation->escalationid, row[0]);
 		ZBX_STR2UINT64(escalation->actionid, row[1]);
 		ZBX_DBROW2UINT64(escalation->triggerid, row[2]);
@@ -2670,7 +2670,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 		{
@@ -2679,7 +2680,6 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 					process_num, old_escalations_count, old_total_sec);
 		}
 
-		sec = zbx_time();
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM);
@@ -2714,9 +2714,5 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }
