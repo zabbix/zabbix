@@ -198,8 +198,11 @@ typedef struct
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
 
-	/* the vmware service instance contents */
-	char			*contents;
+	/* the vmware service instance version */
+	char			*version;
+
+	/* the vmware service instance fullname */
+	char			*fullname;
 
 	/* the performance counters */
 	zbx_hashset_t		counters;
@@ -323,11 +326,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
-
-char	*zbx_xml_read_value(const char *data, const char *xpath);
-int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
-int	zbx_xml_try_read_value(const char *data, const char *xpath, char **value, char **error);
-
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0

@@ -463,7 +463,7 @@ static void	unescape_trim_params(const char *in, char *out)
  ******************************************************************************/
 static int item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg)
 {
-	char	params_raw[ITEM_PREPROC_PARAMS_LEN * 4 + 1];
+	char	params_raw[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -731,7 +731,7 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
  ******************************************************************************/
 static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output, *new_value = NULL;
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *new_value = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
