@@ -604,7 +604,9 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 		csrc = (zbx_vmware_counter_t *)src->values[i];
 
 		cdst = (zbx_vmware_counter_t *)zbx_hashset_insert(dst, csrc, sizeof(zbx_vmware_counter_t));
-		cdst->path = vmware_shared_strdup(csrc->path);
+
+		if (cdst->path == csrc->path)
+			cdst->path = vmware_shared_strdup(csrc->path);
 	}
 }
 
@@ -1793,7 +1795,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_perfcounters";
-	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL,
+	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL, *stats = NULL,
 			*counterid = NULL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
@@ -1826,6 +1828,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 
 	nodeset = xpathObj->nodesetval;
 
+	zbx_vector_ptr_reserve(counters, 2 * nodeset->nodeNr * sizeof(void *));
+
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_counter_t	*counter;
@@ -1837,12 +1841,25 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 						"*[local-name()='nameInfo']/*[local-name()='key']");
 
 		rollup = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='rollupType']");
+		stats = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='statsType']");
 		counterid = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']");
 
 		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
+			ZBX_STR2UINT64(counter->id, counterid);
+
+			zbx_vector_ptr_append(counters, counter);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "adding performance counter %s:" ZBX_FS_UI64, counter->path,
+					counter->id);
+		}
+
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats)
+		{
+			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
 
 			zbx_vector_ptr_append(counters, counter);
