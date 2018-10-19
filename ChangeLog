@@ -1,6 +1,7 @@
 Changes for 4.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-4725] added filter fields to select templates and hosts by directly linked templates; made proxy filter field visible in configuration hosts field (miks)
 ..F....... [ZBXNEXT-4796] added 'fullscreen' and 'kiosk' URL arguments to allow to set layout mode via link (ashubin, gcalenko)
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
