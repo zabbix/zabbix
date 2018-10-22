@@ -17,15 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ITEM_PREPROC_H
-#define ZABBIX_ITEM_PREPROC_H
+#ifndef ZABBIX_PREPROC_HISTORY_H
+#define ZABBIX_PREPROC_HISTORY_H
 
+#include "common.h"
 #include "dbcache.h"
 
-int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error);
+#define ZBX_PREPROC_TYPE_NONE		0
+#define ZBX_PREPROC_TYPE_DELTA		1
+#define ZBX_PREPROC_TYPE_THROTTLE	2
 
-int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
-		unsigned char value_type, char **errmsg);
+typedef struct
+{
+	unsigned char	type;
+	zbx_variant_t	value;
+	zbx_timespec_t	ts;
+}
+zbx_preproc_op_history_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_ptr_t	history;
+}
+zbx_preproc_history_t;
+
+void	zbx_preproc_op_history_free(zbx_preproc_op_history_t *ophistory);
+const zbx_preproc_op_history_t	*zbx_preproc_history_get_value(zbx_vector_ptr_t *history, int type);
+void	zbx_preproc_history_set_value(zbx_vector_ptr_t *history, int type, const zbx_variant_t *data,
+		const zbx_timespec_t *ts);
 
 #endif

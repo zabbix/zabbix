@@ -90,13 +90,13 @@ static int	str_to_preproc_error_handler(const char *str)
 	return FAIL;
 }
 
-static void	read_value(const char *path, unsigned char *value_type, zbx_timespec_t *ts,
-		zbx_variant_t *value)
+static void	read_value(const char *path, unsigned char *value_type, zbx_variant_t *value, zbx_timespec_t *ts)
 {
 	zbx_mock_handle_t	handle;
 
 	handle = zbx_mock_get_parameter_handle(path);
-	*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value_type"));
+	if (NULL != value_type)
+		*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value_type"));
 	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
@@ -126,27 +126,30 @@ static void	read_step(const char *path, zbx_preproc_op_t *op)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t			value;
+	zbx_variant_t			value, history_value;
 	unsigned char			value_type;
-	zbx_timespec_t			ts;
-	zbx_item_history_value_t	history, *phistory = NULL;
+	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
 	int				returned_ret, expected_ret;
 	char				*error = NULL;
 
 	ZBX_UNUSED(state);
 
-	read_value("in.value", &value_type, &ts, &value);
+	read_value("in.value", &value_type, &value, &ts);
 	read_step("in.step", &op);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
-		history.itemid = 0;
-		read_value("in.history", &history.value_type, &history.timestamp, &history.value);
-		phistory = &history;
+		read_value("in.history", NULL, &history_value, &history_ts);
+	}
+	else
+	{
+		zbx_variant_set_none(&history_value);
+		history_ts.sec = 0;
+		history_ts.ns = 0;
 	}
 
-	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, phistory, &error);
+	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("zbx_item_preproc() return", expected_ret, returned_ret);
 
@@ -166,6 +169,25 @@ void	zbx_mock_test_entry(void **state)
 		{
 			if (ZBX_VARIANT_NONE != value.type)
 				fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
+		}
+
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
+		{
+			if (ZBX_VARIANT_NONE == history_value.type)
+				fail_msg("preprocessing history was empty value");
+
+			zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
+			del_zeros(history_value.data.str);
+			zbx_mock_assert_str_eq("preprocessing step history value",
+					zbx_mock_get_parameter_string("out.history.data"), history_value.data.str);
+
+			zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"), &expected_history_ts);
+			zbx_mock_assert_timespec_eq("preprocessing step history time", &expected_history_ts, &history_ts);
+		}
+		else
+		{
+			if (ZBX_VARIANT_NONE != history_value.type)
+				fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&history_value));
 		}
 	}
 

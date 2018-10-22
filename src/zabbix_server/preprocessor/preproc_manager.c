@@ -31,6 +31,7 @@
 #include "preprocessing.h"
 #include "preproc_manager.h"
 #include "linked_list.h"
+#include "preproc_history.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
@@ -138,31 +139,11 @@ static void	request_free_steps(zbx_preprocessing_request_t *request)
  ******************************************************************************/
 static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager)
 {
-	const char			*__function_name = "preprocessor_sync_configuration";
-	zbx_hashset_iter_t		iter;
-	zbx_preproc_item_t		*item, item_local;
-	zbx_item_history_value_t	*history_value;
-	int				ts;
+	const char	*__function_name = "preprocessor_sync_configuration";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ts = manager->cache_ts;
 	DCconfig_get_preprocessable_items(&manager->item_config, &manager->cache_ts);
-
-	if (ts != manager->cache_ts)
-	{
-		zbx_hashset_iter_reset(&manager->history_cache, &iter);
-		while (NULL != (history_value = (zbx_item_history_value_t *)zbx_hashset_iter_next(&iter)))
-		{
-			item_local.itemid = history_value->itemid;
-			if (NULL == (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) ||
-					history_value->value_type != item->value_type)
-			{
-				/* history value is removed if item was removed/disabled or item value type changed */
-				zbx_hashset_iter_remove(&iter);
-			}
-		}
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() item config size: %d, history cache size: %d", __function_name,
 			manager->item_config.num_data, manager->history_cache.num_data);
@@ -281,8 +262,11 @@ static zbx_preprocessing_worker_t	*preprocessor_get_free_worker(zbx_preprocessin
 static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manager,
 		zbx_preprocessing_request_t *request, unsigned char **task)
 {
-	zbx_uint32_t	size;
-	zbx_variant_t	value;
+	zbx_uint32_t		size;
+	zbx_variant_t		value;
+	zbx_preproc_history_t	*vault;
+	zbx_vector_ptr_t	*phistory;
+
 
 	if (ISSET_LOG(request->value.result))
 		zbx_variant_set_str(&value, request->value.result->log->value);
@@ -297,9 +281,16 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 
+	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
+				&request->value.itemid)))
+	{
+		phistory = &vault->history;
+	}
+	else
+		phistory = NULL;
+
 	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
-			(zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, &request->value.itemid),
-			request->steps, request->steps_num);
+			phistory, request->steps, request->steps_num);
 
 	return size;
 }
@@ -854,33 +845,38 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_preprocessing_request_t	*request;
 	zbx_variant_t			value;
 	char				*error;
-	zbx_item_history_value_t	*history_value, *cached_value;
 	zbx_delta_item_index_t		*index;
+	zbx_vector_ptr_t		history;
+	zbx_preproc_history_t		*vault;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	worker = preprocessor_get_worker_by_client(manager, client);
 	request = (zbx_preprocessing_request_t *)worker->queue_item->data;
 
-	zbx_preprocessor_unpack_result(&value, &history_value, &error, message->data);
+	zbx_vector_ptr_create(&history);
+	zbx_preprocessor_unpack_result(&value, &history, &error, message->data);
 
-	if (NULL != history_value)
+	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
+			&request->value.itemid)))
 	{
-		history_value->itemid = request->value.itemid;
-		history_value->value_type = request->value_type;
+		zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+	}
 
-		if (NULL != (cached_value = (zbx_item_history_value_t *)zbx_hashset_search(&manager->history_cache, history_value)))
+	if (0 != history.values_num)
+	{
+		if (NULL == vault)
 		{
-			if (0 < zbx_timespec_compare(&history_value->timestamp, &cached_value->timestamp))
-			{
-				/* history_value can only be numeric so it can be copied without extra memory */
-				/* allocation */
-				cached_value->timestamp = history_value->timestamp;
-				cached_value->value = history_value->value;
-			}
+			zbx_preproc_history_t	history_local;
+
+			history_local.itemid = request->value.itemid;
+			vault = (zbx_preproc_history_t *)zbx_hashset_insert(&manager->history_cache, &history_local,
+					sizeof(history_local));
+			zbx_vector_ptr_create(&vault->history);
 		}
-		else
-			zbx_hashset_insert(&manager->history_cache, history_value, sizeof(zbx_item_history_value_t));
+
+		zbx_vector_ptr_append_array(&vault->history, history.values, history.values_num);
+		zbx_vector_ptr_clear(&history);
 	}
 
 	request->state = REQUEST_STATE_DONE;
@@ -901,12 +897,13 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 
 	worker->queue_item = NULL;
 	zbx_variant_clear(&value);
-	zbx_free(history_value);
 
 	manager->preproc_num--;
 
 	preprocessor_assign_tasks(manager);
 	preprocessing_flush_queue(manager);
+
+	zbx_vector_ptr_destroy(&history);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

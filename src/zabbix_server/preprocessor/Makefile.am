@@ -8,7 +8,8 @@ libpreprocessor_a_SOURCES = \
 	preproc_manager.c preproc_manager.h \
 	item_preproc.c \
 	item_preproc.h \
-	preprocessing.c preprocessing.h
+	preprocessing.c preprocessing.h \
+	preproc_history.c preproc_history.h
 
 libpreprocessor_a_CFLAGS = \
 	 @LIBXML2_CFLAGS@

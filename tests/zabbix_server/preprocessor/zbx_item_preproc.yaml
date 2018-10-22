@@ -577,6 +577,9 @@ in:
 out:
   return: SUCCEED
   value: 5
+  history:
+    data: 10
+    time: 2017-10-29 03:15:00 +03:00
 ---
 test case: deltavalue(-4.5, 5.5)
 in:
@@ -593,6 +596,9 @@ in:
 out:
   return: SUCCEED
   value: 10
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 5.5
 ---
 test case: deltavalue(10, 10)
 in:
@@ -609,6 +615,9 @@ in:
 out:
   return: SUCCEED
   value: 0
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
 ---
 test case: deltavalue(10, 9)
 in:
@@ -624,6 +633,9 @@ in:
     type: ZBX_PREPROC_DELTA_VALUE
 out:
   return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
 ---
 test case: deltavalue(0, 1.5)
 in:
@@ -640,6 +652,9 @@ in:
 out:
   return: SUCCEED
   value: 1.5
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
 ---
 test case: deltaspeed(2, 1, 10s)
 in:
@@ -655,6 +670,9 @@ in:
     type: ZBX_PREPROC_DELTA_SPEED
 out:
   return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
 ---
 test case: deltaspeed(1, 2, -10s)
 in:
@@ -670,6 +688,9 @@ in:
     type: ZBX_PREPROC_DELTA_SPEED
 out:
   return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
 ---
 test case: deltaspeed(1, 2, 10s)
 in:
@@ -686,6 +707,9 @@ in:
 out:
   return: SUCCEED
   value: 0.1
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
 ---
 test case: deltaspeed(2, 3, 10s)
 in:
@@ -702,6 +726,9 @@ in:
 out:
   return: SUCCEED
   value: 0
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
 ---
 test case: deltaspeed(2, 3, 1s)
 in:
@@ -718,6 +745,9 @@ in:
 out:
   return: SUCCEED
   value: 1
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
 ---
 test case: xpath1
 in:

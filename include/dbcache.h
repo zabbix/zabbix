@@ -467,15 +467,6 @@ ZBX_DC_TREND;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_timespec_t		timestamp;
-	zbx_variant_t		value;
-	unsigned char		value_type;
-}
-zbx_item_history_value_t;
-
-typedef struct
-{
 	zbx_uint64_t	itemid;
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;

@@ -261,8 +261,6 @@ typedef struct
 }
 ZBX_DC_HTTPITEM;
 
-typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
