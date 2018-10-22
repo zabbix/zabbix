@@ -51,7 +51,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @param array $elements
 	 */
-	public function __construct($elements, $class = CElement::class) {
+	public function __construct($elements, $class = 'CElement') {
 		if (is_array($elements)) {
 			$this->elements = $elements;
 			$this->element_class = $class;
