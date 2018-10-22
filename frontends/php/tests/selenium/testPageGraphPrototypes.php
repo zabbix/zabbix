@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup graphs
  */
-class testPageGraphPrototypes extends CWebTest {
+class testPageGraphPrototypes extends CLegacyWebTest {
 
 	/**
 	 * Discovery rule "testFormDiscoveryRule" id used in test.
