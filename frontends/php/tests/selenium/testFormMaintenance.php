@@ -107,7 +107,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
-		$this->assertEquals(3, DBcount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
+		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
 	/**
@@ -227,9 +227,9 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->zbxTestClick('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Maintenance updated');
 
-		$this->assertEquals(2, DBcount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value=\'A1\' AND operator=0'));
-		$this->assertEquals(1, DBcount('SELECT NULL FROM maintenance_tag WHERE value=\'B1\' AND operator=2'));
+		$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'A1\' AND operator=0'));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'B1\' AND operator=2'));
 	}
 
 	/**
