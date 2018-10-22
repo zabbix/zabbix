@@ -195,6 +195,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
 
 	zbx_variant_clear(&value);
+	zbx_variant_clear(&history_value);
 	zbx_free(error);
 
 }
