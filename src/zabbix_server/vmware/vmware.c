@@ -1878,6 +1878,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		}
 
 		zbx_free(counterid);
+		zbx_free(stats);
 		zbx_free(rollup);
 		zbx_free(key);
 		zbx_free(group);
