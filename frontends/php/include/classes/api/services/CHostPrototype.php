@@ -1120,7 +1120,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Retrieves and adds additional requested data to result set.
+	 * Retrieves and adds additional requested data to the result set.
 	 *
 	 * @param array  $options
 	 * @param array  $result
@@ -1139,7 +1139,7 @@ class CHostPrototype extends CHostBase {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
@@ -1204,7 +1204,7 @@ class CHostPrototype extends CHostBase {
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
@@ -1237,9 +1237,9 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => ['hostid', 'inventory_mode'],
-				'filter' => ['hostid' => $hostPrototypeIds]
+				'filter' => ['hostid' => $hostPrototypeIds],
+				'preservekeys' => true
 			]);
-			$inventory = zbx_toHash($inventory, 'hostid');
 
 			$output = [];
 			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {

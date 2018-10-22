@@ -1303,7 +1303,7 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Retrieves and adds additional requested data to result set.
+	 * Retrieves and adds additional requested data to the result set.
 	 *
 	 * @param array  $options
 	 * @param array  $result
@@ -1319,9 +1319,9 @@ class CHost extends CHostGeneral {
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],
-				'filter' => ['hostid' => $hostids]
+				'filter' => ['hostid' => $hostids],
+				'preservekeys' => true
 			]);
-			$inventory = zbx_toHash($inventory, 'hostid');
 
 			foreach ($hostids as $hostid) {
 				// Only HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC values are stored in DB.
