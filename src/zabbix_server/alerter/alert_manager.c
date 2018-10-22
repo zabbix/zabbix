@@ -1920,7 +1920,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_am_alerter_t	*alerter;
 	int			ret, sent_num = 0, failed_num = 0, now, time_db = 0, time_watchdog = 0, freq_watchdog;
 	int			time_connect;
-	double			time_stat, time_idle = 0, time_now, time_file = 0;
+	double			time_stat, time_idle = 0, time_now, sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -1967,10 +1967,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds",
 						ZBX_DB_WAIT_DOWN);
 			}
-			else
+			else if (0 != zbx_db_txn_level() && ZBX_DB_OK > zbx_db_rollback())
 			{
-				if (0 != zbx_db_txn_level())
-					manager.dbstatus = zbx_db_rollback();
+				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
 			}
 
 			if (ZBX_DB_OK == manager.dbstatus)
@@ -1997,7 +1997,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				ret = am_db_queue_alerts(&manager, now);
 
 			if (FAIL == ret)
+			{
 				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
+			}
 
 			time_db = now;
 		}
@@ -2005,7 +2008,10 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		if (ZBX_DB_OK == manager.dbstatus && now - time_watchdog >= freq_watchdog)
 		{
 			if (FAIL == am_db_sync_watchdog(&manager))
+			{
 				manager.dbstatus = ZBX_DB_DOWN;
+				DBclose();
+			}
 
 			time_watchdog = now;
 		}
@@ -2025,18 +2031,11 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		ret = zbx_ipc_service_recv(&alerter_service, 1, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-		/* handle /etc/resolv.conf update and log rotate less often than once a second */
-		if (1.0 < time_now - time_file)
-		{
-			time_file = time_now;
-			zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-			zbx_update_resolver_conf();
-#endif
-		}
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += zbx_time() - time_now;
+			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{

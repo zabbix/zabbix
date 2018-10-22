@@ -93,8 +93,8 @@ class testPageHosts extends CLegacyWebTest {
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 		$sqlApplications = "select * from applications where hostid=$hostid order by applicationid";
 		$oldHashApplications = CDBHelper::getHash($sqlApplications);
-		$sqlInteraface = "select * from interface where hostid=$hostid order by interfaceid";
-		$oldHashInterface = CDBHelper::getHash($sqlInteraface);
+		$sqlInterface = "select * from interface where hostid=$hostid order by interfaceid";
+		$oldHashInterface = CDBHelper::getHash($sqlInterface);
 		$sqlHostMacro = "select * from hostmacro where hostid=$hostid order by hostmacroid";
 		$oldHashHostMacro = CDBHelper::getHash($sqlHostMacro);
 		$sqlHostsGroups = "select * from hosts_groups where hostid=$hostid order by hostgroupid";
@@ -121,7 +121,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 		$this->assertEquals($oldHashApplications, CDBHelper::getHash($sqlApplications));
-		$this->assertEquals($oldHashInterface, CDBHelper::getHash($sqlInteraface));
+		$this->assertEquals($oldHashInterface, CDBHelper::getHash($sqlInterface));
 		$this->assertEquals($oldHashHostMacro, CDBHelper::getHash($sqlHostMacro));
 		$this->assertEquals($oldHashHostsGroups, CDBHelper::getHash($sqlHostsGroups));
 		$this->assertEquals($oldHashHostsTemplates, CDBHelper::getHash($sqlHostsTemplates));

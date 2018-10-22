@@ -31,6 +31,7 @@ class CSchedulingIntervalParser extends CParser {
 
 	private $user_macro_parser;
 	private $lld_macro_parser;
+	private $lld_macro_function_parser;
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
@@ -45,6 +46,7 @@ class CSchedulingIntervalParser extends CParser {
 		}
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
+			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
 	}
 
@@ -65,6 +67,10 @@ class CSchedulingIntervalParser extends CParser {
 		}
 		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
 			$p += $this->lld_macro_parser->getLength();
+		}
+		elseif ($this->options['lldmacros']
+				&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
+			$p += $this->lld_macro_function_parser->getLength();
 		}
 		elseif (!self::parseIntervals($source, $p)) {
 			return self::PARSE_FAIL;

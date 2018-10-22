@@ -267,7 +267,7 @@ int	zbx_mock_data_free(void **state)
 {
 	ZBX_UNUSED(state);
 
-	zbx_vector_str_clear_ext(&string_pool, zbx_ptr_free);
+	zbx_vector_str_clear_ext(&string_pool, zbx_str_free);
 	zbx_vector_ptr_clear_ext(&handle_pool, zbx_ptr_free);
 	zbx_vector_str_destroy(&string_pool);
 	zbx_vector_ptr_destroy(&handle_pool);

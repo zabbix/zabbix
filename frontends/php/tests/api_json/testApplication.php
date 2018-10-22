@@ -28,7 +28,7 @@ class testApplication extends CAPITest {
 		return [
 			[
 				'application' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'hostid' => '50009',
 					'flags' => '4'
 				],
@@ -266,7 +266,7 @@ class testApplication extends CAPITest {
 				'application' => [
 					[
 						'applicationid' => '367',
-						'name' => 'non existent parametr',
+						'name' => 'non existent parameter',
 						'flags' => '4'
 					]
 				],

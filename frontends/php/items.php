@@ -1373,7 +1373,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
-		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
 			$master_item_options = [
 				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
 				'itemids' => getRequest('master_itemid', $item['master_itemid']),
@@ -1726,9 +1726,9 @@ else {
 	}
 
 	/*
-	 * Trapper and SNMP trap items contain zeroes in "delay" field and, if no specific type is set, look in item types
-	 * other than trapper and SNMP trap that allow zeroes. For example, when a flexible interval is used. Since trapper
-	 * and SNMP trap items contain zeroes, but those zeroes should not be displayed, they cannot be filtered by entering
+	 * Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
+	 * other than trapper and SNMP trap that allow zeros. For example, when a flexible interval is used. Since trapper
+	 * and SNMP trap items contain zeros, but those zeros should not be displayed, they cannot be filtered by entering
 	 * either zero or any other number in filter field.
 	 */
 	if (hasRequest('filter_delay')) {
@@ -1807,9 +1807,6 @@ else {
 
 	// Set values for subfilters, if any of subfilters = false then item shouldn't be shown.
 	if ($data['items']) {
-		// Get parent templates.
-		$data['parent_templates'] = getItemParentTemplates($data['items']);
-
 		// resolve name macros
 		$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
 
@@ -1962,6 +1959,7 @@ else {
 	}
 
 	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));
+	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
@@ -1974,23 +1972,8 @@ else {
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
-	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
 
-	// Select writable templates IDs.
-	$hostids = [];
-
-	foreach ($data['triggerRealHosts'] as $real_host) {
-		$hostids = array_merge($hostids, zbx_objectValues($real_host, 'hostid'));
-	}
-
-	$data['writable_templates'] = $hostids
-		? API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys(array_flip($hostids)),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
+	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	// determine, show or not column of errors
 	if (isset($hosts)) {

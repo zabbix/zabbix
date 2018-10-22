@@ -25,8 +25,7 @@ $item = ($data['url']['error'] !== null)
 
 $output = [
 	'header' => $data['name'],
-	'body' => $item->toString(),
-	'footer' => (new CList([_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))]))->toString()
+	'body' => $item->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

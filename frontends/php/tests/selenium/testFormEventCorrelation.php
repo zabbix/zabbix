@@ -58,7 +58,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Event correlation rules');
 		$this->zbxTestCheckTitle('Event correlation rules');
 
-		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestDropdownSelectWait('new_condition_type', $data['select_tag']);
 		$this->zbxTestInputType('new_condition_tag', $data['tag']);
 		$this->zbxTestClickXpath('//button[contains(@onclick, \'add_condition\')]');
@@ -186,16 +186,16 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		return [
 			[
 				[
-					'name' => 'Test create with New event host group =',
+					'name' => 'Test create with New event host group equals',
 					'select_tag' => 'New event host group',
-					'operator' => '='
+					'operator' => 'equals'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event host group !=',
+					'name' => 'Test create with New event host group does not equa',
 					'select_tag' => 'New event host group',
-					'operator' => '<>'
+					'operator' => 'does not equal'
 				]
 			],
 			[
@@ -208,91 +208,91 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value = tag',
+					'name' => 'Test create with Old event tag value equals tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value = Empty',
+					'name' => 'Test create with Old event tag value equals Empty',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => ''
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value != tag',
+					'name' => 'Test create with Old event tag value does not equal tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => '<>',
+					'operator' => 'does not equal',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value like tag',
+					'name' => 'Test create with Old event tag value contains tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'like',
+					'operator' => 'contains',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with Old event tag value not like tag',
+					'name' => 'Test create with Old event tag value does not contain tag',
 					'select_tag' => 'Old event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'not like',
+					'operator' => 'does not contain',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value = tag',
+					'name' => 'Test create with New event tag value equals tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value = Empty',
+					'name' => 'Test create with New event tag value equals Empty',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '=',
+					'operator' => 'equals',
 					'value' => ''
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value != tag',
+					'name' => 'Test create with New event tag value does not equal tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => '<>',
+					'operator' => 'does not equal',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value like tag',
+					'name' => 'Test create with New event tag value contains tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'like',
+					'operator' => 'contains',
 					'value' => 'TagValue'
 				]
 			],
 			[
 				[
-					'name' => 'Test create with New event tag value not like tag',
+					'name' => 'Test create with New event tag value does not contain tag',
 					'select_tag' => 'New event tag value',
 					'tag' => 'TagTag',
-					'operator' => 'not like',
+					'operator' => 'does not contain',
 					'value' => 'TagValue'
 				]
 			]
@@ -536,7 +536,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'A or B',
 					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
@@ -548,7 +548,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> '(A or B) and (C or D)',
 					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
@@ -560,7 +560,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags'=>[
 						['select_tag' => 'Old event tag', 'tag_name' => 'Test tag1' ],
 						['select_tag' => 'New event tag', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'like','value' => 'Value']
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
 					'error_message' => 'Incorrect custom expression "Wrong formula" for correlation "Test create with wrong formula": check expression starting from "Wrong formula".'

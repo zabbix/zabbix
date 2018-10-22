@@ -709,7 +709,7 @@ class testFormWeb extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/delay": a time unit is expected.'
+						'Invalid parameter "/1/delay": value must be one of 1-86400.'
 					]
 				]
 			],

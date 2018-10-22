@@ -11,7 +11,7 @@
       <template>
          <template>Template Module Generic SNMPv1</template>
          <name>Template Module Generic SNMPv1</name>
-         <description>Template Module Generic version: 0.14&#13;
+         <description>Template Module Generic version: 0.15&#13;
 MIBs used:&#13;
 SNMPv2-MIB</description>
          <groups>
@@ -21,10 +21,10 @@ SNMPv2-MIB</description>
          </groups>
          <applications>
             <application>
-               <name>Status</name>
+               <name>General</name>
             </application>
             <application>
-               <name>General</name>
+               <name>Status</name>
             </application>
          </applications>
          <items>
@@ -33,9 +33,9 @@ SNMPv2-MIB</description>
                <type>1</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.3.0</snmp_oid>
-               <key>system.uptime</key>
-               <delay>30</delay>
-               <history>14d</history>
+               <key>system.uptime[sysUpTime]</key>
+               <delay>30s</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>3</value_type>
@@ -81,8 +81,8 @@ The time (in hundredths of a second) since the network management portion of the
                <snmp_community/>
                <snmp_oid/>
                <key>snmptrap.fallback</key>
-               <delay>300</delay>
-               <history>14d</history>
+               <delay>5m</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>2</value_type>
@@ -122,8 +122,8 @@ The time (in hundredths of a second) since the network management portion of the
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.6.0</snmp_oid>
                <key>system.location</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -164,8 +164,8 @@ The physical location of this node (e.g., `telephone closet, 3rd floor').  If th
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.4.0</snmp_oid>
                <key>system.contact</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -206,8 +206,8 @@ The textual identification of the contact person for this managed node, together
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.2.0</snmp_oid>
                <key>system.objectid</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -248,8 +248,8 @@ The vendor's authoritative identification of the network management subsystem co
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.5.0</snmp_oid>
                <key>system.name</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -290,8 +290,8 @@ An administratively-assigned name for this managed node.By convention, this is t
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
                <key>system.descr</key>
-               <delay>3600</delay>
-               <history>14d</history>
+               <delay>1h</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>1</value_type>
@@ -334,8 +334,8 @@ networking software.</description>
                <snmp_community/>
                <snmp_oid/>
                <key>zabbix[host,snmp,available]</key>
-               <delay>60</delay>
-               <history>14d</history>
+               <delay>1m</delay>
+               <history>2w</history>
                <trends>0d</trends>
                <status>0</status>
                <value_type>3</value_type>
@@ -391,7 +391,7 @@ networking software.</description>
    <graphs/>
    <triggers>
       <trigger>
-         <expression>{Template Module Generic SNMPv1:system.uptime.last()}&lt;10m</expression>
+         <expression>{Template Module Generic SNMPv1:system.uptime[sysUpTime].last()}&lt;10m</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>{HOST.NAME} has been restarted</name>

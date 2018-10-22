@@ -127,6 +127,7 @@ class ZBase {
 				$this->initDB();
 				$this->authenticateUser();
 				$this->initLocales();
+				$this->setLayoutModeByUrl();
 				break;
 
 			case self::EXEC_MODE_API:
@@ -211,6 +212,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export',
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
+			$this->rootDir.'/include/classes/graph',
 			$this->rootDir.'/include/classes/graphdraw',
 			$this->rootDir.'/include/classes/import',
 			$this->rootDir.'/include/classes/import/converters',
@@ -230,6 +232,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/include/classes/html',
 			$this->rootDir.'/include/classes/html/pageheader',
+			$this->rootDir.'/include/classes/html/svg',
 			$this->rootDir.'/include/classes/html/widget',
 			$this->rootDir.'/include/classes/html/interfaces',
 			$this->rootDir.'/include/classes/parsers',
@@ -356,14 +359,14 @@ class ZBase {
 	 * Authenticate user.
 	 */
 	protected function authenticateUser() {
-		$sessionId = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
+		$sessionid = CWebUser::checkAuthentication(CWebUser::getSessionCookie());
 
-		if (!$sessionId) {
+		if (!$sessionid) {
 			CWebUser::setDefault();
 		}
 
 		// set the authentication token for the API
-		API::getWrapper()->auth = $sessionId;
+		API::getWrapper()->auth = $sessionid;
 
 		// enable debug mode in the API
 		API::getWrapper()->debug = CWebUser::getDebugMode();
@@ -395,7 +398,6 @@ class ZBase {
 				$data['page']['file'] = $response->getFileName();
 				$data['controller']['action'] = $router->getAction();
 				$data['main_block'] = $view->getOutput();
-				$data['fullscreen'] = isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'] == 1 ? 1 : 0;
 				$data['javascript']['files'] = $view->getAddedJS();
 				$data['javascript']['pre'] = $view->getIncludedJS();
 				$data['javascript']['post'] = $view->getPostJS();
@@ -444,5 +446,20 @@ class ZBase {
 
 			redirect('zabbix.php?action=system.warning');
 		}
+	}
+
+	/**
+	 * Set layout to fullscreen or kiosk mode if URL contains 'fullscreen' and/or 'kiosk' arguments.
+	 */
+	private function setLayoutModeByUrl() {
+		if (array_key_exists('kiosk', $_GET) && $_GET['kiosk'] === '1') {
+			CView::setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
+		}
+		elseif (array_key_exists('fullscreen', $_GET)) {
+			CView::setLayoutMode($_GET['fullscreen'] === '1' ? ZBX_LAYOUT_FULLSCREEN : ZBX_LAYOUT_NORMAL);
+		}
+
+		// Remove $_GET arguments to prevent CUrl from generating URL with 'fullscreen'/'kiosk' arguments.
+		unset($_GET['fullscreen'], $_GET['kiosk']);
 	}
 }

@@ -76,7 +76,10 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 		}
 
-		// Logout as super admin and login as simple user
+		// Logout as super admin and login as simple user.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE alias='. zbx_dbstr($this->user)));
 		$this->assertFalse(empty($userid));
 		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b54f', $userid['userid']);
@@ -174,9 +177,9 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				'0 of 0 problems are shown');
+		$this->zbxTestAssertElementText('//h4[text()="Problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -281,15 +284,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page
@@ -391,15 +387,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='top-nav-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
+		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Problems"]/../../..//div[@class="preloader"]'));
 		$this->zbxTestTextPresent($data['trigger_names']);
-		if ($countTriggers === 1) {
-		$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problem is shown');
-		}
-		else {
-			$this->zbxTestAssertElementText("//h4[text()='Problems']/../..//div[@class='dashbrd-grid-widget-foot']//li[1]",
-				$countTriggers.' of '.$countTriggers.' problems are shown');
-		}
 		$this->zbxTestCheckFatalErrors();
 
 		// Check problem displaying on Problem page

@@ -510,7 +510,7 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 * @param array $actions[0,...]['pause_suppressed'] OPTIONAL
 	 *
 	 * @return array
 	 */
@@ -670,7 +670,7 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 * @param array $actions[0,...]['pause_suppressed'] OPTIONAL
 	 *
 	 * @return array
 	 */
@@ -2628,7 +2628,7 @@ class CAction extends CApiService {
 			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD,
 			CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT,
 			CONDITION_TYPE_DSTATUS, CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_TEMPLATE,
-			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_MAINTENANCE,
+			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_SUPPRESSED,
 			CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT,
 			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG,
 			CONDITION_TYPE_EVENT_TAG_VALUE
@@ -2637,7 +2637,8 @@ class CAction extends CApiService {
 		$operators = [
 			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 			CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN
+			CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
+			CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 		];
 
 		return [
@@ -2755,8 +2756,8 @@ class CAction extends CApiService {
 
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		$maintenance_mode_validator = new CLimitedSetValidator([
-			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		$pause_suppressed_validator = new CLimitedSetValidator([
+			'values' => [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]
 		]);
 
 		$conditionsToValidate = [];
@@ -2766,14 +2767,14 @@ class CAction extends CApiService {
 		// is present and is not empty. Also collect conditions and operations for more validation.
 		foreach ($actions as $action) {
 			if ($action['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot set "%1$s" for action "%2$s".'),
+				$this->checkNoParameters($action, ['pause_suppressed'], _('Cannot set "%1$s" for action "%2$s".'),
 					$action['name']
 				);
 			}
-			elseif (array_key_exists('maintenance_mode', $action)
-					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+			elseif (array_key_exists('pause_suppressed', $action)
+					&& !$pause_suppressed_validator->validate($action['pause_suppressed'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['pause_suppressed'], 'pause_suppressed')
 				);
 			}
 
@@ -2880,8 +2881,8 @@ class CAction extends CApiService {
 		}
 		$actions = zbx_toHash($actions, 'actionid');
 
-		$maintenance_mode_validator = new CLimitedSetValidator([
-			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		$pause_suppressed_validator = new CLimitedSetValidator([
+			'values' => [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]
 		]);
 
 		// check fields
@@ -2910,14 +2911,14 @@ class CAction extends CApiService {
 			);
 
 			if ($db_actions[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot update "%1$s" for action "%2$s".'),
+				$this->checkNoParameters($action, ['pause_suppressed'], _('Cannot update "%1$s" for action "%2$s".'),
 					$actionName
 				);
 			}
-			elseif (array_key_exists('maintenance_mode', $action)
-					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+			elseif (array_key_exists('pause_suppressed', $action)
+					&& !$pause_suppressed_validator->validate($action['pause_suppressed'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['pause_suppressed'], 'pause_suppressed')
 				);
 			}
 

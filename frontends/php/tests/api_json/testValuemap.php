@@ -30,7 +30,7 @@ class testValuemap extends CAPITest {
 		return [
 			[
 				'valuemap' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'valuemapid' => 4,
 					'mappings' =>[
 						[
@@ -115,7 +115,7 @@ class testValuemap extends CAPITest {
 			// Check valuemap mappings.
 			[
 				'valuemap' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'mappings' =>[
 						[
 							'value' => '0',
@@ -134,7 +134,7 @@ class testValuemap extends CAPITest {
 			],
 			[
 				'valuemap' => [
-					'name' => 'without mapping parametrs',
+					'name' => 'without mapping parameters',
 					'mappings' =>[
 					]
 				],
@@ -301,7 +301,7 @@ class testValuemap extends CAPITest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'API update non existent parametr',
+					'name' => 'API update non existent parameter',
 					'value' => 4
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "value".'
@@ -458,7 +458,7 @@ class testValuemap extends CAPITest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '18',
-					'name' => 'API update non existent parametr',
+					'name' => 'API update non existent parameter',
 					'mappings' =>[
 						[
 							'value' => '0',

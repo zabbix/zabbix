@@ -2,6 +2,10 @@
 
 #ifdef HAVE_IPCSERVICE
 
+#ifdef HAVE_LIBEVENT
+#	include <event.h>
+#endif
+
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 #include "log.h"
@@ -797,7 +801,7 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 
 	zbx_vector_ptr_append(&service->clients, client);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:%d", __function_name, client->id);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() clientid:" ZBX_FS_UI64, __function_name, client->id);
 }
 
 /******************************************************************************
@@ -1137,7 +1141,7 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket)
  *                                                                            *
  * Purpose: writes a message to IPC service                                   *
  *                                                                            *
- * Parameters: csocket - [IN] an opened IPC socket to the servic              *
+ * Parameters: csocket - [IN] an opened IPC socket to the service             *
  *             code    - [IN] the message code                                *
  *             data    - [IN] the data                                        *
  *             size    - [IN] the data size                                   *

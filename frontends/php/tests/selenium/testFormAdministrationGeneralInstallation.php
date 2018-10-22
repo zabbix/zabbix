@@ -134,6 +134,6 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 		$this->zbxTestClickWait('cancel');
 
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 	}
 }

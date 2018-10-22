@@ -22,6 +22,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "dbcache.h"
 
 #include "housekeeper.h"
 
@@ -170,7 +171,7 @@ static int	get_housekeeper_period(double time_slept)
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int	records, start, sleeptime;
-	double	sec, time_slept;
+	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -204,9 +205,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		else
 			zbx_sleep_loop(sleeptime);
 
-		zbx_handle_log();
-
-		time_slept = zbx_time() - sec;
+		time_now = zbx_time();
+		time_slept = time_now - sec;
+		zbx_update_env(time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 
@@ -226,6 +227,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		DBclose();
 
+		zbx_dc_cleanup_data_sessions();
+
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), records, sec, sleeptext);
 
@@ -234,9 +237,5 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }

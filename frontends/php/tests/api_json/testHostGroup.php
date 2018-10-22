@@ -30,7 +30,7 @@ class testHostGroup extends CAPITest {
 		return [
 			[
 				'hostgroup' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'flags' => '4'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
@@ -142,7 +142,7 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'flags' => '4'
 					]
 				],

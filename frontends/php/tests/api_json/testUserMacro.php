@@ -28,7 +28,7 @@ class testUserMacro extends CAPITest {
 
 	public static function globalmacro_create() {
 		return [
-			// Check unexpected parametr
+			// Check unexpected parameter
 			[
 				'globalmacro' => [
 					'macro' => '{$HOSTID}',
@@ -134,7 +134,7 @@ class testUserMacro extends CAPITest {
 
 	public static function globalmacro_failed() {
 		return [
-			// Check unexpected parametr
+			// Check unexpected parameter
 			[
 				'globalmacro' => [
 					'macro' => '{$HOSTID}',

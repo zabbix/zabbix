@@ -21,14 +21,18 @@
 
 function condition_operator2str($operator) {
 	$operators = [
-		CONDITION_OPERATOR_EQUAL  => '=',
-		CONDITION_OPERATOR_NOT_EQUAL  => '<>',
-		CONDITION_OPERATOR_LIKE  => _('like'),
-		CONDITION_OPERATOR_NOT_LIKE  => _('not like'),
+		CONDITION_OPERATOR_EQUAL  => _('equals'),
+		CONDITION_OPERATOR_NOT_EQUAL  => _('does not equal'),
+		CONDITION_OPERATOR_LIKE  => _('contains'),
+		CONDITION_OPERATOR_NOT_LIKE  => _('does not contain'),
 		CONDITION_OPERATOR_IN => _('in'),
-		CONDITION_OPERATOR_MORE_EQUAL => '>=',
-		CONDITION_OPERATOR_LESS_EQUAL => '<=',
-		CONDITION_OPERATOR_NOT_IN => _('not in')
+		CONDITION_OPERATOR_MORE_EQUAL => _('is greater than or equals'),
+		CONDITION_OPERATOR_LESS_EQUAL => _('is less than or equals'),
+		CONDITION_OPERATOR_NOT_IN => _('not in'),
+		CONDITION_OPERATOR_YES => _('Yes'),
+		CONDITION_OPERATOR_NO => _('No'),
+		CONDITION_OPERATOR_REGEXP => _('matches'),
+		CONDITION_OPERATOR_NOT_REGEXP => _('does not match')
 	];
 
 	return $operators[$operator];
@@ -36,7 +40,7 @@ function condition_operator2str($operator) {
 
 function condition_type2str($type) {
 	$types = [
-		CONDITION_TYPE_MAINTENANCE => _('Maintenance status'),
+		CONDITION_TYPE_SUPPRESSED => _('Problem is suppressed'),
 		CONDITION_TYPE_TRIGGER_NAME => _('Trigger name'),
 		CONDITION_TYPE_TRIGGER_SEVERITY => _('Trigger severity'),
 		CONDITION_TYPE_TRIGGER => _('Trigger'),
@@ -151,10 +155,6 @@ function actionConditionValueToString(array $actions, array $config) {
 
 				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 					$result[$i][$j] = $condition['value'] ? _('Ack') : _('Not Ack');
-					break;
-
-				case CONDITION_TYPE_MAINTENANCE:
-					$result[$i][$j] = _('maintenance');
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -344,22 +344,27 @@ function actionOperationConditionValueToString(array $conditions) {
 /**
  * Returns the HTML representation of an action condition and action operation condition.
  *
- * @param string $conditionType
+ * @param string $condition_type
  * @param string $operator
  * @param string $value
  * @param string $value2
  *
  * @return array
  */
-function getConditionDescription($conditionType, $operator, $value, $value2) {
-	if ($conditionType == CONDITION_TYPE_EVENT_TAG_VALUE) {
+function getConditionDescription($condition_type, $operator, $value, $value2) {
+	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
 		$description = [_('Tag')];
 		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
 		$description[] = ' ';
 	}
+	elseif ($condition_type == CONDITION_TYPE_SUPPRESSED) {
+		return ($operator == CONDITION_OPERATOR_YES)
+			? [_('Problem is suppressed')]
+			: [_('Problem is not suppressed')];
+	}
 	else {
-		$description = [condition_type2str($conditionType)];
+		$description = [condition_type2str($condition_type)];
 		$description[] = ' ';
 	}
 
@@ -980,41 +985,41 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
  */
 function get_conditions_by_eventsource($eventsource) {
 	$conditions[EVENT_SOURCE_TRIGGERS] = [
-		CONDITION_TYPE_APPLICATION,
-		CONDITION_TYPE_HOST_GROUP,
-		CONDITION_TYPE_TEMPLATE,
-		CONDITION_TYPE_HOST,
-		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_NAME,
+		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_SEVERITY,
-		CONDITION_TYPE_TIME_PERIOD,
-		CONDITION_TYPE_MAINTENANCE,
+		CONDITION_TYPE_APPLICATION,
+		CONDITION_TYPE_HOST,
+		CONDITION_TYPE_HOST_GROUP,
+		CONDITION_TYPE_SUPPRESSED,
 		CONDITION_TYPE_EVENT_TAG,
-		CONDITION_TYPE_EVENT_TAG_VALUE
+		CONDITION_TYPE_EVENT_TAG_VALUE,
+		CONDITION_TYPE_TEMPLATE,
+		CONDITION_TYPE_TIME_PERIOD
 	];
 	$conditions[EVENT_SOURCE_DISCOVERY] = [
 		CONDITION_TYPE_DHOST_IP,
-		CONDITION_TYPE_DSERVICE_TYPE,
-		CONDITION_TYPE_DSERVICE_PORT,
-		CONDITION_TYPE_DRULE,
 		CONDITION_TYPE_DCHECK,
 		CONDITION_TYPE_DOBJECT,
+		CONDITION_TYPE_DRULE,
 		CONDITION_TYPE_DSTATUS,
-		CONDITION_TYPE_DUPTIME,
+		CONDITION_TYPE_PROXY,
 		CONDITION_TYPE_DVALUE,
-		CONDITION_TYPE_PROXY
+		CONDITION_TYPE_DSERVICE_PORT,
+		CONDITION_TYPE_DSERVICE_TYPE,
+		CONDITION_TYPE_DUPTIME
 	];
 	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = [
 		CONDITION_TYPE_HOST_NAME,
-		CONDITION_TYPE_PROXY,
-		CONDITION_TYPE_HOST_METADATA
+		CONDITION_TYPE_HOST_METADATA,
+		CONDITION_TYPE_PROXY
 	];
 	$conditions[EVENT_SOURCE_INTERNAL] = [
 		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_EVENT_TYPE,
+		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_HOST_GROUP,
-		CONDITION_TYPE_TEMPLATE,
-		CONDITION_TYPE_HOST
+		CONDITION_TYPE_TEMPLATE
 	];
 
 	if (isset($conditions[$eventsource])) {
@@ -1207,9 +1212,9 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_IN,
 		CONDITION_OPERATOR_NOT_IN
 	];
-	$operators[CONDITION_TYPE_MAINTENANCE] = [
-		CONDITION_OPERATOR_IN,
-		CONDITION_OPERATOR_NOT_IN
+	$operators[CONDITION_TYPE_SUPPRESSED] = [
+		CONDITION_OPERATOR_NO,
+		CONDITION_OPERATOR_YES
 	];
 	$operators[CONDITION_TYPE_DRULE] = [
 		CONDITION_OPERATOR_EQUAL,
@@ -1263,14 +1268,18 @@ function get_operators_by_conditiontype($conditiontype) {
 	];
 	$operators[CONDITION_TYPE_HOST_NAME] = [
 		CONDITION_OPERATOR_LIKE,
-		CONDITION_OPERATOR_NOT_LIKE
+		CONDITION_OPERATOR_NOT_LIKE,
+		CONDITION_OPERATOR_REGEXP,
+		CONDITION_OPERATOR_NOT_REGEXP
 	];
 	$operators[CONDITION_TYPE_EVENT_TYPE] = [
 		CONDITION_OPERATOR_EQUAL
 	];
 	$operators[CONDITION_TYPE_HOST_METADATA] = [
 		CONDITION_OPERATOR_LIKE,
-		CONDITION_OPERATOR_NOT_LIKE
+		CONDITION_OPERATOR_NOT_LIKE,
+		CONDITION_OPERATOR_REGEXP,
+		CONDITION_OPERATOR_NOT_REGEXP
 	];
 	$operators[CONDITION_TYPE_EVENT_TAG] = [
 		CONDITION_OPERATOR_EQUAL,
@@ -1792,7 +1801,8 @@ function makeEventMessagesIcon(array $data, array $users) {
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
 			],
-			'num' => $total
+			'num' => $total,
+			'aria-label' => _xn('%1$s message', '%1$s messages', $total, 'screen reader', $total)
 		])
 		: null;
 }
@@ -1838,12 +1848,15 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
 		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
+		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
 	return $total
@@ -1859,7 +1872,8 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
-			]
+			],
+			'aria-label' => $aria_label
 		])
 		: null;
 }
@@ -1950,7 +1964,8 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
 			],
-			'num' => $total
+			'num' => $total,
+			'aria-label' => _xn('%1$s action', '%1$s actions', $total, 'screen reader', $total)
 		])
 		: null;
 }

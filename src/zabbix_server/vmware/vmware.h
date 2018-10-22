@@ -76,6 +76,12 @@ typedef struct
 
 	/* the performance counters to monitor */
 	zbx_vector_ptr_t	counters;
+
+	/* the performance counter query instance name */
+	char			*query_instance;
+
+	/* error information */
+	char			*error;
 }
 zbx_vmware_perf_entity_t;
 
@@ -168,7 +174,8 @@ typedef struct
 	zbx_hashset_t		hvs;
 	zbx_hashset_t		vms_index;
 	zbx_vector_ptr_t	clusters;
-	zbx_vector_ptr_t	events;		/* vector of pointers to zbx_vmware_event_t structures */
+	zbx_vector_ptr_t	events;			/* vector of pointers to zbx_vmware_event_t structures */
+	int			max_query_metrics;	/* max count of Datastore perfCounters in one request */
 }
 zbx_vmware_data_t;
 
@@ -191,11 +198,14 @@ typedef struct
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int			lastaccess;
 
-	/* the vmware service instance contents */
-	char			*contents;
+	/* the vmware service instance version */
+	char			*version;
+
+	/* the vmware service instance fullname */
+	char			*fullname;
 
 	/* the performance counters */
-	zbx_hashset_t 		counters;
+	zbx_hashset_t		counters;
 
 	/* list of entities to monitor with performance counters */
 	zbx_hashset_t		entities;
@@ -215,6 +225,7 @@ zbx_vmware_service_t;
 typedef struct
 {
 	zbx_vector_ptr_t	services;
+	zbx_hashset_t		strpool;
 }
 zbx_vmware_t;
 
@@ -242,7 +253,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 
 int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
 int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid);
+		zbx_uint64_t counterid, const char *instance);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
 
@@ -315,9 +326,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
-
-char	*zbx_xml_read_value(const char *data, const char *xpath);
-int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0

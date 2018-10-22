@@ -46,7 +46,6 @@ class testFormTemplate extends CLegacyWebTest {
 					'visible_name' => 'Test template with visible name',
 					'group' => 'Linux servers',
 					'new_group' => 'Selenium new group',
-					'other_group' => 'Zabbix servers',
 					'description' => 'template description',
 					'dbCheck' => true,
 					'formCheck' => true

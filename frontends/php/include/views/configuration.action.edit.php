@@ -135,14 +135,24 @@ foreach ($data['allowedConditions'] as $key => $condition) {
 		'type' => $condition
 	];
 }
-order_result($data['allowedConditions'], 'name');
+
 foreach ($data['allowedConditions'] as $condition) {
 	$conditionTypeComboBox->addItem($condition['type'], $condition['name']);
 }
 
-$conditionOperatorsComboBox = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
-foreach (get_operators_by_conditiontype($data['new_condition']['conditiontype']) as $operator) {
-	$conditionOperatorsComboBox->addItem($operator, condition_operator2str($operator));
+$condition_operators_list = get_operators_by_conditiontype($data['new_condition']['conditiontype']);
+
+if (count($condition_operators_list) > 1) {
+	$condition_operator = new CComboBox('new_condition[operator]', $data['new_condition']['operator']);
+
+	foreach ($condition_operators_list as $operator) {
+		$condition_operator->addItem($operator, condition_operator2str($operator));
+	}
+}
+else {
+	$condition_operator = [new CVar('new_condition[operator]', $condition_operators_list[0]),
+		condition_operator2str($condition_operators_list[0])
+	];
 }
 
 $condition2 = null;
@@ -233,10 +243,6 @@ switch ($data['new_condition']['conditiontype']) {
 			$severityNames[] = getSeverityName($severity, $data['config']);
 		}
 		$condition = new CComboBox('new_condition[value]', null, null, $severityNames);
-		break;
-
-	case CONDITION_TYPE_MAINTENANCE:
-		$condition = _('maintenance');
 		break;
 
 	case CONDITION_TYPE_DRULE:
@@ -381,8 +387,8 @@ $action_tab->addRow(_('New condition'),
 					$conditionTypeComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition2,
-					$condition2 === null ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$conditionOperatorsComboBox,
+					($condition2 === null) ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition_operator,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition
 				])
@@ -421,9 +427,9 @@ $operation_tab
 	);
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operation_tab->addRow(_('Pause operations while in maintenance'),
-		(new CCheckBox('maintenance_mode', ACTION_MAINTENANCE_MODE_PAUSE))
-			->setChecked($data['action']['maintenance_mode'] == ACTION_MAINTENANCE_MODE_PAUSE)
+	$operation_tab->addRow(_('Pause operations for suppressed problems'),
+		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
 	);
 }
 

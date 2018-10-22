@@ -462,7 +462,7 @@ class testWebScenario extends CAPITest {
 			// Check  unexpected parameter.
 			[
 				'httptest' => [
-					'name' => 'Api web scenario with readonly parametr',
+					'name' => 'Api web scenario with readonly parameter',
 					'templateid' => '1'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "templateid".'
@@ -616,7 +616,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong delay',
 					'delay' => '-1'
 				],
-				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
+				'expected_error' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 			],
 			[
 				'httptest' => [

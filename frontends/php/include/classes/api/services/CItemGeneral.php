@@ -927,13 +927,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $hostids) {
+		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
 					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $hostids).
+					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
 			);
 
@@ -1262,7 +1262,8 @@ abstract class CItemGeneral extends CApiService {
 						if (!is_numeric($params)
 								&& (new CUserMacroParser())->parse($params) != CParser::PARSE_SUCCESS
 								&& (!($this instanceof CItemPrototype)
-									|| (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS)) {
+									|| ((new CLLDMacroFunctionParser())->parse($params) != CParser::PARSE_SUCCESS
+										&& (new CLLDMacroParser())->parse($params) != CParser::PARSE_SUCCESS))) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
@@ -1912,8 +1913,8 @@ abstract class CItemGeneral extends CApiService {
 		$rules = [
 			'timeout' => [
 				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-					? API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-					: API_ALLOW_USER_MACRO,
+					? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+					: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 				'in' => '1:'.SEC_PER_MIN
 			],
 			'url' => [
@@ -2074,12 +2075,12 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
-			$validator = new CStatusCodeRangesValidator([
+			$ranges_parser = new CRangesParser([
 				'usermacros' => true,
 				'lldmacros' => ($this instanceof CItemPrototype)
 			]);
 
-			if (!$validator->validate($item['status_codes'])) {
+			if ($ranges_parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
 				);

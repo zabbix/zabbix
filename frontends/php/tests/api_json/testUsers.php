@@ -31,9 +31,12 @@ class testUsers extends CAPITest {
 			// Check user password.
 			[
 				'user' => [
-					'alias' => 'API user create without password'
+					'alias' => 'API user create without password',
+					'usrgrps' => [
+						['usrgrpid' => 7]
+					]
 				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "passwd" is missing.'
+				'Incorrect value for field "passwd": cannot be empty.'
 			],
 			// Check user alias.
 			[

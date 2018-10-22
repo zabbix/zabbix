@@ -19,20 +19,10 @@
 **/
 
 
-class CColHeader extends CTag {
+class CColHeader extends CCol {
 
 	public function __construct($item = null) {
-		parent::__construct('th', true);
-		$this->addItem($item);
-	}
-
-	public function setColSpan($value) {
-		$this->setAttribute('colspan', $value);
-		return $this;
-	}
-
-	public function setWidth($value) {
-		$this->setAttribute('width', $value);
-		return $this;
+		$this->tag = 'th';
+		parent::__construct($item);
 	}
 }

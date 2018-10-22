@@ -63,7 +63,7 @@ static void	DBget_lastsize(void)
 static void	DBupdate_lastsize(void)
 {
 	DBbegin();
-	DBexecute("update globalvars set snmp_lastsize=" ZBX_FS_UI64, trap_lastsize);
+	DBexecute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
 	DBcommit();
 }
 
@@ -81,12 +81,11 @@ static void	DBupdate_lastsize(void)
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
-	const char* __function_name = "process_trap_for_interface";
 	DC_ITEM			*items = NULL;
 	const char		*regex;
 	char			error[ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
-	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, rret;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
 	AGENT_RESULT		*results = NULL;
@@ -149,14 +148,15 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				}
 			}
 
-			if (ZBX_REGEXP_NO_MATCH == (rret = regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE)))
+			if (ZBX_REGEXP_NO_MATCH == (regexp_ret = regexp_match_ex(&regexps, trap, regex,
+					ZBX_CASE_SENSITIVE)))
 			{
 				goto next;
 			}
-			else if (FAIL == rret)
+			else if (FAIL == regexp_ret)
 			{
 				SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
-						"Invalid regular expression \"%s\" in %s()", regex, __function_name));
+						"Invalid regular expression \"%s\".", regex));
 				errcodes[i] = NOTSUPPORTED;
 				goto next;
 			}
@@ -433,11 +433,11 @@ static int	read_traps(void)
 	int		nbytes = 0;
 	char		*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:" ZBX_FS_I64, __function_name, trap_lastsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize: %lld", __function_name, (long long int)trap_lastsize);
 
 	if (-1 == lseek(trap_fd, trap_lastsize, SEEK_SET))
 	{
-		error = zbx_dsprintf(error, "cannot set position to " ZBX_FS_I64 " for \"%s\": %s", trap_lastsize,
+		error = zbx_dsprintf(error, "cannot set position to %lld for \"%s\": %s", (long long int)trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		delay_trap_logs(error, LOG_LEVEL_WARNING);
 		goto out;
@@ -642,11 +642,11 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		sec = zbx_time();
 		while (SUCCEED == get_latest_data())
 			read_traps();
 		sec = zbx_time() - sec;
@@ -655,10 +655,6 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 				get_process_type_string(process_type), sec);
 
 		zbx_sleep_loop(1);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 
 	zbx_free(buffer);

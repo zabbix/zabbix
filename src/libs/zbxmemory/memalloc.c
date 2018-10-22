@@ -283,13 +283,15 @@ static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 		{
 			if (NULL == chunk)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
+				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked " ZBX_FS_UI64 " skip_min "
+						ZBX_FS_UI64 " skip_max " ZBX_FS_UI64,
 						counter, size, skip_min, skip_max);
 			}
 			else if (counter >= 100)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u"
-						" size %u", counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked " ZBX_FS_UI64 " skip_min "
+						ZBX_FS_UI64 " skip_max " ZBX_FS_UI64 " size " ZBX_FS_UI64, counter,
+						size, skip_min, skip_max, CHUNK_SIZE(chunk));
 			}
 		}
 	}
@@ -627,8 +629,8 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 	(*info)->free_size = (*info)->total_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T,
-			(char *)(*info)->lo_bound + MEM_SIZE_FIELD,
-			(char *)(*info)->hi_bound - MEM_SIZE_FIELD,
+			(void *)((char *)(*info)->lo_bound + MEM_SIZE_FIELD),
+			(void *)((char *)(*info)->hi_bound - MEM_SIZE_FIELD),
 			(zbx_fs_size_t)(*info)->total_size);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -667,6 +669,8 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __function_name, info->mem_param);
+		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
@@ -700,6 +704,8 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __function_name, info->mem_param);
+		zbx_mem_dump_stats(LOG_LEVEL_CRIT, info);
+		zbx_backtrace();
 		exit(EXIT_FAILURE);
 	}
 
@@ -740,14 +746,14 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	zbx_mem_dump_stats(zbx_mem_info_t *info)
+void	zbx_mem_dump_stats(int level, zbx_mem_info_t *info)
 {
 	void		*chunk;
 	int		index;
 	zbx_uint64_t	counter, total, total_free = 0;
 	zbx_uint64_t	min_size = __UINT64_C(0xffffffffffffffff), max_size = __UINT64_C(0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "=== memory statistics for %s ===", info->mem_descr);
+	zabbix_log(level, "=== memory statistics for %s ===", info->mem_descr);
 
 	for (index = 0; index < MEM_BUCKET_COUNT; index++)
 	{
@@ -765,21 +771,24 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 		if (counter > 0)
 		{
 			total_free += counter;
-			zabbix_log(LOG_LEVEL_DEBUG, "free chunks of size %2s %3d bytes: %8d",
+			zabbix_log(level, "free chunks of size %2s %3d bytes: %8llu",
 					index == MEM_BUCKET_COUNT - 1 ? ">=" : "",
-					MEM_MIN_BUCKET_SIZE + 8 * index, counter);
+					MEM_MIN_BUCKET_SIZE + 8 * index, (unsigned long long)counter);
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "min chunk size: %10u bytes", min_size);
-	zabbix_log(LOG_LEVEL_DEBUG, "max chunk size: %10u bytes", max_size);
+	zabbix_log(level, "min chunk size: %10llu bytes", (unsigned long long)min_size);
+	zabbix_log(level, "max chunk size: %10llu bytes", (unsigned long long)max_size);
 
 	total = (info->total_size - info->used_size - info->free_size) / (2 * MEM_SIZE_FIELD) + 1;
-	zabbix_log(LOG_LEVEL_DEBUG, "memory of total size %u bytes fragmented into %d chunks", info->total_size, total);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d free chunks", info->free_size, total_free);
-	zabbix_log(LOG_LEVEL_DEBUG, "of those, %10u bytes are in %8d used chunks", info->used_size, total - total_free);
+	zabbix_log(level, "memory of total size %llu bytes fragmented into %llu chunks",
+			(unsigned long long)info->total_size, (unsigned long long)total);
+	zabbix_log(level, "of those, %10llu bytes are in %8llu free chunks",
+			(unsigned long long)info->free_size, (unsigned long long)total_free);
+	zabbix_log(level, "of those, %10llu bytes are in %8llu used chunks",
+			(unsigned long long)info->used_size, (unsigned long long)(total - total_free));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "================================");
+	zabbix_log(level, "================================");
 }
 
 size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)

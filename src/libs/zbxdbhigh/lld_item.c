@@ -575,7 +575,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	DB_ROW				row;
 	zbx_lld_item_t			*item, *master;
 	zbx_lld_item_preproc_t		*preproc_op;
-	zbx_lld_item_prototype_t	*item_prototype;
+	const zbx_lld_item_prototype_t	*item_prototype;
 	zbx_uint64_t			db_valuemapid, db_interfaceid, itemid, master_itemid;
 	zbx_vector_uint64_t		parent_itemids;
 	int				i, index;
@@ -589,8 +589,6 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	for (i = 0; i < item_prototypes->values_num; i++)
 	{
-		const zbx_lld_item_prototype_t	*item_prototype;
-
 		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[i];
 
 		zbx_vector_uint64_append(&parent_itemids, item_prototype->itemid);
@@ -629,7 +627,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
 		item = (zbx_lld_item_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_t));
 
@@ -826,7 +824,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
+		item_prototype = (const zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
 		if (master_itemid != item_prototype->master_itemid)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_MASTER_ITEM;
@@ -1248,8 +1246,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
-	char		err[MAX_STRING_LEN], *err_dyn = NULL;
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	char		err[MAX_STRING_LEN];
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+	const char*	regexp_err = NULL;
 
 	*err = '\0';
 
@@ -1274,11 +1273,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 
 			*output++ = '\0';
 
-			if (FAIL == (ret = zbx_regexp_compile(pattern, REG_EXTENDED | REG_NEWLINE | REG_NOSUB, NULL,
-					&err_dyn)))
+			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &regexp_err)))
 			{
-				zbx_strlcpy(err, err_dyn, sizeof(err));
-				zbx_free(err_dyn);
+				zbx_strlcpy(err, regexp_err, sizeof(err));
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
@@ -1790,8 +1787,9 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->query_fields = zbx_strdup(NULL, item_prototype->query_fields);
 	item->query_fields_orig = NULL;
-	substitute_lld_macros(&item->query_fields, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/*zbx_lrtrim(item->query_fields, ZBX_WHITESPACE);*/
+
+	if (SUCCEED == ret)
+		ret = substitute_macros_in_json_pairs(&item->query_fields, jp_row, err, sizeof(err));
 
 	item->posts = zbx_strdup(NULL, item_prototype->posts);
 	item->posts_orig = NULL;
@@ -1802,8 +1800,11 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_JSON, NULL, 0);
 			break;
 		case ZBX_POSTTYPE_XML:
-			if (FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err, sizeof(err))))
+			if (SUCCEED == ret && FAIL == (ret = substitute_macros_xml(&item->posts, NULL, jp_row, err,
+					sizeof(err))))
+			{
 				zbx_lrtrim(err, ZBX_WHITESPACE);
+			}
 			break;
 		default:
 			substitute_lld_macros(&item->posts, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -2073,8 +2074,10 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->query_fields);
-	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_JSON, NULL, 0);
-	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+
+	if (FAIL == substitute_macros_in_json_pairs(&buffer, jp_row, err, sizeof(err)))
+		*error = zbx_strdcatf(*error, "Cannot update item: %s.\n", err);
+
 	if (0 != strcmp(item->query_fields, buffer))
 	{
 		item->query_fields_orig = item->query_fields;

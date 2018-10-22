@@ -92,9 +92,10 @@ const char	*help_message[] = {
 	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        pid                      Process identifier",
 	"        process-type             All processes of specified type (e.g., poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
+	"        pid                      Process identifier, up to 65535. For larger",
+	"                                 values specify target as \"process-type,N\"",
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
@@ -460,6 +461,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_SOCKET_PATH)
 		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
+
+	if (0 != CONFIG_IPMIPOLLER_FORKS)
+		CONFIG_IPMIMANAGER_FORKS = 1;
 }
 
 /******************************************************************************
@@ -1027,9 +1031,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 	DBclose();
-
-	if (0 != CONFIG_IPMIPOLLER_FORKS)
-		CONFIG_IPMIMANAGER_FORKS = 1;
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS

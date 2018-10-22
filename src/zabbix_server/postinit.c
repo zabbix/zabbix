@@ -277,7 +277,7 @@ static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *s
 			" from events"
 			" where source=%d"
 				" and object=%d"
-				" and objectid=%d"
+				" and objectid=" ZBX_FS_UI64
 			" order by eventid",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid);
 

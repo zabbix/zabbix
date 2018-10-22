@@ -27,6 +27,7 @@
 #include "zbxself.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
+#include "dbcache.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
@@ -78,6 +79,7 @@ static int	proxy_data_sender(int *more, int now)
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp)
 	{
@@ -226,13 +228,13 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		time_now = zbx_time();
+		zbx_update_env(time_now);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, time_diff);
 
 		records = 0;
-		time_now = zbx_time();
 		time_start = time_now;
 
 		do
@@ -249,9 +251,5 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }

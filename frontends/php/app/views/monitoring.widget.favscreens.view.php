@@ -30,19 +30,17 @@ foreach ($data['screens'] as $screen) {
 		: "rm4favorites('screenid','".$screen['screenid']."')";
 
 	$table->addRow([
-		new CLink($screen['label'], $url->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)),
+		new CLink($screen['label'], $url),
 		(new CButton())
 			->onClick($on_click)
 			->addClass(ZBX_STYLE_REMOVE_BTN)
+			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $screen['label']))
 	]);
 }
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([
-		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-	]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -31,7 +31,7 @@ class testIconMap extends CAPITest {
 			[
 				'iconmap' => [
 					'iconmapid' => 1,
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'default_iconid' => '2',
 					'mappings' =>[
 						[
@@ -301,7 +301,7 @@ class testIconMap extends CAPITest {
 			// Check mappings.
 			[[
 				'iconmap' => [
-					'name' => 'API icon map without mapping parametrs',
+					'name' => 'API icon map without mapping parameters',
 					'default_iconid' => '2',
 					'mappings' =>[
 					]
@@ -628,7 +628,7 @@ class testIconMap extends CAPITest {
 			[
 				'iconmap' => [[
 					'iconmappingid' => 2,
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'default_iconid' => '2',
 				]],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "iconmappingid".'

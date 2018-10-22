@@ -1644,7 +1644,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  * Purpose: finds daylight saving change time inside specified time period    *
  *                                                                            *
  * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the the time period end                      *
+ *             time_end   - [IN] the time period end                          *
  *                                                                            *
  * Return Value: Time when the daylight saving changes should occur.          *
  *                                                                            *
@@ -2117,7 +2117,7 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == xdigits && 0 < colons)
 			{
-				/* consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeros are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
 			}
@@ -2392,32 +2392,18 @@ int	zbx_double_compare(double a, double b)
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
 {
-	size_t	i;
-	char	dot = 0;
+	int	len;
 
-	for (i = 0; '\0' != str[i]; i++)
-	{
-		/* negative number? */
-		if ('-' == str[i] && 0 == i)
-			continue;
+	if ('-' == *str)	/* check leading sign */
+		str++;
 
-		if (0 != isdigit(str[i]))
-			continue;
-
-		if ('.' == str[i] && 0 == dot)
-		{
-			dot = 1;
-			continue;
-		}
-
-		/* last character is suffix */
-		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]) && '\0' == str[i + 1])
-			continue;
-
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
-	}
 
-	return SUCCEED;
+	if ('\0' != *(str += len) && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
+		str++;		/* allow valid suffix if flag is enabled */
+
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2436,50 +2422,37 @@ int	is_double_suffix(const char *str, unsigned char flags)
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	int	i = 0, digits = 0;
+	int	len;
 
-	while (' ' == str[i])				/* trim left spaces */
-		i++;
+	while (' ' == *str)			/* trim left spaces */
+		str++;
 
-	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
-		i++;
+	if ('-' == *str || '+' == *str)		/* check leading sign */
+		str++;
 
-	while (0 != isdigit(str[i]))			/* check digits before dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if ('.' == str[i])				/* check decimal dot */
-		i++;
-
-	while (0 != isdigit(str[i]))			/* check digits after dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
+	str += len;
+
+	if ('e' == *str || 'E' == *str)		/* check exponential part */
 	{
-		i++;
+		str++;
 
-		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
-			i++;
+		if ('-' == *str || '+' == *str)	/* check exponent sign */
+			str++;
 
-		if (0 == isdigit(str[i]))		/* check exponent */
+		if (0 == isdigit(*str))		/* check exponent */
 			return FAIL;
 
-		while (0 != isdigit(str[i]))
-			i++;
+		while (0 != isdigit(*str))
+			str++;
 	}
 
-	while (' ' == str[i])				/* trim right spaces */
-		i++;
+	while (' ' == *str)			/* trim right spaces */
+		str++;
 
-	return '\0' == str[i] ? SUCCEED : FAIL;
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2848,7 +2821,8 @@ int	is_uoct(const char *str)
  *                                                                            *
  * Function: is_uhex                                                          *
  *                                                                            *
- * Purpose: check if the string is unsigned hexadecimal                       *
+ * Purpose: check if the string is unsigned hexadecimal representation of     *
+ *          data in the form "0-9, a-f or A-F"                                *
  *                                                                            *
  * Parameters: str - string to check                                          *
  *                                                                            *
@@ -3494,4 +3468,72 @@ unsigned int	zbx_alarm_off(void)
 int	zbx_alarm_timed_out(void)
 {
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_create_token                                                 *
+ *                                                                            *
+ * Purpose: creates semi-unique token based on the seed and current timestamp *
+ *                                                                            *
+ * Parameters:  seed - [IN] the seed                                          *
+ *                                                                            *
+ * Return value: Hexadecimal token string, must be freed by caller            *
+ *                                                                            *
+ * Comments: if you change token creation algorithm do not forget to adjust   *
+ *           ZBX_DATA_SESSION_TOKEN_SIZE definition                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_create_token(zbx_uint64_t seed)
+{
+	const char	*hex = "0123456789abcdef";
+	zbx_timespec_t	ts;
+	md5_state_t	state;
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	int		i;
+	char		*token, *ptr;
+
+	ptr = token = (char *)zbx_malloc(NULL, ZBX_DATA_SESSION_TOKEN_SIZE + 1);
+
+	zbx_timespec(&ts);
+
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)&seed, (int)sizeof(seed));
+	zbx_md5_append(&state, (const md5_byte_t *)&ts, (int)sizeof(ts));
+	zbx_md5_finish(&state, hash);
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	{
+		*ptr++ = hex[hash[i] >> 4];
+		*ptr++ = hex[hash[i] & 15];
+	}
+
+	*ptr = '\0';
+
+	return token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_env                                                   *
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] the time for compare in seconds                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();
+#endif
+	}
 }

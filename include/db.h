@@ -312,6 +312,7 @@ typedef struct
 	int			acknowledged;
 	int			ns;
 	int			severity;
+	unsigned char		suppressed;
 
 	zbx_vector_ptr_t	tags;
 
@@ -441,7 +442,7 @@ typedef struct
 	char		*ack_longdata;
 	int		esc_period;
 	unsigned char	eventsource;
-	unsigned char	maintenance_mode;
+	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
 }
@@ -475,8 +476,8 @@ void	DBstatement_prepare(const char *sql);
 #	define DBexecute __zbx_DBexecute
 #	define DBexecute_once __zbx_DBexecute_once
 #endif
-int	__zbx_DBexecute(const char *fmt, ...);
-int	__zbx_DBexecute_once(const char *fmt, ...);
+int	__zbx_DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+int	__zbx_DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #ifdef HAVE___VA_ARGS__
 #	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -485,8 +486,8 @@ int	__zbx_DBexecute_once(const char *fmt, ...);
 #	define DBselect_once	__zbx_DBselect_once
 #	define DBselect		__zbx_DBselect
 #endif
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
-DB_RESULT	__zbx_DBselect(const char *fmt, ...);
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+DB_RESULT	__zbx_DBselect(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
@@ -514,7 +515,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;	/* itemid should come first for correct sorting */
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN * 4 + 1];
+	char		key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype;
 	int		sortorder;
 	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
@@ -764,5 +765,7 @@ typedef struct
 	zbx_uint64_t	flags;
 }
 zbx_proxy_diff_t;
+
+int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 #endif
