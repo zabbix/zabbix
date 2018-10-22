@@ -79,6 +79,18 @@ class CControllerMediatypeCreate extends CController {
 		return $ret;
 	}
 
+	/**
+	 * Return all input parameters.
+	 * Providing controller specific defaults.
+	 *
+	 * @return var
+	 */
+	public function getInputAll() {
+		return parent::getInputAll() + [
+			'status' => (string) MEDIA_TYPE_STATUS_DISABLED
+		];
+	}
+
 	protected function checkPermissions() {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
@@ -89,7 +101,7 @@ class CControllerMediatypeCreate extends CController {
 		$this->getInputs($mediatype, ['type', 'description', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
 
 		$mediatype += [
-			'status' => MEDIA_TYPE_STATUS_DISABLED,
+			'status' => MEDIA_TYPE_STATUS_DISABLED
 		];
 
 		switch ($mediatype['type']) {

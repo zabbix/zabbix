@@ -100,6 +100,17 @@ class CControllerMediatypeEdit extends CController {
 		return true;
 	}
 
+	/**
+	 * Return all input parameters.
+	 *
+	 * @return var
+	 */
+	public function getInputAll() {
+		return parent::getInputAll() + [
+			'status' => (string) MEDIA_TYPE_STATUS_DISABLED
+		];
+	}
+
 	protected function doAction() {
 		// default values
 		$db_defaults = DB::getDefaults('media_type');
