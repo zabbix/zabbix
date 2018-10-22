@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup maintenances
  */
-class testMaintenance extends CZabbixTest {
+class testMaintenance extends CAPITest {
 	public static function getMaintenanceCreateData() {
 		$n = 0;
 		$def_options = [

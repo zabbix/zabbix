@@ -118,7 +118,7 @@ class testPageDashboard extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 			$this->zbxTestCheckFatalErrors();
-			$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
+			$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 		}
 		catch (Exception $e) {
 			$exception = $e;
