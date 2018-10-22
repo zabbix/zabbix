@@ -3839,6 +3839,9 @@ tr.cursor-move td * {
 .flickerfreescreen {
   position: relative; }
 
+.graph-wrapper {
+  display: inline; }
+
 .clock {
   padding: 0 10px;
   height: 99%;
