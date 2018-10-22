@@ -1155,6 +1155,8 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
+	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
+	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
@@ -1186,6 +1188,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	VMWARE_VECTOR_CREATE(&dst->datastores, ptr);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
+	zbx_vector_ptr_reserve(&dst->datastores, src->datastores.values_num);
+	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
@@ -1225,6 +1229,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 			__vm_mem_realloc_func, __vm_mem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
+	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
+	zbx_vector_ptr_reserve(&data->events, src->events.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
 			__vm_mem_realloc_func, __vm_mem_free_func);
@@ -1830,8 +1836,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 	}
 
 	nodeset = xpathObj->nodesetval;
-
-	zbx_vector_ptr_reserve(counters, 2 * nodeset->nodeNr * sizeof(void *));
+	zbx_vector_ptr_reserve(counters, 2 * nodeset->nodeNr + counters->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -1926,6 +1931,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->devs, nodeset->nodeNr + vm->devs.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -1987,6 +1993,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->devs, nodeset->nodeNr + vm->devs.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -2096,6 +2103,7 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->file_systems, nodeset->nodeNr + vm->file_systems.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -2637,6 +2645,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv->clusterid = value;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
+	zbx_vector_ptr_reserve(&hv->datastores, datastores.values_num + hv->datastores.values_alloc);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -2647,6 +2656,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	}
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
+	zbx_vector_ptr_reserve(&hv->vms, vms.values_num + hv->vms.values_alloc);
 
 	for (i = 0; i < vms.values_num; i++)
 	{
@@ -3090,6 +3100,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	if (0 != ids.values_num)
 	{
 		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_ptr_reserve(events, ids.values_num + events->values_alloc);
 
 		/* we are reading "scrollable views" in reverse chronological order, */
 		/* so inside a "scrollable view" latest events should come first too */
@@ -3462,6 +3473,7 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 		goto out;
 
 	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
+	zbx_vector_ptr_reserve(clusters, ids.values_num + clusters->values_alloc);
 
 	for (i = 0; i < ids.values_num; i++)
 	{
@@ -3928,6 +3940,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 		goto out;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(pervalues, nodeset->nodeNr + pervalues->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -4000,6 +4013,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(perfdata, nodeset->nodeNr + perfdata->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
