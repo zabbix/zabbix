@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup applications
  */
-class testInheritanceApplication extends CWebTest {
+class testInheritanceApplication extends CLegacyWebTest {
 
 	private $template = 'Inheritance test template';
 	private $host = 'Template inheritance test host';
