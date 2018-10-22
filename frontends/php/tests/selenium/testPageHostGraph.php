@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup graphs
  */
-class testPageHostGraph extends CWebTest {
+class testPageHostGraph extends CLegacyWebTest {
 
 	public function testPageHostGraph_CheckLayout() {
 		$host_name = 'Host to check graph 1';

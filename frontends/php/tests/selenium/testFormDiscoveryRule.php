@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup items
  */
-class testFormDiscoveryRule extends CWebTest {
+class testFormDiscoveryRule extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -348,14 +348,13 @@ class testFormDiscoveryRule extends CWebTest {
 				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBdata(
+					$dbInterfaces = CDBHelper::getAll(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
 					);
-					$dbInterfaces = reset($dbInterfaces);
-					if ($dbInterfaces != null) {
+					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
 							$host_interface['ip'].' : '.$host_interface['port'].'"]');
@@ -657,7 +656,10 @@ class testFormDiscoveryRule extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
+		return CDBHelper::getDataProvider(
+			'select * from items'.
+			' where hostid = 40001 and key_ LIKE \'discovery-rule-form%\''
+		);
 	}
 
 	/**
@@ -667,7 +669,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
-		$oldHashDiscovery = DBhash($sqlDiscovery);
+		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -678,7 +680,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 
-		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
+		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 
 	// Returns create data
@@ -1799,7 +1801,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
-			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
+			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');
 		}
 	}
 
