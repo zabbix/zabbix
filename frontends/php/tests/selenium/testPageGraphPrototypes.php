@@ -80,7 +80,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		);
 
 		// Check graph prototype number in breadcrumb.
-		$graphs = DBdata($this->sql_graph_prototypes);
+		$graphs = CDBHelper::getAll($this->sql_graph_prototypes);
 		$count = count($graphs);
 		$xpath = '//ul[contains(@class, "filter-breadcrumb")]//a[text()="Graph prototypes"]/..//sup';
 		$get_number = $this->zbxTestGetText($xpath);
@@ -89,7 +89,6 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		// Check graph prototype configuration parameters in table.
 		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
 		foreach ($graphs as $graph) {
-			$graph = $graph[0];
 			// Check the graph names and get graph row in table.
 			$element = $this->webDriver->findElement(WebDriverBy::xpath('//table[@class="list-table"]/tbody'
 					.'//a[text()="'.$graph['name'].'"]/../..')
@@ -155,7 +154,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		else {
 			$this->zbxTestCheckboxSelect('all_graphs');
 			$sql = $this->sql_graph_prototypes;
-			$this->zbxTestAssertElementText("//span[@id='selected_count']", DBcount($sql).' selected');
+			$this->zbxTestAssertElementText("//span[@id='selected_count']", CDBHelper::getCount($sql).' selected');
 		}
 
 		$this->zbxTestClickButton('graph.massdelete');
@@ -166,7 +165,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -184,7 +183,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 					' WHERE itemid='.$item_id.
 				')';
 
-		$old_hash = DBhash($sql_hash);
+		$old_hash = CDBHelper::getHash($sql_hash);
 
 		$this->zbxTestLogin('graphs.php?parent_discoveryid='.$parent_discovery_id);
 		$this->zbxTestCheckboxSelect('all_graphs');
@@ -194,6 +193,6 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graphs.');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($old_hash, DBhash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 }
