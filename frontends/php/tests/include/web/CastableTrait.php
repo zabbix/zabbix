@@ -28,10 +28,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CElement
 	 */
 	public function asElement($options = []) {
-		return $this->cast(CElement::class, $options);
+		return $this->cast('CElement', $options);
 	}
 
 	/**
@@ -39,10 +39,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CCheckboxElement
 	 */
 	public function asCheckbox($options = []) {
-		return $this->cast(CCheckboxElement::class, $options);
+		return $this->cast('CCheckboxElement', $options);
 	}
 
 	/**
@@ -50,10 +50,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CDashboardElement
 	 */
 	public function asDashboard($options = []) {
-		return $this->cast(CDashboardElement::class, $options);
+		return $this->cast('CDashboardElement', $options);
 	}
 
 	/**
@@ -61,10 +61,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CDropdownElement
 	 */
 	public function asDropdown($options = []) {
-		return $this->cast(CDropdownElement::class, $options);
+		return $this->cast('CDropdownElement', $options);
 	}
 
 	/**
@@ -72,10 +72,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CFormElement
 	 */
 	public function asForm($options = []) {
-		return $this->cast(CFormElement::class, $options);
+		return $this->cast('CFormElement', $options);
 	}
 
 	/**
@@ -83,10 +83,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CMessageElement
 	 */
 	public function asMessage($options = []) {
-		return $this->cast(CMessageElement::class, $options);
+		return $this->cast('CMessageElement', $options);
 	}
 
 	/**
@@ -94,10 +94,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CMultiselectElement
 	 */
 	public function asMultiselect($options = []) {
-		return $this->cast(CMultiselectElement::class, $options);
+		return $this->cast('CMultiselectElement', $options);
 	}
 
 	/**
@@ -105,10 +105,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return COverlayDialogElement
 	 */
 	public function asOverlayDialog($options = []) {
-		return $this->cast(COverlayDialogElement::class, $options);
+		return $this->cast('COverlayDialogElement', $options);
 	}
 
 	/**
@@ -116,10 +116,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CTableElement
 	 */
 	public function asTable($options = []) {
-		return $this->cast(CTableElement::class, $options);
+		return $this->cast('CTableElement', $options);
 	}
 
 	/**
@@ -127,10 +127,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CTableRowElement
 	 */
 	public function asTableRow($options = []) {
-		return $this->cast(CTableRowElement::class, $options);
+		return $this->cast('CTableRowElement', $options);
 	}
 
 	/**
@@ -138,10 +138,10 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return CWidgetElement
 	 */
 	public function asWidget($options = []) {
-		return $this->cast(CWidgetElement::class, $options);
+		return $this->cast('CWidgetElement', $options);
 	}
 
 	/**
@@ -149,9 +149,9 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return mixed
+	 * @return RemoteWebElement
 	 */
 	public function asBaseType($options = []) {
-		return $this->cast(RemoteWebElement::class, $options);
+		return $this->cast('RemoteWebElement', $options);
 	}
 }
