@@ -114,7 +114,7 @@ class CElementQuery implements IWaitable {
 	 * @param string $locator  locator part of selector
 	 */
 	public function __construct($type, $locator = null) {
-		$this->class = CElement::class;
+		$this->class = 'CElement';
 		$this->context = self::$driver;
 
 		if ($type !== null) {
@@ -158,7 +158,7 @@ class CElementQuery implements IWaitable {
 			}
 		}
 
-		return call_user_func([WebDriverBy::class, $type], $locator);
+		return call_user_func(['WebDriverBy', $type], $locator);
 	}
 
 	/**
@@ -268,12 +268,11 @@ class CElementQuery implements IWaitable {
 	 * @return CElement
 	 */
 	public function all() {
-		$result = [];
 		$class = $this->class;
 
 		$elements = $this->context->findElements($this->by);
 
-		if ($this->class !== RemoteWebElement::class) {
+		if ($this->class !== 'RemoteWebElement') {
 			foreach ($elements as &$element) {
 				$element = new $class($element, $this->options);
 			}

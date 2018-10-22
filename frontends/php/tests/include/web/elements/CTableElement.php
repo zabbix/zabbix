@@ -181,6 +181,6 @@ class CTableElement extends CElement {
 			$table[$row->getColumn($column)->getText()] = $row;
 		}
 
-		return new CElementCollection($table, CTableRowElement::class);
+		return new CElementCollection($table, 'CTableRowElement');
 	}
 }
