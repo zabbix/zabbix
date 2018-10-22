@@ -316,27 +316,31 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 		return FAIL;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_variant(value, &value_num);
 
-	if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
+	if (ZBX_VARIANT_NONE != history_value->type)
 	{
-		zbx_variant_convert(value, ZBX_VARIANT_DBL);
-		zbx_variant_convert(history_value, ZBX_VARIANT_DBL);
-		ret = item_preproc_delta_float(value, ts, op_type, history_value, history_ts);
-	}
-	else
-	{
-		zbx_variant_convert(value, ZBX_VARIANT_UI64);
-		zbx_variant_convert(history_value, ZBX_VARIANT_UI64);
-		ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
+		zbx_variant_set_variant(value, &value_num);
+
+		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
+		{
+			zbx_variant_convert(value, ZBX_VARIANT_DBL);
+			zbx_variant_convert(history_value, ZBX_VARIANT_DBL);
+			ret = item_preproc_delta_float(value, ts, op_type, history_value, history_ts);
+		}
+		else
+		{
+			zbx_variant_convert(value, ZBX_VARIANT_UI64);
+			zbx_variant_convert(history_value, ZBX_VARIANT_UI64);
+			ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
+		}
+
+		if (SUCCEED != ret)
+			zbx_variant_clear(value);
 	}
 
 	*history_ts = *ts;
 	zbx_variant_set_variant(history_value, &value_num);
 	zbx_variant_clear(&value_num);
-
-	if (SUCCEED != ret)
-		zbx_variant_clear(value);
 
 	return SUCCEED;
 }
@@ -1370,6 +1374,80 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_throttle_value                                      *
+ *                                                                            *
+ * Purpose: throttles value by suppressing identical values                   *
+ *                                                                            *
+ * Parameters: value         - [IN/OUT] the value to process                  *
+ *             ts            - [IN] the value timestamp                       *
+ *             history_value - [IN] historical data of item with delta        *
+ *                                  preprocessing operation                   *
+ *             errmsg        - [OUT] error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the value was calculated successfully              *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
+		zbx_variant_t *history_value, zbx_timespec_t *history_ts)
+{
+	int	ret;
+
+	ret = zbx_variant_compare(value, history_value);
+	zbx_variant_set_variant(history_value, value);
+
+	if (0 == ret)
+		zbx_variant_set_none(value);
+	else
+		*history_ts = *ts;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_throttle_timed_value                                *
+ *                                                                            *
+ * Purpose: throttles value by suppressing identical values                   *
+ *                                                                            *
+ * Parameters: value         - [IN/OUT] the value to process                  *
+ *             ts            - [IN] the value timestamp                       *
+ *             params        - [IN] the throttle period                       *
+ *             history_value - [IN] historical data of item with delta        *
+ *                                  preprocessing operation                   *
+ *             errmsg        - [OUT] error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the value was calculated successfully              *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
+		zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
+{
+	int	ret, timeout, period = 0;
+
+	if (FAIL == is_time_suffix(params, &timeout, strlen(params)))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
+		zbx_variant_set_none(history_value);
+		return FAIL;
+	}
+
+	ret = zbx_variant_compare(value, history_value);
+	zbx_variant_set_variant(history_value, value);
+
+	if (ZBX_VARIANT_NONE != history_value->type)
+		period = ts->sec - history_ts->sec;
+
+	if (0 == ret && period < timeout )
+		zbx_variant_set_none(value);
+	else
+		*history_ts = *ts;
+
+	return SUCCEED;
+}
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -1448,6 +1526,13 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 			break;
 		case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			ret = item_preproc_get_error_from_regex(value, op->params, &errmsg, error);
+			break;
+		case ZBX_PREPROC_THROTTLE_VALUE:
+			ret = item_preproc_throttle_value(value, ts, history_value, history_ts);
+			break;
+		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			ret = item_preproc_throttle_timed_value(value, ts, op->params, history_value, history_ts,
+					&errmsg);
 			break;
 		default:
 			errmsg = zbx_dsprintf(NULL, "unknown preprocessing operation");

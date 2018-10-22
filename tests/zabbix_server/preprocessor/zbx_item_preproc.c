@@ -187,7 +187,7 @@ void	zbx_mock_test_entry(void **state)
 		else
 		{
 			if (ZBX_VARIANT_NONE != history_value.type)
-				fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&history_value));
+				fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
 		}
 	}
 

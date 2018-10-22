@@ -569,7 +569,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 10
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:00 +03:00
     data: 5
   step:
@@ -588,7 +587,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 5.5
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:00 +03:00
     data: -4.5
   step:
@@ -607,7 +605,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 10
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:00 +03:00
     data: 10
   step:
@@ -626,7 +623,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 0
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:00 +03:00
     data: 10
   step:
@@ -644,7 +640,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 1.5
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:00 +03:00
     data: 0
   step:
@@ -663,7 +658,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 1
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:50 +03:00
     data: 2
   step:
@@ -681,7 +675,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 2
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:15:10 +03:00
     data: 1
   step:
@@ -699,7 +692,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 2
   history:
-    value_type: ITEM_VALUE_TYPE_FLOAT
     time: 2017-10-29 03:14:50 +03:00
     data: 1
   step:
@@ -718,7 +710,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 3
   history:
-    value_type: ITEM_VALUE_TYPE_UINT64
     time: 2017-10-29 03:14:50 +03:00
     data: 2
   step:
@@ -737,7 +728,6 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 3
   history:
-    value_type: ITEM_VALUE_TYPE_UINT64
     time: 2017-10-29 03:14:59 +03:00
     data: 2
   step:
@@ -1305,6 +1295,128 @@ in:
 out:
   return: SUCCEED
   value: value:123
+---
+test case: throttle(1, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  history:
+    time: 2017-10-29 03:14:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: 123
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+---
+test case: throttle(, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: 123
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+---
+test case: throttle(123, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  history:
+    time: 2017-10-29 03:14:00 +03:00
+    data: 123
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:14:00 +03:00
+    data: 123
+---
+test case: throttle_timed(, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+---
+test case: throttle_timed(xyz, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    time: 2017-10-29 03:14:30 +03:00
+    data: xyz
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+---
+test case: throttle_timed(abc, abc, 30s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    time: 2017-10-29 03:14:30 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:14:30 +03:00
+    data: abc
+---
+test case: throttle_timed(abc, abc, 1m)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    time: 2017-10-29 03:14:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
 ...
 
 
