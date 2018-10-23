@@ -142,7 +142,7 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 	const char		*__function_name = "preprocessor_sync_configuration";
 	zbx_hashset_iter_t	iter;
 	int			ts;
-	zbx_preproc_history_t	*history;
+	zbx_preproc_history_t	*vault;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -153,14 +153,14 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 	{
 		/* drop items with removed preprocessing steps from preprocessing history cache */
 		zbx_hashset_iter_reset(&manager->history_cache, &iter);
-		while (NULL != (history = (zbx_preproc_history_t *)zbx_hashset_iter_next(&iter)))
+		while (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (NULL != zbx_hashset_search(&manager->item_config, &history->itemid))
+			if (NULL != zbx_hashset_search(&manager->item_config, &vault->itemid))
 				continue;
 
-			zbx_vector_ptr_clear_ext(&history->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-			zbx_vector_ptr_destroy(&history->history);
-			zbx_hashset_remove_direct(&manager->history_cache, history);
+			zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+			zbx_vector_ptr_destroy(&vault->history);
+			zbx_hashset_remove_direct(&manager->history_cache, vault);
 		}
 	}
 
@@ -902,7 +902,11 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	else
 	{
 		if (NULL != vault)
+		{
+			zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+			zbx_vector_ptr_destroy(&vault->history);
 			zbx_hashset_remove_direct(&manager->history_cache, vault);
+		}
 	}
 
 	request->state = REQUEST_STATE_DONE;
