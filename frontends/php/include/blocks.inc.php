@@ -226,17 +226,13 @@ function getSystemStatusData(array $filter) {
 
 		// Remove problems which resolved between requests.
 		foreach ($data['groups'] as $groupid => &$group) {
-			$severity_count = 0;
-
 			foreach ($group['stats'] as $severity => &$stat) {
-				$severity_count += $stat['count'];
 				foreach (['problems', 'problems_unack'] as $key) {
 					foreach ($stat[$key] as $event_no => &$problem) {
 						if (!array_key_exists($problem['eventid'], $problems_data)) {
 							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
 							if (!$data['groups'][$groupid]['stats'][$severity][$key]) {
 								$data['groups'][$groupid]['stats'][$severity]['count']--;
-								$severity_count--;
 							}
 						}
 					}
@@ -244,9 +240,6 @@ function getSystemStatusData(array $filter) {
 				}
 			}
 			unset($stat);
-			if ($severity_count === 0) {
-				unset($data['groups'][$groupid]);
-			}
 		}
 		unset($group);
 
