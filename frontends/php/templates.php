@@ -54,6 +54,7 @@ $fields = [
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
@@ -245,6 +246,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$templatesClear = getRequest('clear_templates', []);
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 		$templateName = getRequest('template_name', '');
+		$tags = getRequest('tags', []);
+
+		// Remove empty new tag lines.
+		foreach ($tags as $key => $tag) {
+			if ($tag['tag'] === '' && $tag['value'] === '') {
+				unset($tags[$key]);
+			}
+		}
 
 		// create / update template
 		$template = [
@@ -253,6 +262,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
 			'macros' => getRequest('macros', []),
+			'tags' => $tags,
 			'description' => getRequest('description', '')
 		];
 
@@ -461,11 +471,12 @@ if (hasRequest('form')) {
 
 	if ($data['templateid'] != 0) {
 		$dbTemplates = API::Template()->get([
-			'templateids' => $data['templateid'],
+			'output' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'selectTags' => ['tag', 'value'],
+			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
 
@@ -481,7 +492,20 @@ if (hasRequest('form')) {
 	// description
 	$data['description'] = ($data['templateid'] != 0 && !hasRequest('form_refresh'))
 		? $data['dbTemplate']['description']
-		: getRequest('description');
+		: getRequest('description', '');
+
+	// Tags
+	if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
+		$data['tags'] = $data['dbTemplate']['tags'];
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	}
+	else {
+		$data['tags'] = getRequest('tags', []);
+	}
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	$templateIds = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
 

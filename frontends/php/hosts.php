@@ -67,6 +67,7 @@ $fields = [
 									'isset({add}) || isset({update})', _('Agent or SNMP or JMX or IPMI interface')
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
+	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -655,6 +656,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$groups = array_merge($groups, $new_groupid['groupids']);
 			}
 
+			$tags = getRequest('tags', []);
+
+			// Remove empty new tag lines.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
+			}
+
 			// Host data.
 			$host = [
 				'host' => getRequest('host'),
@@ -672,6 +682,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
+				'tags' => $tags,
 				'inventory_mode' => getRequest('inventory_mode'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? []
@@ -1031,6 +1042,10 @@ elseif (hasRequest('form')) {
 			$data['proxy_hostid'] = $dbHost['proxy_hostid'];
 			$data['status'] = $dbHost['status'];
 
+			// Tags
+			$data['tags'] = $dbHost['tags'];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+
 			// Templates
 			$data['templates'] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($data['templates'], $data['templates']);
@@ -1123,6 +1138,10 @@ elseif (hasRequest('form')) {
 		$data['interfaces'] = array_values($data['interfaces']);
 
 		$groups = getRequest('groups', []);
+	}
+
+	if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED && !$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
 
 	if ($data['hostid'] != 0) {

@@ -261,43 +261,13 @@ else {
 	);
 }
 
-// Append tags to form list.
-$tags_table = (new CTable())->setId('tbl_tags');
-
-foreach ($data['tags'] as $tag_key => $tag) {
-	$tags = [
-		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 255))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('value'))
-	];
-
-	if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-		$tags[] = (new CCol(
-			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		))->addClass(ZBX_STYLE_NOWRAP);
-	}
-
-	$tags_table->addRow($tags, 'form_row');
-}
-
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$tags_table->setFooter(new CCol(
-		(new CButton('tag_add', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
-	));
+	$hostList->addRow(_('Tags'),
+		(new CDiv(renderTagTable($data['tags'])->setId('tbl-tags')))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	);
 }
-
-$hostList->addRow(_('Tags'),
-	(new CDiv($tags_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-);
 
 $hostList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

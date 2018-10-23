@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.template.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
@@ -69,7 +71,7 @@ if ($data['show_inherited_macros']) {
 }
 $macros = array_values(order_macros($macros, 'macro'));
 
-$clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
+$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
 natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
@@ -104,6 +106,11 @@ $templateList = (new CFormList('hostlist'))
 		]))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Tags'),
+		(new CDiv(renderTagTable($data['tags'])->setId('tbl-tags')))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -342,8 +349,8 @@ $tmplList = new CFormList();
 $disableids = [];
 
 $linkedTemplateTable = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), _('Action')]);
+	->setHeader([_('Name'), _('Action')])
+	->addStyle('width: 100%;');
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addItem((new CVar('templates[]', $template['templateid']))->removeId());
@@ -435,7 +442,6 @@ $macrosView = new CView('hostmacros', [
 	'readonly' => false
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
-
 
 // Footer
 if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {

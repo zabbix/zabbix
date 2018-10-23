@@ -1737,6 +1737,7 @@ function getTriggerFormData(array $data) {
 
 	return $data;
 }
+
 /**
  * Get "Maintenance period" form.
  *
@@ -2110,4 +2111,56 @@ function getTimeperiodForm(array $data) {
 	);
 
 	return $form;
+}
+
+/**
+ * Renders tag table row.
+ *
+ * @param int|string $index
+ * @param string     $tag
+ * @param string     $value
+ * @param bool       $readonly
+ *
+ * @return CRow
+ */
+function renderTagTableRow($index, $tag = '', $value = '', $readonly = false) {
+	return (new CRow([
+		(new CTextBox('tags['.$index.'][tag]', $tag, $readonly))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tags['.$index.'][value]', $value, $readonly))
+			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		new CCol(
+			(new CButton('tags['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$readonly)
+		)
+	]))->addClass('form_row');
+}
+
+/**
+ * Renders tag table.
+ *
+ * @param array $tags
+ * @param array $tags[]['tag']
+ * @param array $tags[]['value']
+ * @param bool  $readonly
+ *
+ * @return CTable
+ */
+function renderTagTable(array $tags, $readonly = false) {
+	$table = (new CTable());
+
+	foreach ($tags as $index => $tag) {
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $readonly));
+	}
+
+	return $table->setFooter(new CCol(
+		(new CButton('tag_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+			->setEnabled(!$readonly)
+	));
 }
