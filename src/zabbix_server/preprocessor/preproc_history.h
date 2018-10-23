@@ -23,10 +23,6 @@
 #include "common.h"
 #include "dbcache.h"
 
-#define ZBX_PREPROC_TYPE_NONE		0
-#define ZBX_PREPROC_TYPE_DELTA		1
-#define ZBX_PREPROC_TYPE_THROTTLE	2
-
 typedef struct
 {
 	unsigned char	type;

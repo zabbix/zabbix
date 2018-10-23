@@ -72,13 +72,13 @@ typedef struct
 }
 zbx_preprocessing_worker_t;
 
-/* delta item index */
+/* item link index */
 typedef struct
 {
 	zbx_uint64_t		itemid;		/* item id */
 	zbx_list_item_t		*queue_item;	/* queued item */
 }
-zbx_delta_item_index_t;
+zbx_item_link_t;
 
 /* preprocessing manager data */
 typedef struct
@@ -87,8 +87,8 @@ typedef struct
 	int				worker_count;	/* preprocessing worker count */
 	zbx_list_t			queue;		/* queue of item values */
 	zbx_hashset_t			item_config;	/* item configuration L2 cache */
-	zbx_hashset_t			history_cache;	/* item value history cache for delta preprocessing */
-	zbx_hashset_t			delta_items;	/* delta items placed in queue */
+	zbx_hashset_t			history_cache;	/* item value history cache */
+	zbx_hashset_t			linked_items;	/* linked items placed in queue */
 	int				cache_ts;	/* cache timestamp */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
@@ -139,11 +139,30 @@ static void	request_free_steps(zbx_preprocessing_request_t *request)
  ******************************************************************************/
 static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager)
 {
-	const char	*__function_name = "preprocessor_sync_configuration";
+	const char		*__function_name = "preprocessor_sync_configuration";
+	zbx_hashset_iter_t	iter;
+	int			ts;
+	zbx_preproc_history_t	*history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	ts = manager->cache_ts;
 	DCconfig_get_preprocessable_items(&manager->item_config, &manager->cache_ts);
+
+	if (ts != manager->cache_ts)
+	{
+		/* drop items with removed preprocessing steps from preprocessing history cache */
+		zbx_hashset_iter_reset(&manager->history_cache, &iter);
+		while (NULL != (history = (zbx_preproc_history_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (NULL != zbx_hashset_search(&manager->item_config, &history->itemid))
+				continue;
+
+			zbx_vector_ptr_clear_ext(&history->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+			zbx_vector_ptr_destroy(&history->history);
+			zbx_hashset_remove_direct(&manager->history_cache, history);
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() item config size: %d, history cache size: %d", __function_name,
 			manager->item_config.num_data, manager->history_cache.num_data);
@@ -427,22 +446,21 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Function: preprocessor_link_delta_items                                    *
+ * Function: preprocessor_link_items                                          *
  *                                                                            *
- * Purpose: create relation between multiple same delta item values within    *
- *          value queue                                                       *
+ * Purpose: create relation between item values within value queue            *
  *                                                                            *
  * Parameters: manager     - [IN] preprocessing manager                       *
  *             enqueued_at - [IN] position in value queue                     *
  *             item        - [IN] item configuration data                     *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_link_delta_items(zbx_preprocessing_manager_t *manager, zbx_list_item_t *enqueued_at,
+static void	preprocessor_link_items(zbx_preprocessing_manager_t *manager, zbx_list_item_t *enqueued_at,
 		zbx_preproc_item_t *item)
 {
 	int				i;
 	zbx_preprocessing_request_t	*request, *dep_request;
-	zbx_delta_item_index_t		*index, index_local;
+	zbx_item_link_t			*index, index_local;
 	zbx_preproc_op_t		*op;
 
 	for (i = 0; i < item->preproc_ops_num; i++)
@@ -451,12 +469,15 @@ static void	preprocessor_link_delta_items(zbx_preprocessing_manager_t *manager, 
 
 		if (ZBX_PREPROC_DELTA_VALUE == op->type || ZBX_PREPROC_DELTA_SPEED == op->type)
 			break;
+
+		if (ZBX_PREPROC_THROTTLE_VALUE == op->type || ZBX_PREPROC_THROTTLE_TIMED_VALUE)
+			break;
 	}
 
 	if (i != item->preproc_ops_num)
 	{
-		/* existing delta item*/
-		if (NULL != (index = (zbx_delta_item_index_t *)zbx_hashset_search(&manager->delta_items, &item->itemid)))
+		/* existing linked item*/
+		if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &item->itemid)))
 		{
 			dep_request = (zbx_preprocessing_request_t *)(enqueued_at->data);
 			request = (zbx_preprocessing_request_t *)(index->queue_item->data);
@@ -474,7 +495,7 @@ static void	preprocessor_link_delta_items(zbx_preprocessing_manager_t *manager, 
 			index_local.itemid = item->itemid;
 			index_local.queue_item = enqueued_at;
 
-			zbx_hashset_insert(&manager->delta_items, &index_local, sizeof(zbx_delta_item_index_t));
+			zbx_hashset_insert(&manager->linked_items, &index_local, sizeof(zbx_item_link_t));
 		}
 	}
 }
@@ -632,7 +653,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 	}
 
 	if (REQUEST_STATE_QUEUED == request->state)
-		preprocessor_link_delta_items(manager, enqueued_at, item);
+		preprocessor_link_items(manager, enqueued_at, item);
 
 	/* if no preprocessing is needed, dependent items are enqueued */
 	if (REQUEST_STATE_DONE == request->state)
@@ -845,7 +866,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_preprocessing_request_t	*request;
 	zbx_variant_t			value;
 	char				*error;
-	zbx_delta_item_index_t		*index;
+	zbx_item_link_t		*index;
 	zbx_vector_ptr_t		history;
 	zbx_preproc_history_t		*vault;
 
@@ -890,11 +911,10 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	if (NULL != request->pending)
 		request->pending->state = REQUEST_STATE_QUEUED;
 
-	if (NULL != (index = (zbx_delta_item_index_t *)zbx_hashset_search(&manager->delta_items, &request->value.itemid)) &&
+	if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &request->value.itemid)) &&
 			worker->queue_item == index->queue_item)
 	{
-		/* item is removed from delta index if it was present in delta item index*/
-		zbx_hashset_remove_direct(&manager->delta_items, index);
+		zbx_hashset_remove_direct(&manager->linked_items, index);
 	}
 
 	if (FAIL != preprocessor_set_variant_result(request, &value, error))
@@ -935,7 +955,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)preproc_item_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
-	zbx_hashset_create(&manager->delta_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&manager->linked_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&manager->history_cache, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1008,7 +1028,7 @@ static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 	zbx_list_destroy(&manager->queue);
 
 	zbx_hashset_destroy(&manager->item_config);
-	zbx_hashset_destroy(&manager->delta_items);
+	zbx_hashset_destroy(&manager->linked_items);
 	zbx_hashset_destroy(&manager->history_cache);
 }
 
