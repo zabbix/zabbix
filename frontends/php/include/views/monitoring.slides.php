@@ -102,15 +102,15 @@ $widget->setControls((new CList([
 		->setAttribute('aria-label', _('Content controls'))
 ])));
 
-if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget->addItem((new CFilter())
-		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-	);
-}
-
-$widget->addItem(
+$widget
+	->addItem(
+		(new CFilter())
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	)
+	->addItem(
 	(new CDiv((new CDiv())->addClass('preloader')))
 		->setId(WIDGET_SLIDESHOW)
 );

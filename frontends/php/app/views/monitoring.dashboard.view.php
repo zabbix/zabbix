@@ -158,12 +158,9 @@ else {
 		$timeline = (new CFilter())
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-
-		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$timeline = (new CDiv($timeline))->addStyle('display: none;');
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
 		}
-	}
 
 	$widget
 		->addItem($timeline)

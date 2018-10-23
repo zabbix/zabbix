@@ -27,6 +27,8 @@ class CFilter extends CDiv {
 	private $name = 'zbx_filter';
 	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
+	// Visibility of time selector.
+	private $show_time_selector = false;
 	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
 	protected $headers = [];
 	// Array of filter tab content.
@@ -227,71 +229,82 @@ class CFilter extends CDiv {
 	 *
 	 * @param string $from    Start date. (can be in relative time format, example: now-1w)
 	 * @param string $to      End date. (can be in relative time format, example: now-1w)
+	 * @param bool   $visible Either to make time selector visible or hidden.
 	 * @param string $format  Date and time format used in CDateSelector.
 	 *
 	 * @return CFilter
 	 */
-	public function addTimeSelector($from, $to, $format = ZBX_FULL_DATE_TIME) {
+	public function addTimeSelector($from, $to, $visible = true, $format = ZBX_FULL_DATE_TIME) {
 		$header = relativeDateToText($from, $to);
 
-		$this->addTab(new CDiv([
-			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-			(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
-			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
-		]), null);
+		if ($visible) {
+			$this->show_time_selector = true;
 
-		$predefined_ranges = [];
+			$this->addTab(new CDiv([
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+			]), null);
 
-		foreach ($this->time_ranges as $column_ranges) {
-			$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
+			$predefined_ranges = [];
 
-			foreach ($column_ranges as $range) {
-				$label = relativeDateToText($range[0], $range[1]);
-				$is_selected = ($header === $label);
+			foreach ($this->time_ranges as $column_ranges) {
+				$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
 
-				$column->addItem((new CLink($label))
-					->setAttribute('data-from', $range[0])
-					->setAttribute('data-to', $range[1])
-					->setAttribute('data-label', $label)
-					->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
-				);
+				foreach ($column_ranges as $range) {
+					$label = relativeDateToText($range[0], $range[1]);
+					$is_selected = ($header === $label);
+
+					$column->addItem((new CLink($label))
+						->setAttribute('data-from', $range[0])
+						->setAttribute('data-to', $range[1])
+						->setAttribute('data-label', $label)
+						->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
+					);
+				}
+
+				$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 			}
 
-			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
-		}
+			$anchor = 'tab_'.count($this->tabs);
 
-		$anchor = 'tab_'.count($this->tabs);
-
-		$this->addTab(
-			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
-			(new CDiv([
+			$this->addTab(
+				(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
 				(new CDiv([
-					new CList([
-						new CLabel(_('From'), 'from'),
-						(new CDateSelector('from', $from))->setDateFormat($format)
-					]),
-					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-						->setAttribute('data-error-for', 'from')
-						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-						->addStyle('display: none'),
-					new CList([
-						new CLabel(_('To'), 'to'),
-						(new CDateSelector('to', $to))->setDateFormat($format)
-					]),
-					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-						->setAttribute('data-error-for', 'to')
-						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-						->addStyle('display: none'),
-					new CList([
-						(new CButton('apply', _('Apply')))
-					])
-				]))->addClass(ZBX_STYLE_TIME_INPUT),
-				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
-			]))
-				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
-				->setId($anchor)
-		);
+					(new CDiv([
+						new CList([
+							new CLabel(_('From'), 'from'),
+							(new CDateSelector('from', $from))->setDateFormat($format)
+						]),
+						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+							->setAttribute('data-error-for', 'from')
+							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+							->addStyle('display: none'),
+						new CList([
+							new CLabel(_('To'), 'to'),
+							(new CDateSelector('to', $to))->setDateFormat($format)
+						]),
+						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+							->setAttribute('data-error-for', 'to')
+							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+							->addStyle('display: none'),
+						new CList([
+							(new CButton('apply', _('Apply')))
+						])
+					]))->addClass(ZBX_STYLE_TIME_INPUT),
+					(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
+				]))
+					->addClass(ZBX_STYLE_FILTER_CONTAINER)
+					->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
+					->setId($anchor)
+			);
+		}
+		else {
+			$this->addTab(null, (new CDiv([
+				(new CInput('hidden', 'from', $from)),
+				(new CInput('hidden', 'to', $to))
+			])));
+		}
 
 		return $this;
 	}
@@ -353,6 +366,7 @@ class CFilter extends CDiv {
 	 */
 	public function toString($destroy = true) {
 		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
+		$headers_cnt = 0;
 
 		if ($this->tabs_options['active'] !== false
 				&& !array_key_exists($this->tabs_options['active'], $this->headers)) {
@@ -360,7 +374,10 @@ class CFilter extends CDiv {
 		}
 
 		foreach ($this->headers as $index => $header) {
-			$headers->addItem($header);
+			if ($header) {
+				$headers->addItem($header);
+				$headers_cnt++;
+			}
 
 			if ($this->tabs[$index] !== null && $index !== $this->tabs_options['active']) {
 				$this->tabs[$index]->addStyle('display: none');
@@ -370,8 +387,9 @@ class CFilter extends CDiv {
 		$this->form->addItem($this->tabs);
 
 		$this
+			->setAttribute('data-accessible', $this->show_time_selector ? 1 : 0)
 			->addStyle('display:none')
-			->addItem($headers)
+			->addItem($headers_cnt ? $headers : null)
 			->addItem($this->form)
 			->setAttribute('aria-label', _('Filter'));
 

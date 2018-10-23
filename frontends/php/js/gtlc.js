@@ -65,6 +65,7 @@ jQuery(function ($){
 			from: element.from.val(),
 			to: element.to.val()
 		},
+		ui_accessible = (container.attr('data-accessible') === '1'),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
@@ -136,6 +137,10 @@ jQuery(function ($){
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeSelectorUI(data) {
+		if (!ui_accessible) {
+			return;
+		}
+
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
@@ -170,6 +175,10 @@ jQuery(function ($){
 	 * Disable time selector UI.
 	 */
 	function disableTimeSelectorUI() {
+		if (!ui_accessible) {
+			return;
+		}
+
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
