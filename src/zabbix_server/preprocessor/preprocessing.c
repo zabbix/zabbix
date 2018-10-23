@@ -205,8 +205,8 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 
 	history_num = (NULL != history ? history->values_num : 0);
 
-	/* 14 is a max field count (without preprocessing step fields) */
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (10 + steps_num * 4 + history_num * 5)
+	/* 9 is a max field count (without preprocessing step and history fields) */
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (9 + steps_num * 4 + history_num * 5)
 			* sizeof(zbx_packed_field_t));
 
 	offset = fields;
@@ -308,13 +308,11 @@ zbx_uint32_t	zbx_preprocessor_pack_task(unsigned char **data, zbx_uint64_t itemi
 zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *value,
 		const zbx_vector_ptr_t *history, char *error)
 {
-	zbx_packed_field_t	*offset, fields[8]; /* 8 - max field count */
+	zbx_packed_field_t	*offset, *fields;
 	unsigned char		history_num;
 	zbx_uint32_t		size;
 	zbx_ipc_message_t	message;
 	int			i;
-
-	offset = fields;
 
 	if (255 < history->values_num)
 	{
@@ -323,6 +321,10 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	}
 
 	history_num = history->values_num;
+
+	/* 4 is a max field count (without history fields) */
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (4 + history_num * 5) * sizeof(zbx_packed_field_t));
+	offset = fields;
 
 	*offset++ = PACKED_FIELD(&value->type, sizeof(unsigned char));
 
@@ -377,6 +379,8 @@ zbx_uint32_t	zbx_preprocessor_pack_result(unsigned char **data, zbx_variant_t *v
 	zbx_ipc_message_init(&message);
 	size = message_pack_data(&message, fields, offset - fields);
 	*data = message.data;
+
+	zbx_free(fields);
 
 	return size;
 }
