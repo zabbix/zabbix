@@ -80,6 +80,18 @@ class CControllerMediatypeUpdate extends CController {
 		return $ret;
 	}
 
+	/**
+	 * Return all input parameters.
+	 * Providing controller specific defaults.
+	 *
+	 * @return var
+	 */
+	public function getInputAll() {
+		return parent::getInputAll() + [
+			'status' => (string) MEDIA_TYPE_STATUS_DISABLED
+		];
+	}
+
 	protected function checkPermissions() {
 		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
 			return false;
