@@ -980,7 +980,7 @@ abstract class CHostGeneral extends CHostBase {
 				unset($tag['hosttagid'], $tag['hostid']);
 				$host['tags'][] = $tag;
 			}
-			unset($event);
+			unset($host);
 		}
 
 		return $result;

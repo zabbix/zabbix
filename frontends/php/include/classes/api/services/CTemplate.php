@@ -486,7 +486,10 @@ class CTemplate extends CHostGeneral {
 				}
 			}
 
-			$this->validateTags($template);
+			// Validate tags.
+			if (array_key_exists('tags', $template)) {
+				$this->validateTags($template);
+			}
 		}
 	}
 
@@ -533,7 +536,73 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		$this->updateTags($templates);
+
 		return ['templateids' => zbx_objectValues($templates, 'templateid')];
+	}
+
+	/**
+	 * Compares input tags with tags stored in the database and performs tag deleting and inserting.
+	 *
+	 * @param array  $templates
+	 * @param int    $templates[]['templateid']
+	 * @param array  $templates[]['tags']
+	 * @param string $templates[]['tags'][]['tag']
+	 * @param string $templates[]['tags'][]['value']
+	 */
+	private function updateTags(array $templates) {
+		$options = [
+			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'filter' => ['hostid' => zbx_objectValues($templates, 'templateid')]
+		];
+		$db_tags = DBselect(DB::makeSql('host_tag', $options));
+
+		$db_templates = [];
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_templates[$db_tag['hostid']]['tags'][] = $db_tag;
+		}
+
+		$ins_tags = [];
+		$del_hosttagids = [];
+
+		foreach ($templates as $tnum => $template) {
+			$templateid = $template['templateid'];
+
+			if (!array_key_exists('tags', $template)) {
+				unset($templates[$tnum], $db_templates[$templateid]);
+				continue;
+			}
+
+			foreach ($template['tags'] as $tag_num => $tag) {
+				$tag += ['value' => ''];
+
+				foreach ($db_templates[$templateid]['tags'] as $db_tag_num => $db_tag) {
+					if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
+						unset($templates[$tnum]['tags'][$tag_num], $db_templates[$templateid]['tags'][$db_tag_num]);
+					}
+				}
+			}
+		}
+
+		foreach ($templates as $template) {
+			$templateid = $template['templateid'];
+
+			foreach ($template['tags'] as $tag) {
+				$ins_tags[] = ['hostid' => $templateid] + $tag;
+			}
+
+			foreach ($db_templates[$templateid]['tags'] as $db_tag) {
+				$del_hosttagids[] = $db_tag['hosttagid'];
+			}
+		}
+
+		if ($del_hosttagids) {
+			DB::delete('host_tag', ['hosttagid' => $del_hosttagids]);
+		}
+
+		if ($ins_tags) {
+			DB::insert('host_tag', $ins_tags);
+		}
 	}
 
 	/**
@@ -561,7 +630,10 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
-			$this->validateTags($template);
+			// Validate tags.
+			if (array_key_exists('tags', $template)) {
+				$this->validateTags($template);
+			}
 		}
 	}
 
