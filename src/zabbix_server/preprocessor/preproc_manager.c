@@ -878,6 +878,11 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 		zbx_vector_ptr_append_array(&vault->history, history.values, history.values_num);
 		zbx_vector_ptr_clear(&history);
 	}
+	else
+	{
+		if (NULL != vault)
+			zbx_hashset_remove_direct(&manager->history_cache, vault);
+	}
 
 	request->state = REQUEST_STATE_DONE;
 
