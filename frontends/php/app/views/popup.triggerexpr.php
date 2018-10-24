@@ -193,8 +193,9 @@ $output = [
 				'},'.
 				'set: function(elem, value) {'.
 					'var tmp = elem.value;'.
-					'elem.value = value;'.
-					'"description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr")'.
+						'elem.value = value;'.
+
+					'"description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr");'.
 				'}'.
 			'};'.
 		'});'
