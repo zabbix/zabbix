@@ -184,7 +184,20 @@ $output = [
 			'action' => 'return validate_trigger_expression("expression", '.
 					'jQuery(window.document.forms["expression"]).closest("[data-dialogueid]").attr("data-dialogueid"));'
 		]
-	]
+	],
+	'script_inline' =>
+		'jQuery(function($) {'.
+			'$.valHooks.input = {'.
+				'get: function(elem) {'.
+					'return elem.value;'.
+				'},'.
+				'set: function(elem, value) {'.
+					'var tmp = elem.value;'.
+					'elem.value = value;'.
+					'"description" === elem.id && tmp !== value && reloadPopup(elem.form, "popup.triggerexpr")'.
+				'}'.
+			'};'.
+		'});'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
