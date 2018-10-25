@@ -4420,12 +4420,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (last_groupid != groupid || 0 == last_groupid)
+		if (last_groupid != groupid)
 		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
-				continue;
+			group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid);
 			last_groupid = groupid;
 		}
+
+		if (NULL == group)
+			continue;
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
