@@ -3,7 +3,7 @@
 # 20120720T0924
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 4.0\n"
+"Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-25 19:00+0300\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"

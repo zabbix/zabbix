@@ -259,7 +259,8 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 			'alias' => CWebUser::$data['alias'],
 			'name' => CWebUser::$data['name'],
 			'surname' => CWebUser::$data['surname']
-		]
+		],
+		'support_url' => getSupportUrl(CWebUser::getLang())
 	]);
 	echo $pageMenu->getOutput();
 }

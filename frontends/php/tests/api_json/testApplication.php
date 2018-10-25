@@ -18,17 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup applications
  */
-class testApplication extends CZabbixTest {
+class testApplication extends CAPITest {
 	public static function application_create() {
 		return [
 			[
 				'application' => [
-					'name' => 'non existent parametr',
+					'name' => 'non existent parameter',
 					'hostid' => '50009',
 					'flags' => '4'
 				],
@@ -266,7 +267,7 @@ class testApplication extends CZabbixTest {
 				'application' => [
 					[
 						'applicationid' => '367',
-						'name' => 'non existent parametr',
+						'name' => 'non existent parameter',
 						'flags' => '4'
 					]
 				],
@@ -432,7 +433,7 @@ class testApplication extends CZabbixTest {
 			foreach ($applications as $application) {
 				if (array_key_exists('name', $application) && $application['name'] != 'API application'){
 					$dbResult = 'select * from applications where name='.zbx_dbstr($application['name']);
-					$this->assertEquals(0, DBcount($dbResult));
+					$this->assertEquals(0, CDBHelper::getCount($dbResult));
 				}
 			}
 		}
@@ -529,7 +530,7 @@ class testApplication extends CZabbixTest {
 		if ($expected_error === null) {
 			foreach ($result['result']['applicationids'] as $id) {
 				$dbResult = 'select * from applications where applicationid='.zbx_dbstr($id);
-				$this->assertEquals(0, DBcount($dbResult));
+				$this->assertEquals(0, CDBHelper::getCount($dbResult));
 			}
 		}
 	}

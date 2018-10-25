@@ -939,7 +939,7 @@ static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected preprocessing worker              *
- *             message - [IN] message recieved by preprocessing manager       *
+ *             message - [IN] message received by preprocessing manager       *
  *                                                                            *
  ******************************************************************************/
 static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, zbx_ipc_client_t *client,
@@ -1009,7 +1009,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zbx_ipc_message_t		*message;
 	zbx_preprocessing_manager_t	manager;
 	int				ret;
-	double				time_stat, time_idle = 0, time_now, time_flush, time_file = 0;
+	double				time_stat, time_idle = 0, time_now, time_flush, sec;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1059,19 +1059,11 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, ZBX_PREPROCESSING_MANAGER_DELAY, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
-
-		/* handle /etc/resolv.conf update and log rotate less often than once a second */
-		if (1.0 < time_now - time_file)
-		{
-			time_file = time_now;
-			zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-			zbx_update_resolver_conf();
-#endif
-		}
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += zbx_time() - time_now;
+			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{

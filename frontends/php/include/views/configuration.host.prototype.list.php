@@ -58,23 +58,13 @@ $hostTable = (new CTableInfo())
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
-	if ($hostPrototype['templateid']) {
-		$sourceTemplate = $hostPrototype['sourceTemplate'];
-
-		if (array_key_exists($sourceTemplate['hostid'], $data['writable_templates'])) {
-			$name[] = (new CLink($sourceTemplate['name'],
-				'?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId']
-			))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$name[] = (new CSpan($sourceTemplate['name']))->addClass(ZBX_STYLE_GREY);
-		}
-
-		$name[] = NAME_DELIMITER;
-	}
-	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$this->data['discovery_rule']['itemid'].'&hostid='.$hostPrototype['hostid']);
+	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates']);
+	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+		(new CUrl('host_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
+			->setArgument('hostid', $hostPrototype['hostid'])
+	);
 
 	// template list
 	if (empty($hostPrototype['templates'])) {
