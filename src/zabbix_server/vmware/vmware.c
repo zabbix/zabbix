@@ -600,7 +600,10 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 	zbx_vmware_counter_t	*csrc, *cdst;
 
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
-		return;
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	for (i = 0; i < src->values_num; i++)
 	{
@@ -1249,7 +1252,12 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 
 		vmware_hv_shared_copy(&hv_local, hv);
 		hv = (zbx_vmware_hv_t *)zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
-		zbx_hashset_reserve(&data->vms_index, hv->vms.values_num);
+
+		if (SUCCEED != zbx_hashset_reserve(&data->vms_index, hv->vms.values_num))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
@@ -3846,7 +3854,11 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
 		goto clean;
 
-	zbx_hashset_reserve(&data->hvs, hvs.values_num);
+	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
