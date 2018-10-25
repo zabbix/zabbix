@@ -611,6 +611,7 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 
 		cdst = (zbx_vmware_counter_t *)zbx_hashset_insert(dst, csrc, sizeof(zbx_vmware_counter_t));
 
+		/* check if the counter was inserted - copy path only for inserted counters */
 		if (cdst->path == csrc->path)
 			cdst->path = vmware_shared_strdup(csrc->path);
 	}
