@@ -1,6 +1,7 @@
 Changes for 4.0.1rc2
 
 Bug fixes:
+.......PS. [ZBX-15057] fixed possible crash when syncing host groups (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.1rc1
