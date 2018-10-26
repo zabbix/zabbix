@@ -628,6 +628,7 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
  * @param array  $event_tags
  * @param string $event_tags[]['tag']
  * @param string $event_tags[]['value']
+ * @param bool   $event_tags[]['inherited']    (optional)
  * @param array  $f_tags
  * @param int    $f_tags[<tag>][]['operator']
  * @param string $f_tags[<tag>][]['value']
@@ -638,7 +639,9 @@ function orderEventTags(array $event_tags, array $f_tags) {
 	$first_tags = [];
 
 	foreach ($event_tags as $i => $tag) {
-		if (array_key_exists($tag['tag'], $f_tags)) {
+		$tag += ['inherited' => false];
+
+		if (array_key_exists($tag['tag'], $f_tags) && !$tag['inherited']) {
 			foreach ($f_tags[$tag['tag']] as $f_tag) {
 				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
 						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
@@ -710,6 +713,7 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 
 	if ($html) {
 		// Convert $filter_tags to a more usable format.
+
 		$f_tags = [];
 
 		foreach ($filter_tags as $tag) {
@@ -726,9 +730,13 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 	}
 
 	foreach ($list as $element) {
-		CArrayHelper::sort($element['tags'], ['tag', 'value']);
-
 		$tags[$element[$key]] = [];
+
+		if (!$element['tags']) {
+			continue;
+		}
+
+		CArrayHelper::sort($element['tags'], ['tag', 'value']);
 
 		if ($html) {
 			// Show first n tags and "..." with hint box if there are more.
@@ -745,10 +753,17 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
-					$tags[$element[$key]][] = (new CSpan($value))
+					$span = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
+
+					if (array_key_exists('inherited', $tag) && $tag['inherited']) {
+						$span->addClass(ZBX_STYLE_TAG_INHERITED);
+					}
+
+					$tags[$element[$key]][] = $span;
 					$tags_shown++;
+
 					if ($tags_shown >= $list_tag_count) {
 						break;
 					}
@@ -762,16 +777,23 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 
 				foreach ($element['tags'] as $tag) {
 					$value = getTagString($tag);
-					$hint_content[$element[$key]][] = (new CSpan($value))
+
+					$span = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint($value);
+
+					if (array_key_exists('inherited', $tag) && $tag['inherited']) {
+						$span->addClass(ZBX_STYLE_TAG_INHERITED);
+					}
+
+					$hint_content[$element[$key]][] = $span;
 				}
 
 				$tags[$element[$key]][] = (new CSpan(
 					(new CButton(null))
 						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
 						->setHint(new CDiv($hint_content), '', true, 'max-width: 500px')
-					))->addClass(ZBX_STYLE_REL_CONTAINER);
+				))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 		}
 		else {

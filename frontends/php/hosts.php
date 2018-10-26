@@ -1317,7 +1317,7 @@ else {
 
 	$hosts = API::Host()->get([
 		'output' => API_OUTPUT_EXTEND,
-		'selectParentTemplates' => ['hostid', 'name'],
+		'selectParentTemplates' => ['templateid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
@@ -1333,6 +1333,9 @@ else {
 	]);
 	order_result($hosts, $sortField, $sortOrder);
 
+	// Recursively collect all tags of all parent templates and combine them with host tags.
+	addInheritedTags($hosts);
+
 	// selecting linked templates to templates linked to hosts
 	$templateids = [];
 
@@ -1344,8 +1347,7 @@ else {
 
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
-		'selectParentTemplates' => ['hostid', 'name'],
-		'selectTags' => ['tag', 'value'],
+		'selectParentTemplates' => ['templateid', 'name'],
 		'templateids' => $templateids,
 		'preservekeys' => true
 	]);

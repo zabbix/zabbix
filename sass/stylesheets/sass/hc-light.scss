@@ -503,6 +503,13 @@ ul.top-nav-icons {
 	}
 }
 
+.tag {
+	&.tag-inherited {
+		color: $font-color;
+		@include box-shadow(inset 0 0 0 1px $font-color);
+	}
+}
+
 .top-subnav a {
 	&.selected {
 		font-weight: bold;
