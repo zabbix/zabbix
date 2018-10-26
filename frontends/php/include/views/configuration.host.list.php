@@ -103,6 +103,23 @@ $filter = (new CFilter())
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 			)
+			->addRow(
+				(new CLabel(_('Templates'), 'filter_templates__ms')),
+				(new CMultiSelect([
+					'name' => 'filter_templates[]',
+					'object_name' => 'templates',
+					'data' => $data['filter']['templates'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'templates',
+							'srcfld1' => 'hostid',
+							'srcfld2' => 'host',
+							'dstfrm' => $filter->getName(),
+							'dstfld1' => 'filter_templates_'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			)
 			->addRow(_('DNS'),
 				(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
@@ -126,6 +143,7 @@ $filter = (new CFilter())
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',
 					'data' => $data['proxies_ms'],
+					'disabled' => ($data['filter']['monitored_by'] != ZBX_MONITORED_BY_PROXY),
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'proxies',
@@ -135,8 +153,7 @@ $filter = (new CFilter())
 							'dstfld1' => 'filter_proxyids_'
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-				'filter_proxyids_row'
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(_('Tags'), $filter_tags_table)
 	]);

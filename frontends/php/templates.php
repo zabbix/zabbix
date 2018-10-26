@@ -78,6 +78,7 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
+	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 								null
@@ -601,6 +602,7 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
 		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT
 		);
@@ -621,6 +623,7 @@ else {
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
+		CProfile::deleteIdx('web.templates.filter_templates');
 		CProfile::delete('web.templates.filter.evaltype');
 		CProfile::deleteIdx('web.templates.filter.tags.tag');
 		CProfile::deleteIdx('web.templates.filter.tags.value');
@@ -629,6 +632,7 @@ else {
 
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
+		'templates' => CProfile::getArray('web.templates.filter_templates', null),
 		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR)
 	];
 	$filter['tags'] = [];
@@ -645,6 +649,14 @@ else {
 	// get templates
 	$templates = [];
 
+	$filter['templates'] = $filter['templates']
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter['templates'],
+			'preservekeys' => true
+		]), ['templateid' => 'id'])
+		: [];
+
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
@@ -653,6 +665,7 @@ else {
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
+			'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,

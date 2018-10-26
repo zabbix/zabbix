@@ -19,14 +19,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup hosts
  */
-class testInheritanceHostPrototype extends CWebTest {
+class testInheritanceHostPrototype extends CLegacyWebTest {
 
 	public static function getLayoutData() {
 		return [
@@ -40,17 +40,6 @@ class testInheritanceHostPrototype extends CWebTest {
 	}
 
 	/**
-	 * Select a single value from DB.
-	 *
-	 * @param string $query	sql query
-	 *
-	 * @return mixed
-	 */
-	private function DBSelectValue($query) {
-		return (($result = DBSelect($query)) && ($row = DBfetch($result)) && $row) ? reset($row) : null;
-	}
-
-	/**
 	 * @dataProvider getLayoutData
 	 */
 	public function testInheritanceHostPrototype_CheckLayout($data) {
@@ -58,10 +47,10 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Get hostid and discoveryid to check href to template.
-		$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+		$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
 				zbx_dbstr($data['host_prototype'])
 		);
-		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+		$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
 				zbx_dbstr($data['discovery'])
 		);
 
@@ -72,7 +61,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@type="text"][@readonly]');
-		$interface = $this->DBSelectValue('SELECT interfaceid'.
+		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
 					'SELECT hostid'.
@@ -122,9 +111,8 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
-		$macros = DBdata('SELECT * FROM globalmacro', false);
+		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
 		foreach ($macros as $macro) {
-			$macro = $macro[0];
 			// Macro check and row selection.
 			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.
 					$macro['macro'].'"]/../..')
@@ -201,7 +189,7 @@ class testInheritanceHostPrototype extends CWebTest {
 						' WHERE host='.zbx_dbstr($template['name']).
 					')';
 
-			$this->assertEquals(1, DBcount($hosts_templates));
+			$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
 
 			// Host prototype on host and on template are the same.
 			$prototype_on_host = $this->sqlForHostPrototypeCompare($data['host']);
@@ -237,7 +225,7 @@ class testInheritanceHostPrototype extends CWebTest {
 				')'.
 				' ORDER BY host, name';
 
-		return DBhash($sql);
+		return CDBHelper::getHash($sql);
 	}
 
 	public static function getSimpleUpdateData() {
@@ -272,12 +260,12 @@ class testInheritanceHostPrototype extends CWebTest {
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
 		}
 
-		$old_host = DBhash($sql);
+		$old_host = CDBHelper::getHash($sql);
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
-		$this->assertEquals($old_host, DBhash($sql));
+		$this->assertEquals($old_host, CDBHelper::getHash($sql));
 	}
 
 	public static function getUpdateTemplateData() {
@@ -392,7 +380,7 @@ class testInheritanceHostPrototype extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testInheritanceHostPrototype_Delete($data) {
-		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS '.
+		$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS '.
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);
 
@@ -404,12 +392,12 @@ class testInheritanceHostPrototype extends CWebTest {
 		if (array_key_exists('error', $data)) {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete host prototypes');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype']);
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototypes deleted');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -420,18 +408,18 @@ class testInheritanceHostPrototype extends CWebTest {
 	 */
 	private function selectHostPrototypeForUpdate($action, $data) {
 		if ($action === 'host') {
-			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
 					zbx_dbstr($data['host_prototype'])
 			);
-			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
 					zbx_dbstr($data['discovery'])
 			);
 		}
 		elseif ($action === 'template') {
-			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
 					zbx_dbstr($data['host_prototype'])
 			);
-			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
 					zbx_dbstr($data['discovery'])
 			);
 		}

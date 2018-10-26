@@ -1,17 +1,33 @@
 Changes for 4.2.0alpha1
 
 New features:
+..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.1rc2
+
+Bug fixes:
+..F....... [ZBX-14904] fixed possible PHP errors in "Problem hosts" widget (Sasha)
+.......PS. [ZBX-15057] fixed possible crash when syncing host groups (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-4725] added filter fields to select templates and hosts by directly linked templates; made proxy filter field visible in configuration hosts field (miks)
+..F....... [ZBXNEXT-4796] added 'fullscreen' and 'kiosk' URL arguments to allow to set layout mode via link (ashubin, gcalenko)
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14807] fixed selection box for graphs on monitoring screens (gcalenko)
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
@@ -266,7 +282,7 @@ A.F.I..PS. [ZBXNEXT-4569] added support of MySQL 8.0 (gcalenko, vso)
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
-A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototype.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-14329] fixed error opening map's submap (ashubin)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-13783] dropped support for Zapcat-style and multi-level parameter arrays from item key validation in frontend (agriscenko)
@@ -579,6 +595,11 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
@@ -710,7 +731,7 @@ Changes for 3.4.10rc1
 
 Bug fixes:
 ..F....... [ZBX-14414] fixed PHP 7.2 error message in the Monitoring->Latest data page (Sasha)
-A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototype.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
@@ -1954,6 +1975,10 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
 .D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
 A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
 ..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)

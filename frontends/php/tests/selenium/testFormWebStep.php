@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup httptest
  */
-class testFormWebStep extends CWebTest {
+class testFormWebStep extends CLegacyWebTest {
 
 	public static function steps() {
 		return [
@@ -782,17 +782,6 @@ class testFormWebStep extends CWebTest {
 				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath($context.'//input[@data-type="'.$field.'"]'));
 				$input = $element->findElement(WebDriverBy::xpath('.//input[@data-type="'.$field.'"]'));
 				$input->sendKeys($value);
-
-				// TODO: debug info
-				$this->webDriver->wait(5, self::WAIT_ITERATION)->until(
-					function ($driver) use ($input, $value) {
-						try {
-							return $input->getAttribute('value') === $value;
-						} catch (StaleElementReferenceException $e) {
-							return null;
-						}
-					}
-				);
 
 				// Fire onchange event.
 				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
