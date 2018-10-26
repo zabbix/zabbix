@@ -81,18 +81,20 @@ const char	*zbx_compress_strerror(void)
  ******************************************************************************/
 int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
-	uLong	size_o;
+	Bytef	*buf;
+	uLongf	buf_size;
 
-	size_o = compressBound(size_in);
-	*out = (char *)zbx_malloc(NULL, size_o);
+	buf_size = compressBound(size_in);
+	buf = (Bytef *)zbx_malloc(NULL, buf_size);
 
-	if (Z_OK != (zbx_zlib_errno = compress((unsigned char *)*out, &size_o, (const unsigned char *)in, size_in)))
+	if (Z_OK != (zbx_zlib_errno = compress(buf, &buf_size, (const Bytef *)in, size_in)))
 	{
-		zbx_free(*out);
+		zbx_free(buf);
 		return FAIL;
 	}
 
-	*size_out = (size_t)size_o;
+	*out = (char *)buf;
+	*size_out = buf_size;
 
 	return SUCCEED;
 }
@@ -114,12 +116,12 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
  ******************************************************************************/
 int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 {
-	uLong	size_o = (uLong)*size_out;
+	uLongf	size_o = *size_out;
 
-	if (Z_OK != (zbx_zlib_errno = uncompress((unsigned char *)out, &size_o, (const unsigned char *)in, size_in)))
+	if (Z_OK != (zbx_zlib_errno = uncompress((Bytef *)out, &size_o, (const Bytef *)in, size_in)))
 		return FAIL;
 
-	*size_out = (size_t)size_o;
+	*size_out = size_o;
 
 	return SUCCEED;
 }
