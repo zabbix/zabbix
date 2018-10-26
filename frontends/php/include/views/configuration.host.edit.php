@@ -627,13 +627,20 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Name')]);
+		->setHeader([_('Name')])
+		->addStyle('width: 100%;');
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-			->setTarget('_blank');
+
+		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				'templates.php?form=update&templateid='.$template['templateid']
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
+		}
 
 		$linkedTemplateTable->addRow($template_link, null, 'conditions_'.$template['templateid']);
 	}
@@ -641,7 +648,7 @@ else {
 	$tmplList->addRow(_('Linked templates'),
 		(new CDiv($linkedTemplateTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 

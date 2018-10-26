@@ -596,8 +596,7 @@ function addInheritedTags(array &$hosts) {
 			'output' => ['templateid'],
 			'selectParentTemplates' => ['templateid'],
 			'selectTags' => ['tag', 'value'],
-			'templateids' => array_keys($templateids),
-			'editable' => true
+			'templateids' => array_keys($templateids)
 		]);
 
 		$all_templateids += $templateids;
