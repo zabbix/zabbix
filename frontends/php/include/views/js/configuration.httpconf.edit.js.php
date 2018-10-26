@@ -209,19 +209,6 @@
 				jQuery('.pairs-control-add', $form).on('click', function() {
 					pairManager.addNew(formid, {type:jQuery(this).data('type')});
 				});
-
-				jQuery('#retrieve_mode', $form)
-					.on('change', function() {
-						jQuery('#post_fields', $form).toggleClass('disabled',this.checked);
-						jQuery('#required, #posts, #post_fields input[type="text"], #post_fields .btn-link,' +
-								'#post_type input', $form)
-							.attr('disabled', this.checked);
-
-						if (this.checked === false) {
-							pairManager.refresh();
-						}
-					})
-					.trigger('change');
 			},
 
 			/**
