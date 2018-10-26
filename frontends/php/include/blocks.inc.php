@@ -233,10 +233,13 @@ function getSystemStatusData(array $filter) {
 							$problem['tags'] = $problems_data[$problem['eventid']]['tags'];
 						}
 						else {
-							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
-							if (!$data['groups'][$groupid]['stats'][$severity][$key]) {
+							if ($key === 'problems') {
 								$data['groups'][$groupid]['stats'][$severity]['count']--;
 							}
+							else {
+								$data['groups'][$groupid]['stats'][$severity]['count_unack']--;
+							}
+							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
 						}
 					}
 					unset($problem);
