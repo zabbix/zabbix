@@ -1160,25 +1160,25 @@ class CHost extends CHostGeneral {
 		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first
-		$delRules = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
+		$del_rules = API::DiscoveryRule()->get([
+			'output' => [],
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-		if ($delRules) {
-			API::DiscoveryRule()->delete(array_keys($delRules), true);
+		if ($del_rules) {
+			API::DiscoveryRule()->delete(array_keys($del_rules), true);
 		}
 
 		// delete the items
-		$delItems = API::Item()->get([
+		$del_items = API::Item()->get([
+			'output' => [],
 			'templateids' => $hostIds,
-			'output' => ['itemid'],
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-		if ($delItems) {
-			CItemManager::delete(array_keys($delItems));
+		if ($del_items) {
+			CItemManager::delete(array_keys($del_items));
 		}
 
 		// delete web tests
