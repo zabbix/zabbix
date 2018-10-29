@@ -235,28 +235,28 @@ $ipmiFormList = new CFormList('ipmiFormList');
 // append ipmi to form list
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
-		->setLabel(_('IPMI authentication algorithm'))
+		->setLabel(_('Authentication algorithm'))
 		->setChecked(isset($data['visible']['ipmi_authtype'])),
 	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
-		->setLabel(_('IPMI privilege level'))
+		->setLabel(_('Privilege level'))
 		->setChecked(isset($data['visible']['ipmi_privilege'])),
 	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
-		->setLabel(_('IPMI username'))
+		->setLabel(_('Username'))
 		->setChecked(isset($data['visible']['ipmi_username'])),
 	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
-		->setLabel(_('IPMI password'))
+		->setLabel(_('Password'))
 		->setChecked(isset($data['visible']['ipmi_password'])),
 	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
@@ -288,21 +288,9 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
-		$field_length = $hostInventoryTable['fields'][$field]['length'];
-
-		if ($field_length < 39) {
-			$width = ZBX_TEXTAREA_SMALL_WIDTH;
-		}
-		elseif ($field_length < 64) {
-			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
-		}
-		else {
-			$width = ZBX_TEXTAREA_BIG_WIDTH;
-		}
-
 		$fieldInput = (new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]))
-			->setWidth($width)
-			->setAttribute('maxlength', $field_length);
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('maxlength', $hostInventoryTable['fields'][$field]['length']);
 	}
 
 	$inventoryFormList->addRow(
@@ -331,12 +319,18 @@ $encryption_table = (new CTable())
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
 	])
-	->addRow([_('PSK identity'),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-	])
-	->addRow([_('PSK'),
-		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-	])
+	->addRow(
+		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAriaRequired()
+	)
 	->addRow([_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	])
