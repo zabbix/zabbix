@@ -527,6 +527,7 @@ typedef struct
 
 	int			dep_itemids_num;
 	int			preproc_ops_num;
+	int			update_time;
 
 	zbx_uint64_t		*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
