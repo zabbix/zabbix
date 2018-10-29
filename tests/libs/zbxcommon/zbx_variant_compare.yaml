@@ -248,7 +248,7 @@ in:
     value: 0
   value2:
     type: ZBX_VARIANT_DBL
-    value: 0.00000020
+    value: 0.000001
 out:
   return: equal
 ---
