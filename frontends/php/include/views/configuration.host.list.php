@@ -93,7 +93,8 @@ $filter_tags_table->addRow(
 );
 
 // filter
-$filter = (new CFilter())
+$filter = new CFilter();
+$filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
