@@ -3,10 +3,10 @@ test case: none == none
 in:
   value1:
     type: ZBX_VARIANT_NONE
-    value: 
+    value:
   value2:
     type: ZBX_VARIANT_NONE
-    value: 
+    value:
 out:
   return: equal
 ---
@@ -14,7 +14,7 @@ test case: none < value
 in:
   value1:
     type: ZBX_VARIANT_NONE
-    value: 
+    value:
   value2:
     type: ZBX_VARIANT_STR
     value: abc
@@ -129,7 +129,7 @@ in:
     type: ZBX_VARIANT_STR
     value: 0
 out:
-  return: equal  
+  return: equal
 ---
 test case: floating < uint64
 in:
@@ -229,5 +229,38 @@ in:
     value: 1000000000000
 out:
   return: equal
+---
+test case: floating == floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.000001
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.000002
+out:
+  return: equal
+---
+test case: floating == floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.00000020
+out:
+  return: equal
+---
+test case: floating < floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.00001
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.00002
+out:
+  return: less
 ...
 

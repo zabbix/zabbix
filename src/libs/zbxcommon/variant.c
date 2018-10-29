@@ -292,20 +292,10 @@ static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_
  ******************************************************************************/
 static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
-	const char	*pvalue1, *pvalue2;
-
 	if (ZBX_VARIANT_STR == value1->type)
-	{
-		pvalue1 = value1->data.str;
-		pvalue2 = zbx_variant_value_desc(value2);
-	}
-	else
-	{
-		pvalue1 = zbx_variant_value_desc(value1);
-		pvalue2 = value2->data.str;
-	}
+		return strcmp(value1->data.str, zbx_variant_value_desc(value2));
 
-	return strcmp(pvalue1, pvalue2);
+	return strcmp(zbx_variant_value_desc(value1), value2->data.str);
 }
 
 /******************************************************************************
@@ -346,7 +336,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			exit(EXIT_FAILURE);
 	}
 
-	if (fabs(value1_dbl - value2_dbl) <= ZBX_DOUBLE_EPSILON)
+	if (ZBX_DOUBLE_EPSILON >= fabs(value1_dbl - value2_dbl))
 		return 0;
 
 	ZBX_RETURN_IF_NOT_EQUAL(value1_dbl, value2_dbl);
