@@ -353,12 +353,6 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
  ******************************************************************************/
 static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
-	if (ZBX_VARIANT_UI64 != value1->type || ZBX_VARIANT_UI64 != value2->type)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
 	ZBX_RETURN_IF_NOT_EQUAL(value1->data.ui64, value2->data.ui64);
 	return 0;
 }
@@ -397,7 +391,7 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_DBL == value1->type || ZBX_VARIANT_DBL == value2->type)
 		return variant_compare_dbl(value1, value2);
 
-	if (ZBX_VARIANT_UI64 == value1->type || ZBX_VARIANT_UI64 == value2->type)
+	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
 		return variant_compare_ui64(value1, value2);
 
 	THIS_SHOULD_NEVER_HAPPEN;
