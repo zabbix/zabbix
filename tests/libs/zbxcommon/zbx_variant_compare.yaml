@@ -252,6 +252,17 @@ in:
 out:
   return: equal
 ---
+test case: floating > floating
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: 0.000003
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 0.000001
+out:
+  return: greater
+---
 test case: floating < floating
 in:
   value1:
