@@ -34,6 +34,7 @@ $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addItem((new CVar('action', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
