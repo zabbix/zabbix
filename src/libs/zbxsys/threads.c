@@ -133,7 +133,7 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 
 		/* The zbx_thread_exit must be called from the handler. */
 		/* And in normal case the program will never reach this point. */
-		zbx_thread_exit(EXIT_SUCCESS);
+		THIS_SHOULD_NEVER_HAPPEN;
 		/* program will never reach this point */
 	}
 	else if (-1 == *thread)
