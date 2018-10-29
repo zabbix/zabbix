@@ -152,6 +152,7 @@ static int	variant_to_str(zbx_variant_t *value)
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_DBL, value->data.dbl);
+			del_zeros(value_str);
 			break;
 		case ZBX_VARIANT_UI64:
 			value_str = zbx_dsprintf(NULL, ZBX_FS_UI64, value->data.ui64);

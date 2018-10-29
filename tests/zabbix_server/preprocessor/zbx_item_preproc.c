@@ -161,7 +161,6 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("preprocessing result was empty value");
 
 			zbx_variant_convert(&value, ZBX_VARIANT_STR);
-			del_zeros(value.data.str);
 			zbx_mock_assert_str_eq("processed value", zbx_mock_get_parameter_string("out.value"),
 					value.data.str);
 		}
@@ -177,7 +176,6 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("preprocessing history was empty value");
 
 			zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
-			del_zeros(history_value.data.str);
 			zbx_mock_assert_str_eq("preprocessing step history value",
 					zbx_mock_get_parameter_string("out.history.data"), history_value.data.str);
 
