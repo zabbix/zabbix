@@ -336,7 +336,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			exit(EXIT_FAILURE);
 	}
 
-	if (ZBX_DOUBLE_EPSILON >= fabs(value1_dbl - value2_dbl))
+	if (SUCCEED == zbx_double_compare(value1_dbl, value2_dbl))
 		return 0;
 
 	ZBX_RETURN_IF_NOT_EQUAL(value1_dbl, value2_dbl);
