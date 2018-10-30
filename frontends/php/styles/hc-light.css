@@ -2978,6 +2978,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: -3px; }
 
 .debug-output {
+  display: none;
   max-height: 600px;
   overflow-y: auto;
   padding: 11px;

@@ -524,7 +524,7 @@ function closeDialogHandler(event) {
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(null, dialog.element, true);
+					hintBox.hideHint(dialog.element, true);
 					break;
 
 				// Close context menu overlays.
