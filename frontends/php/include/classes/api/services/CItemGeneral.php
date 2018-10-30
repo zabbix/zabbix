@@ -927,13 +927,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $hostids) {
+		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
 					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $hostids).
+					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
 			);
 

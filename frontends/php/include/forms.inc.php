@@ -1527,9 +1527,11 @@ function getTriggerFormData(array $data) {
 		if ($data['parent_discoveryid'] === null) {
 			$options['selectDiscoveryRule'] = ['itemid', 'name'];
 			$triggers = API::Trigger()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		else {
 			$triggers = API::TriggerPrototype()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
@@ -1544,52 +1546,9 @@ function getTriggerFormData(array $data) {
 		}
 
 		// Get templates.
-		$tmp_triggerid = $data['triggerid'];
-		do {
-			$db_triggers = DBfetch(DBselect(
-				'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
-				' FROM triggers t'.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
-					' LEFT JOIN items i ON f.itemid=i.itemid'.
-					' LEFT JOIN hosts h ON i.hostid=h.hostid'.
-					' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-				' WHERE t.triggerid='.zbx_dbstr($tmp_triggerid)
-			));
-
-			if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-				// Test if template is editable by user
-				$writable = API::Template()->get([
-					'output' => ['templateid'],
-					'templateids' => [$db_triggers['hostid']],
-					'preservekeys' => true,
-					'editable' => true
-				]);
-
-				if (array_key_exists($db_triggers['hostid'], $writable)) {
-					// parent trigger prototype link
-					if ($data['parent_discoveryid']) {
-						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
-							'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
-					}
-					// parent trigger link
-					else {
-						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
-							'&hostid='.$db_triggers['hostid'];
-					}
-
-					$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
-				}
-				else {
-					$data['templates'][] = new CSpan(CHtml::encode($db_triggers['name']));
-				}
-
-				$data['templates'][] = SPACE.'&rArr;'.SPACE;
-			}
-			$tmp_triggerid = $db_triggers['templateid'];
-		} while ($tmp_triggerid != 0);
-
-		$data['templates'] = array_reverse($data['templates']);
-		array_shift($data['templates']);
+		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
+			getTriggerParentTemplates([$trigger], $flag), $flag
+		);
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 

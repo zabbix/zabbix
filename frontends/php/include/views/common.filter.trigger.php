@@ -54,7 +54,7 @@ $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
-$column1->addRow(_('Minimum trigger severity'),
+$column1->addRow(_('Minimum severity'),
 	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 );
 

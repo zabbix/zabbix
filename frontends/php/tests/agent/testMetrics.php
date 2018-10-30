@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CTest.php';
 
 define('TYPE_UINT', 0);
 define('TYPE_FLOAT', 1);
@@ -27,7 +27,7 @@ define('TYPE_ANY', 2);
 define('ZBX_NOTSUPPORTED', '/ZBX_NOTSUPPORTED/');
 define('ZBX_ACTIVE_ONLY', '/Accessible only as active check!/');
 
-class testMetrics extends CZabbixTest {
+class testMetrics extends CTest {
 
 	public static function metrics() {
 		// List of all supported metrics by the agent

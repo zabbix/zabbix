@@ -1860,6 +1860,9 @@ size_t	zbx_utf8_char_len(const char *text)
 		return 3;
 	else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
 		return 4;
+#if ZBX_MAX_BYTES_IN_UTF8_CHAR != 4
+#	error "zbx_utf8_char_len() is not synchronized with ZBX_MAX_BYTES_IN_UTF8_CHAR"
+#endif
 	return 0;				/* not a valid UTF-8 character */
 }
 

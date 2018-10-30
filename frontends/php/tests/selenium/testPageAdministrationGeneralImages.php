@@ -17,12 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageAdministrationGeneralImages extends CWebTest {
+class testPageAdministrationGeneralImages extends CLegacyWebTest {
 
 	public static function allImages() {
-		return DBdata('SELECT imageid,imagetype,name FROM images LIMIT 5');
+		return CDBHelper::getDataProvider('SELECT imageid,imagetype,name FROM images LIMIT 5');
 	}
 
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons() {
@@ -73,7 +73,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_IconSimpleUpdate($image) {
 		$sql_image = 'SELECT * FROM images WHERE imageid='.$image['imageid'];
-		$old_image_hash = DBhash($sql_image);
+		$old_image_hash = CDBHelper::getHash($sql_image);
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestAssertElementPresentId('form');
@@ -87,7 +87,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
-		$this->assertEquals($old_image_hash, DBhash($sql_image));
+		$this->assertEquals($old_image_hash, CDBHelper::getHash($sql_image));
 	}
 
 }

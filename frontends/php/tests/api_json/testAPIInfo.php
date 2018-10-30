@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-class testAPIInfo extends CZabbixTest {
+class testAPIInfo extends CAPITest {
 	public function testAPIInfo_VersionWithAuth() {
 		$error = [
 			'code' => -32602,

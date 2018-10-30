@@ -77,6 +77,7 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
+	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -572,13 +573,16 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
+		CProfile::deleteIdx('web.templates.filter_templates');
 	}
 
 	$filter = [
-		'name' => CProfile::get('web.templates.filter_name', '')
+		'name' => CProfile::get('web.templates.filter_name', ''),
+		'templates' => CProfile::getArray('web.templates.filter_templates', null)
 	];
 
 	$config = select_config();
@@ -586,12 +590,21 @@ else {
 	// get templates
 	$templates = [];
 
+	$filter['templates'] = $filter['templates']
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter['templates'],
+			'preservekeys' => true
+		]), ['templateid' => 'id'])
+		: [];
+
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
+			'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'groupids' => $pageFilter->groupids,
 			'editable' => true,
 			'sortfield' => $sortField,

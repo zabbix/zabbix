@@ -1,12 +1,51 @@
+Changes for 4.0.1
+
+4.0.1rc2 was released as 4.0.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.1rc2
+
+Bug fixes:
+..F....... [ZBX-14904] fixed possible PHP errors in "Problem hosts" widget (Sasha)
+.......PS. [ZBX-15057] fixed possible crash when syncing host groups (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-4725] added filter fields to select templates and hosts by directly linked templates; made proxy filter field visible in configuration hosts field (miks)
+..F....... [ZBXNEXT-4796] added 'fullscreen' and 'kiosk' URL arguments to allow to set layout mode via link (ashubin, gcalenko)
+.......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 ........S. [ZBXNEXT-4271] improved escalator performance by using nextcheck index instead of reading whole table (vso)
 
 Bug fixes:
+..F....... [ZBX-14807] fixed selection box for graphs on monitoring screens (gcalenko)
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
+.D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
+..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
+A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
+..F....... [ZBX-14925] added support of user language specific url link in support icon, supported languages: english as default, japanese, russian (gcalenko)
+........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
+..F....... [ZBX-14798] fixed incorrect zero rounding in date and time fields (gcalenko, Ivo)
+........S. [ZBX-14954] fixed sql error in escalator when working with Oracle, PostgreSQL (less than v9.4) databases (wiper)
+..F....... [ZBX-14757] fixed incorrect translation string in en_US locale (zalex_ua)
+..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
+..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
+..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
+..F....... [ZBX-14711] fixed triggers in trigger overview being filtered by trigger severity and trigger status change time instead of problem severity and problem creation time (agriscenko)
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
+..F....... [ZBX-12217] removed links to templates with no permissions for templated triggers, trigger prototypes, graphs, graph prototypes, host prototypes and web scenarios (agriscenko)
+..F....... [ZBX-14861] fixed trigger evaluation result not visible in test dialogue when expression is too long (agriscenko)
 ..F....... [ZBX-14723] fixed zoom button for time selector in IE browser (ashubin)
 ..F....... [ZBX-14888] fixed table markup on overview and system info pages (agriscenko)
-..F....... [ZBX-14652] fixed plain text Latest data when selecting more then 1 item (vasilijs)
+..F....... [ZBX-14652] fixed plain text Latest data when selecting more than 1 item (vasilijs)
 ..F....... [ZBX-14618] fixed host prototype status checkbox resets after adding template (vasilijs)
 ..F....... [ZBX-14632] fixed minor typos in comments and tests (vasilijs)
 ..F....... [ZBX-14834] fixed icon misplacement in problem view (Ivo)
@@ -240,7 +279,7 @@ A.F.I..PS. [ZBXNEXT-4569] added support of MySQL 8.0 (gcalenko, vso)
 ........S. [ZBXNEXT-4163] added support LLD, User macros and User macros with context from LLD macro in Items preprocessing (MVekslers)
 
 Bug fixes:
-A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototype.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-14329] fixed error opening map's submap (ashubin)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-13783] dropped support for Zapcat-style and multi-level parameter arrays from item key validation in frontend (agriscenko)
@@ -550,8 +589,24 @@ Bug fixes:
 Changes for 3.4.15rc1
 
 New features:
+.......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
+.D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
+..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
+A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error message while importing multiple templates (Sasha)
+........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
+..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
+..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)
@@ -673,7 +728,7 @@ Changes for 3.4.10rc1
 
 Bug fixes:
 ..F....... [ZBX-14414] fixed PHP 7.2 error message in the Monitoring->Latest data page (Sasha)
-A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototypr.update methods; fixed updating of discovered items (Sasha)
+A.F....... [ZBX-13712] fixed "Undefined index: master_itemid" and SQL errors in item.update and itemprototype.update methods; fixed updating of discovered items (Sasha)
 ..F....... [ZBX-13549] fixed displaying of not monitored triggers in maps (miks)
 ..F....... [ZBX-12359] fixed "Automatic icon selection" checkbox not working and displaying two icons at once in map constructor (Ivo)
 ........S. [ZBX-14333] fixed {ESC.HISTORY} and action log not to display colon without target host when executed on Zabbix server (vso)
@@ -1911,11 +1966,29 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 3.0.23
+
+3.0.23rc1 was released as 3.0.23 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.23rc1
 
 New features:
+.......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
+........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
+.......PS. [ZBX-14972] fixed the case where data from non-monitored VMware services are not removed from vmware cache (MVekslers)
+...G...PS. [ZBX-14856] added support for OpenSSL 1.1.1 (Andris)
+.D.G...PS. [ZBX-14971] added note on runtime control with PID numbers larger than 65535 to server, proxy and agentd help messages and man pages (Andris)
+A......... [ZBX-14734] fixed the verification of the assignment of two web checks with the same name from different templates to one host (vasilijs)
+..F....... [ZBX-14749] fixed cloning inherited host prototype on host (vasilijs)
+..F....... [ZBX-14663] fixed calculation of Y zero position in graph (miks)
+..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
+..F....... [ZBX-14776] fixed sorting when changing status of media type (vasilijs)
+..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
+..F....... [ZBX-14689] fixed updating of the Graph list of host when selecting a group of hosts (vasilijs)
 ..F....... [ZBX-14803] fixed incorrect profile update causing page filter to sometimes show duplicate values (Ivo)
 ..F....... [ZBX-14727] fixed selection of data for trigger overview, data overview and graphs if first drop down entry is "none" (Ivo)
 ..F....... [ZBX-14650] fixed web.page.regexp item parameters description (gcalenko)

@@ -19,13 +19,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 /**
  * @backup items
  */
-class API_JSON_Item extends CZabbixTest {
+class API_JSON_Item extends CAPITest {
 	public static function inventory_links() {
 		$data = [];
 		$inventoryFields = getHostInventories();

@@ -19,19 +19,19 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CTest.php';
 
-class function_DBselect extends CZabbixTest {
+class function_DBselect extends CTest {
 	public function test_DBselectOK() {
 		$result=DBselect('select * from users');
 		$this->assertTrue(is_resource($result) ||is_object($result));
 	}
 
 	public function test_DBselectRange() {
-		$this->assertTrue(0 == DBcount('select * from items', 0));
-		$this->assertTrue(1 == DBcount('select * from items', 1));
-		$this->assertTrue(100 == DBcount('select * from items', 100));
-		$this->assertTrue(1 == DBcount('select * from items', '1'));
+		$this->assertTrue(0 == CDBHelper::getCount('select * from items', 0));
+		$this->assertTrue(1 == CDBHelper::getCount('select * from items', 1));
+		$this->assertTrue(100 == CDBHelper::getCount('select * from items', 100));
+		$this->assertTrue(1 == CDBHelper::getCount('select * from items', '1'));
 	}
 
 	public function test_DBselectWrongParameters() {
