@@ -1268,9 +1268,9 @@ output {
       position: relative;
       z-index: 1; }
     .radio-segmented input[type="radio"]:checked:focus + label {
-      color: #fff;
-      background-color: #02659f;
-      border-color: #02659f;
+      -webkit-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+      -moz-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
