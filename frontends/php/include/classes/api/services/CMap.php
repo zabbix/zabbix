@@ -2294,11 +2294,12 @@ class CMap extends CMapElement {
 
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
-			$selements = API::getApiService()->select('sysmaps_elements', [
+			$selements = $this->getMapElements([
 				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype',
 					'elementid'
 				]),
 				'filter' => ['sysmapid' => $sysmapIds],
+				'selectTriggers' => ['selementid', 'triggerid'],
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($selements, 'sysmapid', 'selementid');
