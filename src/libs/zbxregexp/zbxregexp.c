@@ -59,11 +59,13 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	if(NULL == pcre_regexp)
 		return FAIL;
 
-	if(regexp)
+	if (NULL != regexp)
 	{
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
 	}
+	else
+		pcre_free(pcre_regexp);
 
 	return SUCCEED;
 }
