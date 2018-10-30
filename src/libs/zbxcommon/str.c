@@ -21,6 +21,8 @@
 #include "threads.h"
 #include "module.h"
 
+#include "../zbxcrypto/tls.h"
+
 #ifdef HAVE_ICONV
 #	include <iconv.h>
 #endif
@@ -54,6 +56,10 @@ void	version(void)
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	printf("\n");
+	zbx_tls_version();
+#endif
 }
 
 /******************************************************************************

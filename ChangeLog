@@ -1,6 +1,7 @@
 Changes for 4.0.2rc1
 
 New features:
+...G...PS. [DEV-921] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
 
@@ -596,6 +597,7 @@ Bug fixes:
 Changes for 3.4.15rc1
 
 New features:
+...G...PS. [DEV-921] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
@@ -1977,6 +1979,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.24rc1
 
 New features:
+...G...PS. [DEV-921] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
 
