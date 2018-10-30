@@ -869,6 +869,6 @@ void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
 
-void	zbx_dc_get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags);
+void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags);
 
 #endif

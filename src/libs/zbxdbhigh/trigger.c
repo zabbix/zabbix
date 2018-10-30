@@ -50,7 +50,7 @@ void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char *expre
 	zbx_hashset_iter_reset(&hosts, &iter);
 	while(NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_dc_get_host_tags(&host->hostid, 1, host_tags);
+		DCget_host_tags(&host->hostid, 1, host_tags);
 	}
 
 	zbx_vector_uint64_destroy(&functionids);

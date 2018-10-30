@@ -11856,21 +11856,33 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_host_tag_t	*host_tag;
 	zbx_tag_t		tag;
+	int			i;
+	const ZBX_DC_HTMPL	*htmpl;
 
-	RDLOCK_CACHE;
-
-	zbx_hashset_iter_reset(&config->host_tags, &iter);
-	while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+	for (i=0; i<hostids_num; i++)
 	{
-		tag.tag = zbx_strdup(NULL, host_tag->tag);
-		tag.value = zbx_strdup(NULL, host_tag->value);
-		zbx_hashset_insert(host_tags, &tag, sizeof(zbx_tag_t));
-	}
+		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
+			DCget_host_tags(htmpl->templateids.values, htmpl->templateids.values_num, host_tags);
 
+		zbx_hashset_iter_reset(&config->host_tags, &iter);
+		while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+		{
+			tag.tag = zbx_strdup(NULL, host_tag->tag);
+			tag.value = zbx_strdup(NULL, host_tag->value);
+			if(host_tag->hostid == hostids[i])
+				zbx_hashset_insert(host_tags, &tag, sizeof(zbx_tag_t));
+		}
+	}
+}
+
+void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+{
+	RDLOCK_CACHE;
+	get_host_tags(hostids, hostids_num, host_tags);
 	UNLOCK_CACHE;
 }
