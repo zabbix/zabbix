@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageReportsTriggerTop extends CWebTest {
+class testPageReportsTriggerTop extends CLegacyWebTest {
 
 	public function testPageReportsTriggerTop_FilterLayout() {
 		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
 
@@ -191,6 +191,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
 		$this->zbxTestLogin('toptriggers.php');
+		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();
@@ -232,14 +233,13 @@ class testPageReportsTriggerTop extends CWebTest {
 		// Fill in the date in filter.
 		if (array_key_exists('date', $data)) {
 			$this->zbxTestExpandFilterTab('Time');
-			// Reset the date in filter on Today.
-			$this->zbxTestClickXpathWait('//div[@id="tab_1"]//a[text()="Today"]');
-			$this->zbxTestWaitForPageToLoad();
-
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);
 			}
+			// Wait till table id will be changed after filter apply.
+			$tabel_id = $this->zbxTestGetAttributeValue('//table[@class="list-table"]', 'id');
 			$this->zbxTestClickWait('apply');
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//table[@class="list-table"][not(@id="'.$tabel_id.'")]'));
 			$this->zbxTestWaitForPageToLoad();
 		}
 
