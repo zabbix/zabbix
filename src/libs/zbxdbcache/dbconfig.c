@@ -4305,6 +4305,8 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 		zbx_strpool_release(host_tag->tag);
 		zbx_strpool_release(host_tag->value);
+
+		zbx_hashset_remove_direct(&config->host_tags, host_tag);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
