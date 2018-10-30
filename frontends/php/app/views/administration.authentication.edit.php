@@ -80,25 +80,29 @@ $ldap_tab = (new CFormList('list_ldap'))
 		: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
 			->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
 	)
-	->addRow(new CLabel(_('LDAP host'), 'ldap_host'),
+	->addRow((new CLabel(_('LDAP host'), 'ldap_host'))->setAsteriskMark(),
 		(new CTextBox('ldap_host', $data['ldap_host']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(new CLabel(_('Port'), 'ldap_port'),
+	->addRow((new CLabel(_('Port'), 'ldap_port'))->setAsteriskMark(),
 		(new CNumericBox('ldap_port', $data['ldap_port'], 5))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(new CLabel(_('Base DN'), 'ldap_base_dn'),
+	->addRow((new CLabel(_('Base DN'), 'ldap_base_dn'))->setAsteriskMark(),
 		(new CTextBox('ldap_base_dn', $data['ldap_base_dn']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(new CLabel(_('Search attribute'), 'ldap_search_attribute'),
+	->addRow((new CLabel(_('Search attribute'), 'ldap_search_attribute'))->setAsteriskMark(),
 		(new CTextBox('ldap_search_attribute', $data['ldap_search_attribute']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
 	->addRow(new CLabel(_('Bind DN'), 'ldap_bind_dn'),
 		(new CTextBox('ldap_bind_dn', $data['ldap_bind_dn']))
@@ -112,15 +116,17 @@ $ldap_tab = (new CFormList('list_ldap'))
 	)
 	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
 	->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']')
-	->addRow(new CLabel(_('Login'), 'ldap_test_user'),
+	->addRow((new CLabel(_('Login'), 'ldap_test_user'))->setAsteriskMark(),
 		(new CTextBox('ldap_test_user', $data['ldap_test_user']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 	)
-	->addRow(new CLabel(_('User password'), 'ldap_test_password'),
+	->addRow((new CLabel(_('User password'), 'ldap_test_password'))->setAsteriskMark(),
 		(new CPassBox('ldap_test_password', $data['ldap_test_password']))
 			->setEnabled($data['ldap_enabled'])
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
 );
 
 (new CWidget())
