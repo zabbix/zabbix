@@ -253,11 +253,6 @@ class CProfiler {
 	 * @param string $sql
 	 */
 	public function profileSql($time, $sql) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
-			return;
-		}
-
 		$time = round($time, 6);
 
 		$this->sqlTotalTime += $time;
@@ -277,11 +272,6 @@ class CProfiler {
 	 * @param array  $result
 	 */
 	public function profileApiCall($class, $method, $params, $result) {
-		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
-				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
-			return;
-		}
-
 		$backtrace = debug_backtrace();
 
 		// Use the file name and line number from the first call to the API wrapper object.
