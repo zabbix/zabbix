@@ -12,6 +12,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.1
@@ -609,6 +610,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
 ...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
 ........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
@@ -1990,6 +1992,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.23
