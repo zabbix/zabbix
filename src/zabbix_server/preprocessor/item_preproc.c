@@ -1064,7 +1064,7 @@ static int	item_preproc_validate_range(unsigned char value_type, zbx_variant_t *
 	if (ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "value must be greater or equal to %s",
-				zbx_variant_value_desc(&range_min));
+				zbx_variant_value_desc(&range_max));
 		goto out;
 	}
 	ret = SUCCEED;
