@@ -215,44 +215,582 @@
 	}
 
 	/**
-	 * Rearrange widgets on drag or resize operation.
+	 * Rearrange widgets on drag operation.
 	 *
 	 * @param {array}  data    Array of widgets objects.
 	 * @param {object} widget  Moved widget object.
 	 */
 	function realignWidget(data, widget) {
 		var realignDrag = function (widget) {
-			var pos = widget.current_pos,
-				to_row = pos.y + pos.height;
+				var pos = widget.current_pos,
+					to_row = pos.y + pos.height;
 
-			$.map(data.widgets, function (box) {
-				return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
-					? box : null
-			})
-			.sort(function (box1, box2) {
-				return box2.current_pos.y - box1.current_pos.y;
-			})
-			.each(function (box) {
-				if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0) {
-					var free;
-					box.current_pos.y = pos.y - box.current_pos.height;
+				$.map(data.widgets, function (box) {
+					return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
+						? box : null
+				})
+				.sort(function (box1, box2) {
+					return box2.current_pos.y - box1.current_pos.y;
+				})
+				.each(function (box) {
+					if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0) {
+						var free;
+						box.current_pos.y = pos.y - box.current_pos.height;
 
-					$.each(data.widgets, function() {
-						free = !(box.uniqueid != this.uniqueid && rectOverlap(box.current_pos, this.current_pos));
-						return free;
+						$.each(data.widgets, function() {
+							free = !(box.uniqueid != this.uniqueid && rectOverlap(box.current_pos, this.current_pos));
+							return free;
+						});
+
+						if (free) {
+							return true;
+						}
+					}
+					box.current_pos.y = to_row;
+
+					realignDrag(box);
+				});
+			};
+
+		realignDrag(widget);
+	}
+
+	/**
+	 * Rearrange widgets.
+	 * TODO: fix step 2 collapse part.
+	 *
+	 * @param {array}  data    Array of widgets objects.
+	 * @param {object} widget  Moved widget object.
+	 */
+	function realignResizeStateless(data, widget) {
+		var changes = {};
+
+		// Fill changes object with difference between current_pos and pos. Do not set not changed values.
+		$.each(widget.current_pos, function(k, v) {
+			if (widget.pos[k] != v) {
+				changes[k] = v - widget.pos[k];
+			}
+		});
+
+		// If there are no affected widgets restore initial dimensions.
+		if ('width' in changes == false && 'height' in changes == false) {
+			resetCurrentPositions(data['widgets']);
+			return;
+		}
+
+		/**
+		 * Same code will be used for X and Y axes.
+		 */
+		var axis_key = 'x',
+			size_key = 'width',
+			size_min = 1,
+			size_max = 12;
+
+		// Do horizontal resize.
+		if ('width' in changes) {
+			var max_width = size_max,
+				max_height = 1,
+				pos = {
+					x: widget.current_pos.x,
+					width: widget.current_pos.width,
+					y: widget.pos.y,
+					height: widget.pos.height
+				},
+				getAffectedTreeAsArray = function (pos) {
+					$.map(data.widgets, function(box) {
+						return !('current_pos' in box) && rectOverlap(pos, box.pos) ? box : null;
+					}).each(function (box) {
+						if ('current_pos' in box) {
+							return;
+						}
+
+						box.current_pos = $.extend({}, box.pos);
+
+						var boundary = {
+							y: box.pos.y,
+							height: box.pos.height
+						};
+
+						if ('x' in changes) {
+							boundary.x = Math.max(0, box.pos.x - changes.width);
+							boundary.width = box.pos.x - changes.width < 0
+								? box.pos.width
+								: box.pos.width + changes.width;
+						}
+						else {
+							boundary.x = box.pos.x;
+							boundary.width = box.pos.width + changes.width;
+						}
+
+						getAffectedTreeAsArray(boundary);
 					});
 
-					if (free) {
-						return true;
+					return $.map(data.widgets, function (box) {
+						return 'current_pos' in box && box.uniqueid != widget.uniqueid ? box : null;
+					});
+				},
+				affected = getAffectedTreeAsArray(pos)
+					.sort(function (box1, box2) {
+						return 'x' in changes
+							? (box2.current_pos.x + box2.current_pos.width) - (box1.current_pos.x + box1.current_pos.width)
+							: box1.current_pos.x - box2.current_pos.x;
+					})
+					.each(function (box) {
+						max_height = Math.max(max_height, box.current_pos.y + box.current_pos.height);
+						box.div.css('background-color', 'red');
+						box.div.css('opacity', '0.5');
+					}),
+				getAffectedInBounds = function (bounds) {
+					return $.map(affected, function (box) {
+						return rectOverlap(bounds, box.current_pos) ? box : null;
+					});
+				}
+
+			// debug code.
+			// affected[0] && affected[0].div.css('background-color', 'maroon');
+
+			/**
+			 * 1. Move widgets.
+			 */
+			var margins = {},
+				axis_pos = $.extend(widget.current_pos);
+
+			// Is Alice in mirrorland?
+			if (axis_key in changes) {
+				affected.each(function (box) {
+					box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
+				});
+				axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
+			}
+
+			// Move widget and it affected siblings. Everybody knows what TETЯIS is.
+			var new_max = 0,
+				opposite_axis_key = axis_key == 'x' ? 'y' : 'x',
+				opposite_size_key = size_key == 'width' ? 'height' : 'width';
+
+			affected.each(function (box) {
+				var newpos = axis_pos[axis_key] + axis_pos[size_key],
+					last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
+
+				for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
+					if (i in margins) {
+						newpos = Math.max(newpos, margins[i]);
 					}
 				}
-				box.current_pos.y = to_row;
 
-				realignDrag(box);
+				for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
+					margins[i] = newpos + box.current_pos[size_key];
+				}
+
+				if (box.current_pos[axis_key] <= newpos) {
+					box.current_pos[axis_key] = newpos;
+					new_max = Math.max(new_max, newpos + box.current_pos[size_key]);
+					//box.div.css('background-color', 'rgba(0, 0, 255, 0.1)');
+					box.div.css('opacity', '1');
+				}
+			});
+
+			/**
+			 * 2. Resize.
+			 */
+			if (new_max > size_max) {
+				var scanline = {
+						x: axis_pos[axis_key] + axis_pos[size_key],
+						width: 1,
+						y: 0,
+						height: max_height
+					},
+					delta = 0,
+					slots = [getAffectedInBounds(scanline)],
+					i = 1;
+				scanline[axis_key] += 1
+				while (scanline[axis_key] < new_max) {
+					slots.push(getAffectedInBounds(scanline));
+
+					var can_move = true,
+						can_collapse = new_max > size_max + delta;
+
+					$.each(slots[i], function (_, box) {
+						box.new_pos = $.extend({}, box.current_pos);
+						box.new_pos[axis_key] -= delta + (can_collapse ? 1 : 0);
+						//box.content_header.html('delta: '+delta);
+
+						if (can_collapse) {
+							$.each(slots[i - 1], function (_, box1) {
+								if (rectOverlap(box1.current_pos, box.new_pos)) {
+									if (box1.current_pos[size_key] > size_min) {
+										box1.new_pos = $.extend({}, box1.current_pos);
+										box1.new_pos[size_key] -= 1;
+										box1.div.css('background-color', 'rgba(255, 0, 255, 0.2)');
+									}
+									else {
+										can_move = false;
+									}
+								}
+
+								return can_move;
+							});
+						}
+						else {
+							if (scanline[axis_key] != box.current_pos[axis_key]
+									&& box.current_pos[size_key] > size_min) {
+								/*
+								 * Slots can contain multiple entries for same widget when widget size is greater
+								 * than 1, such widget should be moved only once.
+								 */
+								box.new_pos = $.extend({}, box.current_pos);
+							}
+						}
+
+						return can_move;
+					});
+
+					if (can_move) {
+						// debug code
+						// TODO: remove!
+						// console['log']('will move, delta='+delta+', collapse='+can_collapse,
+						// 	JSON.parse(JSON.stringify(slots[i]))
+						// );
+						delta += can_collapse ? 1 : 0;
+
+						slots[i].each(function (box) {
+							slots[i - 1].push(box);
+						});
+						slots[i - 1].each(function (box) {
+							if ('new_pos' in box) {
+								box.current_pos = box.new_pos;
+								delete box.new_pos;
+								box.div.css('background-color', can_collapse
+									? 'rgba(0, 255, 0, 0.5)'
+									: 'rgba(0, 255, 0, 0.1)');
+								// box.content_header.html(JSON.stringify({delta: delta, new_max:new_max}));
+							}
+						});
+						// slots.pop();
+						// i -= 1;
+						slots[i] = [];
+					}
+					else {
+						// TODO: remove!
+						console['log']('  no move, delta='+delta+', collapse='+can_collapse,
+							JSON.parse(JSON.stringify(slots[i]))
+						);
+
+						slots[i].each(function (box) {
+							'new_pos' in box && box.div.css('background-color', 'rgba(0, 0, 0, 0.2)');
+							delete box.new_pos;
+						});
+						slots[i - 1].each(function (box) {
+							'new_pos' in box && box.div.css('background-color', 'rgba(0, 0, 0, 0.2)');
+							delete box.new_pos;
+						});
+						//i += 1;
+					}
+
+					i += 1;
+					scanline[axis_key] += 1;
+				}
+			}
+
+			/**
+			 * 3. Move widget to best available 'fit' position when it is impossible to fit widgets in to desired
+			 *    boundary box.
+			 * TODO: remove false when step 2 collapse will work.
+			 */
+			if (false && new_max > size_max) {
+				affected.each(function (box) {
+					box.current_pos[axis_key] = Math.max(box.pos[axis_key],
+						box.current_pos[axis_key] - new_max - size_max
+					);
+				});
+			}
+
+		}
+
+		// Get Alice back.
+		if (axis_key in changes) {
+			affected.each(function (box) {
+				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
+				// debug code
+				// TODO: remove!
+				if (box.current_pos[axis_key] < 0) {
+					console.error(box.header+' outside bounds for '+axis_key, box.current_pos);
+					box.current_pos[axis_key] = 0;
+				}
 			});
 		}
 
-		realignDrag(widget);
+		// Force to repaint non changed widgets too.
+		$.each(data.widgets, function (i, box) {
+			if ('current_pos' in box == false) {
+				box.current_pos = $.extend({}, box.pos);
+				box.div.css('opacity', '1');
+			}
+		});
+	}
+
+	/**
+	 * TODO: remove when realignResizeStateless step 2 will work.
+	 * Rearrange widgets on resize operation.
+	 *
+	 * @param {array}  data    Array of widgets objects.
+	 * @param {object} widget  Moved widget object.
+	 */
+	function realignResize(data, widget) {
+		var changes = {},
+			max_width = 11,
+			max_height = 12,
+			min_width = 1,
+			min_height = 2,
+			pos_changed = false,
+			resized = [],
+			sortHandler,
+			success;
+
+		$.each(widget.current_pos, function(index, val) {
+			val -= widget.previous_pos[index];
+
+			if (val !== 0) {
+				changes[index] = val;
+				pos_changed = true;
+			}
+		});
+
+		if (!pos_changed) {
+			// TODO: remove!
+			console['log']('no position changes? '+widget.header, widget);
+			return false;
+		}
+
+		$.map(data.widgets, function(box) {
+			box.restore_pos = $.extend({}, box.current_pos);
+		});
+
+		// TODO: diagonal resize should be separated into two steps.
+		var sort = {
+			Xdesc: function (box1, box2) {
+				return box2.current_pos.x - box1.current_pos.x;
+			},
+			Xasc: function (box1, box2) {
+				return box1.current_pos.x - box2.current_pos.x;
+			},
+			Ydesc: function (box1, box2) {
+				return box2.current_pos.y - box1.current_pos.y;
+			},
+			Yasc: function (box1, box2) {
+				return box1.current_pos.y - box2.current_pos.y;
+			}
+		};
+
+		if ('width' in changes) {
+			sortHandler = 'x' in changes ? sort.Xdesc : sort.Xasc;
+		}
+		else if ('height' in changes) {
+			sortHandler = 'y' in changes ? sort.Ydesc : sort.Yasc;
+		}
+
+		var realignMove = function (widget) {
+				var dbg = $.map(data.widgets, function (box) {
+					return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
+						? box : null
+				})
+				.sort(sortHandler)
+				.each(function (box) {
+					// Horizontal move.
+					if ('x' in changes || 'width' in changes) {
+						box.current_pos.x += 'x' in changes ? changes.x : changes.width;
+
+						if (box.current_pos.x + box.current_pos.width > max_width || box.current_pos.x < 0) {
+							success = false;
+							return false;
+						}
+					}
+
+					// Vertical move.
+					if ('y' in changes || 'height' in changes) {
+						box.current_pos.y += 'y' in changes ? changes.y : changes.height;
+
+						if (box.current_pos.y + box.current_pos.height > max_height|| box.current_pos.y < 0) {
+							success = false;
+							return false;
+						}
+					}
+
+					// Stop processing if box moving attempt failed.
+					return realignMove(box);
+				});
+
+				return success;
+			},
+			realignResize = function (widget, resize) {
+				$.map(data.widgets, function (box) {
+					return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
+						? box : null
+				})
+				.sort(sortHandler)
+				.each(function (box) {
+					var x, width,
+						y, height;
+					// Horizontal move and resize.
+					if ('width' in changes) {
+						x = box.current_pos.x + ('x' in changes ? changes.x : changes.width);
+						width = resize ? box.current_pos.width - changes.width : box.current_pos.width;
+
+						if ((x < 0 || x + width > max_width) && width < min_width) {
+							// We can not move nor resize sibling. Stop processing of all other branches.
+							success = false;
+							return false;
+						}
+
+						// box.current_pos.x = x > 0 ? x : 0;
+						width = width < min_width ? min_width : width;
+
+						// if (resize && width != box.current_pos.width) {
+						resize = true;
+						if (width != box.current_pos.width) {
+							resized.push({
+								uniqueid: box.uniqueid,
+								x: x > 0 ? x : 0,
+								width: box.current_pos.width
+							});
+
+							if (x + width > max_width) {
+								box.current_pos.width = width;
+								resize = false;
+							}
+							else {
+								// For resize to right side set new x position.
+								if ('x' in changes == false) {
+									box.current_pos.x = x > 0 ? x : 0;
+								}
+								// Resize only if there will be overlap.
+								$.each(data.widgets, function() {
+									if (this.uniqueid != box.uniqueid && rectOverlap(box.current_pos, this.current_pos)) {
+										box.current_pos.width = width;
+										resize = false;
+										return false;
+									}
+								});
+							}
+
+							if (!resize && 'x' in changes) {
+								// For successfull resize to left side do not change x position.
+								// Ignore overlap check for children of resized sibling.
+								return true;
+							}
+						}
+
+						box.current_pos.x = x > 0 ? x : 0;
+					}
+
+					// Vertical move and resize.
+					if ('height' in changes) {
+						y = box.current_pos.y + ('y' in changes ? changes.y : changes.height);
+						height = resize ? box.current_pos.height - changes.height : box.current_pos.height;
+
+						if (y < 0 && height < min_height) {
+							// We can not move nor resize sibling. Stop processing of all other branches.
+							success = false;
+							return false;
+						}
+
+						//box.current_pos.y = y > 0 ? y : 0;
+						height = height < min_height ? min_height : height;
+
+						resize = true;
+						if (resize && height != box.current_pos.height) {
+							resized.push({
+								uniqueid: box.uniqueid,
+								y: y > 0 ? y : 0,
+								height: box.current_pos.height
+							});
+
+							if (y + height > max_height) {
+								box.current_pos.height = height;
+								resize = false;
+							}
+							else {
+								// For resize to bottom side set new y position.
+								if ('y' in changes == false) {
+									box.current_pos.y = y > 0 ? y : 0;
+								}
+								// Resize only if there will be overlap.
+								$.each(data.widgets, function() {
+									if (this.uniqueid != box.uniqueid && rectOverlap(box.current_pos, this.current_pos)) {
+										box.current_pos.height = height;
+										resize = false;
+										return false;
+									}
+								});
+							}
+
+							if (!resize && 'y' in changes) {
+								// For successfull resize to top side do not change y position.
+								// Ignore overlap check for resized sibling.
+								return true;
+							}
+						}
+
+						box.current_pos.y = y > 0 ? y : 0;
+					}
+					return realignResize(box, resize);
+				});
+				return success;
+			};
+
+		success = true;
+		// attempt to move first.
+		if (realignMove(widget)) {
+			return true;
+		}
+
+		$.map(data.widgets, function(box) {
+			box.current_pos = $.extend({}, box.restore_pos);
+		});
+
+		success = true;
+		// attempt resize and move.
+		if (realignResize(widget, true)) {
+			// When resized widgets count is more than 1, check is the resize operation valid and should not be reverted.
+			if (resized.length) {
+				$.each(resized, function(_, pos) {
+					var widget,
+						widget_pos;
+
+					$.each(data.widgets, function(i, box) {
+						if (box.uniqueid == pos.uniqueid) {
+							widget = box;
+							return false;
+						}
+					});
+
+					widget_pos = $.extend({}, widget.current_pos);
+					widget.current_pos = $.extend(widget.current_pos, pos);
+
+					if (widget.current_pos.x + widget.current_pos.width > max_width) {
+						// Widget will be outside allowed area.
+						widget.current_pos = widget_pos;
+					}
+					else {
+						$.each(data.widgets, function(i, box) {
+							if (box.uniqueid != pos.uniqueid && rectOverlap(widget.current_pos, box.current_pos)) {
+								widget.current_pos = widget_pos;
+								return false;
+							}
+						});
+					}
+				});
+			}
+
+			return true;
+		}
+
+		$.map(data.widgets, function(box) {
+			box.current_pos = box.restore_pos;
+			delete box.restore_pos;
+		});
+
+		return false;
 	}
 
 	function checkWidgetOverlap($obj, data, widget) {
@@ -269,6 +807,84 @@
 		});
 	}
 
+	/**
+	 * User action handler for resize of widget
+	 *
+	 * @param {object} $obj  Dasboard DOM element.
+	 * @param {object} $div  Widget DOM element.
+	 * @param {object} data  Dashboard data object.
+	 */
+	function doWidgetResize($obj, $div, data) {
+		var	widget = getWidgetByTarget(data['widgets'], $div),
+			pos = getDivPosition($obj, data, $div);
+
+		setDivPosition(data['placeholder'], data, pos, true);
+
+		if (!posEquals(pos, widget['current_pos'])) {
+			$.each(data.widgets, function(i, box) {
+				box.div.css('background-color', '');
+				delete box.current_pos;
+			});
+			widget['current_pos'] = pos;
+			realignResizeStateless(data, widget);
+
+			$.each(data['widgets'], function() {
+				if (widget.uniqueid != this.uniqueid && 'current_pos' in this) {
+					setDivPosition(this['div'], data, this['current_pos'], false);
+				}
+			});
+		}
+		return;
+
+		// This part is used by doWidgetResize
+		// TODO: remove
+		if (!posEquals(pos, widget['current_pos'])) {
+			widget['current_pos'] = pos;
+			// TODO: envoke realignResize separately for x and y changes.
+
+			if (realignResize(data, widget)) {
+				delete widget.freeze_pos;
+				widget.previous_pos = $.extend({}, pos);
+				setDivPosition(data['placeholder'], data, pos, true);
+
+				$.each(data['widgets'], function() {
+					if (widget.uniqueid != this.uniqueid) {
+						setDivPosition(this['div'], data, this['current_pos'], false);
+					}
+				});
+			}
+			else {
+				widget.current_pos = $.extend({}, widget.previous_pos);
+				widget.freeze_pos = $.extend({}, widget.previous_pos);
+				pos = widget.freeze_pos;
+				setDivPosition($div, data, widget.freeze_pos, false);
+				setDivPosition(data['placeholder'], data, widget.freeze_pos, true);
+			}
+		}
+
+		// TODO: envoke only on vertical resize!
+		// var min_rows = 0;
+
+		// $.each(data['widgets'], function() {
+		// 	var rows = this['current_pos']['y'] + this['current_pos']['height'];
+
+		// 	if (min_rows < rows) {
+		// 		min_rows = rows;
+		// 	}
+		// });
+
+		// if (data['options']['rows'] < min_rows) {
+		// 	resizeDashboardGrid($obj, data, min_rows);
+		// }
+	}
+
+	/**
+	 * User action handler for drag of widget
+	 *
+	 * @param {object} $obj  Dasboard DOM element.
+	 * @param {object} $div  Widget DOM element.
+	 * @param {object} data  Dashboard data object.
+	 */
 	function doWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = getDivPosition($obj, data, $div);
@@ -385,7 +1001,10 @@
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
-				data['pos-action'] = 'resize';
+				var widget = getWidgetByTarget(data['widgets'], $(event.target));
+				// Is used only by realignResize method.
+				// TODO: remove
+				widget.previous_pos = widget.pos;
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -398,7 +1017,7 @@
 					});
 				}
 
-				doWidgetPositioning($obj, $(event.target), data);
+				doWidgetResize($obj, $(event.target), data);
 			},
 			stop: function(event, ui) {
 				stopWidgetPositioning($obj, $(event.target), data);
