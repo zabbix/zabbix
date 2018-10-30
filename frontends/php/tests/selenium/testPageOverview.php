@@ -610,9 +610,9 @@ class testPageOverview extends CLegacyWebTest {
 
 		// Count rows and columns to compare with expected number of results.
 		$rows = $this->webDriver->findElements(WebDriverBy::xpath('//th//div[@class="vertical_rotation_inner"]'));
-		$columns = $this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]//th[1]'));
+		$columns = $this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]//tbody//th[1]'));
 		$this->assertEquals(count($thead), count($rows));
-		$this->assertEquals(count($tbody), count($columns)-1);
+		$this->assertEquals(count($tbody), count($columns));
 	}
 
 	public function getContextMenu() {
