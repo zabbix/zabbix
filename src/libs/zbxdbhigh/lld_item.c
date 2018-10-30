@@ -216,14 +216,22 @@ typedef struct
 	zbx_uint64_t	item_preprocid;
 	int		step;
 	int		type;
+	int		error_handler;
 	char		*params;
+	char		*error_handler_params;
 
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UNSET				__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE			__UINT64_C(0x02)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS			__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE							\
-		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER		__UINT64_C(0x08)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS	__UINT64_C(0x10)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE				\
+		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE |		\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS |		\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER |	\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS	\
+		)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DELETE				__UINT64_C(0x08)
 	zbx_uint64_t	flags;
 }
@@ -449,6 +457,7 @@ static void	lld_application_free(zbx_lld_application_t *application)
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
+	zbx_free(op->error_handler_params);
 	zbx_free(op);
 }
 
@@ -834,7 +843,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select ip.item_preprocid,ip.itemid,ip.step,ip.type,ip.params"
+			"select ip.item_preprocid,ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,"
+				"ip.error_handler_params"
 			" from item_discovery id"
 				" join item_preproc ip"
 					" on id.itemid=ip.itemid"
@@ -863,6 +873,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		preproc_op->step = atoi(row[2]);
 		preproc_op->type = atoi(row[3]);
 		preproc_op->params = zbx_strdup(NULL, row[4]);
+		preproc_op->error_handler = atoi(row[5]);
+		preproc_op->error_handler_params = zbx_strdup(NULL, row[6]);
 		zbx_vector_ptr_append(&item->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
@@ -1247,7 +1259,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN];
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
 
 	*err = '\0';
@@ -1263,30 +1275,71 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	switch (pp->type)
 	{
 		case ZBX_PREPROC_REGSUB:
-			zbx_strlcpy(pattern, pp->params, sizeof(pattern));
-			if (NULL == (output = strchr(pattern, '\n')))
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
 			{
 				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
 				ret = FAIL;
 				break;
 			}
 
-			*output++ = '\0';
+			*param2++ = '\0';
 
-			if (FAIL == (ret = zbx_regexp_compile(pattern, NULL, &regexp_err)))
+			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
 				zbx_strlcpy(err, regexp_err, sizeof(err));
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_JSON:
 			ret = zbx_json_path_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_XPATH:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_XML:
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
 			break;
 		case ZBX_PREPROC_MULTIPLIER:
 			if (FAIL == (ret = is_double(pp->params)))
 				zbx_snprintf(err, sizeof(err), "value is not numeric: %s", pp->params);
+			break;
+		case ZBX_PREPROC_VALIDATE_RANGE:
+			zbx_strlcpy(param1, pp->params, sizeof(param1));
+			if (NULL == (param2 = strchr(param1, '\n')))
+			{
+				zbx_snprintf(err, sizeof(err), "cannot find second parameter: %s", pp->params);
+				ret = FAIL;
+				break;
+			}
+			*param2++ = '\0';
+			zbx_lrtrim(param1, " \t");
+			zbx_lrtrim(param2, " \t");
+
+			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
+				zbx_snprintf(err, sizeof(err), "first parameter is not numeric: %s", param1);
+
+			if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+				zbx_snprintf(err, sizeof(err), "second parameter is not numeric: %s", param2);
+
+			if ('\0' == *param1 && '\0' == *param2)
+			{
+				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s", pp->params);
+				ret = FAIL;
+			}
+
+			break;
+		case ZBX_PREPROC_VALIDATE_REGEX:
+			/* break; is not missing here */
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			if (FAIL == (ret = zbx_regexp_compile(pp->params, NULL, &regexp_err)))
+				zbx_strlcpy(err, regexp_err, sizeof(err));
+			break;
+		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			if (SUCCEED != (ret = is_time_suffix(pp->params, NULL, strlen(pp->params))))
+				zbx_snprintf(err, sizeof(err), "invalid time interval: %s", pp->params);
 			break;
 	}
 
@@ -2323,9 +2376,17 @@ static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const z
 	switch (pp->type)
 	{
 		case ZBX_PREPROC_REGSUB:
+			/* break; is not missing here */
+		case ZBX_PREPROC_VALIDATE_REGEX:
+			/* break; is not missing here */
+		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			token_type |= ZBX_TOKEN_REGEXP;
 			break;
 		case ZBX_PREPROC_XPATH:
+			/* break; is not missing here */
+		case ZBX_PREPROC_ERROR_FIELD_XML:
 			token_type |= ZBX_TOKEN_XPATH;
 			break;
 	}
@@ -2360,7 +2421,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 	zbx_lld_item_t			*item;
 	zbx_lld_item_prototype_t	*item_proto;
 	zbx_lld_item_preproc_t		*ppsrc, *ppdst;
-	char				*sub_params;
+	char				*buffer;
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -2392,16 +2453,27 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags = ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE;
 				ppdst->step = ppsrc->step;
 				ppdst->type = ppsrc->type;
+				ppdst->params = NULL;
+				ppdst->error_handler = ppsrc->error_handler;
+				ppdst->error_handler_params = zbx_strdup(NULL, ppsrc->error_handler_params);
 
-				if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &sub_params,
+				if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &buffer,
 						error))
 				{
-					zbx_free(ppdst);
+					lld_item_preproc_free(ppdst);
 					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 					break;
 				}
 
-				ppdst->params = sub_params;
+				ppdst->params = buffer;
+
+				if (SUCCEED != substitute_lld_macros(&ppdst->error_handler_params,
+						&item->lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0))
+				{
+					lld_item_preproc_free(ppdst);
+					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					break;
+				}
 				zbx_vector_ptr_append(&item->preproc_ops, ppdst);
 				continue;
 			}
@@ -2424,20 +2496,38 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE;
 			}
 
-			if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &sub_params, error))
+			if (SUCCEED != lld_items_preproc_step_esc(ppsrc, item->lld_row, item->key, &buffer, error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;
 			}
 
-			if (0 != strcmp(ppdst->params, sub_params))
+			if (0 != strcmp(ppdst->params, buffer))
 			{
 				zbx_free(ppdst->params);
-				ppdst->params = sub_params;
+				ppdst->params = buffer;
+				buffer = NULL;
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS;
 			}
+
+			if (ppdst->error_handler != ppsrc->error_handler)
+			{
+				ppdst->error_handler = ppsrc->error_handler;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER;
+			}
+
+			buffer = zbx_strdup(buffer, ppsrc->error_handler_params);
+			substitute_lld_macros(&buffer, &item->lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+			if (0 != strcmp(ppdst->error_handler_params, buffer))
+			{
+				zbx_free(ppdst->error_handler_params);
+				ppdst->error_handler_params = buffer;
+				buffer = NULL;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS;
+			}
 			else
-				zbx_free(sub_params);
+				zbx_free(buffer);
 		}
 	}
 }
@@ -3127,7 +3217,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 	if (0 != new_preproc_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
-				NULL);
+				"error_handler", "error_handler_params", NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -3146,7 +3236,8 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 			if (0 == preproc_op->item_preprocid)
 			{
 				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), item->itemid, preproc_op->step,
-						preproc_op->type, preproc_op->params);
+						preproc_op->type, preproc_op->params, preproc_op->error_handler,
+						preproc_op->error_handler_params);
 				continue;
 			}
 
@@ -3167,6 +3258,25 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 
 				params_esc = DBdyn_escape_string(preproc_op->params);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cparams='%s'", delim, params_esc);
+
+				zbx_free(params_esc);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror_handler=%d", delim,
+						preproc_op->error_handler);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS))
+			{
+				char	*params_esc;
+
+				params_esc = DBdyn_escape_string(preproc_op->error_handler_params);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror_handler_params='%s'", delim,
+						params_esc);
 
 				zbx_free(params_esc);
 			}
@@ -4768,7 +4878,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	/* get item prototype preprocessing options */
 
 	result = DBselect(
-			"select ip.itemid,ip.step,ip.type,ip.params from item_preproc ip,item_discovery id"
+			"select ip.itemid,ip.step,ip.type,ip.params,ip.error_handler,ip.error_handler_params"
+			" from item_preproc ip,item_discovery id"
 			" where ip.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -4790,6 +4901,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		preproc_op->step = atoi(row[1]);
 		preproc_op->type = atoi(row[2]);
 		preproc_op->params = zbx_strdup(NULL, row[3]);
+		preproc_op->error_handler = atoi(row[4]);
+		preproc_op->error_handler_params = zbx_strdup(NULL, row[5]);
 		zbx_vector_ptr_append(&item_prototype->preproc_ops, preproc_op);
 	}
 	DBfree_result(result);
