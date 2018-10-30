@@ -4,6 +4,7 @@ New features:
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 Bug fixes:
+A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.2rc1
