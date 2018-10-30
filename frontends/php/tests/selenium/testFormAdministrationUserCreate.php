@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup users
  */
-class testFormAdministrationUserCreate extends CWebTest {
+class testFormAdministrationUserCreate extends CLegacyWebTest {
 
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
@@ -43,6 +43,6 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->zbxTestTextPresent('User added');
 
 		$sql = 'SELECT * FROM users WHERE alias=\'User alias\'';
-		$this->assertEquals(1, DBcount($sql), 'User with such alias has not been added');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'User with such alias has not been added');
 	}
 }

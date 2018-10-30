@@ -845,28 +845,9 @@ else {
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
 
-	// get real hosts
-	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_NORMAL);
 
-	// Select writable template IDs.
-	$hostids = [];
-
-	foreach ($data['realHosts'] as $realHost) {
-		$hostids = array_merge($hostids, zbx_objectValues($realHost, 'hostid'));
-	}
-
-	$data['writable_templates'] = [];
-
-	if ($hostids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => $hostids,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	// do not show 'Info' column, if it is a template
+	// Do not show 'Info' column, if it is a template.
 	if ($data['hostid']) {
 		$data['showInfoColumn'] = (bool) API::Host()->get([
 			'output' => [],

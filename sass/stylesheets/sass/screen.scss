@@ -825,6 +825,13 @@ output {
 				}
 			}
 
+			[class*='icon-depend-'] {
+				&,
+				&:last-of-type {
+					margin-right: 12px;
+				}
+			}
+
 			.rel-container {
 
 				span {
@@ -1018,7 +1025,7 @@ output {
 			@extend %nothing-to-show;
 		}
 
-		&:last-child td {
+		&:last-child th, &:last-child td {
 			border-bottom: none;
 		}
 
@@ -1871,7 +1878,7 @@ output {
 		}
 
 		&:checked:focus + label {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
 			z-index: 2;
 		}
@@ -2570,6 +2577,7 @@ $icon-widget-btn: (
 	border: 1px solid transparent;
 	color: $font-color;
 	height: 24px;
+	line-height: 22px;
 	margin: 0 5px;
 	vertical-align: top;
 
@@ -3209,7 +3217,7 @@ $form-icon-btn: (
 
 		tbody tr {
 
-			&:last-child td {
+			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
 				&.list-table-footer {
@@ -4312,6 +4320,7 @@ $form-icon-btn: (
 
 // Debug, Overlay Description
 .debug-output {
+	display: none;
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;

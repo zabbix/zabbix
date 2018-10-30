@@ -1247,7 +1247,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN];
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 	const char*	regexp_err = NULL;
 
 	*err = '\0';

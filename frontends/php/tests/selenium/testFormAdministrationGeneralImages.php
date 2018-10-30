@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormAdministrationGeneralImages extends CWebTest {
+class testFormAdministrationGeneralImages extends CLegacyWebTest {
 	public $icon_image_name = '1image1';
 	public $icon_image_name2 = '2image2';
 	public $bg_image_name = '1bgimage1';
@@ -61,14 +61,14 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name has not been added to the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name has not been added to the DB');
 
 	}
 
 	public function testFormAdministrationGeneralImages_CancelIconImageChanges() {
 
 		$sqlIcons = 'SELECT * FROM images WHERE imagetype=1';
-		$oldHashIcons=DBhash($sqlIcons);
+		$oldHashIcons=CDBHelper::getHash($sqlIcons);
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
@@ -77,7 +77,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
-		$this->assertEquals($oldHashIcons, DBhash($sqlIcons), 'Chuck Norris: No-change images update should not update data in table "images"');
+		$this->assertEquals($oldHashIcons, CDBHelper::getHash($sqlIcons), 'Chuck Norris: No-change images update should not update data in table "images"');
 
 	}
 
@@ -92,7 +92,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');;
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
 	}
 
 	public function testFormAdministrationGeneralImages_DeleteImage() {
@@ -106,7 +106,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Image with such name still exist in the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name still exist in the DB');
 	}
 
 	public function testFormAdministrationGeneralImages_AddBgImage() {
@@ -121,7 +121,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name has not been added to the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name has not been added to the DB');
 	}
 
 	public function testFormAdministrationGeneralImages_UpdateBgImage() {
@@ -138,7 +138,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
 	}
 
 	public function testFormAdministrationGeneralImages_DeleteBgImage() {
@@ -152,7 +152,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Image with such name still exist in the DB');
+		$this->assertEquals(0, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name still exist in the DB');
 	}
 
 }
