@@ -840,7 +840,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 		{
@@ -850,7 +851,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		now = time(NULL);
-		sec = zbx_time();
 		rule_count += process_discovery(now);
 		total_sec += zbx_time() - sec;
 
@@ -879,10 +879,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 
 #undef STAT_INTERVAL

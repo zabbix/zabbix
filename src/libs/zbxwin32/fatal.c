@@ -105,6 +105,10 @@ static void	print_fatal_info(CONTEXT *pctx)
 typedef BOOL (WINAPI *SymGetLineFromAddrW64_func_t)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
 typedef BOOL (WINAPI *SymFromAddr_func_t)(HANDLE a, DWORD64 b , PDWORD64 c, PSYMBOL_INFO d);
 
+void	zbx_backtrace(void)
+{
+}
+
 static void	print_backtrace(CONTEXT *pctx)
 {
 	SymGetLineFromAddrW64_func_t	zbx_SymGetLineFromAddrW64 = NULL;

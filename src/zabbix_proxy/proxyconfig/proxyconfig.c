@@ -157,11 +157,11 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		sec = zbx_time();
 		process_configuration_sync(&data_size);
 		sec = zbx_time() - sec;
 
@@ -170,9 +170,5 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				CONFIG_PROXYCONFIG_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }
