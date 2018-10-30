@@ -32,6 +32,32 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
+
+void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char *expression, const char *recovery_expression)
+{
+	zbx_vector_uint64_t	functionids;
+	zbx_hashset_t		hosts;
+	zbx_hashset_iter_t 	iter;
+	DC_HOST			*host;
+
+	zbx_hashset_create(&hosts, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_create(&functionids);
+
+	get_functionids(&functionids, expression);
+	get_functionids(&functionids, recovery_expression);
+	DCget_hosts_by_functionids(&functionids, &hosts);
+
+	zbx_hashset_iter_reset(&hosts, &iter);
+	while(NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_dc_get_host_tags(&host->hostid, 1, host_tags);
+	}
+
+	zbx_vector_uint64_destroy(&functionids);
+	zbx_hashset_destroy(&hosts);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_process_trigger                                              *
@@ -73,6 +99,7 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 	const char	*new_error;
 	int		new_state, new_value, ret = FAIL;
 	zbx_uint64_t	flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
+	zbx_hashset_t	host_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
@@ -118,17 +145,23 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
 	{
+		zbx_hashset_create(&host_tags, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_get_host_tags_by_expression(&host_tags, trigger->expression_orig, trigger->recovery_expression_orig);
+
 		zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 				&trigger->timespec, new_value, trigger->description,
 				trigger->expression_orig, trigger->recovery_expression_orig,
-				trigger->priority, trigger->type, &trigger->tags,
+				trigger->priority, trigger->type, &trigger->tags, &host_tags,
 				trigger->correlation_mode, trigger->correlation_tag, trigger->value, NULL);
+
+		zbx_hashset_destroy(&host_tags);
 	}
 
 	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 	{
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, new_error);
+				&trigger->timespec, new_state, NULL, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, new_error);
 	}
 
 	zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value, new_state,

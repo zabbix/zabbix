@@ -79,6 +79,34 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	return SUCCEED;
 }
 
+static void	process_trigger_tag(const zbx_tag_t *trigger_tag)
+{
+	zbx_tag_t	*tag;
+
+	tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+	tag->tag = zbx_strdup(NULL, trigger_tag->tag);
+	tag->value = zbx_strdup(NULL, trigger_tag->value);
+
+	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+
+	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
+			NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+
+	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
+		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
+	if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
+		tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
+
+	zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
+	zbx_lrtrim(tag->value, ZBX_WHITESPACE);
+
+	if (SUCCEED == validate_event_tag(&events[events_num], tag))
+		zbx_vector_ptr_append(&events[events_num].tags, tag);
+	else
+		zbx_free_tag(tag);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_add_event                                                    *
@@ -108,7 +136,7 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags, zbx_hashset_t *host_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *error)
 {
@@ -160,33 +188,18 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		if (NULL != trigger_tags)
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
-			{
-				const zbx_tag_t	*trigger_tag = (const zbx_tag_t *)trigger_tags->values[i];
-				zbx_tag_t	*tag;
+				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
+		}
 
-				tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-				tag->tag = zbx_strdup(NULL, trigger_tag->tag);
-				tag->value = zbx_strdup(NULL, trigger_tag->value);
+		if (NULL != host_tags)
+		{
+			zbx_hashset_iter_t	iter;
+			zbx_tag_t		*tag;
 
-				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+			zbx_hashset_iter_reset(host_tags, &iter);
 
-				substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-				if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
-					tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
-				if (TAG_VALUE_LEN < zbx_strlen_utf8(tag->value))
-					tag->value[zbx_strlen_utf8_nchars(tag->value, TAG_VALUE_LEN)] = '\0';
-
-				zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
-				zbx_lrtrim(tag->value, ZBX_WHITESPACE);
-
-				if (SUCCEED == validate_event_tag(&events[events_num], tag))
-					zbx_vector_ptr_append(&events[events_num].tags, tag);
-				else
-					zbx_free_tag(tag);
-			}
+			while (NULL != (tag = (zbx_tag_t *)zbx_hashset_iter_next(&iter)))
+				process_trigger_tag(tag);
 		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
@@ -225,7 +238,7 @@ static int	close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, cons
 
 	index = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
+			trigger_type, NULL, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
 			NULL);
 
 	recovery_local.eventid = eventid;

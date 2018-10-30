@@ -510,7 +510,9 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 		ptr = zbx_hashset_insert(hashset, &buffer[0], size);
 	}
 	else
+	{
 		*found = 1;
+	}
 
 	return ptr;
 }
@@ -4249,6 +4251,67 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_host_tags                                                 *
+ *                                                                            *
+ * Purpose: Updates host tags in configuration cache                          *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - hosttagid                                                    *
+ *           1 - hostid                                                       *
+ *           2 - tag                                                          *
+ *           3 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_host_tags(zbx_dbsync_t *sync)
+{
+	const char	*__function_name = "DCsync_hmacros";
+
+	char		**row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+
+	zbx_dc_host_tag_t	*host_tag;
+
+	int		found, context_existed, update_index, ret;
+	zbx_uint64_t	hosttagid, hostid;
+	char		*macro = NULL, *context = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(hosttagid, row[0]);
+		ZBX_STR2UINT64(hostid, row[1]);
+
+		host_tag = (zbx_dc_host_tag_t *)DCfind_id(&config->host_tags, hosttagid, sizeof(zbx_dc_host_tag_t), &found);
+
+		/* store new information in host_tag structure */
+		host_tag->hostid = hostid;
+		DCstrpool_replace(found, &host_tag->tag, row[2]);
+		DCstrpool_replace(found, &host_tag->value, row[3]);
+	}
+
+	/* remove deleted host macros from buffer */
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_search(&config->host_tags, &rowid)))
+			continue;
+
+		zbx_strpool_release(host_tag->tag);
+		zbx_strpool_release(host_tag->value);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: dc_compare_item_preproc_by_step                                  *
  *                                                                            *
  * Purpose: compare two item preprocessing operations by step                 *
@@ -4651,24 +4714,24 @@ static void	dc_hostgroups_update_cache(void)
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode)
 {
-	const char		*__function_name = "DCsync_configuration";
+	const char	*__function_name = "DCsync_configuration";
 
-	int			i, flags;
-	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
-				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
-				expr_sec2, action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
-				action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, correlation_sec,
-				correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
-				corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
-				update_sec, maintenance_sec, maintenance_sec2;
+	int		i, flags;
+	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec, csec2,
+			hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2, expr_sec2,
+			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
+			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
+			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
+			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, total, total2,
+			update_sec, maintenance_sec, maintenance_sec2;
 
-	zbx_dbsync_t		config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync,
-				items_sync, triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
-				action_condition_sync, trigger_tag_sync, correlation_sync, corr_condition_sync,
-				corr_operation_sync, hgroups_sync, itempp_sync, maintenance_sync,
-				maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
-				maintenance_host_sync, hgroup_host_sync;
-	zbx_uint64_t		update_flags = 0;
+	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
+			triggers_sync, tdep_sync, func_sync, expr_sync, action_sync, action_op_sync,
+			action_condition_sync, trigger_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync,
+			corr_operation_sync, hgroups_sync, itempp_sync, maintenance_sync, maintenance_period_sync,
+			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync;
+
+	zbx_uint64_t	update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4697,6 +4760,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	zbx_dbsync_init(&action_condition_sync, mode);
 	zbx_dbsync_init(&trigger_tag_sync, mode);
+	zbx_dbsync_init(&host_tag_sync, mode);
 	zbx_dbsync_init(&correlation_sync, mode);
 	zbx_dbsync_init(&corr_condition_sync, mode);
 	zbx_dbsync_init(&corr_operation_sync, mode);
@@ -4739,6 +4803,11 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	hmsec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_host_tags(&host_tag_sync))
+		goto out;
+	host_tag_sec = zbx_time() - sec;
+
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_htmpls(&htmpl_sync);
@@ -4751,6 +4820,10 @@ void	DCsync_configuration(unsigned char mode)
 	sec = zbx_time();
 	DCsync_hmacros(&hmacro_sync);
 	hmsec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_host_tags(&host_tag_sync);
+	host_tag_sec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
@@ -5052,6 +5125,10 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, trigger_tag_sec, trigger_tag_sec2, trigger_tag_sync.add_num,
 				trigger_tag_sync.update_num, trigger_tag_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__function_name, host_tag_sec, host_tag_sec2, host_tag_sync.add_num,
+				host_tag_sync.update_num, host_tag_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__function_name, fsec, fsec2, func_sync.add_num, func_sync.update_num,
@@ -5233,6 +5310,7 @@ out:
 	zbx_dbsync_clear(&htmpl_sync);
 	zbx_dbsync_clear(&gmacro_sync);
 	zbx_dbsync_clear(&hmacro_sync);
+	zbx_dbsync_clear(&host_tag_sync);
 	zbx_dbsync_clear(&if_sync);
 	zbx_dbsync_clear(&items_sync);
 	zbx_dbsync_clear(&triggers_sync);
@@ -5647,6 +5725,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->actions, 0);
 	CREATE_HASHSET(config->action_conditions, 0);
 	CREATE_HASHSET(config->trigger_tags, 0);
+	CREATE_HASHSET(config->host_tags, 0);
 	CREATE_HASHSET(config->correlations, 0);
 	CREATE_HASHSET(config->corr_conditions, 0);
 	CREATE_HASHSET(config->corr_operations, 0);
@@ -11770,6 +11849,25 @@ void	zbx_dc_cleanup_data_sessions(void)
 			__config_mem_free_func((char *)session->token);
 			zbx_hashset_iter_remove(&iter);
 		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_dc_get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_host_tag_t	*host_tag;
+	zbx_tag_t		tag;
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->host_tags, &iter);
+	while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
+	{
+		tag.tag = zbx_strdup(NULL, host_tag->tag);
+		tag.value = zbx_strdup(NULL, host_tag->value);
+		zbx_hashset_insert(host_tags, &tag, sizeof(zbx_tag_t));
 	}
 
 	UNLOCK_CACHE;

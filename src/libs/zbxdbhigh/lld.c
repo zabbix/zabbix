@@ -707,7 +707,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 		zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported", zbx_host_key_string(lld_ruleid));
 
 		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+				NULL, NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, NULL);
 		zbx_process_events(NULL, NULL);
 		zbx_clean_events();
 
