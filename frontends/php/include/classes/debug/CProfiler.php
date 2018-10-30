@@ -236,7 +236,6 @@ class CProfiler {
 		return (new CPre())
 			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
-			->addStyle('display: none;')
 			->addItem($debug);
 	}
 

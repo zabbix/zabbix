@@ -1,3 +1,15 @@
+Changes for 4.0.2rc1
+
+New features:
+...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
+
+Bug fixes:
+..F....... [ZBX-14905] fixed error reporting for XML import of hosts and templates (gcalenko)
+..F....... [ZBX-14945] fixed action popup being unclosable after widget refresh, fixed debug element being hidden on widget refresh (gcalenko)
+..F....... [ZBX-14806] changed focus style for radio buttons (Andzs)
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.1
 
 4.0.1rc2 was released as 4.0.1 without any changes
@@ -589,9 +601,12 @@ Bug fixes:
 Changes for 3.4.15rc1
 
 New features:
+...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
+A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
 ...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
 ........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
 .......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
@@ -1964,6 +1979,15 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.24rc1
+
+New features:
+...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
+
+Bug fixes:
+...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.23
