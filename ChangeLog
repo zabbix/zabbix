@@ -605,6 +605,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
 ...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
