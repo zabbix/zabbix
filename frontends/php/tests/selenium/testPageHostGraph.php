@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 /**
  * @backup graphs
  */
-class testPageHostGraph extends CLegacyWebTest {
+class testPageHostGraph extends CWebTest {
 
 	public function testPageHostGraph_CheckLayout() {
 		$host_name = 'Host to check graph 1';
@@ -82,8 +82,8 @@ class testPageHostGraph extends CLegacyWebTest {
 			'host_discovery.php?hostid='.$hostid => 'Discovery rules',
 			'httpconf.php?hostid='.$hostid => 'Web scenarios',
 		];
-		$count_items = CDBHelper::getCount('SELECT NULL FROM items WHERE hostid='.$hostid);
-		$count_graphs = CDBHelper::getCount($sql);
+		$count_items = DBcount('SELECT NULL FROM items WHERE hostid='.$hostid);
+		$count_graphs = DBcount($sql);
 
 		foreach ($breadcrumbs as $url => $text) {
 			$this->zbxTestAssertElementPresentXpath('//a[@href="'.$url.'"][text()="'.$text.'"]');
@@ -105,7 +105,9 @@ class testPageHostGraph extends CLegacyWebTest {
 		// Check graph configuration parameters.
 		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
 
-		foreach (CDBHelper::getAll($sql) as $graph) {
+		foreach (DBdata($sql, false) as $graph) {
+			$graph = $graph[0];
+
 			// Get graph row in table.
 			$element = $this->webDriver->findElement(
 					WebDriverBy::xpath('//table[@class="list-table"]/tbody//input[@value="'.$graph['graphid'].'"]/../..')
@@ -482,7 +484,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				$original = $this->getGraphHash($data, $data['host']);
 				// Get every host from the group.
 				foreach ($data['targets'] as $target) {
-					$group_host = CDBHelper::getAll('SELECT host'.
+					$group_host = DBdata('SELECT host'.
 							' FROM hosts'.
 							' WHERE hostid IN ('.
 								'SELECT hostid'.
@@ -490,11 +492,11 @@ class testPageHostGraph extends CLegacyWebTest {
 								' WHERE groupid IN ('.
 									'SELECT groupid'.
 									' FROM hstgrp'.
-									' WHERE name IN ('.zbx_dbstr($target).')))');
+									' WHERE name IN ('.zbx_dbstr($target).')))', false);
 
 					// Check DB with every host
 					foreach ($group_host as $host) {
-						$name = $host['host'];
+						$name = $host[0]['host'];
 						// Save graph data of copy target - host group
 						$this->assertEquals($original, $this->getGraphHash($data, $name));
 					}
@@ -530,8 +532,8 @@ class testPageHostGraph extends CLegacyWebTest {
 							')'.
 					')';
 
-			foreach (CDBHelper::getAll($sql) as $graph) {
-				$names[] = zbx_dbstr($graph['name']);
+			foreach (DBdata($sql, false) as $graph) {
+				$names[] = zbx_dbstr($graph[0]['name']);
 			}
 		}
 		// Get graph names in string.
@@ -571,7 +573,7 @@ class testPageHostGraph extends CLegacyWebTest {
 				')'.
 				' ORDER BY name';
 
-		return CDBHelper::getHash($sql);
+		return DBhash($sql);
 	}
 
 	public static function getDeleteData() {
@@ -645,7 +647,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					' ORDER BY name';
 		}
 
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public static function getFilterData() {

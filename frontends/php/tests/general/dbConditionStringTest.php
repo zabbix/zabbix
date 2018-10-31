@@ -20,9 +20,9 @@
 
 
 require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class dbConditionStringTest extends CTest {
+class dbConditionStringTest extends CZabbixTest {
 
 	public static function provider() {
 		return [

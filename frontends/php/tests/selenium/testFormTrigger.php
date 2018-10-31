@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup triggers
  */
-class testFormTrigger extends CLegacyWebTest {
+class testFormTrigger extends CWebTest {
 
 	/**
 	 * The name of the Simple form test host created in the test data set.
@@ -367,12 +367,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider(
-			'select description'.
-			' from triggers t'.
-			' left join functions f on f.triggerid=t.triggerid'.
-			' where f.itemid=30004 and t.description LIKE \'testFormTrigger%\''
-		);
+		return DBdata("select description from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='30004' and t.description LIKE 'testFormTrigger%'");
 	}
 
 	/**
@@ -382,8 +377,8 @@ class testFormTrigger extends CLegacyWebTest {
 		$sqlTriggers = 'select * from triggers order by triggerid';
 		$sqlFunctions = 'select * from functions order by functionid';
 
-		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
-		$oldHashFunctions = CDBHelper::getHash($sqlFunctions);
+		$oldHashTriggers = DBhash($sqlTriggers);
+		$oldHashFunctions = DBhash($sqlFunctions);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -395,8 +390,8 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent($data['description']);
 		$this->zbxTestCheckHeader('Triggers');
 
-		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
-		$this->assertEquals($oldHashFunctions, CDBHelper::getHash($sqlFunctions));
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+		$this->assertEquals($oldHashFunctions, DBhash($sqlFunctions));
 	}
 
 	// Returns create data

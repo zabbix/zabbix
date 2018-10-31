@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup hstgrp
  */
-class testFormHostGroup extends CLegacyWebTest {
+class testFormHostGroup extends CWebTest {
 	private $hostGroup = 'Test Group';
 
 	public function testFormHostGroup_CheckLayout() {
@@ -60,7 +60,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHostGroup_CreateDuplicate() {
@@ -107,7 +107,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHostGroup_Delete() {
@@ -119,6 +119,6 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

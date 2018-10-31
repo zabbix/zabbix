@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup screens
  */
-class testZBX6339 extends CLegacyWebTest {
+class testZBX6339 extends CWebTest {
 
 	// Returns all screens
 	public static function allScreens() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT s.screenid,s.name,h.name as host_name'.
 			' FROM hosts h'.
 				' LEFT JOIN screens s'.

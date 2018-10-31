@@ -18,23 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
+class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	public static function allValues() {
-		return CDBHelper::getDataProvider('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
+
+		return DBdata('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
 	}
 
 	public static function allGroups() {
-		return CDBHelper::getDataProvider('SELECT name FROM hstgrp ORDER BY groupid');
+
+		return DBdata('SELECT name FROM hstgrp ORDER BY groupid');
 	}
 
 	public static function AlertUsrgrpid() {
-		return CDBHelper::getDataProvider('SELECT * FROM usrgrp ORDER BY usrgrpid');
+
+		return DBdata('SELECT * FROM usrgrp ORDER BY usrgrpid');
 	}
 
 	/**
@@ -112,9 +115,9 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
@@ -128,9 +131,9 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=0';
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 
 		// trying to enter value > max_value
 		$this->zbxTestCheckTitle('Other configuration parameters');

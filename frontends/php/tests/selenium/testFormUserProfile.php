@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormUserProfile extends CLegacyWebTest {
+class testFormUserProfile extends CWebTest {
 
 	public function testFormProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -34,13 +34,13 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('Global view');
 
-		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_Cancel() {
 		$sqlHashUsers = 'select userid,alias,name,surname,passwd,url,autologin,lang,refresh,type,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
@@ -49,7 +49,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestCheckHeader('Global view');
 
-		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public static function passwords() {
@@ -90,7 +90,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	 */
 	public function testFormProfile_PasswordChange($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -109,14 +109,14 @@ class testFormUserProfile extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 				break;
 		}
 	}
 
 	public function testFormProfile_ThemeChange() {
 		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -127,7 +127,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$row = DBfetch(DBselect("select theme from users where alias='".PHPUNIT_LOGIN_NAME."'"));
 		$this->assertEquals('blue-theme', $row['theme']);
 
-		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public static function refresh() {
@@ -203,7 +203,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	 */
 	public function testFormProfile_RefreshTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -222,7 +222,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 				break;
 		}
 	}
@@ -312,7 +312,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	 */
 	public function testFormProfile_AutologoutTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
-		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
 
@@ -332,7 +332,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestCheckTitle('User profile');
-				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
+				$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 				break;
 		}
 	}
@@ -564,7 +564,8 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('period', $data)) {
-			$this->zbxTestInputClearAndTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
+			$this->webDriver->findElement(WebDriverBy::xpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]'))->clear();
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
 		}
 
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
@@ -577,7 +578,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('Global view');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
-				$this->assertEquals(1, CDBHelper::getCount($sql));
+				$this->assertEquals(1, DBcount($sql));
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));

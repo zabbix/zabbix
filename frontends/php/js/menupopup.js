@@ -410,16 +410,15 @@ function getMenuPopupMap(options, trigger_elmnt) {
 /**
  * Get menu popup refresh section data.
  *
- * @param {string}   options['widgetName']   Widget name.
- * @param {string}   options['currentRate']  Current rate value.
- * @param {bool}     options['multiplier']   Multiplier or time mode.
- * @param {array}    options['params']       Url parameters (optional).
- * @param {callback} options['callback']     Callback function on success (optional).
- * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
+ * @param string   options['widgetName']   Widget name.
+ * @param string   options['currentRate']  Current rate value.
+ * @param bool     options['multiplier']   Multiplier or time mode.
+ * @param array    options['params']       Url parameters (optional).
+ * @param callback options['callback']     Callback function on success (optional).
  *
  * @return array
  */
-function getMenuPopupRefresh(options, trigger_elmnt) {
+function getMenuPopupRefresh(options) {
 	var items = [],
 		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
 		intervals = options.multiplier
@@ -479,7 +478,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						}
 					});
 
-					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
+					obj.closest('.action-menu').menuPopup('close', null);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -510,13 +509,13 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 								}
 							});
 
-							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
+							obj.closest('.action-menu').menuPopup('close', null);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
+							obj.closest('.action-menu').menuPopup('close', null);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -883,7 +882,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, false);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 					};
@@ -933,12 +932,10 @@ jQuery(function($) {
 				target = event;
 			}
 
-			opener.attr('data-expanded', 'true');
+			// Close other action menus.
+			$('.action-menu-top').not('#' + id).menuPopup('close');
 
 			if (menuPopup.length > 0) {
-				// Close other action menus.
-				$('.action-menu-top').not('#' + id).menuPopup('close');
-
 				var display = menuPopup.css('display');
 
 				// Hide current action menu sub-levels.
@@ -946,7 +943,6 @@ jQuery(function($) {
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
-					$(opener).removeAttr('data-expanded');
 				}
 				else {
 					menuPopup.fadeIn(50);
@@ -1049,7 +1045,7 @@ jQuery(function($) {
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
 			$(document)
-				.on('click', {menu: menuPopup, opener: opener}, menuPopupDocumentCloseHandler)
+				.on('click', {menu: menuPopup}, menuPopupDocumentCloseHandler)
 				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
 
 			menuPopup.focus();
@@ -1058,7 +1054,6 @@ jQuery(function($) {
 			var menuPopup = $(this);
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
-				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
 				$('.highlighted', menuPopup).removeClass('highlighted');
@@ -1132,7 +1127,7 @@ jQuery(function($) {
 	};
 
 	function menuPopupDocumentCloseHandler(event) {
-		$(event.data.menu[0]).menuPopup('close', event.data.opener);
+		$(event.data.menu[0]).menuPopup('close');
 	}
 
 	function menuPopupKeyDownHandler(event) {

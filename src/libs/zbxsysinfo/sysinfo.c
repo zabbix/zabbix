@@ -1410,9 +1410,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	args.args = (void *)&metric_args;
 
-	zbx_thread_start(agent_metric_thread, &args, &thread);
-
-	if (ZBX_THREAD_ERROR == thread)
+	if (ZBX_THREAD_ERROR == (thread = zbx_thread_start(agent_metric_thread, &args)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
 				strerror_from_system(GetLastError())));

@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class function_DBloadfile extends CTest {
+class function_DBloadfile extends CZabbixTest {
 	public function test_DBloadfile() {
 		// TODO
 		$this->markTestIncomplete();

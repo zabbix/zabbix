@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageReportsActionLog extends CLegacyWebTest {
+class testPageReportsActionLog extends CWebTest {
 
 	public function testPageReportsActionLog_CheckLayout() {
 		// from: 2012-02-20 09:00:00
@@ -42,7 +42,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 	}
 
 	public static function allAuditActions() {
-		return CDBHelper::getDataProvider('SELECT * FROM alerts ORDER BY alertid LIMIT 7');
+		return DBdata('SELECT * FROM alerts ORDER BY alertid LIMIT 7');
 	}
 
 	/**

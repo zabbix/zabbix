@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup scripts
  */
-class testScripts extends CAPITest {
+class testScripts extends CZabbixTest {
 
 	public static function script_create() {
 		return [
@@ -356,7 +356,7 @@ class testScripts extends CAPITest {
 		else {
 			foreach ($scripts as $script) {
 				if (array_key_exists('name', $script) && $script['name'] !== 'Ping'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from scripts where name='.zbx_dbstr($script['name'])));
+					$this->assertEquals(0, DBcount('select * from scripts where name='.zbx_dbstr($script['name'])));
 				}
 			}
 		}
@@ -585,7 +585,7 @@ class testScripts extends CAPITest {
 				$this->assertEquals($dbRow['execute_on'], $script['execute_on']);
 			}
 			else {
-				$this->assertEquals(0, CDBHelper::getCount('select * from scripts where name='.zbx_dbstr($script['name'])));
+				$this->assertEquals(0, DBcount('select * from scripts where name='.zbx_dbstr($script['name'])));
 			}
 		}
 	}
@@ -638,7 +638,7 @@ class testScripts extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['scriptids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from scripts where scriptid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from scripts where scriptid='.zbx_dbstr($id)));
 			}
 		}
 	}

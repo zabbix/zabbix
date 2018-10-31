@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageItemPrototypes extends CLegacyWebTest {
+class testPageItemPrototypes extends CWebTest {
 
 	// Returns all item protos
 	public static function data() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
 			' FROM items i,item_discovery d,items di,hosts h'.
 			' WHERE i.itemid=d.itemid'.
@@ -83,12 +83,12 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
 			' FROM items i,item_discovery d,items di,hosts h'.
 			' WHERE i.itemid=d.itemid'.
@@ -108,7 +108,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
 
-		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
+		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid, false);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
 		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
@@ -123,6 +123,6 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Item prototypes deleted');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

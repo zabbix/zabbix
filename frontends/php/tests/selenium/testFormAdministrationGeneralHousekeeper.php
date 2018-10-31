@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
+class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->zbxTestLogin('adm.housekeeper.php');

@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup globalmacro
  */
-class testUserMacro extends CAPITest {
+class testUserMacro extends CZabbixTest {
 
 	public static function globalmacro_create() {
 		return [
@@ -245,7 +245,7 @@ class testUserMacro extends CAPITest {
 			$this->call($method, $globalmacro, $expected_error);
 			if (array_key_exists('macro', $globalmacro)) {
 				$dbResult = 'select * from globalmacro where macro='.zbx_dbstr($globalmacro['macro']);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}
@@ -348,7 +348,7 @@ class testUserMacro extends CAPITest {
 			foreach ($globalmacros as $globalmacro) {
 				if (array_key_exists('macro', $globalmacro) && $globalmacro['macro'] != '{$SNMP_COMMUNITY}') {
 					$dbResult = "select * from globalmacro where macro=".zbx_dbstr($globalmacro['macro']);
-					$this->assertEquals(0, CDBHelper::getCount($dbResult));
+					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
 		}
@@ -433,7 +433,7 @@ class testUserMacro extends CAPITest {
 		if ($expected_error === null) {
 			foreach ($result['result']['globalmacroids'] as $id) {
 				$dbResult = 'select * from globalmacro where globalmacroid='.zbx_dbstr($id);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}

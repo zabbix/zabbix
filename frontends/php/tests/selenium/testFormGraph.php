@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup graphs
  */
-class testFormGraph extends CLegacyWebTest {
+class testFormGraph extends CWebTest {
 
 	/**
 	 * The name of the host for the testing of the create function created in the test data set.
@@ -574,7 +574,7 @@ class testFormGraph extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT * FROM graphs g'.
 			' LEFT JOIN graphs_items gi'.
 				' ON gi.graphid=g.graphid'.
@@ -587,7 +587,7 @@ class testFormGraph extends CLegacyWebTest {
 	 */
 	public function testFormGraph_SimpleUpdate($data) {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
-		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
+		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('update');
@@ -598,7 +598,7 @@ class testFormGraph extends CLegacyWebTest {
 			'Graphs'
 		]);
 
-		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
+		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
 
 	// Returns create data

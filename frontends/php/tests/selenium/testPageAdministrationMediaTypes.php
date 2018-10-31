@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testPageAdministrationMediaTypes extends CLegacyWebTest {
+class testPageAdministrationMediaTypes extends CWebTest {
 
 	private $sqlHashMediaType = '';
 	private $oldHashMediaType = '';
@@ -35,15 +35,15 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 
 	private function calculateHash($mediatypeid) {
 		$this->sqlHashMediaType = 'SELECT * FROM media_type WHERE mediatypeid='.$mediatypeid;
-		$this->oldHashMediaType = CDBHelper::getHash($this->sqlHashMediaType);
+		$this->oldHashMediaType = DBhash($this->sqlHashMediaType);
 	}
 
 	private function verifyHash() {
-		$this->assertEquals($this->oldHashMediaType, CDBHelper::getHash($this->sqlHashMediaType));
+		$this->assertEquals($this->oldHashMediaType, DBhash($this->sqlHashMediaType));
 	}
 
 	public static function allMediaTypes() {
-		return CDBHelper::getDataProvider('SELECT mediatypeid,description FROM media_type');
+		return DBdata('SELECT mediatypeid,description FROM media_type');
 	}
 
 	public function testPageAdministrationMediaTypes_CheckLayout() {
@@ -80,7 +80,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type disabled');
 
-		$this->assertEquals(1, CDBHelper::getCount(
+		$this->assertEquals(1, DBcount(
 			'SELECT NULL'.
 			' FROM media_type'.
 			' WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
@@ -105,7 +105,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type enabled');
 
-		$this->assertEquals(1, CDBHelper::getCount(
+		$this->assertEquals(1, DBcount(
 			'SELECT NULL'.
 			' FROM media_type'.
 			' WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
@@ -136,11 +136,11 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		if ($usedInOperations) {
 				$this->zbxTestTextNotPresent('Media type deleted');
 				$this->zbxTestTextPresent(['Cannot delete media type', 'Media types used by action']);
-				$this->assertEquals(1, CDBHelper::getCount($sql));
+				$this->assertEquals(1, DBcount($sql));
 		}
 		else {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
-				$this->assertEquals(0, CDBHelper::getCount($sql));
+				$this->assertEquals(0, DBcount($sql));
 		}
 	}
 }

@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class function_DBrollback extends CTest {
+class function_DBrollback extends CZabbixTest {
 	public function test_DBrollback() {
 		// TODO
 		$this->markTestIncomplete();

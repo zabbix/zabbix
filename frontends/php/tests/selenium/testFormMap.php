@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormMap extends CLegacyWebTest {
+class testFormMap extends CWebTest {
 	/**
 	 * Possible combinations of grid settings
 	 * @return array
@@ -65,7 +65,8 @@ class testFormMap extends CLegacyWebTest {
 		$map_name = 'Test map 1';
 
 		// getting map options from DB as they are at the beginning of the test
-		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
+		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
+		$db_map = DBfetch($db_result);
 		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->zbxTestLogin('sysmaps.php');
@@ -108,7 +109,8 @@ class testFormMap extends CLegacyWebTest {
 
 		$this->zbxTestClickAndAcceptAlert('sysmap_update');
 
-		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
+		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
+		$db_map = DBfetch($db_result);
 		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->assertTrue(

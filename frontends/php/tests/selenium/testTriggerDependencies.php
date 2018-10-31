@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup trigger_depends
  */
-class testTriggerDependencies extends CLegacyWebTest {
+class testTriggerDependencies extends CWebTest {
 
 	/**
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider

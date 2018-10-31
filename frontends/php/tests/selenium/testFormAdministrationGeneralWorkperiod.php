@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
+class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 	public static function WorkingTime() {
-		return CDBHelper::getDataProvider('SELECT work_period FROM config ORDER BY configid');
+		return DBdata('SELECT work_period FROM config ORDER BY configid');
 	}
 
 	/**
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralWorkperiod_SimpleUpdate() {
 		$sqlHash = 'SELECT * FROM config ORDER BY configid';
-		$oldHash = CDBHelper::getHash($sqlHash);
+		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
@@ -53,7 +53,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals($oldHash, CDBHelper::getHash($sqlHash));
+		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}
 
 	public static function data() {

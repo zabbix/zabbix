@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup graphs
  */
-class testFormGraphPrototype extends CLegacyWebTest {
+class testFormGraphPrototype extends CWebTest {
 
 	/**
 	 * The name of the test template created in the test data set.
@@ -737,7 +737,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider("select * from graphs where name LIKE 'testFormGraphPrototype%'");
+		return DBdata("select * from graphs where name LIKE 'testFormGraphPrototype%'");
 	}
 
 	/**
@@ -745,7 +745,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 */
 	public function testFormGraphPrototype_SimpleUpdate($data) {
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
-		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
+		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
 		$this->zbxTestClickWait('update');
@@ -757,7 +757,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$data['name']
 		]);
 
-		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
+		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
 
 	// Returns create data

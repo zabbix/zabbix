@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 define('ACTION_GOOD', 0);
 define('ACTION_BAD', 1);
@@ -26,7 +26,7 @@ define('ACTION_BAD', 1);
 /**
  * @backup actions
  */
-class testFormAction extends CLegacyWebTest {
+class testFormAction extends CWebTest {
 
 	public static function layout() {
 		return [
@@ -1621,7 +1621,8 @@ class testFormAction extends CLegacyWebTest {
 	}
 
 	public static function update() {
-		return CDBHelper::getDataProvider('SELECT name, eventsource FROM actions');
+		return DBdata(
+			'SELECT name, eventsource FROM actions');
 	}
 
 	/**
@@ -1637,7 +1638,7 @@ class testFormAction extends CLegacyWebTest {
 		else {
 			$sqlActions = "SELECT * FROM actions ORDER BY actionid";
 		}
-		$oldHashActions = CDBHelper::getHash($sqlActions);
+		$oldHashActions = DBhash($sqlActions);
 
 		$this->zbxTestLogin('actionconf.php');
 		switch ($eventsource) {
@@ -1666,7 +1667,7 @@ class testFormAction extends CLegacyWebTest {
 				$name
 		]);
 
-		$this->assertEquals($oldHashActions, CDBHelper::getHash($sqlActions));
+		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
 	public static function create() {
@@ -1982,7 +1983,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
-				$this->assertEquals(1, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
+				$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
 				break;
 
 			case ACTION_BAD:
@@ -2117,6 +2118,6 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
+		$this->assertEquals(1, DBcount($sql), 'Action has not been created in the DB.');
 	}
 }

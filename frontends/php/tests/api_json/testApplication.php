@@ -18,13 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup applications
  */
-class testApplication extends CAPITest {
+class testApplication extends CZabbixTest {
 	public static function application_create() {
 		return [
 			[
@@ -433,7 +432,7 @@ class testApplication extends CAPITest {
 			foreach ($applications as $application) {
 				if (array_key_exists('name', $application) && $application['name'] != 'API application'){
 					$dbResult = 'select * from applications where name='.zbx_dbstr($application['name']);
-					$this->assertEquals(0, CDBHelper::getCount($dbResult));
+					$this->assertEquals(0, DBcount($dbResult));
 				}
 			}
 		}
@@ -530,7 +529,7 @@ class testApplication extends CAPITest {
 		if ($expected_error === null) {
 			foreach ($result['result']['applicationids'] as $id) {
 				$dbResult = 'select * from applications where applicationid='.zbx_dbstr($id);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+				$this->assertEquals(0, DBcount($dbResult));
 			}
 		}
 	}

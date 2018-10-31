@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup hstgrp
  */
-class testHostGroup extends CAPITest {
+class testHostGroup extends CZabbixTest {
 
 	public static function hostgroup_create() {
 		return [
@@ -299,7 +299,7 @@ class testHostGroup extends CAPITest {
 		else {
 			foreach ($hostgroups as $hostgroup) {
 				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
-					$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
+					$this->assertEquals(0, DBcount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
 				}
 			}
 		}
@@ -408,7 +408,7 @@ class testHostGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from hstgrp where groupid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from hstgrp where groupid='.zbx_dbstr($id)));
 			}
 		}
 	}

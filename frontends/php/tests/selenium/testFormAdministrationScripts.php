@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup scripts
  */
-class testFormAdministrationScripts extends CLegacyWebTest {
+class testFormAdministrationScripts extends CWebTest {
 	// Data provider
 	public static function providerScripts() {
 		// data - values for form inputs
@@ -152,7 +152,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 
 		if (!$resultSave) {
 			$sql = 'SELECT * FROM scripts';
-			$hash = CDBHelper::getHash($sql);
+			$DBhash = DBhash($sql);
 		}
 
 		$this->zbxTestClickWait('add');
@@ -167,7 +167,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add script');
-			$this->assertEquals($hash, CDBHelper::getHash($sql));
+			$this->assertEquals($DBhash, DBhash($sql));
 		}
 	}
 }

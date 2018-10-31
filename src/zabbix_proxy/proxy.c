@@ -1072,67 +1072,67 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
-				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(proxyconfig_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(heart_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-				zbx_thread_start(datasender_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(datasender_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_PROCESS_TYPE_POLLER;
 				thread_args.args = &poller_type;
-				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
 				poller_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 				thread_args.args = &poller_type;
-				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &listen_sock;
-				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(trapper_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
-				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(pinger_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
-				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(housekeeper_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
-				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(httppoller_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERER:
-				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(discoverer_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(dbsyncer_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
 				thread_args.args = &poller_type;
-				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(poller_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
-				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(snmptrapper_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
-				zbx_thread_start(selfmon_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(selfmon_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
-				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(vmware_thread, &thread_args);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
-				zbx_thread_start(ipmi_manager_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(ipmi_manager_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
-				zbx_thread_start(ipmi_poller_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(ipmi_poller_thread, &thread_args);
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
-				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
+				threads[i] = zbx_thread_start(taskmanager_thread, &thread_args);
 				break;
 		}
 	}

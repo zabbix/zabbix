@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAdministrationDMProxies extends CLegacyWebTest {
+class testPageAdministrationDMProxies extends CWebTest {
 
 	private $sqlHashProxy = '';
 	private $oldHashProxy = '';
@@ -33,24 +33,24 @@ class testPageAdministrationDMProxies extends CLegacyWebTest {
 
 	private function calculateHash($proxy_hostid) {
 		$this->sqlHashProxy = 'SELECT * FROM hosts WHERE hostid='.$proxy_hostid;
-		$this->oldHashProxy = CDBHelper::getHash($this->sqlHashProxy);
+		$this->oldHashProxy = DBhash($this->sqlHashProxy);
 		$this->sqlHashInterface = 'SELECT * FROM interface WHERE hostid='.$proxy_hostid.' ORDER BY interfaceid';
-		$this->oldHashInterface = CDBHelper::getHash($this->sqlHashInterface);
+		$this->oldHashInterface = DBhash($this->sqlHashInterface);
 		$this->sqlHashHosts = 'SELECT hostid,proxy_hostid FROM hosts WHERE proxy_hostid='.$proxy_hostid.' ORDER BY hostid';
-		$this->oldHashHosts = CDBHelper::getHash($this->sqlHashHosts);
+		$this->oldHashHosts = DBhash($this->sqlHashHosts);
 		$this->sqlHashDRules = 'SELECT druleid,proxy_hostid FROM drules WHERE proxy_hostid='.$proxy_hostid.' ORDER BY druleid';
-		$this->oldHashDRules = CDBHelper::getHash($this->sqlHashDRules);
+		$this->oldHashDRules = DBhash($this->sqlHashDRules);
 	}
 
 	private function verifyHash() {
-		$this->assertEquals($this->oldHashProxy, CDBHelper::getHash($this->sqlHashProxy));
-		$this->assertEquals($this->oldHashInterface, CDBHelper::getHash($this->sqlHashInterface));
-		$this->assertEquals($this->oldHashHosts, CDBHelper::getHash($this->sqlHashHosts));
-		$this->assertEquals($this->oldHashDRules, CDBHelper::getHash($this->sqlHashDRules));
+		$this->assertEquals($this->oldHashProxy, DBhash($this->sqlHashProxy));
+		$this->assertEquals($this->oldHashInterface, DBhash($this->sqlHashInterface));
+		$this->assertEquals($this->oldHashHosts, DBhash($this->sqlHashHosts));
+		$this->assertEquals($this->oldHashDRules, DBhash($this->sqlHashDRules));
 	}
 
 	public static function proxies() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT hostid,host'.
 			' FROM hosts'.
 			' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') AND hostid<>20003'

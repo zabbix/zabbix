@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup hosts
  */
-class testFormHost extends CLegacyWebTest {
+class testFormHost extends CWebTest {
 	public $host = 'Test host 001';
 	public $host_tmp = 'Test host 001A';
 	public $host_tmp_visible = 'Test host 001A (visible)';
@@ -57,7 +57,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host);
 
 		$sql = "SELECT * FROM hosts WHERE host='$this->host'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_CreateLongHostName() {
@@ -73,7 +73,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($host);
 
 		$sql = "SELECT * FROM hosts WHERE host='$host'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_SimpleUpdate() {
@@ -108,7 +108,7 @@ class testFormHost extends CLegacyWebTest {
 		$host = 'Test host without groups';
 
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
-		$oldHashHosts = CDBHelper::getHash($sqlHosts);
+		$oldHashHosts = DBhash($sqlHosts);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -121,14 +121,14 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
 		$this->zbxTestTextPresent('Field "groups" is mandatory.');
 
-		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
 
 	public function testFormHost_CreateHostExistingHostName() {
 		$host = 'Test host';
 
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
-		$oldHashHosts = CDBHelper::getHash($sqlHosts);
+		$oldHashHosts = DBhash($sqlHosts);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
@@ -140,7 +140,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
 		$this->zbxTestTextPresent('Host with the same name "'.$host.'" already exists.');
 
-		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
 
 	public function testFormHost_CreateHostExistingVisibleName() {
@@ -148,7 +148,7 @@ class testFormHost extends CLegacyWebTest {
 		$hostVisible = 'ЗАББИКС Сервер';
 
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
-		$oldHashHosts = CDBHelper::getHash($sqlHosts);
+		$oldHashHosts = DBhash($sqlHosts);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
@@ -161,7 +161,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host');
 		$this->zbxTestTextPresent('Host with the same visible name "'.$hostVisible.'" already exists.');
 
-		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
 
 	public function testFormHost_CloneHost() {
@@ -177,7 +177,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host_cloned_visible);
 
 		$sql = "SELECT * FROM hosts WHERE host='$this->host_cloned'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_DeleteClonedHost() {
@@ -190,7 +190,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
 		$sql = "SELECT * FROM hosts WHERE host='$this->host_cloned'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public function testFormHost_FullCloneHost() {
@@ -206,7 +206,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host_fullcloned_visible);
 
 		$sql = "SELECT * FROM hosts WHERE host='$this->host_fullcloned'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public function testFormHost_DeleteFullClonedHost() {
@@ -219,7 +219,7 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host deleted');
 
 		$sql = "SELECT * FROM hosts WHERE host='$this->host_fullcloned'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	public function testFormHost_UpdateHostName() {
@@ -235,7 +235,8 @@ class testFormHost extends CLegacyWebTest {
 
 	public function testFormHost_Delete() {
 		// save the ID of the host
-		$hostid = CDBHelper::getValue('select hostid from hosts where host='.zbx_dbstr($this->host_tmp));
+		$host = DBfetch(DBSelect("select hostid from hosts where host='".$this->host_tmp."'"));
+		$hostid=$host['hostid'];
 
 		// Delete Host
 		$this->zbxTestLogin('hosts.php');
@@ -249,7 +250,7 @@ class testFormHost extends CLegacyWebTest {
 		// check if all records have been deleted
 		$tables=['hosts','items','applications','interface','hostmacro','hosts_groups','hosts_templates','maintenances_hosts','host_inventory'];
 		foreach ($tables as $table) {
-			$count=CDBHelper::getCount("select * from $table where hostid=$hostid");
+			$count=DBcount("select * from $table where hostid=$hostid");
 			$this->assertEquals(0, $count, "Records from table '$table' have not been deleted.");
 		}
 	}
@@ -280,12 +281,12 @@ class testFormHost extends CLegacyWebTest {
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
 		$sql2 = "select hostid from hosts where host='".$template."';";
-		$this->assertEquals(1, CDBHelper::getCount($sql2));
+		$this->assertEquals(1, DBcount($sql2));
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 
@@ -342,12 +343,12 @@ class testFormHost extends CLegacyWebTest {
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
 		$sql2 = "select hostid from hosts where host='".$template."';";
-		$this->assertEquals(1, CDBHelper::getCount($sql2));
+		$this->assertEquals(1, DBcount($sql2));
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 

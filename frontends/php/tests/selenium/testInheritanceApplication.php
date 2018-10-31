@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup applications
  */
-class testInheritanceApplication extends CLegacyWebTest {
+class testInheritanceApplication extends CWebTest {
 
 	private $template = 'Inheritance test template';
 	private $host = 'Template inheritance test host';
@@ -61,7 +61,8 @@ class testInheritanceApplication extends CLegacyWebTest {
 				')';
 
 		// Check inherited application name near template name.
-		foreach (CDBHelper::getAll($applications) as $application) {
+		foreach (DBdata($applications, false) as $application) {
+			$application = $application[0];
 			$get_text = $this->zbxTestGetText('//table//td[text()=": '.$application['name'].'"]');
 			$this->assertEquals($get_text, $this->template.': '.$application['name']);
 		}
@@ -128,7 +129,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 					')');
 			$linked_application = 'SELECT NULL FROM application_template WHERE applicationid='.zbx_dbstr($host_application).
 					' AND templateid='.zbx_dbstr($template_application);
-			$this->assertEquals(1, CDBHelper::getCount($linked_application));
+			$this->assertEquals(1, DBcount($linked_application));
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
@@ -139,13 +140,13 @@ class testInheritanceApplication extends CLegacyWebTest {
 					' AND hostid IN ('.
 						'SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']).
 					')';
-			$this->assertEquals(1, CDBHelper::getCount($host_application));
+			$this->assertEquals(1, DBcount($host_application));
 		}
 	}
 
 	public function testInheritanceApplication_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM applications ORDER BY applicationid';
-		$old_hash = CDBHelper::getHash($sql_hash);
+		$old_hash = DBhash($sql_hash);
 
 		// Get application names on template.
 		$applications = 'SELECT name FROM applications WHERE hostid IN ('.
@@ -157,14 +158,15 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 		$this->openApplicationsPage($this->template);
 
-		foreach (CDBHelper::getAll($applications) as $application) {
+		foreach (DBdata($applications, false) as $application) {
+			$application = $application[0];
 			// Update application on template.
 			$this->zbxTestClickLinkTextWait($application['name']);
 			$this->zbxTestClickWait('update');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Application updated');
 		}
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+		$this->assertEquals($old_hash, DBhash($sql_hash));
 	}
 
 	public function testInheritanceApplication_Update() {
@@ -203,7 +205,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 					' AND applicationid IN ('.
 						'SELECT '.$db_column.' FROM application_template'.
 					')';
-			$this->assertEquals(1, CDBHelper::getCount($sql));
+			$this->assertEquals(1, DBcount($sql));
 		}
 	}
 
@@ -263,12 +265,12 @@ class testInheritanceApplication extends CLegacyWebTest {
 			if (array_key_exists('items', $data)) {
 				$this->zbxTestAssertElementPresentXpath('//tbody//a[text()="'.$data['application'].'"]');
 
-				$this->assertEquals(1, CDBHelper::getCount($sql));
+				$this->assertEquals(1, DBcount($sql));
 			}
 			else {
 				$this->zbxTestAssertElementNotPresentXpath('//tbody//td[text()=": '.$data['application'].'"]');
 
-				$this->assertEquals(0, CDBHelper::getCount($sql));
+				$this->assertEquals(0, DBcount($sql));
 			}
 		}
 		else {
@@ -280,7 +282,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 
 			// Check the results in DB.
 			$sql = 'SELECT NULL FROM applications WHERE name='.zbx_dbstr($data['application']);
-			$this->assertEquals(2, CDBHelper::getCount($sql));
+			$this->assertEquals(2, DBcount($sql));
 		}
 	}
 }

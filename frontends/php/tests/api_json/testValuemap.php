@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup valuemaps
  */
-class testValuemap extends CAPITest {
+class testValuemap extends CZabbixTest {
 
 	public static function valuemap_create() {
 		return [
@@ -288,7 +288,7 @@ class testValuemap extends CAPITest {
 				$this->assertEquals($dbRow['name'], $valuemap[$key]['name']);
 
 				foreach ($valuemap[$key]['mappings'] as $values) {
-					$this->assertEquals(1, CDBHelper::getCount('select * from mappings where valuemapid='.zbx_dbstr($id).
+					$this->assertEquals(1, DBcount('select * from mappings where valuemapid='.zbx_dbstr($id).
 							' and value='.zbx_dbstr($values['value']).' and newvalue='.zbx_dbstr($values['newvalue']))
 					);
 				}
@@ -587,7 +587,7 @@ class testValuemap extends CAPITest {
 
 				if (array_key_exists('mappings', $valuemaps[$key])){
 					foreach ($valuemaps[$key]['mappings'] as $values) {
-						$this->assertEquals(1, CDBHelper::getCount('select * from mappings where valuemapid='.zbx_dbstr($id).
+						$this->assertEquals(1, DBcount('select * from mappings where valuemapid='.zbx_dbstr($id).
 								' and value='.zbx_dbstr($values['value']).' and newvalue='.
 								zbx_dbstr($values['newvalue']))
 						);
@@ -598,7 +598,7 @@ class testValuemap extends CAPITest {
 		else {
 			foreach ($valuemaps as $valuemap) {
 				if (array_key_exists('name', $valuemap) && $valuemap['name'] !== 'APC Battery Replacement Status'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from valuemaps where name='.zbx_dbstr($valuemap['name'])));
+					$this->assertEquals(0, DBcount('select * from valuemaps where name='.zbx_dbstr($valuemap['name'])));
 				}
 			}
 		}
@@ -682,8 +682,8 @@ class testValuemap extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['valuemapids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from valuemaps where valuemapid='.zbx_dbstr($id)));
-				$this->assertEquals(0, CDBHelper::getCount('select * from mappings where valuemapid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from valuemaps where valuemapid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from mappings where valuemapid='.zbx_dbstr($id)));
 			}
 		}
 	}

@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class testConfiguration extends CAPITest {
+class testConfiguration extends CZabbixTest {
 
 	public static function export_fail_data() {
 		return [
@@ -595,7 +595,7 @@ class testConfiguration extends CAPITest {
 		);
 
 		$this->assertSame(true, $result['result']);
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
 	public static function import_users() {
@@ -676,7 +676,7 @@ class testConfiguration extends CAPITest {
 				$expected_error
 			);
 
-			$this->assertEquals(0, CDBHelper::getCount($sql));
+			$this->assertEquals(0, DBcount($sql));
 		}
 	}
 }

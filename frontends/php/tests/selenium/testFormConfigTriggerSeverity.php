@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * @backup config
  */
-class testFormConfigTriggerSeverity extends CLegacyWebTest {
+class testFormConfigTriggerSeverity extends CWebTest {
 	// Data provider
 	public static function providerTriggerSeverity() {
 		// array of data, saveResult, db fields value
@@ -158,7 +158,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 
 		$sql = 'SELECT '.implode(', ', array_keys($data)).' FROM config';
 		if (!$resultSave) {
-			$hash = CDBHelper::getHash($sql);
+			$DBhash = DBhash($sql);
 		}
 
 		$this->zbxTestClickWait('update');
@@ -173,7 +173,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestTextPresent('Page received incorrect data');
-			$this->assertEquals($hash, CDBHelper::getHash($sql), "DB fields changed after unsuccessful save.");
+			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 
 	}

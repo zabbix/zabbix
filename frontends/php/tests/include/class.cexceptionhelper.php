@@ -19,7 +19,7 @@
 **/
 
 /**
- * Class that allows changing message of an Exception without recreating it.
+ * A class that allows changing message of an Exception without recreating it.
  */
 class CExceptionHelper extends Exception {
 

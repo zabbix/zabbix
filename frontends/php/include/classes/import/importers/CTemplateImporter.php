@@ -64,14 +64,10 @@ class CTemplateImporter extends CImporter {
 					unset($template['templates']);
 				}
 
-				if (array_key_exists('templateid', $template) && $this->options['templates']['updateExisting']) {
+				if (!empty($template['templateid'])) {
 					$templatesToUpdate[] = $template;
 				}
-				else if ($this->options['templates']['createMissing']) {
-					if (array_key_exists('templateid', $template)) {
-						throw new Exception(_s('Template "%1$s" already exists.', $name));
-					}
-
+				else {
 					$templatesToCreate[] = $template;
 				}
 			}

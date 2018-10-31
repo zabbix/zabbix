@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageTriggerPrototypes extends CLegacyWebTest {
+class testPageTriggerPrototypes extends CWebTest {
 
 	// Returns all trigger protos
 	public static function data() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
 				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
 					' WHERE f.itemid = i.itemid'.
@@ -89,12 +89,12 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
 				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
 					' WHERE f.itemid = i.itemid'.
@@ -112,10 +112,10 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageTriggerPrototypes_MassDelete($rule) {
 		$druleid = $rule['parent_itemid'];
-		$triggerids = CDBHelper::getAll(
+		$triggerids = DBdata(
 				'SELECT i.itemid'.
 				' FROM item_discovery id, items i'.
-				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid'
+				' WHERE parent_itemid='.$druleid.' AND i.itemid = id.itemid', false
 		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
@@ -130,7 +130,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototypes deleted');
 
-		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

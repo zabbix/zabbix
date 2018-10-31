@@ -49,9 +49,7 @@ $widget = (new CWidget())
 	]));
 
 // filter
-$filter = new CFilter();
-
-$filter
+$filter = (new CFilter())
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -60,23 +58,6 @@ $filter
 				(new CTextBox('filter_host', $data['filter']['host']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
-			)
-			->addRow(
-				(new CLabel(_('Templates'), 'filter_templates__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_templates[]',
-					'object_name' => 'templates',
-					'data' => $data['filter']['templates'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'templates',
-							'srcfld1' => 'hostid',
-							'srcfld2' => 'host',
-							'dstfrm' => $filter->getName(),
-							'dstfld1' => 'filter_templates_'
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(_('Monitored by'),
 				(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))
@@ -91,7 +72,6 @@ $filter
 					'name' => 'filter_proxyids[]',
 					'object_name' => 'proxies',
 					'data' => $data['proxies_ms'],
-					'disabled' => ($data['filter']['monitored_by'] != ZBX_MONITORED_BY_PROXY),
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'proxies',
@@ -101,7 +81,8 @@ $filter
 							'dstfld1' => 'filter_proxyids_'
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				'filter_proxyids_row'
 			),
 		(new CFormList())
 			->addRow(_('DNS'),

@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup triggers
  */
-class testInheritanceTriggerPrototype extends CLegacyWebTest {
+class testInheritanceTriggerPrototype extends CWebTest {
 
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
@@ -38,7 +38,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT DISTINCT t.triggerid,id.parent_itemid'.
 			' FROM triggers t,functions f,item_discovery id'.
 			' WHERE t.triggerid=f.triggerid'.
@@ -60,14 +60,14 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceTriggerPrototype_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
-		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
+		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('trigger_prototypes.php?form=update&triggerid='.$data['triggerid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototype updated');
 
-		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
 

@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageDiscoveryRules extends CLegacyWebTest {
+class testPageDiscoveryRules extends CWebTest {
 
 	// Returns all Discovery Rules
 	public static function data() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT h.hostid, i.itemid, i.name, h.host, h.status'.
 			' FROM hosts h, items i'.
 			' WHERE i.hostid=h.hostid'.
@@ -114,12 +114,12 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = "SELECT null FROM items WHERE itemid=$itemid";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	// Returns all discovery rules
 	public static function rule() {
-		return CDBHelper::getDataProvider(
+		return DBdata(
 			'SELECT distinct h.hostid, h.host from hosts h, items i'.
 			' WHERE h.host LIKE \'%-layout-test%\'' .
 				' AND h.hostid = i.hostid'.
@@ -133,11 +133,11 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 	 * @backup-once triggers
 	 */
 	public function testPageDiscoveryRules_MassDelete($rule) {
-		$hostids = CDBHelper::getAll(
+		$hostids = DBdata(
 			'SELECT hostid'.
 			' FROM items'.
 			' WHERE hostid='.$rule['hostid'].
-				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE
+				' AND flags = '.ZBX_FLAG_DISCOVERY_RULE, false
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
@@ -153,6 +153,6 @@ class testPageDiscoveryRules extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('hostids', $hostids);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

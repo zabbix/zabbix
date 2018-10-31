@@ -19,12 +19,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup sysmaps
  */
-class testMap extends CAPITest {
+class testMap extends CZabbixTest {
 	/**
 	 * Create map tests data provider.
 	 *

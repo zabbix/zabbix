@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class function_DBclose extends CTest {
+class function_DBclose extends CZabbixTest {
 	public function test_DBclose() {
 		DBconnect($error);
 		return DBclose();

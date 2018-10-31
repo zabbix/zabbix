@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageReportsNotifications extends CLegacyWebTest {
+class testPageReportsNotifications extends CWebTest {
 
 	public function testPageReportsNotifications_CheckLayout() {
 		$this->zbxTestLogin('report4.php');
@@ -36,8 +36,10 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
 		$this->zbxTestDropdownAssertSelected('year', '2018');
 		// Check media type links
-		$media_types = CDBHelper::getAll('SELECT mediatypeid, description FROM media_type');
+		$media_types = [];
+		$media_types = DBdata('SELECT mediatypeid, description FROM media_type', false);
 		foreach ($media_types as $media) {
+			$media = $media[0];
 			$this->zbxTestAssertElementText("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]", $media['description']);
 		}
 
@@ -171,8 +173,9 @@ class testPageReportsNotifications extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];
-			$media_types = CDBHelper::getAll('SELECT mediatypeid FROM media_type');
+			$media_types = DBdata('SELECT mediatypeid FROM media_type', false);
 			foreach ($media_types as $media) {
+				$media = $media[0];
 				$this->zbxTestAssertElementNotPresentXpath("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]");
 			}
 		}

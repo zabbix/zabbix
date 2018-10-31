@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageTemplates extends CLegacyWebTest {
+class testPageTemplates extends CWebTest {
 
 	public $templateName = 'Template OS Linux';
 
 	public static function allTemplates() {
-		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
+		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -58,7 +58,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$name = $template['name'];
 
 		$sqlTemplate = "select * from hosts where host='$host'";
-		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
+		$oldHashTemplate = DBhash($sqlTemplate);
 		$sqlHosts =
 				'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
@@ -67,11 +67,11 @@ class testPageTemplates extends CLegacyWebTest {
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
 			' ORDER BY hostid';
-		$oldHashHosts = CDBHelper::getHash($sqlHosts);
+		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
-		$oldHashItems = CDBHelper::getHash($sqlItems);
+		$oldHashItems = DBhash($sqlItems);
 		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
-		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
+		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -86,10 +86,10 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($name);
 
-		$this->assertEquals($oldHashTemplate, CDBHelper::getHash($sqlTemplate));
-		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
-		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
-		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
+		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
 	public function testPageTemplates_FilterTemplate() {

@@ -18,13 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup httptest
  */
-class testWebScenario extends CAPITest {
+class testWebScenario extends CZabbixTest {
 
 	public static function httptest_create() {
 		return [
@@ -295,13 +294,13 @@ class testWebScenario extends CAPITest {
 				$dbRowWeb = DBFetch($dbResultWeb);
 				$this->assertEquals($dbRowWeb['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRowWeb['hostid'], $httptests[$key]['hostid']);
-				$this->assertEquals(1, CDBHelper::getCount('select * from httpstep where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(1, DBcount('select * from httpstep where httptestid='.zbx_dbstr($id)));
 			}
 		}
 		else {
 			foreach ([$httptests] as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -452,7 +451,7 @@ class testWebScenario extends CAPITest {
 		else {
 			foreach ($httptests as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -1202,7 +1201,7 @@ class testWebScenario extends CAPITest {
 				$this->assertEquals($dbRow['name'], $httptests['name']);
 			}
 			else {
-				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
+				$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
 			}
 		}
 	}
@@ -1259,7 +1258,7 @@ class testWebScenario extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(0, DBcount('select * from httptest where httptestid='.zbx_dbstr($id)));
 			}
 		}
 	}

@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageSlideShows extends CLegacyWebTest {
+class testPageSlideShows extends CWebTest {
 
 	public static function allSlideShows() {
-		return CDBHelper::getDataProvider("select * from slideshows order by slideshowid");
+		return DBdata("select * from slideshows order by slideshowid");
 	}
 
 	/**
@@ -50,9 +50,9 @@ class testPageSlideShows extends CLegacyWebTest {
 		$slideshowid = $slideshow['slideshowid'];
 
 		$sqlSlideShow = "select * from slideshows where name='$name' order by slideshowid";
-		$oldHashSlideShow = CDBHelper::getHash($sqlSlideShow);
+		$oldHashSlideShow = DBhash($sqlSlideShow);
 		$sqlSlide = "select * from slides where slideshowid=$slideshowid order by slideid";
-		$oldHashSlide = CDBHelper::getHash($sqlSlide);
+		$oldHashSlide = DBhash($sqlSlide);
 
 		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
@@ -67,8 +67,8 @@ class testPageSlideShows extends CLegacyWebTest {
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckHeader('Slide shows');
 
-		$this->assertEquals($oldHashSlideShow, CDBHelper::getHash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
-		$this->assertEquals($oldHashSlide, CDBHelper::getHash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
+		$this->assertEquals($oldHashSlideShow, DBhash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
+		$this->assertEquals($oldHashSlide, DBhash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
 	public function testPageSlideShows_Create() {
@@ -103,9 +103,9 @@ class testPageSlideShows extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Slide shows');
 
 		$sql = "select * from slideshows where slideshowid=$slideshowid";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from slides where slideshowid=$slideshowid";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	/**
@@ -121,7 +121,7 @@ class testPageSlideShows extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Slide show deleted');
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slideshows'));
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM slides'));
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slideshows'));
+		$this->assertEquals(0, DBcount('SELECT NULL FROM slides'));
 	}
 }

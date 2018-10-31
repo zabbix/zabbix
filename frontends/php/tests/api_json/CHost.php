@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class API_JSON_Host extends CAPITest {
+class API_JSON_Host extends CZabbixTest {
 
 	public static function dup_template_ids() {
 		return [

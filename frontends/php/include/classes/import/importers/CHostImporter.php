@@ -50,16 +50,13 @@ class CHostImporter extends CImporter {
 			}
 			unset($host['templates']);
 
+
 			$host = $this->resolveHostReferences($host);
 
-			if (array_key_exists('hostid', $host) && $this->options['hosts']['updateExisting']) {
+			if (isset($host['hostid'])) {
 				$hostsToUpdate[] = $host;
 			}
-			else if ($this->options['hosts']['createMissing']) {
-				if (array_key_exists('hostid', $host)) {
-					throw new Exception(_s('Host "%1$s" already exists.', $host['host']));
-				}
-
+			else {
 				$hostsToCreate[] = $host;
 			}
 		}

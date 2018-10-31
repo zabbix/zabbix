@@ -18,13 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 /**
  * @backup items
  */
-class testTaskCreate extends CAPITest {
+class testTaskCreate extends CZabbixTest {
 
 	public static function tasks() {
 		return [
@@ -199,7 +198,7 @@ class testTaskCreate extends CAPITest {
 	 */
 	public function testTaskCreate_CheckNow($task, $expected_error) {
 		$sqlTask = 'select NULL from task_check_now';
-		$oldHashTasks = CDBHelper::getHash($sqlTask);
+		$oldHashTasks = DBhash($sqlTask);
 
 		$result = $this->call('task.create', $task, $expected_error);
 
@@ -211,7 +210,7 @@ class testTaskCreate extends CAPITest {
 			}
 		}
 		else {
-			$this->assertEquals($oldHashTasks, CDBHelper::getHash($sqlTask));
+			$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 		}
 	}
 
@@ -284,7 +283,7 @@ class testTaskCreate extends CAPITest {
 	 */
 	public function testTaskCreate_DifferentItemTypes($method, $object, $expected_error) {
 		$sqlTask = "select NULL from task_check_now";
-		$oldHashTasks = CDBHelper::getHash($sqlTask);
+		$oldHashTasks = DBhash($sqlTask);
 
 		// Change item/LLD rule type to not allowed for check now
 		$this->call($method, $object);
@@ -296,7 +295,7 @@ class testTaskCreate extends CAPITest {
 		];
 
 		$this->call('task.create', $task, $expected_error);
-		$this->assertEquals($oldHashTasks, CDBHelper::getHash($sqlTask));
+		$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 	}
 
 	public static function user_permissions() {
@@ -343,11 +342,11 @@ class testTaskCreate extends CAPITest {
 	 */
 	public function testTaskCreate_UserPermissions($user, $task, $expected_error) {
 		$sqlTask = "select NULL from task_check_now";
-		$oldHashTasks = CDBHelper::getHash($sqlTask);
+		$oldHashTasks = DBhash($sqlTask);
 
 		$this->authorize($user['user'], $user['password']);
 		$this->call('task.create', $task, $expected_error);
 
-		$this->assertEquals($oldHashTasks, CDBHelper::getHash($sqlTask));
+		$this->assertEquals($oldHashTasks, DBhash($sqlTask));
 	}
 }

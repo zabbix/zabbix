@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageScreens extends CLegacyWebTest {
+class testPageScreens extends CWebTest {
 
 	public static function allScreens() {
-		return CDBHelper::getDataProvider('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
+		return DBdata('SELECT screenid,name FROM screens WHERE templateid IS NULL ORDER BY screenid');
 	}
 
 	public function testPageScreens_CheckLayout() {
-		$screens = CDBHelper::getAll('SELECT name FROM screens WHERE templateid IS NULL');
+		$screens = DBfetchArray(DBSelect('SELECT name FROM screens WHERE templateid IS NULL'));
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -63,9 +63,9 @@ class testPageScreens extends CLegacyWebTest {
 	*/
 	public function testPageScreens_SimpleUpdate($screen) {
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
-		$oldHashScreen = CDBHelper::getHash($sqlScreen);
+		$oldHashScreen = DBhash($sqlScreen);
 		$sqlScreenItems = 'SELECT * FROM screens_items WHERE screenid='.$screen['screenid'].' ORDER BY screenitemid';
-		$oldHashScreenItems = CDBHelper::getHash($sqlScreenItems);
+		$oldHashScreenItems = DBhash($sqlScreenItems);
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -80,8 +80,8 @@ class testPageScreens extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent('Screen updated');
 
-		$this->assertEquals($oldHashScreen, CDBHelper::getHash($sqlScreen));
-		$this->assertEquals($oldHashScreenItems, CDBHelper::getHash($sqlScreenItems));
+		$this->assertEquals($oldHashScreen, DBhash($sqlScreen));
+		$this->assertEquals($oldHashScreenItems, DBhash($sqlScreenItems));
 	}
 
 	public function testPageScreens_Create() {
@@ -114,10 +114,10 @@ class testPageScreens extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Screens');
 
 		$sql = 'SELECT NULL FROM screens WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 		$sql = 'SELECT NULL FROM screens_items WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 		$sql = 'SELECT NULL FROM slides WHERE screenid='.$screen['screenid'];
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertEquals(0, DBcount($sql));
 	}
 }

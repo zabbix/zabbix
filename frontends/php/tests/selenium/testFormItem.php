@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
  *       dropdown field when "on change" event is fired before "on focus" event is fired.
  * @ignore-browser-errors
  */
-class testFormItem extends CLegacyWebTest {
+class testFormItem extends CWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -1176,7 +1176,7 @@ class testFormItem extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider("SELECT * FROM items WHERE hostid = 40001 AND key_ LIKE 'test-item-form%'");
+		return DBdata("SELECT * FROM items WHERE hostid = 40001 AND key_ LIKE 'test-item-form%'");
 	}
 
 	/**
@@ -1186,7 +1186,7 @@ class testFormItem extends CLegacyWebTest {
 		$name = $data['name'];
 
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
-		$oldHashItems = CDBHelper::getHash($sqlItems);
+		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -1198,7 +1198,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckHeader('Items');
 
-		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
 	// Returns create data
@@ -2717,7 +2717,7 @@ class testFormItem extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error']);
 
 				$sqlItem = "SELECT * FROM items where key_ = '".$data['key']."'";
-				$this->assertEquals(0, CDBHelper::getCount($sqlItem));
+				$this->assertEquals(0, DBcount($sqlItem));
 				break;
 		}
 	}
