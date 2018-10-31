@@ -1019,7 +1019,7 @@ static int	item_preproc_xpath(zbx_variant_t *value, const char *params, char **e
  *               FAIL - otherwise, errmsg contains the error message          *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_range(unsigned char value_type, zbx_variant_t *value, const char *params,
+static int	item_preproc_validate_range(unsigned char value_type, const zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
 	zbx_variant_t	value_num;
