@@ -3788,6 +3788,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto out;
 	}
 
+	page.alloc = ZBX_INIT_UPD_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 
@@ -3796,9 +3798,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
-
-	page.alloc = ZBX_INIT_UPD_XML_SIZE;
-	page.data = (char *)zbx_malloc(NULL, page.alloc);
 
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
@@ -4279,6 +4278,8 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		goto out;
 	}
 
+	page.alloc = INIT_PERF_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 
@@ -4287,9 +4288,6 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
-
-	page.alloc = INIT_PERF_XML_SIZE;
-	page.data = (char *)zbx_malloc(NULL, page.alloc);
 
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &error))
 		goto clean;
