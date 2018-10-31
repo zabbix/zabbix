@@ -31,7 +31,7 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
-if (!isset($_REQUEST['form_refresh'])) {
+if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
@@ -42,14 +42,14 @@ $frmHost = (new CForm())
 	->addVar('parent_discoveryid', $discoveryRule['itemid'])
 	->addVar('tls_accept', $parentHost['tls_accept']);
 
+if ($hostPrototype['hostid'] != 0) {
+	$frmHost->addVar('hostid', $hostPrototype['hostid']);
+}
+
 $hostList = new CFormList('hostlist');
 
 if ($data['templates']) {
 	$hostList->addRow(_('Parent discovery rules'), $data['templates']);
-}
-
-if (isset($hostPrototype['hostid'])) {
-	$frmHost->addVar('hostid', $hostPrototype['hostid']);
 }
 
 $hostTB = (new CTextBox('host', $hostPrototype['host'], (bool) $hostPrototype['templateid']))
@@ -365,7 +365,7 @@ $inventoryFormList = (new CFormList('inventorylist'))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-			->setEnabled($hostPrototype['templateid'] == 0)
+			->setReadonly($hostPrototype['templateid'] != 0)
 			->setModern(true)
 	);
 
@@ -423,7 +423,7 @@ $divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 /*
  * footer
  */
-if (isset($hostPrototype['hostid'])) {
+if ($hostPrototype['hostid'] != 0) {
 	$btnDelete = new CButtonDelete(
 		_('Delete selected host prototype?'),
 		url_param('form').url_param('hostid').url_param('parent_discoveryid')

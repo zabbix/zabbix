@@ -79,6 +79,7 @@ void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
+void	zbx_tls_version(void);
 
 #endif	/* #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 

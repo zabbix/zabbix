@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test tag based permissions
  */
-class testTagBasedPermissions extends CWebTest {
+class testTagBasedPermissions extends CLegacyWebTest {
 	public $user = 'Tag-user';
 
 	/**
