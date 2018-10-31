@@ -4,6 +4,7 @@ New features:
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 Bug fixes:
+........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ........S. [ZBX-14974] fixed memory leak in case duplication name of the vmware performance counters (MVekslers)
 ........S. [ZBX-15094] fixed the potential crash during vmware update (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
@@ -17,6 +18,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ..F....... [ZBX-15007] fixed current map refresh in map widget right after update widget configuration (miks)
 ..F....... [ZBX-14990] added missing http agent statistic row in queue screen (miks)
 ..F....... [ZBX-14984] fixed missing focus from problem name when opening description editing popup in monitoring problems section (miks)
@@ -2015,6 +2017,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
