@@ -4,7 +4,6 @@ New features:
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 Bug fixes:
-........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ........S. [ZBX-14974] fixed memory leak in case duplication name of the vmware performance counters (MVekslers)
 ........S. [ZBX-15094] fixed the potential crash during vmware update (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
