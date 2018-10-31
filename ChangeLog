@@ -23,7 +23,7 @@ Bug fixes:
 ..F....... [ZBX-14990] added missing http agent statistic row in queue screen (miks)
 ..F....... [ZBX-14984] fixed missing focus from problem name when opening description editing popup in monitoring problems section (miks)
 ..F....... [ZBX-14947] fixed configuration update in administration authentication section (miks)
-........S. [ZBX-14974] fixed memory leak in case duplication name of the vmware performance counters (MVekslers)
+.......PS. [ZBX-14974] fixed memory leak in case duplication name of the vmware performance counters (MVekslers)
 ..F....... [ZBX-14934] made widget specific javascript files to be loaded with jsLoader (miks)
 .......PS. [ZBX-15094] fixed the potential crash during vmware update (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
