@@ -43,7 +43,7 @@ extern int		server_num, process_num;
  *             message - [IN] packed preprocessing task                       *
  *                                                                            *
  ******************************************************************************/
-static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
+static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t			size = 0;
 	unsigned char			*data = NULL, value_type;
