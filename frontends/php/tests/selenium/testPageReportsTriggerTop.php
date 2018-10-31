@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageReportsTriggerTop extends CWebTest {
+class testPageReportsTriggerTop extends CLegacyWebTest {
 
 	public function testPageReportsTriggerTop_FilterLayout() {
 		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
 
@@ -191,6 +191,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
 		$this->zbxTestLogin('toptriggers.php');
+		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();
