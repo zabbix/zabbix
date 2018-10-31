@@ -56,7 +56,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Another group to check Monitoring-> Overview',
+						'groupid' => 'Another group to check Overview',
 						'type' => 'Triggers'
 					],
 					'result_hosts' => [
@@ -70,7 +70,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers',
 						'view_style' => 'Top'
 					],
@@ -87,7 +87,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers',
 						'view_style' => 'Left'
 					],
@@ -104,7 +104,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers',
 						'view_style' => 'Top'
 					],
@@ -121,7 +121,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'show_severity' => 'Average',
@@ -136,7 +136,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'show_severity' => 'High',
@@ -151,7 +151,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'show_severity' => 'Disaster',
@@ -167,11 +167,11 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'applications' => [
-						'app_group' => 'Group to check Monitoring-> Overview',
+						'app_group' => 'Group to check Overview',
 						'app_host' => '1_Host_to_check_Monitoring_Overview',
 						'application' => '1 application'
 					],
@@ -187,7 +187,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'applications' => [
@@ -205,7 +205,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'name' => 'Warning',
@@ -220,7 +220,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'name' => '2_',
@@ -235,7 +235,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'name' => 'Trigger-map-test-zbx6840'
@@ -245,7 +245,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'ack_status' => 'With last event unacknowledged',
@@ -261,7 +261,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'ack_status' => 'With unacknowledged events',
@@ -278,7 +278,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'inventories' => [
@@ -297,7 +297,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'age' => '1'
@@ -307,7 +307,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'show_severity' => 'Average',
@@ -334,7 +334,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'triggers_status' => 'Recent problems',
@@ -352,7 +352,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'triggers_status' => 'Problems',
@@ -369,7 +369,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'triggers_status' => 'Problems',
@@ -387,7 +387,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
 					'triggers_status' => 'Recent problems',
@@ -404,7 +404,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Another group to check Monitoring-> Overview',
+						'groupid' => 'Another group to check Overview',
 						'type' => 'Data',
 						'view_style' => 'Top'
 					],
@@ -419,7 +419,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Data',
 						'view_style' => 'Left'
 					],
@@ -434,7 +434,7 @@ class testPageOverview extends CLegacyWebTest {
 			[
 				[
 					'main_filter' => [
-						'groupid' => 'Group to check Monitoring-> Overview',
+						'groupid' => 'Group to check Overview',
 						'type' => 'Data'
 					],
 					'applications' => [
@@ -455,7 +455,7 @@ class testPageOverview extends CLegacyWebTest {
 						'type' => 'Data'
 					],
 					'applications' => [
-						'app_group' => 'Group to check Monitoring-> Overview',
+						'app_group' => 'Group to check Overview',
 						'app_host' => '3_Host_to_check_Monitoring_Overview',
 						'application' => '3 application'
 					],
