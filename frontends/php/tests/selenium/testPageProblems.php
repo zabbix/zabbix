@@ -386,7 +386,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestClickButtonMultiselect('filter_hostids_');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+		$this->zbxTestDropdownSelectWait('groupid', 'Host group for suppression');
 		$this->zbxTestClickLinkTextWait('Host for suppression');
 		$this->zbxTestClickButtonText('Apply');
 
