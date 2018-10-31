@@ -1406,7 +1406,7 @@ static int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_
 	zbx_variant_set_variant(history_value, value);
 
 	if (0 == ret)
-		zbx_variant_set_none(value);
+		zbx_variant_clear(value);
 	else
 		*history_ts = *ts;
 
@@ -1449,7 +1449,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 		period = ts->sec - history_ts->sec;
 
 	if (0 == ret && period < timeout )
-		zbx_variant_set_none(value);
+		zbx_variant_clear(value);
 	else
 		*history_ts = *ts;
 
