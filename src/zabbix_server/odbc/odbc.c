@@ -324,28 +324,36 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 	zbx_odbc_query_result_t	*query_result = NULL;
 	SQLRETURN		rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
+	zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, query);
 
 	query_result = (zbx_odbc_query_result_t *)zbx_malloc(query_result, sizeof(zbx_odbc_query_result_t));
 
+	zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "1");
 	rc = SQLAllocHandle(SQL_HANDLE_STMT, data_source->hdbc, &query_result->hstmt);
 
+	zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "2");
 	if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_DBC, data_source->hdbc, rc, &diag))
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "3");
 		rc = SQLExecDirect(query_result->hstmt, (SQLCHAR *)query, SQL_NTS);
 
+		zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "4");
 		if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "5");
 			rc = SQLNumResultCols(query_result->hstmt, &query_result->col_num);
 
+			zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "6");
 			if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
 			{
 				SQLSMALLINT	i;
 
 				query_result->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
+				zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "7");
 
 				for (i = 0; ; i++)
 				{
+					zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s'", __function_name, "8");
 					if (i == query_result->col_num)
 					{
 						zabbix_log(LOG_LEVEL_DEBUG, "selected all %d columns",
@@ -507,14 +515,19 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 	const char	*const *row;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_WARNING, "In %s()", __function_name);
 
 	if (NULL != (row = zbx_odbc_fetch(query_result)))
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "In %s(1)", __function_name);
+
 		if (NULL != row[0])
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "In %s(2)", __function_name);
 			*string = zbx_strdup(*string, row[0]);
+			zabbix_log(LOG_LEVEL_WARNING, "In %s(3)", __function_name);
 			zbx_replace_invalid_utf8(*string);
+			zabbix_log(LOG_LEVEL_WARNING, "In %s(4)", __function_name);
 			ret = SUCCEED;
 		}
 		else
@@ -523,7 +536,7 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 	else
 		*error = zbx_strdup(*error, "SQL query returned empty result.");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s, %s", __function_name, zbx_result_string(ret), *error?*error:"none");
 
 	return ret;
 }

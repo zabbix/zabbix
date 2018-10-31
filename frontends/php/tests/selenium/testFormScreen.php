@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup screens
  */
-class testFormScreen extends CWebTest {
+class testFormScreen extends CLegacyWebTest {
 	public $testscreen = 'Test screen (clock)';
 	public $new_screen_name = 'Changed screen name';
 	public $testscreen_graph = 'Test screen (graph)';
@@ -156,7 +156,7 @@ class testFormScreen extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen added');
-				$this->assertEquals(1, DBcount("SELECT screenid FROM screens WHERE name='".$data['name']."'"));
+				$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='".$data['name']."'"));
 				break;
 
 		case TEST_BAD:
@@ -196,8 +196,8 @@ class testFormScreen extends CWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen updated');
 		$this->zbxTestTextPresent($this->new_screen_name);
-		$this->assertEquals(1, DBcount("SELECT screenid FROM screens WHERE name='$this->new_screen_name'"));
-		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->new_screen_name'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->testscreen'"));
 	}
 
 	public function testFormScreen_CloneScreen() {
@@ -208,8 +208,8 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickWait('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen added');
 		$this->zbxTestTextPresent($this->cloned_screen);
-		$this->assertEquals(1, DBcount("SELECT screenid FROM screens WHERE name='$this->cloned_screen'"));
-		$this->assertEquals(1, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen_graph'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->cloned_screen'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->testscreen_graph'"));
 	}
 
 	public function testFormScreen_DeleteScreen() {
@@ -218,7 +218,7 @@ class testFormScreen extends CWebTest {
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Screen deleted');
-		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE name='$this->testscreen_history'"));
 	}
 
 	public function testFormScreen_ZBX6030() {
