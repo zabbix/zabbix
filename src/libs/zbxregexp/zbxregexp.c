@@ -33,8 +33,6 @@ typedef struct
 }
 zbx_regmatch_t;
 
-#define ZBX_REGEXP_GROUPS_MAX	10
-
 /******************************************************************************
  *                                                                            *
  * Function: regexp_compile                                                   *
@@ -89,18 +87,6 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 #else
 	return regexp_compile(pattern, PCRE_MULTILINE, regexp, error);
 #endif
-}
-
-/*******************************************************
- *                                                     *
- * Function: zbx_regexp_compile_ext                    *
- *                                                     *
- * Purpose: public wrapper for regexp_compile          *
- *                                                     *
- *******************************************************/
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **error)
-{
-	return regexp_compile(pattern, flags, regexp, error);
 }
 
 /****************************************************************************************************
@@ -165,7 +151,8 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, size_t count,
 		zbx_regmatch_t *matches)
 {
-#define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)
+#define MAX_REQUESTED_MATCHES	10
+#define MATCHES_BUFF_SIZE	(MAX_REQUESTED_MATCHES * 3)
 
 	int				result = 0, r = 0;
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
@@ -175,7 +162,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	struct pcre_extra		pextra;
 #endif
 
-	if (ZBX_REGEXP_GROUPS_MAX < count)
+	if (MAX_REQUESTED_MATCHES < count)
 		ovector = (int *)zbx_malloc(NULL, ovecsize * sizeof(int));
 	else
 		ovector = matches_buff;
@@ -202,11 +189,12 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	else
 		result = FAIL;
 
-	if (ZBX_REGEXP_GROUPS_MAX < count)
+	if (MAX_REQUESTED_MATCHES < count)
 		zbx_free(ovector);
 
 	return result;
 #undef MATCHES_BUFF_SIZE
+#undef MAX_REQUESTED_MATCHES
 }
 
 /******************************************************************************
@@ -412,9 +400,10 @@ out:
  *********************************************************************************/
 static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
 {
+#define MATCH_SIZE 10
 	const char	*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
-	zbx_regmatch_t	 match[ZBX_REGEXP_GROUPS_MAX];
+	zbx_regmatch_t	 match[MATCH_SIZE];
 
 	if (NULL == string)
 	{
@@ -433,55 +422,11 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 
 	zbx_free(*out);
 
-	if(ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+	if(ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, MATCH_SIZE, match))
+		*out = regexp_sub_replace(string, output_template, match, MATCH_SIZE);
 
 	return SUCCEED;
 #undef MATCH_SIZE
-}
-
-/*********************************************************************************
- *                                                                               *
- * Function: zbx_mregexp_sub_precompiled                                         *
- *                                                                               *
- * Purpose: Test if a string matches precompiled regular expression. If yes      *
- *          then create a return value by substituting '\<n>' sequences in       *
- *          output template with the captured groups.                            *
- *                                                                               *
- * Parameters: string          - [IN] the string to parse                        *
- *             regexp          - [IN] the precompiled regular expression         *
- *             output_template - [IN] the output string template. The output     *
- *                                    string is constructed from template by     *
- *                                    replacing \<n> sequences with the captured *
- *                                    regexp group.                              *
- *                                    If output template is NULL or contains     *
- *                                    empty string then the whole input string   *
- *                                    is used as output value.                   *
- *            out              - [OUT] the output value if the input string      *
- *                                     matches the specified regular expression  *
- *                                     or NULL otherwise                         *
- *                                                                               *
- * Return value: SUCCEED - the regular expression match was done                 *
- *               FAIL    - failed to match                                       *
- *                                                                               *
- * Comments: Multiline match is performed.                                       *
- *                                                                               *
- *********************************************************************************/
-int	zbx_regexp_msub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
-		char **out)
-{
-	int		ret = FAIL;
-	zbx_regmatch_t	 match[ZBX_REGEXP_GROUPS_MAX];
-
-	zbx_free(*out);
-
-	if(ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
-	{
-		ret = SUCCEED;
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
-	}
-
-	return ret;
 }
 
 /*********************************************************************************

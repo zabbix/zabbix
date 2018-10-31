@@ -743,9 +743,7 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
  ******************************************************************************/
 static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *new_value = NULL;
-	const char	*regex_error;
-	zbx_regexp_t	*regex = NULL;
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *new_value = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -759,13 +757,13 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))
+	if (FAIL == zbx_mregexp_sub(value->data.str, pattern, output, &new_value))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
 		return FAIL;
 	}
 
-	if (FAIL == zbx_regexp_msub_precompiled(value->data.str, regex, output, &new_value))
+	if (NULL == new_value)
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match");
 		return FAIL;
@@ -773,8 +771,6 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_value);
-
-	zbx_regexp_free(regex);
 
 	return SUCCEED;
 }
@@ -1356,8 +1352,6 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 	zbx_variant_t	value_str;
 	int		ret = SUCCEED;
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
-	const char	*regex_error;
-	zbx_regexp_t	*regex = NULL;
 
 	zbx_variant_set_variant(&value_str, value);
 
@@ -1378,17 +1372,15 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))
+	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, error))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
 		ret = FAIL;
 		goto out;
 	}
 
-	if (SUCCEED == zbx_regexp_msub_precompiled(value->data.str, regex, output, error))
+	if (NULL != *error)
 		ret = FAIL;
-
-	zbx_regexp_free(regex);
 out:
 	zbx_variant_clear(&value_str);
 
