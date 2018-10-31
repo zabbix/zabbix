@@ -377,20 +377,23 @@ ul.top-nav-icons {
 
 .header-title,
 .object-group {
-  height: 24px;
+  min-height: 24px;
   line-height: 24px;
-  padding: 6px 0;
-  position: relative; }
+  padding: 10px 0 6px;
+  position: relative;
+  vertical-align: top; }
 
 .header-title {
   border-bottom: 1px solid #444;
-  margin: -5px 0 10px;
+  margin-top: -10px;
+  padding: 10px 0 6px;
   width: 100%; }
   .header-title .cell:first-child {
     max-width: calc(100vw - 370px); }
   .header-title h1 {
     line-height: 24px;
     overflow: hidden;
+    padding-top: 1px;
     text-overflow: ellipsis;
     white-space: nowrap; }
   .header-title form {
@@ -435,7 +438,7 @@ article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
-  margin: -6px 0; }
+  margin-bottom: -1px; }
   .object-group li {
     float: left;
     margin-right: 5px; }
@@ -476,20 +479,23 @@ article, main {
   z-index: 3; }
   .filter-breadcrumb li {
     line-height: 14px;
-    padding: 1px 0;
     vertical-align: top; }
-  .filter-breadcrumb > li:first-child {
-    float: left;
-    white-space: nowrap; }
-    .filter-breadcrumb > li:first-child > span {
+    .filter-breadcrumb li .status-container {
+      padding-top: 3px; }
+    .filter-breadcrumb li > span {
       display: inline-block;
       height: 18px;
       padding: 4px 7px 0; }
-      .filter-breadcrumb > li:first-child > span a {
+      .filter-breadcrumb li > span a {
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
         vertical-align: top; }
+  .filter-breadcrumb > li {
+    padding: 1px 0; }
+  .filter-breadcrumb > li:first-child {
+    float: left;
+    white-space: nowrap; }
   .filter-breadcrumb + .filter-space {
     margin-top: -29px; }
 
@@ -1676,13 +1682,14 @@ button {
   background-color: #000;
   border: 1px solid #444;
   border-bottom: none;
-  margin: 0 0 0 6px;
-  padding: 1px 34px 6px 10px;
+  margin: -1px 0 0 6px;
+  padding: 1px 34px 7px 10px;
   -webkit-border-radius: 2px 2px 0 0;
   -moz-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0; }
 .ui-tabs-nav .ui-tabs-active .btn-time:after {
-  background-position: -246px -583px; }
+  background-position: -246px -583px;
+  top: 1px; }
 .ui-tabs-nav .ui-tabs-active .filter-trigger:after {
   background-position: -246px -547px; }
 .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-time,
@@ -1696,7 +1703,7 @@ button {
 
 .filter-space {
   box-sizing: border-box;
-  margin-top: -1px; }
+  margin-top: 10px; }
   .filter-space li a.ui-tabs-anchor {
     vertical-align: top; }
   .filter-space ul.ui-tabs-nav li:focus {
@@ -2157,7 +2164,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-container {
   position: relative;
-  margin: -.25rem; }
+  margin: -4px; }
 
 .dashbrd-grid-widget-placeholder {
   border-color: #020202 !important;

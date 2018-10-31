@@ -502,15 +502,17 @@ ul.top-nav-icons {
 
 .header-title,
 .object-group {
-	height: 24px;
+	min-height: 24px;
 	line-height: 24px;
-	padding: 6px 0;
+	padding: 10px 0 6px;
 	position: relative;
+	vertical-align: top;
 }
 
 .header-title {
 	border-bottom: 1px solid $ui-border-color;
-	margin: -5px 0 10px;
+	margin-top: -10px;
+	padding: 10px 0 6px;
 	width: 100%;
 
 	.cell {
@@ -523,6 +525,7 @@ ul.top-nav-icons {
 	h1 {
 		line-height: 24px;
 		overflow: hidden;
+		padding-top: 1px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
@@ -592,7 +595,7 @@ article {
 
 // Object Group Navigation
 .object-group {
-	margin: -6px 0;
+	margin-bottom: -1px;
 
 	li {
 		float: left;
@@ -658,15 +661,13 @@ article {
 
 	li {
 		line-height: 14px;
-		padding: 1px 0;
 		vertical-align: top;
-	}
 
-	& > li:first-child {
-		float: left;
-		white-space: nowrap;
+		.status-container {
+			padding-top: 3px;
+		}
 
-		& > span {
+		> span {
 			display: inline-block;
 			height: 18px;
 			padding: 4px 7px 0;
@@ -680,7 +681,16 @@ article {
 		}
 	}
 
-	& + .filter-space {
+	> li {
+		padding: 1px 0;
+	}
+
+	> li:first-child {
+		float: left;
+		white-space: nowrap;
+	}
+
+	+ .filter-space {
 		margin-top: -29px;
 	}
 }
@@ -2480,14 +2490,15 @@ $icon-widget-btn: (
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
-			margin: 0 0 0 6px;
-			padding: 1px 34px 6px 10px;
+			margin: -1px 0 0 6px;
+			padding: 1px 34px 7px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
 		.btn-time {
 			&:after {
 				background-position: -246px -583px;
+				top: 1px;
 			}
 		}
 
@@ -2519,7 +2530,7 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
-	margin-top: -1px;
+	margin-top: 10px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
@@ -3177,7 +3188,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
-	margin: -.25rem;
+	margin: -4px;
 }
 
 .dashbrd-grid-widget-placeholder {
