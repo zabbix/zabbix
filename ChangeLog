@@ -5,7 +5,6 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-14974] fixed memory leak in case duplication name of the vmware performance counters (MVekslers)
-..F....... [ZBX-14934] made widget specific javascript files to be loaded with jsLoader (miks)
 ........S. [ZBX-15094] fixed the potential crash during vmware update (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
