@@ -1206,7 +1206,10 @@ static int	item_preproc_get_error_from_json(zbx_variant_t *value, const char *pa
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	{
+		zbx_free(*errmsg);
 		goto out;
+	}
 
 	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
 		goto out;
@@ -1257,7 +1260,10 @@ static int	item_preproc_get_error_from_xml(zbx_variant_t *value, const char *par
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	{
+		zbx_free(*errmsg);
 		goto out;
+	}
 
 	if (NULL == (doc = xmlReadMemory(value_str.data.str, strlen(value_str.data.str), "noname.xml", NULL, 0)))
 		goto out;
@@ -1345,7 +1351,10 @@ static int	item_preproc_get_error_from_regex(zbx_variant_t *value, const char *p
 	zbx_variant_set_variant(&value_str, value);
 
 	if (FAIL == item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, errmsg))
+	{
+		zbx_free(*errmsg);
 		goto out;
+	}
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
 	if (NULL == (output = strchr(pattern, '\n')))
