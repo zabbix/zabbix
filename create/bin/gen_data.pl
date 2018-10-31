@@ -212,6 +212,10 @@ sub main
 	push(@lines, <INFO>);
 	close(INFO);
 
+	open(INFO, dirname($0)."/../src/dashboards.tmpl");
+	push(@lines, <INFO>);
+	close(INFO);
+
 	if ($ARGV[0] eq 'ibm_db2')		{ %output = %ibm_db2; }
 	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }

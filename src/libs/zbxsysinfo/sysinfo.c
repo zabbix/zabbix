@@ -669,7 +669,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_rtrim(c, " \"");
 			zbx_ltrim(c, " \"+");
-			del_zeroes(c);
+			del_zeros(c);
 
 			if (SUCCEED == is_uint64(c, &value_uint64))
 			{
@@ -732,7 +732,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	{
 		zbx_rtrim(result->str, " \"");
 		zbx_ltrim(result->str, " \"+");
-		del_zeroes(result->str);
+		del_zeros(result->str);
 
 		if (SUCCEED != is_uint64(result->str, &value))
 			return NULL;
@@ -743,7 +743,7 @@ static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
 	{
 		zbx_rtrim(result->text, " \"");
 		zbx_ltrim(result->text, " \"+");
-		del_zeroes(result->text);
+		del_zeros(result->text);
 
 		if (SUCCEED != is_uint64(result->text, &value))
 			return NULL;
@@ -1410,7 +1410,9 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	args.args = (void *)&metric_args;
 
-	if (ZBX_THREAD_ERROR == (thread = zbx_thread_start(agent_metric_thread, &args)))
+	zbx_thread_start(agent_metric_thread, &args, &thread);
+
+	if (ZBX_THREAD_ERROR == thread)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
 				strerror_from_system(GetLastError())));

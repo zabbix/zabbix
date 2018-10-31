@@ -825,6 +825,13 @@ output {
 				}
 			}
 
+			[class*='icon-depend-'] {
+				&,
+				&:last-of-type {
+					margin-right: 12px;
+				}
+			}
+
 			.rel-container {
 
 				span {
@@ -1018,7 +1025,7 @@ output {
 			@extend %nothing-to-show;
 		}
 
-		&:last-child td {
+		&:last-child th, &:last-child td {
 			border-bottom: none;
 		}
 
@@ -1871,7 +1878,7 @@ output {
 		}
 
 		&:checked:focus + label {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
 			z-index: 2;
 		}
@@ -2570,6 +2577,7 @@ $icon-widget-btn: (
 	border: 1px solid transparent;
 	color: $font-color;
 	height: 24px;
+	line-height: 22px;
 	margin: 0 5px;
 	vertical-align: top;
 
@@ -3209,7 +3217,7 @@ $form-icon-btn: (
 
 		tbody tr {
 
-			&:last-child td {
+			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
 				&.list-table-footer {
@@ -4212,6 +4220,8 @@ $form-icon-btn: (
 	}
 }
 
+.svg-single-item-graph-legend,
+.svg-single-two-items-graph-legend,
 .svg-graph-legend {
 	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
 	$svg-legend-line-height: 18px;
@@ -4227,7 +4237,6 @@ $form-icon-btn: (
 		font-size: 12px;
 		line-height: $svg-legend-line-height;
 		vertical-align: middle;
-		max-width: 30%;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -4247,6 +4256,12 @@ $form-icon-btn: (
 		border-top-style: solid;
 		border-top-color: inherit;
 	}
+}
+.svg-graph-legend div {
+	max-width: 30%;
+}
+.svg-single-two-items-graph-legend div {
+	max-width: 50%;
 }
 
 .svg-graph-hintbox {
@@ -4305,6 +4320,7 @@ $form-icon-btn: (
 
 // Debug, Overlay Description
 .debug-output {
+	display: none;
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
@@ -5470,6 +5486,10 @@ tr.cursor-move {
 	position: relative;
 }
 
+.graph-wrapper {
+	display: inline;
+}
+
 // Analog Clock
 .clock {
 	padding: 0 10px;
@@ -6204,7 +6224,7 @@ $range-input-width: 31px;
 	&.range-control-focus {
 		.range-control-thumb {
 			background: $range-thumb-color-focus;
-			box-shadow: 0 0 1px black;
+			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
 		}
 
 		.range-control-progress {

@@ -590,7 +590,7 @@ class CSvgGraphHelper {
 		unset($pattern);
 
 		if ($patterns !== null) {
-			$patterns = array_filter($patterns);
+			$patterns = array_filter($patterns, 'strlen');
 		}
 
 		return $patterns;

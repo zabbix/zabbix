@@ -63,12 +63,18 @@ $scripts[] =
 $scripts[] =
 	'function onLeftYChange() {'.
 		'var on = (!jQuery("#lefty").is(":disabled") && jQuery("#lefty").is(":checked"));'.
+		'if (jQuery("#lefty").is(":disabled") && !jQuery("#lefty").is(":checked")) {'.
+			'jQuery("#lefty").prop("checked", true);'.
+		'}'.
 		'jQuery("#lefty_min, #lefty_max, #lefty_units").prop("disabled", !on);'.
 		'jQuery("#lefty_static_units").prop("disabled",'.
 			'(!on || jQuery("#lefty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
 	'}'.
 	'function onRightYChange() {'.
 		'var on = (!jQuery("#righty").is(":disabled") && jQuery("#righty").is(":checked"));'.
+		'if (jQuery("#righty").is(":disabled") && !jQuery("#righty").is(":checked")) {'.
+			'jQuery("#righty").prop("checked", true);'.
+		'}'.
 		'jQuery("#righty_min, #righty_max, #righty_units").prop("disabled", !on);'.
 		'jQuery("#righty_static_units").prop("disabled",'.
 			'(!on || jQuery("#righty_units").val() != "'.SVG_GRAPH_AXIS_UNITS_STATIC.'"));'.
@@ -103,8 +109,8 @@ $scripts[] =
 				'}'.
 			'});'.
 
-			'jQuery(lefty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
-			'jQuery(righty).prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
+			'jQuery("#lefty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_LEFT.']);'.
+			'jQuery("#righty").prop("disabled", !axes_used['.GRAPH_YAXIS_SIDE_RIGHT.']);'.
 
 			'onLeftYChange();'.
 			'onRightYChange();'.

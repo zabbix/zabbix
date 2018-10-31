@@ -91,11 +91,11 @@ jQuery(function($) {
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data);
+				data = getMenuPopupRefresh(data, obj);
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data);
+				data = getMenuPopupTrigger(data, obj);
 				break;
 
 			case 'triggerLog':
@@ -151,25 +151,22 @@ jQuery(function($) {
 		}
 		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
 			/**
-			 * Pattern select allows enter multiple comma-separated values in same editable field. Values passed to
-			 * add.popup should be appended at the and of existing value string. Repeating values are skipped.
+			 * Pattern select allows enter multiple comma or newline separated values in same editable field. Values
+			 * passed to add.popup should be appended at the and of existing value string. Duplicates are skipped.
 			 */
-			var values = [];
-			$('[name="'+data.parentId+'"]').val().split(',').forEach(function(val) {
-				var val = val.trim();
-				if (val.length) {
-					values.push(val);
-				}
-			});
-
+			var values = $('[name="'+data.parentId+'"]').val();
 			data.values.forEach(function(val) {
-				if (values.indexOf(val[data.object]) === -1) {
-					values.push(val[data.object]);
+				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
+					if (values !== '') {
+						values = values + ', ';
+					}
+					values = values + val[data.object];
 				}
 			});
 
 			$('[name="'+data.parentId+'"]')
-				.val(values.join(', '))
+				.val(values)
 				.trigger('change');
 		}
 		else if (typeof addPopupValues !== 'undefined') {
