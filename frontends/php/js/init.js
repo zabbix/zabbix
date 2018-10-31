@@ -91,7 +91,7 @@ jQuery(function($) {
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data);
+				data = getMenuPopupRefresh(data, obj);
 				break;
 
 			case 'trigger':
