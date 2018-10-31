@@ -337,7 +337,7 @@
 					})
 					.each(function (box) {
 						max_height = Math.max(max_height, box.current_pos.y + box.current_pos.height);
-						box.div.css('background-color', 'red');
+						box.div.css('background-color', 'rgba(255, 0, 0, 0.2)');
 						box.div.css('opacity', '0.5');
 					}),
 				getAffectedInBounds = function (bounds) {
@@ -385,7 +385,6 @@
 				if (box.current_pos[axis_key] <= newpos) {
 					box.current_pos[axis_key] = newpos;
 					new_max = Math.max(new_max, newpos + box.current_pos[size_key]);
-					//box.div.css('background-color', 'rgba(0, 0, 255, 0.1)');
 					box.div.css('opacity', '1');
 				}
 			});
@@ -395,101 +394,87 @@
 			 */
 			if (new_max > size_max) {
 				var scanline = {
-						x: axis_pos[axis_key] + axis_pos[size_key],
-						width: 1,
-						y: 0,
-						height: max_height
-					},
-					delta = 0,
-					slots = [getAffectedInBounds(scanline)],
-					i = 1;
-				scanline[axis_key] += 1
-				while (scanline[axis_key] < new_max) {
-					slots.push(getAffectedInBounds(scanline));
+					x: 0,
+					y: 0,
+					width: 12, // max width
+					height: 12 // max height
+				};
+				scanline[size_key] = size_min;
+				var slot = axis_pos[axis_key] + axis_pos[size_key],
+					next_slot = slot + scanline[size_key];
 
-					var can_move = true,
-						can_collapse = new_max > size_max + delta;
+				var overlap = new_max - size_max ,
+					next_col,
+					col;
 
-					$.each(slots[i], function (_, box) {
-						box.new_pos = $.extend({}, box.current_pos);
-						box.new_pos[axis_key] -= delta + (can_collapse ? 1 : 0);
-						//box.content_header.html('delta: '+delta);
+				var collapsed;
+				var debug = 30;
 
-						if (can_collapse) {
-							$.each(slots[i - 1], function (_, box1) {
+				while (slot < size_max && debug-- > 0) {// TODO: remove debug
+					collapsed = false;
+					scanline[axis_key] = slot;
+					col = getAffectedInBounds(scanline);
+					scanline[axis_key] = next_slot;
+					next_col = getAffectedInBounds(scanline);
+
+					$.each(next_col, function (_, box) {
+						if (box.current_pos[axis_key] == next_slot) {
+							box.current_pos[axis_key] = slot + scanline[size_key];
+						}
+
+						if (overlap > 0) {
+							collapsed = true;
+							box.new_pos = $.extend({}, box.current_pos);
+							box.new_pos[axis_key] = slot;
+
+							$.each(col, function (_, box1) {
 								if (rectOverlap(box1.current_pos, box.new_pos)) {
 									if (box1.current_pos[size_key] > size_min) {
 										box1.new_pos = $.extend({}, box1.current_pos);
-										box1.new_pos[size_key] -= 1;
-										box1.div.css('background-color', 'rgba(255, 0, 255, 0.2)');
+										box1.new_pos[size_key] -= scanline[size_key];
+										box1.div.css('background-color', 'rgba(255, 0, 0, 1)');
 									}
 									else {
-										can_move = false;
+										collapsed = false;
 									}
 								}
 
-								return can_move;
+								return collapsed;
 							});
 						}
-						else {
-							if (scanline[axis_key] != box.current_pos[axis_key]
-									&& box.current_pos[size_key] > size_min) {
-								/*
-								 * Slots can contain multiple entries for same widget when widget size is greater
-								 * than 1, such widget should be moved only once.
-								 */
-								box.new_pos = $.extend({}, box.current_pos);
-							}
-						}
-
-						return can_move;
 					});
 
-					if (can_move) {
-						// debug code
-						// TODO: remove!
-						// console['log']('will move, delta='+delta+', collapse='+can_collapse,
-						// 	JSON.parse(JSON.stringify(slots[i]))
-						// );
-						delta += can_collapse ? 1 : 0;
+					if (collapsed) {
+						console
+							.log(slot+' collapsed', {
+								col: $.map(col, function(b) { return b.header }).join(' - '),
+								next_col: $.map(next_col, function(b) { return b.header }).join(' - ')
+							});
 
-						slots[i].each(function (box) {
-							slots[i - 1].push(box);
-						});
-						slots[i - 1].each(function (box) {
+						$.each(next_col.concat(col), function (_, box) {
 							if ('new_pos' in box) {
 								box.current_pos = box.new_pos;
-								delete box.new_pos;
-								box.div.css('background-color', can_collapse
-									? 'rgba(0, 255, 0, 0.5)'
-									: 'rgba(0, 255, 0, 0.1)');
-								// box.content_header.html(JSON.stringify({delta: delta, new_max:new_max}));
 							}
 						});
-						// slots.pop();
-						// i -= 1;
-						slots[i] = [];
+
+						overlap -= 1;
 					}
 					else {
-						// TODO: remove!
-						console['log']('  no move, delta='+delta+', collapse='+can_collapse,
-							JSON.parse(JSON.stringify(slots[i]))
-						);
-
-						slots[i].each(function (box) {
-							'new_pos' in box && box.div.css('background-color', 'rgba(0, 0, 0, 0.2)');
-							delete box.new_pos;
-						});
-						slots[i - 1].each(function (box) {
-							'new_pos' in box && box.div.css('background-color', 'rgba(0, 0, 0, 0.2)');
-							delete box.new_pos;
-						});
-						//i += 1;
+						console
+							.log(slot+' step', {
+								col: $.map(col, function(b) { return b.header }).join(' - '),
+								next_col: $.map(next_col, function(b) { return b.header }).join(' - ')
+							});
+						slot += scanline[size_key];
 					}
 
-					i += 1;
-					scanline[axis_key] += 1;
+					next_slot += scanline[size_key];
+					$.each(col.concat(next_col), function (_, box) {
+						delete box.new_pos;
+					});
 				}
+
+				console[debug > 0 ? 'log' : 'error']('resize step finished.');// TODO: remove
 			}
 
 			/**
