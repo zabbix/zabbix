@@ -409,6 +409,7 @@ ul.top-nav-icons {
     position: relative;
     display: inline-block;
     background-color: #fff;
+    margin-right: 5px;
     -webkit-box-shadow: 0 0 0 4px #fff;
     -moz-box-shadow: 0 0 0 4px #fff;
     box-shadow: 0 0 0 4px #fff; }

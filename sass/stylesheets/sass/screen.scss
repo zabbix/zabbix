@@ -558,6 +558,7 @@ ul.top-nav-icons {
 		position: relative;
 		display: inline-block;
 		background-color: $ui-bg-color;
+		margin-right: 5px;
 		@include box-shadow(0 0 0 4px $ui-bg-color);
 
 		&::after {
