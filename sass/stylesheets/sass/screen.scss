@@ -1878,7 +1878,7 @@ output {
 		}
 
 		&:checked:focus + label {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include box-shadow(0 0 0 2px rgba($blue, .35));
 			position: relative;
 			z-index: 2;
 		}
@@ -4320,6 +4320,7 @@ $form-icon-btn: (
 
 // Debug, Overlay Description
 .debug-output {
+	display: none;
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;

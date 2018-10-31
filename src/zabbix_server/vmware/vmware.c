@@ -599,12 +599,21 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 	int			i;
 	zbx_vmware_counter_t	*csrc, *cdst;
 
+	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
 	for (i = 0; i < src->values_num; i++)
 	{
 		csrc = (zbx_vmware_counter_t *)src->values[i];
 
 		cdst = (zbx_vmware_counter_t *)zbx_hashset_insert(dst, csrc, sizeof(zbx_vmware_counter_t));
-		cdst->path = vmware_shared_strdup(csrc->path);
+
+		/* check if the counter was inserted - copy path only for inserted counters */
+		if (cdst->path == csrc->path)
+			cdst->path = vmware_shared_strdup(csrc->path);
 	}
 }
 
@@ -1150,6 +1159,8 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
 	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
+	zbx_vector_ptr_reserve(&vm->devs, src->devs.values_num);
+	zbx_vector_ptr_reserve(&vm->file_systems, src->file_systems.values_num);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
@@ -1181,6 +1192,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	VMWARE_VECTOR_CREATE(&dst->datastores, ptr);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
+	zbx_vector_ptr_reserve(&dst->datastores, src->datastores.values_num);
+	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
@@ -1220,6 +1233,8 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 			__vm_mem_realloc_func, __vm_mem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
+	zbx_vector_ptr_reserve(&data->clusters, src->clusters.values_num);
+	zbx_vector_ptr_reserve(&data->events, src->events.values_num);
 
 	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
 			__vm_mem_realloc_func, __vm_mem_free_func);
@@ -1238,6 +1253,12 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 
 		vmware_hv_shared_copy(&hv_local, hv);
 		hv = (zbx_vmware_hv_t *)zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
+
+		if (SUCCEED != zbx_hashset_reserve(&data->vms_index, hv->vms.values_num))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
 
 		for (i = 0; i < hv->vms.values_num; i++)
 		{
@@ -1570,6 +1591,33 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_logout                                            *
+ *                                                                            *
+ * Purpose: Close unused connection with vCenter                              *
+ *                                                                            *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
+{
+#	define ZBX_POST_VMWARE_LOGOUT						\
+		ZBX_POST_VSPHERE_HEADER						\
+		"<ns0:Logout>"							\
+			"<ns0:_this type=\"SessionManager\">%s</ns0:_this>"	\
+		"</ns0:Logout>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vmware_service_logout";
+	char		tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT, vmware_service_objects[service->type].session_manager);
+	return zbx_soap_post(__function_name, easyhandle, tmp, NULL, error);
+}
+
 typedef struct
 {
 	const char	*property_collector;
@@ -1793,7 +1841,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_perfcounters";
-	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL,
+	char		tmp[MAX_STRING_LEN], *group = NULL, *key = NULL, *rollup = NULL, *stats = NULL,
 			*counterid = NULL;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
@@ -1825,6 +1873,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 	}
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(counters, 2 * nodeset->nodeNr + counters->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -1837,6 +1886,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 						"*[local-name()='nameInfo']/*[local-name()='key']");
 
 		rollup = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='rollupType']");
+		stats = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='statsType']");
 		counterid = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='key']");
 
 		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid)
@@ -1851,7 +1901,20 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 					counter->id);
 		}
 
+		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != stats)
+		{
+			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
+			ZBX_STR2UINT64(counter->id, counterid);
+
+			zbx_vector_ptr_append(counters, counter);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "adding performance counter %s:" ZBX_FS_UI64, counter->path,
+					counter->id);
+		}
+
 		zbx_free(counterid);
+		zbx_free(stats);
 		zbx_free(rollup);
 		zbx_free(key);
 		zbx_free(group);
@@ -1906,6 +1969,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->devs, nodeset->nodeNr + vm->devs.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -1967,6 +2031,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->devs, nodeset->nodeNr + vm->devs.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -2076,6 +2141,7 @@ static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(&vm->file_systems, nodeset->nodeNr + vm->file_systems.values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -2617,6 +2683,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv->clusterid = value;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
+	zbx_vector_ptr_reserve(&hv->datastores, datastores.values_num + hv->datastores.values_alloc);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -2627,6 +2694,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	}
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
+	zbx_vector_ptr_reserve(&hv->vms, vms.values_num + hv->vms.values_alloc);
 
 	for (i = 0; i < vms.values_num; i++)
 	{
@@ -3070,6 +3138,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	if (0 != ids.values_num)
 	{
 		zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_ptr_reserve(events, ids.values_num + events->values_alloc);
 
 		/* we are reading "scrollable views" in reverse chronological order, */
 		/* so inside a "scrollable view" latest events should come first too */
@@ -3442,6 +3511,7 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 		goto out;
 
 	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
+	zbx_vector_ptr_reserve(clusters, ids.values_num + clusters->values_alloc);
 
 	for (i = 0; i < ids.values_num; i++)
 	{
@@ -3788,6 +3858,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto out;
 	}
 
+	page.alloc = ZBX_INIT_UPD_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 
@@ -3796,9 +3868,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
-
-	page.alloc = ZBX_INIT_UPD_XML_SIZE;
-	page.data = (char *)zbx_malloc(NULL, page.alloc);
 
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
@@ -3811,6 +3880,12 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	if (SUCCEED != vmware_service_get_hv_list(service, easyhandle, &hvs, &data->error))
 		goto clean;
+
+	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
@@ -3837,6 +3912,12 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		data->max_query_metrics = ZBX_VPXD_STATS_MAXQUERYMETRICS;
 	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, &data->max_query_metrics, &data->error))
 		goto clean;
+
+	if (SUCCEED != vmware_service_logout(service, easyhandle, &data->error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot close vmware connection: %s.", data->error);
+		zbx_free(data->error);
+	}
 
 	ret = SUCCEED;
 clean:
@@ -3908,6 +3989,7 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 		goto out;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(pervalues, nodeset->nodeNr + pervalues->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -3980,6 +4062,7 @@ static void	vmware_service_parse_perf_data(zbx_vector_ptr_t *perfdata, xmlDoc *x
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
+	zbx_vector_ptr_reserve(perfdata, nodeset->nodeNr + perfdata->values_alloc);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -4279,6 +4362,8 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		goto out;
 	}
 
+	page.alloc = INIT_PERF_XML_SIZE;
+	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 
@@ -4287,9 +4372,6 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 		error = zbx_dsprintf(error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
-
-	page.alloc = INIT_PERF_XML_SIZE;
-	page.data = (char *)zbx_malloc(NULL, page.alloc);
 
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &error))
 		goto clean;
@@ -4360,6 +4442,12 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, 0, &perfdata);
 	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, service->data->max_query_metrics,
 			&perfdata);
+
+	if (SUCCEED != vmware_service_logout(service, easyhandle, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot close vmware connection: %s.", error);
+		zbx_free(error);
+	}
 
 	ret = SUCCEED;
 clean:
