@@ -1483,7 +1483,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		const zbx_preproc_op_t *op, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **error)
 {
-	int	ret, error_handler = op->error_handler;
+	int	ret;
 	char	*errmsg = NULL;
 
 	switch (op->type)
@@ -1557,7 +1557,7 @@ int	zbx_item_preproc(int index, unsigned char value_type, zbx_variant_t *value, 
 	if (SUCCEED == ret)
 		return SUCCEED;
 
-	switch (error_handler)
+	switch (op->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DEFAULT:
 			/* if errmsg is NULL then error was set directly by preprocessing step */
