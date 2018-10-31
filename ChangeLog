@@ -632,6 +632,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-14934] made widget specific javascript files to be loaded with jsLoader (miks)
+....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 ........S. [ZBX-14875] fixed discovery and auto registration escalations being kept for one hour instead of deleted immediately (vso)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
