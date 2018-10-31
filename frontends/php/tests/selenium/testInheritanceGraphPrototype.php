@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup graphs
  */
-class testInheritanceGraphPrototype extends CWebTest {
+class testInheritanceGraphPrototype extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
@@ -36,7 +36,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
 
 	public static function update() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT DISTINCT g.graphid,id.parent_itemid'.
 			' FROM graphs g,graphs_items gi,item_discovery id'.
 			' WHERE g.graphid=gi.graphid'.
@@ -58,14 +58,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 */
 	public function testInheritanceGraphPrototype_SimpleUpdate($data) {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
-		$oldHashGraphs = DBhash($sqlGraphs);
+		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
 
-		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
+		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
 	}
 
 	// Returns create data

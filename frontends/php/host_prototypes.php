@@ -129,10 +129,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
-	foreach ($_REQUEST['group_prototypes'] as &$groupPrototype) {
-		unset($groupPrototype['group_prototypeid']);
+	if (hasRequest('group_prototypes')) {
+		foreach ($_REQUEST['group_prototypes'] as &$groupPrototype) {
+			unset($groupPrototype['group_prototypeid']);
+		}
+		unset($groupPrototype);
 	}
-	unset($groupPrototype);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
