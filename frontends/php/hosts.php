@@ -127,6 +127,7 @@ $fields = [
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'filter_host' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'filter_templates' =>		[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'filter_ip' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_dns' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
 	'filter_port' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
@@ -191,6 +192,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_monitored_by', getRequest('filter_monitored_by', ZBX_MONITORED_BY_ANY),
 		PROFILE_TYPE_INT
 	);
+	CProfile::updateArray('web.hosts.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
 	CProfile::updateArray('web.hosts.filter_proxyids', getRequest('filter_proxyids', []), PROFILE_TYPE_ID);
 }
 elseif (hasRequest('filter_rst')) {
@@ -200,6 +202,7 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_host');
 	CProfile::delete('web.hosts.filter_port');
 	CProfile::delete('web.hosts.filter_monitored_by');
+	CProfile::deleteIdx('web.hosts.filter_templates');
 	CProfile::deleteIdx('web.hosts.filter_proxyids');
 	DBend();
 }
@@ -207,6 +210,7 @@ elseif (hasRequest('filter_rst')) {
 $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
 $filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
 $filter['host'] = CProfile::get('web.hosts.filter_host', '');
+$filter['templates'] = CProfile::getArray('web.hosts.filter_templates', []);
 $filter['port'] = CProfile::get('web.hosts.filter_port', '');
 $filter['monitored_by'] = CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY);
 $filter['proxyids'] = CProfile::getArray('web.hosts.filter_proxyids', []);
@@ -1211,6 +1215,14 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	$filter['templates'] = $filter['templates']
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter['templates'],
+			'preservekeys' => true
+		]), ['templateid' => 'id'])
+		: [];
+
 	// get Hosts
 	$hosts = [];
 	if ($pageFilter->groupsSelected) {
@@ -1236,6 +1248,7 @@ else {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sortField],
 			'groupids' => $pageFilter->groupids,
+			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,

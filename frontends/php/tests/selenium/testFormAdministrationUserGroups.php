@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormAdministrationUserGroups extends CWebTest {
+class testFormAdministrationUserGroups extends CLegacyWebTest {
 	private $userGroup = 'Selenium user group';
 
 	public function testFormAdministrationUserGroups_CheckLayout() {
@@ -134,12 +134,12 @@ class testFormAdministrationUserGroups extends CWebTest {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group added');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, DBcount($sql));
+				$this->assertEquals(1, CDBHelper::getCount($sql));
 
 				if (array_key_exists('user_group', $data)) {
 					$groupid = DBfetch(DBselect($sql));
 					$users = "SELECT id FROM users_groups WHERE usrgrpid=".$groupid['usrgrpid'];
-					$this->assertEquals(1, DBcount($users));
+					$this->assertEquals(1, CDBHelper::getCount($users));
 				}
 				break;
 
@@ -243,12 +243,12 @@ class testFormAdministrationUserGroups extends CWebTest {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, DBcount($sql));
+				$this->assertEquals(1, CDBHelper::getCount($sql));
 
 				if (array_key_exists('user_group', $data)) {
 					$groupid = DBfetch(DBselect($sql));
 					$users = "SELECT id FROM users_groups WHERE usrgrpid=".$groupid['usrgrpid'];
-					$this->assertEquals(1, DBcount($users));
+					$this->assertEquals(1, CDBHelper::getCount($users));
 				}
 				break;
 
@@ -319,14 +319,14 @@ class testFormAdministrationUserGroups extends CWebTest {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group deleted');
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(0, DBcount($sql));
+				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete group');
 				$this->zbxTestTextPresent($data['error']);
 				$this->zbxTestCheckFatalErrors();
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, DBcount($sql));
+				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 		}
 	}

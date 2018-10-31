@@ -1255,9 +1255,9 @@ output {
       position: relative;
       z-index: 1; }
     .radio-segmented input[type="radio"]:checked:focus + label {
-      color: #333;
-      background-color: lightgray;
-      border-color: lightgray;
+      -webkit-box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+      -moz-box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
@@ -2978,6 +2978,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: -3px; }
 
 .debug-output {
+  display: none;
   max-height: 600px;
   overflow-y: auto;
   padding: 11px;
@@ -4631,15 +4632,18 @@ button:focus {
 .radio-segmented .warning-bg:before,
 .radio-segmented .warning-bg:after {
   display: none; }
-.radio-segmented li input[type="radio"]:checked:not([disabled]) + label, .radio-segmented li input[type="radio"]:focus + label {
-  border-color: #bbb;
+.radio-segmented li input[type="radio"]:checked:not([disabled]) + label {
   color: #000 !important; }
 .radio-segmented li input[type="radio"]:checked + label {
-  background-color: #ddd; }
+  background-color: #ddd !important; }
+.radio-segmented li input[type="radio"]:focus + label {
+  -webkit-box-shadow: 0 0 0 2px white !important;
+  -moz-box-shadow: 0 0 0 2px white !important;
+  box-shadow: 0 0 0 2px white !important;
+  background-color: #c7c7c7 !important;
+  color: #000 !important; }
 .radio-segmented li input[type="radio"]:checked[disabled] + label {
   background-color: #595959 !important; }
-.radio-segmented li input[type="radio"]:focus + label {
-  background-color: #fff !important; }
 
 a:link {
   border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
