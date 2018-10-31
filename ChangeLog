@@ -4,6 +4,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 ........S. [ZBX-14875] fixed discovery and auto registration escalations being kept for one hour instead of deleted immediately (vso)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ..F....... [ZBX-14905] fixed error reporting for XML import of hosts and templates (gcalenko)
@@ -1991,6 +1992,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
 
