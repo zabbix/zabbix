@@ -533,19 +533,6 @@
 
 				// Creates new script elements and removes previous ones to force their re-execution.
 				widget['content_script'].empty();
-				if (typeof(resp.script_file) !== 'undefined' && resp.script_file.length) {
-					// NOTE: it is done this way to make sure, this script is executed before script_run function below.
-					if (typeof(resp.script_file) === 'string') {
-						resp.script_file = [resp.script_file];
-					}
-
-					for (var i = 0, l = resp.script_file.length; l > i; i++) {
-						var new_script = $('<script>')
-							.attr('type', 'text/javascript')
-							.attr('src', resp.script_file[i]);
-						widget['content_script'].append(new_script);
-					}
-				}
 				if (typeof(resp.script_inline) !== 'undefined') {
 					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 					var new_script = $('<script>')
