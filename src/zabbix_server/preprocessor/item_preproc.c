@@ -1444,7 +1444,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 	if (FAIL == is_time_suffix(params, &timeout, strlen(params)))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
-		zbx_variant_set_none(history_value);
+		zbx_variant_clear(history_value);
 		return FAIL;
 	}
 
