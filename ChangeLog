@@ -18,6 +18,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-15032] fixed sBox position in screen's graph item when dynamic item is enabled (miks)
 ........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ..F....... [ZBX-15007] fixed current map refresh in map widget right after update widget configuration (miks)
 ..F....... [ZBX-14990] added missing http agent statistic row in queue screen (miks)
