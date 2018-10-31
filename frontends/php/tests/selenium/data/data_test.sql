@@ -1960,8 +1960,8 @@ INSERT INTO triggers (triggerid, description, expression, value, priority, state
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '');
 
 -- testPageMonitoringOverview
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Monitoring-> Overview', 0);
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Monitoring-> Overview', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Overview', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Overview', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50011, '1_Host_to_check_Monitoring_Overview', '1_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, '3_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, '4_Host_to_check_Monitoring_Overview', '4_Host_to_check_Monitoring_Overview', 0, '');
