@@ -47,7 +47,7 @@ A......... [ZBX-14865] fixed "Field "parent_itemid" cannot be set to NULL" error
 ........S. [ZBX-14854] improved preprocessor worker performance (MVekslers)
 ..F....... [ZBX-14798] fixed incorrect zero rounding in date and time fields (gcalenko, Ivo)
 ........S. [ZBX-14954] fixed sql error in escalator when working with Oracle, PostgreSQL (less than v9.4) databases (wiper)
-..F....... [ZBX-14757] fixed incorrect translation string in en_US locale (zalex_ua)
+..F....... [ZBX-14952] fixed incorrect translation string in en_US locale (zalex_ua)
 ..F....... [ZBX-14757] fixed fields becoming writable upon form refresh in host prototype form (vmurzins)
 ..F....... [ZBX-14915] fixed 'follow redirects' checkbox in web scenario step's dialog (miks)
 ..F....... [ZBX-14811] fixed color of the host name in the title of the Screens (vasilijs)
