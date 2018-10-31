@@ -37,6 +37,7 @@ require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDiscovery.php';
 require_once dirname(__FILE__).'/testPageDiscoveryRules.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
+require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostGraph.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
@@ -48,6 +49,7 @@ require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
+require_once dirname(__FILE__).'/testPageOverview.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -142,6 +144,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDiscovery');
 		$suite->addTestSuite('testPageDiscoveryRules');
 		$suite->addTestSuite('testPageEventCorrelation');
+		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');

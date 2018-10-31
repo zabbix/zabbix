@@ -48,7 +48,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\zabbix_sender\zabbix_sender.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc
