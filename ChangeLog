@@ -14,6 +14,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14505] fixed compiler warning about incompatible pointer type on 32-bit platform (MVekslers)
 ..F....... [ZBX-1667] fixed error suppression during php ldap module initialization (gcalenko, Ivo)
 ..F....... [ZBX-13505] fixed link coloring in map when related trigger is not monitored (miks)
 ..F....... [ZBX-15032] fixed sBox position in screen's graph item when dynamic item is enabled (miks)
