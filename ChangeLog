@@ -8,7 +8,7 @@ Bug fixes:
 ..F....... [ZBX-1667] fixed error suppression during php ldap module initialization (gcalenko, Ivo)
 ..F....... [ZBX-13505] fixed link coloring in map when related trigger is not monitored (miks)
 ..F....... [ZBX-15032] fixed sBox position in screen's graph item when dynamic item is enabled (miks)
-........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
+.......PS. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ..F....... [ZBX-15007] fixed current map refresh in map widget right after update widget configuration (miks)
 ..F....... [ZBX-14990] added missing http agent statistic row in queue screen (miks)
 ..F....... [ZBX-14984] fixed missing focus from problem name when opening description editing popup in monitoring problems section (miks)
@@ -2010,7 +2010,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-13505] fixed link coloring in map when related trigger is not monitored (miks)
-........S. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
+.......PS. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
 ....I..... [ZBX-14966] removed the notes about sqlite from zabbix_server.conf (MVekslers)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
