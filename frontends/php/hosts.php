@@ -68,6 +68,8 @@ $fields = [
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
+	'new_tags' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'remove_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -348,12 +350,16 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 
 		// filter only normal and discovery created hosts
 		$options = [
-			'output' => ['hostid'],
+			'output' => ['hostid', 'flags'],
 			'hostids' => $hostIds,
 			'selectInventory' => ['inventory_mode'],
 			'selectGroups' => ['groupid'],
 			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		];
+
+		if (array_key_exists('new_tags', $visible) || array_key_exists('remove_tags', $visible)) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
 
 		if (array_key_exists('templates', $visible) && !hasRequest('mass_replace_tpls')) {
 			$options['selectParentTemplates'] = ['templateid'];
@@ -449,6 +455,46 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			$newValues['groups'] = zbx_toObject($replace_groupids, 'groupid');
 		}
 
+		$new_tags = [];
+		if (array_key_exists('new_tags', $visible)) {
+			foreach (getRequest('new_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$new_tags[] = $tag;
+			}
+		}
+
+		$replace_tags = [];
+		if (array_key_exists('tags', $visible)) {
+			foreach (getRequest('tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$replace_tags[] = $tag;
+			}
+
+			$unique_tags = [];
+			foreach (array_merge($replace_tags, $new_tags) as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$newValues['tags'] = array_values($unique_tags);
+		}
+
+		$remove_tags = [];
+		if (array_key_exists('remove_tags', $visible)) {
+			foreach (getRequest('remove_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$remove_tags[] = $tag;
+			}
+		}
+
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$hostTemplates = API::Template()->get([
@@ -536,9 +582,49 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				);
 			}
 
-			unset($host['parentTemplates']);
+			$new_values = $newValues;
 
-			$host = array_merge($host, $newValues);
+			if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if (array_key_exists('remove_tags', $visible)) {
+					if (!array_key_exists('tags', $visible)) {
+						$unique_tags = [];
+						foreach (array_merge($host['tags'], $new_tags) as $tag) {
+							$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+						}
+						$replace_tags = array_values($unique_tags);
+					}
+
+					$diff_tags = [];
+					foreach ($replace_tags as $a) {
+						foreach ($remove_tags as $b) {
+							if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+								continue 2;
+							}
+						}
+						$diff_tags[] = $a;
+					}
+
+					$new_values['tags'] = $diff_tags;
+				}
+
+				if ($new_tags && !array_key_exists('tags', $visible) && !array_key_exists('remove_tags', $visible)) {
+					$unique_tags = [];
+					foreach (array_merge($host['tags'], $new_tags) as $tag) {
+						$unique_tags[$tag['tag'] . ':' . $tag['value']] = $tag;
+					}
+					$host['tags'] = array_values($unique_tags);
+				}
+				else {
+					unset($host['tags']);
+				}
+			}
+			else {
+				unset($host['tags'], $new_values['tags']);
+			}
+
+			unset($host['flags'], $host['parentTemplates']);
+
+			$host = array_merge($host, $new_values);
 		}
 		unset($host);
 
@@ -914,6 +1000,9 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
+		'tags' => getRequest('tags', []),
+		'new_tags' => getRequest('tags', []),
+		'remove_tags' => getRequest('tags', []),
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),
@@ -936,12 +1025,16 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 	// sort templates
 	natsort($data['templates']);
 
-	// get groups
-	$data['all_groups'] = API::HostGroup()->get([
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true
-	]);
-	order_result($data['all_groups'], 'name');
+	// get tags
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	if (!$data['new_tags']) {
+		$data['new_tags'][] = ['tag' => '', 'value' => ''];
+	}
+	if (!$data['remove_tags']) {
+		$data['remove_tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	// get proxies
 	$data['proxies'] = DBfetchArray(DBselect(

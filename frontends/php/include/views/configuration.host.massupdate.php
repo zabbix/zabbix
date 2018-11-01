@@ -155,6 +155,39 @@ $hostFormList->addRow(
 	))->setId('remove_groups')
 );
 
+// Replace tags.
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[tags]', 'tags', _('Original')))
+		->setLabel(_('Replace tags'))
+		->setChecked(array_key_exists('tags', $data['visible'])),
+	(new CDiv(renderTagTable($data['tags'], 'tags')->setId('tbl-tags')))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('tags')
+);
+
+// Add tags.
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[new_tags]', 'new_tags', _('Original')))
+		->setLabel(_('Add tags'))
+		->setChecked(array_key_exists('new_tags', $data['visible'])),
+	(new CDiv(renderTagTable($data['new_tags'], 'new_tags')->setId('tbl-new-tags')))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('new_tags')
+);
+
+// Remove tags.
+$hostFormList->addRow(
+	(new CVisibilityBox('visible[remove_tags]', 'remove_tags', _('Original')))
+		->setLabel(_('Remove tags'))
+		->setChecked(array_key_exists('remove_tags', $data['visible'])),
+	(new CDiv(renderTagTable($data['remove_tags'], 'remove_tags')->setId('tbl-remove-tags')))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('remove_tags')
+);
+
 // append description to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
@@ -319,18 +352,18 @@ $encryption_table = (new CTable())
 			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 			->addItem((new CCheckBox('tls_in_cert'))->setLabel(_('Certificate')))
 	])
-	->addRow(
+	->addRow([
 		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
-	)
-	->addRow(
+	])
+	->addRow([
 		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
 		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAriaRequired()
-	)
+	])
 	->addRow([_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	])
