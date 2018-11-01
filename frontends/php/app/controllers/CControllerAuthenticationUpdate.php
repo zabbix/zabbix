@@ -117,7 +117,7 @@ class CControllerAuthenticationUpdate extends CController {
 			return $is_valid;
 		}
 
-		if ($this->getInput('ldap_bind_password') !== '') {
+		if ($this->getInput('ldap_bind_password', '') !== '') {
 			$ldap_fields[] = 'ldap_bind_dn';
 		}
 
