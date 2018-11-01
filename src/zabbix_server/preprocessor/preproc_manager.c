@@ -300,11 +300,9 @@ static zbx_preprocessing_worker_t	*preprocessor_get_free_worker(zbx_preprocessin
 static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manager,
 		zbx_preprocessing_request_t *request, unsigned char **task)
 {
-	zbx_uint32_t		size;
 	zbx_variant_t		value;
 	zbx_preproc_history_t	*vault;
 	zbx_vector_ptr_t	*phistory;
-
 
 	if (ISSET_LOG(request->value.result))
 		zbx_variant_set_str(&value, request->value.result->log->value);
@@ -327,10 +325,8 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	else
 		phistory = NULL;
 
-	size = zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
+	return zbx_preprocessor_pack_task(task, request->value.itemid, request->value_type, request->value.ts, &value,
 			phistory, request->steps, request->steps_num);
-
-	return size;
 }
 
 /******************************************************************************
