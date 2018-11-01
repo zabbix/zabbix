@@ -461,7 +461,7 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
-			$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 
 			$this->zbxTestTextPresent('Port');
 			$this->zbxTestAssertVisibleId('port');
@@ -1381,6 +1381,7 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1391,6 +1392,7 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'discovery-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1401,6 +1403,7 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1410,7 +1413,20 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
+					'key' => 'test-item-snmp_oid',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "SNMP OID": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-reuse',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-reuse" already exists on "Simple form test host".'
@@ -1423,6 +1439,7 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-form1',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-form1" already exists on "Simple form test host".'
@@ -1671,6 +1688,10 @@ class testFormDiscoveryRule extends CLegacyWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
+		}
+
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
