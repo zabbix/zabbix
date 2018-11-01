@@ -1089,7 +1089,7 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
 		}
 	}
 
