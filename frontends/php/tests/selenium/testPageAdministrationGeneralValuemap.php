@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageAdministrationGeneralValuemap extends CWebTest {
+class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralValuemap_CheckLayout() {
 		$this->zbxTestLogin('adm.valuemapping.php');
@@ -31,12 +31,12 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 
 		$strings = [];
 
-		foreach (DBdata('select name,valuemapid from valuemaps', false) as $valuemap) {
-			$strings[] = $valuemap[0]['name'];
+		foreach (CDBHelper::getAll('select name,valuemapid from valuemaps') as $valuemap) {
+			$strings[] = $valuemap['name'];
 		}
 
-		foreach (DBdata('SELECT value,newvalue FROM mappings', false) as $mapping) {
-			$strings[] = $mapping[0]['value'].' ⇒ '.$mapping[0]['newvalue'];
+		foreach (CDBHelper::getAll('SELECT value,newvalue FROM mappings') as $mapping) {
+			$strings[] = $mapping['value'].' ⇒ '.$mapping['newvalue'];
 		}
 
 		$this->zbxTestTextPresent($strings);
@@ -44,16 +44,15 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 
 	public function testPageAdministrationGeneralValuemap_SimpleUpdate() {
 		$sqlValuemaps = 'select * from valuemaps order by valuemapid';
-		$oldHashValuemap = DBhash($sqlValuemaps);
+		$oldHashValuemap = CDBHelper::getHash($sqlValuemaps);
 
 		$sqlMappings = 'select * from mappings order by mappingid';
-		$oldHashMappings = DBhash($sqlMappings);
+		$oldHashMappings = CDBHelper::getHash($sqlMappings);
 
 		$this->zbxTestLogin('adm.valuemapping.php');
 
 		// There is no need to check simple update of every valuemap.
-		foreach (DBdata('select name from valuemaps limit 10', false) as $valuemap) {
-			$valuemap = $valuemap[0];
+		foreach (CDBHelper::getAll('select name from valuemaps limit 10') as $valuemap) {
 			$this->zbxTestClickLinkText($valuemap['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
@@ -61,10 +60,10 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 			$this->zbxTestTextPresent('Value map updated');
 		}
 
-		$newHashValuemap = DBhash($sqlValuemaps);
+		$newHashValuemap = CDBHelper::getHash($sqlValuemaps);
 		$this->assertEquals($oldHashValuemap, $newHashValuemap);
 
-		$newHashMappings = DBhash($sqlMappings);
+		$newHashMappings = CDBHelper::getHash($sqlMappings);
 		$this->assertEquals($oldHashMappings, $newHashMappings);
 	}
 }
