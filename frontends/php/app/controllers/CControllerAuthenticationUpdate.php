@@ -225,6 +225,10 @@ class CControllerAuthenticationUpdate extends CController {
 		$this->getInputs($data, array_keys($fields));
 		$data = array_diff_assoc($data, $config);
 
+		if (array_key_exists('ldap_bind_dn', $data) && trim($data['ldap_bind_dn']) === '') {
+			$data['ldap_bind_password'] = '';
+		}
+
 		if ($data) {
 			$result = update_config($data);
 
