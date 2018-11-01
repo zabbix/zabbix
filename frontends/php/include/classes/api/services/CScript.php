@@ -29,6 +29,15 @@ class CScript extends CApiService {
 	protected $sortColumns = ['scriptid', 'name'];
 
 	/**
+	 * This property, if filled out, will contain all hostrgroup ids
+	 * that requested scripts did inherit from.
+	 * Keyed by scriptid.
+	 *
+	 * @var array|HostGroup[]
+	 */
+	protected $parent_host_groups = [];
+
+	/**
 	 * Get scripts data.
 	 *
 	 * @param array  $options
@@ -102,26 +111,40 @@ class CScript extends CApiService {
 					'))';
 		}
 
-		// groupids
-		if (!is_null($options['groupids'])) {
-			zbx_value2array($options['groupids']);
-
-			$sqlParts['where'][] = '(s.groupid IS NULL OR '.dbConditionInt('s.groupid', $options['groupids']).')';
-		}
-
-		// hostids
+		$host_group_sources = [];
+		$host_groups = null;
+		// hostids selection source
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-
-			// return scripts that are assigned to the hosts' groups or to no group
-			$hostGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'hostids' => $options['hostids']
-			]);
-			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
-
-			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $hostGroupIds).' OR s.groupid IS NULL)';
+			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'hostids' => $options['hostids'],
+				'preservekeys' => true
+			]));
 		}
+		// groupids selection source
+		if (!is_null($options['groupids'])) {
+			zbx_value2array($options['groupids']);
+			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $options['groupids'],
+				'preservekeys' => true
+			]));
+		}
+		// if more that one source - intersect selection was attempted
+		if (array_key_exists(1, $host_group_sources)) {
+			$host_groups = call_user_func_array('array_intersect_key', $host_group_sources);
+		}
+		// if single selection source was used
+		elseif (array_key_exists(0, $host_group_sources)) {
+			$host_groups = $host_group_sources[0];
+		}
+		// if any selection was attempted
+		if (!is_null($host_groups)) {
+			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
+		}
+
+		$this->parent_host_groups = $host_groups;
 
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
@@ -180,6 +203,68 @@ class CScript extends CApiService {
 
 		return $result;
 	}
+
+
+	/**
+	 * Creates unsorted list of all of group id's that are in preceding path.
+	 *
+	 * @param array $groups
+	 * @param array $groupids
+	 *
+	 * @return array
+	 */
+	public function createGroupPaths(array $groups, array $groupids) {
+		$paths = array_combine($groupids, array_fill(0, count($groupids), []));
+
+		foreach ($groups as $group) {
+			foreach ($groups as $regroup) {
+				if (strpos($regroup['name'], $group['name']) === 0) {
+					$paths[$group['groupid']][] = $regroup['groupid'];
+				}
+			}
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Enriches host groups array by parent groups.
+	 *
+	 * @param array  $groups
+	 * @param string $groups[<groupid>]['groupid']
+	 * @param string $groups[<groupid>]['name']
+	 *
+	 * @return array
+	 */
+	public function enrichParentGroups(array $groups) {
+		$parents = [];
+		foreach ($groups as $group) {
+			$parent = explode('/', $group['name']);
+			for (array_pop($parent); $parent; array_pop($parent)) {
+				$parents[implode('/', $parent)] = true;
+			}
+		}
+
+		if ($parents) {
+			foreach ($groups as $group) {
+				if (array_key_exists($group['name'], $parents)) {
+					unset($parents[$group['name']]);
+				}
+			}
+		}
+
+		if ($parents) {
+			$group = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'filter' => ['name' => array_keys($parents)],
+				'preservekeys' => true
+			]);
+			$groups += $group;
+		}
+
+		return $groups;
+	}
+
 
 	/**
 	 * @param array $scripts
@@ -700,41 +785,153 @@ class CScript extends CApiService {
 		return $sqlParts;
 	}
 
+	/**
+	 * Creates a map between groups and them immediate children.
+	 *
+	 * @param $host_groups array|HostGroup[]
+	 * @return array nodeid => children_nodeid[]
+	 */
+	private static function createAdjList(array $host_groups) {
+		$adj_list = [0 => []];
+		foreach ($host_groups as $groupid => $group) {
+			if (!array_key_exists($groupid, $adj_list)) {
+				$adj_list[$groupid] = [];
+			}
+			foreach ($host_groups as $groupid2 => $group2) {
+				$parts = explode($group['name'] . '/', $group2['name']);
+				if (!array_key_exists(1, $parts)) {
+					continue;
+				}
+				if ($parts[0] === '' && strpos($parts[1], '/') === false) {
+					$adj_list[$groupid][] = $groupid2;
+				}
+			}
+		}
+		return $adj_list;
+	}
+
+	/**
+	 * @param $carry array initial list to append to
+	 * @param $node_list array a valid node lookup list (no checks are made, this is private method)
+	 * @param $adj_list array node relations definition
+	 * @param $groupid int requested branches root node id
+	 * @return array all the branch nodes (inclusive)
+	 */
+	private static function selectNodes($nodeid, array $adj_list, array $node_list, array &$carry = []) {
+		$carry[$nodeid] = $node_list[$nodeid];
+		foreach ($adj_list[$nodeid] as $next_groupid) {
+			self::selectNodes($next_groupid, $adj_list, $node_list, $carry);
+		}
+		return $carry;
+	}
+
+	/**
+	 * Applies relational subselect onto alreadey fetched result.
+	 *
+	 * @param $options array
+	 * @param $restult array
+	 * @return $restult array
+	 */
 	protected function addRelatedObjects(array $options, array $result) {
+		// TODO unset extra added output
+		// TODO allow to flow undefined branching
+		// TODO implement black list filter for self::selectNodes
+		// TODO testing for read only hg etc.
 		$result = parent::addRelatedObjects($options, $result);
 
-		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			foreach ($result as $scriptId => $script) {
-				$result[$scriptId]['groups'] = API::HostGroup()->get([
-					'output' => $options['selectGroups'],
-					'groupids' => $script['groupid'] ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE)
-				]);
+		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT;
+		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT;
+
+		if (!$is_groups_select && !$is_hosts_select) {
+			return $result;
+		}
+
+		// these host group id's are "blacklisted" and will not be used in selection
+		$noselect_groupids = [];
+		// any script has a read only permission
+		$has_read_only_restriction = false;
+
+		// child or all host group selection
+		$child_group_serach = ['name' => []];
+		foreach ($result as $script) {
+			$has_read_only_restriction |= ($script['host_access'] == PERM_READ);
+			if ($script['groupid'] === '0') {
+				$child_group_serach = null;
+				break;
+			}
+			$child_group_serach['name'][] = $this->parent_host_groups[$script['groupid']]['name'];
+		}
+
+		// must select name (later will be unset)
+		if ($options['selectGroups'] !== API_OUTPUT_EXTEND) {
+			if (!is_array($options['selectGroups'])) {
+				$options['selectGroups'] = ['name'];
+			} else {
+				$options['selectGroups'][] = 'name';
 			}
 		}
 
-		// adding hosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$processedGroups = [];
+		$host_group_nodes = API::HostGroup()->get([
+			'output' => $options['selectGroups'],
+			'search' => $child_group_serach,
+			'searchByAny' => true,
+			'startSearch' => true,
+			'preservekeys' => true
+		]);
 
-			foreach ($result as $scriptId => $script) {
-				if (isset($processedGroups[$script['groupid'].'_'.$script['host_access']])) {
-					$result[$scriptId]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
-				}
-				else {
-					$result[$scriptId]['hosts'] = API::Host()->get([
-						'output' => $options['selectHosts'],
-						'groupids' => $script['groupid'] ? $script['groupid'] : null,
-						'hostids' => $options['hostids'] ? $options['hostids'] : null,
-						'editable' => ($script['host_access'] == PERM_READ_WRITE)
-					]);
-
-					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptId;
-				}
-			}
+		if ($has_read_only_restriction) {
+			$noselect_groupids = array_keys(API::HostGroup()->get([
+				'output' => ['groupid'],
+				'search' => $child_group_serach,
+				'searchByAny' => true,
+				'startSearch' => true,
+				'preservekeys' => true,
+				'editable' => false
+			]));
 		}
 
+		$host_group_paths = self::createAdjList($host_group_nodes);
+		if ($is_hosts_select) {
+			$sql = 'SELECT hostid,groupid FROM hosts_groups';
+			if ($child_group_serach !== null) {
+				$sql .= ' WHERE '.dbConditionInt('groupid', array_keys($host_group_nodes));
+			}
+			$db_group_hosts = DBSelect($sql);
+
+			$all_hostids = [];
+			$group_to_hosts = [];
+			while ($row = DBFetch($db_group_hosts)) {
+				$all_hostids[] = $row['hostid'];
+				if (!array_key_exists($row['groupid'], $group_to_hosts)) {
+					$group_to_hosts[$row['groupid']] = [];
+				}
+				$group_to_hosts[$row['groupid']][$row['hostid']] = true;
+			}
+
+			$used_hosts = API::Host()->get([
+				'output' => $options['selectHosts'],
+				'hostids' => $all_hostids,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($result as $scriptid => &$script) {
+			$script_groups = self::selectNodes($script['groupid'], $host_group_paths, $host_group_nodes);
+
+			if ($is_groups_select) {
+				$script['groups'] = array_values($script_groups);
+			}
+
+			if ($is_hosts_select) {
+				$script['hosts'] = [];
+				foreach (array_keys($script_groups) as $script_groupid) {
+					if (array_key_exists($script_groupid, $group_to_hosts)) {
+						$script['hosts'] += array_intersect_key($used_hosts, $group_to_hosts[$script_groupid]);
+					}
+				}
+				$script['hosts'] = array_values($script['hosts']);
+			}
+		}
 		return $result;
 	}
 }

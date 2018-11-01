@@ -151,6 +151,19 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
 INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
 
+-- scripts / inherited hostgroups
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50020, 'DNS', 'DNS', 0, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50050,50020,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50021, 'DB', 'DB', 0, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50051,50021,1,1,1,'127.0.0.1','','10050');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90020,'Eur',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90021,'Eur/LV',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90022,'Eur/LV/Rix',0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50015, 50020, 90021);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50016, 50021, 90022);
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (90021,'A','date',2,NULL,90021,'');
+INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description) VALUES (90022,'B','date',2,NULL,90022,'');
+
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update');

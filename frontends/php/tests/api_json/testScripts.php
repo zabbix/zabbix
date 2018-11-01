@@ -142,6 +142,79 @@ class testScripts extends CAPITest {
 		];
 	}
 
+	public static function script_get() {
+		return [
+			[
+				'params' => [
+					'output' => 'scriptid',
+					'groupids' => '90021'
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90021']
+				],
+			],
+			// group 90022 is child group of 90021 and script from parent group is inherited
+			[
+				'params' => [
+					'output' => 'scriptid',
+					'groupids' => '90022'
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90022', '90021']
+				],
+			],
+			// host 50021 is in group 90022 that is child a group of 90021 and script from parent group is inherited
+			[
+				'params' => [
+					'output' => 'scriptid',
+					'hostids' => '50021',
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90022', '90021']
+				]
+			],
+			// scripts that can be executed on parent host AND child host group
+			// would return ony child host group scripts, if any
+			[
+				'params' => [
+					'output' => 'scriptid',
+					'hostids' => '50020',
+					'groupids' => '90022',
+					'selectHosts' => 'hostids',
+				],
+				'expect' => [
+					'error' => null,
+					'has.scriptid' => ['90021'],
+					'!has.scriptid' => ['90022']
+				],
+			]
+		];
+	}
+
+	/**
+	* @dataProvider script_get
+	*/
+	public function testScripts_Get($params, $expect) {
+		$response = $this->call('script.get', $params, $expect['error']);
+
+		if ($expect['error'] !== null) {
+			return;
+		}
+
+		if (array_key_exists('has.scriptid', $expect)) {
+			$ids = array_column($response['result'], 'scriptid');
+			$this->assertEmpty(array_diff($expect['has.scriptid'], $ids));
+		}
+
+		if (array_key_exists('!has.scriptid', $expect)) {
+			$ids = array_column($response['result'], 'scriptid');
+			$this->assertEquals($expect['!has.scriptid'], array_diff($expect['!has.scriptid'], $ids));
+		}
+	}
+
 	/**
 	* @dataProvider script_create
 	*/
