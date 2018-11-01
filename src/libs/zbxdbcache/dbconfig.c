@@ -11856,7 +11856,14 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_host_tags                                                    *
+ *                                                                            *
+ * Purpose: gather host tags from hosts specified by a list of hostids        *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_host_tag_t	*host_tag;
@@ -11867,7 +11874,7 @@ void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_
 	for (i=0; i<hostids_num; i++)
 	{
 		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
-			DCget_host_tags(htmpl->templateids.values, htmpl->templateids.values_num, host_tags);
+			get_host_tags(htmpl->templateids.values, htmpl->templateids.values_num, host_tags);
 
 		zbx_hashset_iter_reset(&config->host_tags, &iter);
 		while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))

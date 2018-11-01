@@ -4138,7 +4138,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 			}
 		}
-		else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+		else if (macro_type & (MACRO_TYPE_TRIGGER_TAG | MACRO_TYPE_HOST_TAG))
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
@@ -4148,6 +4148,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 							event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 					pos = token.token.r;
+				}
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				{
+					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
+							N_functionid);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -4184,20 +4189,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
 				{
-					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
-							raw_value);
-				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
-				{
-					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
-							event->clock, event->ns, raw_value);
-				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
-				{
-					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
-							N_functionid);
+					if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+					{
+						ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+								raw_value);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+					{
+						ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value);
+					}
 				}
 			}
 		}

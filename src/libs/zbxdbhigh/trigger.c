@@ -32,8 +32,18 @@
 #define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
-
-void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char *expression, const char *recovery_expression)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_host_tags_by_expression                                  *
+ *                                                                            *
+ * Purpose: gather host tags from hosts mentioned in trigger expressions      *
+ *                                                                            *
+ * Parameters: host_tags           - [OUT] resulting list of tags             *
+ *             expression          - [IN] trigger expression                  *
+ *             recovery_expression - [IN] trigger recovery expression         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char *expression, const char *recovery_expression)
 {
 	zbx_vector_uint64_t	functionids;
 	zbx_hashset_t		hosts;
@@ -49,9 +59,7 @@ void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char *expre
 
 	zbx_hashset_iter_reset(&hosts, &iter);
 	while(NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
-	{
 		DCget_host_tags(&host->hostid, 1, host_tags);
-	}
 
 	zbx_vector_uint64_destroy(&functionids);
 	zbx_hashset_destroy(&hosts);

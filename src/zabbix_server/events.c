@@ -59,6 +59,8 @@ static zbx_correlation_rules_t	correlation_rules;
  *                                                                            *
  * Function: validate_event_tag                                               *
  *                                                                            *
+ * Purpose: Check that tag name is not empty and that tag is not duplicate.   *
+ *                                                                            *
  ******************************************************************************/
 static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 {
@@ -79,19 +81,32 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 	return SUCCEED;
 }
 
-static void	process_trigger_tag(const zbx_tag_t *trigger_tag)
+/******************************************************************************
+ *                                                                            *
+ * Function: process_tag                                                      *
+ *                                                                            *
+ * Purpose: Add tag to event object.                                          *
+ *          Resolve tag macros. Prevent duplicates from appearing.            *
+ *                                                                            *
+ * Parameters: trigger_or_host_tag - [IN] tag object to add                   *
+ *             macro_type          - [OUT] can be:                            *
+ *                                           - MACRO_TYPE_TRIGGER_TAG         *
+ *                                           - MACRO_TYPE_HOST_TAG            *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_tag(const zbx_tag_t *trigger_or_host_tag, int macro_type)
 {
 	zbx_tag_t	*tag;
 
 	tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-	tag->tag = zbx_strdup(NULL, trigger_tag->tag);
-	tag->value = zbx_strdup(NULL, trigger_tag->value);
+	tag->tag = zbx_strdup(NULL, trigger_or_host_tag->tag);
+	tag->value = zbx_strdup(NULL, trigger_or_host_tag->value);
 
 	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, &tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+			NULL, &tag->tag, macro_type, NULL, 0);
 
 	substitute_simple_macros(NULL, &events[events_num], NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, &tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+			NULL, &tag->value, macro_type, NULL, 0);
 
 	if (TAG_NAME_LEN < zbx_strlen_utf8(tag->tag))
 		tag->tag[zbx_strlen_utf8_nchars(tag->tag, TAG_NAME_LEN)] = '\0';
@@ -140,7 +155,9 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *error)
 {
-	int	i;
+	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_tag_t		*tag;
 
 	if (events_num == events_alloc)
 	{
@@ -188,18 +205,15 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 		if (NULL != trigger_tags)
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
-				process_trigger_tag((const zbx_tag_t *)trigger_tags->values[i]);
+				process_tag((const zbx_tag_t *)trigger_tags->values[i], MACRO_TYPE_TRIGGER_TAG);
 		}
 
 		if (NULL != host_tags)
 		{
-			zbx_hashset_iter_t	iter;
-			zbx_tag_t		*tag;
-
 			zbx_hashset_iter_reset(host_tags, &iter);
 
 			while (NULL != (tag = (zbx_tag_t *)zbx_hashset_iter_next(&iter)))
-				process_trigger_tag(tag);
+				process_tag(tag, MACRO_TYPE_HOST_TAG);
 		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
