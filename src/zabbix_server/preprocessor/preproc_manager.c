@@ -485,7 +485,7 @@ static void	preprocessor_link_items(zbx_preprocessing_manager_t *manager, zbx_li
 		if (ZBX_PREPROC_DELTA_VALUE == op->type || ZBX_PREPROC_DELTA_SPEED == op->type)
 			break;
 
-		if (ZBX_PREPROC_THROTTLE_VALUE == op->type || ZBX_PREPROC_THROTTLE_TIMED_VALUE)
+		if (ZBX_PREPROC_THROTTLE_VALUE == op->type || ZBX_PREPROC_THROTTLE_TIMED_VALUE == op->type)
 			break;
 	}
 
