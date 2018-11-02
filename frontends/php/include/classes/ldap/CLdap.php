@@ -227,10 +227,10 @@ class CLdap {
 			$filter = '(ObjectClass=*)';
 		}
 		$sr = ldap_search($this->ds, $base, $filter);
-		$result = ldap_get_entries($this->ds, $sr);
+		$result = is_resource($sr) ? ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
-		if ($result['count'] != 1) {
+		if (!$result || $result['count'] != 1) {
 			$this->error = static::ERR_USER_NOT_FOUND;
 
 			return false;

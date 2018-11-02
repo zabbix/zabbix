@@ -68,7 +68,7 @@ class CLdapAuthValidator extends CValidator {
 		$messages = [
 			CLdap::ERR_PHP_EXTENSION => _('PHP LDAP extension missing.'),
 			CLdap::ERR_SERVER_UNAVAILABLE => _('Cannot connect to LDAP server.'),
-			CLdap::ERR_BIND_FAILED => ('Cannot bind to LDAP server.'),
+			CLdap::ERR_BIND_FAILED => _('Cannot bind to LDAP server.'),
 			CLdap::ERR_BIND_ANON_FAILED => _('Cannot bind anonymously to LDAP server.'),
 			CLdap::ERR_USER_NOT_FOUND => _('Login name or password is incorrect.'),
 			CLdap::ERR_OPT_PROTOCOL_FAILED => _('Setting LDAP protocol failed.'),
