@@ -1810,11 +1810,12 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (114,99,'Theta',
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
 
 -- Problem suppression test: host, item, trigger, maintenance, event, problem, tags
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50013, 'Host group for suppression', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host for suppression', 'Host for suppression', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 50013);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99087, 2, 99011, 'Trapper for suppression', '', 'trapper_sup', 30, NULL, '', '', '', '', '','');
-INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger for suppression', '{100031}>0', 0, 3, 0, '1535012391', '');
+INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger for suppression', '{100031}>0', 1, 3, 0, '1535012391', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '0');
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (104, 'SupTag','A', 100031);
 
@@ -1960,8 +1961,8 @@ INSERT INTO triggers (triggerid, description, expression, value, priority, state
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '');
 
 -- testPageMonitoringOverview
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Monitoring-> Overview', 0);
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Monitoring-> Overview', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Overview', 0);
+INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Overview', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50011, '1_Host_to_check_Monitoring_Overview', '1_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, '3_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, '4_Host_to_check_Monitoring_Overview', '4_Host_to_check_Monitoring_Overview', 0, '');
@@ -1984,15 +1985,15 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, de
 INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99004, 99012, 99088);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, posts, headers) VALUES (99089, 50013, 50041, 2, 3, '4_item','trap[4]', '30s', '90d', 0, '', '', 0, '', '');
 INSERT INTO items_applications (itemappid, applicationid, itemid) VALUES (99005, 99013, 99089);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100032, '1_trigger_Not_classified', '{100030}>0', 1, 0, '1533555726', '', 0);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100032}>0', 1, 0, '1533555726', '', 2);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100034, '1_trigger_Average', '{100033}>0', 1, 0, '1533555726', '', 3);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100035, '1_trigger_High', '{100034}>0', 1, 0, '1533555726', '', 4);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100036, '1_trigger_Disaster', '{100035}>0', 1, 0, '1533555726', '', 5);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100037, '2_trigger_Information', '{100036}>0', 1, 0, '1533555726', '', 1);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100038, '3_trigger_Average', '{100037}>0', 1, 0, '1533555726', '', 3);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100039, '3_trigger_Disaster', '{100038}>0', 0, 0, '1533555726', '', 5);
-INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100040, '4_trigger_Average', '{100039}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100032, '1_trigger_Not_classified', '{100032}>0', 1, 0, '1533555726', '', 0);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100033, '1_trigger_Warning', '{100033}>0', 1, 0, '1533555726', '', 2);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100034, '1_trigger_Average', '{100034}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100035, '1_trigger_High', '{100035}>0', 1, 0, '1533555726', '', 4);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100036, '1_trigger_Disaster', '{100036}>0', 1, 0, '1533555726', '', 5);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100037, '2_trigger_Information', '{100037}>0', 1, 0, '1533555726', '', 1);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100038, '3_trigger_Average', '{100038}>0', 1, 0, '1533555726', '', 3);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100039, '3_trigger_Disaster', '{100039}>0', 0, 0, '1533555726', '', 5);
+INSERT INTO triggers (triggerid, description, expression, value, state, lastchange, comments, priority) VALUES (100040, '4_trigger_Average', '{100040}>0', 1, 0, '1533555726', '', 3);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100032, 99086, 100032, 'last', '0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100033, 99086, 100033, 'last', '0');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100034, 99086, 100034, 'last', '0');
