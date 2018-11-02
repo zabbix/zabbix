@@ -102,12 +102,14 @@ static void	zbx_get_host_tags_by_expression(zbx_hashset_t *host_tags, const char
  ******************************************************************************/
 static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
-	const char	*__function_name = "zbx_process_trigger";
+	const char		*__function_name = "zbx_process_trigger";
 
-	const char	*new_error;
-	int		new_state, new_value, ret = FAIL;
-	zbx_uint64_t	flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
-	zbx_hashset_t	host_tags;
+	const char		*new_error;
+	int			new_state, new_value, ret = FAIL;
+	zbx_uint64_t		flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
+	zbx_hashset_t		host_tags;
+	zbx_hashset_iter_t	iter;
+	zbx_tag_t		*tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
 			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
@@ -163,6 +165,12 @@ static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *di
 				trigger->priority, trigger->type, &trigger->tags, &host_tags,
 				trigger->correlation_mode, trigger->correlation_tag, trigger->value, NULL);
 
+		zbx_hashset_iter_reset(&host_tags, &iter);
+		while(NULL != (tag = (zbx_tag_t *)zbx_hashset_iter_next(&iter)))
+		{
+			zbx_free(tag->tag);
+			zbx_free(tag->value);
+		}
 		zbx_hashset_destroy(&host_tags);
 	}
 
