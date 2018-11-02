@@ -821,35 +821,4 @@ abstract class CMapElement extends CApiService {
 			}
 		}
 	}
-
-	protected function getMapElements(array $options = []) {
-
-		$selements = API::getApiService()->select('sysmaps_elements', $options);
-		if ($selements) {
-			$selements = $this->addTriggerObjects($options, $selements);
-		}
-		return $selements;
-	}
-
-	protected function addTriggerObjects(array $options, array $selements) {
-		if (array_key_exists('selectTriggers', $options)) {
-			$trigger_selements = [];
-			foreach ($selements as $selement) {
-				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$trigger_selements[$selement['selementid']] = true;
-				}
-			}
-
-			$trigger_selements = API::getApiService()->select('sysmap_element_trigger', [
-				'output' => $options['selectTriggers'],
-				'filter' => ['selementid' => array_keys($trigger_selements)]
-			]);
-
-			foreach ($trigger_selements as $trigger_selement) {
-				$selements[$trigger_selement['selementid']]['elementid'] = $trigger_selement['triggerid'];
-			}
-		}
-		return $selements;
-	}
-
 }

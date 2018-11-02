@@ -2294,15 +2294,65 @@ class CMap extends CMapElement {
 
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
-			$selements = $this->getMapElements([
+			$selements = API::getApiService()->select('sysmaps_elements', [
 				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid', 'elementtype',
 					'elementid'
 				]),
 				'filter' => ['sysmapid' => $sysmapIds],
-				'selectTriggers' => ['selementid', 'triggerid'],
 				'preservekeys' => true
 			]);
 			$relation_map = $this->createRelationMap($selements, 'sysmapid', 'selementid');
+
+			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
+				$higher_elemens = [];
+
+				foreach ($selements as &$selement) {
+					$selement['elements'] = [];
+				}
+				unset($selement);
+
+				$selement_triggers = DBselect(
+					'SELECT st.selementid,st.triggerid'.
+					' FROM sysmap_element_trigger st'.
+					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
+					' ORDER BY st.selement_triggerid'
+				);
+				while ($selement_trigger = DBfetch($selement_triggers)) {
+					$selements[$selement_trigger['selementid']]['elements'][] = [
+						'triggerid' => $selement_trigger['triggerid']
+					];
+					if (!array_key_exists($selement_trigger['selementid'], $higher_elemens)) {
+						$higher_elemens[$selement_trigger['selementid']] = $selement_trigger['triggerid'];
+					}
+				}
+
+				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP,
+					SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				];
+
+				foreach ($selements as $key => &$selement) {
+					if (in_array($selement['elementtype'], $single_element_types)) {
+						switch ($selement['elementtype']) {
+							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+								$field = 'groupid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_HOST:
+								$field = 'hostid';
+								break;
+
+							case SYSMAP_ELEMENT_TYPE_MAP:
+								$field = 'sysmapid';
+								break;
+						}
+						$selement['elements'][] = [$field => $selement['elementid']];
+					}
+					elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+						$selement['elementid'] = $higher_elemens[$key];
+					}
+				}
+				unset($selement);
+			}
 
 			// add selement URLs
 			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
@@ -2342,49 +2392,6 @@ class CMap extends CMapElement {
 						? $selementUrl
 						: $this->expandUrlMacro($selementUrl, $selements[$selementUrl['selementid']]);
 				}
-			}
-
-			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
-				foreach ($selements as &$selement) {
-					$selement['elements'] = [];
-				}
-				unset($selement);
-
-				$selement_triggers = DBselect(
-					'SELECT st.selementid,st.triggerid'.
-					' FROM sysmap_element_trigger st'.
-					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
-					' ORDER BY st.selement_triggerid'
-				);
-				while ($selement_trigger = DBfetch($selement_triggers)) {
-					$selements[$selement_trigger['selementid']]['elements'][] = [
-						'triggerid' => $selement_trigger['triggerid']
-					];
-				}
-
-				$single_element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP,
-					SYSMAP_ELEMENT_TYPE_HOST_GROUP
-				];
-
-				foreach ($selements as &$selement) {
-					if (in_array($selement['elementtype'], $single_element_types)) {
-						switch ($selement['elementtype']) {
-							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-								$field = 'groupid';
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_HOST:
-								$field = 'hostid';
-								break;
-
-							case SYSMAP_ELEMENT_TYPE_MAP:
-								$field = 'sysmapid';
-								break;
-						}
-						$selement['elements'][] = [$field => $selement['elementid']];
-					}
-				}
-				unset($selement);
 			}
 
 			if ($this->outputIsRequested('permission', $options['selectSelements']) && $selements) {
