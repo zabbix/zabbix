@@ -117,7 +117,7 @@ class CControllerProfileUpdate extends CController {
 				break;
 
 			case 'web.layout.mode':
-				CProfile::update($idx, $value_int, PROFILE_TYPE_INT);
+				CView::setLayoutMode($value_int);
 				break;
 
 			default:

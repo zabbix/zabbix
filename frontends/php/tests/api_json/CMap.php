@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-class API_JSON_Map extends CZabbixTest {
+class API_JSON_Map extends CAPITest {
 
 	public static function map_data() {
 		return [
