@@ -2029,3 +2029,14 @@ INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (1, 4, 
 INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (2, 4, 1, 1533631968, 0, NULL);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (1, 1);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (2, 2);
+
+-- Hosts with proxies for Hosts filtering test
+INSERT INTO hosts (hostid, host, status, description) VALUES (99051, 'Proxy_1 for filter', 5, '');
+INSERT INTO hosts (hostid, host, status, description) VALUES (99052, 'Proxy_2 for filter', 5, '');
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99053, 99051, 'Host_1 with proxy', 'Host_1 with proxy', 0, '');
+INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99054, 99052, 'Host_2 with proxy', 'Host_2 with proxy', 0, '');
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55031, 99053, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55032, 99054, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
+
