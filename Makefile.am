@@ -25,22 +25,7 @@ dist-hook:
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new; \
 	mv $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new \
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java; \
-	flag=0; pos=0; 											\
-	while read -r line; do										\
-		pos=$$((pos+1));									\
-		case "$$line" in									\
-			"if test -d tests;"*) 		fspos=$$pos; flag=1;;				\
-			"AC_CONFIG_FILES"*)		if [ 1 -eq "$$flag" ]; then flag=2; fi;;	\
-			"tests/Makefile") 		if [ 2 -eq "$$flag" ]; then flag=3; fi;;	\
-			"AC_DEFINE([HAVE_TESTS]"*) 	if [ 3 -eq "$$flag" ]; then flag=4; fi;;	\
-			"fi") 				if [ 4 -eq "$$flag" ]; then 			\
-				cat $(top_distdir)/configure.ac | sed -e "$${fspos},$${pos}d" > 	\
-				$(top_distdir)/configure.ac.new; break; fi;;				\
-		esac											\
-	done < $(top_distdir)/configure.ac;								\
-	if [ -f "$(top_distdir)/configure.ac.new" ]; then						\
-		mv $(top_distdir)/configure.ac.new $(top_distdir)/configure.ac;				\
-	fi
+	rm -f $(top_distdir)/m4/make_tests.m4
 
 	rm -rf `find $(top_distdir) -name ".svn"`
 	rm -f $(top_distdir)/include/config.h
