@@ -1122,7 +1122,7 @@ define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
 			\s*? #matches spaces
 		)
 	\] # match closing bracket
-))*? # matches non comma seperated brackets with parameters zero or more times
+))*? # matches non comma separated brackets with parameters zero or more times
 )');
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
@@ -1512,6 +1512,7 @@ define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
+define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
 define('ZBX_STYLE_GREY', 'grey');

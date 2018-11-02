@@ -1,4 +1,4 @@
-.TH ZABBIX_GET 1 "2015\-08\-06" Zabbix
+.TH ZABBIX_GET 1 "2018\-10\-11" Zabbix
 .SH NAME
 zabbix_get \- Zabbix get utility
 .SH SYNOPSIS

@@ -311,7 +311,7 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
  *              range_start - [IN] the interval start time                          *
  *              count       - [IN] the number of values to read                     *
  *              range_end   - [IN] the interval end time                            *
- *              ts          - [IN] the requested timestmap                          *
+ *              ts          - [IN] the requested timestamp                          *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *

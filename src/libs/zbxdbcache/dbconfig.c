@@ -1876,7 +1876,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: substitute_host_interface_macros                                 *
  *                                                                            *
- * Purpose: trying to resolve the macros in host inteface                     *
+ * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
@@ -4420,12 +4420,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (last_groupid != groupid || 0 == last_groupid)
+		if (last_groupid != groupid)
 		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
-				continue;
+			group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid);
 			last_groupid = groupid;
 		}
+
+		if (NULL == group)
+			continue;
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
@@ -5217,7 +5219,7 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
 				config->strpool.num_data, config->strpool.num_slots);
 
-		zbx_mem_dump_stats(config_mem);
+		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 
 	config->status->last_update = 0;
@@ -5829,7 +5831,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	strscpy(dst_host->host, src_host->host);
-	strscpy(dst_host->name, src_host->name);
+	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;
