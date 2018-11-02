@@ -131,7 +131,7 @@ class CScript extends CApiService {
 				'preservekeys' => true
 			]));
 		}
-		// if more that one source - intersect selection was attempted
+		// if more that one source - intersect selection
 		if (array_key_exists(1, $host_group_sources)) {
 			$host_groups = call_user_func_array('array_intersect_key', $host_group_sources);
 		}
