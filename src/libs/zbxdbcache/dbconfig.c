@@ -11879,10 +11879,12 @@ static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_h
 		zbx_hashset_iter_reset(&config->host_tags, &iter);
 		while (NULL != (host_tag = (zbx_dc_host_tag_t *)zbx_hashset_iter_next(&iter)))
 		{
-			tag.tag = zbx_strdup(NULL, host_tag->tag);
-			tag.value = zbx_strdup(NULL, host_tag->value);
 			if(host_tag->hostid == hostids[i])
+			{
+				tag.tag = zbx_strdup(NULL, host_tag->tag);
+				tag.value = zbx_strdup(NULL, host_tag->value);
 				zbx_hashset_insert(host_tags, &tag, sizeof(zbx_tag_t));
+			}
 		}
 	}
 }
