@@ -231,7 +231,7 @@ class CLdap {
 
 		// don't accept more or less than one response
 		if (!$result || $result['count'] != 1) {
-			$this->error = static::ERR_USER_NOT_FOUND;
+			$this->error = $result ? static::ERR_USER_NOT_FOUND : static::ERR_BIND_FAILED;
 
 			return false;
 		}
