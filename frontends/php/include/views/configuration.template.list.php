@@ -271,6 +271,7 @@ $form->addItem([
 	new CActionButtonList('action', 'templates',
 		[
 			'template.export' => ['name' => _('Export')],
+			'template.massupdateform' => ['name' => _('Mass update')],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
 			'template.massdeleteclear' => ['name' => _('Delete and clear'),
 				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')

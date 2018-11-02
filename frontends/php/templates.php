@@ -46,8 +46,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'new_groups'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'remove_groups'		=> [T_ZBX_STR, O_OPT, P_SYS,		DB_ID,	null],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_template' 		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
@@ -55,18 +58,26 @@ $fields = [
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupid'			=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'tags'				=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'new_tags'			=> [T_ZBX_STR, O_OPT, null,		null,	null],
+	'remove_tags'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'visible'			=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'mass_replace_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'mass_clear_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"template.export","template.massdelete","template.massdeleteclear"'),
+								IN('"template.export","template.massupdate","template.massupdateform",'.
+									'"template.massdelete","template.massdeleteclear"'
+								),
 								null
 							],
 	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'masssave'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'full_clone'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
@@ -191,6 +202,257 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('templat
 
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
+	}
+}
+elseif (hasRequest('action') && getRequest('action') == 'template.massupdate' && hasRequest('masssave')) {
+	$templateids = getRequest('templates', []);
+	$visible = getRequest('visible', []);
+
+	try {
+		DBstart();
+
+		$options = [
+			'output' => ['templateid'],
+			'selectGroups' => ['groupid'],
+			'templateids' => $templateids
+		];
+
+		if (array_key_exists('new_tags', $visible) || array_key_exists('remove_tags', $visible)) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
+		if (array_key_exists('linked_templates', $visible) && !hasRequest('mass_replace_tpls')) {
+			$options['selectParentTemplates'] = ['templateid'];
+		}
+
+		$templates = API::Template()->get($options);
+
+		$new_values = [];
+
+		/*
+		 * Step 2. Add new host groups. This is actually done later, but before we can do that we need to check what
+		 * groups will be added and first of all actually create them and get the new IDs.
+		 */
+		$new_groupids = [];
+
+		if (array_key_exists('new_groups', $visible)) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				$ins_groups = [];
+
+				foreach (getRequest('new_groups', []) as $new_group) {
+					if (is_array($new_group) && array_key_exists('new', $new_group)) {
+						$ins_groups[] = ['name' => $new_group['new']];
+					}
+					else {
+						$new_groupids[] = $new_group;
+					}
+				}
+
+				if ($ins_groups) {
+					if (!$result = API::HostGroup()->create($ins_groups)) {
+						throw new Exception();
+					}
+
+					$new_groupids = array_merge($new_groupids, $result['groupids']);
+				}
+			}
+			else {
+				$new_groupids = getRequest('new_groups', []);
+			}
+		}
+
+		// Step 1. Replace existing groups.
+		if (array_key_exists('groups', $visible)) {
+			$replace_groupids = [];
+
+			if (hasRequest('groups')) {
+				// First (step 1.) we try to replace existing groups and add new groups in the process (step 2.).
+				$replace_groupids = array_unique(array_merge(getRequest('groups'), $new_groupids));
+			}
+			elseif ($new_groupids) {
+				/*
+				 * If no groups need to be replaced, use same variable as if new groups are added. This is used in
+				 * step 3. The only difference is that we try to remove all existing groups by replacing with nothing
+				 * since we left it empty.
+				 */
+				$replace_groupids = $new_groupids;
+			}
+
+			$new_values['groups'] = zbx_toObject($replace_groupids, 'groupid');
+		}
+
+		$new_tags = [];
+		if (array_key_exists('new_tags', $visible)) {
+			foreach (getRequest('new_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$new_tags[] = $tag;
+			}
+		}
+
+		$replace_tags = [];
+		if (array_key_exists('tags', $visible)) {
+			foreach (getRequest('tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$replace_tags[] = $tag;
+			}
+
+			$unique_tags = [];
+			foreach (array_merge($replace_tags, $new_tags) as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$new_values['tags'] = array_values($unique_tags);
+		}
+
+		$remove_tags = [];
+		if (array_key_exists('remove_tags', $visible)) {
+			foreach (getRequest('remove_tags', []) as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$remove_tags[] = $tag;
+			}
+		}
+
+		if (array_key_exists('description', $visible)) {
+			$new_values['description'] = getRequest('description');
+		}
+
+		$linked_templateids = [];
+		if (array_key_exists('linked_templates', $visible)) {
+			$linked_templateids = getRequest('linked_templates', []);
+		}
+
+		if (hasRequest('mass_replace_tpls')) {
+			if (hasRequest('mass_clear_tpls')) {
+				$template_templates = API::Template()->get([
+					'output' => ['templateid'],
+					'hostids' => $templateids
+				]);
+
+				$template_templateids = zbx_objectValues($template_templates, 'templateid');
+				$templates_to_delete = array_diff($template_templateids, $linked_templateids);
+
+				$new_values['templates_clear'] = zbx_toObject($templates_to_delete, 'templateid');
+			}
+
+			$new_values['templates'] = $linked_templateids;
+		}
+
+		foreach ($templates as &$template) {
+			/*
+			 * Step 3. Case when groups need to be removed. This is done inside the loop, since each host may have
+			 * different existing groups. So we need to know what can we remove.
+			 */
+			if (array_key_exists('remove_groups', $visible)) {
+				$remove_groups = getRequest('remove_groups', []);
+
+				if (array_key_exists('groups', $visible)) {
+					/*
+					 * Previously we determined what groups for ALL hosts will be replaced.
+					 * The $replace_groupids holds both - groups to replace and new groups to add.
+					 * New $replace_groupids is the difference between the replaceable groups and removable groups.
+					 */
+					$replace_groupids = array_diff($replace_groupids, $remove_groups);
+				}
+				else {
+					/*
+					 * The $new_groupids holds only groups that need to be added. So $replace_groupids is
+					 * the difference between the groups that already exist + groups that need to be added and
+					 * removable groups.
+					 */
+					$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+
+					$replace_groupids = array_diff(array_unique(array_merge($current_groupids, $new_groupids)),
+						$remove_groups
+					);
+				}
+
+				$new_values['groups'] = zbx_toObject($replace_groupids, 'groupid');
+			}
+
+			// Case when we only need to add new groups to host.
+			if ($new_groupids && !array_key_exists('groups', $visible)
+					&& !array_key_exists('remove_groups', $visible)) {
+				$current_groupids = zbx_objectValues($template['groups'], 'groupid');
+
+				$template['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
+					'groupid'
+				);
+			}
+			else {
+				// In all other cases we first clear out the old values. And simply replace with $new_values later.
+				unset($template['groups']);
+			}
+
+			if (array_key_exists('remove_tags', $visible)) {
+				if (!array_key_exists('tags', $visible)) {
+					$unique_tags = [];
+					foreach (array_merge($template['tags'], $new_tags) as $tag) {
+						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+					}
+					$replace_tags = array_values($unique_tags);
+				}
+
+				$diff_tags = [];
+				foreach ($replace_tags as $a) {
+					foreach ($remove_tags as $b) {
+						if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+							continue 2;
+						}
+					}
+					$diff_tags[] = $a;
+				}
+
+				$new_values['tags'] = $diff_tags;
+			}
+
+			if ($new_tags && !array_key_exists('tags', $visible) && !array_key_exists('remove_tags', $visible)) {
+				$unique_tags = [];
+				foreach (array_merge($template['tags'], $new_tags) as $tag) {
+					$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+				}
+				$template['tags'] = array_values($unique_tags);
+			}
+			else {
+				unset($template['tags']);
+			}
+
+			if ($linked_templateids && array_key_exists('parentTemplates', $template)) {
+				$template['templates'] = array_unique(
+					array_merge($linked_templateids, zbx_objectValues($template['parentTemplates'], 'templateid'))
+				);
+			}
+
+			unset($template['parentTemplates']);
+
+			$template = array_merge($template, $new_values);
+		}
+		unset($template);
+
+		$result = (bool) API::Template()->update($templates);
+
+		if ($result === false) {
+			throw new Exception();
+		}
+
+		DBend(true);
+
+		uncheckTableRows();
+		show_message(_('Templates updated'));
+
+		unset($_REQUEST['masssave'], $_REQUEST['form'], $_REQUEST['templates']);
+	}
+	catch (Exception $e) {
+		DBend(false);
+		show_error_message(_('Cannot update templates'));
 	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -463,7 +725,45 @@ $pageFilter = new CPageFilter([
 ]);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-if (hasRequest('form')) {
+if ((getRequest('action') === 'template.massupdateform' || hasRequest('masssave')) && hasRequest('templates')) {
+	$data = [
+		'templates' => getRequest('templates', []),
+		'visible' => getRequest('visible', []),
+		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
+		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
+		'groups' => getRequest('groups', []),
+		'tags' => getRequest('tags', []),
+		'new_tags' => getRequest('tags', []),
+		'remove_tags' => getRequest('tags', []),
+		'description' => getRequest('description'),
+		'linked_templates' => getRequest('linked_templates', [])
+	];
+
+	// sort templates
+	natsort($data['linked_templates']);
+
+	// get tags
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	if (!$data['new_tags']) {
+		$data['new_tags'][] = ['tag' => '', 'value' => ''];
+	}
+	if (!$data['remove_tags']) {
+		$data['remove_tags'][] = ['tag' => '', 'value' => ''];
+	}
+
+	// get templates data
+	$data['linked_templates'] = $data['linked_templates']
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $data['linked_templates']
+		]), ['templateid' => 'id'])
+		: [];
+
+	$view = new CView('configuration.template.massupdate', $data);
+}
+elseif (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
