@@ -570,7 +570,7 @@ class CHostGroup extends CApiService {
 		$this->verifyHostsAndTemplatesAreUnlinkable($hosts_to_unlink, $templates_to_unlink, $groupids);
 
 		$dbScripts = API::Script()->get([
-			'groupids' => $groupids,
+			'filter' => ['groupid' => $groupids],
 			'output' => ['scriptid', 'groupid'],
 			'nopermissions' => true
 		]);

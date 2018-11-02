@@ -245,7 +245,7 @@ class testScripts extends CAPITest {
 					'error' => null,
 					'has.scriptid:hostid' => [
 						'90020' => ['90020', '90022', '90023'],
-						'90021' => ['90022', '90023'],
+						'90021' => ['90022', '90023']
 					],
 					'!has.scriptid:hostid' => [
 						'90020' => ['90021'],
@@ -283,7 +283,7 @@ class testScripts extends CAPITest {
 					'error' => null,
 					'has.scriptid:groupid' => [
 						'90020' => ['90020', '90022', '90023'],
-						'90021' => ['90022', '90023'],
+						'90021' => ['90022', '90023']
 					],
 					'!has.scriptid:groupid' => [
 						'90020' => ['90021'],
