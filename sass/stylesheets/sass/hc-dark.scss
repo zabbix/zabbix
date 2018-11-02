@@ -356,22 +356,22 @@ button {
 
 		input[type="radio"] {
 
-			&:checked:not([disabled]) + label,
-			&:focus + label {
-				border-color: $form-border-focus-color;
+			&:checked:not([disabled]) + label {
 				color: $white;
 			}
 
 			&:checked + label {
-				background-color: $ui-bg-selected-color;
+				background-color: $ui-bg-selected-color !important;
+			}
+
+			&:focus + label {
+				@include box-shadow(0 0 0 2px rgba($blue, 1) !important);
+				background-color: darken($btn-bg-color, 10%) !important;
+				color: $white;
 			}
 
 			&:checked[disabled] + label {
 				background-color: #595959 !important;
-			}
-
-			&:focus + label {
-				background-color: $link-hover-color !important;
 			}
 		}
 	}
