@@ -5,6 +5,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+........S. [ZBX-15025] fixed email alerts being sent twice to one recipient (vso)
 ..F....... [ZBX-15006] fixed possibility to link map widget to itself as filter widget (miks)
 ..F....... [ZBX-14886] fixed undefined offset error in Problems by severity widget (vasilijs)
 ........S. [ZBX-15090] fixed memory leak when validating regular expression preprocessing step parameters during LLD (wiper)
