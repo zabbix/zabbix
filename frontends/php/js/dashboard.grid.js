@@ -411,7 +411,6 @@
 				var debug = 30;
 
 				while (next_slot < new_max && debug-- > 0) {// TODO: remove debug
-					collapsed = true;
 					scanline[axis_key] = slot;
 					col = getAffectedInBounds(scanline);
 					scanline[axis_key] = next_slot;
@@ -425,7 +424,7 @@
 						.log({col: col, next_col:next_col})
 					console
 						.groupEnd();
-
+					collapsed = next_col.length > 0;
 					$.each(next_col, function (_, box) {
 						// if (box.current_pos[axis_key] == next_slot) {
 						// 	box.current_pos[axis_key] = slot + scanline[size_key];
@@ -501,9 +500,9 @@
 							});
 
 						slot += scanline[size_key];
+						next_slot += scanline[size_key];
 					}
 
-					next_slot += scanline[size_key];
 					$.each(col.concat(next_col), function (_, box) {
 						delete box.new_pos;
 					});
