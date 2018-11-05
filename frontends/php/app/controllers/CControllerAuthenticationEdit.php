@@ -108,7 +108,7 @@ class CControllerAuthenticationEdit extends CController {
 				'http_strip_domains'
 			]);
 
-			$data += DB::getDefaults('config');
+			$data += select_config();
 
 			if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
 				$data['change_bind_password'] = 1;
