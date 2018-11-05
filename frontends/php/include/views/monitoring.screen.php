@@ -115,7 +115,7 @@ $screenBuilder = new CScreenBuilder([
 	'to' => $data['to']
 ]);
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl()))
 	->setProfile($data['profileIdx'], $data['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to']);
