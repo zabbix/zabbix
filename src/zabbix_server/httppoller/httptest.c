@@ -665,8 +665,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
@@ -794,6 +792,13 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
 		/* enable/disable fetching the body */
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
 				ZBX_RETRIEVE_MODE_HEADERS == db_httpstep.retrieve_mode ? 1L : 0L)))
@@ -833,6 +838,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
+			char	*var_err_str = NULL;
+
 			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __function_name, httpstep.url,
 					page.data);
 
@@ -866,52 +873,45 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				speed_download_num++;
 			}
 
-			if (ZBX_RETRIEVE_MODE_CONTENT == db_httpstep.retrieve_mode)
+			/* required pattern */
+			if (NULL == err_str && '\0' != *db_httpstep.required &&
+					NULL == zbx_regexp_match(page.data, db_httpstep.required, NULL))
 			{
-				char	*var_err_str = NULL;
-
-				/* required pattern */
-				if (NULL == err_str && '\0' != *db_httpstep.required &&
-						NULL == zbx_regexp_match(page.data, db_httpstep.required, NULL))
-				{
-					err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
-							db_httpstep.required, httpstep.url);
-				}
-
-				/* variables defined in scenario */
-				if (NULL == err_str && FAIL == http_process_variables(httptest,
-						&httptest->variables, page.data, &var_err_str))
-				{
-					char	*variables = NULL;
-					size_t	alloc_len = 0, offset;
-
-					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
-							&httptest->variables);
-
-					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
-							variables, var_err_str);
-
-					zbx_free(variables);
-				}
-
-				/* variables defined in a step */
-				if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables,
-						page.data, &var_err_str))
-				{
-					char	*variables = NULL;
-					size_t	alloc_len = 0, offset;
-
-					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
-							&httpstep.variables);
-
-					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
-							variables, var_err_str);
-
-					zbx_free(variables);
-				}
-
-				zbx_free(var_err_str);
+				err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
+						db_httpstep.required, httpstep.url);
 			}
+
+			/* variables defined in scenario */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httptest->variables, page.data,
+					&var_err_str))
+			{
+				char	*variables = NULL;
+				size_t	alloc_len = 0, offset;
+
+				httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ", &httptest->variables);
+
+				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s", variables,
+						var_err_str);
+
+				zbx_free(variables);
+			}
+
+			/* variables defined in a step */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables, page.data,
+					&var_err_str))
+			{
+				char	*variables = NULL;
+				size_t	alloc_len = 0, offset;
+
+				httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ", &httpstep.variables);
+
+				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s", variables,
+						var_err_str);
+
+				zbx_free(variables);
+			}
+
+			zbx_free(var_err_str);
 
 			zbx_timespec(&ts);
 			process_step_data(db_httpstep.httpstepid, &stat, &ts);
