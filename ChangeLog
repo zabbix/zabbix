@@ -13,6 +13,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
 .......PS. [ZBX-15122] fixed possible crash in web monitoring due to posts not being reset between steps (vso)
 ..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
 A......PS. [ZBX-13695] added support of host macros to trapper, HTTP agent item allowed hosts field (Ivo, wiper)
@@ -639,8 +640,9 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
-..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
+..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
 .......PS. [ZBX-15122] fixed possible crash in web monitoring due to posts not being reset between steps (vso)
+..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
 ........S. [ZBX-15022] fixed shared memory leak during configuration cache synchronization (wiper)
 ..F....... [ZBX-13505] fixed link coloring in map when related trigger is not monitored (miks)
 ..F....... [ZBX-14934] made widget specific javascript files to be loaded with jsLoader (miks)
@@ -2030,6 +2032,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
 ..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
 ..F....... [ZBX-13505] fixed link coloring in map when related trigger is not monitored (miks)
 .......PS. [ZBX-14953] fixed not closed connection with vmware at the end of update session via a call to Logout() (MVekslers)
