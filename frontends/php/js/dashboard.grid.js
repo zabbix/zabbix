@@ -424,7 +424,7 @@
 						.log({col: col, next_col:next_col})
 					console
 						.groupEnd();
-					collapsed = next_col.length > 0;
+					collapsed = (next_col.length > 0 && (next_slot + scanline[size_key] != new_max));
 					$.each(next_col, function (_, box) {
 						// if (box.current_pos[axis_key] == next_slot) {
 						// 	box.current_pos[axis_key] = slot + scanline[size_key];
@@ -432,17 +432,13 @@
 
 						if (overlap > 0) {
 							// collapsed = true;
-							if ('new_pos' in box == false) {
-								box.new_pos = $.extend({}, box.current_pos);
-							}
+							box.new_pos = $.extend({}, box.current_pos);
 							box.new_pos[axis_key] = slot;
 
 							$.each(col, function (_, box1) {
 								if (rectOverlap(box1.current_pos, box.new_pos)) {
 									if (box1.current_pos[size_key] > size_min) {
-										if ('new_pos' in box1 == false) {
-											box1.new_pos = $.extend({}, box1.current_pos);
-										}
+										box1.new_pos = $.extend({}, box1.current_pos);
 										// box1.new_pos = $.extend({}, box1.current_pos);
 										box1.new_pos[size_key] -= scanline[size_key];
 										box1.div.css('background-color', 'rgba(255, 0, 0, 1)');
@@ -467,7 +463,7 @@
 							.log(slot+' collapsed, '+overlap+' overlap', {
 								resized: $.map(next_col.concat(col), function(b) { return 'new_pos' in b ? b.header : null }).join(' - '),
 								col: $.map(col, function(b) { return b.header }).join(' - '),
-								next_col: $.map(next_col, function(b) { return b.header }).join(' - '),
+								next_col: $.map(next_col, function(b) { return b.header }).join(' - ')
 							});
 
 						$.each(next_col.concat(col), function (_, box) {
@@ -484,13 +480,6 @@
 						});
 
 						overlap -= 1;
-
-						// if (slot == 9) {
-						// 	console
-						// 		.log('break on slot '+slot);
-						// 	break;
-						// 	//debugger;
-						// }
 					}
 					else {
 						console
@@ -506,12 +495,6 @@
 					$.each(col.concat(next_col), function (_, box) {
 						delete box.new_pos;
 					});
-
-					// if (slot == 10) {
-					// 	console
-					// 		.log('break on slot '+slot);
-					// 	break;
-					// }
 				}
 
 				console
