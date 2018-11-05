@@ -467,7 +467,7 @@ class testPageOverview extends CLegacyWebTest {
 					]
 				]
 			],
-			//Show suppressed problems from Triggers.
+			// Show suppressed problems with type Triggers.
 			[
 				[
 					'main_filter' => [
@@ -483,7 +483,7 @@ class testPageOverview extends CLegacyWebTest {
 					'show_suppressed' => true
 				]
 			],
-			//Do not show suppressed problems from Triggers.
+			// Do not show suppressed problems with type Triggers.
 			[
 				[
 					'main_filter' => [
@@ -492,7 +492,7 @@ class testPageOverview extends CLegacyWebTest {
 					]
 				]
 			],
-			//Check suppressed problems from Data.
+			// Check suppressed problems with type Data.
 			[
 				[
 					'main_filter' => [
@@ -716,7 +716,7 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestClickButtonText('Reset');
 
-		// Select group and type and open context menu.
+		// Select group and type, then open context menu.
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
