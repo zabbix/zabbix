@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageAvailabilityReport extends CWebTest {
+class testPageAvailabilityReport extends CLegacyWebTest {
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');

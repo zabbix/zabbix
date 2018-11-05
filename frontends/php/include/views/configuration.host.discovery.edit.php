@@ -393,6 +393,7 @@ $itemFormList->addRow(
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited'], 512))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
 		->setAriaRequired(),
 	'row_snmp_oid'
 );

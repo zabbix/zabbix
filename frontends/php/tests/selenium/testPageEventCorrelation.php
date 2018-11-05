@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup correlation
  */
-class testPageEventCorrelation extends CWebTest {
+class testPageEventCorrelation extends CLegacyWebTest {
 
 	/**
 	 * Get text of elements by xpath.
@@ -47,7 +47,7 @@ class testPageEventCorrelation extends CWebTest {
 	private function getDbColumn($sql) {
 		$result = [];
 
-		foreach (DBfetchArray(DBSelect($sql)) as $row) {
+		foreach (CDBHelper::getAll($sql) as $row) {
 			$result[] = reset($row);
 		}
 
@@ -185,7 +185,7 @@ class testPageEventCorrelation extends CWebTest {
 		);
 
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
 				.' AND status ='.$data['make_status'])
 		);
 	}
@@ -208,7 +208,7 @@ class testPageEventCorrelation extends CWebTest {
 
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
 				.' AND status ='.$data['make_status'])
 		);
 	}
@@ -220,7 +220,7 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations enabled');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
 	}
 
 	public function testPageEventCorrelation_EnableAll() {
@@ -230,7 +230,7 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations disabled');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_ENABLED));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_ENABLED));
 	}
 
 	public function testPageEventCorrelation_SingleDelete() {
@@ -243,7 +243,7 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']));
 	}
 
 	public function testPageEventCorrelation_DeleteAll() {
@@ -253,6 +253,6 @@ class testPageEventCorrelation extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected correlations deleted');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount('SELECT NULL FROM correlation'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation'));
 	}
 }
