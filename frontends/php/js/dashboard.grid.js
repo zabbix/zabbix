@@ -331,7 +331,7 @@
 				},
 				affected = getAffectedTreeAsArray(pos)
 					.sort(function (box1, box2) {
-						return 'x' in changes
+						return axis_key in changes
 							? (box2.current_pos.x + box2.current_pos.width) - (box1.current_pos.x + box1.current_pos.width)
 							: box1.current_pos.x - box2.current_pos.x;
 					})
@@ -411,7 +411,7 @@
 				var debug = 30;
 
 				while (next_slot < new_max && debug-- > 0) {// TODO: remove debug
-					collapsed = false;
+					collapsed = true;
 					scanline[axis_key] = slot;
 					col = getAffectedInBounds(scanline);
 					scanline[axis_key] = next_slot;
@@ -419,20 +419,32 @@
 						? [{current_pos: scanline}]
 						: getAffectedInBounds(scanline);
 
+					console
+						.groupCollapsed('col and next_col data')
+					console
+						.log({col: col, next_col:next_col})
+					console
+						.groupEnd();
+
 					$.each(next_col, function (_, box) {
-						if (box.current_pos[axis_key] == next_slot) {
-							box.current_pos[axis_key] = slot + scanline[size_key];
-						}
+						// if (box.current_pos[axis_key] == next_slot) {
+						// 	box.current_pos[axis_key] = slot + scanline[size_key];
+						// }
 
 						if (overlap > 0) {
-							collapsed = true;
-							box.new_pos = $.extend({}, box.current_pos);
+							// collapsed = true;
+							if ('new_pos' in box == false) {
+								box.new_pos = $.extend({}, box.current_pos);
+							}
 							box.new_pos[axis_key] = slot;
 
 							$.each(col, function (_, box1) {
 								if (rectOverlap(box1.current_pos, box.new_pos)) {
 									if (box1.current_pos[size_key] > size_min) {
-										box1.new_pos = $.extend({}, box1.current_pos);
+										if ('new_pos' in box1 == false) {
+											box1.new_pos = $.extend({}, box1.current_pos);
+										}
+										// box1.new_pos = $.extend({}, box1.current_pos);
 										box1.new_pos[size_key] -= scanline[size_key];
 										box1.div.css('background-color', 'rgba(255, 0, 0, 1)');
 									}
@@ -443,30 +455,51 @@
 
 								return collapsed;
 							});
+
+							return collapsed;
+						}
+						else {
+							collapsed = false;
 						}
 					});
 
 					if (collapsed) {
 						console
-							.log(slot+' collapsed', {
+							.log(slot+' collapsed, '+overlap+' overlap', {
+								resized: $.map(next_col.concat(col), function(b) { return 'new_pos' in b ? b.header : null }).join(' - '),
 								col: $.map(col, function(b) { return b.header }).join(' - '),
-								next_col: $.map(next_col, function(b) { return b.header }).join(' - ')
+								next_col: $.map(next_col, function(b) { return b.header }).join(' - '),
 							});
 
 						$.each(next_col.concat(col), function (_, box) {
 							if ('new_pos' in box) {
 								box.current_pos = box.new_pos;
 							}
+							delete box.new_pos;
+						});
+
+						$.each(affected, function (_, box) {
+							if (box.current_pos[axis_key] > slot) {
+								box.current_pos[axis_key] -= scanline[size_key];
+							}
 						});
 
 						overlap -= 1;
+
+						// if (slot == 9) {
+						// 	console
+						// 		.log('break on slot '+slot);
+						// 	break;
+						// 	//debugger;
+						// }
 					}
 					else {
 						console
-							.log(slot+' step', {
+							.log(slot+' step, '+overlap+' overlap', {
 								col: $.map(col, function(b) { return b.header }).join(' - '),
 								next_col: $.map(next_col, function(b) { return b.header }).join(' - ')
 							});
+
 						slot += scanline[size_key];
 					}
 
@@ -474,11 +507,17 @@
 					$.each(col.concat(next_col), function (_, box) {
 						delete box.new_pos;
 					});
+
+					// if (slot == 10) {
+					// 	console
+					// 		.log('break on slot '+slot);
+					// 	break;
+					// }
 				}
 
 				console
 					.log("\t\t"+
-						overlap+"\t"+'overlap'+
+						overlap+"\toverlap\n\t\t"+
 						slot+"\tlast checked position"
 					);
 				console[debug > 0 ? 'log' : 'error']("\t\t"+'resize step finished.');// TODO: remove
