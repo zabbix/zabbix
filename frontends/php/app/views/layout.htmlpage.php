@@ -103,7 +103,7 @@ function local_generateHeader($data) {
 	echo '<main>';
 
 	// should be replaced with addPostJS() at some point
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

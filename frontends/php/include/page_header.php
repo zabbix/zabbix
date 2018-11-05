@@ -273,7 +273,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning
