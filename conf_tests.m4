@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-AC_DEFUN([MAKE_TESTS],[
+AC_DEFUN([CONF_TESTS],[
 	AM_COND_IF([$1],[
 		AC_CONFIG_FILES([
 		tests/Makefile

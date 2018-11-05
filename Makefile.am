@@ -25,7 +25,7 @@ dist-hook:
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new; \
 	mv $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new \
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java; \
-	rm -f $(top_distdir)/m4/make_tests.m4
+	rm -f $(top_distdir)/conf_tests.m4
 
 	rm -rf `find $(top_distdir) -name ".svn"`
 	rm -f $(top_distdir)/include/config.h
