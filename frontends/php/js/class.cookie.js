@@ -51,7 +51,7 @@ var cookie = {
 		// Apache header size limit.
 		if (document.cookie.length > 8000) {
 			document.cookie = encodeURIComponent(name) + '=;';
-			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
+			alert(t('S_MAX_COOKIE_SIZE_REACHED'));
 			return false;
 		}
 		else {
