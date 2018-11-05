@@ -13,6 +13,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
 A......PS. [ZBX-13695] added support of host macros to trapper, HTTP agent item allowed hosts field (Ivo, wiper)
 ........S. [ZBX-15022] fixed shared memory leak during configuration cache synchronization (wiper)
 ........S. [ZBX-15025] fixed email alerts being sent twice to one recipient (vso)
