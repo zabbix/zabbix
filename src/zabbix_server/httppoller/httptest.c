@@ -53,10 +53,11 @@ zbx_httppage_t;
 
 #define ZBX_RETRIEVE_MODE_CONTENT	0
 #define ZBX_RETRIEVE_MODE_HEADERS	1
+#define ZBX_RETRIEVE_MODE_BOTH		2
 
 static zbx_httppage_t	page;
 
-static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
 
@@ -75,7 +76,7 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	return r_size;
 }
 
-static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	ZBX_UNUSED(ptr);
 	ZBX_UNUSED(userdata);
@@ -684,6 +685,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	while (NULL != (row = DBfetch(result)))
 	{
 		struct curl_slist	*headers_slist = NULL;
+		size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+		size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -792,8 +795,27 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)))
+		switch (db_httpstep.retrieve_mode)
+		{
+			case ZBX_RETRIEVE_MODE_CONTENT:
+				curl_header_cb = curl_ignore_cb;
+				curl_body_cb = curl_write_cb;
+				break;
+			case ZBX_RETRIEVE_MODE_BOTH:
+				curl_header_cb = curl_body_cb = curl_write_cb;
+				break;
+			case ZBX_RETRIEVE_MODE_HEADERS:
+				curl_header_cb = curl_write_cb;
+				curl_body_cb = curl_ignore_cb;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				err_str = zbx_strdup(err_str, "invalid retrieve mode");
+				goto httpstep_error;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_header_cb)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
