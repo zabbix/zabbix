@@ -1644,7 +1644,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  * Purpose: finds daylight saving change time inside specified time period    *
  *                                                                            *
  * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the the time period end                      *
+ *             time_end   - [IN] the time period end                          *
  *                                                                            *
  * Return Value: Time when the daylight saving changes should occur.          *
  *                                                                            *
@@ -1807,22 +1807,17 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	zbx_flexible_interval_t		*flexible = NULL;
 	zbx_scheduler_interval_t	*scheduling = NULL;
 	const char			*delim, *interval_type;
+	int				ret;
 
-	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
-			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
+	if (SUCCEED != (ret = is_time_suffix(interval_str, simple_interval,
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
 	{
 		interval_type = "update";
-		goto fail;
-	}
-
-	if (SEC_PER_DAY < *simple_interval)
-	{
-		interval_type = "update";
-		goto fail;
+		goto out;
 	}
 
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
-		return SUCCEED;
+		goto out;
 
 	while (NULL != delim)
 	{
@@ -1835,12 +1830,12 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 
 			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
 
-			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
+			if (SUCCEED != (ret = flexible_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
-				goto fail;
+				goto out;
 			}
 
 			new_interval->next = flexible;
@@ -1853,42 +1848,39 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
 
-			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
+			if (SUCCEED != (ret = scheduler_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
 			{
-				scheduler_interval_free(new_interval);
+				zbx_free(new_interval);
 				interval_type = "scheduling";
-				goto fail;
+				goto out;
 			}
 
 			new_interval->next = scheduling;
 			scheduling = new_interval;
 		}
 	}
-
-	if (0 == *simple_interval && NULL == flexible && NULL == scheduling)
+out:
+	if (SUCCEED != ret)
 	{
-		interval_type = "update";
-		goto fail;
+		if (NULL != error)
+		{
+			*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
+					interval_str);
+		}
+
+		flexible_interval_free(flexible);
+		scheduler_interval_free(scheduling);
+	}
+	else if (NULL != custom_intervals)
+	{
+		*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
+		(*custom_intervals)->flexible = flexible;
+		(*custom_intervals)->scheduling = scheduling;
 	}
 
-	*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
-	(*custom_intervals)->flexible = flexible;
-	(*custom_intervals)->scheduling = scheduling;
-
-	return SUCCEED;
-fail:
-	if (NULL != error)
-	{
-		*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-				(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
-				interval_str);
-	}
-
-	flexible_interval_free(flexible);
-	scheduler_interval_free(scheduling);
-
-	return FAIL;
+	return ret;
 }
 
 /******************************************************************************
@@ -2125,7 +2117,7 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == xdigits && 0 < colons)
 			{
-				/* consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeros are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
 			}
@@ -2400,32 +2392,18 @@ int	zbx_double_compare(double a, double b)
  ******************************************************************************/
 int	is_double_suffix(const char *str, unsigned char flags)
 {
-	size_t	i;
-	char	dot = 0;
+	int	len;
 
-	for (i = 0; '\0' != str[i]; i++)
-	{
-		/* negative number? */
-		if ('-' == str[i] && 0 == i)
-			continue;
+	if ('-' == *str)	/* check leading sign */
+		str++;
 
-		if (0 != isdigit(str[i]))
-			continue;
-
-		if ('.' == str[i] && 0 == dot)
-		{
-			dot = 1;
-			continue;
-		}
-
-		/* last character is suffix */
-		if (0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, str[i]) && '\0' == str[i + 1])
-			continue;
-
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
-	}
 
-	return SUCCEED;
+	if ('\0' != *(str += len) && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
+		str++;		/* allow valid suffix if flag is enabled */
+
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2444,50 +2422,37 @@ int	is_double_suffix(const char *str, unsigned char flags)
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	int	i = 0, digits = 0;
+	int	len;
 
-	while (' ' == str[i])				/* trim left spaces */
-		i++;
+	while (' ' == *str)			/* trim left spaces */
+		str++;
 
-	if ('-' == str[i] || '+' == str[i])		/* check leading sign */
-		i++;
+	if ('-' == *str || '+' == *str)		/* check leading sign */
+		str++;
 
-	while (0 != isdigit(str[i]))			/* check digits before dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if ('.' == str[i])				/* check decimal dot */
-		i++;
-
-	while (0 != isdigit(str[i]))			/* check digits after dot */
-	{
-		i++;
-		digits = 1;
-	}
-
-	if (0 == digits)				/* 1., .1, and 1.1 are good, just . is not */
+	if (FAIL == zbx_number_parse(str, &len))
 		return FAIL;
 
-	if ('e' == str[i] || 'E' == str[i])		/* check exponential part */
+	str += len;
+
+	if ('e' == *str || 'E' == *str)		/* check exponential part */
 	{
-		i++;
+		str++;
 
-		if ('-' == str[i] || '+' == str[i])	/* check exponent sign */
-			i++;
+		if ('-' == *str || '+' == *str)	/* check exponent sign */
+			str++;
 
-		if (0 == isdigit(str[i]))		/* check exponent */
+		if (0 == isdigit(*str))		/* check exponent */
 			return FAIL;
 
-		while (0 != isdigit(str[i]))
-			i++;
+		while (0 != isdigit(*str))
+			str++;
 	}
 
-	while (' ' == str[i])				/* trim right spaces */
-		i++;
+	while (' ' == *str)			/* trim right spaces */
+		str++;
 
-	return '\0' == str[i] ? SUCCEED : FAIL;
+	return '\0' == *str ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -2856,7 +2821,8 @@ int	is_uoct(const char *str)
  *                                                                            *
  * Function: is_uhex                                                          *
  *                                                                            *
- * Purpose: check if the string is unsigned hexadecimal                       *
+ * Purpose: check if the string is unsigned hexadecimal representation of     *
+ *          data in the form "0-9, a-f or A-F"                                *
  *                                                                            *
  * Parameters: str - string to check                                          *
  *                                                                            *
@@ -3545,4 +3511,29 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	*ptr = '\0';
 
 	return token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_env                                                   *
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] the time for compare in seconds                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();
+#endif
+	}
 }

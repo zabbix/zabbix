@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testGeneric extends CWebTest {
+class testGeneric extends CLegacyWebTest {
 
 	public static function provider() {
 		return [
@@ -94,7 +94,7 @@ class testGeneric extends CWebTest {
 			['adm.other.php',					'Other configuration parameters'],
 
 			['zabbix.php?action=proxy.list',						'Configuration of proxies'],
-			['zabbix.php?action=authentication.edit',				'Authentication'],
+			['zabbix.php?action=authentication.edit',				'Configuration of authentication'],
 			['usergrps.php',					'Configuration of user groups'],
 			['users.php',						'Configuration of users'],
 			['zabbix.php?action=mediatype.list',					'Configuration of media types'],

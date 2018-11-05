@@ -49,7 +49,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		return
 			'var input = jQuery("[name=\"'.$this->getName().'\"]", jQuery("#'.$form_name.'")).get(0);'.
 			'jQuery("#'.$this->getName().'_dp")'.
-				'.data("clndr", create_calendar(null, input, null, null, "'.$form_name.'"))'.
+				'.data("clndr", create_calendar(input, null))'.
 				'.data("input", input)'.
 				'.click(function() {'.
 					'var b = jQuery(this),'.

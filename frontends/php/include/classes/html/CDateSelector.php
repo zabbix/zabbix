@@ -33,9 +33,30 @@ class CDateSelector extends CTag {
 	/**
 	 * Set aria-required to textbox.
 	 *
-	 * @var string
+	 * @var bool
 	 */
 	private $is_required = false;
+
+	/**
+	 * Placeholder for date textbox field.
+	 *
+	 * @var string
+	 */
+	private $placeholder = null;
+
+	/**
+	 * Date and time set from view. Absolute (Y-m-d H:i:s) or relative time (now+1d, now/M ...).
+	 *
+	 * @var string
+	 */
+	private $value = null;
+
+	/**
+	 * Enabled or disabled state of HTML element.
+	 *
+	 * @var bool
+	 */
+	private $enabled = true;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -49,18 +70,7 @@ class CDateSelector extends CTag {
 		parent::__construct('div', true);
 
 		$this->name = $name;
-
-		$this
-			->addItem(
-				(new CTextBox($this->name, $value))
-					->setId($this->name)
-					->setAriaRequired($this->is_required)
-			)
-			->addItem((new CButton($this->name.'_calendar'))
-				->addClass(ZBX_STYLE_ICON_CAL)
-				->onClick('dateSelectorOnClick(event, this, "'.$this->name.'_calendar");'));
-
-		return $this;
+		$this->value = $value;
 	}
 
 	/**
@@ -90,6 +100,32 @@ class CDateSelector extends CTag {
 	}
 
 	/**
+	 * Add placeholder to date textbox field.
+	 *
+	 * @param type $text  Placeholder text for date textbox field.
+	 *
+	 * @return CDateSelector
+	 */
+	public function setPlaceholder($text) {
+		$this->placeholder = $text;
+
+		return $this;
+	}
+
+	/**
+	 * Set enabled or disabled  state to field.
+	 *
+	 * @param bool $enabled  Field state.
+	 *
+	 * @return CDateSelector
+	 */
+	public function setEnabled($enabled) {
+		$this->enabled = $enabled;
+
+		return $this;
+	}
+
+	/**
 	 * Gets string representation of date textbox and calendar button.
 	 *
 	 * @param bool $destroy
@@ -97,7 +133,18 @@ class CDateSelector extends CTag {
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		zbx_add_post_js('create_calendar("'.$this->name.'", "'.$this->name.'_calendar", "'.$this->date_format.'");');
+		$this
+			->addItem(
+				(new CTextBox($this->name, $this->value))
+					->setId($this->name)
+					->setAttribute('placeholder', $this->placeholder)
+					->setAriaRequired($this->is_required)
+					->setEnabled($this->enabled)
+			)
+			->addItem((new CButton($this->name.'_calendar'))
+				->addClass(ZBX_STYLE_ICON_CAL)
+				->setEnabled($this->enabled)
+				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
 
 		return parent::toString($destroy);
 	}

@@ -18,10 +18,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once 'vendor/autoload.php';
 
-class CSvgForeignObject extends CSvgTag {
+require_once dirname(__FILE__).'/../CElement.php';
 
-	public function __construct() {
-		parent::__construct('foreignObject', true);
+/**
+ * Checkbox element.
+ */
+class CCheckboxElement extends CElement {
+
+	/**
+	 * Set checkbox state.
+	 *
+	 * @param boolean $checked    checked or not
+	 *
+	 * @return $this
+	 */
+	public function set($checked) {
+		if ($checked !== $this->isSelected()) {
+			$this->click();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Set checkbox state to checked.
+	 *
+	 * @return $this
+	 */
+	public function check() {
+		return $this->set(true);
+	}
+
+	/**
+	 * Set checkbox state to not checked.
+	 *
+	 * @return $this
+	 */
+	public function uncheck() {
+		return $this->set(false);
 	}
 }

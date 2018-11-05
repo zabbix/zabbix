@@ -70,8 +70,10 @@
 				</div>
 			</div>
 		</main>
-		<footer role="contentinfo">
-			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
-		</footer>
+
+		<?php
+			$footer = makePageFooter(false);
+			echo $footer->toString();
+		?>
 	</body>
 </html>

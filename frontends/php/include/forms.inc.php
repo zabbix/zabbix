@@ -114,16 +114,6 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 	}
 
-	// authentication type
-	if ($data['user_groups']) {
-		$data['auth_type'] = getGroupAuthenticationType($data['user_groups'], GROUP_GUI_ACCESS_INTERNAL);
-	}
-	else {
-		$data['auth_type'] = ($userId == 0)
-			? $config['authentication_type']
-			: getUserAuthenticationType($userId, GROUP_GUI_ACCESS_INTERNAL);
-	}
-
 	// set autologout
 	if ($data['autologin']) {
 		$data['autologout'] = '0';
@@ -972,7 +962,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', 0),
 		'snmp_community' => getRequest('snmp_community', 'public'),
-		'snmp_oid' => getRequest('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
+		'snmp_oid' => getRequest('snmp_oid', ''),
 		'port' => getRequest('port', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -1094,82 +1084,20 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 		$data['limited'] = ($data['item']['templateid'] != 0);
 
-		// discovery rule & item prototype
-		if ($data['is_discovery_rule'] || $data['parent_discoveryid'] != 0) {
-			// get templates
-			$itemid = $item['itemid'];
-			do {
-				$params = [
-					'itemids' => $itemid,
-					'output' => ['itemid', 'templateid'],
-					'selectHosts' => ['name']
-				];
-				if ($data['is_discovery_rule']) {
-					$item = API::DiscoveryRule()->get($params);
-				}
-				else {
-					$params['selectDiscoveryRule'] = ['itemid'];
-					$params['filter'] = ['flags' => null];
-					$item = API::Item()->get($params);
-				}
-				$item = reset($item);
-
-				if (!empty($item)) {
-					$host = reset($item['hosts']);
-					if (!empty($item['hosts'])) {
-						if (bccomp($data['itemid'], $itemid) != 0) {
-							$writable = API::Template()->get([
-								'output' => ['templateid'],
-								'templateids' => [$host['hostid']],
-								'editable' => true,
-								'preservekeys' => true
-							]);
-						}
-
-						$host['name'] = CHtml::encode($host['name']);
-						if (bccomp($data['itemid'], $itemid) == 0) {
-						}
-						// discovery rule
-						elseif ($data['is_discovery_rule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'],
-									'host_discovery.php?form=update&itemid='.$item['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-						// item prototype
-						elseif ($item['discoveryRule']) {
-							if (array_key_exists($host['hostid'], $writable)) {
-								$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
-									'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
-								);
-							}
-							else {
-								$data['templates'][] = new CSpan($host['name']);
-							}
-
-							$data['templates'][] = SPACE.'&rArr;'.SPACE;
-						}
-					}
-					$itemid = $item['templateid'];
-				}
-				else {
-					break;
-				}
-			} while ($itemid != 0);
-
-			$data['templates'] = array_reverse($data['templates']);
-			array_shift($data['templates']);
+		// discovery rule
+		if ($data['is_discovery_rule']) {
+			$flag = ZBX_FLAG_DISCOVERY_RULE;
+		}
+		// item prototype
+		elseif ($data['parent_discoveryid'] != 0) {
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		// plain item
 		else {
-			$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item]));
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+
+		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag);
 	}
 
 	// caption
@@ -1599,9 +1527,11 @@ function getTriggerFormData(array $data) {
 		if ($data['parent_discoveryid'] === null) {
 			$options['selectDiscoveryRule'] = ['itemid', 'name'];
 			$triggers = API::Trigger()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		else {
 			$triggers = API::TriggerPrototype()->get($options);
+			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
@@ -1616,52 +1546,9 @@ function getTriggerFormData(array $data) {
 		}
 
 		// Get templates.
-		$tmp_triggerid = $data['triggerid'];
-		do {
-			$db_triggers = DBfetch(DBselect(
-				'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
-				' FROM triggers t'.
-					' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
-					' LEFT JOIN items i ON f.itemid=i.itemid'.
-					' LEFT JOIN hosts h ON i.hostid=h.hostid'.
-					' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
-				' WHERE t.triggerid='.zbx_dbstr($tmp_triggerid)
-			));
-
-			if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-				// Test if template is editable by user
-				$writable = API::Template()->get([
-					'output' => ['templateid'],
-					'templateids' => [$db_triggers['hostid']],
-					'preservekeys' => true,
-					'editable' => true
-				]);
-
-				if (array_key_exists($db_triggers['hostid'], $writable)) {
-					// parent trigger prototype link
-					if ($data['parent_discoveryid']) {
-						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
-							'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
-					}
-					// parent trigger link
-					else {
-						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
-							'&hostid='.$db_triggers['hostid'];
-					}
-
-					$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
-				}
-				else {
-					$data['templates'][] = new CSpan(CHtml::encode($db_triggers['name']));
-				}
-
-				$data['templates'][] = SPACE.'&rArr;'.SPACE;
-			}
-			$tmp_triggerid = $db_triggers['templateid'];
-		} while ($tmp_triggerid != 0);
-
-		$data['templates'] = array_reverse($data['templates']);
-		array_shift($data['templates']);
+		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
+			getTriggerParentTemplates([$trigger], $flag), $flag
+		);
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
@@ -2182,24 +2069,15 @@ function getTimeperiodForm(array $data) {
 			->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']))
 			->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
-		if ($data['new_timeperiod_start_date'] === null) {
-			$new_timeperiod['start_date'] = date(ZBX_DATE_TIME, time());
-		}
-		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			if ($range_time_parser->parse($data['new_timeperiod_start_date']) == CParser::PARSE_SUCCESS) {
-				$new_timeperiod['start_date'] = $range_time_parser->getDateTime(false)->format(ZBX_DATE_TIME);
-			}
-			else {
-				$new_timeperiod['start_date'] = $data['new_timeperiod_start_date'];
-			}
-		}
+		$new_timeperiod['start_date'] = ($data['new_timeperiod_start_date'] === null)
+			? date(ZBX_DATE_TIME, time())
+			: $data['new_timeperiod_start_date'];
 
 		$form->addRow(
 			(new CLabel(_('Date'), 'new_timeperiod_start_date'))->setAsteriskMark(),
 			(new CDateSelector('new_timeperiod_start_date', $new_timeperiod['start_date']))
 				->setDateFormat(ZBX_DATE_TIME)
+				->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 				->setAriaRequired()
 		);
 	}

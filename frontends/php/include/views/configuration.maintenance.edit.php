@@ -54,11 +54,13 @@ $maintenanceFormList = (new CFormList('maintenanceFormList'))
 	->addRow((new CLabel(_('Active since'), 'active_since'))->setAsteriskMark(),
 		(new CDateSelector('active_since', $data['active_since']))
 			->setDateFormat(ZBX_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Active till'), 'active_till'))->setAsteriskMark(),
 		(new CDateSelector('active_till', $data['active_till']))
 			->setDateFormat(ZBX_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm'))
 			->setAriaRequired()
 	);
 
@@ -81,7 +83,7 @@ foreach ($data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME)
 			? $timeperiod['start_date']
-			: shedule2str($timeperiod),
+			: schedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol(
 			new CHorList([
@@ -180,8 +182,8 @@ foreach ($tags as $tag) {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setEnabled(false),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true)
 				->setEnabled(false),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
@@ -201,8 +203,8 @@ foreach ($tags as $tag) {
 				->setAttribute('placeholder', _('tag'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CRadioButtonList('tags['.$i.'][operator]', (int) $tag['operator']))
-				->addValue(_('Like'), MAINTENANCE_TAG_OPERATOR_LIKE)
-				->addValue(_('Equal'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))

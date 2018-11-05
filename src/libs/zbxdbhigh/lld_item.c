@@ -875,33 +875,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: is_user_macro                                                    *
- *                                                                            *
- * Purpose: checks if string is user macro                                    *
- *                                                                            *
- * Parameters: str - [IN] string to validate                                  *
- *                                                                            *
- * Returns: SUCCEED - either "{$MACRO}" or "{$MACRO:"{#MACRO}"}"              *
- *          FAIL    - not user macro or contains other characters for example:*
- *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
- *                                                                            *
- ******************************************************************************/
-static int	is_user_macro(const char *str)
-{
-	zbx_token_t	token;
-
-	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
-			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
-			0 != token.token.l || '\0' != str[token.token.r + 1])
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_validate_item_field                                          *
  *                                                                            *
  ******************************************************************************/
@@ -926,66 +899,13 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
 				(0 != item->itemid ? "update" : "create"), *field);
 	}
-	else
+	else if (ZBX_FLAG_LLD_ITEM_UPDATE_NAME == flag && '\0' == **field)
 	{
-		int			value;
-		zbx_custom_interval_t	*custom_intervals;
-		char			*errmsg;
-
-		switch (flag)
-		{
-			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
-				if ('\0' != **field)
-					return;
-
-				*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
-						(0 != item->itemid ? "update" : "create"));
-				break;
-			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
-				if (SUCCEED == is_user_macro(*field))
-					return;
-
-				errmsg = NULL;
-				if (SUCCEED == zbx_interval_preproc(*field, &value, &custom_intervals, &errmsg))
-				{
-					zbx_custom_interval_free(custom_intervals);
-					return;
-				}
-
-				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
-						(0 != item->itemid ? "update" : "create"), errmsg);
-				zbx_free(errmsg);
-				break;
-			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
-				if (SUCCEED == is_user_macro(*field))
-					return;
-
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
-				{
-					return;
-				}
-
-				*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
-				break;
-			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
-				if (SUCCEED == is_user_macro(*field))
-					return;
-
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
-				{
-					return;
-				}
-
-				*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
-				break;
-			default:
-				return;
-		}
+		*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
+				(0 != item->itemid ? "update" : "create"));
 	}
+	else
+		return;
 
 	if (0 != item->itemid)
 		lld_field_str_rollback(field, field_orig, &item->flags, flag);
@@ -1327,7 +1247,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN];
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 	const char*	regexp_err = NULL;
 
 	*err = '\0';

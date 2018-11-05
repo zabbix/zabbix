@@ -33,8 +33,8 @@ class CScreenGraph extends CScreenBase {
 			: $this->screenitem['resourceid'];
 		$containerId = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims($resourceId);
-		$graphDims['graphHeight'] = $this->screenitem['height'];
-		$graphDims['width'] = $this->screenitem['width'];
+		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
+		$graphDims['width'] = (int) $this->screenitem['width'];
 		$graph = getGraphByGraphId($resourceId);
 		$graphId = $graph['graphid'];
 		$legend = $graph['show_legend'];
@@ -186,7 +186,9 @@ class CScreenGraph extends CScreenBase {
 				);
 			}
 
-			$item->setId($containerId);
+			$item
+				->addClass(ZBX_STYLE_GRAPH_WRAPPER)
+				->setId($containerId);
 
 			return $this->getOutput($item);
 		}

@@ -524,15 +524,18 @@ static void	process_rule(DB_DRULE *drule)
 #ifdef HAVE_IPV6
 			if (ZBX_IPRANGE_V6 == iprange.type)
 			{
-				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
-						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
-						ipaddress[7]);
+				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", (unsigned int)ipaddress[0],
+						(unsigned int)ipaddress[1], (unsigned int)ipaddress[2],
+						(unsigned int)ipaddress[3], (unsigned int)ipaddress[4],
+						(unsigned int)ipaddress[5], (unsigned int)ipaddress[6],
+						(unsigned int)ipaddress[7]);
 			}
 			else
 			{
 #endif
-				zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u", ipaddress[0], ipaddress[1], ipaddress[2],
-						ipaddress[3]);
+				zbx_snprintf(ip, sizeof(ip), "%u.%u.%u.%u", (unsigned int)ipaddress[0],
+						(unsigned int)ipaddress[1], (unsigned int)ipaddress[2],
+						(unsigned int)ipaddress[3]);
 #ifdef HAVE_IPV6
 			}
 #endif
@@ -837,7 +840,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log();
+		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (0 != sleeptime)
 		{
@@ -847,7 +851,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		now = time(NULL);
-		sec = zbx_time();
 		rule_count += process_discovery(now);
 		total_sec += zbx_time() - sec;
 
@@ -876,10 +879,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 
 #undef STAT_INTERVAL

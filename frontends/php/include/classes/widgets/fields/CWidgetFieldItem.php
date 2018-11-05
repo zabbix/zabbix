@@ -41,6 +41,28 @@ class CWidgetFieldItem extends CWidgetField {
 		$this->setDefault([]);
 	}
 
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules(null);
+		}
+
+		return $this;
+	}
+
 	public function setValue($value) {
 		$this->value = (array) $value;
 
@@ -86,15 +108,5 @@ class CWidgetFieldItem extends CWidgetField {
 		$this->filter_parameters[$name] = $value;
 
 		return $this;
-	}
-
-	public function validate($strict = false) {
-		$errors = parent::validate($strict);
-
-		if (!$errors && $strict && ($this->getFlags() & CWidgetField::FLAG_NOT_EMPTY) && !$this->getValue()) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getLabel(), _('cannot be empty'));
-		}
-
-		return $errors;
 	}
 }

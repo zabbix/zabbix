@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-class testAPIInfo extends CZabbixTest {
+class testAPIInfo extends CAPITest {
 	public function testAPIInfo_VersionWithAuth() {
 		$error = [
 			'code' => -32602,
@@ -36,6 +36,6 @@ class testAPIInfo extends CZabbixTest {
 		$this->disableAuthorization();
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('4.0.0', $result['result']);
+		$this->assertSame('4.0.2', $result['result']);
 	}
 }

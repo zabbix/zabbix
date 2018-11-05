@@ -26,7 +26,6 @@ foreach ($data['maps'] as $map) {
 		new CLink($map['label'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'map.view')
 			->setArgument('sysmapid', $map['sysmapid'])
-			->setArgument('fullscreen', $data['fullscreen'] ? '1' : null)
 		),
 		(new CButton())
 			->onClick("rm4favorites('sysmapid','".$map['sysmapid']."')")
@@ -37,10 +36,7 @@ foreach ($data['maps'] as $map) {
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList([
-		_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-	]))->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

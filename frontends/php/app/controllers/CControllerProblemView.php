@@ -38,7 +38,6 @@ class CControllerProblemView extends CController {
 			'sort' =>					'in clock,host,severity,name',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>				'in 1',
-			'fullscreen' =>				'in 0,1',
 			'page' =>					'ge 1',
 			'filter_set' =>				'in 1',
 			'filter_rst' =>				'in 1',
@@ -291,7 +290,6 @@ class CControllerProblemView extends CController {
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'uncheck' => $this->hasInput('uncheck'),
-			'fullscreen' => $this->getInput('fullscreen', 0),
 			'page' => $this->getInput('page', 1),
 			'filter' => [
 				'show' => CProfile::get('web.problem.filter.show', TRIGGERS_OPTION_RECENT_PROBLEM),
@@ -343,6 +341,8 @@ class CControllerProblemView extends CController {
 		else {
 			$data['profileIdx'] = 'web.problem.filter';
 		}
+
+		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));

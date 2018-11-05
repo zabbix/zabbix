@@ -224,6 +224,31 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		]);
 
+		// Remove problems that were resolved between requests or set tags.
+		foreach ($data['groups'] as $groupid => &$group) {
+			foreach ($group['stats'] as $severity => &$stat) {
+				foreach (['problems', 'problems_unack'] as $key) {
+					foreach ($stat[$key] as $event_no => &$problem) {
+						if (array_key_exists($problem['eventid'], $problems_data)) {
+							$problem['tags'] = $problems_data[$problem['eventid']]['tags'];
+						}
+						else {
+							if ($key === 'problems') {
+								$data['groups'][$groupid]['stats'][$severity]['count']--;
+							}
+							else {
+								$data['groups'][$groupid]['stats'][$severity]['count_unack']--;
+							}
+							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
+						}
+					}
+					unset($problem);
+				}
+			}
+			unset($stat);
+		}
+		unset($group);
+
 		// actions
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($problems_data, $data['triggers']);
@@ -240,22 +265,6 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			])
 		];
-
-		// tags
-		foreach ($data['groups'] as &$group) {
-			foreach ($group['stats'] as &$stat) {
-				foreach (['problems', 'problems_unack'] as $key) {
-					foreach ($stat[$key] as &$problem) {
-						$problem['tags'] = array_key_exists($problem['eventid'], $problems_data)
-							? $problems_data[$problem['eventid']]['tags']
-							: [];
-					}
-					unset($problem);
-				}
-			}
-			unset($stat);
-		}
-		unset($group);
 	}
 
 	return $data;
@@ -269,6 +278,7 @@ function getSystemStatusData(array $filter) {
  * @param int    $filter['show_suppressed']    (optional)
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
+ * @param int    $filter['show_timeline']      (optional)
  * @param array  $data
  * @param array  $data['groups']
  * @param string $data['groups'][]['groupid']
@@ -295,11 +305,10 @@ function getSystemStatusData(array $filter) {
  * @param array  $config
  * @param string $config['severity_name_*']
  * @param string $backurl
- * @param int    $fullscreen
  *
  * @return CDiv
  */
-function makeSystemStatus(array $filter, array $data, array $config, $backurl, $fullscreen = 0) {
+function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 	$filter_severities = (array_key_exists('severities', $filter) && $filter['severities'])
 		? $filter['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
@@ -335,8 +344,7 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl, $
 			(array_key_exists('show_suppressed', $filter) && $filter['show_suppressed'] == 1)
 				? 1
 				: null
-		)
-		->setArgument('fullscreen', $fullscreen ? '1' : null);
+		);
 
 	foreach ($data['groups'] as $group) {
 		if ($filter_hide_empty_groups && !$group['has_problems']) {
@@ -498,7 +506,8 @@ function make_status_of_zbx() {
  * @param array  $actions
  * @param array  $config
  * @param array  $filter
- * @param array  $filter['show_timeline']
+ * @param array  $filter['show_suppressed']  (optional)
+ * @param array  $filter['show_timeline']    (optional)
  *
  * @return CTableInfo
  */
@@ -509,7 +518,9 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 	$header_time = new CColHeader([_('Time'), (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN)]);
 
-	if (array_key_exists('show_timeline', $filter) && $filter['show_timeline']) {
+	$show_timeline = (array_key_exists('show_timeline', $filter) && $filter['show_timeline']);
+
+	if ($show_timeline) {
 		$header = [
 			$header_time->addClass(ZBX_STYLE_RIGHT),
 			(new CColHeader())->addClass(ZBX_STYLE_TIMELINE_TH),
@@ -537,7 +548,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$triggers_hosts = getTriggersHostsList($triggers);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
-	$tags = makeEventsTags($problems);
+	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		CScreenProblem::addMaintenanceNames($problems);
@@ -555,7 +566,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
 		$cell_clock = new CCol(new CLink($cell_clock, $url_details));
 
-		if ($filter['show_timeline']) {
+		if ($show_timeline) {
 			if ($last_clock != 0) {
 				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
 			}

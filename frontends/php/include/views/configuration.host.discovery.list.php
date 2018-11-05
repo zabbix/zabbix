@@ -38,21 +38,25 @@ $discoveryForm = (new CForm())
 	->setName('discovery')
 	->addVar('hostid', $this->data['hostid']);
 
+$url = (new CUrl('host_discovery.php'))
+	->setArgument('hostid', $data['hostid'])
+	->getUrl();
+
 // create table
 $discoveryTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Items'),
 		_('Triggers'),
 		_('Graphs'),
 		($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
-		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Interval'), 'delay', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
@@ -61,23 +65,7 @@ $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
-
-	if ($discovery['templateid']) {
-		if (array_key_exists($discovery['dbTemplate']['hostid'], $data['writable_templates'])) {
-			$description[] = (new CLink($discovery['dbTemplate']['name'],
-				'?hostid='.$discovery['dbTemplate']['hostid']
-			))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$description[] = (new CSpan($discovery['dbTemplate']['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-
-		$description[] = NAME_DELIMITER;
-	}
-
+	$description[] = makeItemTemplatePrefix($discovery['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_RULE);
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status
@@ -111,7 +99,7 @@ foreach ($data['discoveries'] as $discovery) {
 		];
 	}
 
-	// hide zeroes for trapper and SNMP trap items
+	// Hide zeros for trapper and SNMP trap items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
 		$discovery['delay'] = '';
 	}

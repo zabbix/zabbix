@@ -828,7 +828,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == *value)
 		return FAIL;
 
-	if (0 != *value && (value_min > *value || ZBX_HK_PERIOD_MAX < *value))
+	if (0 != *value && value_min > *value)
 		return FAIL;
 
 	return SUCCEED;
@@ -1876,7 +1876,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: substitute_host_interface_macros                                 *
  *                                                                            *
- * Purpose: trying to resolve the macros in host inteface                     *
+ * Purpose: trying to resolve the macros in host interface                    *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
@@ -3112,6 +3112,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 			zbx_strpool_release(trigger->description);
 			zbx_strpool_release(trigger->expression);
+			zbx_strpool_release(trigger->recovery_expression);
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
 
@@ -4363,6 +4364,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 			}
 		}
 
+		zbx_strpool_release(op->params);
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
@@ -4420,12 +4422,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (last_groupid != groupid || 0 == last_groupid)
+		if (last_groupid != groupid)
 		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
-				continue;
+			group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid);
 			last_groupid = groupid;
 		}
+
+		if (NULL == group)
+			continue;
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
@@ -5217,7 +5221,7 @@ void	DCsync_configuration(unsigned char mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
 				config->strpool.num_data, config->strpool.num_slots);
 
-		zbx_mem_dump_stats(config_mem);
+		zbx_mem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 
 	config->status->last_update = 0;
@@ -5829,7 +5833,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	strscpy(dst_host->host, src_host->host);
-	strscpy(dst_host->name, src_host->name);
+	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;
@@ -7251,6 +7255,20 @@ void	zbx_dc_get_timer_triggerids(zbx_vector_uint64_t *triggerids, int now, int l
 		zbx_binary_heap_update_direct(&config->timer_queue, elem);
 	}
 
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_clear_timer_queue                                         *
+ *                                                                            *
+ * Purpose: clears timer trigger queue                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_clear_timer_queue(void)
+{
+	WRLOCK_CACHE;
+	zbx_binary_heap_clear(&config->timer_queue);
 	UNLOCK_CACHE;
 }
 
@@ -8819,8 +8837,12 @@ void	*DCconfig_get_stats(int request)
 		case ZBX_CONFSTATS_BUFFER_FREE:
 			value_uint = config_mem->free_size;
 			return &value_uint;
+		case ZBX_CONFSTATS_BUFFER_PUSED:
+			value_double = 100 * (double)(config_mem->orig_size - config_mem->free_size) /
+					config_mem->orig_size;
+			return &value_double;
 		case ZBX_CONFSTATS_BUFFER_PFREE:
-			value_double = 100.0 * ((double)(config_mem->free_size) / (config_mem->orig_size));
+			value_double = 100 * (double)config_mem->free_size / config_mem->orig_size;
 			return &value_double;
 		default:
 			return NULL;
@@ -8829,7 +8851,7 @@ void	*DCconfig_get_stats(int request)
 
 static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 {
-	const ZBX_DC_HOST		*host;
+	const ZBX_DC_HOST	*host;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
 	dst_proxy->hostid = src_proxy->hostid;

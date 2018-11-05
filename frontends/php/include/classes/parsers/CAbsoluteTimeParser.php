@@ -61,7 +61,7 @@ class CAbsoluteTimeParser extends CParser {
 	}
 
 	/**
-	 * Prse absolute time.
+	 * Parse absolute time.
 	 *
 	 * @param string	$source
 	 * @param int		$pos
@@ -81,11 +81,7 @@ class CAbsoluteTimeParser extends CParser {
 			return false;
 		}
 
-		$this->tokens['Y'] = $matches['Y'];
-
-		$matches = array_filter($matches);
-
-		foreach (['m', 'd', 'H', 'i', 's'] as $key) {
+		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $key) {
 			if (array_key_exists($key, $matches)) {
 				$this->tokens[$key] = $matches[$key];
 			}
