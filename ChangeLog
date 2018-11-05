@@ -632,6 +632,7 @@ New features:
 .......PS. [ZBXNEXT-4782] improve out of memory error message by adding statistics and backtrace; improve something impossible has just happened error message by adding backtrace (vso)
 
 Bug fixes:
+..F....... [ZBX-14805] fixed unauthorized request error when resetting filter after enabling/disabling elements (agriscenko)
 ..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
 .......PS. [ZBX-15122] fixed possible crash in web monitoring due to posts not being reset between steps (vso)
 ..F....... [ZBX-14691] fixed faulty behaviour of mandatory fields in Trigger expression form (vasilijs)
