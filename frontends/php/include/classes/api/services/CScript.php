@@ -786,46 +786,6 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Creates a map between groups and them immediate children.
-	 *
-	 * @param $host_groups array|HostGroup[]
-	 * @return array nodeid => children_nodeid[]
-	 */
-	private static function createAdjList(array $host_groups) {
-		$adj_list = [0 => []];
-		foreach ($host_groups as $groupid => $group) {
-			if (!array_key_exists($groupid, $adj_list)) {
-				$adj_list[$groupid] = [];
-			}
-			foreach ($host_groups as $groupid2 => $group2) {
-				$parts = explode($group['name'] . '/', $group2['name']);
-				if (!array_key_exists(1, $parts)) {
-					continue;
-				}
-				if ($parts[0] === '' && strpos($parts[1], '/') === false) {
-					$adj_list[$groupid][] = $groupid2;
-				}
-			}
-		}
-		return $adj_list;
-	}
-
-	/**
-	 * @param $carry array initial list to append to
-	 * @param $node_list array a valid node lookup list (no checks are made, this is private method)
-	 * @param $adj_list array node relations definition
-	 * @param $groupid int requested branches root node id
-	 * @return array all the branch nodes (inclusive)
-	 */
-	private static function selectNodes($nodeid, array $adj_list, array $node_list, array &$carry = []) {
-		$carry[$nodeid] = $node_list[$nodeid];
-		foreach ($adj_list[$nodeid] as $next_groupid) {
-			self::selectNodes($next_groupid, $adj_list, $node_list, $carry);
-		}
-		return $carry;
-	}
-
-	/**
 	 * Applies relational subselect onto alreadey fetched result.
 	 *
 	 * @param $options array
@@ -833,10 +793,6 @@ class CScript extends CApiService {
 	 * @return $restult array
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
-		// TODO unset extra added output
-		// TODO allow to flow undefined branching
-		// TODO implement black list filter for self::selectNodes
-		// TODO testing for read only hg etc.
 		$result = parent::addRelatedObjects($options, $result);
 
 		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'] !== API_OUTPUT_COUNT;
@@ -847,7 +803,7 @@ class CScript extends CApiService {
 		}
 
 		// these host group id's are "blacklisted" and will not be used in selection
-		$noselect_groupids = [];
+		$writeable_groups = [];
 		// any script has a read only permission
 		$has_read_only_restriction = false;
 
@@ -862,17 +818,15 @@ class CScript extends CApiService {
 			$child_group_serach['name'][] = $this->parent_host_groups[$script['groupid']]['name'];
 		}
 
-		// must select name (later will be unset)
+		$selectGroups = ['name', 'groupid'];
 		if ($options['selectGroups'] !== API_OUTPUT_EXTEND) {
-			if (!is_array($options['selectGroups'])) {
-				$options['selectGroups'] = ['name'];
-			} else {
-				$options['selectGroups'][] = 'name';
+			if (is_array($options['selectGroups'])) {
+				$selectGroups = array_merge($options['selectGroups'], $selectGroups);
 			}
 		}
 
 		$host_group_nodes = API::HostGroup()->get([
-			'output' => $options['selectGroups'],
+			'output' => $selectGroups,
 			'search' => $child_group_serach,
 			'searchByAny' => true,
 			'startSearch' => true,
@@ -880,17 +834,39 @@ class CScript extends CApiService {
 		]);
 
 		if ($has_read_only_restriction) {
-			$noselect_groupids = array_keys(API::HostGroup()->get([
-				'output' => ['groupid'],
+			$writeable_groups = API::HostGroup()->get([
+				'output' => $selectGroups,
 				'search' => $child_group_serach,
 				'searchByAny' => true,
 				'startSearch' => true,
 				'preservekeys' => true,
-				'editable' => false
-			]));
+				'editable' => true
+			]);
 		}
 
-		$host_group_paths = self::createAdjList($host_group_nodes);
+		$host_group_children = [];
+		$group_parents = [];
+		foreach ($host_group_nodes as $groupid => $group) {
+			$parts = explode('/', $group['name']);
+			$group_parents[$groupid] = [count($parts), []];
+			for (array_pop($parts); $parts; array_pop($parts)) {
+				$group_parents[$groupid][implode('/', $parts)] = true;
+			}
+		}
+		foreach ($host_group_nodes as $groupid => $group) {
+			if (!array_key_exists($groupid, $host_group_children)) {
+				$host_group_children[$groupid] = [$groupid => true];
+			}
+			foreach ($host_group_nodes as $child_groupid => $child_group) {
+				if ($groupid === $child_groupid) {
+					continue;
+				}
+				if (array_key_exists($group['name'], $group_parents[$child_groupid])) {
+					$host_group_children[$groupid][$child_groupid] = true;
+				}
+			}
+		}
+
 		if ($is_hosts_select) {
 			$sql = 'SELECT hostid,groupid FROM hosts_groups';
 			if ($child_group_serach !== null) {
@@ -915,8 +891,19 @@ class CScript extends CApiService {
 			]);
 		}
 
+		$host_group_nodes = $this->unsetExtraFields($host_group_nodes, ['name', 'groupid'], $options['selectGroups']);
+		$writeable_groups = $this->unsetExtraFields($writeable_groups, ['name', 'groupid'], $options['selectGroups']);
+
 		foreach ($result as $scriptid => &$script) {
-			$script_groups = self::selectNodes($script['groupid'], $host_group_paths, $host_group_nodes);
+			if ($script['groupid'] === '0') {
+				$script_groups = $script['host_access'] != PERM_READ_WRITE
+					? $host_group_nodes
+					: $writeable_groups;
+			} else {
+				$script_groups = $script['host_access'] != PERM_READ_WRITE
+					? array_intersect_key($host_group_nodes, $host_group_children[$script['groupid']])
+					: array_intersect_key($writeable_groups, $host_group_children[$script['groupid']]);
+			}
 
 			if ($is_groups_select) {
 				$script['groups'] = array_values($script_groups);

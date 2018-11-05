@@ -232,7 +232,7 @@ class testScripts extends CAPITest {
 				]
 			],
 			// selectHosts test
-			// user has no write permission for group 90021, that group hosts are not expanded
+			// user has no write permission for group 90021 AND script 90021 requires that permission
 			[
 				'params' => [
 					'__auth' => ['90000', 'zabbix'],
@@ -244,11 +244,11 @@ class testScripts extends CAPITest {
 				'expect' => [
 					'error' => null,
 					'has.scriptid:hostid' => [
-						'90020' => ['90020', '90022', '90023'],
+						'90020' => ['90020', '90021', '90022', '90023'],
 						'90021' => ['90022', '90023']
 					],
 					'!has.scriptid:hostid' => [
-						'90020' => ['90021'],
+						'90020' => [],
 						'90021' => ['90021']
 					]
 				]
@@ -282,13 +282,28 @@ class testScripts extends CAPITest {
 				'expect' => [
 					'error' => null,
 					'has.scriptid:groupid' => [
-						'90020' => ['90020', '90022', '90023'],
+						'90020' => ['90020', '90021', '90022', '90023'],
 						'90021' => ['90022', '90023']
 					],
 					'!has.scriptid:groupid' => [
-						'90020' => ['90021'],
+						'90020' => [],
 						'90021' => ['90021']
 					]
+				]
+			],
+			// selectGroups test
+			// no extra output is present
+			[
+				'params' => [
+					'__auth' => ['90000', 'zabbix'],
+					'output' => ['scriptid'],
+					'hostids' => ['90021'],
+					'preservekeys' => true,
+					'selectGroups' => ['flags']
+				],
+				'expect' => [
+					'error' => null,
+					'groupsObjectProperties' => ['flags']
 				]
 			]
 		];
@@ -310,9 +325,6 @@ class testScripts extends CAPITest {
 			return;
 		}
 
-		// TODO maybe dynamic assertions..?
-		// TODO test for output structure to contain only what's asked (unset extra fields).
-		// TODO test for scripts with zero groupid to return all hosts / groups in subselects.
 		if (array_key_exists('has.scriptid', $expect)) {
 			$ids = array_column($response['result'], 'scriptid');
 			$this->assertEmpty(array_diff($expect['has.scriptid'], $ids));
@@ -352,6 +364,16 @@ class testScripts extends CAPITest {
 				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
 				$ids = array_column($response['result'][$scriptid]['groups'], 'groupid');
 				$this->assertEquals($groupids, array_diff($groupids, $ids));
+			}
+		}
+
+		if (array_key_exists('groupsObjectProperties', $expect)) {
+			sort($expect['groupsObjectProperties']);
+			foreach ($response['result'] as $script) {
+				foreach ($script['groups'] as $group) {
+					ksort($group);
+					$this->assertEquals($expect['groupsObjectProperties'], array_keys($group));
+				}
 			}
 		}
 	}
