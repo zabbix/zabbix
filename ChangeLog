@@ -13,6 +13,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-14805] fixed unauthorized request error when resetting filter after enabling/disabling elements (agriscenko)
 ..F....... [ZBX-14789] fixed translations from en_US to en_GB (Ivo)
 ..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
 .......PS. [ZBX-15122] fixed possible crash in web monitoring due to posts not being reset between steps (vso)
