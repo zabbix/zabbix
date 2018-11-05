@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup profiles
  */
-class testPageDashboard extends CWebTest {
+class testPageDashboard extends CLegacyWebTest {
 
 	public $graphCpu = 'CPU load';
 	public $graphCpuId = 524;
@@ -39,51 +39,42 @@ class testPageDashboard extends CWebTest {
 		foreach ($users as $user) {
 			switch ($user) {
 				case 'super-admin' :
-					$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckTitle('Dashboard');
-					$this->zbxTestCheckHeader('Dashboard');
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckTitle('Dashboard');
-					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//a[@href='zabbix.php?action=discovery.view&druleid=3']", 'External network');
 					break;
 				case 'user';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckTitle('Dashboard');
-					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 				case 'guest';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
 					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-					$this->zbxTestCheckTitle('Dashboard');
-					$this->zbxTestCheckHeader('Dashboard');
-					$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//tr[@class='nothing-to-show']/td", 'No permissions to referred object or it does not exist!');
 					break;
 			}
-			if ($user != 'super-admin'){
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No screens added.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No maps added.');
+			$this->zbxTestCheckTitle('Dashboard');
+			$this->zbxTestCheckHeader('Global view');
+			if ($user != 'super-admin') {
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No data found.');
-				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//tr[@class='nothing-to-show']/td", 'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No data found.');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'Favourite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Favourite screens');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Favourite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problem hosts');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Problems');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Problems by severity');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[10]//h4", 'Web monitoring');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[11]//h4", 'Discovery status');
-			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[9]//h4", 'System information');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//h4", 'Favourite graphs');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//h4", 'Favourite maps');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[6]//h4", 'Problems');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//h4", 'Local');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//h4", 'Problems by severity');
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//h4", 'System information');
+
+			// Logout.
+			$this->zbxTestLogout();
+			$this->zbxTestWaitForPageToLoad();
+			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}
 
@@ -105,53 +96,39 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
-		foreach ($FavouriteGraphs as $FavouriteGraph) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[3]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+		// Disable debug mode. Debug button overlaps delete graph icon.
+		DBexecute("UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7");
+		$exception = null;
+
+		try {
+			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+			$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
+			foreach ($FavouriteGraphs as $FavouriteGraph) {
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+				$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]");
+				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
+			}
+			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+			$this->zbxTestCheckFatalErrors();
+			$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[3]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
-	}
-
-	public function testPageDashboard_AddFavouriteScreen() {
-		$this->zbxTestLogin('screenconf.php');
-		$this->zbxTestCheckHeader('Screens');
-		$this->zbxTestClickLinkTextWait($this->screenClock);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Add to favourites');
-		$this->zbxTestClickWait('addrm_fav');
-		$this->zbxTestCheckFatalErrors();
-		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
-
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//a[@href='screens.php?elementid=$this->screenClockId']", $this->screenClock);
-		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids' AND value_id=$this->screenClockId"));
-	}
-
-	public function testPageDashboard_RemoveFavouriteScreens() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.screenids'"));
-		foreach ($FavouriteScreens as $FavouriteScreen) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[4]//button[@onclick=\"rm4favorites('screenid','".$FavouriteScreen['value_id']."')\"]"));
+		catch (Exception $e) {
+			$exception = $e;
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[4]//tr[@class='nothing-to-show']/td", 'No screens added.');
-		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.screenids'"));
+
+		// Enable debug mode.
+		DBexecute("UPDATE usrgrp SET debug_mode=1 WHERE usrgrpid=7");
+		if ($exception !== null) {
+			throw $exception;
+		}
 	}
 
 	public function testPageDashboard_AddFavouriteMap() {
@@ -165,33 +142,34 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favourites');
 
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
-			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
-			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
-			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[5]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[7]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
+			$this->zbxTestClickXpathWait("//div[@class='dashbrd-grid-widget-container']/div[7]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]");
+			$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[7]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
 		}
-		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[5]//tr[@class='nothing-to-show']/td", 'No maps added.');
+		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
 	}
 
 	public function testPageDashboard_FullScreen() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-max')]");
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
+		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
@@ -204,11 +182,12 @@ class testPageDashboard extends CWebTest {
 	 */
 	public function testPageDashboard_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 
 		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
@@ -223,5 +202,34 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function testPageDashboard_KioskModeUrlParameter() {
+		// Set layout mode to kiosk view.
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
+		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementNotPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
+		$this->zbxTestCheckFatalErrors();
+
+		//  Set layout mode to full screen.
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=1', false);
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
+		$this->zbxTestCheckHeader('Global view');
+		$this->zbxTestAssertElementNotPresentXpath("//header");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
+		$this->zbxTestCheckFatalErrors();
+
+		// Set layout mode to default layout.
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&fullscreen=0');
+		$this->zbxTestCheckHeader('Global view');
+		$this->zbxTestAssertElementPresentXpath("//header");
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 	}
 }

@@ -25,11 +25,7 @@ $table = getTriggersOverview($data['hosts'], $data['triggers'], $back_url->getUr
 
 $output = [
 	'header' => $data['name'],
-	'body' => $table->toString(),
-	'footer' => (new CList())
-		->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
-		->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT)
-		->toString()
+	'body' => $table->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

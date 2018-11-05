@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
-class testConfiguration extends CZabbixTest {
+class testConfiguration extends CAPITest {
 
 	public static function export_fail_data() {
 		return [
@@ -296,80 +296,80 @@ class testConfiguration extends CZabbixTest {
 		$this->call('configuration.import', $import, $expected_error);
 	}
 
-	public static function import_rules_parametrs() {
+	public static function import_rules_parameters() {
 		return [
 			[[
-				'parametr' => 'applications',
+				'parameter' => 'applications',
 				'expected' => ['createMissing', 'deleteMissing'],
 				'unexpected' => ['updateExisting']
 			]],
 			[[
-				'parametr' => 'discoveryRules',
+				'parameter' => 'discoveryRules',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'graphs',
+				'parameter' => 'graphs',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'groups',
+				'parameter' => 'groups',
 				'expected' => ['createMissing'],
 				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
-				'parametr' => 'hosts',
+				'parameter' => 'hosts',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parametr' => 'httptests',
+				'parameter' => 'httptests',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'images',
+				'parameter' => 'images',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parametr' => 'items',
+				'parameter' => 'items',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'maps',
+				'parameter' => 'maps',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parametr' => 'screens',
+				'parameter' => 'screens',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parametr' => 'templateLinkage',
+				'parameter' => 'templateLinkage',
 				'expected' => ['createMissing'],
 				'unexpected' => ['deleteMissing', 'updateExisting']
 			]],
 			[[
-				'parametr' => 'templates',
+				'parameter' => 'templates',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]],
 			[[
-				'parametr' => 'templateScreens',
+				'parameter' => 'templateScreens',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'triggers',
+				'parameter' => 'triggers',
 				'expected' => ['createMissing', 'deleteMissing', 'updateExisting'],
 				'unexpected' => []
 			]],
 			[[
-				'parametr' => 'valueMaps',
+				'parameter' => 'valueMaps',
 				'expected' => ['createMissing', 'updateExisting'],
 				'unexpected' => ['deleteMissing']
 			]]
@@ -377,20 +377,20 @@ class testConfiguration extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider import_rules_parametrs
+	* @dataProvider import_rules_parameters
 	*/
-	public function testConfiguration_ImportBooleanTypeAndUnexpectedParametrs($import) {
+	public function testConfiguration_ImportBooleanTypeAndUnexpectedParameters($import) {
 		foreach ($import['expected'] as $expected) {
 			$this->call('configuration.import', [
 					'format' => 'json',
 					'rules' => [
-						$import['parametr'] => [
+						$import['parameter'] => [
 							$expected => 'test'
 						]
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'Invalid parameter "/rules/'.$import['parametr'].'/'.$expected.'": a boolean is expected.'
+				'Invalid parameter "/rules/'.$import['parameter'].'/'.$expected.'": a boolean is expected.'
 			);
 		}
 
@@ -398,13 +398,13 @@ class testConfiguration extends CZabbixTest {
 			$this->call('configuration.import', [
 					'format' => 'json',
 					'rules' => [
-						$import['parametr'] => [
+						$import['parameter'] => [
 							$unexpected => true
 						]
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'Invalid parameter "/rules/'.$import['parametr'].'": unexpected parameter "'.$unexpected.'".'
+				'Invalid parameter "/rules/'.$import['parameter'].'": unexpected parameter "'.$unexpected.'".'
 			);
 		}
 	}
@@ -505,7 +505,7 @@ class testConfiguration extends CZabbixTest {
 		return [
 			[
 				'format' => 'xml',
-				'parametr' => 'groups',
+				'parameter' => 'groups',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -520,13 +520,13 @@ class testConfiguration extends CZabbixTest {
 			],
 			[
 				'format' => 'json',
-				'parametr' => 'groups',
+				'parameter' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import\''
 			],
 			[
 				'format' => 'xml',
-				'parametr' => 'screens',
+				'parameter' => 'screens',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -543,14 +543,14 @@ class testConfiguration extends CZabbixTest {
 			],
 			[
 				'format' => 'json',
-				'parametr' => 'screens',
+				'parameter' => 'screens',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","screens":[{"name":"API screen json import",'
 							. '"hsize":"1","vsize":"1"}]}}',
 				'sql' => 'select * from screens where name=\'API screen json import\''
 			],
 			[
 				'format' => 'xml',
-				'parametr' => 'valueMaps',
+				'parameter' => 'valueMaps',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -571,7 +571,7 @@ class testConfiguration extends CZabbixTest {
 			],
 			[
 				'format' => 'json',
-				'parametr' => 'valueMaps',
+				'parameter' => 'valueMaps',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import",'
 							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
 				'sql' => 'select * from valuemaps where name=\'API valueMap json import\''
@@ -582,11 +582,11 @@ class testConfiguration extends CZabbixTest {
 	/**
 	* @dataProvider import_create
 	*/
-	public function testConfiguration_ImportCreate($format, $parametr, $source, $sql) {
+	public function testConfiguration_ImportCreate($format, $parameter, $source, $sql) {
 		$result = $this->call('configuration.import', [
 				'format' => $format,
 				'rules' => [
-					$parametr => [
+					$parameter => [
 						'createMissing' => true
 					]
 				],
@@ -595,14 +595,14 @@ class testConfiguration extends CZabbixTest {
 		);
 
 		$this->assertSame(true, $result['result']);
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function import_users() {
 		return [
 			[
 				'format' => 'xml',
-				'parametr' => 'groups',
+				'parameter' => 'groups',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -618,14 +618,14 @@ class testConfiguration extends CZabbixTest {
 			],
 			[
 				'format' => 'json',
-				'parametr' => 'groups',
+				'parameter' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
 				'expected_error' => 'Only Super Admins can create host groups.'
 			],
 			[
 				'format' => 'xml',
-				'parametr' => 'valueMaps',
+				'parameter' => 'valueMaps',
 				'source' => '<?xml version="1.0" encoding="UTF-8"?>
 								<zabbix_export>
 								<version>3.2</version>
@@ -647,7 +647,7 @@ class testConfiguration extends CZabbixTest {
 			],
 			[
 				'format' => 'json',
-				'parametr' => 'valueMaps',
+				'parameter' => 'valueMaps',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-12T07:18:00Z","value_maps":[{"name":"API valueMap json import as non Super Admin",'
 							. '"mappings":[{"value":"1","newvalue":"Up"}]}]}}',
 				'sql' => 'select * from valuemaps where name=\'API valueMap json import as non Super Admin\'',
@@ -659,7 +659,7 @@ class testConfiguration extends CZabbixTest {
 	/**
 	* @dataProvider import_users
 	*/
-	public function testConfiguration_UsersPermissionsToImportCreate($format, $parametr, $source, $sql, $expected_error) {
+	public function testConfiguration_UsersPermissionsToImportCreate($format, $parameter, $source, $sql, $expected_error) {
 		$users = ['zabbix-admin', 'zabbix-user'];
 
 		foreach ($users as $username) {
@@ -667,7 +667,7 @@ class testConfiguration extends CZabbixTest {
 			$this->call('configuration.import', [
 					'format' => $format,
 					'rules' => [
-						$parametr => [
+						$parameter => [
 							'createMissing' => true
 						]
 					],
@@ -676,7 +676,7 @@ class testConfiguration extends CZabbixTest {
 				$expected_error
 			);
 
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 }

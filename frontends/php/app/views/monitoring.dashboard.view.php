@@ -29,6 +29,17 @@ else {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
+	$this->addJsFile('class.coverride.js');
+	$this->addJsFile('class.cverticalaccordion.js');
+	$this->addJsFile('class.crangecontrol.js');
+	$this->addJsFile('colorpicker.js');
+	$this->addJsFile('class.csvggraph.js');
+	$this->addJsFile('csvggraphwidget.js');
+	$this->addJsFile('class.cclock.js');
+	$this->addJsFile('class.cnavtree.js');
+	$this->addJsFile('class.mapWidget.js');
+	$this->addJsFile('class.svg.canvas.js');
+	$this->addJsFile('class.svg.map.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 

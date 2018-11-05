@@ -18,17 +18,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once 'vendor/autoload.php';
 
-class CSvgPolyline extends CSvgTag {
+require_once dirname(__FILE__).'/../CElement.php';
 
-	public function __construct($points) {
-		parent::__construct('polyline', true);
+/**
+ * Checkbox element.
+ */
+class CCheckboxElement extends CElement {
 
-		$p = '';
-		foreach ($points as $point) {
-			$p = $p . ' ' . $point[0] . ',' . $point[1];
+	/**
+	 * Set checkbox state.
+	 *
+	 * @param boolean $checked    checked or not
+	 *
+	 * @return $this
+	 */
+	public function set($checked) {
+		if ($checked !== $this->isSelected()) {
+			$this->click();
 		}
 
-		$this->setAttribute('points', trim($p));
+		return $this;
+	}
+
+	/**
+	 * Set checkbox state to checked.
+	 *
+	 * @return $this
+	 */
+	public function check() {
+		return $this->set(true);
+	}
+
+	/**
+	 * Set checkbox state to not checked.
+	 *
+	 * @return $this
+	 */
+	public function uncheck() {
+		return $this->set(false);
 	}
 }

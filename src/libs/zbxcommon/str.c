@@ -21,6 +21,8 @@
 #include "threads.h"
 #include "module.h"
 
+#include "../zbxcrypto/tls.h"
+
 #ifdef HAVE_ICONV
 #	include <iconv.h>
 #endif
@@ -54,6 +56,10 @@ void	version(void)
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	printf("\n");
+	zbx_tls_version();
+#endif
 }
 
 /******************************************************************************
@@ -400,7 +406,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 /******************************************************************************
  *                                                                            *
- * Function: del_zeroes                                                       *
+ * Function: del_zeros                                                       *
  *                                                                            *
  * Purpose: delete all right '0' and '.' for the string                       *
  *                                                                            *
@@ -413,7 +419,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void	del_zeroes(char *s)
+void	del_zeros(char *s)
 {
 	int     i;
 
@@ -1860,6 +1866,9 @@ size_t	zbx_utf8_char_len(const char *text)
 		return 3;
 	else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
 		return 4;
+#if ZBX_MAX_BYTES_IN_UTF8_CHAR != 4
+#	error "zbx_utf8_char_len() is not synchronized with ZBX_MAX_BYTES_IN_UTF8_CHAR"
+#endif
 	return 0;				/* not a valid UTF-8 character */
 }
 
@@ -3968,7 +3977,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
  *                                                                            *
  * Function: zbx_number_parse                                                 *
  *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
+ * Purpose: parse a number like "12.345"                                      *
  *                                                                            *
  * Parameters: number - [IN] start of number                                  *
  *             len    - [OUT] length of parsed number                         *
@@ -4006,11 +4015,36 @@ int	zbx_number_parse(const char *number, int *len)
 		if (1 > digits || 1 < dots)
 			return FAIL;
 
-		if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-			(*len)++;
-
 		return SUCCEED;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_suffixed_number_parse                                        *
+ *                                                                            *
+ * Purpose: parse a suffixed number like "12.345K"                            *
+ *                                                                            *
+ * Parameters: number - [IN] start of number                                  *
+ *             len    - [OUT] length of parsed number                         *
+ *                                                                            *
+ * Return value: SUCCEED - the number was parsed successfully                 *
+ *               FAIL    - invalid number                                     *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *           The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_suffixed_number_parse(const char *number, int *len)
+{
+	if (FAIL == zbx_number_parse(number, len))
+		return FAIL;
+
+	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
+		(*len)++;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -4050,7 +4084,7 @@ int	zbx_number_find(const char *str, size_t pos, zbx_strloc_t *number_loc)
 			continue;
 		}
 
-		if (SUCCEED != zbx_number_parse(s, &len))
+		if (SUCCEED != zbx_suffixed_number_parse(s, &len))
 			continue;
 
 		/* number found */

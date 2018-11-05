@@ -33,17 +33,17 @@ class CSvgGraphArea extends CSvgGraphLine {
 		];
 	}
 
-	public function getStyles() {
+	public function makeStyles() {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA)
-			->addClass(CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA)
+			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA => [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA => [
 				'stroke-width' => 0
 			],
-			'.'.CSvgTag::ZBX_STYLE_SVG_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'fill-opacity' => $this->options['fill']  * 0.1,
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
+				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color']
 			]
 		];

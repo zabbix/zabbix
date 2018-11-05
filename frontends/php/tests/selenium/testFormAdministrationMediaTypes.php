@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup media_type
  */
-class testFormAdministrationMediaTypes extends CWebTest {
+class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 	public static function allMediaTypes() {
-		return DBdata('SELECT * FROM media_type');
+		return CDBHelper::getDataProvider('SELECT * FROM media_type');
 	}
 
 	public static function layout() {
@@ -227,7 +227,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$name = $mediatype['description'];
 
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
-		$oldHashMediaType = DBhash($sql);
+		$oldHashMediaType = CDBHelper::getHash($sql);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
@@ -238,7 +238,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($oldHashMediaType, DBhash($sql));
+		$this->assertEquals($oldHashMediaType, CDBHelper::getHash($sql));
 	}
 
 	public static function newMediaTypes() {
@@ -328,7 +328,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
 		$name = $mediatype['description'];
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
-		$oldHashMediaType=DBhash($sqlMediaType);
+		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestClickLinkTextWait($name);
@@ -337,7 +337,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
 
-		$newHashMediaType = DBhash($sqlMediaType);
+		$newHashMediaType = CDBHelper::getHash($sqlMediaType);
 		$this->assertEquals($oldHashMediaType, $newHashMediaType);
 	}
 
@@ -368,8 +368,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
 			$this->zbxTestCheckFatalErrors();
-			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
-			$this->assertEquals(0, DBcount($sql));
+			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id);
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -623,7 +623,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				}
 
 				$sql = "SELECT * FROM media_type WHERE description = '".$data['name']."'";
-				$this->assertEquals(0, DBcount($sql));
+				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 		}
 

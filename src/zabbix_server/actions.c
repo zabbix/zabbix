@@ -25,6 +25,7 @@
 #include "actions.h"
 #include "operations.h"
 #include "events.h"
+#include "zbxregexp.h"
 
 /******************************************************************************
  *                                                                            *
@@ -922,6 +923,14 @@ static int	check_auto_registration_condition(const DB_EVENT *event, DB_CONDITION
 						break;
 					case CONDITION_OPERATOR_NOT_LIKE:
 						if (NULL == strstr(row[0], condition->value))
+							ret = SUCCEED;
+						break;
+					case CONDITION_OPERATOR_REGEXP:
+						if (NULL != zbx_regexp_match(row[0], condition->value, NULL))
+							ret = SUCCEED;
+						break;
+					case CONDITION_OPERATOR_NOT_REGEXP:
+						if (NULL == zbx_regexp_match(row[0], condition->value, NULL))
 							ret = SUCCEED;
 						break;
 					default:
@@ -1910,7 +1919,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_uint6
 		for (j = 0; j < rec_escalations.values_num; j++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update escalations set r_eventid=" ZBX_FS_UI64
+					"update escalations set r_eventid=" ZBX_FS_UI64 ",nextcheck=0"
 					" where escalationid=" ZBX_FS_UI64 ";\n",
 					rec_escalations.values[j].second, rec_escalations.values[j].first);
 

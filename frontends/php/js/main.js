@@ -432,16 +432,11 @@ var hintBox = {
 	/**
 	 * Initialize hint box event handlers.
 	 *
-	 * Event 'remove' is triggered on:
-	 * - content update using flickerfreeScreen.refreshHtml()
-	 * - widget update by updateWidgetContent()
-	 * - widget remove by deleteWidget().
-	 *
 	 * Triggered events:
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
-		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
 			var target = jQuery(this);
 
 			switch (e.type) {
@@ -452,11 +447,7 @@ var hintBox = {
 					break;
 
 				case 'mouseleave':
-					hintBox.hideHint(e, this);
-					break;
-
-				case 'remove':
-					hintBox.deleteHint(this);
+					hintBox.hideHint(this, false);
 					break;
 
 				case 'keydown':
@@ -517,6 +508,7 @@ var hintBox = {
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
+			jQuery(target).attr('data-expanded', 'true');
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
@@ -525,19 +517,27 @@ var hintBox = {
 				}
 			)
 				.click(function() {
-					hintBox.hideHint(e, target, true);
+					hintBox.hideHint(target, true);
 				});
 			box.prepend(close_link);
 		}
 
 		jQuery(appendTo).append(box);
 
+		var removeHandler = function() {
+			hintBox.deleteHint(target);
+		};
+
+		jQuery(target)
+			.off('remove', removeHandler)
+			.on('remove', removeHandler);
+
 		return box;
 	},
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
-		hintBox.hideHint(e, target, true);
+		hintBox.hideHint(target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
@@ -640,7 +640,7 @@ var hintBox = {
 		});
 	},
 
-	hideHint: function(e, target, hideStatic) {
+	hideHint: function(target, hideStatic) {
 		if (target.isStatic && !hideStatic) {
 			return;
 		}
@@ -650,6 +650,7 @@ var hintBox = {
 
 	deleteHint: function(target) {
 		if (typeof target.hintboxid !== 'undefined') {
+			jQuery(target).removeAttr('data-expanded');
 			removeFromOverlaysStack(target.hintboxid);
 		}
 
@@ -1070,45 +1071,55 @@ jQuery(function ($) {
 		return rows;
 	}
 
-	$.fn.autoGrowTextarea = function(options) {
-		this.each(function() {
-			if (typeof $(this).data('autogrow') === 'undefined') {
-				options = $.extend({}, options);
+	var methods = {
+		init: function(options) {
+			options = $.extend({}, options);
 
-				$(this)
-					.css({
-						'resize': 'none',
-						'overflow-x': 'hidden',
-						'white-space': 'pre-line'
-					})
-					.on('paste change keyup', function() {
-						var rows = calcRows($(this), options);
+			this.each(function() {
+				if (typeof $(this).data('autogrow') === 'undefined') {
+					$(this)
+						.css({
+							'resize': 'none',
+							'overflow-x': 'hidden',
+							'white-space': 'pre-line'
+						})
+						.on('paste change keyup', function() {
+							var rows = calcRows($(this), options);
 
-						if (options && 'pair' in options) {
-							var pair_rows = calcRows($(options.pair), options);
-							if (pair_rows > rows) {
-								rows = pair_rows;
+							if (options && 'pair' in options) {
+								var pair_rows = calcRows($(options.pair), options);
+								if (pair_rows > rows) {
+									rows = pair_rows;
+								}
+								$(options.pair).attr('rows', rows);
 							}
-							$(options.pair).attr('rows', rows);
+
+							$(this).attr('rows', rows);
+						})
+						.data('autogrow', options)
+						.trigger('keyup');
+				}
+
+				if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
+					$(this).bind('paste contextmenu change keydown keypress keyup', function() {
+						if ($(this).val().length > $(this).attr('maxlength')) {
+							$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
 						}
+					});
+				}
 
-						$(this).attr('rows', rows);
-					})
-					.data('autogrow', options)
-					.trigger('change');
-			}
+				if (options && 'pair' in options) {
+					$(options.pair).css({'resize': 'none'});
+				}
+			});
+		}
+	};
 
-			if ($(this).prop('maxlength') !== 'undefined' && !CR && !GK) {
-				$(this).bind('paste contextmenu change keydown keypress keyup', function() {
-					if ($(this).val().length > $(this).attr('maxlength')) {
-						$(this).val($(this).val().substr(0, $(this).attr('maxlength')));
-					}
-				});
-			}
+	$.fn.autoGrowTextarea = function(method, options) {
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		}
 
-			if (options && 'pair' in options) {
-				$(options.pair).css({'resize': 'none'});
-			}
-		});
+		return methods.init.apply(this, arguments);
 	};
 });

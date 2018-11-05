@@ -361,7 +361,7 @@ class CControllerPopupGeneric extends CController {
 			'value_types' =>				'array',
 			'numeric' =>					'in 1',
 			'reference' =>					'string',
-			'resolve_items' =>				'in 0',
+			'orig_names' =>					'in 1',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
 			'submit_parent' =>				'in 1'
@@ -613,7 +613,7 @@ class CControllerPopupGeneric extends CController {
 			}
 		}
 
-		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'resolve_items', 'value_types'];
+		$option_fields_value = ['host_templates', 'itemtype', 'screenid', 'orig_names', 'value_types'];
 		foreach ($option_fields_value as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = $this->getInput($field);
@@ -824,7 +824,7 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				// Resolve item names by default.
-				$records = array_key_exists('resolve_items', $page_options)
+				$records = array_key_exists('orig_names', $page_options)
 					? CArrayHelper::renameObjectsKeys($records, ['name' => 'name_expanded'])
 					: CMacrosResolverHelper::resolveItemNames($records);
 
