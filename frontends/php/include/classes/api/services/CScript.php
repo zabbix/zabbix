@@ -789,8 +789,8 @@ class CScript extends CApiService {
 	 * Applies relational subselect onto alreadey fetched result.
 	 *
 	 * @param $options array
-	 * @param $restult array
-	 * @return $restult array
+	 * @param $result array
+	 * @return $result array
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
@@ -802,62 +802,59 @@ class CScript extends CApiService {
 			return $result;
 		}
 
-		// these host group id's are "blacklisted" and will not be used in selection
-		$writeable_groups = [];
-		// any script has a read only permission
-		$has_read_only_restriction = false;
+		$host_groups_with_write_access = [];
+		$has_write_access_level = false;
 
-		// child or all host group selection
-		$child_group_serach = ['name' => []];
+		$group_search = ['name' => []];
 		foreach ($result as $script) {
-			$has_read_only_restriction |= ($script['host_access'] == PERM_READ);
+			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
 			if ($script['groupid'] === '0') {
-				$child_group_serach = null;
-				break;
+				$group_search = null;
+				continue;
 			}
-			$child_group_serach['name'][] = $this->parent_host_groups[$script['groupid']]['name'];
+			$group_search['name'][] = $this->parent_host_groups[$script['groupid']]['name'];
 		}
 
-		$selectGroups = ['name', 'groupid'];
-		if ($options['selectGroups'] !== API_OUTPUT_EXTEND) {
-			if (is_array($options['selectGroups'])) {
-				$selectGroups = array_merge($options['selectGroups'], $selectGroups);
-			}
+		$select_groups = ['name', 'groupid'];
+		if ($options['selectGroups'] !== API_OUTPUT_EXTEND && is_array($options['selectGroups'])) {
+			$select_groups = array_merge($options['selectGroups'], $select_groups);
 		}
 
-		$host_group_nodes = API::HostGroup()->get([
-			'output' => $selectGroups,
-			'search' => $child_group_serach,
+		$host_groups = API::HostGroup()->get([
+			'output' => $select_groups,
+			'search' => $group_search,
 			'searchByAny' => true,
 			'startSearch' => true,
 			'preservekeys' => true
 		]);
 
-		if ($has_read_only_restriction) {
-			$writeable_groups = API::HostGroup()->get([
-				'output' => $selectGroups,
-				'search' => $child_group_serach,
+		if ($has_write_access_level) {
+			$host_groups_with_write_access = API::HostGroup()->get([
+				'output' => $select_groups,
+				'search' => $group_search,
 				'searchByAny' => true,
 				'startSearch' => true,
 				'preservekeys' => true,
 				'editable' => true
 			]);
+		} else {
+			$host_groups_with_write_access = $host_groups;
 		}
 
 		$host_group_children = [];
 		$group_parents = [];
-		foreach ($host_group_nodes as $groupid => $group) {
+		foreach ($host_groups as $groupid => $group) {
 			$parts = explode('/', $group['name']);
 			$group_parents[$groupid] = [count($parts), []];
 			for (array_pop($parts); $parts; array_pop($parts)) {
 				$group_parents[$groupid][implode('/', $parts)] = true;
 			}
 		}
-		foreach ($host_group_nodes as $groupid => $group) {
+		foreach ($host_groups as $groupid => $group) {
 			if (!array_key_exists($groupid, $host_group_children)) {
 				$host_group_children[$groupid] = [$groupid => true];
 			}
-			foreach ($host_group_nodes as $child_groupid => $child_group) {
+			foreach ($host_groups as $child_groupid => $child_group) {
 				if ($groupid === $child_groupid) {
 					continue;
 				}
@@ -869,8 +866,8 @@ class CScript extends CApiService {
 
 		if ($is_hosts_select) {
 			$sql = 'SELECT hostid,groupid FROM hosts_groups';
-			if ($child_group_serach !== null) {
-				$sql .= ' WHERE '.dbConditionInt('groupid', array_keys($host_group_nodes));
+			if ($group_search !== null) {
+				$sql .= ' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
 			}
 			$db_group_hosts = DBSelect($sql);
 
@@ -891,18 +888,19 @@ class CScript extends CApiService {
 			]);
 		}
 
-		$host_group_nodes = $this->unsetExtraFields($host_group_nodes, ['name', 'groupid'], $options['selectGroups']);
-		$writeable_groups = $this->unsetExtraFields($writeable_groups, ['name', 'groupid'], $options['selectGroups']);
+		$host_groups = $this->unsetExtraFields($host_groups, ['name', 'groupid'], $options['selectGroups']);
+		$host_groups_with_write_access = $this->unsetExtraFields($host_groups_with_write_access,
+																	['name', 'groupid'], $options['selectGroups']);
 
 		foreach ($result as $scriptid => &$script) {
 			if ($script['groupid'] === '0') {
-				$script_groups = $script['host_access'] != PERM_READ_WRITE
-					? $host_group_nodes
-					: $writeable_groups;
+				$script_groups = $script['host_access'] == PERM_READ_WRITE
+					? $host_groups_with_write_access
+					: $host_groups;
 			} else {
-				$script_groups = $script['host_access'] != PERM_READ_WRITE
-					? array_intersect_key($host_group_nodes, $host_group_children[$script['groupid']])
-					: array_intersect_key($writeable_groups, $host_group_children[$script['groupid']]);
+				$script_groups = $script['host_access'] == PERM_READ_WRITE
+					? array_intersect_key($host_groups_with_write_access, $host_group_children[$script['groupid']])
+					: array_intersect_key($host_groups, $host_group_children[$script['groupid']]);
 			}
 
 			if ($is_groups_select) {
