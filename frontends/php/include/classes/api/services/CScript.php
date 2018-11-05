@@ -204,29 +204,6 @@ class CScript extends CApiService {
 		return $result;
 	}
 
-
-	/**
-	 * Creates unsorted list of all of group id's that are in preceding path.
-	 *
-	 * @param array $groups
-	 * @param array $groupids
-	 *
-	 * @return array
-	 */
-	public function createGroupPaths(array $groups, array $groupids) {
-		$paths = array_combine($groupids, array_fill(0, count($groupids), []));
-
-		foreach ($groups as $group) {
-			foreach ($groups as $regroup) {
-				if (strpos($regroup['name'], $group['name']) === 0) {
-					$paths[$group['groupid']][] = $regroup['groupid'];
-				}
-			}
-		}
-
-		return $paths;
-	}
-
 	/**
 	 * Enriches host groups array by parent groups.
 	 *
