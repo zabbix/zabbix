@@ -31,7 +31,7 @@ if (empty($data['screen']) || empty($data['host'])) {
 else {
 	$screen_widget->setTitle([
 		$data['screen']['name'].' '._('on').' ',
-		(new CSpan($data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+		new CSpan($data['host']['name'])
 	]);
 
 	$url = (new CUrl('host_screen.php'))

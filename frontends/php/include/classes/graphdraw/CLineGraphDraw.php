@@ -741,7 +741,9 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 			}
 			else {
-				$this->zero[$side] = $this->sizeY + $this->shiftY - (int) abs($this->m_minY[$side] / $this->unit2px[$side]);
+				$this->zero[$side] = $this->sizeY + $this->shiftY - abs(bcdiv($this->m_minY[$side],
+					$this->unit2px[$side]
+				));
 				$this->oxy[$side] = 0;
 			}
 		}
