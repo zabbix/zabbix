@@ -17,76 +17,96 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 var cookie = {
 	cookies: [],
 	prefix:	null,
+	/*
+	 * Encoding values separated by a comma (%2C), makes the cookie very large in size. A dot, however, remains a dot.
+	 * Must be synced with class.ctree.js for consistency.
+	 */
+	delimiter: '.',
 
 	init: function() {
 		var allCookies = document.cookie.split('; ');
 
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			this.cookies[cookiePair[0]] = cookiePair[1];
+			this.cookies[decodeURIComponent(cookiePair[0])] = decodeURIComponent(cookiePair[1]);
 		}
 	},
 
 	create: function(name, value, days) {
 		var expires = '';
 
-		if (typeof(days) != 'undefined') {
+		if (typeof(days) !== 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
 			expires = '; expires=' + date.toGMTString();
 		}
 
-		document.cookie = name + '=' + value + expires + (location.protocol == 'https:' ? '; secure' : '');
+		document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + expires +
+			(location.protocol === 'https:' ? '; secure' : '');
 
-		// apache header size limit
+		// Apache header size limit.
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=;';
+			document.cookie = encodeURIComponent(name) + '=;';
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
 		else {
 			this.cookies[name] = value;
 		}
+
 		return true;
 	},
 
 	createArray: function(name, value, days) {
-		var list = value.join(',');
-		var list_part = '';
-		var part = 1;
-		var part_count = parseInt(this.read(name + '_parts'), 10);
+		var part_string = '',
+			part_length = 0,
+			part = 0,
+			prev_part_count = parseInt(this.read(name + '_parts'), 10);
 
-		if (is_null(part_count)) {
-			part_count = 1;
+		if (is_null(prev_part_count)) {
+			prev_part_count = 1;
 		}
 
-		var tmp_index = 0
-		var result = true;
-		while (list.length > 0) {
-			list_part = list.substr(0, 4000);
-			list = list.substr(4000);
-			if (list.length > 0) {
-				tmp_index = list_part.lastIndexOf(',');
-				if (tmp_index > -1) {
-					list = list_part.substring(tmp_index+1) + list;
-					list_part = list_part.substring(0, tmp_index + 1);
+		for (var i = 0; i < value.length; i++) {
+			var is_last = (i === value.length - 1),
+				curr_value = value[i];
+
+			if (!is_last) {
+				curr_value += this.delimiter;
+			}
+
+			var curr_length = encodeURIComponent(curr_value).length;
+
+			if (part_length + curr_length <= 4000) {
+				part_string += curr_value;
+				part_length += curr_length;
+			}
+			else {
+				part++;
+
+				if (!this.create(name + '_' + part, part_string, days)) {
+					break;
 				}
-			}
-			result = this.create(name + '_' + part, list_part, days);
-			part++;
 
-			if (!result) {
-				break;
+				part_string = curr_value;
+				part_length = curr_length;
+			}
+
+			if (is_last) {
+				part++;
+				this.create(name + '_' + part, part_string, days);
 			}
 		}
-		this.create(name + '_parts', part - 1, days);
 
-		while (part <= part_count) {
-			this.erase(name + '_' + part);
+		this.create(name + '_parts', part, days);
+
+		while (part < prev_part_count) {
 			part++;
+			this.erase(name + '_' + part);
 		}
 	},
 
@@ -104,19 +124,21 @@ var cookie = {
 		if (typeof(this.cookies[name]) !== 'undefined') {
 			return this.cookies[name];
 		}
-		else if (document.cookie.indexOf(name) != -1) {
-			var nameEQ = name + '=';
+		else if (document.cookie.indexOf(encodeURIComponent(name)) != -1) {
+			var nameEQ = encodeURIComponent(name) + '=';
 			var ca = document.cookie.split(';');
+
 			for (var i = 0; i < ca.length; i++) {
 				var c = ca[i];
 				while (c.charAt(0) == ' ') {
 					c = c.substring(1, c.length);
 				}
 				if (c.indexOf(nameEQ) == 0) {
-					return this.cookies[name] = c.substring(nameEQ.length, c.length);
+					return this.cookies[name] = decodeURIComponent(c.substring(nameEQ.length, c.length));
 				}
 			}
 		}
+
 		return null;
 	},
 
@@ -137,7 +159,7 @@ var cookie = {
 			list_part = this.read(name + '_' + part);
 			part++;
 		}
-		var range = (list != '') ? list.split(',') : [];
+		var range = (list != '') ? list.split(this.delimiter) : [];
 		return range;
 	},
 
