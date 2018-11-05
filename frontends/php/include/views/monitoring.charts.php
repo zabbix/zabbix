@@ -64,7 +64,7 @@ $chartsWidget = (new CWidget())
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([$controls, $content_control]));
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('charts.php')))
 	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 	->setActiveTab($data['active_tab'])
 	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);

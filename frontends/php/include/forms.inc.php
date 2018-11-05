@@ -261,7 +261,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$filter = (new CFilter())
+	$filter = (new CFilter(new CUrl('items.php')))
 		->setProfile('web.items.filter')
 		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)

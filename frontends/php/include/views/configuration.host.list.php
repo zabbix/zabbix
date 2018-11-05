@@ -93,7 +93,7 @@ $filter_tags_table->addRow(
 );
 
 // filter
-$filter = new CFilter();
+$filter = new CFilter(new CUrl('hosts.php'));
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])

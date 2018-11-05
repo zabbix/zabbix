@@ -160,7 +160,7 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeselector']) {
-		$timeline = (new CFilter())
+		$timeline = (new CFilter(new CUrl()))
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);

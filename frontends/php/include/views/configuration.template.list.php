@@ -66,7 +66,7 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$filter = new CFilter();
+$filter = new CFilter(new CUrl('templates.php'));
 $filter
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
