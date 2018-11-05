@@ -193,11 +193,18 @@ out:
 
 static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 {
-	long	http_code;
+	long int	http_code;
+	CURLcode	curl_err;
+	CURLINFO	opt;
 
 	if (CURLE_HTTP_RETURNED_ERROR == error)
 	{
-		curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
+		if (CURLE_OK != (curl_err = curl_easy_getinfo(handle, opt = CURLINFO_RESPONSE_CODE, &http_code)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot get cURL info %d: %s.", (int)opt,
+					curl_easy_strerror(curl_err));
+			http_code = 0;
+		}
 
 		if (0 != page_r.offset)
 		{
@@ -481,10 +488,19 @@ try_again:
 				else
 				{
 					long int	err;
+					CURLcode	curl_err;
+					CURLINFO	opt;
 
-					curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &err);
-					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, HTTP error code:"
-							" %ld", err);
+					if (CURLE_OK != (curl_err = curl_easy_getinfo(msg->easy_handle,
+							opt = CURLINFO_RESPONSE_CODE, &err)))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "Cannot get cURL info %d: %s.", (int)opt,
+								curl_easy_strerror(curl_err));
+						err = 0;
+					}
+
+					zabbix_log(LOG_LEVEL_ERR, "cannot send data to elasticsearch, HTTP "
+							"error code: %ld", err);
 				}
 			}
 			else if (CURLE_OK != msg->data.result)
