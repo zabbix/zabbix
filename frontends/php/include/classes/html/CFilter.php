@@ -27,6 +27,14 @@ class CFilter extends CDiv {
 	private $name = 'zbx_filter';
 	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
+
+	/**
+	 * Filter page URL.
+	 *
+	 * @var object
+	 */
+	private $url;
+
 	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
 	protected $headers = [];
 	// Array of filter tab content.
@@ -83,8 +91,10 @@ class CFilter extends CDiv {
 		]
 	];
 
-	public function __construct() {
+	public function __construct(CUrl $url) {
 		parent::__construct();
+
+		$this->url = $url;
 
 		$this->addClass('filter-space')
 			->setId(uniqid('filter_'));
@@ -190,11 +200,6 @@ class CFilter extends CDiv {
 			->addItem($row);
 
 		if ($this->show_buttons) {
-			$url = (new CUrl())
-				->removeArgument('filter_set')
-				->removeArgument('ddreset')
-				->setArgument('filter_rst', 1);
-
 			$body[] = (new CDiv())
 				->addClass(ZBX_STYLE_FILTER_FORMS)
 				->addItem(
@@ -202,7 +207,11 @@ class CFilter extends CDiv {
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				)
 				->addItem(
-					(new CRedirectButton(_('Reset'), $url->getUrl()))
+					(new CRedirectButton(_('Reset'),
+						$this->url
+							->setArgument('filter_rst', 1)
+							->getUrl()
+					))
 						->addClass(ZBX_STYLE_BTN_ALT)
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				);
