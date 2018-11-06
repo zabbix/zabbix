@@ -2314,7 +2314,7 @@ class CMap extends CMapElement {
 					' FROM sysmap_element_trigger st,triggers tr'.
 					' WHERE '.dbConditionInt('st.selementid', array_keys($selements)).
 						' AND st.triggerid=tr.triggerid'.
-					' ORDER BY st.selementid,tr.priority DESC,st.selement_triggerid'
+					' ORDER BY tr.priority DESC,st.selement_triggerid'
 				);
 				while ($selement_trigger = DBfetch($selement_triggers)) {
 					$selements[$selement_trigger['selementid']]['elements'][] = [
