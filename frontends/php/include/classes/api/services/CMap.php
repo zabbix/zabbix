@@ -2304,8 +2304,6 @@ class CMap extends CMapElement {
 			$relation_map = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
 			if ($this->outputIsRequested('elements', $options['selectSelements']) && $selements) {
-				$higher_elemens = [];
-
 				foreach ($selements as &$selement) {
 					$selement['elements'] = [];
 				}
@@ -2322,8 +2320,8 @@ class CMap extends CMapElement {
 					$selements[$selement_trigger['selementid']]['elements'][] = [
 						'triggerid' => $selement_trigger['triggerid']
 					];
-					if (!array_key_exists($selement_trigger['selementid'], $higher_elemens)) {
-						$higher_elemens[$selement_trigger['selementid']] = $selement_trigger['triggerid'];
+					if ($selements[$selement_trigger['selementid']]['elementid'] == 0) {
+						$selements[$selement_trigger['selementid']]['elementid'] = $selement_trigger['triggerid'];
 					}
 				}
 
@@ -2331,7 +2329,7 @@ class CMap extends CMapElement {
 					SYSMAP_ELEMENT_TYPE_HOST_GROUP
 				];
 
-				foreach ($selements as $key => &$selement) {
+				foreach ($selements as &$selement) {
 					if (in_array($selement['elementtype'], $single_element_types)) {
 						switch ($selement['elementtype']) {
 							case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -2347,9 +2345,6 @@ class CMap extends CMapElement {
 								break;
 						}
 						$selement['elements'][] = [$field => $selement['elementid']];
-					}
-					elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-						$selement['elementid'] = $higher_elemens[$key];
 					}
 				}
 				unset($selement);
