@@ -369,7 +369,7 @@
 				next_col,
 				col,
 				collapsed;
-			scanline[size_key] = size_min;
+			scanline[size_key] = 1;
 
 			while (slot < new_max && overlap > 0) {
 				scanline[axis_key] = slot;
@@ -550,8 +550,7 @@
 		setDivPosition(data['placeholder'], data, pos, true);
 
 		if (!posEquals(pos, widget['current_pos'])) {
-			$.each(data.widgets, function(i, box) {
-				box.div.css('background-color', '');
+			data.widgets.each(function(box) {
 				delete box.current_pos;
 			});
 			widget['current_pos'] = pos;
@@ -563,48 +562,21 @@
 				}
 			});
 		}
-		return;
-
-		// This part is used by doWidgetResize
-		// TODO: remove
-		if (!posEquals(pos, widget['current_pos'])) {
-			widget['current_pos'] = pos;
-			// TODO: envoke realignResize separately for x and y changes.
-
-			if (realignResize(data, widget)) {
-				delete widget.freeze_pos;
-				widget.previous_pos = $.extend({}, pos);
-				setDivPosition(data['placeholder'], data, pos, true);
-
-				$.each(data['widgets'], function() {
-					if (widget.uniqueid != this.uniqueid) {
-						setDivPosition(this['div'], data, this['current_pos'], false);
-					}
-				});
-			}
-			else {
-				widget.current_pos = $.extend({}, widget.previous_pos);
-				widget.freeze_pos = $.extend({}, widget.previous_pos);
-				pos = widget.freeze_pos;
-				setDivPosition($div, data, widget.freeze_pos, false);
-				setDivPosition(data['placeholder'], data, widget.freeze_pos, true);
-			}
-		}
 
 		// TODO: envoke only on vertical resize!
-		// var min_rows = 0;
+		var min_rows = 0;
 
-		// $.each(data['widgets'], function() {
-		// 	var rows = this['current_pos']['y'] + this['current_pos']['height'];
+		$.each(data['widgets'], function() {
+			var rows = this['current_pos']['y'] + this['current_pos']['height'];
 
-		// 	if (min_rows < rows) {
-		// 		min_rows = rows;
-		// 	}
-		// });
+			if (min_rows < rows) {
+				min_rows = rows;
+			}
+		});
 
-		// if (data['options']['rows'] < min_rows) {
-		// 	resizeDashboardGrid($obj, data, min_rows);
-		// }
+		if (data['options']['rows'] < min_rows) {
+			resizeDashboardGrid($obj, data, min_rows);
+		}
 	}
 
 	/**
