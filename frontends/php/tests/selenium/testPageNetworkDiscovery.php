@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageDiscovery extends CLegacyWebTest {
-	public function testPageDiscovery_CheckLayout() {
+class testPageNetworkDiscovery extends CLegacyWebTest {
+	public function testPageNetworkDiscovery_CheckLayout() {
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 
@@ -39,7 +39,7 @@ class testPageDiscovery extends CLegacyWebTest {
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_SimpleUpdate($drule) {
+	public function testPageNetworkDiscovery_SimpleUpdate($drule) {
 		$sqlDRules = 'SELECT * FROM drules WHERE druleid='.$drule['druleid'];
 		$sqlDChecks = 'SELECT * FROM dchecks WHERE druleid='.$drule['druleid'].' ORDER BY dcheckid';
 		$oldHashDRules = CDBHelper::getHash($sqlDRules);
@@ -62,7 +62,7 @@ class testPageDiscovery extends CLegacyWebTest {
 	 * @dataProvider allRules
 	 * @backup drules
 	 */
-	public function testPageDiscovery_MassDelete($drule) {
+	public function testPageNetworkDiscovery_MassDelete($drule) {
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
@@ -76,7 +76,7 @@ class testPageDiscovery extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
 	}
 
-	public function testPageDiscovery_MassDisableAll() {
+	public function testPageNetworkDiscovery_MassDisableAll() {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE);
 
 		$this->zbxTestLogin('discoveryconf.php');
@@ -94,7 +94,7 @@ class testPageDiscovery extends CLegacyWebTest {
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassDisable($drule) {
+	public function testPageNetworkDiscovery_MassDisable($drule) {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE.' WHERE druleid='.$drule['druleid']);
 
 		$this->zbxTestLogin('discoveryconf.php');
@@ -114,7 +114,7 @@ class testPageDiscovery extends CLegacyWebTest {
 		));
 	}
 
-	public function testPageDiscovery_MassEnableAll() {
+	public function testPageNetworkDiscovery_MassEnableAll() {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
 
 		$this->zbxTestLogin('discoveryconf.php');
@@ -132,7 +132,7 @@ class testPageDiscovery extends CLegacyWebTest {
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassEnable($drule) {
+	public function testPageNetworkDiscovery_MassEnable($drule) {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
 
 		$this->zbxTestLogin('discoveryconf.php');
