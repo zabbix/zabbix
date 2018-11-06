@@ -51,10 +51,6 @@ typedef struct
 }
 zbx_httppage_t;
 
-#define ZBX_RETRIEVE_MODE_CONTENT	0
-#define ZBX_RETRIEVE_MODE_HEADERS	1
-#define ZBX_RETRIEVE_MODE_BOTH		2
-
 static zbx_httppage_t	page;
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
