@@ -59,7 +59,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (data\ sender, poller, configuration\ syncer, heartbeat\ sender, unreachable\ poller, trapper, icmp\ pinger, housekeeper, http\ poller, discoverer, history\ syncer, java\ poller, snmp\ trapper, self-monitoring, vmware\ collector, ipmi\ manager, ipmi\ poller, task\ manager)
+All processes of specified type (configuration\ syncer, heartbeat\ sender, data\ sender, ipmi\ manager, housekeeper, http\ poller, discoverer, history\ syncer, ipmi\ poller, java\ poller, snmp\ trapper, self-monitoring, vmware\ collector, task\ manager, poller, unreachable\ poller, trapper, icmp\ pinger )
 .RE
 .RS 4
 .TP 4
