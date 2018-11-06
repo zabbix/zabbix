@@ -42,7 +42,7 @@ foreach ($inventoryFields as $inventoryField) {
 
 // filter
 $hostInventoryWidget->addItem(
-	(new CFilter())
+	(new CFilter(new CUrl('hostinventories.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

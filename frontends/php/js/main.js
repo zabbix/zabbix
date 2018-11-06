@@ -513,7 +513,7 @@ var hintBox = {
 
 			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn',
-					'title': t('Close')
+					'title': t('S_CLOSE')
 				}
 			)
 				.click(function() {
@@ -732,7 +732,7 @@ function changeWidgetState(obj, widgetId, url) {
 		state = 1;
 	}
 
-	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
 
 	sendAjaxData(url, {
 		data: {

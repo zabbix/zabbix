@@ -19,7 +19,7 @@
 **/
 
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('httpconf.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
