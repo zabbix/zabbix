@@ -271,15 +271,15 @@
 			opposite_size_key = size_key == 'width' ? 'height' : 'width',
 			new_max = 0,
 			affected,
-			getAffectedInBounds = function (bounds) {
-				return $.map(affected, function (box) {
+			getAffectedInBounds = function(bounds) {
+				return $.map(affected, function(box) {
 					return rectOverlap(bounds, box.current_pos) ? box : null;
 				});
 			},
-			getAffectedTreeAsArray = function (pos) {
+			getAffectedTreeAsArray = function(pos) {
 				$.map(widgets, function(box) {
 					return !('affected_axis' in box) && rectOverlap(pos, box.pos) ? box : null;
-				}).each(function (box) {
+				}).each(function(box) {
 					if ('affected_axis' in box) {
 						return;
 					}
@@ -299,7 +299,7 @@
 					getAffectedTreeAsArray(boundary);
 				});
 
-				return $.map(widgets, function (box) {
+				return $.map(widgets, function(box) {
 					return 'affected_axis' in box && box.affected_axis == axis_key && box.uniqueid != widget.uniqueid ? box : null;
 				});
 			};
@@ -311,7 +311,7 @@
 
 		// Get array of only affected by resize operation widgets.
 		affected = getAffectedTreeAsArray(boundary)
-			.sort(function (box1, box2) {
+			.sort(function(box1, box2) {
 				return axis_key in axis
 					? (box2.current_pos[axis_key] + box2.current_pos[size_key])
 						- (box1.current_pos[axis_key] + box1.current_pos[size_key])
@@ -332,14 +332,14 @@
 
 		// Resize action for left/up is mirrored right/down action.
 		if (axis_key in axis) {
-			affected.each(function (box) {
+			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 			});
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 		}
 
 		// Compact widget and it affected siblings by removing empty columns.
-		affected.each(function (box) {
+		affected.each(function(box) {
 			var newpos = axis_pos[axis_key] + axis_pos[size_key],
 				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
 
@@ -388,11 +388,11 @@
 					collapsed = next_col.length > 0;
 				}
 
-				$.each(next_col, function (_, box) {
+				$.each(next_col, function(_, box) {
 					box.new_pos = $.extend({}, box.current_pos);
 					box.new_pos[axis_key] = slot;
 
-					$.each(col, function (_, box1) {
+					$.each(col, function(_, box1) {
 						if (rectOverlap(box1.current_pos, box.new_pos)) {
 							if (box1.current_pos[size_key] > size_min) {
 								box1.new_pos = $.extend({}, box1.current_pos);
@@ -409,7 +409,7 @@
 					return collapsed;
 				});
 
-				next_col.concat(col).each(function (box) {
+				next_col.concat(col).each(function(box) {
 					if (collapsed && 'new_pos' in box) {
 						box.current_pos = box.new_pos;
 					}
@@ -418,7 +418,7 @@
 				});
 
 				if (collapsed) {
-					affected.each(function (box) {
+					affected.each(function(box) {
 						if (box.current_pos[axis_key] > slot) {
 							box.current_pos[axis_key] -= scanline[size_key];
 						}
@@ -437,14 +437,19 @@
 		 * stay in dashboard boundary box.
 		 */
 		if (overlap > 0) {
-			affected.each(function (box) {
+			widget.current_pos[size_key] -= overlap;
+			if (axis_key in axis) {
+				widget.current_pos[axis_key] += overlap;
+			}
+
+			affected.each(function(box) {
 				box.current_pos[axis_key] -= overlap;
 			});
 		}
 
 		// Resize action for left/up is mirrored right/down action, mirror coordinates back.
 		if (axis_key in axis) {
-			affected.each(function (box) {
+			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
 				// debug code
 				// TODO: remove!
@@ -457,12 +462,12 @@
 	}
 
 	/**
-	 * Rearrange widgets.
+	 * Rearrange widgets. Modifies widget.current_pos if desired size is greater than allowed by resize.
 	 *
 	 * @param {array}  data    Array of widgets objects.
 	 * @param {object} widget  Moved widget object.
 	 */
-	function realignResizeStateless(data, widget) {
+	function realignResize(data, widget) {
 		var changes = {},
 			axis;
 
@@ -473,7 +478,7 @@
 			}
 		});
 
-		data.widgets.each(function (box) {
+		data.widgets.each(function(box) {
 			if (box.uniqueid != widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
@@ -483,9 +488,9 @@
 			box.div.css('background-color', '');
 		});
 
-		// If there are no affected widgets restore initial dimensions.
+		// If there are no affected widgets exit.
 		if ('width' in changes == false && 'height' in changes == false) {
-			return null;
+			return;
 		}
 
 		// Horizontal resize.
@@ -523,13 +528,12 @@
 		}
 
 		// Force to repaint non changed widgets too.
-		data.widgets.each(function (box) {
+		data.widgets.each(function(box) {
 			if ('current_pos' in box == false) {
 				box.current_pos = $.extend({}, box.pos);
 			}
 		});
 
-		// TODO: return position object.
 		return;
 	}
 
@@ -562,28 +566,25 @@
 
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
-			realignResizeStateless(data, widget);
+			realignResize(data, widget);
 
 			data.widgets.each(function(box) {
 				if (widget.uniqueid != box.uniqueid && 'current_pos' in box) {
 					setDivPosition(box['div'], data, box['current_pos'], false);
 				}
 			});
-		}
 
-		// TODO: envoke only on vertical resize!
-		var min_rows = 0;
+			if (widget.pos.height != widget.current_pos.height) {
+				var min_rows = 0;
 
-		$.each(data['widgets'], function() {
-			var rows = this['current_pos']['y'] + this['current_pos']['height'];
+				data.widgets.each(function(box) {
+					min_rows = Math.max(min_rows, box.current_pos.y + box.current_pos.height);
+				});
 
-			if (min_rows < rows) {
-				min_rows = rows;
+				if (data['options']['rows'] < min_rows) {
+					resizeDashboardGrid($obj, data, min_rows);
+				}
 			}
-		});
-
-		if (data['options']['rows'] < min_rows) {
-			resizeDashboardGrid($obj, data, min_rows);
 		}
 	}
 
@@ -710,10 +711,6 @@
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
-				var widget = getWidgetByTarget(data['widgets'], $(event.target));
-				// Is used only by realignResize method.
-				// TODO: remove
-				widget.previous_pos = widget.pos;
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -725,6 +722,7 @@
 						}
 					});
 				}
+				data['pos-action'] = 'resize';
 
 				doWidgetResize($obj, $(event.target), data);
 			},
