@@ -11865,15 +11865,15 @@ void	zbx_dc_cleanup_data_sessions(void)
  * Purpose: gather host tags from hosts specified by a list of hostids        *
  *                                                                            *
  ******************************************************************************/
-static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_vector_ptr_t *host_tags)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_host_tag_t	*host_tag;
-	zbx_tag_t		tag;
+	zbx_tag_t		*tag;
 	int			i;
 	const ZBX_DC_HTMPL	*htmpl;
 
-	for (i=0; i<hostids_num; i++)
+	for (i = 0; i < hostids_num; i++)
 	{
 		if (NULL != (htmpl = (const ZBX_DC_HTMPL *)zbx_hashset_search(&config->htmpls, &hostids[i])))
 			get_host_tags(htmpl->templateids.values, htmpl->templateids.values_num, host_tags);
@@ -11883,15 +11883,16 @@ static void	get_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_h
 		{
 			if(host_tag->hostid == hostids[i])
 			{
-				tag.tag = zbx_strdup(NULL, host_tag->tag);
-				tag.value = zbx_strdup(NULL, host_tag->value);
-				zbx_hashset_insert(host_tags, &tag, sizeof(zbx_tag_t));
+				tag = (zbx_tag_t *) zbx_malloc(NULL, sizeof(zbx_tag_t));
+				tag->tag = zbx_strdup(NULL, host_tag->tag);
+				tag->value = zbx_strdup(NULL, host_tag->value);
+				zbx_vector_ptr_append(host_tags, tag);
 			}
 		}
 	}
 }
 
-void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_hashset_t *host_tags)
+void	DCget_host_tags(const zbx_uint64_t *hostids, size_t hostids_num, zbx_vector_ptr_t *host_tags)
 {
 	RDLOCK_CACHE;
 	get_host_tags(hostids, hostids_num, host_tags);

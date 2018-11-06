@@ -151,7 +151,7 @@ static void	process_tag(const zbx_tag_t *trigger_or_host_tag, int macro_type)
 int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags, zbx_hashset_t *host_tags,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags, zbx_vector_ptr_t *host_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *error)
 {
@@ -210,10 +210,8 @@ int	zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objec
 
 		if (NULL != host_tags)
 		{
-			zbx_hashset_iter_reset(host_tags, &iter);
-
-			while (NULL != (tag = (zbx_tag_t *)zbx_hashset_iter_next(&iter)))
-				process_tag(tag, MACRO_TYPE_HOST_TAG);
+			for (i = 0; i < host_tags->values_num; i++)
+				process_tag((const zbx_tag_t *)host_tags->values[i], MACRO_TYPE_HOST_TAG);
 		}
 	}
 	else if (EVENT_SOURCE_INTERNAL == source && NULL != error)
