@@ -260,12 +260,12 @@
 	 *
 	 * @param {object} widgets  Array of widget objects.
 	 * @param {object} widget   Resized widget object.
-	 * @param {object} axis     Resize options.
+	 * @param {object} axis     Resized axis options.
 	 */
 	function fitWigetsIntoBox(widgets, widget, axis) {
 		var axis_key = axis.axis_key,// axis.axis_key - 'x'/'y'
 			size_key = axis.size_key,// axis.size_key - 'width'/'height'
-			size_min = axis.size_min,// axis.size_min - minimax size of single widget
+			size_min = axis.size_min,// axis.size_min - min size of single widget
 			size_max = axis.size_max,// axis.size_max - max size for single widget and whole dashboard
 			opposite_axis_key = axis_key == 'x' ? 'y' : 'x',
 			opposite_size_key = size_key == 'width' ? 'height' : 'width',
@@ -278,13 +278,11 @@
 			},
 			getAffectedTreeAsArray = function (pos) {
 				$.map(widgets, function(box) {
-					return !('current_pos' in box) && rectOverlap(pos, box.pos) ? box : null;
+					return !('affected_axis' in box) && rectOverlap(pos, box.pos) ? box : null;
 				}).each(function (box) {
-					if ('current_pos' in box) {
+					if ('affected_axis' in box) {
 						return;
 					}
-
-					box.current_pos = $.extend({}, box.pos);
 
 					var boundary = $.extend({}, box.pos);
 
@@ -296,18 +294,23 @@
 						boundary[size_key] += box.pos.width + axis[size_key];
 					}
 
+					box.affected_axis = axis_key;
+
 					getAffectedTreeAsArray(boundary);
 				});
 
 				return $.map(widgets, function (box) {
-					return 'current_pos' in box && box.uniqueid != widget.uniqueid ? box : null;
+					return 'affected_axis' in box && box.affected_axis == axis_key && box.uniqueid != widget.uniqueid ? box : null;
 				});
 			};
 
-		/**
-		 * Get array of only affected by resize operation widgets.
-		 */
-		affected = getAffectedTreeAsArray(widget.current_pos)
+		var boundary = $.extend({}, widget.pos);
+		boundary[axis_key] += axis_key in axis ? axis[axis_key] : boundary[size_key];
+		boundary[size_key] = axis[size_key];
+		boundary[opposite_size_key] = widget.current_pos[opposite_size_key];
+
+		// Get array of only affected by resize operation widgets.
+		affected = getAffectedTreeAsArray(boundary)
 			.sort(function (box1, box2) {
 				return axis_key in axis
 					? (box2.current_pos[axis_key] + box2.current_pos[size_key])
@@ -317,11 +320,13 @@
 
 		// Debug code.
 		affected.each(function(box) {
-			box.div.css('background-color', 'rgba(255, 0, 0, 0.3)');
-		})
-		/**
-		 * 1. Move widgets.
-		 */
+			box.div.css('background-color',
+				'width' in axis
+				? 'rgba(255, 0, 0, 0.3)'
+				: 'rgba(0, 255, 0, 0.3)'
+			);
+		});
+
 		var margins = {},
 			axis_pos = $.extend(widget.current_pos);
 
@@ -333,7 +338,7 @@
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 		}
 
-		// Move widget and it affected siblings. Everybody knows what TETЯIS is.
+		// Compact widget and it affected siblings by removing empty columns.
 		affected.each(function (box) {
 			var newpos = axis_pos[axis_key] + axis_pos[size_key],
 				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
@@ -354,15 +359,13 @@
 			}
 		});
 
-		/**
-		 * 2. Resize.
-		 */
+		// Compact widget by resizing.
 		if (new_max > size_max) {
 			var scanline = {
 					x: 0,
 					y: 0,
-					width: 12, // max width
-					height: 12 // max height
+					width: 12,
+					height: 12
 				},
 				overlap = new_max - size_max,
 				slot = axis_pos[axis_key] + axis_pos[size_key],
@@ -430,8 +433,8 @@
 		}
 
 		/**
-		 * 3. Move widget to best available 'fit' position when it is impossible to fit widgets in to desired
-		 *    boundary box.
+		 * When it is impossible to fit affected widgets into required boundary box ensure that wigets at least will
+		 * stay in dashboard boundary box.
 		 */
 		if (overlap > 0) {
 			affected.each(function (box) {
@@ -455,7 +458,6 @@
 
 	/**
 	 * Rearrange widgets.
-	 * TODO: fix step 2 collapse part.
 	 *
 	 * @param {array}  data    Array of widgets objects.
 	 * @param {object} widget  Moved widget object.
@@ -471,10 +473,19 @@
 			}
 		});
 
+		data.widgets.each(function (box) {
+			if (box.uniqueid != widget.uniqueid) {
+				box.current_pos = $.extend({}, box.pos);
+			}
+			delete box.affected_axis;
+
+			// Debug code.
+			box.div.css('background-color', '');
+		});
+
 		// If there are no affected widgets restore initial dimensions.
 		if ('width' in changes == false && 'height' in changes == false) {
-			resetCurrentPositions(data['widgets']);
-			return;
+			return null;
 		}
 
 		// Horizontal resize.
@@ -483,7 +494,7 @@
 				axis_key: 'x',
 				size_key: 'width',
 				size_min: 1,
-				size_max: 12,
+				size_max: data.options['max-columns'],
 				width: changes.width
 			}
 
@@ -499,8 +510,8 @@
 			axis = {
 				axis_key: 'y',
 				size_key: 'height',
-				size_min: 2,
-				size_max: 30,// TODO: calculate current max
+				size_min: data.options['widget-min-rows'],
+				size_max: data.options['max-rows'],
 				height: changes.height
 			}
 
@@ -550,15 +561,12 @@
 		setDivPosition(data['placeholder'], data, pos, true);
 
 		if (!posEquals(pos, widget['current_pos'])) {
-			data.widgets.each(function(box) {
-				delete box.current_pos;
-			});
 			widget['current_pos'] = pos;
 			realignResizeStateless(data, widget);
 
-			$.each(data['widgets'], function() {
-				if (widget.uniqueid != this.uniqueid && 'current_pos' in this) {
-					setDivPosition(this['div'], data, this['current_pos'], false);
+			data.widgets.each(function(box) {
+				if (widget.uniqueid != box.uniqueid && 'current_pos' in box) {
+					setDivPosition(box['div'], data, box['current_pos'], false);
 				}
 			});
 		}
