@@ -1150,7 +1150,7 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_SYSTEM => $config['authentication_type'],
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => null
+			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
 		];
 
 		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
@@ -1183,10 +1183,6 @@ class CUser extends CApiService {
 					if (md5($user['password']) !== $db_user['passwd']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 					}
-					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 					break;
 			}
 		}
