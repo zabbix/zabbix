@@ -291,10 +291,12 @@
 						boundary[size_key] += boundary[axis_key] - axis[size_key] < 0 ? 0 : axis[size_key];
 					}
 					else {
-						boundary[size_key] += box.pos.width + axis[size_key];
+						boundary[size_key] += box.pos[size_key] + axis[size_key];
 					}
 
 					box.affected_axis = axis_key;
+					console
+						.log(box.header+' boundary:'+JSON.stringify(boundary));
 
 					getAffectedTreeAsArray(boundary);
 				});
@@ -709,6 +711,7 @@
 			handles: handles,
 			autoHide: true,
 			scroll: false,
+			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
 				startWidgetPositioning($(event.target), data);
