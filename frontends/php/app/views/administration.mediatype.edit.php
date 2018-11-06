@@ -149,6 +149,7 @@ else {
 
 // append password field to form list
 $mediatype_formlist
+	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
 		(new CTextBox('jabber_username', $data['jabber_username']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
