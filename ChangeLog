@@ -2037,6 +2037,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
 .......PS. [ZBX-15062] fixed binary heap trying to reallocate slots on every insert (wiper)
 ..F....... [ZBX-14805] fixed unauthorized request error when resetting filter after enabling/disabling elements (agriscenko)
 ..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)
