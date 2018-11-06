@@ -2880,6 +2880,7 @@ static int	vmware_service_get_hv_list(const zbx_vmware_service_t *service, CURL 
 		while (NULL != iter->token)
 		{
 			xmlFreeDoc(doc);
+			doc = NULL;
 
 			if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
 				goto out;
@@ -3243,6 +3244,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	do
 	{
 		xmlFreeDoc(doc);
+		doc = NULL;
 
 		if (SUCCEED != vmware_service_read_previous_events(easyhandle, event_session, &doc, error))
 			goto end_session;
@@ -4292,6 +4294,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 		zbx_vmware_unlock();
 		xmlFreeDoc(doc);
+		doc = NULL;
 
 		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerf>");
 		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
