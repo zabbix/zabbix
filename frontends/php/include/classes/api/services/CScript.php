@@ -818,25 +818,12 @@ class CScript extends CApiService {
 			$host_groups_with_write_access = $host_groups;
 		}
 
-		$host_group_children = [];
-		$group_parents = [];
+		$hstgrp_branch = [];
 		foreach ($host_groups as $groupid => $group) {
-			$parts = explode('/', $group['name']);
-			$group_parents[$groupid] = [count($parts), []];
-			for (array_pop($parts); $parts; array_pop($parts)) {
-				$group_parents[$groupid][implode('/', $parts)] = true;
-			}
-		}
-		foreach ($host_groups as $groupid => $group) {
-			if (!array_key_exists($groupid, $host_group_children)) {
-				$host_group_children[$groupid] = [$groupid => true];
-			}
-			foreach ($host_groups as $child_groupid => $child_group) {
-				if ($groupid === $child_groupid) {
-					continue;
-				}
-				if (array_key_exists($group['name'], $group_parents[$child_groupid])) {
-					$host_group_children[$groupid][$child_groupid] = true;
+			$hstgrp_branch[$groupid] = [$groupid => true];
+			foreach ($host_groups as $n_groupid => $n_group) {
+				if (strpos($n_group['name'], $group['name'].'/') === 0) {
+					$hstgrp_branch[$groupid][$n_groupid] = true;
 				}
 			}
 		}
@@ -866,8 +853,9 @@ class CScript extends CApiService {
 		}
 
 		$host_groups = $this->unsetExtraFields($host_groups, ['name', 'groupid'], $options['selectGroups']);
-		$host_groups_with_write_access = $this->unsetExtraFields($host_groups_with_write_access,
-																	['name', 'groupid'], $options['selectGroups']);
+		$host_groups_with_write_access = $this->unsetExtraFields(
+			$host_groups_with_write_access, ['name', 'groupid'], $options['selectGroups']
+		);
 
 		foreach ($result as $scriptid => &$script) {
 			if ($script['groupid'] === '0') {
@@ -876,8 +864,8 @@ class CScript extends CApiService {
 					: $host_groups;
 			} else {
 				$script_groups = $script['host_access'] == PERM_READ_WRITE
-					? array_intersect_key($host_groups_with_write_access, $host_group_children[$script['groupid']])
-					: array_intersect_key($host_groups, $host_group_children[$script['groupid']]);
+					? array_intersect_key($host_groups_with_write_access, $hstgrp_branch[$script['groupid']])
+					: array_intersect_key($host_groups, $hstgrp_branch[$script['groupid']]);
 			}
 
 			if ($is_groups_select) {
