@@ -57,6 +57,7 @@ Changes for 4.0.1
 Changes for 4.0.1rc2
 
 Bug fixes:
+.......PS. [ZBX-15057] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 ..F....... [ZBX-14904] fixed possible PHP errors in "Problem hosts" widget (Sasha)
 .......PS. [ZBX-15057] fixed possible crash when syncing host groups (wiper)
 
