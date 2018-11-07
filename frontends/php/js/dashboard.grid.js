@@ -258,29 +258,37 @@
 	/**
 	 * Resize widgets.
 	 *
-	 * @param {object} widgets  Array of widget objects.
-	 * @param {object} widget   Resized widget object.
-	 * @param {object} axis     Resized axis options.
+	 * @param {object} widgets        Array of widget objects.
+	 * @param {object} widget         Resized widget object.
+	 * @param {object} axis           Resized axis options.
+	 * @param {string} axis.axis_key  Axis key as string: 'x', 'y'.
+	 * @param {string} axis.size_key  Size key as string: 'width', 'height'.
+	 * @param {number} axis.axis_key  Minimum size allowed for one item.
+	 * @param {number} axis.axis_key  Maximum size allowed for one item, also is used as maximum size of dashboard.
 	 */
 	function fitWigetsIntoBox(widgets, widget, axis) {
-		var axis_key = axis.axis_key,// axis.axis_key - 'x'/'y'
-			size_key = axis.size_key,// axis.size_key - 'width'/'height'
-			size_min = axis.size_min,// axis.size_min - min size of single widget
-			size_max = axis.size_max,// axis.size_max - max size for single widget and whole dashboard
+		var axis_key = axis.axis_key,
+			size_key = axis.size_key,
+			size_min = axis.size_min,
+			size_max = axis.size_max,
 			opposite_axis_key = axis_key == 'x' ? 'y' : 'x',
 			opposite_size_key = size_key == 'width' ? 'height' : 'width',
 			new_max = 0,
 			affected,
 			getAffectedInBounds = function(bounds) {
+
 				return $.map(affected, function(box) {
+
 					return rectOverlap(bounds, box.current_pos) ? box : null;
 				});
 			},
 			getAffectedTreeAsArray = function(pos) {
 				$.map(widgets, function(box) {
+
 					return !('affected_axis' in box) && rectOverlap(pos, box.pos) ? box : null;
 				}).each(function(box) {
 					if ('affected_axis' in box) {
+
 						return;
 					}
 
@@ -300,11 +308,13 @@
 				});
 
 				return $.map(widgets, function(box) {
+
 					return 'affected_axis' in box && box.affected_axis == axis_key && box.uniqueid != widget.uniqueid ? box : null;
 				});
 			};
 
 		var boundary = $.extend({}, widget.pos);
+
 		boundary[axis_key] += axis_key in axis ? axis[axis_key] : boundary[size_key];
 		boundary[size_key] = axis[size_key];
 		boundary[opposite_size_key] = widget.current_pos[opposite_size_key];
@@ -312,20 +322,12 @@
 		// Get array of only affected by resize operation widgets.
 		affected = getAffectedTreeAsArray(boundary)
 			.sort(function(box1, box2) {
+
 				return axis_key in axis
 					? (box2.current_pos[axis_key] + box2.current_pos[size_key])
 						- (box1.current_pos[axis_key] + box1.current_pos[size_key])
 					: box1.current_pos[axis_key] - box2.current_pos[axis_key];
 			});
-
-		// Debug code.
-		affected.each(function(box) {
-			box.div.css('background-color',
-				'width' in axis
-				? 'rgba(255, 0, 0, 0.3)'
-				: 'rgba(0, 255, 0, 0.3)'
-			);
-		});
 
 		var margins = {},
 			axis_pos = $.extend(widget.current_pos);
@@ -438,6 +440,7 @@
 		 */
 		if (overlap > 0) {
 			widget.current_pos[size_key] -= overlap;
+
 			if (axis_key in axis) {
 				widget.current_pos[axis_key] += overlap;
 			}
@@ -451,12 +454,6 @@
 		if (axis_key in axis) {
 			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
-				// debug code
-				// TODO: remove!
-				if (box.current_pos[axis_key] < 0) {
-					console.error(box.header+' outside bounds for '+axis_key, box.current_pos);
-					box.current_pos[axis_key] = 0;
-				}
 			});
 		}
 	}
@@ -482,10 +479,8 @@
 			if (box.uniqueid != widget.uniqueid) {
 				box.current_pos = $.extend({}, box.pos);
 			}
-			delete box.affected_axis;
 
-			// Debug code.
-			box.div.css('background-color', '');
+			delete box.affected_axis;
 		});
 
 		// If there are no affected widgets exit.
