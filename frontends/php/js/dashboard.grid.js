@@ -288,15 +288,13 @@
 
 					if (axis_key in axis) {
 						boundary[axis_key] = Math.max(0, boundary[axis_key] - axis[size_key]);
-						boundary[size_key] += boundary[axis_key] - axis[size_key] < 0 ? 0 : axis[size_key];
+						boundary[size_key] += box.pos[axis_key] - boundary[axis_key];
 					}
 					else {
-						boundary[size_key] += box.pos[size_key] + axis[size_key];
+						boundary[size_key] += axis[size_key];
 					}
 
 					box.affected_axis = axis_key;
-					console
-						.log(box.header+' boundary:'+JSON.stringify(boundary));
 
 					getAffectedTreeAsArray(boundary);
 				});
