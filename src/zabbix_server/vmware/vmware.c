@@ -449,7 +449,7 @@ static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *re
 
 	if (NULL != xdoc)
 		*xdoc = doc;
-	else
+	else if (NULL != doc)
 		xmlFreeDoc(doc);
 
 	return ret;
