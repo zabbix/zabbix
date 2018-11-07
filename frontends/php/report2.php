@@ -416,7 +416,7 @@ elseif (hasRequest('filter_hostid')) {
 	}
 
 	$reportWidget->addItem(
-		(new CFilter())
+		(new CFilter(new CUrl('report2.php')))
 			->setProfile($data['filter']['timeline']['profileIdx'])
 			->setActiveTab($data['filter']['active_tab'])
 			->addFormItem((new CVar('config', $availabilityReportMode))->removeId())
