@@ -320,14 +320,7 @@
 		boundary[opposite_size_key] = widget.current_pos[opposite_size_key];
 
 		// Get array of only affected by resize operation widgets.
-		affected = getAffectedTreeAsArray(boundary)
-			.sort(function(box1, box2) {
-
-				return axis_key in axis
-					? (box2.current_pos[axis_key] + box2.current_pos[size_key])
-						- (box1.current_pos[axis_key] + box1.current_pos[size_key])
-					: box1.current_pos[axis_key] - box2.current_pos[axis_key];
-			});
+		affected = getAffectedTreeAsArray(boundary);
 
 		var margins = {},
 			axis_pos = $.extend(widget.current_pos);
@@ -339,6 +332,10 @@
 			});
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 		}
+
+		affected = affected.sort(function(box1, box2) {
+			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
+		});
 
 		// Compact widget and it affected siblings by removing empty columns.
 		affected.each(function(box) {
@@ -414,6 +411,7 @@
 				next_col.concat(col).each(function(box) {
 					if (collapsed && 'new_pos' in box) {
 						box.current_pos = box.new_pos;
+						box.current_pos[axis_key] = Math.max(box.pos[axis_key], box.current_pos[axis_key]);
 					}
 
 					delete box.new_pos;
@@ -421,8 +419,12 @@
 
 				if (collapsed) {
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > slot) {
+						if (box.current_pos[axis_key] > slot + scanline[size_key]) {
 							box.current_pos[axis_key] -= scanline[size_key];
+							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key], axis_key in axis
+								? size_max - box.pos[axis_key] - box.pos[size_key]
+								: box.pos[axis_key]
+							);
 						}
 					});
 
@@ -447,6 +449,10 @@
 
 			affected.each(function(box) {
 				box.current_pos[axis_key] -= overlap;
+				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key], axis_key in axis
+					? size_max - box.pos[axis_key] - box.pos[size_key]
+					: box.pos[axis_key]
+				);
 			});
 		}
 
