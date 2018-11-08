@@ -1789,8 +1789,8 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  * Purpose: checks if string is user macro                                    *
  *                                                                            *
  * Parameters: str        - [IN] string to validate                           *
- *             delimiters - [IN] next character after macro that is allowed   *
- *             len        - [OUT] length of user macro                        *
+ *             delimiters - [IN] allowed delimiters (including NULL char)     *
+ *             delim      - [OUT] address of next delimiter if any or NULL    *
  *                                                                            *
  * Returns: SUCCEED - either "{$MACRO}", "{$MACRO:"{#MACRO}"}" or             *
  *                    "{$MACRO};{$MACRO}"                                     *
@@ -1798,18 +1798,20 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
  *                                                                            *
  ******************************************************************************/
-static int	is_delimited_user_macro(const char *str, const char *delimiters, int *len)
+static int	is_delimited_user_macro(const char *str, const char *delimiters, const char **delim)
 {
 	zbx_token_t	token;
 
-	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
-			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
-			0 != token.token.l || NULL == strchr(delimiters, str[token.token.r + 1]))
+	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) || 0 != token.token.l ||
+			0 == (token.type & ZBX_TOKEN_USER_MACRO) || NULL == strchr(delimiters, str[token.token.r + 1]))
 	{
 		return FAIL;
 	}
 
-	*len = token.token.r + 1;
+	if ('\0' == str[token.token.r + 1])
+		*delim = NULL;
+	else
+		*delim = str + token.token.r + 1;
 
 	return SUCCEED;
 }
@@ -1839,18 +1841,16 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	zbx_flexible_interval_t		*flexible = NULL;
 	zbx_scheduler_interval_t	*scheduling = NULL;
 	const char			*delim, *interval_type;
-	int				len;
 
 	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
 			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
 	{
-		if (FAIL == is_delimited_user_macro(interval_str, ";", &len))
+		if (FAIL == is_delimited_user_macro(interval_str, ";", &delim))
 		{
 			interval_type = "update";
 			goto fail;
 		}
 
-		delim = ';' == interval_str[len] ? interval_str + len : NULL;
 		*simple_interval = 1;
 	}
 
@@ -1889,14 +1889,12 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
 					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
 			{
-				if (FAIL == is_delimited_user_macro(interval_str, ";", &len))
+				if (FAIL == is_delimited_user_macro(interval_str, ";", &delim))
 				{
 					scheduler_interval_free(new_interval);
 					interval_type = "scheduling";
 					goto fail;
 				}
-
-				delim = ';' == interval_str[len] ? interval_str + len : NULL;
 			}
 
 			new_interval->next = scheduling;
