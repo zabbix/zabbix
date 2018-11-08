@@ -38,7 +38,7 @@ $widget = (new CWidget())
 			->getUrl()
 		)))->setAttribute('aria-label', _('Content controls'))
 	]))
-	->addItem((new CFilter())
+	->addItem((new CFilter(new CUrl('maintenance.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

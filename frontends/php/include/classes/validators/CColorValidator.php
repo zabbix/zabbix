@@ -30,7 +30,7 @@ class CColorValidator extends CStringValidator {
 
 	public function __construct(array $options = []) {
 		$this->messageRegex = _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).');
-		$this->messageEmpty = _('Empty color.');
+		$this->messageEmpty = _('Empty colour.');
 
 		parent::__construct($options);
 	}

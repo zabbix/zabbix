@@ -39,7 +39,7 @@ $widget = (new CWidget())
 
 // filter
 $widget->addItem(
-	(new CFilter())
+	(new CFilter(new CUrl('slideconf.php')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

@@ -54,16 +54,18 @@ zbx_regmatch_t;
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **error)
 {
 	int	error_offset = -1;
+	pcre	*pcre_regexp;
 
-	pcre*	pcre_regexp = pcre_compile(pattern, flags, error, &error_offset, NULL);
-	if(NULL == pcre_regexp)
+	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, error, &error_offset, NULL)))
 		return FAIL;
 
-	if(regexp)
+	if (NULL != regexp)
 	{
 		*regexp = (zbx_regexp_t *)zbx_malloc(NULL, sizeof(zbx_regexp_t));
 		(*regexp)->pcre_regexp = pcre_regexp;
 	}
+	else
+		pcre_free(pcre_regexp);
 
 	return SUCCEED;
 }
@@ -100,7 +102,7 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 	if (NULL == curr_regexp || 0 != strcmp(curr_pattern, pattern) || curr_flags != flags)
 	{
-		if(NULL != curr_regexp)
+		if (NULL != curr_regexp)
 		{
 			zbx_regexp_free(curr_regexp);
 			zbx_free(curr_pattern);

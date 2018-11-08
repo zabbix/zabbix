@@ -522,25 +522,6 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 			zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
 			goto close;
 		}
-
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
-		{
-			zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
-			goto close;
-		}
-
-		if (FAIL == smtp_readln(&s, &response))
-		{
-			zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
-			goto close;
-		}
-
-		/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
-		if (0 != strncmp(response, OK_250, strlen(OK_250)) && 0 != strncmp(response, OK_251, strlen(OK_251)))
-		{
-			zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
-			goto close;
-		}
 	}
 
 	/* send DATA */
