@@ -305,3 +305,34 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (96, 1, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (96, 96, 7);
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (97,96,18,0,'16','');
+
+-- testHostGroup_Delete maintenance constraint
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61001, 'maintenance_has_only_host', 'maintenance_has_only_host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61002, 'maintenance_has_only_group', 'maintenance_has_only_group', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61003, 'maintenance_has_group_and_host', 'maintenance_has_group_and_host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61004, 'maintenance_host_1', 'maintenance_host_1', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (61005, 'maintenance_host_2', 'maintenance_host_2', 0, '');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (62001,'maintenance_has_only_host',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (62002,'maintenance_has_only_group',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (62003,'maintenance_has_group_and_host',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (62004,'maintenance_group_1',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (62005,'maintenance_group_2',0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till, tags_evaltype) VALUES (60001,'maintenance_has_only_host',0,'',1539723600,1539810000,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till, tags_evaltype) VALUES (60002,'maintenance_has_only_group',0,'',1539723600,1539810000,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till, tags_evaltype) VALUES (60003,'maintenance_has_group_and_host',0,'',1539723600,1539810000,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till, tags_evaltype) VALUES (60004,'maintenance_two_hosts',0,'',1539723600,1539810000,0);
+INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till, tags_evaltype) VALUES (60005,'maintenance_two_groups',0,'',1539723600,1539810000,0);
+INSERT INTO timeperiods (timeperiodid) VALUES (1);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1,60001,61001);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (2,60003,61003);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (3,60004,61004);
+INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (4,60004,61005);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,60002,62002);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,60003,62003);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (3,60005,62004);
+INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (4,60005,62005);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,60001,1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,60002,1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (3,60003,1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (4,60004,1);
+INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (5,60005,1);

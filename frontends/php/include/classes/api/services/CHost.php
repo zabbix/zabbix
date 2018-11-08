@@ -1146,7 +1146,48 @@ class CHost extends CHostGeneral {
 		if (!$nopermissions) {
 			$this->checkPermissions($hostIds, _('No permissions to referred object or it does not exist!'));
 		}
+
+		$this->validateDeleteCheckMaintenances($hostIds);
 	}
+
+
+	/**
+	 * Validates if hosts may be deleted, due to maintenance constrain.
+	 *
+	 * @throws APIException if a constrain failed
+	 *
+	 * @param array $hostids
+	 */
+	protected function validateDeleteCheckMaintenances(array $hostids) {
+		$res = DBselect(
+			'SELECT m.maintenanceid, m.name'.
+			' FROM maintenances m'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_hosts mh'.
+				' WHERE m.maintenanceid=mh.maintenanceid'.
+					' AND mh.hostid NOT IN ('.implode(',', $hostids).')'.
+			')'.
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg'.
+					' WHERE m.maintenanceid=mg.maintenanceid'.
+				')'
+		);
+
+		$maintenance = DBfetch($res);
+		if (!$maintenance) {
+			return;
+		}
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+			'Cannot delete host because maintenance "%1$s" must contain at least one host or host group.',
+			'Cannot delete selected hosts because maintenance "%1$s" must contain at least one host or host group.',
+			$maintenance['name'],
+			count($hostids)
+		));
+	}
+
 
 	/**
 	 * Delete Host.
