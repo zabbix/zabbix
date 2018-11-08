@@ -1830,7 +1830,8 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
 
 			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
+					(0 == *simple_interval && 0 == new_interval->delay))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";

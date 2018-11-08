@@ -100,12 +100,6 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "zero seconds alone are not allowed"
-in:
-  str: '0s'
-out:
-  return: 'FAIL'
----
 test case: "custom intervals don't matter so we cannot determine if 0 is OK"
 in:
   str: '0'
@@ -113,10 +107,65 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "custom intervals don't matter so we cannot determine if 0 is OK"
+test case: "custom intervals don't matter so we cannot determine if 0 seconds is OK"
 in:
   str: '0s'
   no_custom: '1'
 out:
   return: 'SUCCEED'
+---
+test case: "custom intervals don't matter even if are invalid"
+in:
+  str: '1;foo/bar,00:00-23:00;0/1-6,00:00-23:00;baz1-5h9-18;;;;'
+  no_custom: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "don't allow invalid custom intervals if matter"
+in:
+  str: '1;foo/bar,00:00-23:00;0/1-6,00:00-23:00;baz1-5h9-18;;;;'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 update interval even if custom is used and still 0"
+in:
+  str: '0;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 simple update interval if one of custom update intervals has 0 update interval"
+in:
+  str: '0;1/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 update interval if one of custom update intervals has 0 update interval and schedulling"
+in:
+  str: '0;0/1-6,00:00-23:00;1/1-6,00:00-23:00;wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "allow 0 update interval even if custom has non 0"
+in:
+  str: '0;1/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "allow 0 custom update interval even if custom is 0"
+in:
+  str: '1;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "allow 0 simple update interval if only schedulling is present"
+in:
+  str: '0;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "custom intervals are missing, there is only separator"
+in:
+  str: '0;'
+out:
+  return: 'FAIL'
 ...
