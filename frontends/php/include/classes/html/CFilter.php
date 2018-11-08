@@ -25,10 +25,8 @@ class CFilter extends CDiv {
 	private $form;
 	// Filter form object name and id attribute.
 	private $name = 'zbx_filter';
-	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
+	// Visibility of 'Apply', 'Reset' form buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
-	// Visibility of time selector.
-	private $show_time_selector = false;
 	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
 	protected $headers = [];
 	// Array of filter tab content.
@@ -43,7 +41,7 @@ class CFilter extends CDiv {
 	protected $idx2 = 0;
 
 	/**
-	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
+	 * List of predefined time ranges.
 	 */
 	protected $time_ranges = [
 		[
@@ -88,7 +86,9 @@ class CFilter extends CDiv {
 	public function __construct() {
 		parent::__construct();
 
-		$this->addClass('filter-space')
+		$this
+			->setAttribute('data-accessible', 1)
+			->addClass('filter-space')
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
@@ -238,8 +238,6 @@ class CFilter extends CDiv {
 		$header = relativeDateToText($from, $to);
 
 		if ($visible) {
-			$this->show_time_selector = true;
-
 			$this->addTab(new CDiv([
 				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
 				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
@@ -289,7 +287,7 @@ class CFilter extends CDiv {
 							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
 							->addStyle('display: none'),
 						new CList([
-							(new CButton('apply', _('Apply')))
+							new CButton('apply', _('Apply'))
 						])
 					]))->addClass(ZBX_STYLE_TIME_INPUT),
 					(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
@@ -300,10 +298,12 @@ class CFilter extends CDiv {
 			);
 		}
 		else {
-			$this->addTab(null, (new CDiv([
-				(new CInput('hidden', 'from', $from)),
-				(new CInput('hidden', 'to', $to))
-			])));
+			$this
+				->setAttribute('data-accessible', 0)
+				->addTab(null, (new CDiv([
+					new CVar('from', $from),
+					new CVar('to', $to)
+				])));
 		}
 
 		return $this;
@@ -313,7 +313,7 @@ class CFilter extends CDiv {
 	 * Add tab.
 	 *
 	 * @param string|CTag $header    Tab header title string or CTag contaier.
-	 * @param array  $body           Array of body elements.
+	 * @param array       $body      Array of body elements.
 	 *
 	 * @return CFilter
 	 */
@@ -384,15 +384,18 @@ class CFilter extends CDiv {
 			}
 		}
 
-		$this->form->addItem($this->tabs);
-
 		$this
-			->setAttribute('data-accessible', $this->show_time_selector ? 1 : 0)
 			->addStyle('display:none')
-			->addItem($headers_cnt ? $headers : null)
-			->addItem($this->form)
-			->setAttribute('aria-label', _('Filter'));
+			->form->addItem($this->tabs);
 
-		return parent::toString($destroy).get_js($this->getJS());
+		if ($headers_cnt) {
+			$this
+				->addItem($headers)
+				->setAttribute('aria-label', _('Filter'));
+		}
+
+		$this->addItem($this->form);
+
+		return parent::toString($destroy).($headers_cnt ? get_js($this->getJS()) : '');
 	}
 }

@@ -48,8 +48,8 @@ jQuery(function ($){
 		xhr = null,
 		endpoint = new Curl('zabbix.php'),
 		element = {
-			from: container.find('#from'),
-			to: container.find('#to'),
+			from: container.find('[name=from]'),
+			to: container.find('[name=to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -60,12 +60,12 @@ jQuery(function ($){
 			label: container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.length ? container.data()['profileIdx'] : '',
-			idx2: container.length ? container.data()['profileIdx2'] : 0,
+			idx: container.data('profileIdx'),
+			idx2: container.data('profileIdx2'),
 			from: element.from.val(),
 			to: element.to.val()
 		},
-		ui_accessible = (container.attr('data-accessible') === '1'),
+		ui_accessible = (container.data('accessible') == 1),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
@@ -315,7 +315,6 @@ jQuery(function ($){
 
 	// Time selection box for graphs.
 	var selection = null,
-		anchor = null,
 		noclick_area = null,
 		was_dragged = false,
 		prevent_click = false;
