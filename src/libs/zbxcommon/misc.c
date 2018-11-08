@@ -1861,7 +1861,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		}
 	}
 
-	if ((0 == *simple_interval || SEC_PER_DAY < *simple_interval) && NULL == flexible && NULL == scheduling)
+	if (NULL == flexible && NULL == scheduling && (0 == *simple_interval || SEC_PER_DAY < *simple_interval))
 	{
 		interval_type = "update";
 		goto fail;
