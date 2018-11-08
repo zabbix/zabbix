@@ -186,11 +186,10 @@ class CWidgetHelper {
 	 * @param CWidgetFieldGroup $field
 	 * @param array $captions
 	 * @param string $form_name
-	 * @param array $parameters  prvides a defauls override
 	 *
 	 * @return CMultiSelect
 	 */
-	public static function getGroup($field, $captions, $form_name, $parameters = []) {
+	public static function getGroup($field, $captions, $form_name) {
 		$field_name = $field->getName().'[]';
 
 		return (new CMultiSelect([
@@ -198,11 +197,11 @@ class CWidgetHelper {
 			'object_name' => 'hostGroup',
 			'data' => $captions,
 			'popup' => [
-				'parameters' => $parameters + [
+				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name)
+					'dstfld1' => zbx_formatDomId($field_name),
 				]
 			],
 			'add_post_js' => false
