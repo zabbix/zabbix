@@ -186,7 +186,9 @@ class CScreenGraph extends CScreenBase {
 				);
 			}
 
-			$item->setId($containerId);
+			$item
+				->addClass(ZBX_STYLE_GRAPH_WRAPPER)
+				->setId($containerId);
 
 			return $this->getOutput($item);
 		}
