@@ -168,7 +168,7 @@ $mediatype_formlist
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 	]))
 	->addRow(_('Enabled'),
-		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 
