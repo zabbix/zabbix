@@ -13,6 +13,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
 .D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
 A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
@@ -58,7 +59,6 @@ Changes for 4.0.1
 Changes for 4.0.1rc2
 
 Bug fixes:
-.......PS. [ZBX-15057] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 ..F....... [ZBX-14904] fixed possible PHP errors in "Problem hosts" widget (Sasha)
 .......PS. [ZBX-15057] fixed possible crash when syncing host groups (wiper)
 
