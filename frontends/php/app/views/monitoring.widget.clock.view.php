@@ -48,7 +48,6 @@ else {
 	$output = [
 		'header' => $data['name'],
 		'body' => $item->toString(),
-		'script_file' => $item->getScriptFile(),
 		'script_inline' => $item->getScriptRun()
 	];
 }

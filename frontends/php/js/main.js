@@ -432,16 +432,11 @@ var hintBox = {
 	/**
 	 * Initialize hint box event handlers.
 	 *
-	 * Event 'remove' is triggered on:
-	 * - content update using flickerfreeScreen.refreshHtml()
-	 * - widget update by updateWidgetContent()
-	 * - widget remove by deleteWidget().
-	 *
 	 * Triggered events:
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
-		jQuery(document).on('keydown click mouseenter mouseleave remove', '[data-hintbox=1]', function (e) {
+		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
 			var target = jQuery(this);
 
 			switch (e.type) {
@@ -452,11 +447,7 @@ var hintBox = {
 					break;
 
 				case 'mouseleave':
-					hintBox.hideHint(e, this);
-					break;
-
-				case 'remove':
-					hintBox.deleteHint(this);
+					hintBox.hideHint(this, false);
 					break;
 
 				case 'keydown':
@@ -517,27 +508,36 @@ var hintBox = {
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
+			jQuery(target).attr('data-expanded', 'true');
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
 					'class': 'overlay-close-btn',
-					'title': t('Close')
+					'title': t('S_CLOSE')
 				}
 			)
 				.click(function() {
-					hintBox.hideHint(e, target, true);
+					hintBox.hideHint(target, true);
 				});
 			box.prepend(close_link);
 		}
 
 		jQuery(appendTo).append(box);
 
+		var removeHandler = function() {
+			hintBox.deleteHint(target);
+		};
+
+		jQuery(target)
+			.off('remove', removeHandler)
+			.on('remove', removeHandler);
+
 		return box;
 	},
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
 		var isStatic = target.isStatic;
-		hintBox.hideHint(e, target, true);
+		hintBox.hideHint(target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
@@ -640,7 +640,7 @@ var hintBox = {
 		});
 	},
 
-	hideHint: function(e, target, hideStatic) {
+	hideHint: function(target, hideStatic) {
 		if (target.isStatic && !hideStatic) {
 			return;
 		}
@@ -650,6 +650,7 @@ var hintBox = {
 
 	deleteHint: function(target) {
 		if (typeof target.hintboxid !== 'undefined') {
+			jQuery(target).removeAttr('data-expanded');
 			removeFromOverlaysStack(target.hintboxid);
 		}
 
@@ -731,7 +732,7 @@ function changeWidgetState(obj, widgetId, url) {
 		state = 1;
 	}
 
-	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
 
 	sendAjaxData(url, {
 		data: {
