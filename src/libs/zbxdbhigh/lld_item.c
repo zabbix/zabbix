@@ -952,6 +952,9 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						return;
 				}
 
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
 				if (SUCCEED == zbx_interval_preproc(*field, &value, &custom_intervals, &errmsg))
 				{
 					zbx_custom_interval_free(custom_intervals);

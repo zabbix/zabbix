@@ -1784,40 +1784,6 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 
 /******************************************************************************
  *                                                                            *
- * Function: is_delimited_user_macro                                          *
- *                                                                            *
- * Purpose: checks if string is user macro                                    *
- *                                                                            *
- * Parameters: str        - [IN] string to validate                           *
- *             delimiters - [IN] allowed delimiters (including NULL char)     *
- *             delim      - [OUT] address of next delimiter if any or NULL    *
- *                                                                            *
- * Returns: SUCCEED - either "{$MACRO}", "{$MACRO:"{#MACRO}"}" or             *
- *                    "{$MACRO};{$MACRO}"                                     *
- *          FAIL    - not user macro or contains other characters for example:*
- *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
- *                                                                            *
- ******************************************************************************/
-static int	is_delimited_user_macro(const char *str, const char *delimiters, const char **delim)
-{
-	zbx_token_t	token;
-
-	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) || 0 != token.token.l ||
-			0 == (token.type & ZBX_TOKEN_USER_MACRO) || NULL == strchr(delimiters, str[token.token.r + 1]))
-	{
-		return FAIL;
-	}
-
-	if ('\0' == str[token.token.r + 1])
-		*delim = NULL;
-	else
-		*delim = str + token.token.r + 1;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_interval_preproc                                             *
  *                                                                            *
  * Purpose: parses item and low-level discovery rule update intervals         *
@@ -1845,13 +1811,8 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
 			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
 	{
-		if (FAIL == is_delimited_user_macro(interval_str, ";", &delim))
-		{
-			interval_type = "update";
-			goto fail;
-		}
-
-		*simple_interval = 1;
+		interval_type = "update";
+		goto fail;
 	}
 
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
@@ -1889,12 +1850,9 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
 					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
 			{
-				if (FAIL == is_delimited_user_macro(interval_str, ";", &delim))
-				{
-					scheduler_interval_free(new_interval);
-					interval_type = "scheduling";
-					goto fail;
-				}
+				scheduler_interval_free(new_interval);
+				interval_type = "scheduling";
+				goto fail;
 			}
 
 			new_interval->next = scheduling;
