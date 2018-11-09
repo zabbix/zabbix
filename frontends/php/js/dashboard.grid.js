@@ -563,8 +563,6 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = getDivPosition($obj, data, $div);
 
-		setDivPosition(data['placeholder'], data, pos, true);
-
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
 			realignResize(data, widget);
@@ -574,6 +572,8 @@
 					setDivPosition(box['div'], data, box['current_pos'], false);
 				}
 			});
+
+			setDivPosition(data['placeholder'], data, pos, true);
 
 			if (widget.pos.height != widget.current_pos.height) {
 				var min_rows = 0;
@@ -586,6 +586,9 @@
 					resizeDashboardGrid($obj, data, min_rows);
 				}
 			}
+		}
+		else {
+			setDivPosition(data['placeholder'], data, pos, false);
 		}
 	}
 
