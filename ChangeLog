@@ -2049,6 +2049,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15132] backported daylight saving related scheduled checks fix from ZBX-12965 (wiper)
 ...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
