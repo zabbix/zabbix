@@ -750,7 +750,6 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	protected function calcMinMaxInterval() {
-		// Init intervals.
 		$intervals = [];
 		foreach ([1, 2, 3, 4] as $num) {
 			$dec = pow(0.1, $num);

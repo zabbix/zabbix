@@ -153,7 +153,7 @@ function _x($message, $context) {
  *
  * @param string $message       String to translate.
  * @param string $context       Context of the string.
- * @param string $param         Unlimited number of optional parameters to replace sequential placeholders.
+ * @param string $param,...     Unlimited number of optional parameters to replace sequential placeholders.
  *
  * @return string
  */
@@ -177,7 +177,7 @@ function _xs($message, $context) {
  * @param string $messagePlural     String to translate for plural form.
  * @param int    $num               Number to determine usage of plural form, also is used as first replace argument.
  * @param string $context           Context of the string.
- * @param string $param             Unlimited number of optional parameters to replace sequential placeholders.
+ * @param string $param,...         Unlimited number of optional parameters to replace sequential placeholders.
  *
  * @return string
  */
