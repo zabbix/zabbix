@@ -5,6 +5,14 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
+...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
+..F....... [ZBX-14724] fixed breadcrumb jumping in EI browser (ashubin)
+A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
+.......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
+A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
+.D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
+A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
 .......PS. [ZBX-15062] fixed binary heap trying to reallocate slots on every insert (wiper)
 ..F....... [ZBX-14805] fixed unauthorized request error when resetting filter after enabling/disabling elements (agriscenko)
 ..F....... [ZBX-14789] fixed translations from en_US to en_GB (Ivo)
@@ -2029,6 +2037,8 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
+A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
 .......PS. [ZBX-15062] fixed binary heap trying to reallocate slots on every insert (wiper)
 ..F....... [ZBX-14805] fixed unauthorized request error when resetting filter after enabling/disabling elements (agriscenko)
 ..F....... [ZBX-14758] fixed encoding for cookie names and values (Ivo, vmurzins)

@@ -174,7 +174,6 @@ else {
 					),
 				(new CTag('nav', true, get_icon('fullscreen')))->setAttribute('aria-label', _('Content controls'))
 			]))
-			->addItem(BR())
 			->addItem($tree->getHTML())
 			->show();
 	}
