@@ -989,8 +989,11 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 
 		if (ZBX_MEDIA_CONTENT_TYPE_HTML == mediatype->content_type)
 		{
-			alert_message = xml_escape_dyn(alert_message);
-			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", alert_message);
+			char	*am_esc;
+
+			am_esc = xml_escape_dyn(alert_message);
+			alert_message = zbx_dsprintf(alert_message, "<html><pre>%s</pre></html>", am_esc);
+			zbx_free(am_esc);
 		}
 
 		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject, alert_message, 0,
