@@ -349,7 +349,7 @@ static int    proc_read_tcp_listen(const char *filename, char **buffer, int *buf
 				count++;
 			}
 
-			if (3 == count && 0 != strncmp(start, "0A", 2))
+			if (3 == count && 0 != strncmp(start, "0A", 2) && 0 != strncmp(start, "03", 2))
 				break;
 		}
 	}
