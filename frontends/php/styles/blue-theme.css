@@ -1878,10 +1878,13 @@ button {
   padding: 0; }
 
 button[disabled], button[disabled]:hover, button[disabled]:active {
-  color: #acbbc2;
+  color: #acbbc2 !important;
   background-color: #ebebeb;
   border-color: #ccd5d9;
   cursor: default; }
+  button.icon-cal[disabled] {
+    opacity: 0.3;
+    background-color: transparent; }
 
 .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #acbbc2;
