@@ -19,14 +19,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup hosts
  */
-class testInheritanceHostPrototype extends CWebTest {
+class testInheritanceHostPrototype extends CLegacyWebTest {
 
 	public static function getLayoutData() {
 		return [
@@ -40,17 +40,6 @@ class testInheritanceHostPrototype extends CWebTest {
 	}
 
 	/**
-	 * Select a single value from DB.
-	 *
-	 * @param string $query	sql query
-	 *
-	 * @return mixed
-	 */
-	private function DBSelectValue($query) {
-		return (($result = DBSelect($query)) && ($row = DBfetch($result)) && $row) ? reset($row) : null;
-	}
-
-	/**
 	 * @dataProvider getLayoutData
 	 */
 	public function testInheritanceHostPrototype_CheckLayout($data) {
@@ -58,10 +47,10 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Get hostid and discoveryid to check href to template.
-		$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+		$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
 				zbx_dbstr($data['host_prototype'])
 		);
-		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+		$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
 				zbx_dbstr($data['discovery'])
 		);
 
@@ -72,7 +61,7 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-ip"]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//td[@class="interface-dns"]/input[@type="text"][@readonly]');
-		$interface = $this->DBSelectValue('SELECT interfaceid'.
+		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
 					'SELECT hostid'.
@@ -122,9 +111,8 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
-		$macros = DBdata('SELECT * FROM globalmacro', false);
+		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
 		foreach ($macros as $macro) {
-			$macro = $macro[0];
 			// Macro check and row selection.
 			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.
 					$macro['macro'].'"]/../..')
@@ -201,7 +189,7 @@ class testInheritanceHostPrototype extends CWebTest {
 						' WHERE host='.zbx_dbstr($template['name']).
 					')';
 
-			$this->assertEquals(1, DBcount($hosts_templates));
+			$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
 
 			// Host prototype on host and on template are the same.
 			$prototype_on_host = $this->sqlForHostPrototypeCompare($data['host']);
@@ -237,7 +225,7 @@ class testInheritanceHostPrototype extends CWebTest {
 				')'.
 				' ORDER BY host, name';
 
-		return DBhash($sql);
+		return CDBHelper::getHash($sql);
 	}
 
 	public static function getSimpleUpdateData() {
@@ -272,12 +260,12 @@ class testInheritanceHostPrototype extends CWebTest {
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
 		}
 
-		$old_host = DBhash($sql);
+		$old_host = CDBHelper::getHash($sql);
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
-		$this->assertEquals($old_host, DBhash($sql));
+		$this->assertEquals($old_host, CDBHelper::getHash($sql));
 	}
 
 	public static function getUpdateTemplateData() {
@@ -370,6 +358,150 @@ class testInheritanceHostPrototype extends CWebTest {
 		$this->assertEquals($prototype_on_template, $prototype_on_host);
 	}
 
+		public static function getCloneData() {
+		return [
+			[
+				[
+					'host' => 'Host for inheritance host prototype tests',
+					'host_prototype' => 'Host prototype for Clone {#TEST}',
+					'discovery' => 'Discovery rule for host prototype test',
+					'cloned_name' => 'Cloned host prototype without macro',
+					'error' => 'Cannot add host prototype',
+					'error_detail' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.'
+				]
+			],
+			[
+				[
+					'host' => 'Host for inheritance host prototype tests',
+					'host_prototype' => 'Host prototype for Clone {#TEST}',
+					'discovery' => 'Discovery rule for host prototype test',
+					'cloned_name' => ' ',
+					'error' => 'Page received incorrect data',
+					'error_detail' => 'Incorrect value for field "Host name": cannot be empty.'
+				]
+			],
+			[
+				[
+					'host' => 'Host for inheritance host prototype tests',
+					'host_prototype' => 'Host prototype for Clone {#TEST}',
+					'discovery' => 'Discovery rule for host prototype test',
+					'error' => 'Cannot add host prototype',
+					'error_detail' => 'Host prototype with host name "Host prototype for Clone {#TEST}" already exists in discovery rule "Discovery rule for host prototype test".'
+				]
+			],
+			[
+				[
+					'host' => 'Host for inheritance host prototype tests',
+					'host_prototype' => 'Host prototype for Clone {#TEST}',
+					'discovery' => 'Discovery rule for host prototype test',
+					'cloned_name' => 'Cloned host prototype with minimum changed fields {#TEST}',
+				]
+			],
+			[
+				[
+					'host' => 'Host for inheritance host prototype tests',
+					'host_prototype' => 'Host prototype for Clone {#TEST}',
+					'discovery' => 'Discovery rule for host prototype test',
+					'cloned_name' => 'Cloned host prototype {#TEST}',
+					'cloned_visible_name' => 'Visible name of Cloned host prototype {#TEST}',
+					'create_enabled' => true,
+					'hostgroup' => 'Hypervisors',
+					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
+					'template' => 'Template OS Mac OS X',
+					'inventory' => 'Manual',
+					'check_form' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Clone templated host prototype on host.
+	 *
+	 * @dataProvider getCloneData
+	 */
+	public function testInheritanceHostPrototype_Clone($data) {
+		$this->selectHostPrototypeForUpdate('host', $data);
+		$this->zbxTestClickWait('clone');
+
+		if (array_key_exists('cloned_name', $data)) {
+			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
+		}
+		if (array_key_exists('cloned_visible_name', $data)) {
+			$this->zbxTestInputTypeOverwrite('name', $data['cloned_visible_name']);
+		}
+		if (array_key_exists('create_enabled', $data)) {
+			$this->zbxTestCheckboxSelect('status', $data['create_enabled']);
+		}
+
+		// Change groups.
+		if (array_key_exists('hostgroup', $data) || array_key_exists('group_prototype', $data)) {
+			$this->zbxTestTabSwitch('Groups');
+			if (array_key_exists('hostgroup', $data)) {
+				$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
+				$this->zbxTestMultiselectClear('group_links_');
+				$this->zbxTestClickButtonMultiselect('group_links_');
+				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->zbxTestClickLinkTextWait($data['hostgroup']);
+			}
+			if (array_key_exists('group_prototype', $data)) {
+				$this->zbxTestInputClearAndTypeByXpath('//*[@name="group_prototypes[0][name]"]', $data['group_prototype']);
+			}
+		}
+
+		// Change template.
+		if (array_key_exists('template', $data)) {
+			$this->zbxTestTabSwitch('Templates');
+			$this->zbxTestClickButtonMultiselect('add_templates_');
+			$this->zbxTestLaunchOverlayDialog('Templates');
+			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+			$this->zbxTestClickLinkTextWait($data['template']);
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+		}
+
+		// Change inventory mode.
+		if (array_key_exists('inventory', $data)) {
+			$this->zbxTestTabSwitch('Host inventory');
+			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
+		}
+
+		$this->zbxTestClick('add');
+
+		if (array_key_exists('error', $data)) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+			$this->zbxTestTextPresent($data['error_detail']);
+		}
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
+			$this->zbxTestCheckFatalErrors();
+
+			$this->zbxTestTextPresent($data['host_prototype']);
+			if (array_key_exists('cloned_visible_name', $data)) {
+				$this->zbxTestTextPresent($data['cloned_visible_name']);
+			}
+			else {
+				$this->zbxTestTextPresent($data['cloned_name']);
+			}
+
+			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host = '.zbx_dbstr($data['host_prototype'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host = '.zbx_dbstr($data['cloned_name'])));
+
+			if (array_key_exists('check_form', $data)) {
+				$this->zbxTestClickLinkTextWait($data['cloned_visible_name']);
+				$this->zbxTestAssertElementValue('host', $data['cloned_name']);
+				$this->zbxTestAssertElementValue('name', $data['cloned_visible_name']);
+				$this->zbxTestCheckboxSelected('status');
+				$this->zbxTestTabSwitch('Groups');
+				$this->zbxTestMultiselectAssertSelected('group_links_', $data['hostgroup']);
+				$this->zbxTestAssertAttribute('//*[@name="group_prototypes[0][name]"]', 'value' , $data['group_prototype']);
+				$this->zbxTestTabSwitch('Templates');
+				$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+				$this->zbxTestTabSwitch('Host inventory');
+				$this->zbxTestAssertAttribute('//label[text()="'.$data['inventory'].'"]/../input', 'checked');
+			}
+		}
+	}
+
 	public static function getDeleteData() {
 		return [
 			[
@@ -392,7 +524,7 @@ class testInheritanceHostPrototype extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testInheritanceHostPrototype_Delete($data) {
-		$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS '.
+		$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS '.
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);
 
@@ -404,12 +536,12 @@ class testInheritanceHostPrototype extends CWebTest {
 		if (array_key_exists('error', $data)) {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete host prototypes');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype']);
-			$this->assertEquals(1, DBcount($sql));
+			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototypes deleted');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
-			$this->assertEquals(0, DBcount($sql));
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -420,18 +552,18 @@ class testInheritanceHostPrototype extends CWebTest {
 	 */
 	private function selectHostPrototypeForUpdate($action, $data) {
 		if ($action === 'host') {
-			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.
 					zbx_dbstr($data['host_prototype'])
 			);
-			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NOT NULL AND name='.
 					zbx_dbstr($data['discovery'])
 			);
 		}
 		elseif ($action === 'template') {
-			$host_prototype = $this->DBSelectValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
+			$host_prototype = CDBHelper::getValue('SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.
 					zbx_dbstr($data['host_prototype'])
 			);
-			$discovery_id = $this->DBSelectValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
+			$discovery_id = CDBHelper::getValue('SELECT itemid FROM items WHERE templateid IS NULL AND name='.
 					zbx_dbstr($data['discovery'])
 			);
 		}

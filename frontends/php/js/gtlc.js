@@ -448,7 +448,7 @@ jQuery(function ($){
 			width = Math.abs(x - selection.base_x),
 			seconds = Math.round(width * selection.seconds_per_px),
 			label = formatTimestamp(seconds, false, true)
-				+ (seconds < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+				+ (seconds < 60 ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
 
 		if (!was_dragged) {
 			was_dragged = true;

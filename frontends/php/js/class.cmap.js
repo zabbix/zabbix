@@ -288,7 +288,7 @@ ZABBIX.apps.map = (function($) {
 				this.updateImage();
 
 				if (labels === null) {
-					alert(locale['S_MACRO_EXPAND_ERROR']);
+					alert(t('S_MACRO_EXPAND_ERROR'));
 				}
 			},
 
@@ -423,7 +423,7 @@ ZABBIX.apps.map = (function($) {
 			deleteSelectedElements: function() {
 				var selementid;
 
-				if (this.selection.count.selements && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])) {
+				if (this.selection.count.selements && confirm(t('S_DELETE_SELECTED_ELEMENTS_Q'))) {
 					for (selementid in this.selection.selements) {
 						this.selements[selementid].remove();
 						this.removeLinksBySelementId(selementid);
@@ -438,7 +438,7 @@ ZABBIX.apps.map = (function($) {
 			deleteSelectedShapes: function() {
 				var shapeid;
 
-				if (this.selection.count.shapes && confirm(locale['S_DELETE_SELECTED_SHAPES_Q'])) {
+				if (this.selection.count.shapes && confirm(t('S_DELETE_SELECTED_SHAPES_Q'))) {
 					for (shapeid in this.selection.shapes) {
 						this.shapes[shapeid].remove();
 					}
@@ -495,7 +495,7 @@ ZABBIX.apps.map = (function($) {
 				// toggle expand macros
 				$('#expand_macros').click(function() {
 					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
-					$(this).html((that.data.expand_macros === '1') ? locale['S_ON'] : locale['S_OFF']);
+					$(this).html((that.data.expand_macros === '1') ? t('S_ON') : t('S_OFF'));
 					that.updateImage();
 				});
 
@@ -512,13 +512,13 @@ ZABBIX.apps.map = (function($) {
 				// toggle autoalign
 				$('#gridautoalign').click(function() {
 					that.data.grid_align = (that.data.grid_align === '1') ? '0' : '1';
-					$(this).html((that.data.grid_align === '1') ? locale['S_ON'] : locale['S_OFF']);
+					$(this).html((that.data.grid_align === '1') ? t('S_ON') : t('S_OFF'));
 				});
 
 				// toggle grid visibility
 				$('#gridshow').click(function() {
 					that.data.grid_show = (that.data.grid_show === '1') ? '0' : '1';
-					$(this).html((that.data.grid_show === '1') ? locale['S_SHOWN'] : locale['S_HIDDEN']);
+					$(this).html((that.data.grid_show === '1') ? t('S_SHOWN') : t('S_HIDDEN'));
 					that.updateImage();
 				});
 
@@ -541,7 +541,7 @@ ZABBIX.apps.map = (function($) {
 				// add element
 				$('#selementAdd').click(function() {
 					if (typeof(that.iconList[0]) === 'undefined') {
-						alert(locale['S_NO_IMAGES']);
+						alert(t('S_NO_IMAGES'));
 
 						return;
 					}
@@ -571,7 +571,7 @@ ZABBIX.apps.map = (function($) {
 					var link;
 
 					if (that.selection.count.selements !== 2) {
-						alert(locale['S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED']);
+						alert(t('S_TWO_MAP_ELEMENTS_SHOULD_BE_SELECTED'));
 
 						return false;
 					}
@@ -587,14 +587,14 @@ ZABBIX.apps.map = (function($) {
 					var linkids;
 
 					if (that.selection.count.selements !== 2) {
-						alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+						alert(t('S_PLEASE_SELECT_TWO_ELEMENTS'));
 
 						return false;
 					}
 
 					linkids = that.getLinksBySelementIds(that.selection.selements);
 
-					if (linkids.length && confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
+					if (linkids.length && confirm(t('S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'))) {
 						for (var i = 0, ln = linkids.length; i < ln; i++) {
 							that.links[linkids[i]].remove();
 						}
@@ -648,7 +648,7 @@ ZABBIX.apps.map = (function($) {
 						{
 							'items': [
 								{
-									label: locale['S_BRING_TO_FRONT'],
+									label: t('S_BRING_TO_FRONT'),
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'last');
@@ -656,7 +656,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_BRING_FORWARD'],
+									label: t('S_BRING_FORWARD'),
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'next');
@@ -664,7 +664,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_SEND_BACKWARD'],
+									label: t('S_SEND_BACKWARD'),
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'previous');
@@ -672,7 +672,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_SEND_TO_BACK'],
+									label: t('S_SEND_TO_BACK'),
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'first');
@@ -684,7 +684,7 @@ ZABBIX.apps.map = (function($) {
 						{
 							'items': [
 								{
-									label: locale['S_COPY'],
+									label: t('S_COPY'),
 									disabled: !can_copy,
 									clickCallback: function() {
 										that.copypaste_buffer = that.getSelectionBuffer(that);
@@ -692,7 +692,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_PASTE'],
+									label: t('S_PASTE'),
 									disabled: !can_paste,
 									clickCallback: function() {
 										var offset = $(that.container).offset(),
@@ -714,7 +714,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_PASTE_SIMPLE'],
+									label: t('S_PASTE_SIMPLE'),
 									disabled: !can_paste,
 									clickCallback: function() {
 										var offset = $(that.container).offset(),
@@ -736,7 +736,7 @@ ZABBIX.apps.map = (function($) {
 									}
 								},
 								{
-									label: locale['S_REMOVE'],
+									label: t('S_REMOVE'),
 									disabled: !can_remove,
 									clickCallback: function() {
 										if (that.selection.count.selements || that.selection.count.shapes) {
@@ -2222,7 +2222,7 @@ ZABBIX.apps.map = (function($) {
 					elementtype: '4', // image
 					elements: {},
 					iconid_off: this.sysmap.defaultIconId, // first imageid
-					label: locale['S_NEW_ELEMENT'],
+					label: t('S_NEW_ELEMENT'),
 					label_location: -1, // set default map label location
 					x: 0,
 					y: 0,
@@ -2340,7 +2340,7 @@ ZABBIX.apps.map = (function($) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}
 					else {
-						this.data.inherited_label = locale['S_IMAGE'];
+						this.data.inherited_label = t('S_IMAGE');
 					}
 				}
 
@@ -2716,7 +2716,7 @@ ZABBIX.apps.map = (function($) {
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
 			}
 			$('#iconid_on, #iconid_maintenance, #iconid_disabled')
-				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
+				.prepend('<option value="0">' + t('S_DEFAULT') + '</option>');
 			$('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
 			// hosts
@@ -3050,13 +3050,13 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					if (data.urls[i].name === '' || data.urls[i].url === '') {
-						alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
+						alert(t('S_INCORRECT_ELEMENT_MAP_LINK'));
 
 						return false;
 					}
 
 					if (typeof urlNames[data.urls[i].name] !== 'undefined') {
-						alert(locale['S_EACH_URL_SHOULD_HAVE_UNIQUE'] + " '" + data.urls[i].name + "'.");
+						alert(t('S_EACH_URL_SHOULD_HAVE_UNIQUE') + " '" + data.urls[i].name + "'.");
 
 						return false;
 					}
@@ -3209,7 +3209,7 @@ ZABBIX.apps.map = (function($) {
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
 			}
 			$('#massIconidOn, #massIconidMaintenance, #massIconidDisabled')
-				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
+				.prepend('<option value="0">' + t('S_DEFAULT') + '</option>');
 
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
@@ -3285,11 +3285,11 @@ ZABBIX.apps.map = (function($) {
 					element = this.sysmap.selements[id];
 
 					switch (element.data.elementtype) {
-						case '0': elementTypeText = locale['S_HOST']; break;
-						case '1': elementTypeText = locale['S_MAP']; break;
-						case '2': elementTypeText = locale['S_TRIGGER']; break;
-						case '3': elementTypeText = locale['S_HOST_GROUP']; break;
-						case '4': elementTypeText = locale['S_IMAGE']; break;
+						case '0': elementTypeText = t('S_HOST'); break;
+						case '1': elementTypeText = t('S_MAP'); break;
+						case '2': elementTypeText = t('S_TRIGGER'); break;
+						case '3': elementTypeText = t('S_HOST_GROUP'); break;
+						case '4': elementTypeText = t('S_IMAGE'); break;
 					}
 
 					list.push({
@@ -3573,10 +3573,7 @@ ZABBIX.apps.map = (function($) {
 
 					if (linkTrigger !== null) {
 						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(
-								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
-								values[i].value
-							);
+							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
 						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
@@ -3587,10 +3584,7 @@ ZABBIX.apps.map = (function($) {
 					}
 					else {
 						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
-							throw sprintf(
-								t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'),
-								values[i].value
-							);
+							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
 						data[values[i].name] = values[i].value.toString();
@@ -3656,23 +3650,23 @@ ZABBIX.apps.map = (function($) {
 				for (optgroupType in optgroups) {
 					switch (optgroupType) {
 						case '0':
-							optgroupLabel = locale['S_HOST'];
+							optgroupLabel = t('S_HOST');
 							break;
 
 						case '1':
-							optgroupLabel = locale['S_MAP'];
+							optgroupLabel = t('S_MAP');
 							break;
 
 						case '2':
-							optgroupLabel = locale['S_TRIGGER'];
+							optgroupLabel = t('S_TRIGGER');
 							break;
 
 						case '3':
-							optgroupLabel = locale['S_HOST_GROUP'];
+							optgroupLabel = t('S_HOST_GROUP');
 							break;
 
 						case '4':
-							optgroupLabel = locale['S_IMAGE'];
+							optgroupLabel = t('S_IMAGE');
 							break;
 					}
 

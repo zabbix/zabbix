@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageAdministrationGeneralIconMapping extends CWebTest {
+class testPageAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
 		$this->zbxTestLogin('adm.gui.php');
@@ -28,12 +28,12 @@ class testPageAdministrationGeneralIconMapping extends CWebTest {
 		$this->zbxTestCheckHeader('Icon mapping');
 		$strings = [];
 
-		foreach (DBdata('SELECT name FROM icon_map', false) as $iconname) {
-			$strings[] = $iconname[0]['name'];
+		foreach (CDBHelper::getAll('SELECT name FROM icon_map') as $iconname) {
+			$strings[] = $iconname['name'];
 		}
 
-		foreach (DBdata('SELECT expression FROM icon_mapping', false) as $expression) {
-			$strings[] = $expression[0]['expression'];
+		foreach (CDBHelper::getAll('SELECT expression FROM icon_mapping') as $expression) {
+			$strings[] = $expression['expression'];
 		}
 
 		$this->zbxTestTextPresent($strings);
