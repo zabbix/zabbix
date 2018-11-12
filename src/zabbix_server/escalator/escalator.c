@@ -2282,7 +2282,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 				goto cancel_warning;	/* error is NULL on skip */
 			case ZBX_ESCALATION_SUPPRESS:
 				diff = escalation_create_diff(escalation);
-				escalation->nextcheck = time(NULL) + SEC_PER_MIN;
+				escalation->nextcheck = now + SEC_PER_MIN;
 				escalation_update_diff(escalation, diff);
 				zbx_vector_ptr_append(&diffs, diff);
 				continue;
@@ -2334,7 +2334,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
-				escalation->nextcheck = time(NULL) + (0 == action->esc_period ? SEC_PER_HOUR :
+				escalation->nextcheck = now + (0 == action->esc_period ? SEC_PER_HOUR :
 						action->esc_period);
 			}
 			else
