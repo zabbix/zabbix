@@ -88,17 +88,14 @@ abstract class CBaseElement extends RemoteWebElement {
 
 	/**
 	 * Alias for isDisplayed.
-	 * @see RemoteWebElement::isDisplayed
+	 * @see isDisplayed
 	 *
-	 * @return $this
+	 * @param boolean $displayed if element should be visible
+	 *
+	 * @return boolean
 	 */
-	public function isVisible() {
-		try {
-			return $this->isDisplayed();
-		}
-		catch (StaleElementReferenceException $exception) {
-			return false;
-		}
+	public function isVisible($displayed = true) {
+		return $this->isDisplayed($displayed);
 	}
 
 	/**
@@ -197,5 +194,31 @@ abstract class CBaseElement extends RemoteWebElement {
 	 */
 	public function findElements(WebDriverBy $by) {
 		return $this->executeStaleSafe(__FUNCTION__, [$by]);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isDisplayed($displayed = true) {
+		try {
+			return (parent::isDisplayed() === $displayed);
+		}
+		catch (StaleElementReferenceException $exception) {
+			return ($displayed === false);
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return (parent::isEnabled() === $enabled);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isSelected($selected = true) {
+		return (parent::isSelected() === $selected);
 	}
 }
