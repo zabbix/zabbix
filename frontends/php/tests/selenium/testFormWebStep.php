@@ -614,7 +614,7 @@ class testFormWebStep extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Retrieve only headers',
+					'name' => 'Retrieve mode',
 					'step_name' => 'Step retrieve only headers',
 					'url' => 'http://www.zabbix.com',
 					'retrieve' => true
