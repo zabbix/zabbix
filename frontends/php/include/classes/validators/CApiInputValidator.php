@@ -1125,7 +1125,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (false === @preg_match('/'.$data.'/', '')) {
+		$invalid = @preg_match('/'.str_replace('/', '\/', $data).'/', '') === false;
+
+		if ($invalid) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
 			return false;
 		}

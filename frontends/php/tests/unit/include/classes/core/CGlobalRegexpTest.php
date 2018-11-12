@@ -99,10 +99,30 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 		];
 	}
 
+	public function dataProviderMatchMethod() {
+		return [
+			[
+				'expression' => '/',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test\/string'
+			],
+			[
+				'expression' => '\\/',
+				'type' => EXPRESSION_TYPE_FALSE,
+				'string' => 'test/string'
+			],
+			[
+				'expression' => '[a-z\\\\/]+',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test/string'
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testMatchExpressions ($expression, $successValues, $failValues)
+	public function testMatchExpressions($expression, $successValues, $failValues)
 	{
 		foreach ($successValues as $successValue) {
 			$this->assertTrue(CGlobalRegexp::matchExpression($expression, $successValue), 'Value: '.$successValue);
@@ -110,6 +130,20 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 
 		foreach ($failValues as $failValue) {
 			$this->assertFalse(CGlobalRegexp::matchExpression($expression, $failValue), 'Value: '.$failValue);
+		}
+	}
+
+	/**
+	 * @dataProvider dataProviderMatchMethod
+	 */
+	public function testMatchMethod($expression, $expression_type, $string) {
+		$expr = new CGlobalRegexp($expression);
+
+		if ($expression_type == EXPRESSION_TYPE_TRUE) {
+			$this->assertTrue($expr->match($string));
+		}
+		else {
+			$this->assertFalse($expr->match($string));
 		}
 	}
 
