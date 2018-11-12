@@ -101,20 +101,29 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 
 	public function dataProviderMatchMethod() {
 		return [
+			// Char '/' is escaped before preg_match call.
 			[
 				'expression' => '/',
 				'type' => EXPRESSION_TYPE_TRUE,
 				'string' => 'test\/string'
 			],
+			// Double escaping of '/' should fail.
 			[
 				'expression' => '\\/',
 				'type' => EXPRESSION_TYPE_FALSE,
 				'string' => 'test/string'
 			],
+			// Char '/' should not be escaped if used as part of regex pattern.
 			[
-				'expression' => '[a-z\\\\/]+',
+				'expression' => '^[a-z/]+$',
 				'type' => EXPRESSION_TYPE_TRUE,
 				'string' => 'test/string'
+			],
+			// Char '/' should not be escaped if used as part of regex pattern.
+			[
+				'expression' => '^[a-z\\\\/]+$',
+				'type' => EXPRESSION_TYPE_TRUE,
+				'string' => 'test/\\string'
 			]
 		];
 	}

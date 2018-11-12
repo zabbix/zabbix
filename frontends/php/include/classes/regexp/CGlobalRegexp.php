@@ -108,7 +108,7 @@ class CGlobalRegexp {
 			}
 		}
 		else {
-			$result = (bool) preg_match('/'.str_replace('/', '\/', $this->expression).'/', $string);
+			$result = (bool) @preg_match('/'.str_replace('/', '\/', $this->expression).'/', $string);
 		}
 
 		return $result;
