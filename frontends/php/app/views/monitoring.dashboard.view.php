@@ -35,6 +35,11 @@ else {
 	$this->addJsFile('colorpicker.js');
 	$this->addJsFile('class.csvggraph.js');
 	$this->addJsFile('csvggraphwidget.js');
+	$this->addJsFile('class.cclock.js');
+	$this->addJsFile('class.cnavtree.js');
+	$this->addJsFile('class.mapWidget.js');
+	$this->addJsFile('class.svg.canvas.js');
+	$this->addJsFile('class.svg.map.js');
 
 	$this->includeJSfile('app/views/monitoring.dashboard.view.js.php');
 
@@ -155,7 +160,7 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeselector']) {
-		$timeline = (new CFilter())
+		$timeline = (new CFilter(new CUrl()))
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);

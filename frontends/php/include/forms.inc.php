@@ -261,7 +261,7 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$filter = (new CFilter())
+	$filter = (new CFilter(new CUrl('items.php')))
 		->setProfile('web.items.filter')
 		->setActiveTab(CProfile::get('web.items.filter.active', 1))
 		->addVar('subfilter_hosts', $subfilter_hosts)
@@ -962,7 +962,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', 0),
 		'snmp_community' => getRequest('snmp_community', 'public'),
-		'snmp_oid' => getRequest('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
+		'snmp_oid' => getRequest('snmp_oid', ''),
 		'port' => getRequest('port', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),

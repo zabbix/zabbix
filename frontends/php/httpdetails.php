@@ -201,7 +201,7 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 // Create graphs widget.
 $widget = (new CWidget())->setWebLayoutMode($page['web_layout_mode']);
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl()))
 	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
 	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
 	->addTimeSelector($timeline['from'], $timeline['to']);

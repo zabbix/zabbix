@@ -3112,6 +3112,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 			zbx_strpool_release(trigger->description);
 			zbx_strpool_release(trigger->expression);
+			zbx_strpool_release(trigger->recovery_expression);
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
 
@@ -4363,6 +4364,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 			}
 		}
 
+		zbx_strpool_release(op->params);
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
@@ -4420,12 +4422,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (last_groupid != groupid || 0 == last_groupid)
+		if (last_groupid != groupid)
 		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
-				continue;
+			group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid);
 			last_groupid = groupid;
 		}
+
+		if (NULL == group)
+			continue;
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
@@ -5829,7 +5833,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	strscpy(dst_host->host, src_host->host);
-	strscpy(dst_host->name, src_host->name);
+	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;

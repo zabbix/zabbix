@@ -19,7 +19,7 @@
 **/
 
 
-$filterForm = new CFilter();
+$filterForm = new CFilter(new CUrl('toptriggers.php'));
 
 // severities
 $severity_columns = [0 => [], 1 => []];
