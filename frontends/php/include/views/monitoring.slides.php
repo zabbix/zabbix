@@ -104,16 +104,16 @@ $widget->setControls((new CList([
 
 $widget
 	->addItem(
-		(new CFilter())
+		(new CFilter(new CUrl()))
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
 			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
 	)
 	->addItem(
-	(new CDiv((new CDiv())->addClass('preloader')))
-		->setId(WIDGET_SLIDESHOW)
-);
+		(new CDiv((new CDiv())->addClass('preloader')))
+			->setId(WIDGET_SLIDESHOW)
+	);
 
 require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
 

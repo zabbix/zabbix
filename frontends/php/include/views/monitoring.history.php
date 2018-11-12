@@ -99,7 +99,7 @@ $action_list->addItem([(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), get_
 $header['right']->addItem($action_list);
 
 // create filter
-$filter_form = new CFilter();
+$filter_form = new CFilter(new CUrl());
 $filter_tab = [];
 
 if ($data['action'] == HISTORY_LATEST || $data['action'] == HISTORY_VALUES) {

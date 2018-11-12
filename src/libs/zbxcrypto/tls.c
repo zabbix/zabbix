@@ -488,6 +488,27 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_tls_version                                                  *
+ *                                                                            *
+ * Purpose: print tls library version on stdout by application request with   *
+ *          parameter '-V'                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_version(void)
+{
+#if defined(HAVE_POLARSSL)
+	printf("Compiled with %s\n", POLARSSL_VERSION_STRING_FULL);
+#elif defined(HAVE_GNUTLS)
+	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
+#elif defined(HAVE_OPENSSL)
+	printf("This product includes software developed by the OpenSSL Project\n"
+			"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n");
+	printf("Compiled with %s\nRunning with %s\n", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tls_parameter_name                                           *
  *                                                                            *
  * Purpose:                                                                   *

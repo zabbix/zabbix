@@ -764,6 +764,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 
 			$this->zbxTestCheckFatalErrors();
+			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}
 

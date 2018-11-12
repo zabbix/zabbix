@@ -202,7 +202,7 @@ CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 $widget = (new CWidget())
 	->setWebLayoutMode($page['web_layout_mode'])
 	->addItem(
-		(new CFilter())
+		(new CFilter(new CUrl()))
 			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
 			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
 			->addTimeSelector($timeline['from'], $timeline['to'], $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE)

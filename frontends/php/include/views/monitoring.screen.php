@@ -116,7 +116,7 @@ $screenBuilder = new CScreenBuilder([
 ]);
 
 $widget->addItem(
-	(new CFilter())
+	(new CFilter(new CUrl()))
 		->setProfile($data['profileIdx'], $data['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($screenBuilder->timeline['from'], $screenBuilder->timeline['to'],

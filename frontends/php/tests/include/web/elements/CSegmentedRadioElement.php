@@ -18,24 +18,43 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../CElement.php';
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
+/**
+ * Segmented radio element.
+ */
+class CSegmentedRadioElement extends CElement {
 
-		$this->call('apiinfo.version', [], $error);
+	/**
+	 * Get collection of labels.
+	 *
+	 * @return CElementCollection
+	 */
+	public function getLabels() {
+		return $this->query('tag:label')->all();
 	}
 
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
+	/**
+	 * Get text of selected element.
+	 *
+	 * @return string
+	 */
+	public function getText() {
+		return $this->query('xpath:.//input[@checked="checked"]/../label')->one()->getText();
+	}
 
-		$this->assertSame('4.0.2', $result['result']);
+	/**
+	 * Select label by text.
+	 *
+	 * @param string $text    label text to be selected
+	 *
+	 * @return $this
+	 */
+	public function select($text) {
+		$this->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($text).']')->waitUntilVisible()->one()->click();
+
+		return $this;
 	}
 }
