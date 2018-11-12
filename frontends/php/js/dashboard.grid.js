@@ -364,7 +364,7 @@
 					x: 0,
 					y: 0,
 					width: 12,
-					height: 12
+					height: 128
 				},
 				overlap = new_max - size_max,
 				slot = axis_pos[axis_key] + axis_pos[size_key],
