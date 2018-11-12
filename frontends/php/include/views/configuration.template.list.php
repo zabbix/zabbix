@@ -19,6 +19,34 @@
 **/
 
 
+$filter = new CFilter(new CUrl('templates.php'));
+$filter->setProfile($data['profileIdx'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormList())->addRow(_('Name'),
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		),
+		(new CFormList())->addRow(
+			(new CLabel(_('Linked templates'), 'filter_templates__ms')),
+			(new CMultiSelect([
+				'name' => 'filter_templates[]',
+				'object_name' => 'templates',
+				'data' => $data['filter']['templates'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'srcfld2' => 'host',
+						'dstfrm' => $filter->getName(),
+						'dstfld1' => 'filter_templates_'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		)
+	]);
+
 $widget = (new CWidget())
 	->setTitle(_('Templates'))
 	->setControls(new CList([
@@ -45,17 +73,7 @@ $widget = (new CWidget())
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	]))
-	->addItem((new CFilter())
-		->setProfile($data['profileIdx'])
-		->setActiveTab($data['active_tab'])
-		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			)
-		])
-	);
+	->addItem($filter);
 
 $form = (new CForm())->setName('templates');
 

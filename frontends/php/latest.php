@@ -332,7 +332,7 @@ $widget = (new CWidget())
 
 if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// Filter
-	$widget->addItem((new CFilter())
+	$widget->addItem((new CFilter(new CUrl('latest.php')))
 		->setProfile('web.latest.filter')
 		->setActiveTab(CProfile::get('web.latest.filter.active', 1))
 		->addFilterTab(_('Filter'), [

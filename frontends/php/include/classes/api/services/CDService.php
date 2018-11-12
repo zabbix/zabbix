@@ -254,43 +254,46 @@ class CDService extends CApiService {
 		}
 
 		// selectHosts
-		if (!is_null($options['selectHosts'])) {
-			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
-				$relationMap = new CRelationMap();
-				// discovered items
-				$dbRules = DBselect(
-					'SELECT ds.dserviceid,i.hostid'.
-						' FROM dservices ds,interface i'.
-						' WHERE '.dbConditionInt('ds.dserviceid', $dserviceIds).
-						' AND ds.ip=i.ip'
-				);
-				while ($rule = DBfetch($dbRules)) {
-					$relationMap->addRelation($rule['dserviceid'], $rule['hostid']);
-				}
-
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $relationMap->getRelatedIds(),
-					'preservekeys' => true,
-					'sortfield' => 'status'
-				]);
-				if (!is_null($options['limitSelects'])) {
-					order_result($hosts, 'hostid');
-				}
-				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
+		if ($options['selectHosts'] !== null) {
+			foreach ($result as $dserviceid => $dservice) {
+				$result[$dserviceid]['hosts'] = ($options['selectHosts'] == API_OUTPUT_COUNT) ? 0 : [];
 			}
-			else {
-				$hosts = API::Host()->get([
-					'dserviceids' => $dserviceIds,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach ($result as $dserviceid => $dservice) {
-					if (isset($hosts[$dserviceid]))
-						$result[$dserviceid]['hosts'] = $hosts[$dserviceid]['rowscount'];
-					else
-						$result[$dserviceid]['hosts'] = 0;
+
+			$db_services = DBselect(
+				'SELECT DISTINCT ds.dserviceid,h.hostid'.
+				' FROM dservices ds,dchecks dc,drules dr,hosts h,interface i'.
+				' WHERE ds.dcheckid=dc.dcheckid'.
+					' AND dc.druleid=dr.druleid'.
+					' AND (dr.proxy_hostid=h.proxy_hostid OR (dr.proxy_hostid IS NULL AND h.proxy_hostid IS NULL))'.
+					' AND h.hostid=i.hostid'.
+					' AND ds.ip=i.ip'.
+					' AND '.dbConditionInt('ds.dserviceid', $dserviceIds)
+			);
+
+			$host_services = [];
+
+			while ($db_service = DBfetch($db_services)) {
+				$host_services[$db_service['hostid']][] = $db_service['dserviceid'];
+			}
+
+			$db_hosts = API::Host()->get([
+				'output' => ($options['selectHosts'] == API_OUTPUT_COUNT) ? [] : $options['selectHosts'],
+				'hostids' => array_keys($host_services),
+				'sortfield' => 'hostid',
+				'preservekeys' => true
+			]);
+
+			$db_hosts = $this->unsetExtraFields($db_hosts, ['hostid'], $options['selectHosts']);
+
+			foreach ($db_hosts as $hostid => $db_host) {
+				foreach ($host_services[$hostid] as $dserviceid) {
+					if ($options['selectHosts'] == API_OUTPUT_COUNT) {
+						$result[$dserviceid]['hosts']++;
+					}
+					elseif ($options['limitSelects'] === null
+							|| count($result[$dserviceid]['hosts']) < $options['limitSelects']) {
+						$result[$dserviceid]['hosts'][] = $db_host;
+					}
 				}
 			}
 		}

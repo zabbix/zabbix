@@ -262,17 +262,4 @@ class CDashboardWidgetMap extends CDiv {
 
 		return parent::toString($destroy);
 	}
-
-	/**
-	 * Returns a list of javascript files that are requested to load map widget.
-	 *
-	 * @return array
-	 */
-	public function getScriptFile() {
-		return [
-			'js/vector/class.svg.canvas.js',
-			'js/vector/class.svg.map.js',
-			'js/class.mapWidget.js'
-		];
-	}
 }

@@ -103,7 +103,7 @@ $widget->setControls((new CList([
 ])));
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	$widget->addItem((new CFilter())
+	$widget->addItem((new CFilter(new CUrl()))
 		->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
