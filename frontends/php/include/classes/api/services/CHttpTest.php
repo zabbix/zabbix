@@ -438,8 +438,8 @@ class CHttpTest extends CApiService {
 		unset($db_httptest);
 
 		$db_httpsteps = DB::select('httpstep', [
-			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'required',
-				'status_codes', 'follow_redirects', 'retrieve_mode', 'posts'
+			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+				'status_codes', 'follow_redirects', 'retrieve_mode'
 			],
 			'filter' => ['httptestid' => array_keys($db_httptests)]
 		]);
@@ -766,59 +766,6 @@ class CHttpTest extends CApiService {
 		$this->validateRetrieveMode($httptests, $method, $db_httptests);
 	}
 
-	/*
--	 * @param array  $httptests
--	 * @param string $method
--	 * @param array  $db_httptests
--	 *
--	 * @throws APIException if parameters is invalid.
--	 */
-	private function validateRetrieveMode(array &$httptests, $method, array $db_httptests = null) {
-		foreach ($httptests as &$httptest) {
-			if (!array_key_exists('steps', $httptest)) {
-				continue;
-			}
-
-			foreach ($httptest['steps'] as &$httpstep) {
-				if (array_key_exists('retrieve_mode', $httpstep)
-						|| array_key_exists('posts', $httpstep)
-						|| array_key_exists('required', $httpstep)) {
-
-					if ($method === 'validateCreate' || !array_key_exists('httpstepid', $httpstep)) {
-						$httpstep += [
-							'retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
-							'posts' => '',
-							'required' => ''
-						];
-					}
-					else {
-						$db_httptest = $db_httptests[$httptest['httptestid']];
-						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
-						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
-						$httpstep += [
-							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-								? $db_httpstep['posts']
-								: '',
-							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-								? $db_httpstep['required']
-								: ''
-						];
-					}
-
-					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'posts', _('should be empty'))
-							);
-						}
-					}
-				}
-			}
-			unset($httpstep);
-		}
-		unset($httptest);
-	}
-
 	/**
 	 * Validate http response code range.
 	 * Range can be empty string or list of comma separated numeric strings or user macroses.
@@ -1084,6 +1031,59 @@ class CHttpTest extends CApiService {
 					);
 				}
 			}
+		}
+		unset($httptest);
+	}
+
+	/**
+	 * @param array  $httptests
+	 * @param string $method
+	 * @param array  $db_httptests
+	 *
+	 * @throws APIException if parameters is invalid.
+	 */
+	private function validateRetrieveMode(array &$httptests, $method, array $db_httptests = null) {
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('steps', $httptest)) {
+				continue;
+			}
+
+			foreach ($httptest['steps'] as &$httpstep) {
+				if (array_key_exists('retrieve_mode', $httpstep)
+						|| array_key_exists('posts', $httpstep)
+						|| array_key_exists('required', $httpstep)) {
+
+					if ($method === 'validateCreate' || !array_key_exists('httpstepid', $httpstep)) {
+						$httpstep += [
+							'retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_CONTENT,
+							'posts' => '',
+							'required' => ''
+						];
+					}
+					else {
+						$db_httptest = $db_httptests[$httptest['httptestid']];
+						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
+						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
+						$httpstep += [
+							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['posts']
+								: '',
+							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+								? $db_httpstep['required']
+								: ''
+						];
+					}
+
+					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
+						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'posts', _('should be empty'))
+							);
+						}
+					}
+				}
+			}
+			unset($httpstep);
 		}
 		unset($httptest);
 	}
