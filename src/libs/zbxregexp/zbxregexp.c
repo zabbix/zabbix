@@ -56,6 +56,31 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	int	error_offset = -1;
 	pcre	*pcre_regexp;
 
+#ifdef PCRE_NO_AUTO_CAPTURE
+	/* If PCRE_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
+	/* capturing groups then reset PCRE_NO_AUTO_CAPTURE bit. Otherwise the regular expression might not compile. */
+
+	if (0 != (flags & PCRE_NO_AUTO_CAPTURE))
+	{
+		const char	*pstart = pattern, *offset;
+
+		while (NULL != (offset = strchr(pstart, '\\')))
+		{
+			offset++;
+
+			if (('1' <= *offset && *offset <= '9') || 'g' == *offset)
+			{
+				flags ^= PCRE_NO_AUTO_CAPTURE;
+				break;
+			}
+
+			if (*offset == '\\')
+				offset++;
+
+			pstart = offset;
+		}
+	}
+#endif
 	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, error, &error_offset, NULL)))
 		return FAIL;
 

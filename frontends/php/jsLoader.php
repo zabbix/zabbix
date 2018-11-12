@@ -61,6 +61,7 @@ $availableJScripts = [
 	'multiselect.js' => '',
 	'colorpicker.js' => '',
 	'chkbxrange.js' => '',
+	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
@@ -76,16 +77,20 @@ $availableJScripts = [
 	'class.cmessages.js' => '',
 	'class.cnavtree.js' => '',
 	'class.cookie.js' => '',
+	'class.coverride.js' => '',
+	'class.crangecontrol.js' => '',
 	'class.cscreen.js' => '',
 	'class.csuggest.js' => '',
+	'class.csvggraph.js' => '',
 	'class.ctree.js' => '',
 	'class.curl.js' => '',
-	'class.rpc.js' => '',
+	'class.cverticalaccordion.js' => '',
 	'class.mapWidget.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
-	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
+	'class.pmaster.js' => '',
+	'class.rpc.js' => '',
 	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
@@ -192,6 +197,14 @@ $tranStrings = [
 	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
+	'class.coverride.js' => [
+		'S_COLOR' => _('colour'),
+		'S_TIME_SHIFT' => _('time shift')
+	],
+	'class.cverticalaccordion.js' => [
+		'S_COLLAPSE' => _('Collapse'),
+		'S_EXPAND' => _('Expand')
+	],
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
@@ -268,14 +281,6 @@ $tranStrings = [
 	],
 	'colorpicker.js' => [
 		'S_CLOSE' => _('Close')
-	],
-	'class.coverride.js' => [
-		'S_COLOR' => _('colour'),
-		'S_TIME_SHIFT' => _('time shift')
-	],
-	'class.cverticalaccordion.js' => [
-		'S_EXPAND' => _('Expand'),
-		'S_COLLAPSE' => _('Collapse')
 	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
