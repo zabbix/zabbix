@@ -62,17 +62,14 @@ $web_layout_mode = CView::getLayoutMode();
 $chartsWidget = (new CWidget())
 	->setTitle(_('Graphs'))
 	->setWebLayoutMode($web_layout_mode)
-	->setControls(new CList([$controls, $content_control]));
-
-$filter = (new CFilter(new CUrl('charts.php')))
-	->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
-	->setActiveTab($data['active_tab'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-
-if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass(ZBX_STYLE_HIDDEN);
-}
-$chartsWidget->addItem($filter);
+	->setControls(new CList([$controls, $content_control]))
+	->addItem(
+		(new CFilter(new CUrl('charts.php')))
+			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
