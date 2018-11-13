@@ -72,16 +72,19 @@ class CHistory extends CApiService {
 		];
 		$options = zbx_array_merge($def_options, $options);
 
-		$items = API::Item()->get([
-			'itemids' => $options['itemids'],
-			'hostids' => $options['hostids'],
-			'nopermissions' => $options['nopermissions'],
-			'output' => ['itemid'],
-			'editable' => $options['editable'],
-			'preservekeys' => true,
-			'webitems' => true
-		]);
-		$options['itemids'] = array_keys($items);
+		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions']) ||
+				$options['hostids'] !== null) {
+			$items = API::Item()->get([
+				'itemids' => $options['itemids'],
+				'hostids' => $options['hostids'],
+				'nopermissions' => $options['nopermissions'],
+				'output' => ['itemid'],
+				'editable' => $options['editable'],
+				'preservekeys' => true,
+				'webitems' => true
+			]);
+			$options['itemids'] = array_keys($items);
+		}
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
