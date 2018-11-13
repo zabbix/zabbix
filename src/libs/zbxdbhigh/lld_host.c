@@ -689,13 +689,14 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                                                            *
  * Function: lld_hostgroups_make                                              *
  *                                                                            *
- * Parameters: groupids         - [IN] sorted list of host groups which       *
+ * Parameters: groupids         - [IN] sorted list of host group ids which    *
  *                                     should be present on the each          *
  *                                     discovered host                        *
  *             hosts            - [IN/OUT] list of hosts                      *
  *                                         should be sorted by hostid         *
- *             del_hostgroupids - [OUT] list of host groups which should be   *
- *                                      deleted                               *
+ *             groups           - [IN]  list of host groups                   *
+ *             del_hostgroupids - [OUT] sorted list of host groups which      *
+ *                                      should be deleted                     *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
@@ -715,21 +716,6 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 	zbx_vector_uint64_create(&hostids);
 
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-			continue;
-
-		zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
-		for (j = 0; j < groupids->values_num; j++)
-			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
-
-		if (0 != host->hostid)
-			zbx_vector_uint64_append(&hostids, host->hostid);
-	}
-
 	for (i = 0; i < groups->values_num; i++)
 	{
 		group = (zbx_lld_group_t *)groups->values[i];
@@ -741,8 +727,30 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 		{
 			host = (zbx_lld_host_t *)group->hosts.values[j];
 
+			if (0 == host->new_groupids.values_alloc)
+				zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
+
 			zbx_vector_uint64_append(&host->new_groupids, group->groupid);
 		}
+	}
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 == host->new_groupids.values_alloc)
+			zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
+
+		for (j = 0; j < groupids->values_num; j++)
+			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
+
+		zbx_vector_uint64_sort(&host->new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		if (0 != host->hostid)
+			zbx_vector_uint64_append(&hostids, host->hostid);
 	}
 
 	if (0 != hostids.values_num)
