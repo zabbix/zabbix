@@ -68,18 +68,18 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
 		switch (token.type)
 		{
 			case ZBX_TOKEN_MACRO:
-				pos = token.token.r;
-				if (0 == strncmp(*out + token.token.l, oldmacro, token.token.r - token.token.l))
+				pos = token.loc.r;
+				if (0 == strncmp(*out + token.loc.l, oldmacro, token.loc.r - token.loc.l))
 				{
-					pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.token.l,
-							token.token.r - token.token.l + 1, newmacro, newmacro_len);
+					pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
+							token.loc.r - token.loc.l + 1, newmacro, newmacro_len);
 					ret = SUCCEED;
 				}
 				break;
 
 			case ZBX_TOKEN_USER_MACRO:
 			case ZBX_TOKEN_SIMPLE_MACRO:
-				pos = token.token.r;
+				pos = token.loc.r;
 				break;
 		}
 	}
