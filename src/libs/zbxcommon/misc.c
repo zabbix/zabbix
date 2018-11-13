@@ -1782,6 +1782,108 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	return nextcheck;
 }
 
+static int	parse_user_macro(const char *str, int *len)
+{
+	int	macro_r, context_l, context_r;
+
+	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r))
+		return FAIL;
+
+	*len = macro_r + 1;
+
+	return SUCCEED;
+}
+
+static int	parse_simple_interval(const char *str, int *len, char sep, int *simple_interval)
+{
+	const char	*delim;
+
+	if (SUCCEED != is_time_suffix(str, simple_interval,
+			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
+	{
+		return FAIL;
+	}
+
+	*len = NULL == delim ? (int)strlen(str) : delim - str;
+
+	return SUCCEED;
+}
+
+int	zbx_validate_interval(const char *str)
+{
+	int		simple_interval, len;
+	const char	*delim;
+
+	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+	{
+		if ('\0' == *(delim = str + len))
+			return SUCCEED;
+	}
+	else if (SUCCEED == parse_simple_interval(str, &len, ';', &simple_interval))
+	{
+		if ('\0' == *(delim = str + len))
+			return SUCCEED;
+	}
+
+	while (NULL != delim)
+	{
+		str = delim + 1;
+
+		if ((SUCCEED == parse_user_macro(str, &len) ||
+				SUCCEED == parse_simple_interval(str, &len, '/', &simple_interval)) &&
+				'/' == *(delim = str + len))
+		{
+			zbx_time_period_t period;
+
+			str = delim + 1;
+
+			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *(delim = str + len))
+					return SUCCEED;
+
+				continue;
+			}
+
+			if (SUCCEED == time_period_parse(&period, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : delim - str))
+			{
+				continue;
+			}
+
+			return FAIL;
+		}
+		else
+		{
+			zbx_scheduler_interval_t	*new_interval;
+
+			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *(delim = str + len))
+					return SUCCEED;
+
+				continue;
+			}
+
+
+			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
+
+			if (SUCCEED == scheduler_interval_parse(new_interval, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
+			{
+				scheduler_interval_free(new_interval);
+				continue;
+			}
+
+			scheduler_interval_free(new_interval);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_interval_preproc                                             *
