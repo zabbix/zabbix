@@ -89,15 +89,15 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
 
 /******************************************************************************
  *                                                                            *
- * Function: db_rename_macros                                                 *
+ * Function: db_rename_macro                                                  *
  *                                                                            *
- * Purpose: rename macros in the specified database fields                    *
+ * Purpose: rename macro in the specified database fields                     *
  *                                                                            *
  * Parameters: result     - [IN] database query with fields to replace. First *
  *                               field is table id field, following with      *
  *                               the target fields listed in fields parameter *
  *             table      - [IN] the target table name                        *
- *             idfield    - [IN] the table id field name                      *
+ *             pkey       - [IN] the primary key field name                   *
  *             fields     - [IN] the table fields to check for macros and     *
  *                               rename if found                              *
  *             fields_num - [IN] the number of fields to check                *
@@ -108,7 +108,7 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
  *               FAIL     - database error occurred                           *
  *                                                                            *
  ******************************************************************************/
-static int	db_rename_macros(DB_RESULT result, const char *table, const char *idfield, const char **fields,
+static int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields,
 		int fields_num, const char *oldmacro, const char *newmacro)
 {
 	DB_ROW		row;
@@ -128,13 +128,12 @@ static int	db_rename_macros(DB_RESULT result, const char *table, const char *idf
 		{
 			if (SUCCEED == str_rename_macro(row[i + 1], oldmacro, newmacro, &field, &field_alloc))
 			{
-				field_esc = DBdyn_escape_string(field);
-
 				if (old_offset == sql_offset)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
 				else
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 
+				field_esc = DBdyn_escape_string(field);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s='%s'", fields[i], field_esc);
 				zbx_free(field_esc);
 			}
@@ -142,7 +141,7 @@ static int	db_rename_macros(DB_RESULT result, const char *table, const char *idf
 
 		if (old_offset != sql_offset)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=%s;\n", idfield, row[0]);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=%s;\n", pkey, row[0]);
 			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				goto out;
 		}
@@ -170,7 +169,7 @@ static int	DBpatch_4000001(void)
 	result = DBselect("select actionid,def_shortdata,def_longdata,r_shortdata,r_longdata,ack_shortdata,"
 			"ack_longdata from actions where eventsource=0");
 
-	ret = db_rename_macros(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
+	ret = db_rename_macro(result, "actions", "actionid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
 	DBfree_result(result);
@@ -191,7 +190,7 @@ static int	DBpatch_4000002(void)
 				" and o.actionid=a.actionid"
 				" and a.eventsource=0");
 
-	ret = db_rename_macros(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
+	ret = db_rename_macro(result, "opmessage", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
 	DBfree_result(result);
@@ -212,7 +211,7 @@ static int	DBpatch_4000003(void)
 				" and o.actionid=a.actionid"
 				" and a.eventsource=0");
 
-	ret = db_rename_macros(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
+	ret = db_rename_macro(result, "opcommand", "operationid", fields, ARRSIZE(fields), "{TRIGGER.NAME}",
 			"{EVENT.NAME}");
 
 	DBfree_result(result);
