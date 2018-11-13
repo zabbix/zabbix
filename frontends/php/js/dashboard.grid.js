@@ -672,16 +672,34 @@
 
 		widget['div'].draggable({
 			handle: widget['content_header'],
-			scroll: false,
+			scroll: true,
+			scrollSensitivity: data.options['widget-height'],
 			start: function(event, ui) {
 				data['pos-action'] = 'drag';
-				startWidgetPositioning($(event.target), data);
+				data.calculated = {
+					'dshbrd-max-width': $('.dashbrd-grid-widget-container').width(),
+					'dshbrd-max-height': data.options['max-rows'] * data.options['widget-height']
+				};
+				startWidgetPositioning(ui.helper, data);
 			},
 			drag: function(event, ui) {
-				doWidgetPositioning($obj, $(event.target), data);
+
+				// Limit element draggable area for X and Y axis.
+				ui.position = {
+					left: Math.max(0, Math.min(ui.position.left,
+						data.calculated['dshbrd-max-width'] - ui.helper.width())
+					),
+					top: Math.max(0, Math.min(ui.position.top,
+						data.calculated['dshbrd-max-height'] - ui.helper.height())
+					)
+				};
+
+				doWidgetPositioning($obj, ui.helper, data);
 			},
 			stop: function(event, ui) {
-				stopWidgetPositioning($obj, $(event.target), data);
+				delete data.calculated;
+
+				stopWidgetPositioning($obj, ui.helper, data);
 			}
 		});
 	}
