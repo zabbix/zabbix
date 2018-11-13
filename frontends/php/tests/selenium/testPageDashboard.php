@@ -40,20 +40,20 @@ class testPageDashboard extends CLegacyWebTest {
 			switch ($user) {
 				case 'super-admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					$this->zbxTestCheckNoRealHostnames();
 					break;
 				case 'admin' :
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'user';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 				case 'guest';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
-					$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+					$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 					break;
 			}
 			$this->zbxTestCheckTitle('Dashboard');
