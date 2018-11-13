@@ -677,21 +677,18 @@
 			start: function(event, ui) {
 				data['pos-action'] = 'drag';
 				data.calculated = {
-					'dshbrd-max-width': $('.dashbrd-grid-widget-container').width(),
-					'dshbrd-max-height': data.options['max-rows'] * data.options['widget-height']
+					'left-max': $('.dashbrd-grid-widget-container').width() - ui.helper.width(),
+					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
 				};
+
 				startWidgetPositioning(ui.helper, data);
 			},
 			drag: function(event, ui) {
 
 				// Limit element draggable area for X and Y axis.
 				ui.position = {
-					left: Math.max(0, Math.min(ui.position.left,
-						data.calculated['dshbrd-max-width'] - ui.helper.width())
-					),
-					top: Math.max(0, Math.min(ui.position.top,
-						data.calculated['dshbrd-max-height'] - ui.helper.height())
-					)
+					left: Math.max(0, Math.min(ui.position.left, data.calculated['left-max'])),
+					top: Math.max(0, Math.min(ui.position.top, data.calculated['top-max']))
 				};
 
 				doWidgetPositioning($obj, ui.helper, data);
@@ -702,13 +699,6 @@
 				stopWidgetPositioning($obj, ui.helper, data);
 			}
 		});
-	}
-
-	function stopDraggable($obj, data, widget) {
-		widget['content_header']
-			.removeClass('cursor-move');
-
-		widget['div'].draggable("destroy");
 	}
 
 	function makeResizable($obj, data, widget) {
