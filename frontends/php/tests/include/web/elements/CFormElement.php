@@ -115,8 +115,8 @@ class CFormElement extends CElement {
 	 * @return $this
 	 */
 	public function selectTab($name) {
-		return $this->query('xpath:.//ul[contains(@class, "ui-tabs-nav")]//a[text()='.
-				CXPathHelper::escapeQuotes($name).']')->waitUntilPresent()->one()->click();
+		$xpath = './/ul[contains(@class, "ui-tabs-nav")]//a[text()='.CXPathHelper::escapeQuotes($name).']';
+		return $this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
 	}
 
 	/**
