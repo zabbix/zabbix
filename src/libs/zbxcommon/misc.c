@@ -1904,7 +1904,12 @@ int	zbx_validate_interval(const char *str, char **error)
 			str = delim + 1;
 
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
 				continue;
+			}
 
 			if (SUCCEED == time_period_parse(&period, str,
 					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
@@ -1923,7 +1928,12 @@ int	zbx_validate_interval(const char *str, char **error)
 			custom = 1;
 
 			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
 				continue;
+			}
 
 			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
