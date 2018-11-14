@@ -47,10 +47,10 @@ FIELDS|dcheckid|druleid|type|key_        |snmp_community|ports|snmpv3_securityna
 ROW   |2       |2      |9   |system.uname|              |10050|                   |0                   |                     |                     |0   |0                  |0                  |                  |
 
 TABLE |media_type
-FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|
-ROW   |1          |0   |Email      |mail.example.com|example.com|zabbix@example.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
-ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@example.com|zabbix|0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
-ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |
+FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|content_type
+ROW   |1          |0   |Email      |mail.example.com|example.com|zabbix@example.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |1
+ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@example.com|zabbix|0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0
+ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0
 
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
