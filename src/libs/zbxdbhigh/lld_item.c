@@ -952,12 +952,6 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 						return;
 				}
 
-				if (SUCCEED == zbx_token_find(*field, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
-						0 != (token.type & ZBX_TOKEN_USER_MACRO))
-				{
-					return;
-				}
-
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
 					return;
 
