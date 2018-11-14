@@ -694,6 +694,7 @@
 				doWidgetPositioning($obj, ui.helper, data);
 			},
 			stop: function(event, ui) {
+				data['pos-action'] = '';
 				delete data.calculated;
 
 				stopWidgetPositioning($obj, ui.helper, data);
@@ -724,6 +725,8 @@
 			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
+				data['pos-action'] = 'resize';
+
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -735,11 +738,12 @@
 						}
 					});
 				}
-				data['pos-action'] = 'resize';
 
 				doWidgetResize($obj, $(event.target), data);
 			},
 			stop: function(event, ui) {
+				data['pos-action'] = '';
+
 				stopWidgetPositioning($obj, $(event.target), data);
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
@@ -991,9 +995,11 @@
 					// No errors, proceed with update.
 					overlayDialogueDestroy('widgetConfg');
 
-					if (widget === null) {
+					if (widget === null || 'type' in widget == false) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
-						var pos = findEmptyPosition($obj, data, type),
+						var pos = (widget === null || 'pos' in widget == false)
+								? findEmptyPosition($obj, data, type)
+								: widget.pos,
 							scroll_by = (pos['y'] * data['options']['widget-height'])
 								- $('.dashbrd-grid-widget-container').scrollTop(),
 							widget_data = {
@@ -1123,6 +1129,91 @@
 			widget['rf_rate'] = 0;
 			setWidgetModeEdit($obj, data, widget);
 		});
+
+		data['pos-action'] = '';
+		data['cell-width'] = getCurrentCellWidth(data);
+		data['add_widget_dimension'] = {};
+
+		// Bind tracking of empty space as placeholder for create new widget action.
+		data.placeholder.on('click', function(event) {
+			if (data['pos-action'] != '') {
+				return;
+			}
+
+			// Envoke add new widget action.
+			data.placeholder.hide();
+			$obj.dashboardGrid('addNewWidget', null, data.add_widget_dimension);
+		});
+		$obj.on('mousemove', function(event) {
+			if (data['pos-action'] != '' || !$(event.target).is($obj)) {
+				return;
+			}
+
+			var o = data.options,
+				offset = $obj.offset(),
+				y = Math.min(o['max-rows'] - 1,
+					Math.max(0, Math.ceil((event.pageY - offset.top) / o['widget-height']) - 1)
+				),
+				x = Math.min(o['max-columns'] - 1,
+					Math.max(0, Math.ceil((event.pageX + offset.left) / data['cell-width']) - 1)
+				),
+				pos = {
+					y: y,
+					x: x,
+					height: o['widget-min-rows'],
+					width: 1
+				},
+				overlap;
+
+			// Proceed only when coordinates have been changed.
+			if (data.prev_pos && data.prev_pos.y == pos.y && data.prev_pos.x == pos.x) {
+				return;
+			}
+
+			data.prev_pos = $.extend({}, pos);
+
+			overlap = $.map(data.widgets, function(box) {
+				return rectOverlap(box.pos, pos) ? box : null;
+			});
+
+			/**
+			 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
+			 * slot.
+			 */
+			if (overlap.length && pos.y > 0) {
+				--pos.y;
+				overlap = $.map(data.widgets, function(box) {
+					return rectOverlap(box.pos, pos) ? box : null;
+				});
+			}
+
+			/**
+			 * If slot is free try to expand horizontally to occupy 2 slots.
+			 */
+			// TODO
+			/**
+			 * If slot is free try to expand vertically to occupy 3/4 slots.
+			 */
+			// TODO
+
+			if (overlap.length) {
+				return;
+			}
+
+			if (pos.y + pos.height > o['max-rows']) {
+				resizeDashboardGrid($obj, data, o['max-rows'] + 1);
+			}
+
+			data.placeholder.css({
+					top: pos.y * o['widget-height'] + 'px',
+					height: pos.height * o['widget-height'] + 'px',
+					left: pos.x * o['widget-width'] + '%',
+					width: pos.width * o['widget-width'] + '%'
+				})
+				.show();
+
+			data.add_widget_dimension = pos;
+		})
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
@@ -1965,12 +2056,14 @@
 			return ref;
 		},
 
-		addNewWidget: function(trigger_elmnt) {
+		addNewWidget: function(trigger_elmnt, pos) {
+			var widget = (pos && 'width' in pos && 'height' in pos) ? {pos: pos} : null;
+
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				openConfigDialogue($this, data, null, trigger_elmnt);
+				openConfigDialogue($this, data, widget, trigger_elmnt);
 			});
 		},
 
