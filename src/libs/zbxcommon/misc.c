@@ -1909,7 +1909,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 	if ((0 == custom && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
 	{
-		*error = zbx_dsprintf(*error, "Invalid update interval %d", simple_interval);
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%d\"", simple_interval);
 		return FAIL;
 	}
 
