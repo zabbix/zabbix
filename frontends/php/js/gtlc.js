@@ -684,7 +684,7 @@ var timeControl = {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
 				obj.loadSBox = 0;
-				jQuery('#'+obj.id).data('zbx_sbox', null);
+				jQuery('#'+obj.id).removeData('zbx_sbox');
 			}
 		});
 	},

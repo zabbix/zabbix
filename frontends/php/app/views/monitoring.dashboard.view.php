@@ -192,7 +192,8 @@ else {
 	$dashboard_options = [
 		'max-rows' => DASHBOARD_MAX_ROWS,
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
-		'editable' => $data['dashboard']['editable']
+		'editable' => $data['dashboard']['editable'],
+		'edit_mode' => $data['dashboard_edit_mode']
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];
