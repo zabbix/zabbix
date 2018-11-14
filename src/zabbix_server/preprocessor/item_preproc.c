@@ -740,6 +740,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 		return FAIL;
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
+
 	if (NULL == (output = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
@@ -748,7 +749,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))
+	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))	/* PCRE_MULTILINE is not used here */
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
 		return FAIL;
@@ -756,7 +757,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, &new_value))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match");
+		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
 		zbx_regexp_free(regex);
 		return FAIL;
 	}
