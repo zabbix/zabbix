@@ -103,6 +103,7 @@ static zbx_vmware_t	*vmware = NULL;
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS	64
+#define ZBX_MAXQUERYMETRICS_UNLIMITED	0
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -3610,7 +3611,9 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		goto out;
 	}
 
-	if (SUCCEED != (ret = is_uint31(val, max_qm)))
+	if (-1 == atoi(val))		/* https://kb.vmware.com/s/article/2107096 */
+		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+	else if (SUCCEED != (ret = is_uint31(val, max_qm)))
 		*error = zbx_dsprintf(*error, "Cannot convert maxQueryMetrics from %s.",  val);
 
 	zbx_free(val);
