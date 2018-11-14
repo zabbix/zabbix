@@ -23,7 +23,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*str, *no_custom = NULL;
+	const char		*str, *error = NULL;
 	int			value, expected_ret, ret, custom;
 	zbx_custom_interval_t	*custom_intervals;
 	zbx_mock_handle_t	handle;
@@ -33,8 +33,8 @@ void	zbx_mock_test_entry(void **state)
 	str = zbx_mock_get_parameter_string("in.str");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.no_custom", &handle))
-			zbx_mock_string(handle, &no_custom);
+	if (FAIL == (ret = zbx_validate_interval(str, &error)))
+		zbx_free(error);
 
-	zbx_mock_assert_int_eq("return value", expected_ret, zbx_validate_interval(str));
+	zbx_mock_assert_int_eq("return value", expected_ret, ret);
 }

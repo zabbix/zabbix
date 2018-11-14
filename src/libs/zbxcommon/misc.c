@@ -1809,9 +1809,9 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *simpl
 	return SUCCEED;
 }
 
-int	zbx_validate_interval(const char *str)
+int	zbx_validate_interval(const char *str, char **error)
 {
-	int		simple_interval, interval, len, flexible = 0, schedulling = 0;
+	int		simple_interval, interval, len, custom = 0;
 	const char	*delim;
 
 	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
@@ -1827,7 +1827,11 @@ int	zbx_validate_interval(const char *str)
 			delim = NULL;
 	}
 	else
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%.*s\".",
+				NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str), str);
 		return FAIL;
+	}
 
 	while (NULL != delim)
 	{
@@ -1839,13 +1843,17 @@ int	zbx_validate_interval(const char *str)
 		{
 			zbx_time_period_t period;
 
-			flexible = 1;
+			custom = 1;
 
 			if ('{' == *str)
 				interval = 1;
 
 			if ((0 == interval && 0 == simple_interval) || SEC_PER_DAY < interval)
+			{
+				*error = zbx_dsprintf(*error, "Invalid flexible interval \"%.*s\".", (int)(delim - str),
+						str);
 				return FAIL;
+			}
 
 			str = delim + 1;
 
@@ -1858,18 +1866,20 @@ int	zbx_validate_interval(const char *str)
 			}
 
 			if (SUCCEED == time_period_parse(&period, str,
-					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : delim - str))
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
 			{
 				continue;
 			}
 
+			*error = zbx_dsprintf(*error, "Invalid flexible period \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
 			return FAIL;
 		}
 		else
 		{
 			zbx_scheduler_interval_t	*new_interval;
 
-			schedulling = 1;
+			custom = 1;
 
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
@@ -1888,14 +1898,20 @@ int	zbx_validate_interval(const char *str)
 				scheduler_interval_free(new_interval);
 				continue;
 			}
-
 			scheduler_interval_free(new_interval);
+
+			*error = zbx_dsprintf(*error, "Invalid schedulling interval \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
+
 			return FAIL;
 		}
 	}
 
-	if ((0 == schedulling && 0 == flexible && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
+	if ((0 == custom && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval %d", simple_interval);
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
