@@ -189,7 +189,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 {
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)
 
-	int				result = 0, r = 0;
+	int				result, r;
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
 	int				ovecsize = count * 2 + count;
@@ -198,7 +198,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #endif
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
-		ovector = (int *)zbx_malloc(NULL, ovecsize * sizeof(int));
+		ovector = (int *)zbx_malloc(NULL, (size_t)ovecsize * sizeof(int));
 	else
 		ovector = matches_buff;
 
@@ -221,7 +221,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else if (-1 == r)
 		result = ZBX_REGEXP_NO_MATCH;
-	else
+	else				/* r < -1: "some kind of unexpected problem" in pcre_exec() */
 		result = FAIL;
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
