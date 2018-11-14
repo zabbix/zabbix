@@ -134,7 +134,7 @@ out:
 ---
 test case: "several macros not allowed"
 in:
-  str: '${MACRO}${MACRO}'
+  str: '{$MACRO}{$MACRO}'
 out:
   return: 'FAIL'
 ---
@@ -194,7 +194,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "flexible interval double semicolomn"
+test case: "flexible interval double semicolon"
 in:
   str: '1;;0/1-6,00:00-23:00'
 out:
@@ -218,9 +218,27 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "ends with unexpected semicolomn"
+test case: "ends with unexpected semicolon"
 in:
   str: '1s;2s/1-6,00:00-23:00;'
+out:
+  return: 'FAIL'
+---
+test case: "flexible update interval is missing"
+in:
+  str: '1s;1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible period is missing"
+in:
+  str: '1s;2s'
+out:
+  return: 'FAIL'
+---
+test case: "flexible period is missing but there is delimiter"
+in:
+  str: '1s;2s/'
 out:
   return: 'FAIL'
 ---
@@ -280,6 +298,24 @@ in:
 out:
   return: 'FAIL'
 ---
+test case: "suffixes are not allowed in flexible update interval after macro"
+in:
+  str: '1s;{$MACRO}s/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "macro must be whole value in flexible, not just part"
+in:
+  str: '1s;1s/{$MACRO}-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "macro must be whole value in flexible, not just part in the end"
+in:
+  str: '1s;1s/1-6,00:00-{$MACRO}'
+out:
+  return: 'FAIL'
+---
 # simple interval + flexible and one is invalid but with macros
 test case: "invalid simple interval"
 in:
@@ -311,7 +347,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "flexible interval double semicolomn"
+test case: "flexible interval double semicolon"
 in:
   str: '{$MACRO};;0/1-6,00:00-23:00'
 out:
@@ -454,4 +490,127 @@ in:
   str: '{$MACRO};86401/1-6,00:00-23:00'
 out:
   return: 'FAIL'
+---
+# schedulling
+test case: "update interval + schedulling check"
+in:
+  str: '1;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "0 update interval + schedulling check"
+in:
+  str: '0;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "schedulling check with slash"
+in:
+  str: '0;h9m/30;h10'
+out:
+  return: 'SUCCEED'
+---
+test case: "schedulling check with flexible check"
+in:
+  str: '0;h9m/30;h10;1m/1-6,00:00-23:00;h9m10-40/1;1/1-7,12:00-12:01'
+out:
+  return: 'SUCCEED'
+---
+# schedulling with invalid
+test case: "update interval is invalid + schedulling check"
+in:
+  str: 'a;wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "invalid schedulling check"
+in:
+  str: '1;x'
+out:
+  return: 'FAIL'
+---
+test case: "invalid schedulling check"
+in:
+  str: '1;x'
+out:
+  return: 'FAIL'
+---
+test case: "schedulling double semicolon"
+in:
+  str: '1;;0/wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "schedulling ends with unexpected semicolon"
+in:
+  str: '1;wd1-5h9-18;'
+out:
+  return: 'FAIL'
+---
+test case: "update interval is missing"
+in:
+  str: 'wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between schedulling macros"
+in:
+  str: '1;wd1-5h9-18/wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+# schedulling with macros
+test case: "schedulling check as macro"
+in:
+  str: '0;{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "schedulling check macro with macro update interval"
+in:
+  str: '{$MACRO};{$MACRO};{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple update interval as macro"
+in:
+  str: '{$MACRO};h9m/30'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple update interval as macro and one of schedulling"
+in:
+  str: '{$MACRO};h9m/30;{$MACRO}'
+out:
+  return: 'SUCCEED'
+---
+test case: "macro in update interval does not cancel validation of schedulling"
+in:
+  str: '{$MACRO};r'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between schedulling macros must be present"
+in:
+  str: '{$MACRO};{$MACRO}{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "delimiter between schedulling macros must be present"
+in:
+  str: '{$MACRO};{$MACRO}{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "schedulling higher than upper limit"
+in:
+  str: '86401;h9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "schedulling in limit"
+in:
+  str: '86400;h9m/30'
+out:
+  return: 'SUCCEED'
 ...
