@@ -6,6 +6,7 @@ SERVER_tests = \
 	calculate_item_nextcheck \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
+	zbx_interval_preproc \
 	zbx_validate_interval
 endif
 
@@ -165,6 +166,20 @@ zbx_token_find_LDADD += @SERVER_LIBS@
 zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_token_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+zbx_interval_preproc_SOURCES = \
+	zbx_interval_preproc.c \
+	$(COMMON_SRC_FILES)
+
+zbx_interval_preproc_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_interval_preproc_LDADD += @SERVER_LIBS@
+
+zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_interval_preproc_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 zbx_validate_interval_SOURCES = \
 	zbx_validate_interval.c \
