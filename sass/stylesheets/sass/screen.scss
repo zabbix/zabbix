@@ -1522,6 +1522,10 @@ output {
 		border-color: $form-border-focus-color;
 	}
 
+	&[aria-disabled] {
+		@extend %form-disabled;
+	}
+
 	input[type="text"] {
 		border: none;
 		background: none;
