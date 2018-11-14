@@ -184,7 +184,7 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
  *               FAIL                 - error occurred                             *
  *                                                                                 *
  ***********************************************************************************/
-static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, size_t count,
+static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
 		zbx_regmatch_t *matches)
 {
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)
@@ -215,7 +215,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	if (0 <= r)
 	{
 		if(NULL != matches)
-			memcpy(matches, ovector, count * sizeof(zbx_regmatch_t));
+			memcpy(matches, ovector, (size_t)count * sizeof(zbx_regmatch_t));
 
 		result = ZBX_REGEXP_MATCH;
 	}
@@ -265,7 +265,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  ******************************************************************************/
 int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
 {
-	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, (size_t)0, NULL)) ? 0 : -1;
+	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL)) ? 0 : -1;
 }
 
 /****************************************************************************************************
