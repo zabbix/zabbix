@@ -145,6 +145,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to SegmentedRadio element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CSegmentedRadioElement
+	 */
+	public function asSegmentedRadio($options = []) {
+		return $this->cast('CSegmentedRadioElement', $options);
+	}
+
+	/**
 	 * Cast object to base RemoteWebElement.
 	 *
 	 * @param array $options    additional casting options

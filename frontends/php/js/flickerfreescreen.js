@@ -269,14 +269,12 @@
 							screen.isRefreshing = false;
 
 							$('main .msg-bad').remove();
-							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).replaceWith(html);
 							$('main .msg-bad').insertBefore('main > :first-child');
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {
-							$('[data-hintbox=1]', $('#flickerfreescreen_' + id)).trigger('remove');
 							$('#flickerfreescreen_' + id).remove();
 						}
 
