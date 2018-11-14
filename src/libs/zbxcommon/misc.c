@@ -1782,6 +1782,21 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	return nextcheck;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_user_macro                                                 *
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str  - [IN] string to check                                    *
+ *             len  - [OUT] length of macro                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	parse_user_macro(const char *str, int *len)
 {
 	int	macro_r, context_l, context_r;
@@ -1794,11 +1809,28 @@ static int	parse_user_macro(const char *str, int *len)
 	return SUCCEED;
 }
 
-static int	parse_simple_interval(const char *str, int *len, char sep, int *simple_interval)
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_simple_interval                                            *
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             len   - [OUT] length simple interval string until separator    *
+ *             sep   - [IN] separator to calculate length                     *
+ *             value - [OUT] interval value                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_simple_interval(const char *str, int *len, char sep, int *value)
 {
 	const char	*delim;
 
-	if (SUCCEED != is_time_suffix(str, simple_interval,
+	if (SUCCEED != is_time_suffix(str, value,
 			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
 	{
 		return FAIL;
@@ -1809,6 +1841,20 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *simpl
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_interval                                            *
+ *                                                                            *
+ * Purpose: validate update interval, flexible and schedulling intervals      *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             error - [OUT] validation error                                 *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - parsed successfully.                                         *
+ *     FAIL    - parsing failed.                                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_validate_interval(const char *str, char **error)
 {
 	int		simple_interval, interval, len, custom = 0, macro;
@@ -1858,12 +1904,7 @@ int	zbx_validate_interval(const char *str, char **error)
 			str = delim + 1;
 
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
-			{
-				if ('\0' == *delim)
-					delim = NULL;
-
 				continue;
-			}
 
 			if (SUCCEED == time_period_parse(&period, str,
 					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
@@ -1882,12 +1923,7 @@ int	zbx_validate_interval(const char *str, char **error)
 			custom = 1;
 
 			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
-			{
-				if ('\0' == *delim)
-					delim = NULL;
-
 				continue;
-			}
 
 			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
