@@ -1811,7 +1811,7 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *simpl
 
 int	zbx_validate_interval(const char *str, char **error)
 {
-	int		simple_interval, interval, len, custom = 0;
+	int		simple_interval, interval, len, custom = 0, macro;
 	const char	*delim;
 
 	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
@@ -1837,7 +1837,7 @@ int	zbx_validate_interval(const char *str, char **error)
 	{
 		str = delim + 1;
 
-		if ((SUCCEED == parse_user_macro(str, &len) ||
+		if ((SUCCEED == (macro = parse_user_macro(str, &len)) ||
 				SUCCEED == parse_simple_interval(str, &len, '/', &interval)) &&
 				'/' == *(delim = str + len))
 		{
@@ -1881,7 +1881,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 			custom = 1;
 
-			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
 				if ('\0' == *(delim = str + len))
 					delim = NULL;
