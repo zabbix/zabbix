@@ -280,50 +280,6 @@ in:
 out:
   return: 'FAIL'
 ---
-# context macro
-test case: "context macro is correctly handled"
-in:
-  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"}'
-out:
-  return: 'SUCCEED'
----
-test case: "context macro + real values"
-in:
-  str: '{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"}'
-out:
-  return: 'SUCCEED'
----
-test case: "context macro + last macro is broken"
-in:
-  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"'
-out:
-  return: 'FAIL'
----
-# simple interval + flexible and one is 0
-test case: "simple interval can be 0 in case flexible is non zero"
-in:
-  str: '0;2s/1-6,00:00-23:00'
-out:
-  return: 'SUCCEED'
----
-test case: "simple interval can be 0 in case flexible intervals are non zero"
-in:
-  str: '0;2s/1-6,00:00-23:00;1/1-6,00:00-23:00'
-out:
-  return: 'SUCCEED'
----
-test case: "flexible interval can be 0 in case simple interval is not 0"
-in:
-  str: '1;0/1-6,00:00-23:00'
-out:
-  return: 'SUCCEED'
----
-test case: "simple interval can be 0 in case flexible intervals are non zero"
-in:
-  str: '1;0/1-6,00:00-23:00;0/1-6,00:00-23:00'
-out:
-  return: 'SUCCEED'
----
 # simple interval + flexible and one is invalid but with macros
 test case: "invalid simple interval"
 in:
@@ -361,6 +317,75 @@ in:
 out:
   return: 'FAIL'
 ---
+# macro does not affect other field validation
+test case: "invalid in update interval"
+in:
+  str: 'a;{$MACRO}/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid in flexible update interval"
+in:
+  str: '{$MACRO};s/{$MACRO}'
+out:
+  return: 'FAIL'
+---
+test case: "invalid in flexible interval"
+in:
+  str: '{$MACRO};{$MACRO}/z'
+out:
+  return: 'FAIL'
+---
+# context macro
+test case: "context macro is correctly handled"
+in:
+  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "context macro + real values"
+in:
+  str: '{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"}'
+out:
+  return: 'SUCCEED'
+---
+test case: "context macro + last macro is broken"
+in:
+  str: '1s;{$MACRO:";"}/{$MACRO};{$MACRO:"/"}/{$MACRO:";"'
+out:
+  return: 'FAIL'
+---
+test case: "context macro + invalid flexible"
+in:
+  str: '1s;{$MACRO:";"}/b;{$MACRO:"/"}/{$MACRO:";"}'
+out:
+  return: 'FAIL'
+---
+# simple interval + flexible and one is 0
+test case: "simple interval can be 0 in case flexible is non zero"
+in:
+  str: '0;2s/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 in case flexible intervals are non zero"
+in:
+  str: '0;2s/1-6,00:00-23:00;1/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "flexible interval can be 0 in case simple interval is not 0"
+in:
+  str: '1;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "simple interval can be 0 in case flexible intervals are non zero"
+in:
+  str: '1;0/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
 # simple interval + flexible and both are 0
 test case: "simple interval cannot be 0 in case flexible update interval is zero"
 in:
@@ -387,7 +412,7 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "simple interval can be 0 if one of flexible intervals is macro"
+test case: "simple interval can be 0 if flexible update interval is non zero or macro"
 in:
   str: '0;2s/1-6,00:00-23:00;{$MACRO}/1-6,00:00-23:00'
 out:
@@ -399,10 +424,34 @@ in:
 out:
   return: 'FAIL'
 ---
-# simple interval + flexible as macros
-test case: "simple interval cannot be 0 in case flexible update interval is zero"
+# upper limit of interval
+test case: "within limits"
 in:
-  str: '{$MACRO};{$MACRO}/{$MACRO}'
+  str: '86400;86400/1-6,00:00-23:00'
 out:
   return: 'SUCCEED'
+---
+test case: "simple interval is too high"
+in:
+  str: '86401;1/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval is too high"
+in:
+  str: '1;86401/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval too high but flexible is macro"
+in:
+  str: '86401;{$MACRO}/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval is too high but simple is macro"
+in:
+  str: '{$MACRO};86401/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
 ...

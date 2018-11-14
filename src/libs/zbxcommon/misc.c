@@ -1879,7 +1879,6 @@ int	zbx_validate_interval(const char *str)
 				continue;
 			}
 
-
 			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
 
@@ -1894,6 +1893,7 @@ int	zbx_validate_interval(const char *str)
 			return FAIL;
 		}
 	}
+
 	if ((0 == schedulling && 0 == flexible && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
 		return FAIL;
 
