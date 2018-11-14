@@ -1900,7 +1900,7 @@ int	zbx_validate_interval(const char *str, char **error)
 			}
 			scheduler_interval_free(new_interval);
 
-			*error = zbx_dsprintf(*error, "Invalid schedulling or flexible interval \"%.*s\".",
+			*error = zbx_dsprintf(*error, "Invalid custom interval \"%.*s\".",
 					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
 
 			return FAIL;
