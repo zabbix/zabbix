@@ -45,6 +45,14 @@ static int	DBpatch_4010001(void)
 	if (SUCCEED != DBadd_field("media_type", &field))
 		return FAIL;
 
+	return SUCCEED;
+}
+
+static int	DBpatch_4010002(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update media_type set content_type=0"))
 		return FAIL;
 
@@ -59,5 +67,6 @@ DBPATCH_START(4010)
 
 DBPATCH_ADD(4010000, 0, 1)
 DBPATCH_ADD(4010001, 0, 1)
+DBPATCH_ADD(4010002, 0, 0)
 
 DBPATCH_END()
