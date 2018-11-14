@@ -1035,11 +1035,11 @@
 				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
-				'editable': true
+				'editable': true,
+				'edit_mode': false
 			};
 			options = $.extend(default_options, options);
 			options['widget-width'] = 100 / options['max-columns'];
-			options['edit_mode'] = false;
 
 			return this.each(function() {
 				var	$this = $(this),
