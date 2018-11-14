@@ -1811,36 +1811,48 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *simpl
 
 int	zbx_validate_interval(const char *str)
 {
-	int		simple_interval, len;
+	int		simple_interval, interval, len, flexible = 0, schedulling = 0;
 	const char	*delim;
 
 	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 	{
 		if ('\0' == *(delim = str + len))
-			return SUCCEED;
+			delim = NULL;
+
+		simple_interval = 1;
 	}
 	else if (SUCCEED == parse_simple_interval(str, &len, ';', &simple_interval))
 	{
 		if ('\0' == *(delim = str + len))
-			return SUCCEED;
+			delim = NULL;
 	}
+	else
+		return FAIL;
 
 	while (NULL != delim)
 	{
 		str = delim + 1;
 
 		if ((SUCCEED == parse_user_macro(str, &len) ||
-				SUCCEED == parse_simple_interval(str, &len, '/', &simple_interval)) &&
+				SUCCEED == parse_simple_interval(str, &len, '/', &interval)) &&
 				'/' == *(delim = str + len))
 		{
 			zbx_time_period_t period;
+
+			flexible = 1;
+
+			if ('{' == *str)
+				interval = 1;
+
+			if ((0 == interval && 0 == simple_interval) || SEC_PER_DAY < interval)
+				return FAIL;
 
 			str = delim + 1;
 
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
 				if ('\0' == *(delim = str + len))
-					return SUCCEED;
+					delim = NULL;
 
 				continue;
 			}
@@ -1857,10 +1869,12 @@ int	zbx_validate_interval(const char *str)
 		{
 			zbx_scheduler_interval_t	*new_interval;
 
+			schedulling = 1;
+
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
 				if ('\0' == *(delim = str + len))
-					return SUCCEED;
+					delim = NULL;
 
 				continue;
 			}
@@ -1880,6 +1894,8 @@ int	zbx_validate_interval(const char *str)
 			return FAIL;
 		}
 	}
+	if ((0 == schedulling && 0 == flexible && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
+		return FAIL;
 
 	return SUCCEED;
 }
