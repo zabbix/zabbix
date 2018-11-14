@@ -37,4 +37,16 @@ void	zbx_mock_test_entry(void **state)
 		zbx_free(error);
 
 	zbx_mock_assert_int_eq("return value", expected_ret, ret);
+
+	expected_ret = NULL == strstr(str, "{$") ? expected_ret : FAIL;
+
+	custom_intervals = zbx_malloc(NULL, sizeof(custom_intervals));
+
+	if (SUCCEED == (ret = zbx_interval_preproc(str, &value, &custom_intervals, NULL)))
+		zbx_custom_interval_free(custom_intervals);
+	zbx_free(custom_intervals);
+
+	zbx_mock_assert_int_eq("return value", expected_ret, ret);
+
+
 }

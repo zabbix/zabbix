@@ -1965,7 +1965,8 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 
 			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
 					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
-					(0 == *simple_interval && 0 == new_interval->delay))
+					(0 == *simple_interval && 0 == new_interval->delay) ||
+					new_interval->delay > SEC_PER_DAY)
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
@@ -1995,7 +1996,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 		}
 	}
 
-	if (NULL == flexible && NULL == scheduling && (0 == *simple_interval || SEC_PER_DAY < *simple_interval))
+	if ((NULL == flexible && NULL == scheduling && 0 == *simple_interval) || SEC_PER_DAY < *simple_interval)
 	{
 		interval_type = "update";
 		goto fail;
