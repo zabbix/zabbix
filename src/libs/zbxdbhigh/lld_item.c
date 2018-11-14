@@ -931,7 +931,6 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	else
 	{
 		int			value;
-		zbx_custom_interval_t	*custom_intervals;
 		char			*errmsg = NULL;
 		zbx_token_t		token;
 
@@ -959,11 +958,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 					return;
 				}
 
-				if (SUCCEED == zbx_interval_preproc(*field, &value, &custom_intervals, &errmsg))
-				{
-					zbx_custom_interval_free(custom_intervals);
+				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
 					return;
-				}
 
 				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
 						(0 != item->itemid ? "update" : "create"), errmsg);

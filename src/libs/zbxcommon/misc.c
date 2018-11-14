@@ -1816,7 +1816,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 	{
-		if ('\0' == *(delim = str + len))
+		if ('\0' == *delim)
 			delim = NULL;
 
 		simple_interval = 1;
@@ -1859,7 +1859,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
-				if ('\0' == *(delim = str + len))
+				if ('\0' == *delim)
 					delim = NULL;
 
 				continue;
@@ -1883,7 +1883,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
 			{
-				if ('\0' == *(delim = str + len))
+				if ('\0' == *delim)
 					delim = NULL;
 
 				continue;
@@ -1900,7 +1900,7 @@ int	zbx_validate_interval(const char *str, char **error)
 			}
 			scheduler_interval_free(new_interval);
 
-			*error = zbx_dsprintf(*error, "Invalid schedulling interval \"%.*s\".",
+			*error = zbx_dsprintf(*error, "Invalid schedulling or flexible interval \"%.*s\".",
 					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
 
 			return FAIL;

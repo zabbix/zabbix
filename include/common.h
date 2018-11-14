@@ -1017,6 +1017,7 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
+int	zbx_validate_interval(const char *str, char **error);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
