@@ -3612,9 +3612,14 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 	}
 
 	if (-1 == atoi(val))		/* https://kb.vmware.com/s/article/2107096 */
+	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+		ret = SUCCEED;
+	}
 	else if (SUCCEED != (ret = is_uint31(val, max_qm)))
+	{
 		*error = zbx_dsprintf(*error, "Cannot convert maxQueryMetrics from %s.",  val);
+	}
 
 	zbx_free(val);
 out:
