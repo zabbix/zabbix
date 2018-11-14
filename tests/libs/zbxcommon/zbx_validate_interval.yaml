@@ -289,7 +289,7 @@ out:
 ---
 test case: "context macro + real values"
 in:
-  str: '1s;{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00'
+  str: '{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"}'
 out:
   return: 'SUCCEED'
 ---
