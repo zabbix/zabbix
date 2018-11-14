@@ -23,10 +23,10 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*str, *error = NULL;
+	const char		*str;
+	char			*error = NULL;
 	int			value, expected_ret, ret;
 	zbx_custom_interval_t	*custom_intervals;
-	zbx_mock_handle_t	handle;
 
 	ZBX_UNUSED(state);
 
@@ -40,11 +40,8 @@ void	zbx_mock_test_entry(void **state)
 
 	expected_ret = NULL == strstr(str, "{$") ? expected_ret : FAIL;
 
-	custom_intervals = zbx_malloc(NULL, sizeof(custom_intervals));
-
 	if (SUCCEED == (ret = zbx_interval_preproc(str, &value, &custom_intervals, NULL)))
 		zbx_custom_interval_free(custom_intervals);
-	zbx_free(custom_intervals);
 
 	zbx_mock_assert_int_eq("return value", expected_ret, ret);
 

@@ -39,11 +39,8 @@ void	zbx_mock_test_entry(void **state)
 
 	if (NULL == no_custom)
 	{
-		custom_intervals = zbx_malloc(NULL, sizeof(custom_intervals));
-
 		if (SUCCEED == (ret = zbx_interval_preproc(str, &value, &custom_intervals, NULL)))
 			zbx_custom_interval_free(custom_intervals);
-		zbx_free(custom_intervals);
 	}
 	else
 		ret = zbx_interval_preproc(str, &value, NULL, NULL);
