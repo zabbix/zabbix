@@ -454,10 +454,10 @@ elseif (hasRequest('filter_hostid')) {
 					->setArgument('filter_triggerids[]', $trigger['triggerid'])
 					->setArgument('filter_set', '1')
 			),
-			($availability['true'] == 0)
+			($availability['true'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
-			($availability['false'] == 0)
+			($availability['false'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
