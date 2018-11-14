@@ -101,6 +101,30 @@ in:
 out:
   return: 'FAIL'
 ---
+test case: "simple interval with improper delimiter not allowed"
+in:
+  str: '1/'
+out:
+  return: 'FAIL'
+---
+test case: "invalid update interval"
+in:
+  str: 'x'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with only delimiter is not allowed"
+in:
+  str: '1;'
+out:
+  return: 'FAIL'
+---
+test case: "simple interval with double delimiter is not allowed"
+in:
+  str: '1;;'
+out:
+  return: 'FAIL'
+---
 # macros in simple interval
 test case: "macro is allowed as simple interval"
 in:
@@ -140,19 +164,7 @@ out:
 ---
 test case: "simple interval with only delimiter is not allowed"
 in:
-  str: '1;'
-out:
-  return: 'FAIL'
----
-test case: "simple interval with only delimiter is not allowed"
-in:
   str: '{$MACRO};'
-out:
-  return: 'FAIL'
----
-test case: "simple interval with double delimiter is not allowed"
-in:
-  str: '1;;'
 out:
   return: 'FAIL'
 ---
