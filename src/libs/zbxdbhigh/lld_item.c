@@ -930,9 +930,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	}
 	else
 	{
-		int			value;
-		char			*errmsg = NULL;
-		zbx_token_t		token;
+		int	value;
+		char	*errmsg = NULL;
 
 		switch (flag)
 		{
