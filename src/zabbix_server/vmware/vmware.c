@@ -4465,7 +4465,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	zbx_vmware_unlock();
 
-	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, 0, &perfdata);
+	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, ZBX_MAXQUERYMETRICS_UNLIMITED, &perfdata);
 	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, service->data->max_query_metrics,
 			&perfdata);
 
