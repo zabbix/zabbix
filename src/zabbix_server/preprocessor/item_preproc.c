@@ -790,7 +790,7 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match: %s. type \"%s\", value \"%s\"",
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match: %s, type \"%s\", value \"%s\"",
 			err, zbx_variant_type_desc(value), zbx_variant_value_desc(value));
 
 	zbx_free(err);
