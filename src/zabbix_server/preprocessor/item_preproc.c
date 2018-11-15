@@ -26,7 +26,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 
