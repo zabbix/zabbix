@@ -54,7 +54,8 @@ function getSystemStatusData(array $filter) {
 			if ($filter_groupids === null) {
 				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
-					'preservekeys' => true
+					'preservekeys' => true,
+					'real_hosts' => true
 				]));
 			}
 
