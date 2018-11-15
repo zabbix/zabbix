@@ -488,24 +488,23 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  * Return value: SUCCEED - the regular expression match was done                 *
  *               FAIL    - failed to match                                       *
  *                                                                               *
- * Comments: Multiline match is performed.                                       *
+ * Comments: Multiline match is performed                                        *
  *                                                                               *
  *********************************************************************************/
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
 		char **out)
 {
-	int		ret = FAIL;
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
 
 	zbx_free(*out);
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
 	{
-		ret = SUCCEED;
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
+		return SUCCEED;
 	}
 
-	return ret;
+	return FAIL;
 }
 
 /*********************************************************************************
