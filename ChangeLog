@@ -6,6 +6,17 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
+...G...PS. [ZBX-15138] fixed error message when receiving compressed data over maximum size (kalimulin)
+..F....... [ZBX-15154] fixed time period parameters in data overview context menu links (miks)
+..F....... [ZBX-15044] fixed javascript error when zooming classic graph in edit mode (talbergs)
+..F....... [ZBX-15044] fixed dashboard initialization in edit mode (talbergs)
+..F....... [ZBX-15053] fixed timetamp position in map (talbergs)
+..F....... [ZBX-15033] fixed zoom-out and select box for graphs in kiosk mode (miks)
+..F....... [ZBX-8396] improved source code comments (miks)
+..F....... [ZBX-14970] fixed wrong media type status upon creation, if chosen status disabled (talbergs)
+...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
+....I..... [ZBX-14941] fixed issue with autoreconf/automake for source tarball (MVekslers)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
 ..F....... [ZBX-14724] fixed breadcrumb jumping in EI browser (ashubin)
@@ -634,6 +645,11 @@ Bug fixes:
 ........S. [ZBX-10578] fixed redundant init_result() calls; thanks to MATSUDA Daiki for the patch (abs)
 ....I..... [ZBX-12793] fixed system compiler checks during source configuration (abs)
 ...G...... [ZBX-11970] fixed style for some enumerators and structure type declarations (abs, Andris)
+
+--------------------------------------------------------------------------------
+Changes for 3.4.15
+
+3.4.15rc1 was released as 3.4.15 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.4.15rc1
@@ -2039,6 +2055,9 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
+.......PS. [ZBX-15132] backported daylight saving related scheduled checks fix from ZBX-12965 (wiper)
+...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
 .......PS. [ZBX-15062] fixed binary heap trying to reallocate slots on every insert (wiper)

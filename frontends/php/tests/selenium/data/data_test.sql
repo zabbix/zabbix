@@ -2056,3 +2056,22 @@ INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES 
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55032, 99054, 1, '127.0.0.1', 1, '10050', 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
+
+-- Dashboard for problem hosts widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100, 'Dashboard for Problem hosts widget', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (100, 100, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1, '', 1);
+
+-- testPageAvailabilityReport SLA reports
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50009, 1, 1, 1, '127.0.0.1', '10051');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40067, 2, 50014, 'Item A', 'A', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40068, 2, 50014, 'Item B', 'B', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40069, 2, 50014, 'Item C', 'C', '', '', '', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16027, '{16027}=0', 'A trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16028, '{16028}=0', 'B trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16029, '{16029}=0', 'C trigger', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 16027,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 16028,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');
