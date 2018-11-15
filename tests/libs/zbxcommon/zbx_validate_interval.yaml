@@ -475,7 +475,7 @@ out:
 # upper limit of interval
 test case: "within limits"
 in:
-  str: '86400;86400/1-6,00:00-23:00'
+  str: '86400;2147483647/1-6,00:00-23:00'
 out:
   return: 'SUCCEED'
 ---
@@ -487,7 +487,13 @@ out:
 ---
 test case: "flexible interval is too high"
 in:
-  str: '1;86401/1-6,00:00-23:00'
+  str: '1;9223372036854775807/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "flexible interval overflow"
+in:
+  str: '1;86400;2147483648/1-6,00:00-23:00'
 out:
   return: 'FAIL'
 ---
@@ -499,7 +505,7 @@ out:
 ---
 test case: "flexible interval is too high but simple is macro"
 in:
-  str: '{$MACRO};86401/1-6,00:00-23:00'
+  str: '{$MACRO};9223372036854775807/1-6,00:00-23:00'
 out:
   return: 'FAIL'
 ---

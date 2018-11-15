@@ -1894,7 +1894,7 @@ int	zbx_validate_interval(const char *str, char **error)
 			if ('{' == *str)
 				interval = 1;
 
-			if ((0 == interval && 0 == simple_interval) || SEC_PER_DAY < interval)
+			if (0 == interval && 0 == simple_interval)
 			{
 				*error = zbx_dsprintf(*error, "Invalid flexible interval \"%.*s\".", (int)(delim - str),
 						str);
@@ -2011,8 +2011,7 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 
 			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
 					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
-					(0 == *simple_interval && 0 == new_interval->delay) ||
-					new_interval->delay > SEC_PER_DAY)
+					(0 == *simple_interval && 0 == new_interval->delay))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
