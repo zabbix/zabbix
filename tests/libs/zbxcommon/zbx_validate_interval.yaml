@@ -493,7 +493,7 @@ out:
 ---
 test case: "flexible interval overflow"
 in:
-  str: '1;86400;2147483648/1-6,00:00-23:00'
+  str: '1;2147483648/1-6,00:00-23:00'
 out:
   return: 'FAIL'
 ---
