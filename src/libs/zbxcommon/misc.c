@@ -1845,7 +1845,7 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *value
  *                                                                            *
  * Function: zbx_validate_interval                                            *
  *                                                                            *
- * Purpose: validate update interval, flexible and schedulling intervals      *
+ * Purpose: validate update interval, flexible and scheduling intervals       *
  *                                                                            *
  * Parameters: str   - [IN] string to check                                   *
  *             error - [OUT] validation error                                 *

@@ -139,7 +139,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "don't allow 0 update interval if one of custom update intervals has 0 update interval and schedulling"
+test case: "don't allow 0 update interval if one of custom update intervals has 0 update interval and scheduling"
 in:
   str: '0;0/1-6,00:00-23:00;1/1-6,00:00-23:00;wd1-5h9-18'
 out:
@@ -157,7 +157,7 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "allow 0 simple update interval if only schedulling is present"
+test case: "allow 0 simple update interval if only scheduling is present"
 in:
   str: '0;wd1-5h9-18'
 out:

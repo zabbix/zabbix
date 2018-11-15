@@ -509,57 +509,57 @@ in:
 out:
   return: 'FAIL'
 ---
-# schedulling
-test case: "update interval + schedulling check"
+# scheduling
+test case: "update interval + scheduling check"
 in:
   str: '1;wd1-5h9-18'
 out:
   return: 'SUCCEED'
 ---
-test case: "0 update interval + schedulling check"
+test case: "0 update interval + scheduling check"
 in:
   str: '0;wd1-5h9-18'
 out:
   return: 'SUCCEED'
 ---
-test case: "schedulling check with slash"
+test case: "scheduling check with slash"
 in:
   str: '0;h9m/30;h10'
 out:
   return: 'SUCCEED'
 ---
-test case: "schedulling check with flexible check"
+test case: "scheduling check with flexible check"
 in:
   str: '0;h9m/30;h10;1m/1-6,00:00-23:00;h9m10-40/1;1/1-7,12:00-12:01'
 out:
   return: 'SUCCEED'
 ---
-# schedulling with invalid
-test case: "update interval is invalid + schedulling check"
+# scheduling with invalid
+test case: "update interval is invalid + scheduling check"
 in:
   str: 'a;wd1-5h9-18'
 out:
   return: 'FAIL'
 ---
-test case: "invalid schedulling check"
+test case: "invalid scheduling check"
 in:
   str: '1;x'
 out:
   return: 'FAIL'
 ---
-test case: "invalid schedulling check"
+test case: "invalid scheduling check"
 in:
   str: '1;x'
 out:
   return: 'FAIL'
 ---
-test case: "schedulling double semicolon"
+test case: "scheduling double semicolon"
 in:
   str: '1;;0/wd1-5h9-18'
 out:
   return: 'FAIL'
 ---
-test case: "schedulling ends with unexpected semicolon"
+test case: "scheduling ends with unexpected semicolon"
 in:
   str: '1;wd1-5h9-18;'
 out:
@@ -571,20 +571,20 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "delimiter between schedulling macros"
+test case: "delimiter between scheduling macros"
 in:
   str: '1;wd1-5h9-18/wd1-5h9-18'
 out:
   return: 'FAIL'
 ---
-# schedulling with macros
-test case: "schedulling check as macro"
+# scheduling with macros
+test case: "scheduling check as macro"
 in:
   str: '0;{$MACRO}'
 out:
   return: 'SUCCEED'
 ---
-test case: "schedulling check macro with macro update interval"
+test case: "scheduling check macro with macro update interval"
 in:
   str: '{$MACRO};{$MACRO};{$MACRO}'
 out:
@@ -596,37 +596,37 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "simple update interval as macro and one of schedulling"
+test case: "simple update interval as macro and one of scheduling"
 in:
   str: '{$MACRO};h9m/30;{$MACRO}'
 out:
   return: 'SUCCEED'
 ---
-test case: "macro in update interval does not cancel validation of schedulling"
+test case: "macro in update interval does not cancel validation of scheduling"
 in:
   str: '{$MACRO};r'
 out:
   return: 'FAIL'
 ---
-test case: "delimiter between schedulling macros must be present"
+test case: "delimiter between scheduling macros must be present"
 in:
   str: '{$MACRO};{$MACRO}{$MACRO}'
 out:
   return: 'FAIL'
 ---
-test case: "delimiter between schedulling macros must be present"
+test case: "delimiter between scheduling macros must be present"
 in:
   str: '{$MACRO};{$MACRO}{$MACRO}'
 out:
   return: 'FAIL'
 ---
-test case: "schedulling higher than upper limit"
+test case: "scheduling higher than upper limit"
 in:
   str: '86401;h9m/30'
 out:
   return: 'FAIL'
 ---
-test case: "schedulling in limit"
+test case: "scheduling in limit"
 in:
   str: '86400;h9m/30'
 out:
