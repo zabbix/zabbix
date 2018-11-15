@@ -3612,10 +3612,10 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		goto out;
 	}
 
-	/* vmware article 2107096 */
+	/* vmware article 2107096                                                                    */
 	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server */
-	/* To disable the limit, set a value to -1*/
-	/* Edit the web.xml file. To disable the limit, set a value 0*/
+	/* To disable the limit, set a value to -1                                                   */
+	/* Edit the web.xml file. To disable the limit, set a value 0                                */
 	if (-1 == atoi(val))
 	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
