@@ -56,8 +56,8 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
 						'output' => [],
-						'preservekeys' => true,
-						'real_hosts' => true
+						'real_hosts' => true,
+						'preservekeys' => true
 					]));
 				}
 
