@@ -14,6 +14,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-13793] fixed focus styles on read-only textarea fields (Andzs)
 ..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
 ...G...PS. [ZBX-15138] fixed error message when receiving compressed data over maximum size (kalimulin)
 ..F....... [ZBX-15154] fixed time period parameters in data overview context menu links (miks)
