@@ -602,9 +602,33 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "macro in update interval does not cancel validation of scheduling"
+test case: "macro in update interval does not skip validation of scheduling"
 in:
   str: '{$MACRO};r'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of scheduling"
+in:
+  str: '1;{$MACRO};w9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of flexible does not skip validation of scheduling"
+in:
+  str: '1;{$MACRO}/{$MACRO};w9m/30'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of flexible period"
+in:
+  str: '1;{$MACRO};{$MACRO}/b'
+out:
+  return: 'FAIL'
+---
+test case: "macro in one of scheduling does not skip validation of flexible interval"
+in:
+  str: '1;{$MACRO};b/{$MACRO}'
 out:
   return: 'FAIL'
 ---
