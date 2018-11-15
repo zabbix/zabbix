@@ -1063,19 +1063,17 @@ class CHttpTest extends CApiService {
 					else {
 						$db_httptest = $db_httptests[$httptest['httptestid']];
 						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
-						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
 						$httpstep += [
+							'retrieve_mode' => $db_httpstep['retrieve_mode'],
+							'required' => $db_httpstep['required'],
 							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 								? $db_httpstep['posts']
-								: '',
-							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-								? $db_httpstep['required']
 								: ''
 						];
 					}
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+						if ($httpstep['posts'] !== '' && $httpstep['posts'] !== []) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'posts', _('should be empty'))
 							);
