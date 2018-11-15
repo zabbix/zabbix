@@ -158,6 +158,7 @@ class testPageDashboardWidgets extends CWebTest {
 
 		$dashboard = CDashboardElement::find()->one();
 		// Check the name of dashboard.
+		$this->query('id:page-title-general')->waitUntilTextPresent('Dashboard create test');
 		$this->assertEquals('Dashboard create test', $dashboard->getTitle());
 
 		// Add widget.

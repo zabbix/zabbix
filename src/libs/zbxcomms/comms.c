@@ -1666,8 +1666,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
 						" from %s exceeds the maximum size " ZBX_FS_UI64
-						" bytes. Message ignored.", (zbx_uint64_t)expected_len,
-						s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+						" bytes. Message ignored.", (zbx_uint64_t)reserved, s->peer,
+						(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 				nbytes = ZBX_PROTO_ERROR;
 				goto out;
 			}
