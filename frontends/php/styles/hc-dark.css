@@ -3027,8 +3027,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
-  background: linear-gradient(#000 30%, rgba(0, 0, 0, 0)), linear-gradient(rgba(0, 0, 0, 0), #000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#000 30%, transparent), linear-gradient(transparent, #000 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#000 30%, transparent), linear-gradient(transparent, #000 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
   background-repeat: no-repeat;
   background-color: #000;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -4868,7 +4868,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     border-left: none; }
 
 .na-bg, .log-na-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .na-bg a.link-action {
   color: #f8f8f8; }
@@ -4900,7 +4900,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .normal-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .normal-bg a.link-action {
   color: #f8f8f8; }
@@ -4928,7 +4928,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .info-bg, .log-info-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .info-bg a.link-action {
   color: #f8f8f8; }
@@ -4959,7 +4959,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .average-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .average-bg a.link-action {
   color: #f8f8f8; }
@@ -4986,7 +4986,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .warning-bg, .log-warning-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .warning-bg a.link-action {
   color: #f8f8f8; }
@@ -5017,7 +5017,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .high-bg, .log-high-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .high-bg a.link-action {
   color: #f8f8f8; }
@@ -5048,7 +5048,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .disaster-bg, .log-disaster-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .disaster-bg a.link-action {
   color: #f8f8f8; }
@@ -5100,7 +5100,7 @@ td.inactive-bg {
   color: #fff; }
 
 .inactive-bg, td.inactive-bg {
-  background-color: rgba(0, 0, 0, 0) !important;
+  background-color: transparent !important;
   padding-left: 42px; }
 
 .inactive-bg:before {
