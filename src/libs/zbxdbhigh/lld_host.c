@@ -691,10 +691,10 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                                                            *
  * Parameters: groupids         - [IN] sorted list of host group ids which    *
  *                                     should be present on the each          *
- *                                     discovered host                        *
+ *                                     discovered host (Groups)               *
  *             hosts            - [IN/OUT] list of hosts                      *
  *                                         should be sorted by hostid         *
- *             groups           - [IN]  list of host groups                   *
+ *             groups           - [IN]  list of host groups (Group prototypes)*
  *             del_hostgroupids - [OUT] sorted list of host groups which      *
  *                                      should be deleted                     *
  *                                                                            *
