@@ -33,7 +33,9 @@ typedef struct
 }
 zbx_regmatch_t;
 
-#define ZBX_REGEXP_GROUPS_MAX	10
+#define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
+					/* Group \0 contains the whole matched string, groups \1 ...\9    */
+					/* contain captured groups (substrings).                          */
 
 /******************************************************************************
  *                                                                            *
@@ -187,12 +189,12 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
 		zbx_regmatch_t *matches)
 {
-#define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)
+#define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
 	int				result, r;
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
-	int				ovecsize = count * 2 + count;
+	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
 #if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
 	struct pcre_extra		pextra;
 #endif
@@ -212,7 +214,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	r = pcre_exec(regexp->pcre_regexp, NULL, string, strlen(string), flags, 0, ovector, ovecsize);
 #endif
 
-	if (0 <= r)
+	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	{
 		if(NULL != matches)
 			memcpy(matches, ovector, (size_t)count * sizeof(zbx_regmatch_t));
