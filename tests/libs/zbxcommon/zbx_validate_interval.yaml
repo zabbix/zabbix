@@ -150,6 +150,12 @@ in:
 out:
   return: 'FAIL'
 ---
+test case: "macro as units is not allowed"
+in:
+  str: '1{$MACRO}'
+out:
+  return: 'FAIL'
+---
 test case: "only user macro is allowed"
 in:
   str: '{MACRO}'
@@ -221,12 +227,6 @@ out:
 test case: "flexible interval wrong delimiter"
 in:
   str: '1;0x1-6,00:00-23:00'
-out:
-  return: 'FAIL'
----
-test case: "invalid flexible"
-in:
-  str: '1;1/b'
 out:
   return: 'FAIL'
 ---
@@ -629,6 +629,12 @@ out:
 test case: "scheduling in limit"
 in:
   str: '86400;h9m/30'
+out:
+  return: 'SUCCEED'
+---
+test case: "scheduling context macro"
+in:
+  str: '{$MACRO:";"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:";"}'
 out:
   return: 'SUCCEED'
 ...
