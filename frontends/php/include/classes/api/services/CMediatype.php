@@ -328,7 +328,7 @@ class CMediatype extends CApiService {
 						$content_type_validator = new CLimitedSetValidator([
 							'values' => [
 								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
-								SMTP_MESSAGE_FORMAT_HTML,
+								SMTP_MESSAGE_FORMAT_HTML
 							]
 						]);
 
@@ -659,11 +659,12 @@ class CMediatype extends CApiService {
 					}
 
 					// Validate optional field 'content_type'.
-					if (array_key_exists('content_type', $mediatype)) {
+					if (array_key_exists('content_type', $mediatype)
+							&& $db_mediatype['content_type'] != $mediatype['content_type']) {
 						$content_type_validator = new CLimitedSetValidator([
 							'values' => [
 								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
-								SMTP_MESSAGE_FORMAT_HTML,
+								SMTP_MESSAGE_FORMAT_HTML
 							]
 						]);
 
