@@ -342,11 +342,12 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
  * Return value: Allocated string containing output value                        *
  *                                                                               *
  *********************************************************************************/
-static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, size_t nmatch)
+static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch)
 {
 	char		*ptr = NULL;
 	const char	*pstart = output_template, *pgroup;
-	size_t		size = 0, offset = 0, group_index;
+	size_t		size = 0, offset = 0;
+	int		group_index;
 
 	if (NULL == output_template || '\0' == *output_template)
 		return zbx_strdup(NULL, text);
