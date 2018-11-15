@@ -127,9 +127,9 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 	 */
 	public function testPageAvailabilityReportSLA($start_time, $end_time, $sla_item_values) {
 		$args = [
-			'filter_timesince' => date('YmdHis', strtotime($start_time)),
-			'filter_timetill' => date('YmdHis', strtotime($end_time)),
-			'filter_hostid' => 50009
+			'from' => date('Y-m-d H:i:s', strtotime($start_time)),
+			'to' => date('Y-m-d H:i:s', strtotime($end_time)),
+			'filter_hostid' => 50014
 		];
 
 		$this->zbxTestLogin('report2.php?'.http_build_query($args));
@@ -146,8 +146,8 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 				$cells_values[] = $cell->getText();
 			}
 
-			// Check only first 3 cells in every row: Label, Problem state value, Ok state value.
-			$this->assertContains(array_slice($cells_values, 0, 3), $sla_item_values);
+			// Check only cells 2,3,4 in every row: Label, Problem state value, Ok state value.
+			$this->assertContains(array_slice($cells_values, 1, 3), $sla_item_values);
 		}
 	}
 
