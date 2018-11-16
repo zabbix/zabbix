@@ -9281,10 +9281,10 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.token.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
 			continue;
 
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.token.l - last_pos);
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
 		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
@@ -9298,14 +9298,14 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		}
 		else
 		{
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.token.l,
-					token.token.r - token.token.l + 1);
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
 		}
 
 		zbx_free(name);
 		zbx_free(context);
 
-		pos = token.token.r;
+		pos = token.loc.r;
 		last_pos = pos + 1;
 	}
 

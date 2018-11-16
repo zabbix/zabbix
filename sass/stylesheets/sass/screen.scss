@@ -500,23 +500,34 @@ ul.top-nav-icons {
 	@include transform(scale(.9999));
 }
 
-.header-title {
+.header-title,
+.object-group {
+	min-height: 24px;
+	line-height: 24px;
+	padding: 10px 0 6px;
 	position: relative;
-	width: 100%;
-	padding: 0 0 6px 0;
-	margin: 0 0 10px 0;
-	text-align: right;
-	border-bottom: 1px solid $ui-border-color;
+	vertical-align: top;
+}
 
-	.cell:first-child {
-		max-width: calc(100vw - 370px);
+.header-title {
+	border-bottom: 1px solid $ui-border-color;
+	margin-top: -10px;
+	padding: 10px 0 6px;
+	width: 100%;
+
+	.cell {
+
+		&:first-child {
+			max-width: calc(100vw - 370px);
+		}
 	}
 
 	h1 {
-		text-align: left;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		line-height: 24px;
 		overflow: hidden;
+		padding-top: 1px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	form {
@@ -525,6 +536,8 @@ ul.top-nav-icons {
 	}
 
 	ul {
+		text-align: right;
+
 		li {
 			display: inline-block;
 			vertical-align: top;
@@ -535,12 +548,17 @@ ul.top-nav-icons {
 		ul li:first-child {
 			padding-left: 0;
 		}
+
+		button {
+			line-height: 22px;
+		}
 	}
 
 	.dashbrd-edit {
 		position: relative;
 		display: inline-block;
 		background-color: $ui-bg-color;
+		margin-right: 5px;
 		@include box-shadow(0 0 0 4px $ui-bg-color);
 
 		&::after {
@@ -578,9 +596,7 @@ article {
 
 // Object Group Navigation
 .object-group {
-	min-height: 24px;
-	line-height: 24px;
-	margin-bottom: 5px;
+	margin-bottom: -1px;
 
 	li {
 		float: left;
@@ -613,6 +629,14 @@ article {
 	.arrow-right {
 		border-left-color: $font-color;
 	}
+
+	button {
+		line-height: 22px;
+	}
+
+	.btn-link {
+		line-height: 14px;
+	}
 }
 
 .hor-list {
@@ -634,22 +658,22 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
-	position: relative;
-	top: 0;
 	z-index: 3;
-	margin-bottom: 0;
 
-	& > li:first-child {
-		float: left;
-		white-space: nowrap;
+	li {
+		line-height: 14px;
+		vertical-align: top;
 
-		& > span {
+		.status-container {
+			padding-top: 3px;
+		}
+
+		> span {
 			display: inline-block;
-			line-height: 1;
-			padding: 4px 7px;
+			height: 18px;
+			padding: 4px 7px 0;
 
 			a {
-				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -658,8 +682,17 @@ article {
 		}
 	}
 
-	& + .filter-space {
-		margin-top: -28px;
+	> li {
+		padding: 1px 0;
+	}
+
+	> li:first-child {
+		float: left;
+		white-space: nowrap;
+	}
+
+	+ .filter-space {
+		margin-top: -29px;
 	}
 }
 
@@ -1470,8 +1503,6 @@ output {
 	}
 }
 
-.hidden {display: none !important;}
-
 .multiselect-wrapper {
 	position: relative;
 	vertical-align: top;
@@ -1993,6 +2024,10 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+		}
 	}
 }
 
@@ -2458,14 +2493,15 @@ $icon-widget-btn: (
 			background-color: $ui-bg-color;
 			border: 1px solid $ui-border-color;
 			border-bottom: none;
-			margin: 0 0 0 6px;
-			padding: 0 34px 7px 10px;
+			margin: -1px 0 0 6px;
+			padding: 1px 34px 7px 10px;
 			@include border-radius(2px 2px 0 0);
 		}
 
 		.btn-time {
 			&:after {
 				background-position: -246px -583px;
+				top: 1px;
 			}
 		}
 
@@ -2497,6 +2533,7 @@ $icon-widget-btn: (
 
 .filter-space {
 	box-sizing: border-box;
+	margin-top: 10px;
 
 	li a.ui-tabs-anchor {
 		vertical-align: top;
@@ -3154,7 +3191,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
-	margin: -.25rem;
+	margin: -4px;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -5549,6 +5586,7 @@ svg {
 	border: 10px solid $ui-bg-color;
 	background: $ui-bg-color;
 	display: block;
+	margin: 4px 0;
 
 	.map-container {
 		display: table;

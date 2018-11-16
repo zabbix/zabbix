@@ -75,15 +75,13 @@ else {
 		'to' => $data['to']
 	]);
 
-	$filter = (new CFilter(new CUrl()))
-		->setProfile($data['profileIdx'], $data['profileIdx2'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to']);
-
-	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-		$filter->addClass(ZBX_STYLE_HIDDEN);
-	}
-	$screen_widget->addItem($filter);
+	$screen_widget->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($data['profileIdx'], $data['profileIdx2'])
+			->setActiveTab($data['active_tab'])
+			->addTimeSelector($screen_builder->timeline['from'], $screen_builder->timeline['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE)
+	);
 
 	$screen_widget->addItem((new CDiv($screen_builder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER));
 
