@@ -667,4 +667,10 @@ in:
   str: '{$MACRO:";"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:"/"};{$MACRO:"/"};{$MACRO:";"};{$MACRO:";"};{$MACRO:";"}/1-6,00:00-23:00;{$MACRO:"/"}/1-6,00:00-23:00;1/{$MACRO:";"};{$MACRO:";"}'
 out:
   return: 'SUCCEED'
+---
+test case: "empty delay"
+in:
+  str: ''
+out:
+  return: 'FAIL'
 ...
