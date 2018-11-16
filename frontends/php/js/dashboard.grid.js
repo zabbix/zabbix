@@ -1140,17 +1140,18 @@
 				return;
 			}
 
-			// Envoke add new widget action.
 			data.placeholder.hide();
 			$obj.dashboardGrid('addNewWidget', null, data.add_widget_dimension);
 		});
+
 		$obj.on('mousemove', function(event) {
-			if (data['pos-action'] != '' || !$(event.target).is($obj)) {
+			if (data['pos-action'] != '' && !$(event.target).is($obj) && !$(event.target).is(data.placeholder)) {
 				return;
 			}
 
 			var o = data.options,
 				offset = $obj.offset(),
+				prevy = data.prev_pos ? data.prev_pos.y : 0,
 				y = Math.min(o['max-rows'] - 1,
 					Math.max(0, Math.ceil((event.pageY - offset.top) / o['widget-height']) - 1)
 				),
@@ -1163,7 +1164,7 @@
 					height: o['widget-min-rows'],
 					width: 1
 				},
-				overlap;
+				overlap = false;
 
 			// Proceed only when coordinates have been changed.
 			if (data.prev_pos && data.prev_pos.y == pos.y && data.prev_pos.x == pos.x) {
@@ -1172,36 +1173,100 @@
 
 			data.prev_pos = $.extend({}, pos);
 
-			overlap = $.map(data.widgets, function(box) {
-				return rectOverlap(box.pos, pos) ? box : null;
+			$.each(data.widgets, function(_, box) {
+				overlap |= rectOverlap(box.pos, pos);
+
+				return !overlap;
 			});
 
 			/**
 			 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
 			 * slot.
 			 */
-			if (overlap.length && pos.y > 0) {
+			if (overlap && pos.y > 0) {
+				overlap = false;
 				--pos.y;
-				overlap = $.map(data.widgets, function(box) {
-					return rectOverlap(box.pos, pos) ? box : null;
+
+				$.each(data.widgets, function(_, box) {
+					overlap |= rectOverlap(box.pos, pos);
+
+					return !overlap;
 				});
+
 			}
 
-			/**
-			 * If slot is free try to expand horizontally to occupy 2 slots.
-			 */
-			// TODO
-			/**
-			 * If slot is free try to expand vertically to occupy 3/4 slots.
-			 */
-			// TODO
+			if (o['rows'] > 1 && prevy > y) {
+				var free = true;
 
-			if (overlap.length) {
+				$.each(data.widgets, function(_, box) {
+					free &= !rectOverlap(box.pos, {
+						x: 0,
+						y: o['rows'],
+						width: o['max-columns'],
+						height: 1
+					});
+
+					return free;
+				});
+
+				if (free) {
+					resizeDashboardGrid($obj, data, o['rows'] - 1);
+				}
+			}
+
+			if (overlap) {
 				return;
 			}
 
-			if (pos.y + pos.height > o['max-rows']) {
-				resizeDashboardGrid($obj, data, o['max-rows'] + 1);
+			var best_pos = {
+					x: Math.max(0, pos.x - 2),
+					y: Math.max(0, pos.y - 2),
+					width: 5,
+					height:  5
+				},
+				affected = $.map(data.widgets, function(box) {
+					return rectOverlap(box.pos, best_pos) ? box : null;
+				});
+
+			$.each(affected, function(_, box) {
+				if (!rectOverlap(box.pos, best_pos)) {
+					return;
+				}
+
+				if (box.pos.y >= pos.y + pos.height || box.pos.y + box.pos.height <= pos.y ) {
+					// vertical
+					if (box.pos.y < pos.y) {
+						// top
+						best_pos.height -= box.pos.y + box.pos.height - best_pos.y;
+						best_pos.y = box.pos.y + box.pos.height;
+					}
+					else {
+						// bottom
+						best_pos.height = box.pos.y - best_pos.y;
+					}
+				}
+				else {
+					if (box.pos.x < pos.x) {
+						// left
+						best_pos.width -= box.pos.x + box.pos.width - best_pos.x;
+						best_pos.x = box.pos.x + box.pos.width;
+					}
+					else {
+						// right
+						best_pos.width = box.pos.x - best_pos.x;
+					}
+				}
+			});
+
+			if (pos.y + pos.height > o['rows']) {
+				resizeDashboardGrid($obj, data, o['rows'] + 1);
+			}
+
+			pos = {
+				x: best_pos.x,
+				y: best_pos.y,
+				width: Math.min(o['max-columns'] - best_pos.x, best_pos.width),
+				height: Math.min(o['rows'] - best_pos.y, best_pos.height),
 			}
 
 			data.placeholder.css({
@@ -1213,7 +1278,7 @@
 				.show();
 
 			data.add_widget_dimension = pos;
-		})
+		});
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
