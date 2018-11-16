@@ -628,59 +628,6 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 
 		$this->checkExistingItems($items);
-
-		// Validate inherited dependent items linkage.
-		$templateids = [];
-
-		foreach ($dbHosts as $db_host) {
-			if ($db_host['status'] == HOST_STATUS_TEMPLATE) {
-				$templateids[] = $db_host['hostid'];
-			}
-		}
-
-		$templateids = array_keys(array_flip($templateids));
-		$templates = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => $templateids,
-			'selectHosts' => ['hostid']
-		]);
-
-		foreach ($templates as $template) {
-			if (!$template['hosts']) {
-				continue;
-			}
-
-			$hostids = zbx_objectValues($template['hosts'], 'hostid');
-			$hostids = array_keys(array_flip($hostids));
-			$all_hostids = array_merge($hostids, [$template['templateid']]);
-
-			$options = [
-				'output' => ['itemid', 'type', 'key_', 'master_itemid', 'hostid'],
-				'hostids' => $all_hostids,
-				'preservekeys' => true
-			];
-
-			if ($this instanceof CItem) {
-				$options['webitems'] = true;
-			}
-
-			$host_items = $this->get($options);
-
-			foreach ($items as $item) {
-				if ($update) {
-					$item += $dbItems[$item['itemid']];
-				}
-
-				if ($item['hostid'] == $template['templateid']
-						|| ($item['type'] == ITEM_TYPE_DEPENDENT
-							&& array_key_exists($item['master_itemid'], $host_items))) {
-					$item_index = array_key_exists('itemid', $item) ? $item['itemid'] : $item['key_'];
-					$host_items[$item_index] = $item;
-				}
-			}
-
-			$this->validateDependentItemsIntersection($host_items, $hostids);
-		}
 	}
 
 	/**
@@ -839,15 +786,83 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
 	 *
-	 * @abstract
-	 *
 	 * @param array $items          an array of items to inherit
 	 * @param array|null $hostids   an array of hosts to inherit to; if set to null, the children will be updated on all
 	 *                              child hosts
-	 *
-	 * @return bool
 	 */
-	abstract protected function inherit(array $items, array $hostids = null);
+	protected function inherit(array $items, array $hostids = null) {
+		if (!$items) {
+			return;
+		}
+
+		// Prepare the child items.
+		$new_items = $this->prepareInheritedItems($items, $hostids);
+		if (!$new_items) {
+			return;
+		}
+
+		$ins_items = [];
+		$upd_items = [];
+		foreach ($new_items as $new_item) {
+			if (array_key_exists('itemid', $new_item)) {
+				if ($this instanceof CItemPrototype) {
+					unset($new_item['ruleid']);
+				}
+				$upd_items[] = $new_item;
+			}
+			else {
+				$ins_items[] = $new_item;
+			}
+		}
+
+		if ($this instanceof CItem) {
+			if ($ins_items) {
+				static::validateInventoryLinks($ins_items, false); // false means 'create'
+			}
+			if ($upd_items) {
+				static::validateInventoryLinks($upd_items, true); // true means 'update'
+			}
+		}
+
+		// Save the new items.
+		if ($ins_items) {
+			$this->createReal($ins_items);
+		}
+
+		if ($upd_items) {
+			$this->updateReal($upd_items);
+		}
+
+		$new_items = array_merge($upd_items, $ins_items);
+
+		if ($this instanceof CItem || $this instanceof CItemPrototype) {
+			$new_items = $this->inheritDependentItems($new_items);
+			$this->validateDependentItems($new_items, __METHOD__);
+		}
+
+		// Inheriting items from the templates.
+		$tpl_items = DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
+				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
+		);
+
+		$tpl_itemids = [];
+		while ($tpl_item = DBfetch($tpl_items)) {
+			$tpl_itemids[$tpl_item['itemid']] = true;
+		}
+
+		foreach ($new_items as $index => $new_item) {
+			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
+				unset($new_items[$index]);
+			}
+		}
+
+		// Inheriting items from the templates.
+		$this->inherit($new_items);
+	}
 
 	/**
 	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
@@ -1497,6 +1512,19 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException for invalid data.
 	 */
 	protected function validateDependentItems(array $items, $method) {
+		$has_dependent = false;
+
+		foreach($items as $item) {
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$has_dependent = true;
+				break;
+			};
+		}
+
+		if (!$has_dependent) {
+			return [];
+		}
+
 		$items_cache = zbx_toHash($items, 'itemid');
 		$root_items = [];
 		$items_added = [];
@@ -1773,7 +1801,7 @@ abstract class CItemGeneral extends CApiService {
 			$data = [];
 			$host_master_items = [];
 
-			foreach ($items as $item) {
+			foreach ($items as &$item) {
 				if ($item['type'] != ITEM_TYPE_DEPENDENT || !array_key_exists('master_itemid', $item)) {
 					continue;
 				}
@@ -1798,76 +1826,17 @@ abstract class CItemGeneral extends CApiService {
 						'values' => ['master_itemid' => $inherited_master_item['itemid']],
 						'where' => ['itemid' => $item['itemid']]
 					];
+					$item['master_itemid'] = $inherited_master_item['itemid'];
 				}
 			}
+			unset($item);
 
 			if ($data) {
 				DB::update('items', $data);
 			}
 		}
-	}
 
-	/**
-	 * Validate merge of template dependent items and every host dependent items, host dependent item will be
-	 * overwritten by template dependent items.
-	 * Return false if intersection of host dependent items and template dependent items create dependent items
-	 * with dependency level greater than ZBX_DEPENDENT_ITEM_MAX_LEVELS.
-	 *
-	 * @param array $db_items
-	 * @param array $hostids
-	 *
-	 * @throws APIException if intersection of template items and host items creates dependent items tree with
-	 *                      dependent item level more than ZBX_DEPENDENT_ITEM_MAX_LEVELS or master item recursion.
-	 */
-	protected function validateDependentItemsIntersection(array $db_items, array $hostids) {
-		$hosts_items = [];
-		$tmpl_items = [];
-
-		foreach ($db_items as $db_item) {
-			$master_key = ($db_item['type'] == ITEM_TYPE_DEPENDENT
-					&& array_key_exists($db_item['master_itemid'], $db_items))
-				? $db_items[$db_item['master_itemid']]['key_']
-				: '';
-
-			if (in_array($db_item['hostid'], $hostids)) {
-				$hosts_items[$db_item['hostid']][$db_item['key_']] = $master_key;
-			}
-			elseif (!array_key_exists($db_item['key_'], $tmpl_items) || !$tmpl_items[$db_item['key_']]) {
-				$tmpl_items[$db_item['key_']] = $master_key;
-			}
-		}
-
-		foreach ($hosts_items as $hostid => $items) {
-			$linked_items = $items;
-
-			// Merge host items dependency tree with template items dependency tree.
-			$linked_items = array_merge($linked_items, $tmpl_items);
-
-			// Check dependency level for every dependent item.
-			foreach ($linked_items as $linked_item => $linked_master_key) {
-				$master_key = $linked_master_key;
-				$dependency_level = 0;
-				$traversing_path = [];
-
-				while ($master_key && $dependency_level <= ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					$traversing_path[] = $master_key;
-					$master_key = $linked_items[$master_key];
-					++$dependency_level;
-
-					if (in_array($master_key, $traversing_path)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('circular item dependency is not allowed')
-						));
-					}
-				}
-
-				if ($dependency_level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('maximum number of dependency levels reached')
-					));
-				}
-			}
-		}
+		return $items;
 	}
 
 	/**

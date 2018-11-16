@@ -878,67 +878,6 @@ class CItem extends CItemGeneral {
 		$this->validateItemPreprocessing($item, $method);
 	}
 
-	protected function inherit(array $items, array $hostids = null) {
-		if (!$items) {
-			return;
-		}
-
-		// Prepare the child items.
-		$new_items = $this->prepareInheritedItems($items, $hostids);
-		if (!$new_items) {
-			return;
-		}
-
-		$ins_items = [];
-		$upd_items = [];
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				$upd_items[] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
-			}
-		}
-
-		// Save the new items.
-		if ($ins_items) {
-			self::validateInventoryLinks($ins_items, false); // false means 'create'
-			$this->createReal($ins_items);
-		}
-
-		if ($upd_items) {
-			self::validateInventoryLinks($upd_items, true); // true means 'update'
-			$this->updateReal($upd_items);
-		}
-
-		$new_items = array_merge($upd_items, $ins_items);
-
-		// Update master_itemid for inserted or updated inherited dependent items.
-		$this->inheritDependentItems($new_items);
-
-		// Inheriting items from the templates.
-		$tpl_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
-		);
-
-		$tpl_itemids = [];
-		while ($tpl_item = DBfetch($tpl_items)) {
-			$tpl_itemids[$tpl_item['itemid']] = true;
-		}
-
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
-		}
-
-		$this->inherit($new_items);
-	}
-
 	/**
 	 * Check, if items that are about to be inserted or updated violate the rule:
 	 * only one item can be linked to a inventory filed.
