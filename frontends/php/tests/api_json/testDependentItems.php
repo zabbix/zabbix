@@ -78,7 +78,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => [
 					'name' => 'test',
 					'key_' => 'di_max_levels',
-					'value_type' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'delay' => '30s',
 					'hostid' => 99009,
 					'ruleid' => 90006,
@@ -124,9 +124,23 @@ class testDependentItems extends CAPITest {
 				'request_data' => $items
 			],
 			[
-				'error' => false,
+				'error' => null,
 				'method' => 'item.create',
 				'request_data' => array_slice($items, 1)
+			],
+			[
+				'error' => 'Incorrect value for field "master_itemid2": maximum dependent items count reached.',
+				'method' => 'itemprototype.create',
+				'request_data' => [
+					'name' => 'test',
+					'key_' => 'di_max_levels',
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'delay' => '30s',
+					'hostid' => 99010,
+					'ruleid' => 90007,
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => 40581
+				]
 			]
 		];
 	}
