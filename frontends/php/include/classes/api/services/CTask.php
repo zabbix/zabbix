@@ -160,8 +160,9 @@ class CTask extends CApiService {
 
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.',
-					_('discovery rule is templated')));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot send request: %1$s.', _('discovery rule is templated'))
+				);
 			}
 
 			if (!in_array($discovery_rule['type'], $allowed_types)) {
