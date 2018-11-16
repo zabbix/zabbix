@@ -115,9 +115,8 @@ class CTask extends CApiService {
 
 		// Check if user has permissions to items and LLD rules.
 		$items = API::Item()->get([
-			'output' => ['itemid', 'type', 'hostid', 'status'],
+			'output' => ['itemid', 'type', 'hostid', 'status', 'templateid'],
 			'itemids' => $task['itemids'],
-			'templated' => false,
 			'editable' => true
 		]);
 
@@ -127,9 +126,8 @@ class CTask extends CApiService {
 
 		if ($items_cnt != $itemids_cnt) {
 			$discovery_rules = API::DiscoveryRule()->get([
-				'output' => ['itemid', 'type', 'hostid', 'status'],
+				'output' => ['itemid', 'type', 'hostid', 'status', 'templateid'],
 				'itemids' => $task['itemids'],
-				'templated' => false,
 				'editable' => true
 			]);
 
@@ -145,7 +143,7 @@ class CTask extends CApiService {
 		$allowed_types = checkNowAllowedTypes();
 
 		foreach ($items as $item) {
-			if (!in_array($item['type'], $allowed_types)) {
+			if (!in_array($item['type'], $allowed_types) || $item['templateid']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('wrong item type')));
 			}
 
@@ -157,7 +155,7 @@ class CTask extends CApiService {
 		}
 
 		foreach ($discovery_rules as $discovery_rule) {
-			if (!in_array($discovery_rule['type'], $allowed_types)) {
+			if (!in_array($discovery_rule['type'], $allowed_types) || $discovery_rule['templateid']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot send request: %1$s.', _('wrong discovery rule type'))
 				);
