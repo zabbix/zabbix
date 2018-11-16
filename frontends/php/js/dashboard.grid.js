@@ -1145,7 +1145,12 @@
 		});
 
 		$obj.on('mousemove', function(event) {
-			if (data['pos-action'] != '' && !$(event.target).is($obj) && !$(event.target).is(data.placeholder)) {
+			if (data['pos-action'] != '') {
+				return;
+			}
+
+			if (!$(event.target).is($obj) && !$(event.target).is(data.placeholder)) {
+				data.placeholder.hide();
 				return;
 			}
 
@@ -1228,13 +1233,12 @@
 					return rectOverlap(box.pos, best_pos) ? box : null;
 				});
 
-			$.each(affected, function(_, box) {
+			affected.each(function(box) {
 				if (!rectOverlap(box.pos, best_pos)) {
 					return;
 				}
 
 				if (box.pos.y >= pos.y + pos.height || box.pos.y + box.pos.height <= pos.y ) {
-					// vertical
 					if (box.pos.y < pos.y) {
 						// top
 						best_pos.height -= box.pos.y + box.pos.height - best_pos.y;
