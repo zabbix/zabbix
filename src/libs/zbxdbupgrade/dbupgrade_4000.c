@@ -69,7 +69,7 @@ static int	str_rename_macro(const char *in, const char *oldmacro, const char *ne
 		{
 			case ZBX_TOKEN_MACRO:
 				pos = token.loc.r;
-				if (0 == strncmp(*out + token.loc.l, oldmacro, token.loc.r - token.loc.l))
+				if (0 == strncmp(*out + token.loc.l, oldmacro, token.loc.r - token.loc.l + 1))
 				{
 					pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
 							token.loc.r - token.loc.l + 1, newmacro, newmacro_len);
