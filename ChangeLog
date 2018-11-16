@@ -6,6 +6,18 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
+..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
+........S. [ZBX-14964] improved escalator performance during maintenance by checking paused escalations less frequently (vso)
+..F....... [ZBX-13793] fixed focus styles on read-only textarea fields (Andzs)
+..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
+...G...PS. [ZBX-15138] fixed error message when receiving compressed data over maximum size (kalimulin)
+..F....... [ZBX-15154] fixed time period parameters in data overview context menu links (miks)
+..F....... [ZBX-15044] fixed javascript error when zooming classic graph in edit mode (talbergs)
+..F....... [ZBX-15044] fixed dashboard initialization in edit mode (talbergs)
+..F....... [ZBX-15053] fixed timetamp position in map (talbergs)
+..F....... [ZBX-15033] fixed zoom-out and select box for graphs in kiosk mode (miks)
 ..F....... [ZBX-8396] improved source code comments (miks)
 ..F....... [ZBX-14970] fixed wrong media type status upon creation, if chosen status disabled (talbergs)
 ...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
@@ -2048,6 +2060,9 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
+..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
+..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
 .......PS. [ZBX-15132] backported daylight saving related scheduled checks fix from ZBX-12965 (wiper)
 ...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
