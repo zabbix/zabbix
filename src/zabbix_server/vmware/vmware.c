@@ -3625,7 +3625,7 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot convert maxQueryMetrics from %s.", val);
 		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
 	}
-	else if (0 == max_qm)
+	else if (0 == *max_qm)
 	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
 	}
