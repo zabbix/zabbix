@@ -6,6 +6,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+....I..... [ZBX-15129] added optional upgrade patches to rename TRIGGER.NAME macros to EVENT.NAME in action operation messages and custom scripts (wiper)
 .......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
 ..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
