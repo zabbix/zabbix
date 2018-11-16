@@ -142,8 +142,7 @@ $http_popup_form_list
 			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setModern(true),
-		'retrieve_mode_row'
+			->setModern(true)
 	)
 	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $options['timeout']))
