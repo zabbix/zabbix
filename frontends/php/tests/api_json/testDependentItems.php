@@ -129,7 +129,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => array_slice($items, 1)
 			],
 			[
-				'error' => 'Incorrect value for field "master_itemid2": maximum dependent items count reached.',
+				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'itemprototype.create',
 				'request_data' => [
 					'name' => 'test',
