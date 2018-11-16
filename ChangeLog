@@ -14,6 +14,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
 ..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
 ........S. [ZBX-14964] improved escalator performance during maintenance by checking paused escalations less frequently (vso)
 ..F....... [ZBX-13793] fixed focus styles on read-only textarea fields (Andzs)
@@ -2066,6 +2067,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
 ..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
 ..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
 .......PS. [ZBX-15132] backported daylight saving related scheduled checks fix from ZBX-12965 (wiper)
