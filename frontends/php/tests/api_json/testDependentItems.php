@@ -98,6 +98,7 @@ class testDependentItems extends CAPITest {
 
 	public static function getCreateData() {
 		$items = [];
+		$prototypes = [];
 
 		for ($index = 3; $index < 1000; $index++) {
 			$items[] = [
@@ -115,6 +116,17 @@ class testDependentItems extends CAPITest {
 				'flags' => 0,
 				'master_itemid' => 40581
 			];
+
+			$prototypes[] = [
+				'name' => 'dependent_prototype_'.$index,
+				'key_' => 'dependent_prototype_'.$index,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => '30s',
+				'hostid' => 99009,
+				'ruleid' => 90006,
+				'type' => ITEM_TYPE_DEPENDENT,
+				'master_itemid' => 40567
+			];
 		}
 
 		return [
@@ -129,6 +141,14 @@ class testDependentItems extends CAPITest {
 				'request_data' => array_slice($items, 1)
 			],
 			[
+				'error' => null,
+				'method' => 'item.update',
+				'request_data' => [
+					'itemid' => 40581,
+					'name' => 'updated master item'
+				]
+			],
+			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'itemprototype.create',
 				'request_data' => [
@@ -141,6 +161,19 @@ class testDependentItems extends CAPITest {
 					'type' => ITEM_TYPE_DEPENDENT,
 					'master_itemid' => 40581
 				]
+			],
+			[
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'method' => 'itemprototype.create',
+				'request_data' => [
+					'hostid' => 99010,
+					'ruleid' => 90007,
+				] + reset($prototypes)
+			],
+			[
+				'error' => null,
+				'method' => 'itemprototype.create',
+				'request_data' => array_slice($prototypes, 1)
 			]
 		];
 	}
