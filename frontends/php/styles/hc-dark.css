@@ -988,9 +988,6 @@ output {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
-.hidden {
-  display: none !important; }
-
 .multiselect-wrapper {
   position: relative;
   vertical-align: top;
@@ -1314,6 +1311,8 @@ textarea {
   overflow: auto; }
   textarea[readonly] {
     color: #fff !important; }
+    textarea[readonly]:focus {
+      border-color: #bbb; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;

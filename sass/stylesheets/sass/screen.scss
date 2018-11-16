@@ -1503,8 +1503,6 @@ output {
 	}
 }
 
-.hidden {display: none !important;}
-
 .multiselect-wrapper {
 	position: relative;
 	vertical-align: top;
@@ -2026,6 +2024,10 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
+
+		&:focus {
+			border-color: $form-border-focus-color;
+		}
 	}
 }
 
