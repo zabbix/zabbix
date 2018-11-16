@@ -348,7 +348,7 @@
 						on_dashboard = timeControl.objectList[id].onDashboard,
 						zbx_sbox = domImg.data('zbx_sbox');
 
-					if (zbx_sbox && zbx_sbox.prevent_refresh) {
+					if (typeof zbx_sbox === 'undefined' || zbx_sbox && zbx_sbox.prevent_refresh) {
 						screen.isRefreshing = false;
 						window.flickerfreeScreen.setElementProgressState(id, false);
 						return;
