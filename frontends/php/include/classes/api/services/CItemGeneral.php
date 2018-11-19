@@ -967,7 +967,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		// Prapering list of application prototypes.
+		// Preparing list of application prototypes.
 		if ($class === 'CItemPrototype') {
 			$tpl_app_prototypes = [];
 			$item_prototypeids = [];
