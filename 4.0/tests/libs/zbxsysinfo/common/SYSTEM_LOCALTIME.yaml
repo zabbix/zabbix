@@ -1,0 +1,46 @@
+---
+test case: "timestamp check without params"
+in:
+  timestamp: 1513598769
+  key: "system.localtime"
+out:
+  result: "1513598769"
+  return: "SYSINFO_RET_OK"
+---
+test case: "timestamp check with empty params"
+in:
+  timestamp: 1513598769
+  key: "system.localtime[]"
+out:
+  result: "1513598769"
+  return: "SYSINFO_RET_OK"
+---
+test case: "timestamp check with UTC type param"
+in:
+  timestamp: "1513598769"
+  key: "system.localtime[utc]"
+out:
+  result: "1513598769"
+  return: "SYSINFO_RET_OK"
+---
+test case: "localtime check"
+in:
+  timestamp: "2017-12-18,14:06:09.123,+02:30"
+  key: "system.localtime[local]"
+out:
+  result: "2017-12-18,14:06:09.123,+02:30"
+  return: "SYSINFO_RET_OK"
+---
+test case: "input parameter count check"
+in:
+  key: "system.localtime[1,2]"
+out:
+  result: "Too many parameters."
+  return: "SYSINFO_RET_FAIL"
+---
+test case: "input parameter value check"
+in:
+  key: "system.localtime[bebebe]"
+out:
+  result: "Invalid first parameter."
+  return: "SYSINFO_RET_FAIL"

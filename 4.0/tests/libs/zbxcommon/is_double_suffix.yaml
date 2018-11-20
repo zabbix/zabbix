@@ -1,0 +1,511 @@
+---
+test case: succeed -1.0K
+in:
+  num: -1.0K
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0M
+in:
+  num: -1.0M
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0G
+in:
+  num: -1.0G
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0T
+in:
+  num: -1.0T
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0s
+in:
+  num: -1.0s
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0m
+in:
+  num: -1.0m
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0h
+in:
+  num: -1.0h
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0d
+in:
+  num: -1.0d
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0w
+in:
+  num: -1.0w
+out:
+  return: SUCCEED
+---
+test case: succeed 10K
+in:
+  num: 10K
+out:
+  return: SUCCEED
+---
+test case: succeed 10M
+in:
+  num: 10M
+out:
+  return: SUCCEED
+---
+test case: succeed 10G
+in:
+  num: 10G
+out:
+  return: SUCCEED
+---
+test case: succeed 10T
+in:
+  num: 10T
+out:
+  return: SUCCEED
+---
+test case: succeed 10s
+in:
+  num: 10s
+out:
+  return: SUCCEED
+---
+test case: succeed 10m
+in:
+  num: 10m
+out:
+  return: SUCCEED
+---
+test case: succeed 10h
+in:
+  num: 10h
+out:
+  return: SUCCEED
+---
+test case: succeed 10d
+in:
+  num: 10d
+out:
+  return: SUCCEED
+---
+test case: succeed 10w
+in:
+  num: 10w
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0K
+in:
+  num: 1.0K
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0M
+in:
+  num: 1.0M
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0G
+in:
+  num: 1.0G
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0T
+in:
+  num: 1.0T
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0s
+in:
+  num: 1.0s
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0m
+in:
+  num: 1.0m
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0h
+in:
+  num: 1.0h
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0d
+in:
+  num: 1.0d
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0w
+in:
+  num: 1.0w
+out:
+  return: SUCCEED
+---
+test case: succeed -10K
+in:
+  num: -10K
+out:
+  return: SUCCEED
+---
+test case: succeed -10M
+in:
+  num: -10M
+out:
+  return: SUCCEED
+---
+test case: succeed -10G
+in:
+  num: -10G
+out:
+  return: SUCCEED
+---
+test case: succeed -10T
+in:
+  num: -10T
+out:
+  return: SUCCEED
+---
+test case: succeed -10s
+in:
+  num: -10s
+out:
+  return: SUCCEED
+---
+test case: succeed -10m
+in:
+  num: -10m
+out:
+  return: SUCCEED
+---
+test case: succeed -10h
+in:
+  num: -10h
+out:
+  return: SUCCEED
+---
+test case: succeed -10d
+in:
+  num: -10d
+out:
+  return: SUCCEED
+---
+test case: succeed -10w
+in:
+  num: -10w
+out:
+  return: SUCCEED
+---
+test case: succeed -1.0
+in:
+  num: -1.0
+out:
+  return: SUCCEED
+---
+test case: succeed 1.0
+in:
+  num: 1.0
+out:
+  return: SUCCEED
+---
+test case: succeed -1
+in:
+  num: -1
+out:
+  return: SUCCEED
+---
+test case: succeed 1
+in:
+  num: 1
+out:
+  return: SUCCEED
+---
+test case: succeed 1234567890.0987654321
+in:
+  num: 1234567890.0987654321
+out:
+  return: SUCCEED
+---
+test case: succeed -1234567890.0987654321
+in:
+  num: -1234567890.0987654321
+out:
+  return: SUCCEED
+---
+test case: succeed 1234567890.0987654321K
+in:
+  num: 1234567890.0987654321K
+out:
+  return: SUCCEED
+---
+test case: succeed -1234567890.0987654321K
+in:
+  num: -1234567890.0987654321K
+out:
+  return: SUCCEED
+---
+test case: fail .
+in:
+  num: .
+out:
+  return: FAIL
+---
+test case: fail -.
+in:
+  num: -.
+out:
+  return: FAIL
+---
+test case: fail +.
+in:
+  num: +.
+out:
+  return: FAIL
+---
+test case: fail .K
+in:
+  num: .K
+out:
+  return: FAIL
+---
+test case: fail -.K
+in:
+  num: -.K
+out:
+  return: FAIL
+---
+test case: fail +.K
+in:
+  num: +.K
+out:
+  return: FAIL
+---
+test case: fail -1.0k
+in:
+  num: -1.0k
+out:
+  return: FAIL
+---
+test case: fail -1.0Kk
+in:
+  num: -1.0Kk
+out:
+  return: FAIL
+---
+test case: fail -1,0K
+in:
+  num: -1,0K
+out:
+  return: FAIL
+---
+test case: fail +1
+in:
+  num: +1
+out:
+  return: FAIL
+---
+test case: fail +1.0
+in:
+  num: +1.0
+out:
+  return: FAIL
+---
+test case: fail +.1
+in:
+  num: +.1
+out:
+  return: FAIL
+---
+test case: succeed 1.K
+in:
+  num: 1.K
+out:
+  return: SUCCEED
+---
+test case: succeed .1K
+in:
+  num: .1K
+out:
+  return: SUCCEED
+---
+test case: succeed -1.K
+in:
+  num: -1.K
+out:
+  return: SUCCEED
+---
+test case: succeed -.1K
+in:
+  num: -.1K
+out:
+  return: SUCCEED
+---
+test case: succeed 1.
+in:
+  num: 1.
+out:
+  return: SUCCEED
+---
+test case: succeed -1.
+in:
+  num: -1.
+out:
+  return: SUCCEED
+---
+test case: succeed .1
+in:
+  num: .1
+out:
+  return: SUCCEED
+---
+test case: succeed -.1
+in:
+  num: -.1
+out:
+  return: SUCCEED
+---
+test case: fail "1. "
+in:
+  num: "1. "
+out:
+  return: FAIL
+---
+test case: fail "-1. "
+in:
+  num: "-1. "
+out:
+  return: FAIL
+---
+test case: fail " .1"
+in:
+  num: " .1"
+out:
+  return: FAIL
+---
+test case: fail "- .1"
+in:
+  num: "- .1"
+out:
+  return: FAIL
+---
+test case: fail " -0.1"
+in:
+  num: " -0.1"
+out:
+  return: FAIL
+---
+test case: fail "-0.1 "
+in:
+  num: "-0.1 "
+out:
+  return: FAIL
+---
+test case: fail "-0.1 K"
+in:
+  num: "-0.1 K"
+out:
+  return: FAIL
+---
+test case: fail "1 K"
+in:
+  num: "1 K"
+out:
+  return: FAIL
+---
+test case: fail "1K "
+in:
+  num: "1K "
+out:
+  return: FAIL
+---
+test case: fail "1 "
+in:
+  num: "1 "
+out:
+  return: FAIL
+---
+test case: fail " 1"
+in:
+  num: " 1"
+out:
+  return: FAIL
+---
+test case: fail ..1
+in:
+  num: ..1
+out:
+  return: FAIL
+---
+test case: fail .1.
+in:
+  num: .1.
+out:
+  return: FAIL
+---
+test case: fail 1..
+in:
+  num: 1..
+out:
+  return: FAIL
+---
+test case: fail .1.2
+in:
+  num: .1.2
+out:
+  return: FAIL
+---
+test case: fail 1..2
+in:
+  num: 1..2
+out:
+  return: FAIL
+---
+test case: fail ..
+in:
+  num: ..
+out:
+  return: FAIL
+---
+test case: fail 1e+2
+in:
+  num: 1e+2
+out:
+  return: FAIL
+---
+test case: fail 1E+2
+in:
+  num: 1E+2
+out:
+  return: FAIL
+---
+test case: fail --1
+in:
+  num: --1
+out:
+  return: FAIL
+---
+test case: fail "- -1"
+in:
+  num: "- -1"
+out:
+  return: FAIL
+
