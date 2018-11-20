@@ -1434,7 +1434,7 @@ typedef struct
 	/* token type, see ZBX_TOKEN_ defines */
 	int			type;
 	/* the token location in expression including opening and closing brackets {} */
-	zbx_strloc_t		token;
+	zbx_strloc_t		loc;
 	/* the token type specific data */
 	zbx_token_data_t	data;
 }

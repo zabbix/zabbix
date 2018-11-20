@@ -3781,7 +3781,8 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 			" from hosts_groups hg,hosts h"
 			" where hg.hostid=h.hostid"
 			" and h.status in (%d,%d)"
-			" and h.flags<>%d",
+			" and h.flags<>%d"
+			" order by hg.groupid",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;

@@ -258,7 +258,8 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null
 				]);
 
 				if ($hostGroups) {

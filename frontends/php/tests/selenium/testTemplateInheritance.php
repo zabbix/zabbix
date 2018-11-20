@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
  */
-class testTemplateInheritance extends CWebTest {
+class testTemplateInheritance extends CLegacyWebTest {
 
 	/**
 	 * The name of the test template created in the test data set.
@@ -43,7 +43,7 @@ class testTemplateInheritance extends CWebTest {
 
 	public function testTemplateInheritance_linkHost(){
 		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
@@ -65,7 +65,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		$sql = 'select hosttemplateid from hosts_templates where templateid='.$hostid.' AND hostid=15001';
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 	}
 
 	public static function dataCreate() {
@@ -175,7 +175,7 @@ class testTemplateInheritance extends CWebTest {
 	public function testTemplateInheritance_unlinkHost(){
 
 		$sql = "select hostid from hosts where host='Inheritance test template for unlink';";
-		$this->assertEquals(1, DBcount($sql));
+		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
@@ -192,7 +192,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		$sql = 'select hosttemplateid from hosts_templates where templateid='.$hostid.'';
-		$this->assertEquals(0, DBcount($sql));
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	/**
@@ -430,10 +430,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent('Test LLD trigger');
 
 		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NULL";
-		$this->assertEquals(1, DBcount($sql), 'Trigger prototype has not been added into Zabbix DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Trigger prototype has not been added into Zabbix DB');
 
 		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NOT NULL";
-		$this->assertEquals(1, DBcount($sql), 'Trigger prototype has not been added into Zabbix DB');
+		$this->assertEquals(1, CDBHelper::getCount($sql), 'Trigger prototype has not been added into Zabbix DB');
 
 		// check that the inherited trigger prototype matches the original
 		$this->zbxTestOpen('hosts.php');

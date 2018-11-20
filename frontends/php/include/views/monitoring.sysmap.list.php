@@ -34,7 +34,7 @@ $widget = (new CWidget())
 		)))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(
-		(new CFilter())
+		(new CFilter(new CUrl('sysmaps.php')))
 			->setProfile($data['profileIdx'])
 			->setActiveTab($data['active_tab'])
 			->addFilterTab(_('Filter'), [

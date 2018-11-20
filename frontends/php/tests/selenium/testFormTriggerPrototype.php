@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
  *
  * @backup triggers
  */
-class testFormTriggerPrototype extends CWebTest {
+class testFormTriggerPrototype extends CLegacyWebTest {
 
 	/**
 	 * The name of the test template created in the test data set.
@@ -417,7 +417,7 @@ class testFormTriggerPrototype extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23804' and t.description LIKE 'testFormTriggerPrototype%'");
+		return CDBHelper::getDataProvider("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23804' and t.description LIKE 'testFormTriggerPrototype%'");
 	}
 
 	/**
@@ -427,7 +427,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$description = $data['description'];
 
 		$sqlTriggers = "select * from triggers ORDER BY triggerid";
-		$oldHashTriggers = DBhash($sqlTriggers);
+		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -443,7 +443,7 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestTextPresent($this->discoveryRule);
 		$this->zbxTestTextPresent($description);
 
-		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
 	}
 
 	public static function create() {
@@ -924,7 +924,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototypes deleted');
-			$this->assertEquals(0, DBcount("SELECT triggerid FROM triggers where description = '".$description."'"));
+			$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers where description = '".$description."'"));
 		}
 	}
 }

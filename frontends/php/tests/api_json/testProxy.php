@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup hosts
  */
-class testProxy extends CZabbixTest {
+class testProxy extends CAPITest {
 
 	public static function proxy_delete() {
 		return [
@@ -95,7 +96,7 @@ class testProxy extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['proxyids'] as $id) {
-				$this->assertEquals(0, DBcount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE hostid='.zbx_dbstr($id)));
 			}
 		}
 	}

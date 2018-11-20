@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup profiles
  */
-class testPageDashboard extends CWebTest {
+class testPageDashboard extends CLegacyWebTest {
 
 	public $graphCpu = 'CPU load';
 	public $graphCpuId = 524;
@@ -99,8 +99,8 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='charts.php?graphid=$this->graphCpuId']", 'ЗАББИКС Сервер: '.$this->graphCpu);
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//a[@href='charts.php?graphid=$this->graphMemoryId']", 'ЗАББИКС Сервер: '.$this->graphMemory);
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphCpuId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids' AND value_id=$this->graphMemoryId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteGraphs() {
@@ -118,7 +118,7 @@ class testPageDashboard extends CWebTest {
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
 			$this->zbxTestCheckFatalErrors();
-			$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
+			$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.graphids'"));
 		}
 		catch (Exception $e) {
 			$exception = $e;
@@ -144,7 +144,7 @@ class testPageDashboard extends CWebTest {
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//a[@href='zabbix.php?action=map.view&sysmapid=$this->mapTestId']", $this->mapTest);
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(1, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids' AND value_id=$this->mapTestId"));
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
@@ -157,7 +157,7 @@ class testPageDashboard extends CWebTest {
 		}
 		$this->zbxTestAssertElementText("//div[@class='dashbrd-grid-widget-container']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
 		$this->zbxTestCheckFatalErrors();
-		$this->assertEquals(0, DBcount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT profileid FROM profiles WHERE idx='web.favorite.sysmapids'"));
 	}
 
 	public function testPageDashboard_FullScreen() {

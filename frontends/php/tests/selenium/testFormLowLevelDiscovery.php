@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup items
  */
-class testFormDiscoveryRule extends CWebTest {
+class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -220,7 +220,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormDiscoveryRule_CheckLayout($data) {
+	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
@@ -348,14 +348,13 @@ class testFormDiscoveryRule extends CWebTest {
 				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
 					$this->zbxTestTextPresent('Host interface');
-					$dbInterfaces = DBdata(
+					$dbInterfaces = CDBHelper::getAll(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType), false
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
 					);
-					$dbInterfaces = reset($dbInterfaces);
-					if ($dbInterfaces != null) {
+					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {
 							$this->zbxTestAssertElementPresentXpath('//select[@id="interfaceid"]/optgroup/option[text()="'.
 							$host_interface['ip'].' : '.$host_interface['port'].'"]');
@@ -462,7 +461,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'size', 20);
-			$this->zbxTestAssertElementValue('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1');
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
 
 			$this->zbxTestTextPresent('Port');
 			$this->zbxTestAssertVisibleId('port');
@@ -657,17 +656,20 @@ class testFormDiscoveryRule extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
+		return CDBHelper::getDataProvider(
+			'select * from items'.
+			' where hostid = 40001 and key_ LIKE \'discovery-rule-form%\''
+		);
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormDiscoveryRule_SimpleUpdate($data) {
+	public function testFormLowLevelDiscovery_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
-		$oldHashDiscovery = DBhash($sqlDiscovery);
+		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -678,7 +680,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		$this->zbxTestTextPresent("$name");
 
-		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
+		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 
 	// Returns create data
@@ -1379,6 +1381,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'discovery-snmpv1-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1389,6 +1392,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
 					'key' => 'discovery-snmpv2-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1399,6 +1403,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
 					'key' => 'discovery-snmpv3-agent',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1408,7 +1413,20 @@ class testFormDiscoveryRule extends CWebTest {
 					'expected' => TEST_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
+					'key' => 'test-item-snmp_oid',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "SNMP OID": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-reuse',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-reuse" already exists on "Simple form test host".'
@@ -1421,6 +1439,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
 					'key' => 'test-item-form1',
+					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
 						'Item with key "test-item-form1" already exists on "Simple form test host".'
@@ -1602,7 +1621,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormDiscoveryRule_SimpleCreate($data) {
+	public function testFormLowLevelDiscovery_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -1669,6 +1688,10 @@ class testFormDiscoveryRule extends CWebTest {
 
 		if (isset($data['delay']))	{
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
+		}
+
+		if (array_key_exists('snmp_oid', $data))	{
+			$this->zbxTestInputTypeOverwrite('snmp_oid', $data['snmp_oid']);
 		}
 
 		$itemFlexFlag = true;
@@ -1799,7 +1822,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
-			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');
+			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');
 		}
 	}
 
@@ -1866,7 +1889,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider getCreateFiltersData
 	 */
-	public function testFormDiscoveryRule_CreateFiltersMacros($data) {
+	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -1894,7 +1917,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestTextPresent($data['name']);
 
-		$this->assertEquals(1, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 
 	public static function getCreateFiltersMacrosValidationData() {
@@ -2007,7 +2030,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider getCreateFiltersMacrosValidationData
 	 */
-	public function testFormDiscoveryRule_FiltersMacrosValidation($data) {
+	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
 		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
@@ -2035,6 +2058,6 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals(0, DBcount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
 	}
 }
