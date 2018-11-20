@@ -100,7 +100,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
-	char		name[HOST_HOST_LEN_MAX];
+	char		name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
@@ -164,7 +164,7 @@ typedef struct
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
 	unsigned char		allow_traps;
-	char			key_orig[ITEM_KEY_LEN * 4 + 1], *key;
+	char			key_orig[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			*units;
 	char			*delay;
 	int			history_sec;
@@ -560,15 +560,18 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_TOTAL		7
 #define ZBX_STATS_HISTORY_USED		8
 #define ZBX_STATS_HISTORY_FREE		9
-#define ZBX_STATS_HISTORY_PFREE		10
-#define ZBX_STATS_TREND_TOTAL		11
-#define ZBX_STATS_TREND_USED		12
-#define ZBX_STATS_TREND_FREE		13
-#define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
-#define ZBX_STATS_HISTORY_INDEX_USED	16
-#define ZBX_STATS_HISTORY_INDEX_FREE	17
-#define ZBX_STATS_HISTORY_INDEX_PFREE	18
+#define ZBX_STATS_HISTORY_PUSED		10
+#define ZBX_STATS_HISTORY_PFREE		11
+#define ZBX_STATS_TREND_TOTAL		12
+#define ZBX_STATS_TREND_USED		13
+#define ZBX_STATS_TREND_FREE		14
+#define ZBX_STATS_TREND_PUSED		15
+#define ZBX_STATS_TREND_PFREE		16
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	17
+#define ZBX_STATS_HISTORY_INDEX_USED	18
+#define ZBX_STATS_HISTORY_INDEX_FREE	19
+#define ZBX_STATS_HISTORY_INDEX_PUSED	20
+#define ZBX_STATS_HISTORY_INDEX_PFREE	21
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -642,7 +645,8 @@ int	DCget_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to,
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
 #define ZBX_CONFSTATS_BUFFER_USED	2
 #define ZBX_CONFSTATS_BUFFER_FREE	3
-#define ZBX_CONFSTATS_BUFFER_PFREE	4
+#define ZBX_CONFSTATS_BUFFER_PUSED	4
+#define ZBX_CONFSTATS_BUFFER_PFREE	5
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_last_sync_time(void);

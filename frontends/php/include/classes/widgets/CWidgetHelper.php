@@ -202,6 +202,7 @@ class CWidgetHelper {
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form_name,
 					'dstfld1' => zbx_formatDomId($field_name),
+					'real_hosts' => true
 				]
 			],
 			'add_post_js' => false
@@ -1242,6 +1243,6 @@ class CWidgetHelper {
 	 */
 	public static function splitPatternIntoParts($patterns) {
 		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', $patterns), 255);
-		return array_filter($patterns);
+		return array_filter($patterns, 'strlen');
 	}
 }

@@ -2176,10 +2176,11 @@ function getMapLinktriggerInfo($sysmap, $options) {
 	$trigger_options = [
 		'output' => ['status', 'value', 'priority'],
 		'triggerids' => $triggerids,
+		'monitored' => true,
 		'preservekeys' => true
 	];
 
-	return getTriggersWithActualSeverity($trigger_options, $sysmap['show_suppressed']);
+	return getTriggersWithActualSeverity($trigger_options, ['show_suppressed' => $sysmap['show_suppressed']]);
 }
 
 /**

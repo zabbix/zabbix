@@ -172,7 +172,7 @@ jQuery(function ($) {
 
 			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
 				label = formatTimestamp(seconds, false, true)
-					+ (seconds < data.minPeriod ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
+					+ (seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
 
 			stxt
 				.text(label)
@@ -501,7 +501,7 @@ jQuery(function ($) {
 					.addClass('paging-btn-container')
 					.append(
 						$('<div></div>')
-							.text(sprintf(t('Displaying %1$s of %2$s found'), num_displayed, num_total))
+							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
 							.addClass('table-stats')
 					)
 		);
@@ -545,7 +545,12 @@ jQuery(function ($) {
 
 				if (options.sbox) {
 					destroySBox(null, graph);
-					graph.on('mousedown', {graph: graph}, startSBoxDrag);
+					graph
+						.on('dblclick', function() {
+							$.publish('timeselector.zoomout');
+							return false;
+						})
+						.on('mousedown', {graph: graph}, startSBoxDrag);
 				}
 			});
 		},

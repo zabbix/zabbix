@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testFormAdministrationGeneralInstallation extends CWebTest {
+class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 
 	private $failIfNotExistsInstall = [
 		'Welcome',
@@ -134,6 +134,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestClickWait('cancel');
 
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 	}
 }

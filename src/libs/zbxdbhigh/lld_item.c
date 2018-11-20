@@ -894,7 +894,7 @@ static int	is_user_macro(const char *str)
 
 	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
 			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
-			0 != token.token.l || '\0' != str[token.token.r + 1])
+			0 != token.loc.l || '\0' != str[token.loc.r + 1])
 	{
 		return FAIL;
 	}
@@ -1336,7 +1336,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	int		ret = SUCCEED;
 	zbx_token_t	token;
 	char		err[MAX_STRING_LEN];
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * 4 + 1], *output;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 	const char*	regexp_err = NULL;
 
 	*err = '\0';

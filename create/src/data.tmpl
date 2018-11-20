@@ -148,7 +148,7 @@ ROW   |5       |Windows service startup states for discovery|automatic  |
 
 TABLE |expressions
 FIELDS|expressionid|regexpid|expression                                                                                                                                                           |expression_type|exp_delimiter|case_sensitive|
-ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;jfs&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
+ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
 ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                       |4              |,            |1             |
 ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                        |4              |,            |1             |
 ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                 |3              |,            |1             |
@@ -158,20 +158,3 @@ ROW   |9           |2       |^NULL[0-9.]*$                                      
 ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                       |4              |,            |1             |
 ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                          |4              |,            |1             |
 ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                          |4              |,            |1             |
-
-TABLE |dashboard
-FIELDS|dashboardid|name     |userid|private|
-ROW   |1          |Dashboard|1     |0      |
-
-TABLE |widget
-FIELDS|widgetid|dashboardid|type        |name|x   |y   |width|height|
-ROW   |1       |1          |favgraphs   |    |0   |0   |2    |3     |
-ROW   |2       |1          |favscreens  |    |2   |0   |2    |3     |
-ROW   |3       |1          |favmaps     |    |4   |0   |2    |3     |
-ROW   |4       |1          |problems    |    |0   |3   |6    |6     |
-ROW   |5       |1          |web         |    |0   |9   |3    |4     |
-ROW   |6       |1          |discovery   |    |3   |9   |3    |4     |
-ROW   |7       |1          |problemhosts|    |6   |0   |6    |4     |
-ROW   |8       |1          |problemsbysv|    |6   |4   |6    |4     |
-ROW   |9       |1          |systeminfo  |    |6   |8   |6    |5     |
-

@@ -19,7 +19,7 @@
 **/
 
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('httpconf.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
@@ -101,14 +101,13 @@ $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
 	$name = [];
-	if (isset($this->data['parentTemplates'][$httpTestId])) {
-		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = (new CLink($template['name'], '?groupid=0&hostid='.$template['id']))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREY);
-		$name[] = NAME_DELIMITER;
-	}
-	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
+	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates']);
+	$name[] = new CLink(CHtml::encode($httpTest['name']),
+		(new CUrl('httpconf.php'))
+			->setArgument('form', 'update')
+			->setArgument('hostid', $httpTest['hostid'])
+			->setArgument('httptestid', $httpTestId)
+	);
 
 	if ($this->data['showInfoColumn']) {
 		$info_icons = [];
