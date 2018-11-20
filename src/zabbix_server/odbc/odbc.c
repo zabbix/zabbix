@@ -611,7 +611,7 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 		{
 			char	*value = NULL;
 
-			if (NULL != value)
+			if (NULL != row[i])
 			{
 				value = zbx_strdup(value, row[i]);
 				zbx_replace_invalid_utf8(value);
