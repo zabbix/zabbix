@@ -54,7 +54,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->getText();
+		return $this->query('xpath:./span')->one()->getText();
 	}
 
 	/**
@@ -81,5 +81,14 @@ class CMessageElement extends CElement {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get text of lines in message details.
+	 *
+	 * @return array
+	 */
+	public function getLinesText() {
+		return $this->getLines()->asText();
 	}
 }

@@ -1311,6 +1311,8 @@ textarea {
   overflow: auto; }
   textarea[readonly] {
     color: #fff !important; }
+    textarea[readonly]:focus {
+      border-color: #bbb; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
