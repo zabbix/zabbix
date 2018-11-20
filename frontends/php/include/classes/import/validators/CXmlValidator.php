@@ -38,7 +38,8 @@ class CXmlValidator {
 			'3.0' => 'C30XmlValidator',
 			'3.2' => 'C32XmlValidator',
 			'3.4' => 'C34XmlValidator',
-			'4.0' => 'C40XmlValidator'
+			'4.0' => 'C40XmlValidator',
+			'4.2' => 'C42XmlValidator'
 		];
 	}
 
