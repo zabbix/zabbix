@@ -387,9 +387,7 @@ tests/libs/zbxalgo/.deps
 tests/libs/zbxalgo/Makefile
 tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
-tests/libs/zbxcommon/..........[!!-~][ZBXNEXT-3848]
 tests/libs/zbxcommon/.deps
-tests/libs/zbxcommon/ADFGIJLPST
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
