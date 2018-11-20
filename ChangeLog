@@ -1,11 +1,25 @@
 Changes for 4.0.2rc1
 
 New features:
+.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 ....I..... [ZBXNEXT-4841] removed hardcoded locations for iconv.h and pthread.h; thanks to Helmut Grohne for the patch (kalimulin)
 ...G...... [ZBXNEXT-3047] fixed compilation errors on Windows platform with static OpenSSL libraries (Andris, viktors)
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-15045] fixed a case where a disable multiselect looks like a similar to enabled text field (vasilijs)
+..F....... [ZBX-14927] fixed filter by host group without real hosts in triggers top 100, dashboard widgets, screens (talbergs)
+....I..... [ZBX-13662] fixed duplication of file system type in global regular expression for file systems discovery (MVekslers)
+....I....T [ZBX-15036] added system.cpu.util[,guest], system.cpu.util[,guest_nice] to OS Linux template (kalimulin)
+...G...PS. [ZBX-15106] improved error messages for item preprocessing, general pcre code improvements (Andris, kalimulin, wiper)
+........S. [ZBX-15095] fixed curl error handling for elasticsearch history backend (MVekslers)
+....I..... [ZBX-15129] added optional upgrade patches to rename TRIGGER.NAME macros to EVENT.NAME in action operation messages and custom scripts (wiper)
+.......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
+..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
+........S. [ZBX-14964] improved escalator performance during maintenance by checking paused escalations less frequently (vso)
+..F....... [ZBX-13793] fixed focus styles on read-only textarea fields (Andzs)
+..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
 ...G...PS. [ZBX-15138] fixed error message when receiving compressed data over maximum size (kalimulin)
 ..F....... [ZBX-15154] fixed time period parameters in data overview context menu links (miks)
 ..F....... [ZBX-15044] fixed javascript error when zooming classic graph in edit mode (talbergs)
@@ -2054,6 +2068,8 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
+..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
 ..F....... [ZBX-13009] fixed percentage calculation on availability reports list page (gcalenko)
 .......PS. [ZBX-15132] backported daylight saving related scheduled checks fix from ZBX-12965 (wiper)
 ...G...... [ZBX-14899] fixed wrong net.tcp.listen values on obsolete Linux systems (kalimulin)
