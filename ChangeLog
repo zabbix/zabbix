@@ -6,6 +6,7 @@ New features:
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+..F....... [ZBX-15045] fixed a case where a disable multiselect looks like a similar to enabled text field (vasilijs)
 ..F....... [ZBX-14927] fixed filter by host group without real hosts in triggers top 100, dashboard widgets, screens (talbergs)
 ....I..... [ZBX-13662] fixed duplication of file system type in global regular expression for file systems discovery (MVekslers)
 ....I....T [ZBX-15036] added system.cpu.util[,guest], system.cpu.util[,guest_nice] to OS Linux template (kalimulin)
