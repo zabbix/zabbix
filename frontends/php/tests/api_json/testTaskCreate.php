@@ -204,6 +204,21 @@ class testTaskCreate extends CZabbixTest {
 				],
 				'expected_error' => null
 			],
+			// Templated lld and items do not accept "Check now" command
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110004']
+				],
+				'expected_error' => 'Cannot send request: item is templated.'
+			],
+			[
+				'task' => [
+					'type' => '6',
+					'itemids' => ['110005']
+				],
+				'expected_error' => 'Cannot send request: discovery rule is templated.'
+			],
 		];
 	}
 
