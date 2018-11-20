@@ -1275,6 +1275,11 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_TRIM:
 					case ZBX_PREPROC_XPATH:
 					case ZBX_PREPROC_JSONPATH:
+					case ZBX_PREPROC_VALIDATE_REGEX:
+					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+					case ZBX_PREPROC_ERROR_FIELD_JSON:
+					case ZBX_PREPROC_ERROR_FIELD_XML:
+					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1288,6 +1293,8 @@ abstract class CItemGeneral extends CApiService {
 						break;
 
 					case ZBX_PREPROC_REGSUB:
+					case ZBX_PREPROC_ERROR_FIELD_REGEX:
+					case ZBX_PREPROC_VALIDATE_RANGE:
 						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1317,6 +1324,7 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_BOOL2DEC:
 					case ZBX_PREPROC_OCT2DEC:
 					case ZBX_PREPROC_HEX2DEC:
+					case ZBX_PREPROC_THROTTLE_VALUE:
 						// Check if 'params' is empty, because it must be empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1386,8 +1394,8 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update item pre-processing data in DB. Delete old records and create new ones.
 	 *
-	 * @param array $items							An array of items.
-	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
+	 * @param array $items                     An array of items.
+	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
 	 */
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
@@ -1403,7 +1411,9 @@ abstract class CItemGeneral extends CApiService {
 						'itemid' => $item['itemid'],
 						'step' => $step++,
 						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params']
+						'params' => $preprocessing['params'],
+						'error_handler' => $preprocessing['error_handler'],
+						'error_handler_params' => $preprocessing['error_handler_params']
 					];
 				}
 			}

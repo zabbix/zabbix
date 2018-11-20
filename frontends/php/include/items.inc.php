@@ -401,7 +401,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			'verify_peer', 'verify_host', 'allow_traps'
 		],
 		'selectApplications' => ['applicationid'],
-		'selectPreprocessing' => ['type', 'params'],
+		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'itemids' => $src_itemids,
 		'preservekeys' => true
 	]);
@@ -572,7 +572,7 @@ function copyItems($srcHostId, $dstHostId) {
 			'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 		],
 		'selectApplications' => ['applicationid'],
-		'selectPreprocessing' => ['type', 'params'],
+		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 		'hostids' => $srcHostId,
 		'webitems' => true,
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
@@ -1686,8 +1686,8 @@ function getParamFieldLabelByType($itemType) {
 }
 
 /**
- * Get either one or all item preprocessing types. If grouped set to true, returns group labels. Returns empty string if
- * no specific type is found.
+ * Get either one or all item preprocessing types.
+ * If grouped set to true, returns group labels. Returns empty string if no specific type is found.
  *
  * Usage examples:
  *    - get_preprocessing_types()              Returns array as defined.
@@ -1710,7 +1710,7 @@ function getParamFieldLabelByType($itemType) {
  * @param int  $type     Item preprocessing type.
  * @param bool $grouped  Group label flag.
  *
- * @return mixed
+ * @return array|string
  */
 function get_preprocessing_types($type = null, $grouped = true) {
 	$groups = [
@@ -1749,6 +1749,24 @@ function get_preprocessing_types($type = null, $grouped = true) {
 				ZBX_PREPROC_BOOL2DEC => _('Boolean to decimal'),
 				ZBX_PREPROC_OCT2DEC => _('Octal to decimal'),
 				ZBX_PREPROC_HEX2DEC => _('Hexadecimal to decimal')
+			]
+		],
+		[
+			'label' => _('Validation'),
+			'types' => [
+				ZBX_PREPROC_VALIDATE_RANGE => _('In range'),
+				ZBX_PREPROC_VALIDATE_REGEX => _('Matches regular expression'),
+				ZBX_PREPROC_VALIDATE_NOT_REGEX => _('Does not match regular expression'),
+				ZBX_PREPROC_ERROR_FIELD_JSON => _('Check for error in JSON'),
+				ZBX_PREPROC_ERROR_FIELD_XML => _('Check for error in XML'),
+				ZBX_PREPROC_ERROR_FIELD_REGEX => _('Check for error using regular expression')
+			]
+		],
+		[
+			'label' => _('Throttling'),
+			'types' => [
+				ZBX_PREPROC_THROTTLE_VALUE => _('Discard unchanged'),
+				ZBX_PREPROC_THROTTLE_TIMED_VALUE => _('Discard unchanged for less than N seconds')
 			]
 		]
 	];

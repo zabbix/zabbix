@@ -1324,7 +1324,7 @@ class CDiscoveryRule extends CItemGeneral {
 			],
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);

@@ -469,7 +469,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				],
 				'selectApplications' => ['applicationid'],
 				'selectApplicationPrototypes' => ['name'],
-				'selectPreprocessing' => ['type', 'params'],
+				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'itemids' => [$itemId]
 			]);
 
@@ -649,7 +649,7 @@ if (isset($_REQUEST['form'])) {
 				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
 				'verify_peer', 'verify_host', 'allow_traps'
 			],
-			'selectPreprocessing' => ['type', 'params']
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params']
 		]);
 		$itemPrototype = reset($itemPrototype);
 		foreach ($itemPrototype['preprocessing'] as &$step) {
