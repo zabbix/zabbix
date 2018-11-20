@@ -259,7 +259,8 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] === ZBX_LAYOUT_NORM
 			'alias' => CWebUser::$data['alias'],
 			'name' => CWebUser::$data['name'],
 			'surname' => CWebUser::$data['surname']
-		]
+		],
+		'support_url' => getSupportUrl(CWebUser::getLang())
 	]);
 	echo $pageMenu->getOutput();
 }
@@ -272,7 +273,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning

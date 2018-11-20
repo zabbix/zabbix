@@ -236,7 +236,14 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		$item_key_parser = new CItemKey();
-		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false, 'usermacros' => true]);
+		$ip_range_parser = new CIPRangeParser([
+			'v6' => ZBX_HAVE_IPV6,
+			'ranges' => false,
+			'usermacros' => true,
+			'macros' => [
+				'{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'
+			]
+		]);
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => (get_class($this) === 'CItemPrototype')
@@ -927,13 +934,13 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		foreach ($hostids_by_key as $key_ => $hostids) {
+		foreach ($hostids_by_key as $key_ => $key_hostids) {
 			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
 			$sql_join = ($class === 'CItemPrototype') ? ' JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid,i.master_itemid'.$sql_select.
 					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $hostids).
+					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
 						' AND '.dbConditionString('i.key_', [$key_])
 			);
 

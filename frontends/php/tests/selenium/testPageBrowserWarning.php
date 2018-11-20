@@ -19,9 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageBrowserWarning extends CWebTest {
+class testPageBrowserWarning extends CLegacyWebTest {
 
 	public function testPageBrowserWarning_CheckLayout() {
 		$this->zbxTestOpen('browserwarning.php');

@@ -869,7 +869,7 @@ if (in_array($resourceType, $resourcesWithHAlign)) {
 	$screenFormList->addRow(_('Horizontal align'),
 		(new CRadioButtonList('halign', (int) $halign))
 			->addValue(_('Left'), HALIGN_LEFT)
-			->addValue(_('Center'), HALIGN_CENTER)
+			->addValue(_('Centre'), HALIGN_CENTER)
 			->addValue(_('Right'), HALIGN_RIGHT)
 			->setModern(true)
 	);

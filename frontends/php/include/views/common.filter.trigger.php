@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/js/common.filter.trigger.js.php';
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = (new CFilter())
+$filterForm = (new CFilter((new CUrl('overview.php'))->setArgument('type', 0)))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addVar('groupid', $filter['groupId'])
@@ -54,7 +54,7 @@ $severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
-$column1->addRow(_('Minimum trigger severity'),
+$column1->addRow(_('Minimum severity'),
 	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 );
 

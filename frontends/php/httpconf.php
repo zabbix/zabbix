@@ -537,32 +537,6 @@ if (isset($_REQUEST['form'])) {
 	]);
 	$data['host'] = reset($host);
 
-	if (isset($data['httptestid'])) {
-		// get templates
-		$httpTestId = $data['httptestid'];
-		while ($httpTestId) {
-			$dbTest = DBfetch(DBselect(
-				'SELECT h.hostid,h.name,ht.httptestid,ht.templateid'.
-					' FROM hosts h,httptest ht'.
-					' WHERE ht.hostid=h.hostid'.
-					' AND ht.httptestid='.zbx_dbstr($httpTestId)
-			));
-			$httpTestId = null;
-
-			if (!empty($dbTest)) {
-				if (!idcmp($data['httptestid'], $dbTest['httptestid'])) {
-					$data['templates'][] = new CLink($dbTest['name'],
-						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']
-					);
-					$data['templates'][] = SPACE.'&rArr;'.SPACE;
-				}
-				$httpTestId = $dbTest['templateid'];
-			}
-		}
-		$data['templates'] = array_reverse($data['templates']);
-		array_shift($data['templates']);
-	}
-
 	if (hasRequest('httptestid') && !hasRequest('form_refresh')) {
 		$db_httptests = API::HttpTest()->get([
 			'output' => ['name', 'applicationid', 'delay', 'retries', 'status', 'agent', 'authentication',
@@ -583,6 +557,9 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
+			getHttpTestParentTemplates($db_httptests)
+		);
 
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
@@ -841,8 +818,7 @@ else {
 
 		order_result($httpTests, $sortField, $sortOrder);
 
-		$data['parentTemplates'] = getHttpTestsParentTemplates($httpTests);
-
+		$data['parent_templates'] = getHttpTestParentTemplates($httpTests);
 		$data['httpTests'] = $httpTests;
 		$data['httpTestsLastData'] = $httpTestsLastData;
 	}

@@ -319,7 +319,7 @@ if ($data['action'] == 'problem.view') {
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		]);
 
-	$filter = (new CFilter())
+	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())

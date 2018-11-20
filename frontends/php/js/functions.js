@@ -189,10 +189,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 /**
  * Validates and formats input element containing a part of date.
  *
- * @param object {obj}			input element value of which is being validated
- * @param int {min}				minimal allowed value (inclusive)
- * @param int {max}				maximum allowed value (inclusive)
- * @param int {paddingSize}		number of zeroes used for padding
+ * @param object {obj}       Input element value of which is being validated.
+ * @param int {min}          Minimal allowed value (inclusive).
+ * @param int {max}          Maximum allowed value (inclusive).
+ * @param int {paddingSize}  Number of zeros used for padding.
  */
 function validateDatePartBox(obj, min, max, paddingSize) {
 	if (obj != null) {
@@ -200,11 +200,11 @@ function validateDatePartBox(obj, min, max, paddingSize) {
 		max = max ? max : 59;
 		paddingSize = paddingSize ? paddingSize : 2;
 
-		var paddingZeroes = [];
+		var paddingZeros = [];
 		for (var i = 0; i != paddingSize; i++) {
-			paddingZeroes.push('0');
+			paddingZeros.push('0');
 		}
-		paddingZeroes = paddingZeroes.join('');
+		paddingZeros = paddingZeros.join('');
 
 		var currentValue = obj.value.toString();
 
@@ -212,15 +212,15 @@ function validateDatePartBox(obj, min, max, paddingSize) {
 			var intValue = parseInt(currentValue, 10);
 
 			if (intValue < min || intValue > max) {
-				obj.value = paddingZeroes;
+				obj.value = paddingZeros;
 			}
 			else if (currentValue.length < paddingSize) {
-				var paddedValue = paddingZeroes + obj.value;
+				var paddedValue = paddingZeros + obj.value;
 				obj.value = paddedValue.substring(paddedValue.length - paddingSize);
 			}
 		}
 		else {
-			obj.value = paddingZeroes;
+			obj.value = paddingZeros;
 		}
 	}
 }
@@ -390,13 +390,13 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		}
 	}
 
-	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
-	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
+	var str = (years == 0) ? '' : years + t('S_YEAR_SHORT') + ' ';
+	str += (months == 0) ? '' : months + t('S_MONTH_SHORT') + ' ';
 	str += (isExtend && isTsDouble)
-		? days + locale['S_DAY_SHORT'] + ' '
-		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
-	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
+		? days + t('S_DAY_SHORT') + ' '
+		: ((days == 0) ? '' : days + t('S_DAY_SHORT') + ' ');
+	str += (hours == 0) ? '' : hours + t('S_HOUR_SHORT') + ' ';
+	str += (minutes == 0) ? '' : minutes + t('S_MINUTE_SHORT') + ' ';
 
 	return str;
 }
@@ -643,7 +643,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 		.append(
 			jQuery('<button>', {
 				class: 'overlay-close-btn',
-				title: t('Close')
+				title: t('S_CLOSE')
 			})
 				.click(function(e) {
 					jQuery('.overlay-bg[data-dialogueid="'+params.dialogueid+'"]').trigger('remove');

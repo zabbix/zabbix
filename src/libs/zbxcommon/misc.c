@@ -1644,7 +1644,7 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  * Purpose: finds daylight saving change time inside specified time period    *
  *                                                                            *
  * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the the time period end                      *
+ *             time_end   - [IN] the time period end                          *
  *                                                                            *
  * Return Value: Time when the daylight saving changes should occur.          *
  *                                                                            *
@@ -2117,7 +2117,7 @@ int	is_ip6(const char *ip)
 		{
 			if (0 == xdigits && 0 < colons)
 			{
-				/* consecutive sections of zeroes are replaced with a double colon */
+				/* consecutive sections of zeros are replaced with a double colon */
 				only_xdigits = 1;
 				dbl_colons++;
 			}
@@ -3511,4 +3511,29 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	*ptr = '\0';
 
 	return token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_env                                                   *
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] the time for compare in seconds                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();
+#endif
+	}
 }
