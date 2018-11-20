@@ -3012,8 +3012,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#fff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
-  background: linear-gradient(#fff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#fff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#fff 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(255, 255, 255, 0), #fff 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
   background-repeat: no-repeat;
   background-color: #fff;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -3621,15 +3621,17 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     border: 1px solid #888;
     background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
     cursor: pointer; }
-  .input-color-picker input[readonly] + div, .input-color-picker input:disabled + div {
-    cursor: default; }
+  .input-color-picker input[readonly],
+  .input-color-picker input:disabled {
+    color: #9f9f9f !important; }
+    .input-color-picker input[readonly] + div,
+    .input-color-picker input:disabled + div {
+      cursor: default; }
+  .input-color-picker input:disabled + div {
+    background: #9f9f9f !important;
+    border: 1px solid #9f9f9f; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
-  .input-color-picker.disabled {
-    opacity: 1; }
-    .input-color-picker.disabled div {
-      background: #9f9f9f !important;
-      border: 1px solid #9f9f9f; }
 
 .in-progress {
   position: relative; }
@@ -4815,7 +4817,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     border-left: none; }
 
 .na-bg, .log-na-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .na-bg a.link-action {
   color: #555; }
@@ -4847,7 +4849,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .normal-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .normal-bg a.link-action {
   color: #555; }
@@ -4875,7 +4877,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .info-bg, .log-info-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .info-bg a.link-action {
   color: #555; }
@@ -4906,7 +4908,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .average-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .average-bg a.link-action {
   color: #555; }
@@ -4933,7 +4935,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .warning-bg, .log-warning-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .warning-bg a.link-action {
   color: #555; }
@@ -4964,7 +4966,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .high-bg, .log-high-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .high-bg a.link-action {
   color: #555; }
@@ -4995,7 +4997,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   content: none; }
 
 .disaster-bg, .log-disaster-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .disaster-bg a.link-action {
   color: #555; }
@@ -5047,7 +5049,7 @@ td.inactive-bg {
   color: #000; }
 
 .inactive-bg, td.inactive-bg {
-  background-color: rgba(0, 0, 0, 0) !important; }
+  background-color: transparent !important; }
 
 .inactive-bg:before {
   content: "";

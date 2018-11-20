@@ -5238,21 +5238,22 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
-	input[readonly] + div, input:disabled + div {
-		cursor: default;
+	input[readonly],
+	input:disabled {
+		color: $form-disabled-font-color !important;
+
+		+ div {
+			cursor: default;
+		}
+	}
+
+	input:disabled + div {
+		background: $form-disabled-font-color !important;
+		border: 1px solid $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		div {
-			background: $form-disabled-font-color !important;
-			border: 1px solid $form-disabled-font-color;
-		}
 	}
 }
 
