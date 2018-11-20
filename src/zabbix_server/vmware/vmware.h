@@ -43,19 +43,28 @@
 
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
+typedef struct
+{
+	char		*name;
+	zbx_uint64_t	value;
+}
+zbx_str_uint64_pair_t;
+
+ZBX_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
+
 /* performance counter data */
 typedef struct
 {
 	/* the counter id */
-	zbx_uint64_t		counterid;
+	zbx_uint64_t			counterid;
 
 	/* the counter values for various instances */
-	/*    pair->first  - instance               */
-	/*    pair->second - value                  */
-	zbx_vector_ptr_pair_t	values;
+	/*    pair->name  - instance                */
+	/*    pair->value - value                   */
+	zbx_vector_str_uint64_pair_t	values;
 
 	/* the counter state, see ZBX_VMAWRE_COUNTER_* defines */
-	unsigned char		state;
+	unsigned char			state;
 }
 zbx_vmware_perf_counter_t;
 

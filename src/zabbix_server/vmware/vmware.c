@@ -34,6 +34,7 @@
 #include "zbxself.h"
 
 #include "vmware.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -105,6 +106,8 @@ static zbx_vmware_t	*vmware = NULL;
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS	64
 #define ZBX_MAXQUERYMETRICS_UNLIMITED	1000
 
+ZBX_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
+
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
 {
@@ -143,7 +146,7 @@ typedef struct
 {
 	zbx_uint64_t	counterid;
 	char		*instance;
-	char		*value;
+	zbx_uint64_t	value;
 }
 zbx_vmware_perf_value_t;
 
@@ -519,7 +522,6 @@ static int	vmware_perf_entity_compare_func(const void *d1, const void *d2)
 static void	vmware_free_perfvalue(zbx_vmware_perf_value_t *value)
 {
 	zbx_free(value->instance);
-	zbx_free(value->value);
 	zbx_free(value);
 }
 
@@ -629,7 +631,7 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_vector_ptr_pair_shared_clean                              *
+ * Function: vmware_vector_str_uint64_pair_shared_clean                       *
  *                                                                            *
  * Purpose: frees shared resources allocated to store instance performance    *
  *          counter values                                                    *
@@ -637,18 +639,16 @@ static void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr
  * Parameters: pairs - [IN] vector of performance counter pairs               *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_vector_ptr_pair_shared_clean(zbx_vector_ptr_pair_t *pairs)
+static void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pairs)
 {
 	int	i;
 
 	for (i = 0; i < pairs->values_num; i++)
 	{
-		zbx_ptr_pair_t	*pair = &pairs->values[i];
+		zbx_str_uint64_pair_t	*pair = &pairs->values[i];
 
-		if (NULL != pair->first)
-			vmware_shared_strfree(pair->first);
-
-		vmware_shared_strfree(pair->second);
+		if (NULL != pair->name)
+			vmware_shared_strfree(pair->name);
 	}
 
 	pairs->values_num = 0;
@@ -666,8 +666,8 @@ static void	vmware_vector_ptr_pair_shared_clean(zbx_vector_ptr_pair_t *pairs)
  ******************************************************************************/
 static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
 {
-	vmware_vector_ptr_pair_shared_clean(&counter->values);
-	zbx_vector_ptr_pair_destroy(&counter->values);
+	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
+	zbx_vector_str_uint64_pair_destroy(&counter->values);
 	__vm_mem_free_func(counter);
 }
 
@@ -692,7 +692,7 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 		for (i = 0; i < entity->counters.values_num; i++)
 		{
 			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
-			vmware_vector_ptr_pair_shared_clean(&counter->values);
+			vmware_vector_str_uint64_pair_shared_clean(&counter->values);
 
 			if (0 != (counter->state & ZBX_VMWARE_COUNTER_UPDATING))
 				counter->state = ZBX_VMWARE_COUNTER_READY;
@@ -3657,7 +3657,7 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
 	counter->counterid = counterid;
 	counter->state = ZBX_VMWARE_COUNTER_NEW;
 
-	zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
+	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
 			__vm_mem_free_func);
 
 	zbx_vector_ptr_append(counters, counter);
@@ -4033,15 +4033,16 @@ static int	vmware_service_process_perf_entity_data(zbx_vector_ptr_t *pervalues, 
 
 			ZBX_STR2UINT64(perfvalue->counterid, counter);
 			perfvalue->instance = (NULL != instance ? instance : zbx_strdup(NULL, ""));
-			perfvalue->value = value;
+
+			if (0 == strcmp(value, "-1") || SUCCEED != is_uint64(value, &perfvalue->value))
+				perfvalue->value = UINT64_MAX;
+			else if (FAIL == ret)
+				ret = SUCCEED;
 
 			zbx_vector_ptr_append(pervalues, perfvalue);
 
-			if (FAIL == ret && 0 != strcmp(value, "-1"))
-				ret = SUCCEED;
-
 			instance = NULL;
-			value = NULL;
+			values++;
 		}
 
 		zbx_free(counter);
@@ -4172,7 +4173,7 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vec
 	zbx_vmware_perf_value_t		*value;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
-	zbx_ptr_pair_t			perfvalue;
+	zbx_str_uint64_pair_t		perfvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -4201,10 +4202,10 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vec
 
 			perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[index];
 
-			perfvalue.first = vmware_shared_strdup(value->instance);
-			perfvalue.second = vmware_shared_strdup(value->value);
+			perfvalue.name = vmware_shared_strdup(value->instance);
+			perfvalue.value = value->value;
 
-			zbx_vector_ptr_pair_append_ptr(&perfcounter->values, &perfvalue);
+			zbx_vector_str_uint64_pair_append_ptr(&perfcounter->values, &perfvalue);
 		}
 	}
 
