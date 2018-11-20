@@ -347,7 +347,8 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'groupids_'
+								'dstfld1' => 'groupids_',
+								'real_hosts' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
