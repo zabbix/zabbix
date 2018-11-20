@@ -130,6 +130,16 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get message of form in overlay dialog.
+	 *
+	 * @return CMessageElement
+	 */
+	public function getOverlayMessage() {
+		return $this->parents('class:overlay-dialogue-body')->one()
+				->query('tag:output')->waitUntilPresent()->asMessage()->one();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function submit() {
