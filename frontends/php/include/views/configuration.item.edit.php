@@ -974,16 +974,18 @@ foreach ($data['preprocessing'] as $i => $step) {
 	$params = [];
 
 	// Create a primary param text box, so it can be hidden if necessary.
-	$params[] = (new CTextBox('preprocessing['.$i.'][params][0]',
-		array_key_exists('params', $step) ? $step['params'][0] : ''
-	))->setReadonly($readonly);
+	$step_param_0 = array_key_exists('params', $step) ? $step['params'][0] : '';
+	$params[] = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0))
+		->setTitle($step_param_0)
+		->setReadonly($readonly);
 
 	// Create a secondary param text box, so it can be hidden if necessary.
-	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]',
-		(array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+	$step_param_1 = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 			? $step['params'][1]
-			: ''
-	))->setReadonly($readonly);
+			: '';
+	$params[] = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1))
+		->setTitle($step_param_1)
+		->setReadonly($readonly);
 
 	// Add corresponding placeholders and show or hide text boxes.
 	switch ($step['type']) {
@@ -1075,7 +1077,9 @@ foreach ($data['preprocessing'] as $i => $step) {
 		->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
 		->setModern(true);
 
-	$error_handler_params = new CTextBox('preprocessing['.$i.'][error_handler_params]', $step['error_handler_params']);
+	$error_handler_params = (new CTextBox('preprocessing['.$i.'][error_handler_params]',
+		$step['error_handler_params'])
+	)->setTitle($step['error_handler_params']);
 
 	if ($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT) {
 		$error_handler->setEnabled(false);

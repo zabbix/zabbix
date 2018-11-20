@@ -254,6 +254,9 @@
 							break;
 					}
 				})
+				.on('change', 'input[name*="params"]', function() {
+					$(this).attr('title', $(this).val());
+				})
 				.on('change', 'input[name*="on_fail"]', function() {
 					var on_fail_options = $(this).closest('.preprocessing-list-item').find('.on-fail-options');
 
@@ -266,7 +269,7 @@
 						on_fail_options.find('input').prop('disabled', true);
 					}
 				})
-				.on('change', 'input[name*="error_handler"]', function() {
+				.on('change', 'input[name*="error_handler]"]', function() {
 					var error_handler = $(this).val(),
 						error_handler_params = $(this).closest('.on-fail-options').find('[name*="error_handler_params"]');
 
