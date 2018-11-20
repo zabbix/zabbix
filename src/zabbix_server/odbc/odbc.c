@@ -616,6 +616,7 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 				value = zbx_strdup(value, row[i]);
 				zbx_replace_invalid_utf8(value);
 			}
+
 			zbx_json_addstring(&json, macros.values[i], value, ZBX_JSON_TYPE_STRING);
 			zbx_free(value);
 		}
