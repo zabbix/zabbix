@@ -1891,7 +1891,7 @@ int	zbx_validate_interval(const char *str, char **error)
 
 			custom = 1;
 
-			if ('{' == *str)
+			if (SUCCEED == macro)
 				interval = 1;
 
 			if (0 == interval && 0 == simple_interval)
