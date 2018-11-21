@@ -826,19 +826,24 @@ abstract class CItemGeneral extends CApiService {
 
 		// Save the new items.
 		if ($ins_items) {
+			if ($this instanceof CItem || $this instanceof CItemPrototype) {
+				$ins_items = $this->inheritDependentItems($ins_items);
+				$this->validateDependentItems($ins_items, get_class($this).'::create');
+			}
+
 			$this->createReal($ins_items);
 		}
 
 		if ($upd_items) {
+			if ($this instanceof CItem || $this instanceof CItemPrototype) {
+				$upd_items = $this->inheritDependentItems($upd_items);
+				$this->validateDependentItems($upd_items, get_class($this).'::update');
+			}
+
 			$this->updateReal($upd_items);
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);
-
-		if ($this instanceof CItem || $this instanceof CItemPrototype) {
-			$new_items = $this->inheritDependentItems($new_items);
-			$this->validateDependentItems($new_items, __METHOD__);
-		}
 
 		// Inheriting items from the templates.
 		$tpl_items = DBselect(
@@ -1781,6 +1786,8 @@ abstract class CItemGeneral extends CApiService {
 	 * Synchronize dependent item to master item relation for inherited items.
 	 *
 	 * @param array $items  Array of inherited items.
+	 *
+	 * @return array an array of synchronized inherited items.
 	 */
 	protected function inheritDependentItems(array $items) {
 		$master_itemids = [];
@@ -1798,7 +1805,6 @@ abstract class CItemGeneral extends CApiService {
 				'preservekeys' => true
 			]);
 
-			$data = [];
 			$host_master_items = [];
 
 			foreach ($items as &$item) {
@@ -1822,18 +1828,10 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
-					$data[] = [
-						'values' => ['master_itemid' => $inherited_master_item['itemid']],
-						'where' => ['itemid' => $item['itemid']]
-					];
 					$item['master_itemid'] = $inherited_master_item['itemid'];
 				}
 			}
 			unset($item);
-
-			if ($data) {
-				DB::update('items', $data);
-			}
 		}
 
 		return $items;
