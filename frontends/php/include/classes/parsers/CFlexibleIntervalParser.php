@@ -26,6 +26,7 @@ class CFlexibleIntervalParser extends CParser {
 
 	private $simple_interval_parser;
 	private $time_period_parser;
+	private $matched_parts;
 
 	private $options = [
 		'usermacros' => false,
@@ -63,10 +64,12 @@ class CFlexibleIntervalParser extends CParser {
 		$this->match = '';
 
 		$p = $pos;
+		$this->matched_parts = [];
 
 		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
+		$this->matched_parts[] = $this->simple_interval_parser->getMatch();
 		$p += $this->simple_interval_parser->getLength();
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
@@ -77,11 +80,21 @@ class CFlexibleIntervalParser extends CParser {
 		if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
+		$this->matched_parts[] = $this->time_period_parser->getMatch();
 		$p += $this->time_period_parser->getLength();
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
 		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	/**
+	 * Returns matched user and LLD macros.
+	 *
+	 * @return array
+	 */
+	public function getMatchedParts() {
+		return $this->matched_parts;
 	}
 }

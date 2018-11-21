@@ -1220,10 +1220,9 @@ function getItemFormData(array $item = [], array $options = []) {
 
 				foreach ($update_interval_parser->getIntervals() as $interval) {
 					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-						$interval_parts = explode('/', $interval['interval']);
 						$data['delay_flex'][] = [
-							'delay' => $interval_parts[0],
-							'period' => $interval_parts[1],
+							'delay' => $interval['parts'][0],
+							'period' => $interval['parts'][1],
 							'type' => ITEM_DELAY_FLEXIBLE
 						];
 					}
