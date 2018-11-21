@@ -208,6 +208,7 @@ typedef struct
 	const zbx_lld_row_t	*lld_row;
 	zbx_vector_ptr_t	preproc_ops;
 	zbx_vector_ptr_t	dependent_items;
+	unsigned char		type;
 }
 zbx_lld_item_t;
 
@@ -642,6 +643,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		item->key_orig = NULL;
 		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
+		item->type = item_prototype->type;
 		if ((unsigned char)atoi(row[6]) != item_prototype->type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
 
@@ -875,6 +877,33 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_user_macro                                                    *
+ *                                                                            *
+ * Purpose: checks if string is user macro                                    *
+ *                                                                            *
+ * Parameters: str - [IN] string to validate                                  *
+ *                                                                            *
+ * Returns: SUCCEED - either "{$MACRO}" or "{$MACRO:"{#MACRO}"}"              *
+ *          FAIL    - not user macro or contains other characters for example:*
+ *                    "dummy{$MACRO}", "{$MACRO}dummy" or "{$MACRO}{$MACRO}"  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_user_macro(const char *str)
+{
+	zbx_token_t	token;
+
+	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC) ||
+			0 == (token.type & ZBX_TOKEN_USER_MACRO) ||
+			0 != token.loc.l || '\0' != str[token.loc.r + 1])
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_validate_item_field                                          *
  *                                                                            *
  ******************************************************************************/
@@ -884,8 +913,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return;
 
-	/* only new items or items with changed data will be validated */
-	if (0 != item->itemid && 0 == (item->flags & flag))
+	/* only new items or items with changed data or item type will be validated */
+	if (0 != item->itemid && 0 == (item->flags & flag) && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
 		return;
 
 	if (SUCCEED != zbx_is_utf8(*field))
@@ -899,13 +928,73 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
 				(0 != item->itemid ? "update" : "create"), *field);
 	}
-	else if (ZBX_FLAG_LLD_ITEM_UPDATE_NAME == flag && '\0' == **field)
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
-				(0 != item->itemid ? "update" : "create"));
-	}
 	else
-		return;
+	{
+		int	value;
+		char	*errmsg = NULL;
+
+		switch (flag)
+		{
+			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
+				if ('\0' != **field)
+					return;
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
+						(0 != item->itemid ? "update" : "create"));
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
+				switch (item->type)
+				{
+					case ITEM_TYPE_TRAPPER:
+					case ITEM_TYPE_SNMPTRAP:
+					case ITEM_TYPE_DEPENDENT:
+						return;
+				}
+
+				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
+					return;
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
+						(0 != item->itemid ? "update" : "create"), errmsg);
+				zbx_free(errmsg);
+
+				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
+				if (0 != item->itemid)
+				{
+					item->flags &= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+					return;
+				}
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY:
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				{
+					return;
+				}
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				break;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
+				if (SUCCEED == is_user_macro(*field))
+					return;
+
+				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
+						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				{
+					return;
+				}
+
+				*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				break;
+			default:
+				return;
+		}
+	}
 
 	if (0 != item->itemid)
 		lld_field_str_rollback(field, field_orig, &item->flags, flag);
@@ -1696,6 +1785,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	item->parent_itemid = item_prototype->itemid;
 	item->lastcheck = 0;
 	item->ts_delete = 0;
+	item->type = item_prototype->type;
 	item->key_proto = NULL;
 	item->master_itemid = item_prototype->master_itemid;
 

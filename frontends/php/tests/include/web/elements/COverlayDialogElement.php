@@ -53,7 +53,7 @@ class COverlayDialogElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('class:overlay-dialogue-body')->one();
+		return $this->query('class:overlay-dialogue-body')->waitUntilPresent()->one();
 	}
 
 	/**
