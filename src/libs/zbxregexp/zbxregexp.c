@@ -216,8 +216,10 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	{
-		if(NULL != matches)
-			memcpy(matches, ovector, (size_t)count * sizeof(zbx_regmatch_t));
+		if (NULL != matches && 0 < r)
+		{
+			memcpy(matches, ovector, (size_t)MIN(r, count) * sizeof(zbx_regmatch_t));
+		}
 
 		result = ZBX_REGEXP_MATCH;
 	}
@@ -290,7 +292,7 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
 static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
 	char		*c = NULL;
-	zbx_regmatch_t	match;
+	zbx_regmatch_t	match = { -1, -1 }; 	/* -1 is special pcre value for unused patterns */
 	zbx_regexp_t	*regexp = NULL;
 	const char*	error = NULL;
 
@@ -440,6 +442,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 	const char	*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
 	zbx_regmatch_t	 match[ZBX_REGEXP_GROUPS_MAX];
+	int	i;
 
 	if (NULL == string)
 	{
@@ -457,6 +460,10 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		return FAIL;
 
 	zbx_free(*out);
+
+	/* -1 is special pcre value for unused patterns */
+	for (i = 0; i < ARRSIZE(match); i++)
+		match[i].rm_so = match[i].rm_eo = -1;
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX);
@@ -496,8 +503,13 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 		char **out)
 {
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
+	int	i;
 
 	zbx_free(*out);
+
+	/* -1 is special pcre value for unused patterns */
+	for (i = 0; i < ARRSIZE(match); i++)
+		match[i].rm_so = match[i].rm_eo = -1;
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match))
 	{
