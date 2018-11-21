@@ -1725,7 +1725,6 @@ abstract class CItemGeneral extends CApiService {
 		foreach (array_keys($root_items) as $root_itemid) {
 			$dependency_level = 0;
 			$find_itemids = [$root_itemid => $dependency_level];
-			$find_itemprototypeids = [];
 
 			$items_count = array_key_exists($root_itemid, $items_created)
 				? $items_created[$root_itemid]
@@ -1749,15 +1748,11 @@ abstract class CItemGeneral extends CApiService {
 					$find_itemids += $items_added[$root_itemid][$dependency_level];
 				}
 
-				$options = [
+				$find_itemids = DB::select('items', [
 					'output' => ['itemid'],
 					'filter' => ['master_itemid' => array_keys($find_itemids)],
 					'preservekeys' => true
-				];
-				$find_itemids = API::Item()->get($options);
-
-				$find_itemprototypeids += API::ItemPrototype()->get($options);
-				$find_itemids += $find_itemprototypeids;
+				]);
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
 				$items_count = $items_count + count(array_diff_key($find_itemids, $find_itemprototypeids));
