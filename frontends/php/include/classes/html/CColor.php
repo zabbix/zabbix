@@ -102,10 +102,6 @@ class CColor extends CDiv {
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		if (!$this->is_enabled) {
-			$this->addClass(ZBX_STYLE_DISABLED);
-		}
-
 		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
 
 		return parent::toString($destroy).$init_script;
