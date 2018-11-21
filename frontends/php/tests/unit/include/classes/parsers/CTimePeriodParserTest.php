@@ -97,6 +97,27 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
 				]
 			],
+			[
+				'{$M: "macros context"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "macros context"}'
+				]
+			],
+			[
+				'{$M: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: ";"}'
+				]
+			],
+			[
+				'{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "/"}'
+				]
+			],
 			// partial success
 			[
 				'random text.....1-7,00:00-00:01....text', 16, [],
@@ -404,6 +425,27 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "macros context"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: ";"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

@@ -762,6 +762,27 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
 				]
 			],
+			[
+				'{$M: "macros context"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "macros context"}'
+				]
+			],
+			[
+				'{$M: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: ";"}'
+				]
+			],
+			[
+				'{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "/"}'
+				]
+			],
 			// partial success
 			[
 				'random text.....md01-31....text', 16, [],
@@ -1900,6 +1921,27 @@ class CSchedulingIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				's23-15/1', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "macros context"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: ";"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

@@ -43,7 +43,11 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '0;5m/1-5,09:00-18:00;wd6-7h9',
 					'delay' => '0',
 					'intervals' => [
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '5m/1-5,09:00-18:00'],
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '5m/1-5,09:00-18:00',
+							'parts' => ['5m', '1-5,09:00-18:00']
+						],
 						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'wd6-7h9']
 					]
 				]
@@ -68,7 +72,8 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'intervals' => [
 						[
 							'type' => ITEM_DELAY_FLEXIBLE,
-							'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+							'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
+							'parts' => ['{$FLEXIBLE_INTERVAL_DELAY}', '{$FLEXIBLE_INTERVAL_PERIOD}']
 						],
 						[
 							'type' => ITEM_DELAY_SCHEDULING,
@@ -85,7 +90,11 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'delay' => '0',
 					'intervals' => [
 						['type' => ITEM_DELAY_SCHEDULING, 'interval' => '{$UPDATE_AT_NINE_A_M}'],
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}']
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '{$UPDATE_EVERY_TEN_MINUTES}/{$ON_MONDAYS}',
+							'parts' => ['{$UPDATE_EVERY_TEN_MINUTES}', '{$ON_MONDAYS}']
+						]
 					]
 				]
 			],
@@ -100,7 +109,8 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'intervals' => [
 						[
 							'type' => ITEM_DELAY_FLEXIBLE,
-							'interval' => '{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD}'
+							'interval' => '{#FLEXIBLE_INTERVAL_DELAY}/{#FLEXIBLE_INTERVAL_PERIOD}',
+							'parts' => ['{#FLEXIBLE_INTERVAL_DELAY}', '{#FLEXIBLE_INTERVAL_PERIOD}']
 						],
 						[
 							'type' => ITEM_DELAY_SCHEDULING,
@@ -127,11 +137,30 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 							'type' => ITEM_DELAY_FLEXIBLE,
 							'interval' =>
 								'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}/'.
+								'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")}',
+							'parts' => [
+								'{{#FLEXIBLE_INTERVAL_DELAY}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_DELAY}: \1")}',
 								'{{#FLEXIBLE_INTERVAL_PERIOD}.regsub("^([0-9]+)", "{#FLEXIBLE_INTERVAL_PERIOD}: \1")}'
+							]
 						],
 						[
 							'type' => ITEM_DELAY_SCHEDULING,
 							'interval' => '{{#SCHEDULING_INTERVAL}.regsub("^([0-9]+)", "{#SCHEDULING_INTERVAL}: \1")}'
+						]
+					]
+				]
+			],
+			[
+				'0;{$M: ";"}/{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '0;{$M: ";"}/{$M: "/"}',
+					'delay' => '0',
+					'intervals' => [
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '{$M: ";"}/{$M: "/"}',
+							'parts' => ['{$M: ";"}', '{$M: "/"}']
 						]
 					]
 				]
@@ -173,8 +202,16 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '30m;5h/1-7,09:00-18:00;600s/7-7,00:00-18:00;md30;wd5;md1-31h18m59s59',
 					'delay' => '30m',
 					'intervals' => [
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '5h/1-7,09:00-18:00'],
-						['type' => ITEM_DELAY_FLEXIBLE, 'interval' => '600s/7-7,00:00-18:00'],
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '5h/1-7,09:00-18:00',
+							'parts' => ['5h', '1-7,09:00-18:00']
+						],
+						[
+							'type' => ITEM_DELAY_FLEXIBLE,
+							'interval' => '600s/7-7,00:00-18:00',
+							'parts' => ['600s', '7-7,00:00-18:00']
+						],
 						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md30'],
 						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'wd5'],
 						['type' => ITEM_DELAY_SCHEDULING, 'interval' => 'md1-31h18m59s59']
@@ -270,7 +307,8 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'delay' => '{$SIMPLE_INTERVAL}',
 					'intervals' => [[
 						'type' => ITEM_DELAY_FLEXIBLE,
-						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
+						'parts' => ['{$FLEXIBLE_INTERVAL_DELAY}', '{$FLEXIBLE_INTERVAL_PERIOD}']
 					]]
 				]
 			],
@@ -285,7 +323,8 @@ class CUpdateIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'delay' => '{$SIMPLE_INTERVAL}',
 					'intervals' => [[
 						'type' => ITEM_DELAY_FLEXIBLE,
-						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}'
+						'interval' => '{$FLEXIBLE_INTERVAL_DELAY}/{$FLEXIBLE_INTERVAL_PERIOD}',
+						'parts' => ['{$FLEXIBLE_INTERVAL_DELAY}', '{$FLEXIBLE_INTERVAL_PERIOD}']
 					]]
 				]
 			],

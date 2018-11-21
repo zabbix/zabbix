@@ -118,6 +118,27 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 					'match' => '-3600'
 				]
 			],
+			[
+				'{$M: "macros context"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "macros context"}'
+				]
+			],
+			[
+				'{$M: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: ";"}'
+				]
+			],
+			[
+				'{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "/"}'
+				]
+			],
 			// partial success
 			[
 				'02', 0, [],
@@ -264,6 +285,27 @@ class CSimpleIntervalParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "macros context"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: ";"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
