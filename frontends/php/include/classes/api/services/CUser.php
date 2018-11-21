@@ -1157,9 +1157,70 @@ class CUser extends CApiService {
 			$config['authentication_type'], true
 		);
 
-		// Check if user is blocked.
+		// Set massage if user is blocked.
+		if (!$this->UserIsBlocked($db_user)) {
+			try {
+				switch ($group_to_auth_map[$db_user['gui_access']]) {
+					case ZBX_AUTH_LDAP:
+						$this->ldapLogin($user);
+						break;
+
+					case ZBX_AUTH_INTERNAL:
+						if (md5($user['password']) !== $db_user['passwd']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+						}
+						break;
+
+					default:
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+						break;
+				}
+			}
+			catch (APIException $e) {
+				DB::update('users', [
+					'values' => [
+						'attempt_failed' => ++$db_user['attempt_failed'],
+						'attempt_clock' => time(),
+						'attempt_ip' => $db_user['userip']
+					],
+					'where' => ['userid' => $db_user['userid']]
+				]);
+
+				// Check if user is blocked.
+				if (!$this->UserIsBlocked($db_user, true)) {
+					$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
+						$db_user['userip']
+					);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
+				}
+			}
+		}
+
+		// Start session.
+		unset($db_user['passwd']);
+		$db_user = $this->createSession($user, $db_user);
+		self::$userData = $db_user;
+
+		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
+
+		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+	}
+
+	/**
+	 * Check if user is blocked.
+	 *
+	 * @param array		$db_user		User info array.
+	 * @param boolean	$first_bloker	True if the first actuation of the block process.
+	 *
+	 * @throws Exception if account is blocked.
+	 *
+	 * @return boolean
+	 */
+	private function UserIsBlocked(array $db_user, $first_bloker = false) {
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$time_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+
+			$time_left = $first_bloker ? ZBX_LOGIN_BLOCK : ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
 
 			if ($time_left > 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1171,50 +1232,10 @@ class CUser extends CApiService {
 				'values' => ['attempt_clock' => time()],
 				'where' => ['userid' => $db_user['userid']]
 			]);
+			return true;
 		}
 
-		try {
-			switch ($group_to_auth_map[$db_user['gui_access']]) {
-				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
-					break;
-
-				case ZBX_AUTH_INTERNAL:
-					if (md5($user['password']) !== $db_user['passwd']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
-					}
-					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
-					break;
-			}
-		}
-		catch (APIException $e) {
-			DB::update('users', [
-				'values' => [
-					'attempt_failed' => ++$db_user['attempt_failed'],
-					'attempt_clock' => time(),
-					'attempt_ip' => $db_user['userip']
-				],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-
-			$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
-				$db_user['userip']
-			);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
-		}
-
-		// Start session.
-		unset($db_user['passwd']);
-		$db_user = $this->createSession($user, $db_user);
-		self::$userData = $db_user;
-
-		$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER);
-
-		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+		return false;
 	}
 
 	/**
