@@ -34,19 +34,19 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost'
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com'
 				]
 			],
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'STARTTLS',
 					'smtp_authentication' => 'Username and password'
 				]
@@ -54,11 +54,22 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'SSL/TLS'
+				]
+			],
+			[
+				[
+					'type' => 'Email',
+					'smtp_server' => 'mail.example.com',
+					'smtp_port' => 25,
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
+					'smtp_security' => 'SSL/TLS',
+					'message_format' => 'HTML'
 				]
 			],
 			[
@@ -99,7 +110,8 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email', 'Connection security', 'Authentication']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
+			'Connection security', 'Authentication', 'Message format']);
 
 		$this->zbxTestAssertElementPresentId('description');
 		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
@@ -170,6 +182,11 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					$this->assertTrue($this->zbxTestCheckboxSelected('smtp_authentication_0'));
 					$this->zbxTestAssertNotVisibleId('smtp_username');
 					$this->zbxTestAssertNotVisibleId('passwd');
+				}
+
+				if (array_key_exists('message_format', $data)) {
+					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_0'));
 				}
 				break;
 			case 'Script':
@@ -557,7 +574,15 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'interval' => '50s',
 					'dbCheck' => true
 				]
-			]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Email',
+					'name' => 'Email via Plain text',
+					'message_format' => 'Plain text'
+				]
+			],
 		];
 	}
 
@@ -580,6 +605,10 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		if (array_key_exists('passwd', $data)){
 			$this->zbxTestInputType('passwd', $data['passwd']);
+		}
+
+		if (array_key_exists('message_format', $data)){
+			$this->zbxTestClick('content_type_1');
 		}
 
 		$this->zbxTestTabSwitch('Options');
