@@ -35,20 +35,21 @@ function getMenuPopupHistory(options) {
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
+		url.setArgument('to', 'now');
 
-		url.setArgument('period', '3600');
+		url.setArgument('from', 'now-1h');
 		items.push({
 			label: t('Last hour graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '604800');
+		url.setArgument('from', 'now-7d');
 		items.push({
 			label: t('Last week graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '2678400');
+		url.setArgument('from', 'now-1M');
 		items.push({
 			label: t('Last month graph'),
 			url: url.getUrl()
@@ -57,7 +58,7 @@ function getMenuPopupHistory(options) {
 
 	// latest values
 	url.setArgument('action', 'showvalues');
-	url.setArgument('period', '3600');
+	url.setArgument('from', 'now-1h');
 	items.push({
 		label: t('Latest values'),
 		url: url.getUrl()

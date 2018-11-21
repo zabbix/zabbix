@@ -48,8 +48,8 @@ jQuery(function ($){
 		xhr = null,
 		endpoint = new Curl('zabbix.php'),
 		element = {
-			from: container.find('#from'),
-			to: container.find('#to'),
+			from: container.find('[name=from]'),
+			to: container.find('[name=to]'),
 			from_clndr: container.find('[name=from_calendar]'),
 			to_clndr: container.find('[name=to_calendar]'),
 			apply: container.find('[name=apply]'),
@@ -60,11 +60,12 @@ jQuery(function ($){
 			label: container.find('.btn-time')
 		},
 		request_data = {
-			idx: container.length ? container.data()['profileIdx'] : '',
-			idx2: container.length ? container.data()['profileIdx2'] : 0,
+			idx: container.data('profileIdx'),
+			idx2: container.data('profileIdx2'),
 			from: element.from.val(),
 			to: element.to.val()
 		},
+		ui_accessible = (container.data('accessible') == 1),
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
@@ -136,6 +137,10 @@ jQuery(function ($){
 	 * @param {object} data Server response on 'timeselector.rangechange' request.
 	 */
 	function updateTimeSelectorUI(data) {
+		if (!ui_accessible) {
+			return;
+		}
+
 		if ('error' in data === false) {
 			element.from.val(data.from);
 			element.to.val(data.to);
@@ -170,6 +175,10 @@ jQuery(function ($){
 	 * Disable time selector UI.
 	 */
 	function disableTimeSelectorUI() {
+		if (!ui_accessible) {
+			return;
+		}
+
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
 		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
@@ -306,7 +315,6 @@ jQuery(function ($){
 
 	// Time selection box for graphs.
 	var selection = null,
-		anchor = null,
 		noclick_area = null,
 		was_dragged = false,
 		prevent_click = false;
@@ -676,7 +684,7 @@ var timeControl = {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
 				obj.loadSBox = 0;
-				jQuery('#'+obj.id).data('zbx_sbox', null);
+				jQuery('#'+obj.id).removeData('zbx_sbox');
 			}
 		});
 	},

@@ -34,6 +34,7 @@ $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
@@ -175,7 +176,7 @@ $mediatype_formlist
 			->setModern(true)
 	)
 	->addRow(_('Enabled'),
-		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 

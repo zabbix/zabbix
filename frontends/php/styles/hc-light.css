@@ -988,9 +988,6 @@ output {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
-.hidden {
-  display: none !important; }
-
 .multiselect-wrapper {
   position: relative;
   vertical-align: top;
@@ -1314,6 +1311,8 @@ textarea {
   overflow: auto; }
   textarea[readonly] {
     color: #000 !important; }
+    textarea[readonly]:focus {
+      border-color: #000; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -1889,7 +1888,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border-color: #999;
   cursor: default; }
 
-.radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #9f9f9f;
   background-color: #f0f0f0 !important;
   border-color: #9f9f9f; }
