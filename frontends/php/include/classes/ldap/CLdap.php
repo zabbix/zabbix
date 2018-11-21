@@ -162,7 +162,7 @@ class CLdap {
 		// try to bind to with the dn if we have one.
 		if ($dn) {
 			// user/password bind
-			if (!ldap_bind($this->ds, $dn, $pass)) {
+			if (!@ldap_bind($this->ds, $dn, $pass)) {
 				$this->error = static::ERR_BIND_FAILED;
 
 				return false;
@@ -226,8 +226,8 @@ class CLdap {
 		else {
 			$filter = '(ObjectClass=*)';
 		}
-		$sr = ldap_search($this->ds, $base, $filter);
-		$result = is_resource($sr) ? ldap_get_entries($this->ds, $sr) : [];
+		$sr = @ldap_search($this->ds, $base, $filter);
+		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
 		if (!$result || $result['count'] != 1) {
