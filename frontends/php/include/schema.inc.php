@@ -1862,6 +1862,12 @@ return [
 				'length' => 32,
 				'default' => '10s',
 			],
+			'content_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 		],
 	],
 	'usrgrp' => [

@@ -1,7 +1,7 @@
 Changes for 4.2.0alpha1
 
 New features:
-A.F....... [ZBXNEXT-4853] added ability to send email messages in HTML format on demand (vasilijs)
+A.F.....S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 Bug fixes:
