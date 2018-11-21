@@ -75,13 +75,13 @@ class CHistory extends CApiService {
 		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions']) ||
 				$options['hostids'] !== null) {
 			$items = API::Item()->get([
+				'output' => ['itemid'],
 				'itemids' => $options['itemids'],
 				'hostids' => $options['hostids'],
 				'nopermissions' => $options['nopermissions'],
-				'output' => ['itemid'],
 				'editable' => $options['editable'],
-				'preservekeys' => true,
-				'webitems' => true
+				'webitems' => true,
+				'preservekeys' => true
 			]);
 			$options['itemids'] = array_keys($items);
 		}
