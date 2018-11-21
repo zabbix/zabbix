@@ -73,8 +73,8 @@ class CLdapAuthValidator extends CValidator {
 			CLdap::ERR_USER_NOT_FOUND => _('Login name or password is incorrect.'),
 			CLdap::ERR_OPT_PROTOCOL_FAILED => _('Setting LDAP protocol failed.'),
 			CLdap::ERR_OPT_TLS_FAILED => _('Starting TLS failed.'),
-			CLdap::ERR_OPT_REFERRALS_FAILED => _('Setting LDAP referrals to off failed.'),
-			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP deref mode failed.')
+			CLdap::ERR_OPT_REFERRALS_FAILED => _('Setting LDAP referrals to "Off" failed.'),
+			CLdap::ERR_OPT_DEREF_FAILED => _('Setting LDAP dereferencing mode failed.')
 		];
 
 		return array_key_exists($error, $messages) ? $messages[$error] : '';
