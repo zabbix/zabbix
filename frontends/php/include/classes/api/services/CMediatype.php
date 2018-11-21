@@ -322,6 +322,25 @@ class CMediatype extends CApiService {
 							));
 						}
 					}
+
+					// Validate optional field 'content_type'.
+					if (array_key_exists('content_type', $mediatype)) {
+						$content_type_validator = new CLimitedSetValidator([
+							'values' => [
+								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
+								SMTP_MESSAGE_FORMAT_HTML
+							]
+						]);
+
+						if (!$content_type_validator->validate($mediatype['content_type'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['content_type'],
+								'content_type',
+								$mediatype['description']
+							));
+						}
+					}
 					break;
 
 				case MEDIA_TYPE_EXEC:
@@ -444,7 +463,8 @@ class CMediatype extends CApiService {
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval'
+				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
+				'content_type'
 			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -637,6 +657,26 @@ class CMediatype extends CApiService {
 							));
 						}
 					}
+
+					// Validate optional field 'content_type'.
+					if (array_key_exists('content_type', $mediatype)
+							&& $db_mediatype['content_type'] != $mediatype['content_type']) {
+						$content_type_validator = new CLimitedSetValidator([
+							'values' => [
+								SMTP_MESSAGE_FORMAT_PLAIN_TEXT,
+								SMTP_MESSAGE_FORMAT_HTML
+							]
+						]);
+
+						if (!$content_type_validator->validate($mediatype['content_type'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['content_type'],
+								'content_type',
+								$mediatype['description']
+							));
+						}
+					}
 					break;
 
 				case MEDIA_TYPE_EXEC:
@@ -754,6 +794,7 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
 	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
+	 * @param int		$mediatypes['content_type']			Message format
 	 * @param string	$mediatypes['exec_path']			script name/message text limit
 	 * @param string	$mediatypes['exec_params']			script parameters
 	 * @param string	$mediatypes['gsm_modem']			GSM modem
@@ -791,6 +832,7 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
 	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
+	 * @param int		$mediatypes['content_type']			Message format
 	 * @param string	$mediatypes['exec_path']			script name/message text limit
 	 * @param string	$mediatypes['exec_params']			script parameters
 	 * @param string	$mediatypes['gsm_modem']			GSM modem
