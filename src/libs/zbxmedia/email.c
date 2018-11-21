@@ -754,6 +754,7 @@ out:
 	ZBX_UNUSED(smtp_authentication);
 	ZBX_UNUSED(username);
 	ZBX_UNUSED(password);
+	ZBX_UNUSED(content_type);
 	ZBX_UNUSED(timeout);
 
 	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
