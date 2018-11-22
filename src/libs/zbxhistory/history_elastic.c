@@ -84,7 +84,7 @@ static void fetch_today(char *today){
     struct tm *lt;
     time(&t);
     lt = localtime(&t);
-    zbx_snprintf(today, sizeof(today) + 10, "%d.%d.%d", lt->tm_year+1900, lt->tm_mon, lt->tm_mday);
+    zbx_snprintf(today, sizeof(today) + 10, "%d.%d.%d", lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday);
 }
 
 
