@@ -126,7 +126,7 @@ static void	read_step(const char *path, zbx_preproc_op_t *op)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t			value, history_value;
+	zbx_variant_t			value, history_value, history_value_copy;
 	unsigned char			value_type;
 	zbx_timespec_t			ts, history_ts, expected_history_ts;
 	zbx_preproc_op_t		op;
@@ -148,6 +148,8 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.sec = 0;
 		history_ts.ns = 0;
 	}
+
+	history_value_copy = history_value;
 
 	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
@@ -194,6 +196,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_variant_clear(&value);
 	zbx_variant_clear(&history_value);
+	zbx_variant_clear(&history_value_copy);
 	zbx_free(error);
 
 }
