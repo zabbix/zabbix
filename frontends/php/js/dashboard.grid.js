@@ -1189,7 +1189,7 @@
 			}
 
 			data['pos-action'] = '';
-			data['add_widget_dimension'] = {};
+			data.add_widget_dimension = {};
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		}).on('mousedown', function(event) {
 			if (data['pos-action'] == '' && ($(event.target).is($obj)) || $(event.target).is(data.placeholder)) {
@@ -1198,12 +1198,13 @@
 			}
 		}).on('mouseleave', function() {
 			data['pos-action'] = '';
-			data['add_widget_dimension'] = {};
+			data.add_widget_dimension = {};
 			data.placeholder.hide();
 		}).on('mousemove', function(event) {
 			var drag = data['pos-action'] == 'add';
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.placeholder)) {
+				data.add_widget_dimension = {};
 				data.placeholder.hide();
 				return;
 			}
