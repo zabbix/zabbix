@@ -164,8 +164,8 @@
 					switch (type) {
 						case '<?= ZBX_PREPROC_MULTIPLIER ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('number')) ?>)
+								.show();
 							$(params[1]).hide();
 							break;
 
@@ -173,8 +173,8 @@
 						case '<?= ZBX_PREPROC_LTRIM ?>':
 						case '<?= ZBX_PREPROC_TRIM ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('list of characters')) ?>)
+								.show();
 							$(params[1]).hide();
 							break;
 
@@ -183,19 +183,19 @@
 						case '<?= ZBX_PREPROC_ERROR_FIELD_JSON ?>':
 						case '<?= ZBX_PREPROC_ERROR_FIELD_XML ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('path')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('path')) ?>)
+								.show();
 							$(params[1]).hide();
 							break;
 
 						case '<?= ZBX_PREPROC_REGSUB ?>':
 						case '<?= ZBX_PREPROC_ERROR_FIELD_REGEX ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>)
+								.show();
 							$(params[1])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('output')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('output')) ?>)
+								.show();
 							break;
 
 						case '<?= ZBX_PREPROC_BOOL2DEC ?>':
@@ -210,25 +210,25 @@
 
 						case '<?= ZBX_PREPROC_VALIDATE_RANGE ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('min')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('min')) ?>)
+								.show();
 							$(params[1])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('max')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('max')) ?>)
+								.show();
 							break;
 
 						case '<?= ZBX_PREPROC_VALIDATE_REGEX ?>':
 						case '<?= ZBX_PREPROC_VALIDATE_NOT_REGEX ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('pattern')) ?>)
+								.show();
 							$(params[1]).hide();
 							break;
 
 						case '<?= ZBX_PREPROC_THROTTLE_TIMED_VALUE ?>':
 							$(params[0])
-								.show()
-								.attr('placeholder', <?= CJs::encodeJson(_('seconds')) ?>);
+								.attr('placeholder', <?= CJs::encodeJson(_('seconds')) ?>)
+								.show();
 							$(params[1]).hide();
 							break;
 					}
@@ -261,12 +261,12 @@
 					var on_fail_options = $(this).closest('.preprocessing-list-item').find('.on-fail-options');
 
 					if ($(this).is(':checked')) {
-						on_fail_options.show();
 						on_fail_options.find('input').prop('disabled', false);
+						on_fail_options.show();
 					}
 					else {
-						on_fail_options.hide();
 						on_fail_options.find('input').prop('disabled', true);
+						on_fail_options.hide();
 					}
 				})
 				.on('change', 'input[name*="error_handler]"]', function() {
