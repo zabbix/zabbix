@@ -826,21 +826,21 @@ abstract class CItemGeneral extends CApiService {
 
 		// Save the new items.
 		if ($ins_items) {
+			$this->createReal($ins_items);
+
 			if ($this instanceof CItem || $this instanceof CItemPrototype) {
 				$ins_items = $this->inheritDependentItems($ins_items);
 				$this->validateDependentItems($ins_items, get_class($this).'::create');
 			}
-
-			$this->createReal($ins_items);
 		}
 
 		if ($upd_items) {
+			$this->updateReal($upd_items);
+
 			if ($this instanceof CItem || $this instanceof CItemPrototype) {
 				$upd_items = $this->inheritDependentItems($upd_items);
 				$this->validateDependentItems($upd_items, get_class($this).'::update');
 			}
-
-			$this->updateReal($upd_items);
 		}
 
 		$new_items = array_merge($upd_items, $ins_items);
@@ -1755,7 +1755,7 @@ abstract class CItemGeneral extends CApiService {
 				]);
 
 				$find_itemids = array_diff_key($find_itemids, $counted_masters);
-				$items_count = $items_count + count(array_diff_key($find_itemids, $find_itemprototypeids));
+				$items_count = $items_count + count($find_itemids);
 
 				$counted_masters += $find_itemids;
 				++$dependency_level;
@@ -1800,6 +1800,7 @@ abstract class CItemGeneral extends CApiService {
 				'preservekeys' => true
 			]);
 
+			$data = [];
 			$host_master_items = [];
 
 			foreach ($items as &$item) {
@@ -1823,10 +1824,18 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					$inherited_master_item = $host_master_items[$item['hostid']][$master_item['key_']];
+					$data[] = [
+						'values' => ['master_itemid' => $inherited_master_item['itemid']],
+						'where' => ['itemid' => $item['itemid']]
+					];
 					$item['master_itemid'] = $inherited_master_item['itemid'];
 				}
 			}
 			unset($item);
+
+			if ($data) {
+				DB::update('items', $data);
+			}
 		}
 
 		return $items;
