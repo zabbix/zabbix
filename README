@@ -3,9 +3,8 @@
 2, 去除bulk 提交强制 refresh
 3, 支持写入验证 es
 
-    zabbix_server.conf
-
-使用
+    
+zabbix_server.conf
 HistoryStorageUSERNAME=wangzhengtian
 HistoryStoragePASSWORD=wangzhengtianpassword
 HistoryStorageURL=http://test.mylinuxsa.com:9200
