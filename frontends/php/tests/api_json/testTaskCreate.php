@@ -210,14 +210,14 @@ class testTaskCreate extends CZabbixTest {
 					'type' => '6',
 					'itemids' => ['110004']
 				],
-				'expected_error' => 'Cannot send request: item is templated.'
+				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
 			[
 				'task' => [
 					'type' => '6',
 					'itemids' => ['110005']
 				],
-				'expected_error' => 'Cannot send request: discovery rule is templated.'
+				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
 		];
 	}
