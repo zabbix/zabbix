@@ -167,42 +167,49 @@ typedef struct
 }
 zbx_vmware_perf_data_t;
 
-static char	const *hv_propmap[] = {
-	ZBX_XPATH_HV_QUICKSTATS("overallCpuUsage"),			/* ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE */
-	ZBX_XPATH_HV_CONFIG_PRODUCT("fullName"),			/* ZBX_VMWARE_HVPROP_FULL_NAME */
-	ZBX_XPATH_HV_HARDWARE("numCpuCores"),				/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES */
-	ZBX_XPATH_HV_HARDWARE("cpuMhz"),				/* ZBX_VMWARE_HVPROP_HW_CPU_MHZ */
-	ZBX_XPATH_HV_HARDWARE("cpuModel"),				/* ZBX_VMWARE_HVPROP_HW_CPU_MODEL */
-	ZBX_XPATH_HV_HARDWARE("numCpuThreads"), 			/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS */
-	ZBX_XPATH_HV_HARDWARE("memorySize"), 				/* ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE */
-	ZBX_XPATH_HV_HARDWARE("model"), 				/* ZBX_VMWARE_HVPROP_HW_MODEL */
-	ZBX_XPATH_HV_HARDWARE("uuid"), 					/* ZBX_VMWARE_HVPROP_HW_UUID */
-	ZBX_XPATH_HV_HARDWARE("vendor"), 				/* ZBX_VMWARE_HVPROP_HW_VENDOR */
-	ZBX_XPATH_HV_QUICKSTATS("overallMemoryUsage"),			/* ZBX_VMWARE_HVPROP_MEMORY_USED */
-	ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"),	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
-	ZBX_XPATH_HV_QUICKSTATS("uptime"),				/* ZBX_VMWARE_HVPROP_UPTIME */
-	ZBX_XPATH_HV_CONFIG_PRODUCT("version"),				/* ZBX_VMWARE_HVPROP_VERSION */
-	ZBX_XPATH_HV_CONFIG("name"),					/* ZBX_VMWARE_HVPROP_NAME */
-	ZBX_XPATH_HV_STATUS()					        /* ZBX_VMWARE_HVPROP_STATUS */
+#define ZBX_MAP_SET		0
+#define ZBX_MAP_GET		1
+#define ZBX_MAP_DIMENSION	2
+#define ZBX_XML_PATHSET(property1)	"<ns0:pathSet>" property1 "</ns0:pathSet>"
+#define ZBX_XPATH_SET_GET(property)	{ZBX_XML_PATHSET(property), ZBX_XPATH_PROP_NAME(property)}
+
+static char	const *hv_propmap[ZBX_VMWARE_HVPROPS_NUM][ZBX_MAP_DIMENSION] = {
+	ZBX_XPATH_SET_GET("summary.quickStats.overallCpuUsage"),	/* ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE */
+	ZBX_XPATH_SET_GET("summary.config.product.fullName"),		/* ZBX_VMWARE_HVPROP_FULL_NAME */
+	ZBX_XPATH_SET_GET("summary.hardware.numCpuCores"),		/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES */
+	ZBX_XPATH_SET_GET("summary.hardware.cpuMhz"),			/* ZBX_VMWARE_HVPROP_HW_CPU_MHZ */
+	ZBX_XPATH_SET_GET("summary.hardware.cpuModel"),			/* ZBX_VMWARE_HVPROP_HW_CPU_MODEL */
+	ZBX_XPATH_SET_GET("summary.hardware.numCpuThreads"), 		/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS */
+	ZBX_XPATH_SET_GET("summary.hardware.memorySize"), 		/* ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE */
+	ZBX_XPATH_SET_GET("summary.hardware.model"), 			/* ZBX_VMWARE_HVPROP_HW_MODEL */
+	ZBX_XPATH_SET_GET("summary.hardware.uuid"), 			/* ZBX_VMWARE_HVPROP_HW_UUID */
+	ZBX_XPATH_SET_GET("summary.hardware.vendor"), 			/* ZBX_VMWARE_HVPROP_HW_VENDOR */
+	ZBX_XPATH_SET_GET("summary.quickStats.overallMemoryUsage"),	/* ZBX_VMWARE_HVPROP_MEMORY_USED */
+	{ZBX_XML_PATHSET("runtime.healthSystemRuntime.systemHealthInfo"),
+	ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State")},	/* ZBX_VMWARE_HVPROP_HEALTH_STATE */
+	ZBX_XPATH_SET_GET("summary.quickStats.uptime"),			/* ZBX_VMWARE_HVPROP_UPTIME */
+	ZBX_XPATH_SET_GET("summary.config.product.version"),		/* ZBX_VMWARE_HVPROP_VERSION */
+	ZBX_XPATH_SET_GET("summary.config.name"),			/* ZBX_VMWARE_HVPROP_NAME */
+	ZBX_XPATH_SET_GET("overallStatus")				/* ZBX_VMWARE_HVPROP_STATUS */
 };
 
-static char	const *vm_propmap[] = {
-	ZBX_XPATH_VM_CONFIG("numCpu"),					/* ZBX_VMWARE_VMPROP_CPU_NUM */
-	ZBX_XPATH_VM_QUICKSTATS("overallCpuUsage"),			/* ZBX_VMWARE_VMPROP_CPU_USAGE */
-	ZBX_XPATH_VM_CONFIG("name"),					/* ZBX_VMWARE_VMPROP_NAME */
-	ZBX_XPATH_VM_CONFIG("memorySizeMB"),				/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
-	ZBX_XPATH_VM_QUICKSTATS("balloonedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
-	ZBX_XPATH_VM_QUICKSTATS("compressedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
-	ZBX_XPATH_VM_QUICKSTATS("swappedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
-	ZBX_XPATH_VM_QUICKSTATS("guestMemoryUsage"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
-	ZBX_XPATH_VM_QUICKSTATS("hostMemoryUsage"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
-	ZBX_XPATH_VM_QUICKSTATS("privateMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
-	ZBX_XPATH_VM_QUICKSTATS("sharedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
-	ZBX_XPATH_VM_RUNTIME("powerState"),				/* ZBX_VMWARE_VMPROP_POWER_STATE */
-	ZBX_XPATH_VM_STORAGE("committed"),				/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
-	ZBX_XPATH_VM_STORAGE("unshared"),				/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
-	ZBX_XPATH_VM_STORAGE("uncommitted"),				/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
-	ZBX_XPATH_VM_QUICKSTATS("uptimeSeconds")			/* ZBX_VMWARE_VMPROP_UPTIME */
+static char	const *vm_propmap[ZBX_VMWARE_VMPROPS_NUM][ZBX_MAP_DIMENSION] = {
+	ZBX_XPATH_SET_GET("summary.config.numCpu"),			/* ZBX_VMWARE_VMPROP_CPU_NUM */
+	ZBX_XPATH_SET_GET("summary.quickStats.overallCpuUsage"),	/* ZBX_VMWARE_VMPROP_CPU_USAGE */
+	ZBX_XPATH_SET_GET("summary.config.name"),			/* ZBX_VMWARE_VMPROP_NAME */
+	ZBX_XPATH_SET_GET("summary.config.memorySizeMB"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
+	ZBX_XPATH_SET_GET("summary.quickStats.balloonedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
+	ZBX_XPATH_SET_GET("summary.quickStats.compressedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
+	ZBX_XPATH_SET_GET("summary.quickStats.swappedMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
+	ZBX_XPATH_SET_GET("summary.quickStats.guestMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
+	ZBX_XPATH_SET_GET("summary.quickStats.hostMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
+	ZBX_XPATH_SET_GET("summary.quickStats.privateMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
+	ZBX_XPATH_SET_GET("summary.quickStats.sharedMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
+	ZBX_XPATH_SET_GET("summary.runtime.powerState"),		/* ZBX_VMWARE_VMPROP_POWER_STATE */
+	ZBX_XPATH_SET_GET("summary.storage.committed"),			/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
+	ZBX_XPATH_SET_GET("summary.storage.unshared"),			/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
+	ZBX_XPATH_SET_GET("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
+	ZBX_XPATH_SET_GET("summary.quickStats.uptimeSeconds")		/* ZBX_VMWARE_VMPROP_UPTIME */
 };
 
 /* hypervisor hashset support */
@@ -558,7 +565,7 @@ static void	vmware_free_perfdata(zbx_vmware_perf_data_t *data)
  * Comments: The array with property values must be freed by the caller.      *
  *                                                                            *
  ******************************************************************************/
-static char	**xml_read_props(xmlDoc *xdoc, char **propmap, int props_num)
+static char	**xml_read_props(xmlDoc *xdoc, const char *propmap[][ZBX_MAP_DIMENSION], int props_num)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -574,7 +581,7 @@ static char	**xml_read_props(xmlDoc *xdoc, char **propmap, int props_num)
 	{
 		xpathCtx = xmlXPathNewContext(xdoc);
 
-		if (NULL != (xpathObj = xmlXPathEvalExpression((const xmlChar *)propmap[i], xpathCtx)))
+		if (NULL != (xpathObj = xmlXPathEvalExpression((const xmlChar *)propmap[i][ZBX_MAP_GET], xpathCtx)))
 		{
 			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 			{
@@ -2197,6 +2204,8 @@ clean:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             vmid         - [IN] the virtual machine id                     *
+ *             propmap      - [IN] the xpaths of the properties to read       *
+ *             props_num    - [IN] the number of properties to read           *
  *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -2205,7 +2214,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyhandle, const char *vmid,
-		xmlDoc **xdoc, char **error)
+		const char *propmap[][ZBX_MAP_DIMENSION], int props_num, xmlDoc **xdoc, char **error)
 {
 #	define ZBX_POST_VMWARE_VM_STATUS_EX 						\
 		ZBX_POST_VSPHERE_HEADER							\
@@ -2217,8 +2226,8 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>config.hardware</ns0:pathSet>"	\
 					"<ns0:pathSet>config.uuid</ns0:pathSet>"	\
 					"<ns0:pathSet>config.instanceUuid</ns0:pathSet>"\
-					"<ns0:pathSet>summary</ns0:pathSet>"		\
 					"<ns0:pathSet>guest.disk</ns0:pathSet>"		\
+					"%s"						\
 				"</ns0:propSet>"					\
 				"<ns0:objectSet>"					\
 					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
@@ -2230,15 +2239,21 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 
 	const char	*__function_name = "vmware_service_get_vm_data";
 
-	char		tmp[MAX_STRING_LEN], *vmid_esc;
-	int		ret = FAIL;
+	char		tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *vmid_esc;
+	int		i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
+	zabbix_log(LOG_LEVEL_WARNING, "In %s() vmid:'%s'", __function_name, vmid);
+	props[0] = '\0';
+
+	for (i = 0; i < props_num; i++)
+	{
+		zbx_strlcat(props, propmap[i][ZBX_MAP_SET], sizeof(props));
+	}
 
 	vmid_esc = xml_escape_dyn(vmid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
-			vmware_service_objects[service->type].property_collector, vmid_esc);
+			vmware_service_objects[service->type].property_collector, props, vmid_esc);
 
 	zbx_free(vmid_esc);
 
@@ -2286,8 +2301,11 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	zbx_vector_ptr_create(&vm->devs);
 	zbx_vector_ptr_create(&vm->file_systems);
 
-	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &details, error))
+	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, vm_propmap,
+			ZBX_VMWARE_VMPROPS_NUM, &details, error))
+	{
 		goto out;
+	}
 
 	if (NULL == (value = zbx_xml_read_doc_value(details, uuid_xpath[service->type])))
 		goto out;
@@ -2295,7 +2313,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	vm->uuid = value;
 	vm->id = zbx_strdup(NULL, id);
 
-	if (NULL == (vm->props = xml_read_props(details, (char **)vm_propmap, ZBX_VMWARE_VMPROPS_NUM)))
+	if (NULL == (vm->props = xml_read_props(details, vm_propmap, ZBX_VMWARE_VMPROPS_NUM)))
 		goto out;
 
 	vmware_vm_get_nic_devices(vm, details);
@@ -2487,6 +2505,8 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             hvid         - [IN] the vmware hypervisor id                   *
+ *             propmap      - [IN] the xpaths of the properties to read       *
+ *             props_num    - [IN] the number of properties to read           *
  *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -2495,7 +2515,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
-		xmlDoc **xdoc, char **error)
+		const char *propmap[][ZBX_MAP_DIMENSION], int props_num, xmlDoc **xdoc, char **error)
 {
 #	define ZBX_POST_HV_DETAILS 								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -2504,16 +2524,10 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
-					"<ns0:pathSet>overallStatus</ns0:pathSet>"		\
 					"<ns0:pathSet>vm</ns0:pathSet>"				\
-					"<ns0:pathSet>summary.quickStats</ns0:pathSet>"		\
-					"<ns0:pathSet>summary.config</ns0:pathSet>"		\
-					"<ns0:pathSet>summary.hardware</ns0:pathSet>"		\
 					"<ns0:pathSet>parent</ns0:pathSet>"			\
 					"<ns0:pathSet>datastore</ns0:pathSet>"			\
-					"<ns0:pathSet>runtime.healthSystemRuntime."		\
-							"systemHealthInfo</ns0:pathSet>"	\
+					"%s"							\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
@@ -2524,15 +2538,21 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 
 	const char	*__function_name = "vmware_service_get_hv_data";
 
-	char		tmp[MAX_STRING_LEN], *hvid_esc;
-	int		ret = FAIL;
+	char		tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *hvid_esc;
+	int		i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, hvid);
+	props[0] = '\0';
+
+	for (i = 0; i < props_num; i++)
+	{
+		zbx_strlcat(props, propmap[i][ZBX_MAP_SET], sizeof(props));
+	}
 
 	hvid_esc = xml_escape_dyn(hvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DETAILS,
-			vmware_service_objects[service->type].property_collector, hvid_esc);
+			vmware_service_objects[service->type].property_collector, props, hvid_esc);
 
 	zbx_free(hvid_esc);
 
@@ -2674,10 +2694,13 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
 
-	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &details, error))
+	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, hv_propmap,
+			ZBX_VMWARE_HVPROPS_NUM, &details, error))
+	{
 		goto out;
+	}
 
-	if (NULL == (hv->props = xml_read_props(details, (char **)hv_propmap, ZBX_VMWARE_HVPROPS_NUM)))
+	if (NULL == (hv->props = xml_read_props(details, hv_propmap, ZBX_VMWARE_HVPROPS_NUM)))
 		goto out;
 
 	if (NULL == hv->props[ZBX_VMWARE_HVPROP_HW_UUID])

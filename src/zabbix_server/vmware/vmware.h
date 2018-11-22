@@ -268,26 +268,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
-#define ZBX_XPATH_VM_QUICKSTATS(property)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='quickStats']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_RUNTIME(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='runtime']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_CONFIG(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='config']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_VM_STORAGE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
-		"/*[local-name()='val']/*[local-name()='storage']/*[local-name()='" property "']"
-
 #define ZBX_XPATH_VM_HARDWARE(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
-
+//
 #define ZBX_XPATH_VM_GUESTDISKS()									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
 	"/*/*[local-name()='GuestDiskInfo']"
@@ -300,33 +284,12 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
 		"/*[local-name()='val']"
 
-#define ZBX_XPATH_HV_QUICKSTATS(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.quickStats']]"	\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_CONFIG(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_CONFIG_PRODUCT(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.config']]"		\
-		"/*[local-name()='val']/*[local-name()='product']"					\
-		"/*[local-name()='" property "']"
-
-#define ZBX_XPATH_HV_HARDWARE(property)									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary.hardware']]"		\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
 #define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
 		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
 		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
-
-#define ZBX_XPATH_HV_STATUS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='overallStatus']]"		\
-		"/*[local-name()='val']"
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
@@ -335,6 +298,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+
+#define ZBX_XPATH_PROP_NAME(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
+		"/*[local-name()='val']"
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
