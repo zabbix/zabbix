@@ -542,7 +542,6 @@ foreach ($items as $key => $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -697,7 +696,6 @@ foreach ($items as $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
