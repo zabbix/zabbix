@@ -28,6 +28,8 @@
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
+extern char	*CONFIG_HISTORY_STORAGE_USERNAME;
+extern char	*CONFIG_HISTORY_STORAGE_PASSWORD;
 extern char	*CONFIG_HISTORY_STORAGE_OPTS;
 
 zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_MAX];

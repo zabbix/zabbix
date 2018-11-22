@@ -282,6 +282,8 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
+char	*CONFIG_HISTORY_STORAGE_USERNAME	= NULL;
+char	*CONFIG_HISTORY_STORAGE_PASSWORD	= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
@@ -527,6 +529,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageURL", CONFIG_HISTORY_STORAGE_URL, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStorageUSERNAME", CONFIG_HISTORY_STORAGE_USERNAME, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("HistoryStoragePASSWORD", CONFIG_HISTORY_STORAGE_PASSWORD, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
@@ -722,6 +726,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartPreprocessors",		&CONFIG_PREPROCESSOR_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"HistoryStorageURL",		&CONFIG_HISTORY_STORAGE_URL,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HistoryStorageUSERNAME",		&CONFIG_HISTORY_STORAGE_USERNAME,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HistoryStoragePASSWORD",		&CONFIG_HISTORY_STORAGE_PASSWORD,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HistoryStorageTypes",		&CONFIG_HISTORY_STORAGE_OPTS,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},

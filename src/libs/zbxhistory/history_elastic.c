@@ -79,6 +79,15 @@ zbx_curlpage_t;
 
 static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_MAX];
 
+static void fetch_today(char *today){
+    time_t t;
+    struct tm *lt;
+    time(&t);
+    lt = localtime(&t);
+    zbx_snprintf(today, sizeof(today) + 10, "%d.%d.%d", lt->tm_year+1900, lt->tm_mon, lt->tm_mday);
+}
+
+
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
@@ -637,6 +646,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		return FAIL;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG,"%s/%s*/values/_search?scroll=10s", data->base_url, value_type_str[hist->value_type]);
 	zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/%s*/values/_search?scroll=10s", data->base_url,
 			value_type_str[hist->value_type]);
 
@@ -845,8 +855,20 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
 
+	char today[10];
+    fetch_today(today);
+
+	char index[50] = {};
+	
+	strcat(index, value_type_str[hist->value_type]);
+    strcat(index, "-");
+    strcat(index, today);
+    zabbix_log(LOG_LEVEL_DEBUG, "index ----  %s", index);	
+
+
 	zbx_json_addobject(&json_idx, "index");
-	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json_idx, "_index", index, ZBX_JSON_TYPE_STRING);
+	//zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json_idx, "_type", "values", ZBX_JSON_TYPE_STRING);
 
 	if (1 == CONFIG_HISTORY_STORAGE_PIPELINES)
@@ -898,7 +920,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	if (num > 0)
 	{
-		data->post_url = zbx_dsprintf(NULL, "%s/_bulk?refresh=true", data->base_url);
+		data->post_url = zbx_dsprintf(NULL, "%s/_bulk", data->base_url);
 		elastic_writer_add_iface(hist);
 	}
 
@@ -955,6 +977,27 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	data = (zbx_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_elastic_data_t));
 	memset(data, 0, sizeof(zbx_elastic_data_t));
 	data->base_url = zbx_strdup(NULL, CONFIG_HISTORY_STORAGE_URL);
+
+	//add authentication info
+    char auth[100];
+    if ( CONFIG_HISTORY_STORAGE_USERNAME != NULL && CONFIG_HISTORY_STORAGE_PASSWORD != NULL ){
+         zbx_snprintf(auth, strlen(CONFIG_HISTORY_STORAGE_USERNAME) + strlen(CONFIG_HISTORY_STORAGE_PASSWORD) + strlen(":") + strlen("@") + 1, "%s:%s@", CONFIG_HISTORY_STORAGE_USERNAME, CONFIG_HISTORY_STORAGE_PASSWORD);
+    }
+
+    char *httpschema = "http://";
+    char *res = strstr(data->base_url, httpschema);
+
+    if ( res != NULL ){
+        res = res + sizeof(httpschema) - 1 ;
+        char tempstr[300];
+        zbx_snprintf(tempstr, strlen(res) + strlen(httpschema) + strlen(auth) + 1, "%s%s%s", httpschema, auth, res);
+        data->base_url = zbx_strdup(NULL, tempstr);
+        zabbix_log(LOG_LEVEL_DEBUG, "data->base_url %s \n", data->base_url);
+    }
+    //end add authentication info
+
+
+
 	zbx_rtrim(data->base_url, "/");
 	data->buf = NULL;
 	data->post_url = NULL;
