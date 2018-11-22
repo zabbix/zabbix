@@ -116,7 +116,6 @@ class CTask extends CApiService {
 		// Check if user has permissions to items and LLD rules.
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
-			'selectHosts' => ['status'],
 			'itemids' => $task['itemids'],
 			'editable' => true
 		]);
@@ -128,7 +127,6 @@ class CTask extends CApiService {
 		if ($items_cnt != $itemids_cnt) {
 			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'type', 'hostid', 'status'],
-				'selectHosts' => ['status'],
 				'itemids' => $task['itemids'],
 				'editable' => true
 			]);
@@ -145,10 +143,6 @@ class CTask extends CApiService {
 		$allowed_types = checkNowAllowedTypes();
 
 		foreach ($items as $item) {
-			if ($item['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('item is templated')));
-			}
-
 			if (!in_array($item['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', _('wrong item type')));
 			}
@@ -161,12 +155,6 @@ class CTask extends CApiService {
 		}
 
 		foreach ($discovery_rules as $discovery_rule) {
-			if ($discovery_rule['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot send request: %1$s.', _('discovery rule is templated'))
-				);
-			}
-
 			if (!in_array($discovery_rule['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot send request: %1$s.', _('wrong discovery rule type'))
@@ -186,6 +174,7 @@ class CTask extends CApiService {
 		$hosts = API::Host()->get([
 			'output' => ['status'],
 			'hostids' => array_keys($hostids),
+			'templated_hosts'=> true,
 			'nopermissions' => true
 		]);
 
