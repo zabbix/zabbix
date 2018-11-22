@@ -923,7 +923,13 @@ function zbx_avg($values) {
 	return bcdiv($sum, count($values));
 }
 
-// accepts parameter as integer either
+/**
+ * Check if every character in given string value is a decimal digit.
+ *
+ * @param string | int   $x Value to check.
+ *
+ * @return boolean
+ */
 function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
@@ -1905,6 +1911,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
+	}
+
+	if ($title !== null) {
+		$title = new CSpan($title);
 	}
 
 	// Details link should be in front of title.
