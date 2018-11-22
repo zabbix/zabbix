@@ -8,6 +8,7 @@
 使用
 HistoryStorageUSERNAME=wangzhengtian
 HistoryStoragePASSWORD=wangzhengtianpassword
+HistoryStorageURL=http://test.mylinuxsa.com:9200
 
-
-
+/usr/share/zabbix/conf/zabbix.conf.php
+$HISTORY['url']   = 'http://wangzhengtian:wangzhengtianpassword@test.mylinuxsa.com:9200';
