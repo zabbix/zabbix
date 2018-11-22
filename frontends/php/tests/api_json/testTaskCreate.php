@@ -218,7 +218,7 @@ class testTaskCreate extends CZabbixTest {
 					'itemids' => ['110005']
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
-			],
+			]
 		];
 	}
 

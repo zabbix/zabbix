@@ -174,7 +174,7 @@ class CTask extends CApiService {
 		$hosts = API::Host()->get([
 			'output' => ['status'],
 			'hostids' => array_keys($hostids),
-			'templated_hosts'=> true,
+			'templated_hosts' => true,
 			'nopermissions' => true
 		]);
 
