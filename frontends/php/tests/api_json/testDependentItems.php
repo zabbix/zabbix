@@ -171,6 +171,14 @@ class testDependentItems extends CAPITest {
 				] + reset($prototypes)
 			],
 			[
+				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
+				'method' => 'itemprototype.create',
+				'request_data' => [
+					'name' => 'should not allow to create dependent on item',
+					'master_itemid' => 40574
+				] + reset($prototypes)
+			],
+			[
 				'error' => null,
 				'method' => 'itemprototype.create',
 				'request_data' => array_slice($prototypes, 1)
