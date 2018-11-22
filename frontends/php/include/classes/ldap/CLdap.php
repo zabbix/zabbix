@@ -117,7 +117,7 @@ class CLdap {
 			$this->error = static::ERR_OPT_DEREF_FAILED;
 		}
 
-		return true;
+		return !$this->error;
 	}
 
 	public function checkPass($user, $pass) {
