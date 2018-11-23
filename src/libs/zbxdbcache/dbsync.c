@@ -3156,8 +3156,6 @@ static char	**dbsync_item_pp_preproc_row(char **row)
 			row[7] = zbx_dc_expand_user_macros(row[7], &hostid, 1, NULL);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] %s, %s", row[3], row[7]);
-
 	return row;
 
 #undef ZBX_DBSYNC_ITEM_PP_COLUMN_PARAM
