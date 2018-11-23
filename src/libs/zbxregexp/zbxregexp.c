@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxregexp.h"
+#include "log.h"
 
 struct zbx_regexp
 {
@@ -191,6 +192,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 {
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
+	const char			*__function_name = "regexp_exec";
 	int				result, r;
 	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
@@ -221,10 +223,15 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 		result = ZBX_REGEXP_MATCH;
 	}
-	else if (-1 == r)
+	else if (PCRE_ERROR_NOMATCH == r)
+	{
 		result = ZBX_REGEXP_NO_MATCH;
-	else				/* r < -1: "some kind of unexpected problem" in pcre_exec() */
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() failed with error %d", __function_name, r);
 		result = FAIL;
+	}
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
 		zbx_free(ovector);
