@@ -212,7 +212,7 @@ zbx_vmware_perf_data_t;
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
 
 #define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_MAXQUERYMETRICS()									\
