@@ -672,7 +672,11 @@ class CHistoryManager {
 
 			$urls[$value_name] = $url;
 		}
-
+		$username = $HISTORY['username'];
+        	$password = $HISTORY['password'];
+        	$pattern = '/(https?:\/\/)(.+?)/';
+	
+        	$urls[$value_name] = preg_replace($pattern,"$1$username:$password@$2",$urls[$value_name]);
 		return $urls[$value_name];
 	}
 
