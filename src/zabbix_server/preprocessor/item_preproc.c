@@ -1063,14 +1063,14 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 
 	if (ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "value must be less or equal to %s",
+		*errmsg = zbx_dsprintf(*errmsg, "value must be greater or equal to %s",
 				zbx_variant_value_desc(&range_min));
 		goto out;
 	}
 
 	if (ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "value must be greater or equal to %s",
+		*errmsg = zbx_dsprintf(*errmsg, "value must be less or equal to %s",
 				zbx_variant_value_desc(&range_max));
 		goto out;
 	}
