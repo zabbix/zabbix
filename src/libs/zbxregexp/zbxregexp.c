@@ -51,12 +51,13 @@ zbx_regmatch_t;
  *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
  *                      PCRE_CASELESS, PCRE_NO_AUTO_CAPTURE, PCRE_MULTILINE.  *
  *     regexp    - [OUT] output regexp.                                       *
- *     error     - [OUT] error message if any.                                *
+ *     err_msg_static - [OUT] error message if any. Do not deallocate with    *
+ *                            zbx_free().                                     *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **error)
+static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
 	int	error_offset = -1;
 	pcre	*pcre_regexp;
@@ -86,7 +87,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		}
 	}
 #endif
-	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, error, &error_offset, NULL)))
+	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, err_msg_static, &error_offset, NULL)))
 		return FAIL;
 
 	if (NULL != regexp)
@@ -107,12 +108,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
  * Purpose: public wrapper for regexp_compile          *
  *                                                     *
  *******************************************************/
-int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **error)
+int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg_static)
 {
 #ifdef PCRE_NO_AUTO_CAPTURE
-	return regexp_compile(pattern, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, regexp, error);
+	return regexp_compile(pattern, PCRE_MULTILINE | PCRE_NO_AUTO_CAPTURE, regexp, err_msg_static);
 #else
-	return regexp_compile(pattern, PCRE_MULTILINE, regexp, error);
+	return regexp_compile(pattern, PCRE_MULTILINE, regexp, err_msg_static);
 #endif
 }
 
@@ -123,9 +124,9 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
  * Purpose: public wrapper for regexp_compile          *
  *                                                     *
  *******************************************************/
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **error)
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg_static)
 {
-	return regexp_compile(pattern, flags, regexp, error);
+	return regexp_compile(pattern, flags, regexp, err_msg_static);
 }
 
 /****************************************************************************************************
@@ -135,7 +136,7 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags
  * Purpose: wrapper for zbx_regexp_compile. Caches and reuses the last used regexp.                 *
  *                                                                                                  *
  ****************************************************************************************************/
-static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, const char **error)
+static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
 	ZBX_THREAD_LOCAL static zbx_regexp_t	*curr_regexp = NULL;
 	ZBX_THREAD_LOCAL static char		*curr_pattern = NULL;
@@ -154,7 +155,7 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 		curr_pattern = NULL;
 		curr_flags = 0;
 
-		if (SUCCEED == regexp_compile(pattern, flags, &curr_regexp, error))
+		if (SUCCEED == regexp_compile(pattern, flags, &curr_regexp, err_msg_static))
 		{
 			curr_pattern = zbx_strdup(curr_pattern, pattern);
 			curr_flags = flags;
