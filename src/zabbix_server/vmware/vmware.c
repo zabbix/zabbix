@@ -3516,7 +3516,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 				"<ns0:propSet>"								\
 					"<ns0:type>ClusterComputeResource</ns0:type>"			\
 					"<ns0:all>false</ns0:all>"					\
-					"<ns0:pathSet>summary</ns0:pathSet>"				\
+					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"		\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
 					"<ns0:obj type=\"ClusterComputeResource\">%s</ns0:obj>"		\
@@ -3543,7 +3543,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
 		goto out;
 
-	*status = zbx_xml_read_doc_value(doc, ZBX_XPATH_LN2("val", "overallStatus"));
+	*status = zbx_xml_read_doc_value(doc, ZBX_XPATH_PROP_NAME("summary.overallStatus"));
 
 	ret = SUCCEED;
 out:
