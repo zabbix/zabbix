@@ -1567,39 +1567,70 @@ abstract class CItemGeneral extends CApiService {
 				$db_items += $db_item_prototypes;
 			}
 
-			foreach ($db_items as $db_itemid => $db_item) {
-				$items_cache[$db_itemid] += $db_item;
+			foreach ($items as $index => $item) {
+				/**
+				 * All elements of $items array should be accessible by current user therefore should be present
+				 * in $db_items array.
+				 */
+				$itemid = $item['itemid'];
+
+				// When updating validate only dependent items with changed type and/or master_itemid.
+				if ((!array_key_exists('type', $items_cache[$itemid])
+						|| $items_cache[$itemid]['type'] != ITEM_TYPE_DEPENDENT)
+						&& !array_key_exists('master_itemid', $items_cache[$itemid])) {
+					$processed_items[$index] = true;
+				}
+
+				$items_cache[$itemid] += $db_items[$itemid];
 			}
 		}
 
 		do {
 			if ($has_unresolved_masters) {
-				$options = [
-					'output' => ['type', 'name', 'hostid', 'master_itemid'],
-					'itemids' => array_keys($unresolved_master_itemids),
-					'preservekeys' => true
-				];
-
-				// Allow to select web items. And for item prototypes select only normal items (no LLD).
-				$db_masters = API::Item()->get($options
-					+ ['webitems' => true]
-					+ (($this instanceof CItemPrototype) ? ['filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]] : [])
-				);
-
 				if ($this instanceof CItemPrototype) {
-					$db_master_prototypes = API::ItemPrototype()->get($options + ['selectDiscoveryRule' => ['itemid']]);
+					$db_masters = DB::select('items', [
+						'output' => ['itemid', 'type', 'flags', 'hostid', 'master_itemid'],
+						'filter' => [
+							'itemid' => array_keys($unresolved_master_itemids),
+							'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						],
+						'preservekeys' => true
+					]);
 
-					foreach ($db_master_prototypes as &$db_master_prototype) {
-						$db_master_prototype['ruleid'] = $db_master_prototype['discoveryRule']['itemid'];
+					$prototypeids = [];
+					foreach ($db_masters as $itemid => $item) {
+						if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+							$prototypeids[] = $itemid;
+						}
 					}
-					unset($db_master_prototype);
 
-					$db_masters += $db_master_prototypes;
+					if ($prototypeids) {
+						$db_discovery_rules = DB::select('item_discovery', [
+							'output' => ['itemid', 'parent_itemid'],
+							'filter' => [
+								'parent_itemid' => $prototypeids
+							]
+						]);
+
+						foreach ($db_discovery_rules as $drule) {
+							$db_masters[$drule['parent_itemid']]['ruleid'] = $drule['itemid'];
+						}
+					}
+				}
+				else {
+					$db_masters = DB::select('items', [
+						'output' => ['itemid', 'type', 'hostid', 'master_itemid'],
+						'filter' => [
+							'itemid' => array_keys($unresolved_master_itemids),
+							'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+						],
+						'preservekeys' => true
+					]);
 				}
 
-				foreach ($db_masters as $db_master) {
-					$items_cache[$db_master['itemid']] = $db_master;
-					unset($unresolved_master_itemids[$db_master['itemid']]);
+				foreach ($db_masters as $db_masterid => $db_master) {
+					$items_cache[$db_masterid] = $db_master;
+					unset($unresolved_master_itemids[$db_masterid]);
 				}
 
 				if ($unresolved_master_itemids) {
@@ -1609,6 +1640,7 @@ abstract class CItemGeneral extends CApiService {
 							key($unresolved_master_itemids)
 					)));
 				}
+
 				$has_unresolved_masters = false;
 			}
 
