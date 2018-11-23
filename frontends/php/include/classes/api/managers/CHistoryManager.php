@@ -672,7 +672,7 @@ class CHistoryManager {
 
 			$urls[$value_name] = $url;
 		}
-		if ($username === null and $password === null){
+		if (isset($username)  and isset($password)){
 			$username = $HISTORY['username'];
         		$password = $HISTORY['password'];
         		$pattern = '/(https?:\/\/)(.+?)/';
