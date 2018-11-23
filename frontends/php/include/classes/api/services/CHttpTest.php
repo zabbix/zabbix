@@ -1066,7 +1066,7 @@ class CHttpTest extends CApiService {
 						$httpstep += [
 							'retrieve_mode' => $db_httpstep['retrieve_mode'],
 							'required' => $db_httpstep['required'],
-							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+							'posts' => ($db_httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 								? $db_httpstep['posts']
 								: ''
 						];
