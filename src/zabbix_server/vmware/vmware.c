@@ -258,7 +258,8 @@ zbx_vmware_perf_data_t;
 #define ZBX_MAP_SET		0
 #define ZBX_MAP_GET		1
 #define ZBX_MAP_DIMENSION	2
-#define ZBX_XML_PATHSET(prop_path)		"<ns0:pathSet>" prop_path "</ns0:pathSet>"
+
+#define ZBX_XML_PATHSET(prop_path)	"<ns0:pathSet>" prop_path "</ns0:pathSet>"
 #define ZBX_XPATH_SET_GET(property)	{ZBX_XML_PATHSET(property), ZBX_XPATH_PROP_NAME(property)}
 
 static char	const *hv_propmap[ZBX_VMWARE_HVPROPS_NUM][ZBX_MAP_DIMENSION] = {
