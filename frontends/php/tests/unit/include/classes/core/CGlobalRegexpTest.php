@@ -95,6 +95,18 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, 'http://example.com/', 0),
 				'success' => ['referrer: http://example.com/', 'request to http://example.com/test'],
 				'fail' => ['example.com']
+			],
+			// empty part of search string is ignored during match
+			[
+				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/', 0, '/'),
+				'success' => ['/'],
+				'fail' => []
+			],
+			// empty part of search string is ignored during match
+			[
+				'expression' => $this->expr(EXPRESSION_TYPE_ANY_INCLUDED, '/0/a/ /', 0, '/'),
+				'success' => ['d// e', '1/0// '],
+				'fail' => ['/', 'b//	b']
 			]
 		];
 	}

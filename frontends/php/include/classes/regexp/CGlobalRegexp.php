@@ -187,7 +187,7 @@ class CGlobalRegexp {
 		$result = true;
 
 		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-			$patterns = explode($expression['exp_delimiter'], $expression['expression']);
+			$patterns = array_filter(explode($expression['exp_delimiter'], $expression['expression']), 'strlen');
 		}
 		else {
 			$patterns = [$expression['expression']];
