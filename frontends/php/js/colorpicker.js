@@ -175,6 +175,7 @@
 					'background': background,
 					'title': background
 				});
+				colorbox.attr('title', background)
 				input.val(color);
 			},
 			/**
@@ -222,7 +223,7 @@
 				return;
 			}
 
-			var $wrapper = $('<div/>').attr({
+			$('<div/>').attr({
 				'id': 'lbl_' + id,
 				'title': element.value ? '#' + element.value : ''
 			}).click(function(event) {
@@ -239,7 +240,6 @@
 				 */
 				methods.set_color_by_id($(element).attr('id'), this.value);
 				callback && callback.call(element, this.value);
-				$wrapper.attr('title', this.value);
 			});
 
 			methods.set_color_by_id(id, element.value);
