@@ -2154,21 +2154,33 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 999; }
 
-.dashbrd-grid-empty-placeholder {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #fff;
-  border: 1px solid #9f9f9f;
-  position: absolute;
-  left: 0;
-  top: 0;
+.dashbrd-grid-new-widget-placeholder {
+  border-color: #f0f0f0 !important;
+  background-color: #f0f0f0 !important;
+  z-index: 999;
   width: calc(100% / 6 - .65rem);
-  height: 200px;
-  margin: .25rem; }
-  .dashbrd-grid-empty-placeholder h1 {
-    padding: 10px;
-    text-align: center; }
+  height: 200px; }
+  .dashbrd-grid-new-widget-placeholder div {
+    display: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
+  .dashbrd-grid-new-widget-placeholder div:nth-child(1) {
+    display: block; }
+  .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-set-position {
+    position: absolute; }
+    .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-set-position div {
+      display: none; }
+    .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-set-position div:nth-child(2) {
+      display: block; }
+  .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-customize-size {
+    position: absolute; }
+    .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-customize-size div {
+      display: none; }
+    .dashbrd-grid-new-widget-placeholder.dashbrd-grid-widget-customize-size div:nth-child(3) {
+      display: block; }
 
 .dashbrd-grid-widget-mask {
   position: absolute;

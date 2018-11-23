@@ -1191,6 +1191,10 @@
 			data.add_widget_dimension = {};
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		}).on('mousedown', function(event) {
+			if (event.which != 1 ) {
+				return;
+			}
+
 			if (data['pos-action'] == '' && ($(event.target).is($obj))
 					|| $(event.target).is(data.new_widget_placeholder)
 					|| $(event.target).parent().is(data.new_widget_placeholder)) {
@@ -1200,7 +1204,7 @@
 					.addClass('dashbrd-grid-widget-customize-size');
 				return cancelEvent(event);
 			}
-		}).on('mouseleave', function() {
+		}).on('mouseleave', function(event) {
 			data['pos-action'] = '';
 			data.add_widget_dimension = {};
 
