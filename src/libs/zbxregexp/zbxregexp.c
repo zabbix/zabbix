@@ -98,7 +98,6 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	else
 		pcre_free(pcre_regexp);
 
-
 	return SUCCEED;
 }
 
