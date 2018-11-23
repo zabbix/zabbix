@@ -1180,7 +1180,6 @@
 				return;
 			}
 
-			data.placeholder.hide();
 			var dimension = $.extend({}, data.add_widget_dimension);
 
 			if (dimension.width == 1 && dimension.height == 2) {
@@ -1192,20 +1191,40 @@
 			data.add_widget_dimension = {};
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		}).on('mousedown', function(event) {
-			if (data['pos-action'] == '' && ($(event.target).is($obj)) || $(event.target).is(data.placeholder)) {
+			if (data['pos-action'] == '' && ($(event.target).is($obj))
+					|| $(event.target).is(data.new_widget_placeholder)
+					|| $(event.target).parent().is(data.new_widget_placeholder)) {
 				data['pos-action'] = 'add';
+				data.new_widget_placeholder
+					.removeClass('dashbrd-grid-widget-set-position')
+					.addClass('dashbrd-grid-widget-customize-size');
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function() {
 			data['pos-action'] = '';
 			data.add_widget_dimension = {};
-			data.placeholder.hide();
-		}).on('mousemove', function(event) {
+
+			if (data.widgets.length) {
+				data.new_widget_placeholder.hide();
+			}
+			else {
+				data.new_widget_placeholder.removeAttr('style');
+			}
+
+			data.new_widget_placeholder
+				.removeClass('dashbrd-grid-widget-customize-size dashbrd-grid-widget-set-position');
+
+		}).on('mouseenter mousemove', function(event) {
+			if (event.type == 'mouseenter') {
+				data.new_widget_placeholder.show().addClass('dashbrd-grid-widget-set-position');
+			}
+
 			var drag = data['pos-action'] == 'add';
 
-			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.placeholder)) {
+			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
+					&& !$(event.target).parent().is(data.new_widget_placeholder)) {
 				data.add_widget_dimension = {};
-				data.placeholder.hide();
+				data.new_widget_placeholder.hide().removeClass('dashbrd-grid-widget-customize-size');
 				return;
 			}
 
@@ -1291,7 +1310,7 @@
 
 			data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
-			data.placeholder.css({
+			data.new_widget_placeholder.css({
 				top: data.add_widget_dimension.y * o['widget-height'] + 'px',
 				left: data.add_widget_dimension.x * o['widget-width'] + '%',
 				height: data.add_widget_dimension.height * o['widget-height'] + 'px',
@@ -1456,46 +1475,6 @@
 	}
 
 	/**
-	 * Creates div for empty dashboard.
-	 *
-	 * @param {object} $obj     Dashboard grid object.
-	 * @param {object} options  Dashboard options (will be put in data['options'] in dashboard grid).
-	 *
-	 * @return {object}         jQuery <div> object for placeholder.
-	 */
-	function emptyPlaceholderDiv($obj, options) {
-		var $div = $('<div>', {'class': 'dashbrd-grid-empty-placeholder'}),
-			$text = $('<h1>');
-
-		if (options['editable']) {
-			if (options['kioskmode']) {
-				$text.text(t('Cannot add widgets in kiosk mode'));
-			}
-			else {
-				$text.append(
-					$('<a>', {'href':'#'})
-						.text(t('Add a new widget'))
-						.click(function(e){
-							// To prevent going by href link.
-							e.preventDefault();
-
-							if (!methods.isEditMode.call($obj)) {
-								showEditMode();
-							}
-
-							methods.addNewWidget.call($obj, this);
-						})
-				);
-			}
-		}
-		else {
-			$text.addClass('disabled').text(t('Add a new widget'));
-		}
-
-		return $div.append($text);
-	}
-
-	/**
 	 * Performs action added by addAction function.
 	 *
 	 * @param {string} hook_name  Name of trigger that is currently being called.
@@ -1594,8 +1573,26 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					$placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}),
-					$empty_placeholder = emptyPlaceholderDiv($this, options);
+					new_widget_placeholder = $this.find('.dashbrd-grid-new-widget-placeholder');
+
+				if (options['editable']) {
+					if (options['kioskmode']) {
+						new_widget_placeholder.remove();
+						new_widget_placeholder = $();
+					}
+					else {
+						new_widget_placeholder.on('click', function() {
+							// Add new widget handler when not in edit mode.
+							if (!methods.isEditMode.call($this)) {
+								showEditMode();
+								methods.addNewWidget.call($this, this);
+							}
+						});
+					}
+				}
+				else {
+					new_widget_placeholder.addClass('disabled');
+				}
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -1603,8 +1600,8 @@
 					widgets: [],
 					widget_defaults: {},
 					triggers: {},
-					placeholder: $placeholder,
-					empty_placeholder: $empty_placeholder,
+					placeholder: $this.find('.dashbrd-grid-widget-placeholder').hide(),
+					new_widget_placeholder: new_widget_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
 						relations: [],
@@ -1614,9 +1611,6 @@
 				});
 
 				var	data = $this.data('dashboardGrid');
-
-				$this.append($placeholder.hide());
-				$this.append($empty_placeholder);
 
 				$(window).bind('beforeunload', function() {
 					var	res = confirmExit($this, data);
@@ -1686,7 +1680,6 @@
 				widget['uniqueid'] = generateUniqueId($this, data);
 				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
-				data['empty_placeholder'].hide();
 
 				data['widgets'].push(widget);
 				$this.append(widget['div']);

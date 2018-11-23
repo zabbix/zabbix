@@ -3155,6 +3155,10 @@ $form-icon-btn: (
 .dashbrd-grid-widget-container {
 	position: relative;
 	margin: -.25rem;
+
+	&.dashbrd-grid-container-have-widgets {
+
+	}
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -3164,22 +3168,48 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
-.dashbrd-grid-empty-placeholder {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	position: absolute;
-	left: 0;
-	top: 0;
+.dashbrd-grid-new-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+	z-index: 999;
 	width: calc(100% / 6 - .65rem);
 	height: 200px;
-	margin: .25rem;
 
-	h1 {
-		padding: 10px;
-		text-align: center;
+	& div {
+		display: none;
+		-moz-user-select: none;
+		-khtml-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+
+	div:nth-child(1) {
+		display: block;
+	}
+
+	&.dashbrd-grid-widget-set-position {
+		position: absolute;
+
+		div {
+			display: none;
+		}
+
+		div:nth-child(2) {
+			display: block;
+		}
+	}
+
+	&.dashbrd-grid-widget-customize-size {
+		position: absolute;
+
+		div {
+			display: none;
+		}
+
+		div:nth-child(3) {
+			display: block;
+		}
 	}
 }
 
