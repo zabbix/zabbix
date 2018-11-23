@@ -501,26 +501,27 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		size = 0;
-	zbx_vector_ptr_t	list;
+	zbx_vector_ptr_t	list, descriptors;
 	zbx_stat_t		status;
-	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
-	zbx_directory_item_t	*item;
-	zbx_vector_ptr_t	descriptors;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
 
 	if (SUCCEED != prepare_mode_parameter(request, result, &mode))
 		return ret;
 
-	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
-			4, 5))
+	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &regex_excl_dir, &max_depth,
+			&dir, &status, 4, 5, 6))
+	{
 		goto err1;
+	}
 
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
-	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
-		dir = NULL;
-	else
+	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
+	{
+		zbx_free(dir);
 		goto err2;
+	}
 
 	while (0 < list.values_num)
 	{
@@ -529,6 +530,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_uint64_t		cluster_size = 0;
 		HANDLE			handle;
 		WIN32_FIND_DATA		data;
+		zbx_directory_item_t	*item;
 
 		item = list.values[--list.values_num];
 
@@ -586,6 +588,18 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			name = zbx_unicode_to_utf8(data.cFileName);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
 			wpath = zbx_utf8_to_unicode(path);
+
+			if (NULL != regex_excl_dir && 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				/* consider only path relative to path given in first parameter */
+				if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+				{
+					zbx_free(wpath);
+					zbx_free(path);
+					zbx_free(name);
+					continue;
+				}
+			}
 
 			if (SUCCEED == link_processed(data.dwFileAttributes, wpath, &descriptors, path))
 			{
@@ -646,8 +660,7 @@ err2:
 	list_vector_destroy(&list);
 	descriptors_vector_destroy(&descriptors);
 err1:
-	regex_incl_excl_free(regex_incl, regex_excl);
-	zbx_free(dir);
+	regex_incl_excl_free(regex_incl, regex_excl, regex_excl_dir);
 
 	return ret;
 }
@@ -725,7 +738,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == lstat(path, &status))
 			{
-				if (0 != S_ISDIR(status.st_mode) && NULL != regex_excl_dir)
+				if (NULL != regex_excl_dir && 0 != S_ISDIR(status.st_mode))
 				{
 					/* consider only path relative to path given in first parameter */
 					if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
@@ -823,28 +836,29 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*dir = NULL;
 	int			types, max_depth, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t		count = 0;
-	zbx_vector_ptr_t	list;
+	zbx_vector_ptr_t	list, descriptors;
 	zbx_stat_t		status;
-	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL;
-	zbx_directory_item_t	*item;
+	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 	time_t			min_time = 0, max_time = 0x7fffffff;
-	zbx_vector_ptr_t	descriptors;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
 
-	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &max_depth, &dir, &status,
-			5, 10))
+	if (SUCCEED != prepare_common_parameters(request, result, &regex_incl, &regex_excl, &regex_excl_dir, &max_depth,
+			&dir, &status, 5, 10, 11))
+	{
 		goto err1;
+	}
 
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
-	if (SUCCEED == queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
-		dir = NULL;
-	else
+	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
+	{
+		zbx_free(dir);
 		goto err2;
+	}
 
 	while (0 < list.values_num)
 	{
@@ -852,6 +866,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 		wchar_t			*wpath;
 		HANDLE			handle;
 		WIN32_FIND_DATA		data;
+		zbx_directory_item_t	*item;
 
 		item = list.values[--list.values_num];
 
@@ -902,6 +917,18 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			name = zbx_unicode_to_utf8(data.cFileName);
 			path = zbx_dsprintf(NULL, "%s/%s", item->path, name);
+
+			if (NULL != regex_excl_dir && 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				/* consider only path relative to path given in first parameter */
+				if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+				{
+					zbx_free(path);
+					zbx_free(name);
+					continue;
+				}
+			}
+
 			match = filename_matches(name, regex_incl, regex_excl);
 
 			if (min_size > DW2UI64(data.nFileSizeHigh, data.nFileSizeLow))
@@ -969,8 +996,7 @@ err2:
 	list_vector_destroy(&list);
 	descriptors_vector_destroy(&descriptors);
 err1:
-	regex_incl_excl_free(regex_incl, regex_excl);
-	zbx_free(dir);
+	regex_incl_excl_free(regex_incl, regex_excl, regex_excl_dir);
 
 	return ret;
 }
@@ -1039,7 +1065,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (0 == lstat(path, &status))
 			{
-				if (0 != S_ISDIR(status.st_mode) && NULL != regex_excl_dir)
+				if (NULL != regex_excl_dir && 0 != S_ISDIR(status.st_mode))
 				{
 					/* consider only path relative to path given in first parameter */
 					if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
