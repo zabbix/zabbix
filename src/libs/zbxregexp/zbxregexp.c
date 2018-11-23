@@ -219,8 +219,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 	if (0 <= r)	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	{
-		if (NULL != matches && 0 < r)
-			memcpy(matches, ovector, (size_t)MIN(r, count) * sizeof(zbx_regmatch_t));
+		if (NULL != matches)
+			memcpy(matches, ovector, (size_t)((0 < r) ? MIN(r, count) : count) * sizeof(zbx_regmatch_t));
 
 		result = ZBX_REGEXP_MATCH;
 	}
