@@ -305,9 +305,10 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	if (NULL != len)
 		*len = FAIL;
 
-	regexp_prepare(pattern, flags, &regexp, &error);
+	if (SUCCEED != regexp_prepare(pattern, flags, &regexp, &error))
+		return NULL;
 
-	if (NULL != regexp && NULL != string)
+	if (NULL != string)
 	{
 		int	r;
 
