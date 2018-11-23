@@ -266,43 +266,6 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
 		const char *id);
 
-#define ZBX_VM_NONAME_XML	"noname.xml"
-
-#define ZBX_XPATH_VM_HARDWARE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-//
-#define ZBX_XPATH_VM_GUESTDISKS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
-	"/*/*[local-name()='GuestDiskInfo']"
-
-#define ZBX_XPATH_VM_UUID()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_INSTANCE_UUID()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
-		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
-		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
-		"[*[local-name()='name'][text()='" sensor "']]"						\
-		"/*[local-name()='healthState']/*[local-name()='key']"
-
-#define ZBX_XPATH_VMWARE_ABOUT(property)								\
-	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
-
-#	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
-#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
-#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
-#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
-
-#define ZBX_XPATH_PROP_NAME(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
-		"/*[local-name()='val']"
-
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
 #define ZBX_VMWARE_HVPROP_FULL_NAME			1

@@ -167,10 +167,98 @@ typedef struct
 }
 zbx_vmware_perf_data_t;
 
+/*
+ * SOAP support
+ */
+#define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
+#define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
+
+#define ZBX_POST_VSPHERE_HEADER									\
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
+		"<SOAP-ENV:Envelope"								\
+			" xmlns:ns0=\"urn:vim25\""						\
+			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""		\
+			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""		\
+			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"	\
+			"<SOAP-ENV:Header/>"							\
+			"<ns1:Body>"
+#define ZBX_POST_VSPHERE_FOOTER									\
+			"</ns1:Body>"								\
+		"</SOAP-ENV:Envelope>"
+
+#define ZBX_XPATH_FAULTSTRING()										\
+	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
+
+#define ZBX_XPATH_REFRESHRATE()										\
+	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
+
+#define ZBX_XPATH_ISAGGREGATE()										\
+	"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
+	"../*[local-name()='currentSupported']='false']"
+
+#define ZBX_XPATH_COUNTERINFO()										\
+	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
+
+#define ZBX_XPATH_DATASTORE_MOUNT()									\
+	"/*/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
+	"/*[local-name()='mountInfo']/*[local-name()='path']"
+
+#define ZBX_XPATH_HV_DATASTORES()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
+	"/*[local-name()='val']/*[@type='Datastore']"
+
+#define ZBX_XPATH_HV_VMS()										\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
+	"/*[local-name()='val']/*[@type='VirtualMachine']"
+
+#define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
+		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_MAXQUERYMETRICS()									\
+	"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
+
+#define ZBX_XPATH_VM_HARDWARE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
+		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_VM_GUESTDISKS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+	"/*/*[local-name()='GuestDiskInfo']"
+
+#define ZBX_XPATH_VM_UUID()										\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
+		"/*[local-name()='val']"
+
+#define ZBX_XPATH_VM_INSTANCE_UUID()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
+		"/*[local-name()='val']"
+
+#define ZBX_XPATH_HV_SENSOR_STATUS(sensor)								\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"					\
+		"[text()='runtime.healthSystemRuntime.systemHealthInfo']]"				\
+		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
+		"[*[local-name()='name'][text()='" sensor "']]"						\
+		"/*[local-name()='healthState']/*[local-name()='key']"
+
+#define ZBX_XPATH_VMWARE_ABOUT(property)								\
+	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
+
+#	define ZBX_XPATH_LN(LN)			"/*[local-name()='" LN "']"
+#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
+#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
+#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
+
+#define ZBX_XPATH_PROP_NAME(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='" property "']]"		\
+		"/*[local-name()='val']"
+
+#define ZBX_VM_NONAME_XML	"noname.xml"
+
 #define ZBX_MAP_SET		0
 #define ZBX_MAP_GET		1
 #define ZBX_MAP_DIMENSION	2
-#define ZBX_XML_PATHSET(property1)	"<ns0:pathSet>" property1 "</ns0:pathSet>"
+#define ZBX_XML_PATHSET(prop_path)		"<ns0:pathSet>" prop_path "</ns0:pathSet>"
 #define ZBX_XPATH_SET_GET(property)	{ZBX_XML_PATHSET(property), ZBX_XPATH_PROP_NAME(property)}
 
 static char	const *hv_propmap[ZBX_VMWARE_HVPROPS_NUM][ZBX_MAP_DIMENSION] = {
@@ -290,57 +378,6 @@ static void	vmware_shared_strfree(char *str)
 			zbx_hashset_remove_direct(&vmware->strpool, ptr);
 	}
 }
-
-/*
- * SOAP support
- */
-#define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
-#define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
-
-#define ZBX_POST_VSPHERE_HEADER									\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
-		"<SOAP-ENV:Envelope"								\
-			" xmlns:ns0=\"urn:vim25\""						\
-			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""		\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""		\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"	\
-			"<SOAP-ENV:Header/>"							\
-			"<ns1:Body>"
-#define ZBX_POST_VSPHERE_FOOTER									\
-			"</ns1:Body>"								\
-		"</SOAP-ENV:Envelope>"
-
-#define ZBX_XPATH_FAULTSTRING()										\
-	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
-
-#define ZBX_XPATH_REFRESHRATE()										\
-	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
-
-#define ZBX_XPATH_ISAGGREGATE()										\
-	"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
-	"../*[local-name()='currentSupported']='false']"
-
-#define ZBX_XPATH_COUNTERINFO()										\
-	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
-
-#define ZBX_XPATH_DATASTORE_MOUNT()									\
-	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
-	"/*[local-name()='mountInfo']/*[local-name()='path']"
-
-#define ZBX_XPATH_HV_DATASTORES()									\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
-	"/*[local-name()='val']/*[@type='Datastore']"
-
-#define ZBX_XPATH_HV_VMS()										\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
-	"/*[local-name()='val']/*[@type='VirtualMachine']"
-
-#define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
-	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"			\
-		"/*[local-name()='val']/*[local-name()='" property "']"
-
-#define ZBX_XPATH_MAXQUERYMETRICS()									\
-	"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
 
 typedef struct
 {
@@ -1843,7 +1880,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 {
 #	define ZBX_POST_VMWARE_GET_PERFCOUNTER							\
 		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrieveProperties>"							\
+		"<ns0:RetrievePropertiesEx>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
@@ -1854,7 +1891,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 					"<ns0:obj type=\"PerformanceManager\">%s</ns0:obj>"	\
 				"</ns0:objectSet>"						\
 			"</ns0:specSet>"							\
-		"</ns0:RetrieveProperties>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_perfcounters";
@@ -2233,7 +2271,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
 				"</ns0:objectSet>"					\
 			"</ns0:specSet>"						\
-			"<ns0:options></ns0:options>"					\
+			"<ns0:options/>"						\
 		"</ns0:RetrievePropertiesEx>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
@@ -2242,7 +2280,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 	char		tmp[MAX_STRING_LEN], props[MAX_STRING_LEN], *vmid_esc;
 	int		i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() vmid:'%s'", __function_name, vmid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
 	props[0] = '\0';
 
 	for (i = 0; i < props_num; i++)
@@ -2392,7 +2430,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 {
 #	define ZBX_POST_DATASTORE_GET								\
 		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrieveProperties>"							\
+		"<ns0:RetrievePropertiesEx>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
@@ -2404,7 +2442,8 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
 				"</ns0:objectSet>"						\
 			"</ns0:specSet>"							\
-		"</ns0:RetrieveProperties>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
@@ -2519,7 +2558,7 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 {
 #	define ZBX_POST_HV_DETAILS 								\
 		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrieveProperties>"							\
+		"<ns0:RetrievePropertiesEx>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
@@ -2533,7 +2572,8 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
 				"</ns0:objectSet>"						\
 			"</ns0:specSet>"							\
-		"</ns0:RetrieveProperties>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_service_get_hv_data";
@@ -2586,7 +2626,7 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 {
 #	define ZBX_POST_HV_DATACENTER_NAME									\
 		ZBX_POST_VSPHERE_HEADER										\
-			"<ns0:RetrieveProperties>"								\
+			"<ns0:RetrievePropertiesEx>"								\
 				"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
 				"<ns0:specSet>"									\
 					"<ns0:propSet>"								\
@@ -2631,7 +2671,8 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 						"</ns0:selectSet>"						\
 					"</ns0:objectSet>"							\
 				"</ns0:specSet>"								\
-			"</ns0:RetrieveProperties>"								\
+				"<ns0:options/>"								\
+			"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vmware_hv_get_datacenter_name";
@@ -2648,7 +2689,7 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
 		goto out;
 
-	if (NULL == (hv->datacenter_name = zbx_xml_read_doc_value(doc, "/*/*/*/*/*/*[local-name()='val']")))
+	if (NULL == (hv->datacenter_name = zbx_xml_read_doc_value(doc, "/*/*/*/*/*/*/*[local-name()='val']")))
 		hv->datacenter_name = zbx_strdup(NULL, "");
 
 	ret = SUCCEED;
