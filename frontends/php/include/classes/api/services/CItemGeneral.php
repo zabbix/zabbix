@@ -1387,7 +1387,9 @@ abstract class CItemGeneral extends CApiService {
 						'itemid' => $item['itemid'],
 						'step' => $step++,
 						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params']
+						'params' => $preprocessing['params'],
+						'error_handler' => $preprocessing['error_handler'],
+						'error_handler_params' => $preprocessing['error_handler_params']
 					];
 				}
 			}
