@@ -35,7 +35,7 @@ typedef struct
 zbx_regmatch_t;
 
 #define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
-					/* Group \0 contains the whole matched string, groups \1 ...\9    */
+					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
 
 /******************************************************************************
