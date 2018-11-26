@@ -90,7 +90,7 @@ class CFlexibleIntervalParser extends CParser {
 	}
 
 	/**
-	 * Returns matched user and LLD macros.
+	 * Returns matched interval parts, user macros and LLD macros.
 	 *
 	 * @return array
 	 */

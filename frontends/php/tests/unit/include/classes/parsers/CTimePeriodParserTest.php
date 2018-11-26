@@ -84,24 +84,10 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				'{#M}', 0, ['lldmacros' => true],
+				'{$M: "context"}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{#M}'
-				]
-			],
-			[
-				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
-				]
-			],
-			[
-				'{$M: "macros context"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$M: "macros context"}'
+					'match' => '{$M: "context"}'
 				]
 			],
 			[
@@ -116,6 +102,20 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M: "/"}'
+				]
+			],
+			[
+				'{#M}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{#M}'
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#M}.regsub("^([0-9]+)", "{#M}: \1")}'
 				]
 			],
 			// partial success
@@ -415,23 +415,8 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 					'match' => ''
 				]
 			],
-			// LLD macros are not enabled.
 			[
-				'{#M}', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				]
-			],
-			[
-				'{$M: "macros context"}', 0, [],
+				'{$M: "context"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -446,6 +431,21 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 			],
 			[
 				'{$M: "/"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			// LLD macros are not enabled.
+			[
+				'{#M}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{{#M}.regsub("^([0-9]+)", "{#M}: \1")}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
