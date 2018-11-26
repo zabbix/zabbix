@@ -167,14 +167,7 @@ else {
 
 	$widget
 		->addItem($timeline)
-		->addItem((new CDiv([
-				(new CDiv())->addClass('dashbrd-grid-widget-placeholder'),
-				(new CDiv([
-					new CDiv('Visible when dashboard NOT in edit mode'),
-					new CDiv('Visible when dashboard in edit mode'),
-					new CDiv('Visible when dashboard in edit mode and widget is dragged')
-				]))->addClass('dashbrd-grid-new-widget-placeholder')
-			]))->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
+		->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBRD_GRID_WIDGET_CONTAINER))
 		->show();
 
 	/*

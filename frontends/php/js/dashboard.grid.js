@@ -96,6 +96,13 @@
 		}
 	}
 
+	/**
+	 * Set height of dashboard container DOM element.
+	 *
+	 * @param {object} $obj         Dashboard container jQuery object.
+	 * @param {object} data         Dashboard data and options object.
+	 * @param {integer} min_rows    Minimal desired rows count.
+	 */
 	function resizeDashboardGrid($obj, data, min_rows) {
 		data['options']['rows'] = 0;
 
@@ -105,15 +112,23 @@
 			}
 		});
 
+		if (data['options']['rows'] == 0) {
+			data.new_widget_placeholder.show();
+		}
+
 		if (typeof(min_rows) != 'undefined' && data['options']['rows'] < min_rows) {
 			data['options']['rows'] = min_rows;
 		}
 
-		$obj.css({'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'});
+		var height = data['options']['widget-height'] * data['options']['rows'],
+			footer = $('footer');
 
-		if (data['options']['rows'] == 0) {
-			data.new_widget_placeholder.show();
+		if (footer.length) {
+			// FIX @greg: this calculates wrong size!!!
+			height = Math.max(height, footer.offset().top - $obj.offset().top - footer.height());
 		}
+
+		$obj.css({'height': '' + height + 'px'});
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -574,18 +589,7 @@
 			});
 
 			setDivPosition(data['placeholder'], data, pos, true);
-
-			if (widget.pos.height != widget.current_pos.height) {
-				var min_rows = 0;
-
-				data.widgets.each(function(box) {
-					min_rows = Math.max(min_rows, box.current_pos.y + box.current_pos.height);
-				});
-
-				if (data['options']['rows'] < min_rows) {
-					resizeDashboardGrid($obj, data, min_rows);
-				}
-			}
+			resizeDashboardGrid($obj, data, pos.y + pos.height);
 		}
 		else {
 			setDivPosition(data['placeholder'], data, pos, false);
@@ -618,19 +622,7 @@
 			});
 		}
 
-		var min_rows = 1;
-
-		$.each(data['widgets'], function() {
-			var rows = this['current_pos']['y'] + this['current_pos']['height'];
-
-			if (min_rows < rows) {
-				min_rows = rows;
-			}
-		});
-
-		if (data['options']['rows'] < min_rows) {
-			resizeDashboardGrid($obj, data, min_rows);
-		}
+		resizeDashboardGrid($obj, data, pos.y + pos.height);
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
@@ -677,8 +669,8 @@
 			start: function(event, ui) {
 				data['pos-action'] = 'drag';
 				data.calculated = {
-					'left-max': $('.dashbrd-grid-widget-container').width() - ui.helper.width(),
-					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
+					'left-max': $obj.width() - ui.helper.width(),
+					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height(),
 				};
 
 				startWidgetPositioning(ui.helper, data);
@@ -726,7 +718,6 @@
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
 				data['pos-action'] = 'resize';
-
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -743,7 +734,6 @@
 			},
 			stop: function(event, ui) {
 				data['pos-action'] = '';
-
 				stopWidgetPositioning($obj, $(event.target), data);
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
@@ -1200,12 +1190,17 @@
 					|| $(event.target).parent().is(data.new_widget_placeholder)) {
 				data['pos-action'] = 'add';
 				data.new_widget_placeholder
-					.removeClass('dashbrd-grid-widget-set-position')
-					.addClass('dashbrd-grid-widget-customize-size');
+					.find('.dashbrd-grid-widget-new-box')
+						.removeClass('dashbrd-grid-widget-set-position')
+						.text(t('Release to create a new widget in the selected area.'))
+						.addClass('dashbrd-grid-widget-set-size');
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function(event) {
-			data['pos-action'] = '';
+			if (data['pos-action'] == 'add') {
+				data['pos-action'] = '';
+			}
+
 			data.add_widget_dimension = {};
 
 			if (data.widgets.length) {
@@ -1216,19 +1211,30 @@
 			}
 
 			data.new_widget_placeholder
-				.removeClass('dashbrd-grid-widget-customize-size dashbrd-grid-widget-set-position');
+				.find('.dashbrd-grid-widget-new-box')
+					.text(t('Add a new widget'))
+					.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
 
 		}).on('mouseenter mousemove', function(event) {
-			if (event.type == 'mouseenter') {
-				data.new_widget_placeholder.show().addClass('dashbrd-grid-widget-set-position');
+			var drag = data['pos-action'] == 'add';
+
+			if (data['pos-action'] !== '' && !drag) {
+				return;
 			}
 
-			var drag = data['pos-action'] == 'add';
+			if (event.type == 'mouseenter') {
+				data.new_widget_placeholder.show()
+					.find('.dashbrd-grid-widget-new-box')
+						.text(t('Click and drag to mark desired widget size.'))
+						.addClass('dashbrd-grid-widget-set-position');
+			}
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
 					&& !$(event.target).parent().is(data.new_widget_placeholder)) {
 				data.add_widget_dimension = {};
-				data.new_widget_placeholder.hide().removeClass('dashbrd-grid-widget-customize-size');
+				data.new_widget_placeholder.hide()
+					.find('.dashbrd-grid-widget-new-box')
+						.removeClass('dashbrd-grid-widget-set-size');
 				return;
 			}
 
@@ -1271,8 +1277,6 @@
 					return !overlap;
 				});
 
-				$obj.css('height', Math.max(o['rows'], pos.y + pos.height + 1) * o['widget-height'] + 'px');
-
 				if (overlap) {
 					pos = data.add_widget_dimension;
 				}
@@ -1305,16 +1309,15 @@
 				}
 
 				if (overlap) {
-					data.placeholder.hide();
 					return;
 				}
-
-				$obj.css('height', Math.max(o['rows'], pos.y + pos.height) * o['widget-height'] + 'px');
 			}
 
+			resizeDashboardGrid($obj, data, pos.y + pos.height);
 			data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
 			data.new_widget_placeholder.css({
+				position: 'absolute',
 				top: data.add_widget_dimension.y * o['widget-height'] + 'px',
 				left: data.add_widget_dimension.x * o['widget-width'] + '%',
 				height: data.add_widget_dimension.height * o['widget-height'] + 'px',
@@ -1577,12 +1580,16 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					new_widget_placeholder = $this.find('.dashbrd-grid-new-widget-placeholder');
+					new_widget_placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(
+						$('<div>', {
+							class: 'dashbrd-grid-widget-new-box',
+							text: t('Add a new widget')
+						})
+					);
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.remove();
-						new_widget_placeholder = $();
+						new_widget_placeholder = $('<h1>').text(t('Cannot add widgets in kiosk mode'));
 					}
 					else {
 						new_widget_placeholder.on('click', function() {
@@ -1597,6 +1604,8 @@
 				else {
 					new_widget_placeholder.addClass('disabled');
 				}
+
+				$this.append(new_widget_placeholder);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -1763,11 +1772,6 @@
 				doAction('onEditStart', $this, data, null);
 				dashboardRemoveMessages();
 				setModeEditDashboard($this, data);
-
-				/**
-				 * Set maximal possible height of dashboard, this should be done for 'add new widget' event handlers.
-				 */
-				$this.height($('footer').offset().top - $this.offset().top - $('footer').height());
 			});
 		},
 
@@ -1826,10 +1830,6 @@
 					data = $this.data('dashboardGrid');
 
 				deleteWidget($this, data, widget);
-				/**
-				 * Keep dashboard container height is required by 'add new widget' event handlers.
-				 */
-				$this.height($('footer').offset().top - $this.offset().top - $('footer').height());
 			});
 		},
 

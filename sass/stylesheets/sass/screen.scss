@@ -3169,15 +3169,13 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-new-widget-placeholder {
-	position: absolute;
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
 	z-index: 999;
 	width: calc(100% / 6 - .65rem);
 	height: 200px;
 
-	.dashbrd-grid-new-widget-label {
-		display: none;
+	div {
 		-moz-user-select: none;
 		-khtml-user-select: none;
 		-webkit-user-select: none;
