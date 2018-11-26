@@ -448,8 +448,8 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 {
 	const char	*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
-	zbx_regmatch_t	 match[ZBX_REGEXP_GROUPS_MAX];
-	int	i;
+	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
+	unsigned int	i;
 
 	if (NULL == string)
 	{
