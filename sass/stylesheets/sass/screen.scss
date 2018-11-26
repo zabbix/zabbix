@@ -3169,13 +3169,14 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-new-widget-placeholder {
+	position: absolute;
 	border-color: darken($body-bg-color, 6%) !important;
 	background-color: darken($body-bg-color, 6%) !important;
 	z-index: 999;
 	width: calc(100% / 6 - .65rem);
 	height: 200px;
 
-	& div {
+	.dashbrd-grid-new-widget-label {
 		display: none;
 		-moz-user-select: none;
 		-khtml-user-select: none;
@@ -3184,32 +3185,16 @@ $form-icon-btn: (
 		user-select: none;
 	}
 
-	div:nth-child(1) {
-		display: block;
+	.dashbrd-grid-widget-new-box {
+
 	}
 
-	&.dashbrd-grid-widget-set-position {
-		position: absolute;
+	.dashbrd-grid-widget-set-position {
 
-		div {
-			display: none;
-		}
-
-		div:nth-child(2) {
-			display: block;
-		}
 	}
 
-	&.dashbrd-grid-widget-customize-size {
-		position: absolute;
+	.dashbrd-grid-widget-set-size {
 
-		div {
-			display: none;
-		}
-
-		div:nth-child(3) {
-			display: block;
-		}
 	}
 }
 
