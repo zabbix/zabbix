@@ -9781,7 +9781,7 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9813,7 +9813,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9840,7 +9840,7 @@ zbx_uint64_t	DCget_trigger_count(void)
 {
 	zbx_uint64_t	count;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
