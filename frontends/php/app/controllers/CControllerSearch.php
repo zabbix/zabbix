@@ -188,14 +188,14 @@ class CControllerSearch extends CController {
 			];
 		}
 
-		$this->setResponse(
-			(new CControllerResponseData([
-				'search' => $this->getInput('search', _('Search pattern is empty')),
-				'admin' => $this->admin,
-				'hosts' => $view_hosts,
-				'host_groups' => $view_host_groups,
-				'templates' => $this->admin ? $view_templates : null
-			]))
-		);
+		$response = new CControllerResponseData([
+			'search' => $this->getInput('search', _('Search pattern is empty')),
+			'admin' => $this->admin,
+			'hosts' => $view_hosts,
+			'host_groups' => $view_host_groups,
+			'templates' => $this->admin ? $view_templates : null
+		]);
+		$response->setTitle(_('Search'));
+		$this->setResponse($response);
 	}
 }

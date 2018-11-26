@@ -111,9 +111,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'imgstore.php'
 				],
 				[
-					'url' => 'search.php'
-				],
-				[
 					'url' => 'jsrpc.php'
 				]
 			]
