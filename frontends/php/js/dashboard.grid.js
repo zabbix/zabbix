@@ -112,7 +112,7 @@
 		$obj.css({'height': '' + (data['options']['widget-height'] * data['options']['rows']) + 'px'});
 
 		if (data['options']['rows'] == 0) {
-			data['empty_placeholder'].show();
+			data.new_widget_placeholder.show();
 		}
 	}
 
@@ -1694,6 +1694,7 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
+				data.new_widget_placeholder.hide();
 			});
 		},
 
@@ -1825,6 +1826,10 @@
 					data = $this.data('dashboardGrid');
 
 				deleteWidget($this, data, widget);
+				/**
+				 * Keep dashboard container height is required by 'add new widget' event handlers.
+				 */
+				$this.height($('footer').offset().top - $this.offset().top - $('footer').height());
 			});
 		},
 
