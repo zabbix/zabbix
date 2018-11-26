@@ -142,7 +142,7 @@ foreach ($hosts['rows'] as $host) {
 	]);
 }
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
-	->setExpanded($hosts['hat'], true)
+	->setExpanded((bool) CProfile::get($hosts['hat'], true))
 	->setHeader(_('Hosts'), [], false, $hosts['hat'])
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $hosts['count'], $hosts['overall_count'])]));
 
@@ -213,7 +213,7 @@ foreach ($host_groups['rows'] as $group) {
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
-	->setExpanded($host_groups['hat'], true)
+	->setExpanded((bool) CProfile::get($host_groups['hat'], true))
 	->setHeader(_('Host groups'), [], false, $host_groups['hat'])
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $host_groups['count'], $host_groups['overall_count'])]));
 
