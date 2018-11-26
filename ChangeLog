@@ -1,11 +1,22 @@
+Changes for 4.0.2
+
+4.0.2rc1 was released as 4.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.2rc1
 
 New features:
+.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 ....I..... [ZBXNEXT-4841] removed hardcoded locations for iconv.h and pthread.h; thanks to Helmut Grohne for the patch (kalimulin)
 ...G...... [ZBXNEXT-3047] fixed compilation errors on Windows platform with static OpenSSL libraries (Andris, viktors)
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15171] fixed crash in ODBC when creating JSON from null db values, fixed memory leak (kalimulin)
+..F....... [ZBX-15045] fixed a case where a disable multiselect looks like a similar to enabled text field (vasilijs)
+..F....... [ZBX-14927] fixed filter by host group without real hosts in triggers top 100, dashboard widgets, screens (talbergs)
+....I..... [ZBX-13662] fixed duplication of file system type in global regular expression for file systems discovery (MVekslers)
+....I....T [ZBX-15036] added system.cpu.util[,guest], system.cpu.util[,guest_nice] to OS Linux template (kalimulin)
 ...G...PS. [ZBX-15106] improved error messages for item preprocessing, general pcre code improvements (Andris, kalimulin, wiper)
 ........S. [ZBX-15095] fixed curl error handling for elasticsearch history backend (MVekslers)
 ....I..... [ZBX-15129] added optional upgrade patches to rename TRIGGER.NAME macros to EVENT.NAME in action operation messages and custom scripts (wiper)
@@ -27,7 +38,7 @@ Bug fixes:
 ....I..... [ZBX-14941] fixed issue with autoreconf/automake for source tarball (MVekslers)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
-..F....... [ZBX-14724] fixed breadcrumb jumping in EI browser (ashubin)
+..F....... [ZBX-14724] fixed breadcrumb jumping in IE browser (ashubin)
 A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
 .......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
 A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
@@ -2053,6 +2064,11 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.24
+
+3.0.24rc1 was released as 3.0.24 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.24rc1

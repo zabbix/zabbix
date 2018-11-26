@@ -1913,6 +1913,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS)->addItem($list);
 	}
 
+	if ($title !== null) {
+		$title = new CSpan($title);
+	}
+
 	// Details link should be in front of title.
 	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
 		->addClass($class)
