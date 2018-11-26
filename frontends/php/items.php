@@ -592,7 +592,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if (!array_key_exists('on_fail', $step)) {
-				$step['error_handler'] = 0;
+				$step['error_handler'] = ZBX_PREPROC_FAIL_DEFAULT;
 				$step['error_handler_params'] = '';
 			}
 		}

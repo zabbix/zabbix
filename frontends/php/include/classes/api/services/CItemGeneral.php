@@ -1401,9 +1401,12 @@ abstract class CItemGeneral extends CApiService {
 						if (is_array($preprocessing['error_handler'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}
-						elseif ($preprocessing['error_handler'] !== '' && $preprocessing['error_handler'] !== null
-								&& $preprocessing['error_handler'] !== false) {
-							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler', _('should be empty'));
+						elseif ($preprocessing['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
+									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
+								)
+							);
 						}
 
 						if (is_array($preprocessing['error_handler_params'])) {
@@ -1412,8 +1415,10 @@ abstract class CItemGeneral extends CApiService {
 						elseif ($preprocessing['error_handler_params'] !== ''
 								&& $preprocessing['error_handler_params'] !== null
 								&& $preprocessing['error_handler_params'] !== false) {
-							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-								_('should be empty')
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('should be empty')
+								)
 							);
 						}
 						break;
@@ -1430,11 +1435,28 @@ abstract class CItemGeneral extends CApiService {
 							);
 						}
 
-						if (($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
+						if (is_array($preprocessing['error_handler_params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
 									|| $preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE)
-								&& $preprocessing['error_handler_params'] !== '') {
-							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-								_('should be empty')
+								&& $preprocessing['error_handler_params'] !== ''
+								&& $preprocessing['error_handler_params'] !== null
+								&& $preprocessing['error_handler_params'] !== false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('should be empty')
+								)
+							);
+						}
+						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
+								&& ($preprocessing['error_handler_params'] === ''
+									|| $preprocessing['error_handler_params'] === null
+									|| $preprocessing['error_handler_params'] === false)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+									_('cannot be empty')
+								)
 							);
 						}
 				}
