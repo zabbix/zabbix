@@ -33,6 +33,7 @@ dist-hook:
 	rm -rf $(top_distdir)/frontends/php/tests
 	rm -f $(top_distdir)/sass/*.html
 	rm -rf $(top_distdir)/sass/img_source
+	autoreconf $(top_distdir)
 
 if DBSCHEMA
 dbschema_ibm_db2:
