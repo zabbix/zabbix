@@ -881,7 +881,7 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_preprocessing_request_t	*request;
 	zbx_variant_t			value;
 	char				*error;
-	zbx_item_link_t		*index;
+	zbx_item_link_t			*index;
 	zbx_vector_ptr_t		history;
 	zbx_preproc_history_t		*vault;
 
