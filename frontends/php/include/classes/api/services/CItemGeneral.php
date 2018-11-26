@@ -1195,25 +1195,40 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Validate item pre-processing.
 	 *
-	 * @param array  $item									An array of single item data.
-	 * @param array  $item['preprocessing']					An array of item pre-processing data.
-	 * @param string $item['preprocessing'][]['type']		The preprocessing option type. Possible values:
-	 *															1 - ZBX_PREPROC_MULTIPLIER;
-	 *															2 - ZBX_PREPROC_RTRIM;
-	 *															3 - ZBX_PREPROC_LTRIM;
-	 *															4 - ZBX_PREPROC_TRIM;
-	 *															5 - ZBX_PREPROC_REGSUB;
-	 *															6 - ZBX_PREPROC_BOOL2DEC;
-	 *															7 - ZBX_PREPROC_OCT2DEC;
-	 *															8 - ZBX_PREPROC_HEX2DEC;
-	 *															9 - ZBX_PREPROC_DELTA_VALUE;
-	 *															10 - ZBX_PREPROC_DELTA_SPEED;
-	 *															11 - ZBX_PREPROC_XPATH;
-	 *															12 - ZBX_PREPROC_JSONPATH.
-	 * @param string $item['preprocessing'][]['params']		Additional parameters used by preprocessing option. In case
-	 *														of regular expression (ZBX_PREPROC_REGSUB), multiple
-	 *														parameters are separated by LF (\n)character.
-	 * @param string $method								A string of "create" or "update" method.
+	 * @param array  $item                                             An array of single item data.
+	 * @param array  $item['preprocessing']                            An array of item pre-processing data.
+	 * @param string $item['preprocessing'][]['type']                  The preprocessing option type. Possible values:
+	 *                                                                  1 - ZBX_PREPROC_MULTIPLIER;
+	 *                                                                  2 - ZBX_PREPROC_RTRIM;
+	 *                                                                  3 - ZBX_PREPROC_LTRIM;
+	 *                                                                  4 - ZBX_PREPROC_TRIM;
+	 *                                                                  5 - ZBX_PREPROC_REGSUB;
+	 *                                                                  6 - ZBX_PREPROC_BOOL2DEC;
+	 *                                                                  7 - ZBX_PREPROC_OCT2DEC;
+	 *                                                                  8 - ZBX_PREPROC_HEX2DEC;
+	 *                                                                  9 - ZBX_PREPROC_DELTA_VALUE;
+	 *                                                                  10 - ZBX_PREPROC_DELTA_SPEED;
+	 *                                                                  11 - ZBX_PREPROC_XPATH;
+	 *                                                                  12 - ZBX_PREPROC_JSONPATH;
+	 *                                                                  13 - ZBX_PREPROC_VALIDATE_RANGE;
+	 *                                                                  14 - ZBX_PREPROC_VALIDATE_REGEX;
+	 *                                                                  15 - ZBX_PREPROC_VALIDATE_NOT_REGEX;
+	 *                                                                  16 - ZBX_PREPROC_ERROR_FIELD_JSON;
+	 *                                                                  17 - ZBX_PREPROC_ERROR_FIELD_XML;
+	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
+	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
+	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE.
+	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
+	 *                                                                 option. Multiple parameters are separated by LF
+	 *                                                                 (\n) character.
+	 * @param string $item['preprocessing'][]['error_handler']         Action type used in case of preprocessing step
+	 *                                                                 failure. Possible values:
+	 *                                                                  0 - ZBX_PREPROC_FAIL_DEFAULT;
+	 *                                                                  1 - ZBX_PREPROC_FAIL_DISCARD_VALUE;
+	 *                                                                  2 - ZBX_PREPROC_FAIL_SET_VALUE;
+	 *                                                                  3 - ZBX_PREPROC_FAIL_SET_ERROR.
+	 * @param string $item['preprocessing'][]['error_handler_params']  Error handler parameters.
+	 * @param string $method                                           A string of "create" or "update" method.
 	 */
 	protected function validateItemPreprocessing(array $item, $method) {
 		if (array_key_exists('preprocessing', $item)) {
@@ -1373,15 +1388,16 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Insert item pre-processing data into DB.
 	 *
-	 * @param array $items							An array of items.
-	 * @param array $items[]['preprocessing']		An array of item pre-processing data.
+	 * @param array $items                     An array of items.
+	 * @param array $items[]['preprocessing']  An array of item pre-processing data.
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$step = 1;
+
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
@@ -1409,11 +1425,11 @@ abstract class CItemGeneral extends CApiService {
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$item_preprocids[] = $item['itemid'];
+				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
