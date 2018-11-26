@@ -1706,6 +1706,14 @@ function getParamFieldLabelByType($itemType) {
  *                                               [6] => Boolean to decimal
  *                                               [7] => Octal to decimal
  *                                               [8] => Hexadecimal to decimal
+ *                                               [13] => In range
+ *                                               [14] => Matches regular expression
+ *                                               [15] => Does not match regular expression
+ *                                               [16] => Check for error in JSON
+ *                                               [17] => Check for error in XML
+ *                                               [18] => Check for error using regular expression
+ *                                               [19] => Discard unchanged
+ *                                               [20] => Discard unchanged for less than N seconds
  *
  * @param int  $type     Item preprocessing type.
  * @param bool $grouped  Group label flag.

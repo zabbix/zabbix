@@ -1238,7 +1238,13 @@ abstract class CItemGeneral extends CApiService {
 
 			$type_validator = new CLimitedSetValidator(['values' => array_keys(get_preprocessing_types(null, false))]);
 
-			$required_fields = ['type', 'params'];
+			$error_handler_validator = new CLimitedSetValidator([
+				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
+					ZBX_PREPROC_FAIL_SET_ERROR
+				]
+			]);
+
+			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
 
 			foreach ($item['preprocessing'] as $preprocessing) {
@@ -1267,6 +1273,7 @@ abstract class CItemGeneral extends CApiService {
 						)
 					);
 				}
+
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:
 						// Check if custom multiplier is a valid number.
@@ -1380,6 +1387,56 @@ abstract class CItemGeneral extends CApiService {
 							$delta = true;
 						}
 						break;
+				}
+
+				switch ($preprocessing['type']) {
+					case ZBX_PREPROC_RTRIM:
+					case ZBX_PREPROC_LTRIM:
+					case ZBX_PREPROC_TRIM:
+					case ZBX_PREPROC_ERROR_FIELD_JSON:
+					case ZBX_PREPROC_ERROR_FIELD_XML:
+					case ZBX_PREPROC_ERROR_FIELD_REGEX:
+					case ZBX_PREPROC_THROTTLE_VALUE:
+					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+						if (is_array($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['error_handler'] !== '' && $preprocessing['error_handler'] !== null
+								&& $preprocessing['error_handler'] !== false) {
+							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler', _('should be empty'));
+						}
+
+						if (is_array($preprocessing['error_handler_params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['error_handler_params'] !== ''
+								&& $preprocessing['error_handler_params'] !== null
+								&& $preprocessing['error_handler_params'] !== false) {
+							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+								_('should be empty')
+							);
+						}
+						break;
+
+					default:
+						if (is_array($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (!$error_handler_validator->validate($preprocessing['error_handler'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
+									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
+								)
+							);
+						}
+
+						if (($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
+									|| $preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE)
+								&& $preprocessing['error_handler_params'] !== '') {
+							_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
+								_('should be empty')
+							);
+						}
 				}
 			}
 		}
