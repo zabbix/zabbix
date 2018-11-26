@@ -1713,7 +1713,7 @@ function getParamFieldLabelByType($itemType) {
  *                                               [17] => Check for error in XML
  *                                               [18] => Check for error using regular expression
  *                                               [19] => Discard unchanged
- *                                               [20] => Discard unchanged for less than N seconds
+ *                                               [20] => Discard unchanged with heartbeat
  *
  * @param int  $type     Item preprocessing type.
  * @param bool $grouped  Group label flag.
@@ -1774,7 +1774,7 @@ function get_preprocessing_types($type = null, $grouped = true) {
 			'label' => _('Throttling'),
 			'types' => [
 				ZBX_PREPROC_THROTTLE_VALUE => _('Discard unchanged'),
-				ZBX_PREPROC_THROTTLE_TIMED_VALUE => _('Discard unchanged for less than N seconds')
+				ZBX_PREPROC_THROTTLE_TIMED_VALUE => _('Discard unchanged with heartbeat')
 			]
 		]
 	];
