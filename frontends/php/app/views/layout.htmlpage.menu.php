@@ -21,9 +21,10 @@
 $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
-		(new CForm('get', 'search.php'))
+		(new CForm('post', 'zabbix.php'))
 			->cleanItems()
 			->addItem([
+				(new CInput('hidden', 'action', 'search'))->removeAttribute('id'),
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH)

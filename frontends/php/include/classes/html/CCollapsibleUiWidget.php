@@ -41,10 +41,10 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * @param string	$caption
 	 * @param array		$controls
 	 */
-	public function setHeader($caption, array $controls = [], $cursor_move = false, $url = '') {
+	public function setHeader($caption, array $controls = [], $cursor_move = false, $idx = '') {
 		$icon = (new CRedirectButton(null, null))
 			->setId($this->id.'_icon')
-			->onClick('changeWidgetState(this, "'.$this->id.'", "'.$url.'");');
+			->onClick('changeWidgetState(this, "'.$this->id.'", "'.$idx.'");');
 		if ($this->expanded) {
 			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE)
 				->setTitle(_('Collapse'));
