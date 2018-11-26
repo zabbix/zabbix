@@ -510,7 +510,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 		char **out)
 {
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
-	int	i;
+	unsigned int	i;
 
 	zbx_free(*out);
 
