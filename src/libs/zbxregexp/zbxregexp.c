@@ -496,7 +496,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                    If output template is NULL or contains     *
  *                                    empty string then the whole input string   *
  *                                    is used as output value.                   *
- *            out              - [OUT] the output value if the input string      *
+ *             out             - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
  *                                                                               *
