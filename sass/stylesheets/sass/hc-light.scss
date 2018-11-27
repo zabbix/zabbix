@@ -496,17 +496,9 @@ ul.top-nav-icons {
 	}
 }
 
-
 .filter-trigger {
 	.arrow-down {
 		border-top-color: #FFF !important;
-	}
-}
-
-.tag {
-	&.tag-inherited {
-		color: $font-color;
-		@include box-shadow(inset 0 0 0 1px $font-color);
 	}
 }
 

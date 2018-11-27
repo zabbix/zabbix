@@ -3175,12 +3175,6 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-  .tag.tag-inherited {
-    color: #333;
-    background-color: #fff;
-    -webkit-box-shadow: inset 0 0 0 1px #333;
-    -moz-box-shadow: inset 0 0 0 1px #333;
-    box-shadow: inset 0 0 0 1px #333; }
 
 .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
@@ -4717,12 +4711,6 @@ ul.top-nav-icons a:focus {
 
 .filter-trigger .arrow-down {
   border-top-color: #FFF !important; }
-
-.tag.tag-inherited {
-  color: #000;
-  -webkit-box-shadow: inset 0 0 0 1px #000;
-  -moz-box-shadow: inset 0 0 0 1px #000;
-  box-shadow: inset 0 0 0 1px #000; }
 
 .top-subnav a.selected {
   font-weight: bold; }

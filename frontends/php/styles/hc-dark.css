@@ -3175,12 +3175,6 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-  .tag.tag-inherited {
-    color: #cacaca;
-    background-color: #000;
-    -webkit-box-shadow: inset 0 0 0 1px #ddd;
-    -moz-box-shadow: inset 0 0 0 1px #ddd;
-    box-shadow: inset 0 0 0 1px #ddd; }
 
 .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
@@ -4759,11 +4753,6 @@ ul.top-nav-icons a:focus {
 
 .tag {
   color: #000; }
-  .tag.tag-inherited {
-    color: #fff;
-    -webkit-box-shadow: inset 0 0 0 1px #ddd;
-    -moz-box-shadow: inset 0 0 0 1px #ddd;
-    box-shadow: inset 0 0 0 1px #ddd; }
 
 .disabled {
   opacity: 0.6;

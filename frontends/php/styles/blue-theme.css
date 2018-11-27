@@ -3188,12 +3188,6 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-  .tag.tag-inherited {
-    color: #768d99;
-    background-color: #fff;
-    -webkit-box-shadow: inset 0 0 0 1px #768d99;
-    -moz-box-shadow: inset 0 0 0 1px #768d99;
-    box-shadow: inset 0 0 0 1px #768d99; }
 
 .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;

@@ -240,11 +240,3 @@ $ok-ack-fg-color: #00ff00;
 		color: $font-selected-color;
 	}
 }
-
-.tag {
-	&.tag-inherited {
-		color: $font-color;
-		background-color: $ui-bg-selected-color;
-		@include box-shadow(inset 0 0 0 1px $font-alt-color);
-	}
-}

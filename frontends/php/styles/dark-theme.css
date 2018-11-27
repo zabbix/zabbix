@@ -3212,12 +3212,6 @@ a.link-action {
   border-radius: 2px; }
   .tag:last-child {
     margin: 0; }
-  .tag.tag-inherited {
-    color: #737373;
-    background-color: #2b2b2b;
-    -webkit-box-shadow: inset 0 0 0 1px #4f4f4f;
-    -moz-box-shadow: inset 0 0 0 1px #4f4f4f;
-    box-shadow: inset 0 0 0 1px #4f4f4f; }
 
 .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg, .status-disabled-bg {
   padding: 2px 3px 1px 3px;
@@ -4533,10 +4527,3 @@ svg {
 
 .icon-actions-number-gray[data-count]::after {
   color: #f2f2f2; }
-
-.tag.tag-inherited {
-  color: #f2f2f2;
-  background-color: #4f4f4f;
-  -webkit-box-shadow: inset 0 0 0 1px #737373;
-  -moz-box-shadow: inset 0 0 0 1px #737373;
-  box-shadow: inset 0 0 0 1px #737373; }

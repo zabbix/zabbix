@@ -1439,9 +1439,6 @@ else {
 	]);
 	order_result($hosts, $sortField, $sortOrder);
 
-	// Recursively collect all tags of all parent templates and combine them with host tags.
-	addInheritedTags($hosts);
-
 	// selecting linked templates to templates linked to hosts
 	$templateids = [];
 

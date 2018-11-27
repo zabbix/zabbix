@@ -628,7 +628,6 @@ function make_popup_eventlist($trigger, $eventid_till, $backurl, $show_timeline 
  * @param array  $event_tags
  * @param string $event_tags[]['tag']
  * @param string $event_tags[]['value']
- * @param bool   $event_tags[]['inherited']    (optional)
  * @param array  $f_tags
  * @param int    $f_tags[<tag>][]['operator']
  * @param string $f_tags[<tag>][]['value']
@@ -639,9 +638,7 @@ function orderEventTags(array $event_tags, array $f_tags) {
 	$first_tags = [];
 
 	foreach ($event_tags as $i => $tag) {
-		$tag += ['inherited' => false];
-
-		if (array_key_exists($tag['tag'], $f_tags) && !$tag['inherited']) {
+		if (array_key_exists($tag['tag'], $f_tags)) {
 			foreach ($f_tags[$tag['tag']] as $f_tag) {
 				if (($f_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $f_tag['value'])
 						|| ($f_tag['operator'] == TAG_OPERATOR_LIKE
@@ -686,24 +683,26 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  * Create element with tags.
  *
  * @param array  $list
- * @param string $list[]['eventid'|'triggerid']
+ * @param string $list[][$key]
  * @param array  $list[]['tags']
  * @param string $list[]['tags'][]['tag']
  * @param string $list[]['tags'][]['value']
  * @param bool   $html
- * @param string $key                            Name of tags source ID. Possible values:
- *                                                - 'eventid' - for events and problems (default);
- *                                                - 'triggerid' - for triggers.
- * @param int    $list_tag_count                 Maximum number of tags to display.
- * @param array  $filter_tags                    An array of tag filtering data.
+ * @param string $key                        Name of tag source ID. Possible values:
+ *                                            - 'eventid' - for events and problems (default);
+ *                                            - 'hostid' - for hosts;
+ *                                            - 'templateid' - for templates;
+ *                                            - 'triggerid' - for triggers.
+ * @param int    $list_tag_count             Maximum number of tags to display.
+ * @param array  $filter_tags                An array of tag filtering data.
  * @param string $filter_tags[]['tag']
  * @param int    $filter_tags[]['operator']
  * @param string $filter_tags[]['value']
- * @param int    $tag_name_format                Tag name format. Possible values:
- *                                                - PROBLEMS_TAG_NAME_FULL (default);
- *                                                - PROBLEMS_TAG_NAME_SHORTENED;
- *                                                - PROBLEMS_TAG_NAME_NONE.
- * @param string $tag_priority                   A list of comma-separated tag names.
+ * @param int    $tag_name_format            Tag name format. Possible values:
+ *                                            - PROBLEMS_TAG_NAME_FULL (default);
+ *                                            - PROBLEMS_TAG_NAME_SHORTENED;
+ *                                            - PROBLEMS_TAG_NAME_NONE.
+ * @param string $tag_priority               A list of comma-separated tag names.
  *
  * @return array
  */
@@ -753,15 +752,10 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 				$value = getTagString($tag, $tag_name_format);
 
 				if ($value !== '') {
-					$span = (new CSpan($value))
+					$tags[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint(getTagString($tag));
 
-					if (array_key_exists('inherited', $tag) && $tag['inherited']) {
-						$span->addClass(ZBX_STYLE_TAG_INHERITED);
-					}
-
-					$tags[$element[$key]][] = $span;
 					$tags_shown++;
 
 					if ($tags_shown >= $list_tag_count) {
@@ -777,16 +771,9 @@ function makeTags(array $list, $html = true, $key = 'eventid', $list_tag_count =
 
 				foreach ($element['tags'] as $tag) {
 					$value = getTagString($tag);
-
-					$span = (new CSpan($value))
+					$hint_content[$element[$key]][] = (new CSpan($value))
 						->addClass(ZBX_STYLE_TAG)
 						->setHint($value);
-
-					if (array_key_exists('inherited', $tag) && $tag['inherited']) {
-						$span->addClass(ZBX_STYLE_TAG_INHERITED);
-					}
-
-					$hint_content[$element[$key]][] = $span;
 				}
 
 				$tags[$element[$key]][] = (new CSpan(

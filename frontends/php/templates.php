@@ -999,9 +999,6 @@ else {
 
 	order_result($templates, $sortField, $sortOrder);
 
-	// Recursively collect all tags of all parent templates and combine them with template tags.
-	addInheritedTags($templates);
-
 	// Select writable templates:
 	$linked_template_ids = [];
 	$writable_templates = [];
