@@ -10,6 +10,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15200] fixed host, trigger and item count calculation; fixed required performance calculation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.2
