@@ -332,6 +332,23 @@ static void	vmware_shared_strfree(char *str)
 #define ZBX_XPATH_MAXQUERYMETRICS()									\
 	"/*/*/*/*[*[local-name()='key']='config.vpxd.stats.maxQueryMetrics']/*[local-name()='value']"
 
+#define ZBX_XPATH_NAME_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"			\
+	"/*[local-name()='propSet'][*[local-name()='name']]/*[local-name()='val']"
+
+#define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
+	"/*/*/*/*/*[local-name()='objects']["								\
+		"*[local-name()='obj'][@type='Folder'] and "						\
+		"*[local-name()='propSet'][*[local-name()='name'][text()='childEntity']]"		\
+		"/*[local-name()='val']/*[local-name()='ManagedObjectReference']=" parent_id " and "	\
+		"*[local-name()='propSet'][*[local-name()='name'][text()='parent']]"			\
+		"/*[local-name()='val'][@type!='Datacenter']"						\
+	"]/*[local-name()='propSet'][*[local-name()='name'][text()='name']]/*[local-name()='val']"
+
+#define ZBX_XPATH_HV_PARENTID										\
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='HostSystem']]"			\
+	"/*[local-name()='propSet'][*[local-name()='name'][text()='parent']]/*[local-name()='val']"
+
 typedef struct
 {
 	char	*data;
@@ -842,6 +859,12 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 	if (NULL != hv->datacenter_name)
 		vmware_shared_strfree(hv->datacenter_name);
 
+	if (NULL != hv->parent_name)
+		vmware_shared_strfree(hv->parent_name);
+
+	if (NULL != hv->parent_type)
+		vmware_shared_strfree(hv->parent_type);
+
 	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
@@ -1211,6 +1234,8 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	dst->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_HVPROPS_NUM);
 	dst->datacenter_name = vmware_shared_strdup(src->datacenter_name);
+	dst->parent_name = vmware_shared_strdup(src->parent_name);
+	dst->parent_type= vmware_shared_strdup(src->parent_type);
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_ptr_append(&dst->datastores, vmware_datastore_shared_dup((zbx_vmware_datastore_t *)src->datastores.values[i]));
@@ -1398,6 +1423,8 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 	zbx_free(hv->id);
 	zbx_free(hv->clusterid);
 	zbx_free(hv->datacenter_name);
+	zbx_free(hv->parent_name);
+	zbx_free(hv->parent_type);
 	vmware_props_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
@@ -2548,9 +2575,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hv_get_datacenter_name                                    *
+ * Function: vmware_hv_get_parent_data                                        *
  *                                                                            *
- * Purpose: gets the vmware hypervisor datacenter name                        *
+ * Purpose: gets the vmware hypervisor datacenter, parent folder or cluster   *
+ *          name                                                              *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
@@ -2561,18 +2589,24 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CURL *easyhandle,
+static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_hv_t *hv, char **error)
 {
 #	define ZBX_POST_HV_DATACENTER_NAME									\
 		ZBX_POST_VSPHERE_HEADER										\
-			"<ns0:RetrieveProperties>"								\
+			"<ns0:RetrievePropertiesEx>"								\
 				"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
 				"<ns0:specSet>"									\
 					"<ns0:propSet>"								\
 						"<ns0:type>Datacenter</ns0:type>"				\
 						"<ns0:pathSet>name</ns0:pathSet>"				\
 					"</ns0:propSet>"							\
+					"<ns0:propSet>"								\
+						"<ns0:type>%s</ns0:type>"					\
+						"<ns0:pathSet>name</ns0:pathSet>"				\
+						"%s"								\
+					"</ns0:propSet>"							\
+					"%s"									\
 					"<ns0:objectSet>"							\
 						"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
 						"<ns0:skip>false</ns0:skip>"					\
@@ -2611,10 +2645,16 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 						"</ns0:selectSet>"						\
 					"</ns0:objectSet>"							\
 				"</ns0:specSet>"								\
-			"</ns0:RetrieveProperties>"								\
+			"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vmware_hv_get_datacenter_name";
+#	define ZBX_POST_HV_PARENT										\
+		"<ns0:propSet>"											\
+			"<urn:type>HostSystem</urn:type>"							\
+			"<urn:pathSet>parent</urn:pathSet>"							\
+		"</ns0:propSet>"
+
+	const char	*__function_name = "vmware_hv_get_parent_data";
 
 	char		tmp[MAX_STRING_LEN];
 	int		ret = FAIL;
@@ -2623,13 +2663,35 @@ static int	vmware_hv_get_datacenter_name(const zbx_vmware_service_t *service, CU
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() id:'%s'", __function_name, hv->id);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
-			vmware_service_objects[service->type].property_collector, hv->id);
+			vmware_service_objects[service->type].property_collector,
+			NULL == hv->clusterid ? ZBX_VMWARE_SOAP_FOLDER : ZBX_VMWARE_SOAP_CLUSTER,
+			NULL == hv->clusterid ? "<urn:pathSet>parent</urn:pathSet>": "",
+			NULL == hv->clusterid ? ZBX_POST_HV_PARENT : "", hv->id);
 
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
 		goto out;
 
-	if (NULL == (hv->datacenter_name = zbx_xml_read_doc_value(doc, "/*/*/*/*/*/*[local-name()='val']")))
+	if (NULL == (hv->datacenter_name = zbx_xml_read_doc_value(doc,
+			ZBX_XPATH_NAME_BY_TYPE(ZBX_VMWARE_SOAP_DATACENTER))))
+	{
 		hv->datacenter_name = zbx_strdup(NULL, "");
+	}
+
+	if (NULL != hv->clusterid && (NULL != (hv->parent_name = zbx_xml_read_doc_value(doc,
+			ZBX_XPATH_NAME_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER)))))
+	{
+		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_CLUSTER);
+	}
+	else if (NULL != (hv->parent_name = zbx_xml_read_doc_value(doc,
+			ZBX_XPATH_HV_PARENTFOLDERNAME(ZBX_XPATH_HV_PARENTID))))
+	{
+		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_FOLDER);
+	}
+	else
+	{
+		hv->parent_name = zbx_strdup(NULL, hv->datacenter_name);
+		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DATACENTER);
+	}
 
 	ret = SUCCEED;
 out:
@@ -2686,11 +2748,11 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	hv->uuid = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_HW_UUID]);
 	hv->id = zbx_strdup(NULL, id);
 
-	if (SUCCEED != vmware_hv_get_datacenter_name(service, easyhandle, hv, error))
-		goto out;
-
-	if (NULL != (value = zbx_xml_read_doc_value(details, "//*[@type='ClusterComputeResource']")))
+	if (NULL != (value = zbx_xml_read_doc_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
+
+	if (SUCCEED != vmware_hv_get_parent_data(service, easyhandle, hv, error))
+		goto out;
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 	zbx_vector_ptr_reserve(&hv->datastores, datastores.values_num + hv->datastores.values_alloc);
