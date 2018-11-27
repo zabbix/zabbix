@@ -1888,7 +1888,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border-color: #7d7d7d;
   cursor: default; }
 
-.radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #7d7d7d;
   background-color: #000 !important;
   border-color: #5a5a5a; }
