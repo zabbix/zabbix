@@ -120,15 +120,18 @@
 			data['options']['rows'] = min_rows;
 		}
 
-		var height = data['options']['widget-height'] * data['options']['rows'],
-			footer = $('footer');
+		$obj.css({
+			height: Math.max(data['options']['widget-height'] * data['options']['rows'], data.minimalHeight) + 'px'
+		});
+	}
 
-		if (footer.length) {
-			// FIX @greg: this calculates wrong size!!!
-			height = Math.max(height, footer.offset().top - $obj.offset().top - footer.height());
-		}
-
-		$obj.css({'height': '' + height + 'px'});
+	/**
+	 * Calculate minimal required height of dashboard container.
+	 *
+	 * @param {object} $obj    Dashboard container DOM element.
+	 */
+	function calculateGridMinHeight($obj) {
+		return $(window).height() - $obj.offset().top - parseInt($(document.body).css('margin-bottom'), 10);
 	}
 
 	function getWidgetByTarget(widgets, $div) {
@@ -1210,6 +1213,7 @@
 				data.new_widget_placeholder.removeAttr('style');
 			}
 
+			resizeDashboardGrid($obj, data);
 			data.new_widget_placeholder
 				.find('.dashbrd-grid-widget-new-box')
 					.text(t('Add a new widget'))
@@ -1231,6 +1235,7 @@
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
 					&& !$(event.target).parent().is(data.new_widget_placeholder)) {
+				resizeDashboardGrid($obj, data);
 				data.add_widget_dimension = {};
 				data.new_widget_placeholder.hide()
 					.find('.dashbrd-grid-widget-new-box')
@@ -1620,18 +1625,23 @@
 						relations: [],
 						tasks: {}
 					},
-					data_buffer: []
+					data_buffer: [],
+					minimalHeight: calculateGridMinHeight($this)
 				});
 
 				var	data = $this.data('dashboardGrid');
 
-				$(window).bind('beforeunload', function() {
+				$(window).on('beforeunload', function() {
 					var	res = confirmExit($this, data);
 
 					// Return value only if we need confirmation window, return nothing otherwise.
 					if (typeof res !== 'undefined') {
 						return res;
 					}
+				}).on('resize', function () {
+					// Recalculate dashboard container minimal required height.
+					data.minimalHeight = calculateGridMinHeight($this);
+					data['cell-width'] = getCurrentCellWidth(data);
 				});
 			});
 		},
