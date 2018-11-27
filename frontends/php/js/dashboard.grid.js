@@ -1168,7 +1168,7 @@
 		/**
 		 * Add new widget user interaction handlers.
 		 */
-		$obj.on('click mouseup dragend', function() {
+		$(document).on('click mouseup dragend', function() {
 			if (data['pos-action'] != 'add') {
 				return;
 			}
@@ -1183,7 +1183,8 @@
 			data['pos-action'] = '';
 			data.add_widget_dimension = {};
 			$obj.dashboardGrid('addNewWidget', null, dimension);
-		}).on('mousedown', function(event) {
+		});
+		$obj.on('mousedown', function(event) {
 			if (event.which != 1 ) {
 				return;
 			}
@@ -1201,7 +1202,7 @@
 			}
 		}).on('mouseleave', function(event) {
 			if (data['pos-action'] == 'add') {
-				data['pos-action'] = '';
+				return;
 			}
 
 			data.add_widget_dimension = {};
