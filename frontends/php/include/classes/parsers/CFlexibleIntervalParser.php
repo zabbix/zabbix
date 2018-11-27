@@ -26,7 +26,8 @@ class CFlexibleIntervalParser extends CParser {
 
 	private $simple_interval_parser;
 	private $time_period_parser;
-	private $matched_parts;
+	private $update_interval;
+	private $time_period;
 
 	private $options = [
 		'usermacros' => false,
@@ -64,23 +65,28 @@ class CFlexibleIntervalParser extends CParser {
 		$this->match = '';
 
 		$p = $pos;
-		$this->matched_parts = [];
+		$this->update_interval = '';
+		$this->time_period = '';
 
 		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
-		$this->matched_parts[] = $this->simple_interval_parser->getMatch();
+		$this->update_interval = $this->simple_interval_parser->getMatch();
 		$p += $this->simple_interval_parser->getLength();
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
+			$this->update_interval = '';
+
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
+			$this->update_interval = '';
+
 			return self::PARSE_FAIL;
 		}
-		$this->matched_parts[] = $this->time_period_parser->getMatch();
+		$this->time_period = $this->time_period_parser->getMatch();
 		$p += $this->time_period_parser->getLength();
 
 		$this->length = $p - $pos;
@@ -90,11 +96,20 @@ class CFlexibleIntervalParser extends CParser {
 	}
 
 	/**
-	 * Returns matched interval parts, user macros and LLD macros.
+	 * Returns matched update interval. Can contain macro.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function getMatchedParts() {
-		return $this->matched_parts;
+	public function getUpdateInterval() {
+		return $this->update_interval;
+	}
+
+	/**
+	 * Returns matched time period. Can contain macro.
+	 *
+	 * @return string
+	 */
+	public function getTimePeriod() {
+		return $this->time_period;
 	}
 }

@@ -90,7 +90,8 @@ class CUpdateIntervalParser extends CParser {
 				$this->intervals[] = [
 					'type' => ITEM_DELAY_FLEXIBLE,
 					'interval' => $this->flexible_interval_parser->getMatch(),
-					'parts' => $this->flexible_interval_parser->getMatchedParts()
+					'update_interval' => $this->flexible_interval_parser->getUpdateInterval(),
+					'time_period' => $this->flexible_interval_parser->getTimePeriod()
 				];
 			}
 			elseif ($this->scheduling_interval_parser->parse($source, $p) != self::PARSE_FAIL) {

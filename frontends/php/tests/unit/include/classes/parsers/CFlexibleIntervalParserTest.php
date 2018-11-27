@@ -32,7 +32,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '10s/7-7,23:59-24:00',
-					'parts' => ['10s', '7-7,23:59-24:00']
+					'update_interval' => '10s',
+					'time_period' => '7-7,23:59-24:00'
 				]
 			],
 			[
@@ -40,7 +41,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '10/7,0:00-0:01',
-					'parts' => ['10', '7,0:00-0:01']
+					'update_interval' => '10',
+					'time_period' => '7,0:00-0:01'
 				]
 			],
 			[
@@ -48,7 +50,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '52w/7,00:00-0:01',
-					'parts' => ['52w', '7,00:00-0:01']
+					'update_interval' => '52w',
+					'time_period' => '7,00:00-0:01'
 				]
 			],
 			[
@@ -56,7 +59,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}/{$M}',
-					'parts' => ['{$M}', '{$M}']
+					'update_interval' => '{$M}',
+					'time_period' => '{$M}'
 				]
 			],
 			[
@@ -64,7 +68,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M:"context"}/{$M:"context"}',
-					'parts' => ['{$M:"context"}', '{$M:"context"}']
+					'update_interval' => '{$M:"context"}',
+					'time_period' => '{$M:"context"}'
 				]
 			],
 			[
@@ -72,7 +77,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M:";"}/{$M:";"}',
-					'parts' => ['{$M:";"}', '{$M:";"}']
+					'update_interval' => '{$M:";"}',
+					'time_period' => '{$M:";"}'
 				]
 			],
 			[
@@ -80,7 +86,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M:"/"}/{$M:"/"}',
-					'parts' => ['{$M:"/"}', '{$M:"/"}']
+					'update_interval' => '{$M:"/"}',
+					'time_period' => '{$M:"/"}'
 				]
 			],
 			[
@@ -88,7 +95,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#A}/{#B}',
-					'parts' => ['{#A}', '{#B}']
+					'update_interval' => '{#A}',
+					'time_period' => '{#B}'
 				]
 			],
 			[
@@ -96,7 +104,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}',
-					'parts' => ['{{#A}.regsub("^([0-9]+)", "{#A}: \1")}', '{#B}']
+					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
+					'time_period' => '{#B}'
 				]
 			],
 			[
@@ -104,7 +113,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{#A}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}',
-					'parts' => ['{#A}', '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}']
+					'update_interval' => '{#A}',
+					'time_period' => '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
 				]
 			],
 			[
@@ -113,7 +123,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{{#B}.regsub("^([0-9]+)", "{#B}: \1")}',
-					'parts' => ['{{#A}.regsub("^([0-9]+)", "{#A}: \1")}', '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}']
+					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
+					'time_period' => '{{#B}.regsub("^([0-9]+)", "{#B}: \1")}'
 				]
 			],
 			[
@@ -122,7 +133,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}/{#B}',
-					'parts' => ['{{#A}.regsub("^([0-9]+)", "{#A}: \1")}', '{#B}']
+					'update_interval' => '{{#A}.regsub("^([0-9]+)", "{#A}: \1")}',
+					'time_period' => '{#B}'
 				]
 			],
 			// partial success
@@ -131,7 +143,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '52w/7,00:00-0:01',
-					'parts' => ['52w', '7,00:00-0:01']
+					'update_interval' => '52w',
+					'time_period' => '7,00:00-0:01'
 				]
 			],
 			[
@@ -139,7 +152,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0/2,0:00-9:00',
-					'parts' => ['0', '2,0:00-9:00']
+					'update_interval' => '0',
+					'time_period' => '2,0:00-9:00'
 				]
 			],
 			[
@@ -147,7 +161,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '5/2,1:00-9:20',
-					'parts' => ['5', '2,1:00-9:20']
+					'update_interval' => '5',
+					'time_period' => '2,1:00-9:20'
 				]
 			],
 			[
@@ -155,7 +170,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '0/2,1:00-9:20',
-					'parts' => ['0', '2,1:00-9:20']
+					'update_interval' => '0',
+					'time_period' => '2,1:00-9:20'
 				]
 			],
 			[
@@ -163,7 +179,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '52w/7,00:00-0:01',
-					'parts' => ['52w', '7,00:00-0:01']
+					'update_interval' => '52w',
+					'time_period' => '7,00:00-0:01'
 				]
 			],
 			[
@@ -171,7 +188,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M}/{$M}',
-					'parts' => ['{$M}', '{$M}']
+					'update_interval' => '{$M}',
+					'time_period' => '{$M}'
 				]
 			],
 			[
@@ -179,7 +197,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M:"context"}/{$M:"context"}',
-					'parts' => ['{$M:"context"}', '{$M:"context"}']
+					'update_interval' => '{$M:"context"}',
+					'time_period' => '{$M:"context"}'
 				]
 			],
 			[
@@ -187,7 +206,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M:";"}/{$M:";"}',
-					'parts' => ['{$M:";"}', '{$M:";"}']
+					'update_interval' => '{$M:";"}',
+					'time_period' => '{$M:";"}'
 				]
 			],
 			[
@@ -195,7 +215,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => '{$M:"/"}/{$M:"/"}',
-					'parts' => ['{$M:"/"}', '{$M:"/"}']
+					'update_interval' => '{$M:"/"}',
+					'time_period' => '{$M:"/"}'
 				]
 			],
 			// fail
@@ -204,7 +225,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -212,7 +234,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -220,7 +243,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -228,7 +252,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -236,7 +261,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -244,7 +270,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -252,7 +279,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -260,7 +288,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -268,7 +297,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -276,7 +306,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -284,7 +315,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -292,7 +324,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -300,7 +333,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -308,7 +342,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -316,7 +351,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -324,7 +360,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -332,7 +369,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -340,7 +378,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -348,7 +387,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -356,7 +396,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -364,7 +405,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -372,7 +414,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -380,7 +423,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -388,7 +432,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -396,7 +441,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -404,7 +450,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -412,7 +459,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -420,7 +468,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -428,7 +477,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -436,7 +486,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -444,7 +495,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -452,7 +504,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -460,7 +513,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -468,7 +522,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -476,7 +531,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -484,7 +540,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -492,7 +549,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -500,7 +558,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -508,7 +567,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -516,7 +576,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -524,7 +585,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -532,7 +594,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -540,7 +603,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -548,7 +612,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -556,7 +621,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -564,7 +630,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -572,7 +639,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -580,7 +648,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -588,7 +657,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -596,7 +666,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -604,7 +675,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -612,7 +684,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -620,7 +693,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -628,7 +702,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -636,7 +711,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -644,7 +720,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -652,7 +729,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -660,7 +738,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -668,7 +747,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -676,7 +756,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -684,7 +765,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -692,7 +774,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -700,7 +783,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -708,7 +792,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -716,7 +801,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -724,7 +810,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -732,7 +819,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -740,7 +828,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -748,7 +837,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -756,7 +846,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -764,7 +855,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -772,7 +864,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -780,7 +873,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -788,7 +882,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -796,7 +891,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -804,7 +900,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -812,7 +909,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -820,7 +918,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -828,7 +927,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -836,7 +936,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -844,7 +945,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -852,7 +954,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -860,7 +963,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -868,7 +972,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -876,7 +981,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -884,7 +990,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -892,7 +999,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -900,7 +1008,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -908,7 +1017,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -916,7 +1026,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -924,7 +1035,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -932,7 +1044,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -940,7 +1053,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -948,7 +1062,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -956,7 +1071,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -964,7 +1080,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -972,7 +1089,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -980,7 +1098,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -988,7 +1107,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -996,7 +1116,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1004,7 +1125,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1012,7 +1134,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1020,7 +1143,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1028,7 +1152,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1036,7 +1161,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1044,7 +1170,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1052,7 +1179,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1060,7 +1188,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1068,7 +1197,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1076,7 +1206,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1084,7 +1215,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1092,7 +1224,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1100,7 +1233,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1108,7 +1242,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1116,7 +1251,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1124,7 +1260,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1132,7 +1269,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1140,7 +1278,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1148,7 +1287,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			],
 			[
@@ -1156,7 +1296,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
-					'parts' => []
+					'update_interval' => '',
+					'time_period' => ''
 				]
 			]
 		];
@@ -1176,7 +1317,8 @@ class CFlexibleIntervalParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'parts' => $parser->getMatchedParts()
+			'update_interval' => $parser->getUpdateInterval(),
+			'time_period' => $parser->getTimePeriod()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 	}
