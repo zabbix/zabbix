@@ -233,7 +233,6 @@ typedef struct
 		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER |	\
 		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_ERROR_HANDLER_PARAMS	\
 		)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_DELETE				__UINT64_C(0x08)
 	zbx_uint64_t	flags;
 }
 zbx_lld_item_preproc_t;
