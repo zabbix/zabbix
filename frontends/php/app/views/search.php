@@ -218,7 +218,7 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $host_groups['count'], $host_groups['overall_count'])]));
 
 
-if ($templates !== null) {
+if ($admin) {
 	$table = (new CTableInfo())->setHeader([
 		_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'), _('Screens'), _('Discovery'), _('Web')
 	]);
