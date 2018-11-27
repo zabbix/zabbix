@@ -34,9 +34,6 @@ static int	DBpatch_4010000(void)
 {
 	const ZBX_FIELD	field = {"content_type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (SUCCEED != DBadd_field("media_type", &field))
 		return FAIL;
 
