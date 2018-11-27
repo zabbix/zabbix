@@ -18,6 +18,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
 .......PS. [ZBX-15200] fixed host, trigger and item count calculation; fixed required performance calculation (vso)
 ....I....T [ZBX-15158] fixed graph name for cache usage in proxy and server templates (kalimulin)
 ...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
