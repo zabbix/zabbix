@@ -283,14 +283,14 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_PROPMAP("summary.config.memorySizeMB"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
 	ZBX_PROPMAP("summary.quickStats.balloonedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
 	ZBX_PROPMAP("summary.quickStats.compressedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
-	ZBX_PROPMAP("summary.quickStats.swappedMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
+	ZBX_PROPMAP("summary.quickStats.swappedMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
 	ZBX_PROPMAP("summary.quickStats.guestMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
 	ZBX_PROPMAP("summary.quickStats.hostMemoryUsage"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
-	ZBX_PROPMAP("summary.quickStats.privateMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
+	ZBX_PROPMAP("summary.quickStats.privateMemory"),	/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
 	ZBX_PROPMAP("summary.quickStats.sharedMemory"),		/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
 	ZBX_PROPMAP("summary.runtime.powerState"),		/* ZBX_VMWARE_VMPROP_POWER_STATE */
-	ZBX_PROPMAP("summary.storage.committed"),			/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
-	ZBX_PROPMAP("summary.storage.unshared"),			/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
+	ZBX_PROPMAP("summary.storage.committed"),		/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
+	ZBX_PROPMAP("summary.storage.unshared"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
 	ZBX_PROPMAP("summary.storage.uncommitted"),		/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
 	ZBX_PROPMAP("summary.quickStats.uptimeSeconds")		/* ZBX_VMWARE_VMPROP_UPTIME */
 };
