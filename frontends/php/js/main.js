@@ -733,7 +733,7 @@ function changeWidgetState(obj, widgetId, idx) {
 	}
 
 	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-	if (typeof idx !== 'undefined') {
+	if (idx !== '' && typeof idx !== 'undefined') {
 		updateUserProfile(idx, state);
 	}
 }

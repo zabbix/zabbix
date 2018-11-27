@@ -38,8 +38,9 @@ class CCollapsibleUiWidget extends CUiWidget {
 	/**
 	 * Sets the header and adds a default expand-collapse icon.
 	 *
-	 * @param string	$caption
-	 * @param array		$controls
+	 * @param string $caption
+	 * @param array	 $controls
+	 * @param string $idx
 	 */
 	public function setHeader($caption, array $controls = [], $cursor_move = false, $idx = '') {
 		$icon = (new CRedirectButton(null, null))
