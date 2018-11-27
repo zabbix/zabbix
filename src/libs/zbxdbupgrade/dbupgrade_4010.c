@@ -32,11 +32,6 @@ extern unsigned char	program_type;
 
 static int	DBpatch_4010000(void)
 {
-	return SUCCEED;
-}
-
-static int	DBpatch_4010001(void)
-{
 	const ZBX_FIELD	field = {"content_type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -48,7 +43,7 @@ static int	DBpatch_4010001(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4010002(void)
+static int	DBpatch_4010001(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -67,6 +62,5 @@ DBPATCH_START(4010)
 
 DBPATCH_ADD(4010000, 0, 1)
 DBPATCH_ADD(4010001, 0, 1)
-DBPATCH_ADD(4010002, 0, 1)
 
 DBPATCH_END()
