@@ -394,6 +394,13 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
 
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (4, 20003, 'Discovery rule for update', '192.14.3.1-255', 600, 0, 0);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (5, 20003, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 0, 1);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (6, 20003, 'Discovery rule to check delete', '192.16.3.1-255', 600, 0, 1);
+INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
+
 -- Global macros
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (6,'{$DEFAULT_DELAY}','30');
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (7,'{$LOCALIP}','127.0.0.1');
@@ -2049,3 +2056,22 @@ INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES 
 INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (55032, 99054, 1, '127.0.0.1', 1, '10050', 1);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99911, 99053, 4);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4);
+
+-- Dashboard for problem hosts widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (100, 'Dashboard for Problem hosts widget', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (100, 100, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO profiles (profileid,userid,idx,value_id,source,type) VALUES (4, 1, 'web.dashbrd.dashboardid', 1, '', 1);
+
+-- testPageAvailabilityReport SLA reports
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50013, 50014, 4);
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40067, 2, 50014, 'Item A', 'A', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40068, 2, 50014, 'Item B', 'B', '', '', '', '');
+INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (40069, 2, 50014, 'Item C', 'C', '', '', '', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16027, '{16027}=0', 'A trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16028, '{16028}=0', 'B trigger', '');
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (16029, '{16029}=0', 'C trigger', '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16028, 40067, 16027,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16029, 40068, 16028,'last','0');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (16030, 40069, 16029,'last','0');

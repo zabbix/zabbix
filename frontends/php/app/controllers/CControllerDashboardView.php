@@ -108,6 +108,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			$widgets = self::getWidgets($this->dashboard['widgets']);
 
 			$data = [
+				'dashboard_edit_mode' => ($dashboard['dashboardid'] == 0),
 				'dashboard' => $dashboard,
 				'grid_widgets' => $widgets,
 				'widget_defaults' => CWidgetConfig::getDefaults(),

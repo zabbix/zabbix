@@ -22,13 +22,36 @@
 #include "dbupgrade.h"
 #include "log.h"
 
+extern unsigned char	program_type;
+
 /*
  * 4.2 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_4010000(void)
+static int	DBpatch_4010001(void)
+{
+	const ZBX_FIELD	field = {"content_type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	if (SUCCEED != DBadd_field("media_type", &field))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010002(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update media_type set content_type=0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4010003(void)
 {
 	const ZBX_TABLE table =
 		{"host_tag", "hosttagid", 0,
@@ -45,12 +68,12 @@ static int	DBpatch_4010000(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4010001(void)
+static int	DBpatch_4010004(void)
 {
 	return DBcreate_index("host_tag", "host_tag_1", "hostid", 0);
 }
 
-static int	DBpatch_4010002(void)
+static int	DBpatch_4010005(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -63,8 +86,10 @@ DBPATCH_START(4010)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(4010000, 0, 1)
 DBPATCH_ADD(4010001, 0, 1)
 DBPATCH_ADD(4010002, 0, 1)
+DBPATCH_ADD(4010003, 0, 1)
+DBPATCH_ADD(4010004, 0, 1)
+DBPATCH_ADD(4010005, 0, 1)
 
 DBPATCH_END()

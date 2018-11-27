@@ -26,7 +26,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 
@@ -731,12 +730,16 @@ static int	item_preproc_hex2dec(zbx_variant_t *value, char **errmsg)
  ******************************************************************************/
 static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output, *new_value = NULL;
+	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		*output, *new_value = NULL;
+	const char	*regex_error;
+	zbx_regexp_t	*regex = NULL;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
+
 	if (NULL == (output = strchr(pattern, '\n')))
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
@@ -745,20 +748,23 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_mregexp_sub(value->data.str, pattern, output, &new_value))
+	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))	/* PCRE_MULTILINE is not used here */
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression \"%s\"", pattern);
+		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
 		return FAIL;
 	}
 
-	if (NULL == new_value)
+	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, &new_value))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "pattern does not match");
+		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
+		zbx_regexp_free(regex);
 		return FAIL;
 	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_value);
+
+	zbx_regexp_free(regex);
 
 	return SUCCEED;
 }
@@ -784,8 +790,8 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
 	if (SUCCEED == item_preproc_regsub_op(value, params, &err))
 		return SUCCEED;
 
-	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match on value \"%s\" of type \"%s\": %s",
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value), err);
+	*errmsg = zbx_dsprintf(*errmsg, "cannot perform regular expression match: %s, type \"%s\", value \"%s\"",
+			err, zbx_variant_type_desc(value), zbx_variant_value_desc(value));
 
 	zbx_free(err);
 
@@ -850,6 +856,7 @@ static int	item_preproc_jsonpath(zbx_variant_t *value, const char *params, char 
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot extract value from json by path \"%s\": %s", params, err);
+
 	zbx_free(err);
 
 	return FAIL;

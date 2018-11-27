@@ -92,7 +92,7 @@ class CTableElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getRows() {
-		return $this->query('xpath:.//tbody/tr')->asTableRow(['parent' => $this])->all();
+		return $this->query('xpath:./tbody/tr')->asTableRow(['parent' => $this])->all();
 	}
 
 	/**
@@ -107,7 +107,7 @@ class CTableElement extends CElement {
 		foreach ($this->getRows() as $row) {
 			$data = [];
 
-			foreach ($row->query('xpath:./td')->all() as $i => $column) {
+			foreach ($row->query('xpath:./*')->all() as $i => $column) {
 				$data[$headers[$i]] = $column;
 			}
 

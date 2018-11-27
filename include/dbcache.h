@@ -621,6 +621,7 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 
 #define ZBX_HK_HISTORY_MIN	SEC_PER_HOUR
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
+#define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
 
 void	DCrequeue_items(const zbx_uint64_t *itemids, const unsigned char *states, const int *lastclocks,
 		const int *errcodes, size_t num);

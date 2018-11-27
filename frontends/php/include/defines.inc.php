@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.2.0alpha1');
+define('ZABBIX_VERSION',		'4.2.0alpha2');
 define('ZABBIX_API_VERSION',	'4.2.0');
 define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',		4010002);
+define('ZABBIX_DB_VERSION',		4010005);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2018');
@@ -624,6 +624,9 @@ define('SMTP_CONNECTION_SECURITY_SSL_TLS',	2);
 
 define('SMTP_AUTHENTICATION_NONE',		0);
 define('SMTP_AUTHENTICATION_NORMAL',	1);
+
+define('SMTP_MESSAGE_FORMAT_PLAIN_TEXT',	0);
+define('SMTP_MESSAGE_FORMAT_HTML',			1);
 
 define('EZ_TEXTING_LIMIT_USA',		0);
 define('EZ_TEXTING_LIMIT_CANADA',	1);
@@ -1519,7 +1522,6 @@ define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_TEAL', 'teal');
 define('ZBX_STYLE_HEADER_LOGO', 'header-logo');
 define('ZBX_STYLE_HEADER_TITLE', 'header-title');
-define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
