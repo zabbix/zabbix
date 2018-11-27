@@ -1374,7 +1374,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 				break;
 			}
 
-			*param2++ = '\0';
+			*param2 = '\0';
 
 			if (FAIL == (ret = zbx_regexp_compile(param1, NULL, &regexp_err)))
 			{
