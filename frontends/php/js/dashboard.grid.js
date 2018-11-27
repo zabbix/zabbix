@@ -1227,7 +1227,7 @@
 				return;
 			}
 
-			if (event.type == 'mouseenter') {
+			if (event.type == 'mouseenter' && data['pos-action'] == '') {
 				data.new_widget_placeholder.show()
 					.find('.dashbrd-grid-widget-new-box')
 						.text(t('Click and drag to mark desired widget size.'))
@@ -1315,6 +1315,10 @@
 				}
 
 				if (overlap) {
+					data.add_widget_dimension = {};
+					data.new_widget_placeholder.hide()
+						.find('.dashbrd-grid-widget-new-box')
+							.removeClass('dashbrd-grid-widget-set-size');
 					return;
 				}
 			}
