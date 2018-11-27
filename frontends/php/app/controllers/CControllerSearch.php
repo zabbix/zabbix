@@ -130,6 +130,86 @@ class CControllerSearch extends CController {
 		return selectByPattern($hosts, 'name', $search, CWebUser::$data['rows_per_page']);
 	}
 
+	/**
+	 * Performs additional api requests, to show overall count, and write access.
+	 *
+	 * @param $search  Initial search query.
+	 * @param &$view  View oject that is filled with resuts.
+	 */
+	protected function collectTemplatesViewData($search, &$view) {
+		$templates = $this->findTemplates($search);
+		if (zbx_empty($templates)) {
+			return;
+		}
+		$rw_templates = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'editable' => true
+		]);
+		$view['rows'] = $templates;
+		$view['editable_rows'] = zbx_toHash($rw_templates, 'templateid');
+		$view['count'] = count($templates);
+		$view['overall_count'] = API::Template()->get([
+			'search' => ['host' => $search, 'name' => $search], 'countOutput' => true, 'searchByAny' => true
+		]);
+	}
+
+	/**
+	 * Performs additional api requests, to show overall count, and write access.
+	 *
+	 * @param $search  Initial search query.
+	 * @param &$view  View oject that is filled with resuts.
+	 */
+	protected function collectHostsGroupsViewData($search, &$view) {
+		$host_groups = $this->findHostGroups($search);
+		if (zbx_empty($host_groups)) {
+			return;
+		}
+		$rw_host_groups = API::HostGroup()->get([
+			'output' => ['groupid'],
+			'groupids' => zbx_objectValues($host_groups, 'groupid'),
+			'editable' => true
+		]);
+		$view['rows'] = $host_groups;
+		$view['editable_rows'] = zbx_toHash($rw_host_groups, 'groupid');
+		$view['count'] = count($host_groups);
+		$view['overall_count'] = API::HostGroup()->get([
+			'search' => ['name' => $search],
+			'countOutput' => true
+		]);
+	}
+
+	/**
+	 * Performs additional api requests, to show overall count, and write access.
+	 *
+	 * @param $search  Initial search query.
+	 * @param &$view  View oject that is filled with resuts.
+	 */
+	protected function collectHostsViewData($search, &$view) {
+		$hosts = $this->findHosts($search);
+		if (zbx_empty($hosts)) {
+			return;
+		}
+		$rw_hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'editable' => true
+		]);
+		$view['rows'] = $hosts;
+		$view['count'] = count($hosts);
+		$view['editable_rows'] = zbx_toHash($rw_hosts, 'hostid');
+		$view['overall_count'] = API::Host()->get([
+			'search' => ['host' => $search, 'name' => $search, 'dns' => $search, 'ip' => $search],
+			'countOutput' => true, 'searchByAny' => true
+		]);
+	}
+
+	/**
+	 * Based on search query returns view data.
+	 *
+	 * @param $search  Initial search query.
+	 * @return array View specific format.
+	 */
 	protected function getViewData($search) {
 		$view_table = ['rows' => [], 'editable_rows' => [], 'overall_count' => 0, 'count' => 0];
 		$view_data = [
@@ -142,53 +222,21 @@ class CControllerSearch extends CController {
 
 		if ($search !== '') {
 			$view_data['search'] = $search;
-			$hosts = $this->findHosts($search);
-			$rw_hosts = API::Host()->get([
-				'output' => ['hostid'],
-				'hostids' => zbx_objectValues($hosts, 'hostid'),
-				'editable' => true
-			]);
-			$view_data['hosts']['rows'] = $hosts;
-			$view_data['hosts']['count'] = count($hosts);
-			$view_data['hosts']['editable_rows'] = zbx_toHash($rw_hosts, 'hostid');
-			$view_data['hosts']['overall_count'] = API::Host()->get([
-				'search' => ['host' => $search, 'name' => $search, 'dns' => $search, 'ip' => $search],
-				'countOutput' => true, 'searchByAny' => true
-			]);
 
-			$host_groups = $this->findHostGroups($search);
-			$rw_host_groups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => zbx_objectValues($host_groups, 'groupid'),
-				'editable' => true
-			]);
-			$view_data['host_groups']['rows'] = $host_groups;
-			$view_data['host_groups']['editable_rows'] = zbx_toHash($rw_host_groups, 'groupid');
-			$view_data['host_groups']['count'] = count($host_groups);
-			$view_data['host_groups']['overall_count'] = API::HostGroup()->get([
-				'search' => ['name' => $search],
-				'countOutput' => true
-			]);
+			$this->collectHostsViewData($search, $view_data['hosts']);
+			$this->collectHostsGroupsViewData($search, $view_data['host_groups']);
 
 			if ($this->admin) {
-				$templates = $this->findTemplates($search);
-				$rw_templates = API::Template()->get([
-					'output' => ['templateid'],
-					'templateids' => zbx_objectValues($templates, 'templateid'),
-					'editable' => true
-				]);
-				$view_data['templates']['rows'] = $templates;
-				$view_data['templates']['editable_rows'] = zbx_toHash($rw_templates, 'templateid');
-				$view_data['templates']['count'] = count($templates);
-				$view_data['templates']['overall_count'] = API::Template()->get([
-					'search' => ['host' => $search, 'name' => $search], 'countOutput' => true, 'searchByAny' => true
-				]);
+				$this->collectTemplatesViewData($search, $view_data['templates']);
 			}
 		}
 
 		return $view_data;
 	}
 
+	/**
+	 * Creates and sets response object with data.
+	 */
 	protected function doAction() {
 		$search = trim($this->getInput('search', ''));
 
