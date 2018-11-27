@@ -748,7 +748,9 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null
+		'time_from' => null,
+		'recent' => null,
+		'any' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
