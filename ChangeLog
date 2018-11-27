@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-15200] fixed host, trigger and item count calculation; fixed required performance calculation (vso)
+....I....T [ZBX-15158] fixed graph name for cache usage in proxy and server templates (kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.2
