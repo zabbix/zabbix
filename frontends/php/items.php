@@ -591,10 +591,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = '';
 			}
 
-			if (!array_key_exists('on_fail', $step)) {
-				$step['error_handler'] = ZBX_PREPROC_FAIL_DEFAULT;
-				$step['error_handler_params'] = '';
-			}
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
 		}
 		unset($step);
 
@@ -1116,16 +1116,28 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_TRIM:
 							case ZBX_PREPROC_XPATH:
 							case ZBX_PREPROC_JSONPATH:
+							case ZBX_PREPROC_VALIDATE_REGEX:
+							case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+							case ZBX_PREPROC_ERROR_FIELD_JSON:
+							case ZBX_PREPROC_ERROR_FIELD_XML:
+							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 								$step['params'] = $step['params'][0];
 								break;
 
 							case ZBX_PREPROC_REGSUB:
+							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
 							default:
 								$step['params'] = '';
 						}
+
+						$step += [
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						];
 					}
 					unset($step);
 
