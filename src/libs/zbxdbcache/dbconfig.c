@@ -7113,6 +7113,9 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					(trigger->timespec.sec == timespecs[i].sec &&
 					trigger->timespec.ns < timespecs[i].ns))
 			{
+				/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+				/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+				/* same time, so its safe to update trigger timespec within read lock.             */
 				trigger->timespec = timespecs[i];
 			}
 		}
@@ -7205,6 +7208,10 @@ void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_ve
 			trigger_local.triggerid = dc_trigger->triggerid;
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
 			DCget_trigger(trigger, dc_trigger);
+
+			/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+			/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+			/* same time, so its safe to update trigger timespec within read lock.             */
 			trigger->timespec = *ts;
 			trigger->flags = flags;
 
@@ -9781,7 +9788,7 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9813,7 +9820,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9840,7 +9847,7 @@ zbx_uint64_t	DCget_trigger_count(void)
 {
 	zbx_uint64_t	count;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
