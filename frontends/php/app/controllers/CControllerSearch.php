@@ -31,22 +31,7 @@ class CControllerSearch extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'search' => 'required|string'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]));
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions() {
@@ -69,6 +54,7 @@ class CControllerSearch extends CController {
 			'limit' => CWebUser::$data['rows_per_page'],
 		]);
 		order_result($host_groups, 'name');
+
 		return selectByPattern($host_groups, 'name', $search, CWebUser::$data['rows_per_page']);
 	}
 
@@ -99,6 +85,7 @@ class CControllerSearch extends CController {
 			'limit' => CWebUser::$data['rows_per_page'],
 		]);
 		order_result($templates, 'name');
+
 		return selectByPattern($templates, 'name', $search, CWebUser::$data['rows_per_page']);
 	}
 
@@ -130,11 +117,12 @@ class CControllerSearch extends CController {
 			'searchByAny' => true
 		]);
 		order_result($hosts, 'name');
+
 		return selectByPattern($hosts, 'name', $search, CWebUser::$data['rows_per_page']);
 	}
 
 	protected function doAction() {
-		$search = $this->getInput('search');
+		$search = trim($this->getInput('search', ''));
 
 		$hosts = $this->findHosts($search);
 		$rw_hosts = API::Host()->get([
@@ -189,7 +177,7 @@ class CControllerSearch extends CController {
 		}
 
 		$response = new CControllerResponseData([
-			'search' => $this->getInput('search', _('Search pattern is empty')),
+			'search' => $search === '' ? _('Search pattern is empty') : $search,
 			'admin' => $this->admin,
 			'hosts' => $view_hosts,
 			'host_groups' => $view_host_groups,
