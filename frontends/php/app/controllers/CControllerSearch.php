@@ -31,7 +31,16 @@ class CControllerSearch extends CController {
 	}
 
 	protected function checkInput() {
-		return true;
+		$fields = [
+			'search' => 'string'
+		];
+
+		$ret = $this->validateInput($fields);
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
