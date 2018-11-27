@@ -5,6 +5,7 @@ New features:
 Bug fixes:
 .......PS. [ZBX-15200] fixed host, trigger and item count calculation; fixed required performance calculation (vso)
 ....I....T [ZBX-15158] fixed graph name for cache usage in proxy and server templates (kalimulin)
+...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.2
