@@ -676,6 +676,7 @@
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height(),
 				};
 
+				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning(ui.helper, data);
 			},
 			drag: function(event, ui) {
@@ -692,6 +693,7 @@
 				data['pos-action'] = '';
 				delete data.calculated;
 
+				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, ui.helper, data);
 			}
 		});
@@ -721,6 +723,7 @@
 			minWidth: getCurrentCellWidth(data),
 			start: function(event, ui) {
 				data['pos-action'] = 'resize';
+				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning($(event.target), data);
 			},
 			resize: function(event, ui) {
@@ -737,6 +740,7 @@
 			},
 			stop: function(event, ui) {
 				data['pos-action'] = '';
+				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
@@ -751,6 +755,21 @@
 				doAction('onResizeEnd', $obj, data, widget);
 			},
 			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height']
+		});
+	}
+
+	/**
+	 * Set resizable state for dashboard widgets.
+	 *
+	 * @param {string} state     Enable or disable resizable for widgets. Available values: 'enable', 'disable'.
+	 * @param {array}  widgets   Array of all widgets.
+	 * @param {string} ignoreid  All widget except widget with such id will be affected.
+	 */
+	function setResizableState(state, widgets, ignoreid) {
+		widgets.each(function (widget) {
+			if (widget.uniqueid !== ignoreid) {
+				widget.div.resizable(state);
+			}
 		});
 	}
 
@@ -1182,6 +1201,7 @@
 
 			data['pos-action'] = '';
 			data.add_widget_dimension = {};
+			setResizableState('enable', data.widgets, '');
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		});
 		$obj.on('mousedown', function(event) {
@@ -1192,6 +1212,7 @@
 			if (data['pos-action'] == '' && ($(event.target).is($obj))
 					|| $(event.target).is(data.new_widget_placeholder)
 					|| $(event.target).parent().is(data.new_widget_placeholder)) {
+				setResizableState('disable', data.widgets, '');
 				data['pos-action'] = 'add';
 				data.new_widget_placeholder
 					.find('.dashbrd-grid-widget-new-box')
