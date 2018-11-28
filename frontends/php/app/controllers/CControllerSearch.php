@@ -30,6 +30,12 @@ class CControllerSearch extends CController {
 		]);
 	}
 
+	/**
+	 * Validates input according to validation rules.
+	 * Only validated fields are readable, remaining fields are unset.
+	 *
+	 * @return bool
+	 */
 	protected function checkInput() {
 		$fields = [
 			'search' => 'string'
@@ -48,11 +54,12 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Preforms api request and returns ordered result
-	 * based on serach query.
+	 * Preforms API request and returns ordered result
+	 * based on search query.
 	 *
-	 * @param $search string  search term
-	 * @return array HostGroup[]  ordered by search term
+	 * @param string $search  Initial search query.
+	 *
+	 * @return array|HostGroup[]  Exact matches are hoisted.
 	 */
 	protected function findHostGroups($search) {
 		$host_groups = API::HostGroup()->get([
@@ -68,11 +75,12 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Preforms api request and returns ordered result
-	 * based on serach query.
+	 * Preforms API request and returns ordered result
+	 * based on search query.
 	 *
-	 * @param $search string  search term
-	 * @return array Template[]  ordered by search term
+	 * @param string $search  Initial search query.
+	 *
+	 * @return array|Template[]  Exact matches are hoisted.
 	 */
 	protected function findTemplates($search) {
 		$templates = API::Template()->get([
@@ -99,11 +107,12 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Preforms api request and returns ordered result
-	 * based on serach query.
+	 * Preforms API request and returns ordered result
+	 * based on search query.
 	 *
-	 * @param $search string  search term
-	 * @return array Host[]  ordered by search term
+	 * @param string $search  Initial search query.
+	 *
+	 * @return array|Host[]  Exact matches are hoisted.
 	 */
 	protected function findHosts($search) {
 		$hosts = API::Host()->get([
@@ -131,12 +140,13 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Performs additional api requests, to show overall count, and write access.
+	 * Performs additional API requests if meta information is needed.
+	 * Prepares view-compatible format.
 	 *
-	 * @param $search  Initial search query.
-	 * @param &$view  View oject that is filled with resuts.
+	 * @param string $search  Initial search query.
+	 * @param array &$view  View object that is filled with results.
 	 */
-	protected function collectTemplatesViewData($search, &$view) {
+	protected function collectTemplatesViewData($search, array &$view) {
 		$templates = $this->findTemplates($search);
 		if (zbx_empty($templates)) {
 			return;
@@ -155,12 +165,13 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Performs additional api requests, to show overall count, and write access.
+	 * Performs additional API requests if meta information is needed.
+	 * Prepares view-compatible format.
 	 *
-	 * @param $search  Initial search query.
-	 * @param &$view  View oject that is filled with resuts.
+	 * @param string $search  Initial search query.
+	 * @param array &$view  View object that is filled with results.
 	 */
-	protected function collectHostsGroupsViewData($search, &$view) {
+	protected function collectHostsGroupsViewData($search, array &$view) {
 		$host_groups = $this->findHostGroups($search);
 		if (zbx_empty($host_groups)) {
 			return;
@@ -180,12 +191,13 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Performs additional api requests, to show overall count, and write access.
+	 * Performs additional API requests if meta information is needed.
+	 * Prepares view-compatible format.
 	 *
-	 * @param $search  Initial search query.
-	 * @param &$view  View oject that is filled with resuts.
+	 * @param string $search  Initial search query.
+	 * @param array &$view  View object that is filled with results.
 	 */
-	protected function collectHostsViewData($search, &$view) {
+	protected function collectHostsViewData($search, array &$view) {
 		$hosts = $this->findHosts($search);
 		if (zbx_empty($hosts)) {
 			return;
@@ -205,10 +217,11 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Based on search query returns view data.
+	 * Based on search query gathers view data.
 	 *
-	 * @param $search  Initial search query.
-	 * @return array View specific format.
+	 * @param string $search  Initial search query.
+	 *
+	 * @return array  View-compatible object.
 	 */
 	protected function getViewData($search) {
 		$view_table = ['rows' => [], 'editable_rows' => [], 'overall_count' => 0, 'count' => 0];
