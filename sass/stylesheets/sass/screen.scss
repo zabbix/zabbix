@@ -3154,6 +3154,7 @@ $form-icon-btn: (
 // Dashboard
 .dashbrd-grid-widget-container {
 	position: relative;
+	margin: -.25rem;
 }
 
 .dashbrd-grid-widget-placeholder {
@@ -3168,21 +3169,14 @@ $form-icon-btn: (
 	padding: .25rem;
 	width: calc(100% / 6 - .65rem);
 	z-index: 999;
-
-	&:hover {
-
-		.dashbrd-grid-new-widget-container {
-			background: grey;
-		}
-	}
+	color: $font-alt-color;
 
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
 	.dashbrd-grid-widget-set-size {
 		@include box-shadow(2px 2px 6px $action-shadow-color);
 		border: 1px dashed $form-border-color;
-		background: lighten($body-bg-color, 6%);
-		color: $btn-disabled-font-color;
+		background-color: rgba($ui-bg-color, .7);
 		flex: 1;
 		position: relative;
 		overflow: hidden;
@@ -3217,76 +3211,14 @@ $form-icon-btn: (
 	}
 }
 
-/*
-.dashbrd-grid-new-widget-placeholder {
-	// border-color: darken($body-bg-color, 6%) !important;
-	// background-color: darken($body-bg-color, 6%) !important;
-	z-index: 999;
-	width: calc(100% / 6 - .65rem);
-	height: 200px;
-
-	div {
-		-moz-user-select: none;
-		-khtml-user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-	}
-
-	.dashbrd-grid-widget-new-box {
-		border-color: darken($body-bg-color, 6%) !important;
-		background-color: darken($body-bg-color, 6%) !important;
-		display: flex;
-		height: 100%;
-		align-items: center;
-		justify-items: center;
-		text-align: center;
-		padding-top: 0;
-		top: calc(50% - 15px);
-		box-sizing: border-box;
-		flex-wrap: wrap;
-
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
 		&::before {
-			display: block;
-			align-items: center;
-			text-align: center;
-			width: 36px;
-			height: 27px;
-			position: absolute;
-			content: '';
-			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
 		}
 	}
-
-	.dashbrd-grid-widget-set-position {
-		border-color: darken($body-bg-color, 6%) !important;
-		background-color: darken($body-bg-color, 6%) !important;
-		display: flex;
-		height: 100%;
-		align-items: center;
-		justify-items: center;
-		text-align: center;
-		padding-top: 0;
-		top: calc(50%-15px);
-		box-sizing: border-box;
-		flex-wrap: wrap;
-	}
-
-	.dashbrd-grid-widget-set-size {
-		border-color: darken($body-bg-color, 6%) !important;
-		background-color: darken($body-bg-color, 6%) !important;
-		display: flex;
-		height: 100%;
-		align-items: center;
-		justify-items: center;
-		text-align: center;
-		padding-top: 0;
-		top: calc(50%-15px);
-		box-sizing: border-box;
-		flex-wrap: wrap;
-	}
 }
-*/
+
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	width: 100%;
