@@ -1218,8 +1218,9 @@
 				data.new_widget_placeholder
 					.find('.dashbrd-grid-widget-new-box')
 						.removeClass('dashbrd-grid-widget-set-position')
-						.text(t('Release to create a new widget in the selected area.'))
-						.addClass('dashbrd-grid-widget-set-size');
+						.addClass('dashbrd-grid-widget-set-size')
+						.find('.dashbrd-grid-new-widget-label')
+							.text(t('Release to create a new widget in the selected area.'));
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function(event) {
@@ -1239,8 +1240,9 @@
 			resizeDashboardGrid($obj, data);
 			data.new_widget_placeholder
 				.find('.dashbrd-grid-widget-new-box')
-					.text(t('Add a new widget'))
-					.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
+					.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position')
+						.find('.dashbrd-grid-new-widget-label')
+							.text(t('Add a new widget'));
 
 		}).on('mouseenter mousemove', function(event) {
 			var drag = data['pos-action'] == 'add';
@@ -1252,8 +1254,9 @@
 			if (event.type == 'mouseenter' && data['pos-action'] == '') {
 				data.new_widget_placeholder.show()
 					.find('.dashbrd-grid-widget-new-box')
-						.text(t('Click and drag to mark desired widget size.'))
-						.addClass('dashbrd-grid-widget-set-position');
+						.addClass('dashbrd-grid-widget-set-position')
+						.find('.dashbrd-grid-new-widget-label')
+							.text(t('Click and drag to mark desired widget size.'));
 			}
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
@@ -1613,10 +1616,12 @@
 			return this.each(function() {
 				var	$this = $(this),
 					new_widget_placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(
-						$('<div>', {
-							class: 'dashbrd-grid-widget-new-box',
-							text: t('Add a new widget')
-						})
+						$('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(
+							$('<div>', {
+								class: 'dashbrd-grid-new-widget-label',
+								text: t('Add a new widget')
+							})
+						)
 					);
 
 				if (options['editable']) {

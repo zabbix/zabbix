@@ -3166,6 +3166,63 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
+	display: flex;
+	height: 200px;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+
+	&:hover {
+
+		.dashbrd-grid-new-widget-container {
+			background: grey;
+		}
+	}
+
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background: lighten($body-bg-color, 6%);
+		color: $btn-disabled-font-color;
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
+		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+}
+
+/*
+.dashbrd-grid-new-widget-placeholder {
 	// border-color: darken($body-bg-color, 6%) !important;
 	// background-color: darken($body-bg-color, 6%) !important;
 	z-index: 999;
@@ -3233,7 +3290,7 @@ $form-icon-btn: (
 		flex-wrap: wrap;
 	}
 }
-
+*/
 .dashbrd-grid-widget-mask {
 	position: absolute;
 	width: 100%;
