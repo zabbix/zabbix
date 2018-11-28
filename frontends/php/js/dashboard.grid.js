@@ -1260,7 +1260,7 @@
 			}
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
-					&& !$(event.target).parent().is(data.new_widget_placeholder)) {
+					&& !$(event.target).closest(data.new_widget_placeholder)) {
 				resizeDashboardGrid($obj, data);
 				data.add_widget_dimension = {};
 				data.new_widget_placeholder.hide()

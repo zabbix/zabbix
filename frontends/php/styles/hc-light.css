@@ -2180,7 +2180,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label {
     position: absolute;
     left: 0;
-    top: calc(50% - 28px);
+    top: calc(50% - 14px);
     right: 0;
     bottom: 0;
     padding: 38px 5px 5px;
