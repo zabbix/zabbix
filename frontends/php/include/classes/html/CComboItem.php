@@ -41,11 +41,6 @@ class CComboItem extends CTag {
 		return $this->getAttribute('value');
 	}
 
-	public function setCaption($value = null) {
-		$this->addItem(nbsp($value));
-		return $this;
-	}
-
 	/**
 	 * Set option as selected.
 	 *
