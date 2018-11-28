@@ -2978,6 +2978,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			if (0 != history_num || 0 != timers_num)
 			{
+				/* timer triggers do not intersect with item triggers because item triggers */
+				/* where already locked and skipped when retrieving timer triggers          */
 				zbx_vector_uint64_append_array(&triggerids, timer_triggerids.values,
 						timer_triggerids.values_num);
 				do
