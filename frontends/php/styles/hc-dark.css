@@ -2145,18 +2145,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   width: 100%; }
 
 .dashbrd-grid-widget-container {
-  position: relative;
-  margin: -.25rem; }
+  position: relative; }
 
 .dashbrd-grid-widget-placeholder {
-  border-color: #020202 !important;
-  background-color: #020202 !important;
   position: absolute;
   z-index: 999; }
 
 .dashbrd-grid-new-widget-placeholder {
-  border-color: #020202 !important;
-  background-color: #020202 !important;
   z-index: 999;
   width: calc(100% / 6 - .65rem);
   height: 200px; }
@@ -2166,6 +2161,51 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box {
+    border-color: #020202 !important;
+    background-color: #020202 !important;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    padding-top: 0;
+    top: calc(50% - 15px);
+    box-sizing: border-box;
+    flex-wrap: wrap; }
+    .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box::before {
+      display: block;
+      align-items: center;
+      text-align: center;
+      width: 36px;
+      height: 27px;
+      position: absolute;
+      content: '';
+      background: url(../img/icon-sprite.svg) no-repeat -157px -888px; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position {
+    border-color: #020202 !important;
+    background-color: #020202 !important;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    padding-top: 0;
+    top: calc(50%-15px);
+    box-sizing: border-box;
+    flex-wrap: wrap; }
+  .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
+    border-color: #020202 !important;
+    background-color: #020202 !important;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+    padding-top: 0;
+    top: calc(50%-15px);
+    box-sizing: border-box;
+    flex-wrap: wrap; }
 
 .dashbrd-grid-widget-mask {
   position: absolute;
@@ -3211,13 +3251,13 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #0e4123; }
 
 .info-bg {
-  color: #00268e; }
+  color: #00268d; }
   .info-bg a.link-action,
   .info-bg input[type="radio"]:checked + label {
-    color: #00268e; }
+    color: #00268d; }
 
 .log-info-bg {
-  color: #00268e;
+  color: #00268d;
   background-color: #7499ff; }
 
 .average-bg {
@@ -4905,7 +4945,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   color: #f8f8f8; }
 
 .log-info-bg:before {
-  color: #00268e !important;
+  color: #00268d !important;
   background-color: #7499ff !important; }
 
 .info-bg:before, .log-info-bg:before {
