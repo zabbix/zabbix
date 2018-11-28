@@ -1403,8 +1403,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 				break;
 			}
 			*param2++ = '\0';
-			zbx_lrtrim(param1, " \t");
-			zbx_lrtrim(param2, " \t");
+			zbx_lrtrim(param1, " ");
+			zbx_lrtrim(param2, " ");
 
 			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
 			{
