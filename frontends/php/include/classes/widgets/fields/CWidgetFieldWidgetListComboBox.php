@@ -47,22 +47,24 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	 */
 	public function getJavascript() {
 		return
-			'var widgets, filters_box, dashboard_data;'.
-			'widgets = jQuery(".dashbrd-grid-widget-container")'.
-				'.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
-			'dashboard_data = jQuery(".dashbrd-grid-widget-container").data("dashboardGrid"),'.
-			'filters_box = jQuery("#'.$this->getName().'");'.
-			'jQuery("<option>'._('Select widget').'</option>").val("").appendTo(filters_box);'.
-			'if (widgets.length) {'.
-				'jQuery.each(widgets, function(i, widget) {'.
-					'jQuery("<option></option>")'.
-						'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
-						'.text(widget["header"].length ? widget["header"] : '.
-							'dashboard_data["widget_defaults"][widget["type"]]["header"])'.
-						'.val(widget["fields"]["reference"])'.
-						'.appendTo(filters_box);'.
-				'});'.
-			'}';
+			'var dashboard = jQuery(".dashbrd-grid-widget-container"),'.
+				'dashboard_data = dashboard.data("dashboardGrid"),'.
+				'filters_box = jQuery("#'.$this->getName().'");'.
+			'jQuery("<option />").text("'._('Select widget').'").val("").appendTo(filters_box);'.
+			'jQuery.each('.
+				'dashboard.dashboardGrid("getWidgetsBy", "'.$this->search_by_key.'", "'.$this->search_by_value.'"),'.
+				'function(i, widget) {'.
+					'if (widget !== dashboard_data["dialogue"]["widget"]) {'. // Widget currently edited or null for new widgets.
+						'jQuery("<option />")'.
+							'.text(widget["header"].length'.
+								'? widget["header"]'.
+								': dashboard_data["widget_defaults"][widget["type"]]["header"]'.
+							')'.
+							'.val(widget["fields"]["reference"])'.
+							'.attr("selected", (widget["fields"]["reference"] === "'.$this->getValue().'"))'.
+							'.appendTo(filters_box);'.
+					'}'.
+			'});';
 	}
 
 	public function setValue($value) {

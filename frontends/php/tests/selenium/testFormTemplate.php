@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup hosts
  */
-class testFormTemplate extends CWebTest {
+class testFormTemplate extends CLegacyWebTest {
 	public $template = 'Form test template';
 	public $template_edit_name = 'Template-layout-test-001';
 	public $template_clone = 'Template OS Linux';
@@ -138,7 +138,7 @@ class testFormTemplate extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Template added');
-				$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='".$data['name']."'"));
+				$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$data['name']."'"));
 				break;
 
 		case TEST_BAD:
@@ -162,7 +162,7 @@ class testFormTemplate extends CWebTest {
 				}
 			}
 			if (isset ($data['new_group'])) {
-				$this->assertEquals(1, DBcount("SELECT groupid FROM hstgrp WHERE name='".$data['new_group']."'"));
+				$this->assertEquals(1, CDBHelper::getCount("SELECT groupid FROM hstgrp WHERE name='".$data['new_group']."'"));
 			}
 		}
 
@@ -204,7 +204,7 @@ class testFormTemplate extends CWebTest {
 	 * Adds two macros to an existing host.
 	 */
 	public function testFormTemplate_AddMacros() {
-		$template = DBfetch(DBSelect("select hostid from hosts where host='".$this->template."'"));
+		$template = CDBHelper::getRow('select hostid from hosts where host='.zbx_dbstr($this->template));
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickLinkTextWait($this->template);
@@ -223,7 +223,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestAssertElementValue('macros_0_value', '1');
 		$this->zbxTestAssertElementValue('macros_1_macro', '{$TEST_MACRO2}');
 		$this->zbxTestAssertElementValue('macros_1_value', '2');
-		$this->assertEquals(2, DBcount("SELECT * FROM hostmacro WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(2, CDBHelper::getCount("SELECT * FROM hostmacro WHERE hostid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {
@@ -235,8 +235,8 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
-		$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='".$new_template_name."'"));
-		$this->assertEquals(0, DBcount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$new_template_name."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
 	}
 
 	public function testFormTemplate_CloneTemplate() {
@@ -249,14 +249,14 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
-		$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
-		$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
-		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$cloned_template_name."'"));
-		$this->assertEquals(3, DBcount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, DBcount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, DBcount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
+		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
+		$this->assertEquals(3, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_FullCloneTemplate() {
@@ -268,18 +268,18 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
-		$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
-		$this->assertEquals(1, DBcount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
-		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$cloned_template_name."'"));
-		$this->assertEquals(41, DBcount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(10, DBcount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, DBcount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(1, DBcount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
+		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
+		$this->assertEquals(43, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(10, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
 	}
 
 		public function testFormTemplate_Delete() {
-		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$this->template."'"));
+		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -288,23 +288,23 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 
-		$this->assertEquals(0, DBcount("SELECT hostid FROM hosts WHERE host='$this->template'"));
-		$this->assertEquals(0, DBcount("select * from hostmacro where hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template'"));
+		$this->assertEquals(0, CDBHelper::getCount("select * from hostmacro where hostid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_DeleteAndClearTemplate() {
-		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$this->template_full_delete."'"));
+		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template_full_delete);
 		$this->zbxTestClickWait('delete_and_clear');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
-		$this->assertEquals(0, DBcount("SELECT hostid FROM hosts WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT graphid FROM graphs WHERE templateid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT triggerid FROM triggers WHERE templateid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(0, DBcount("SELECT httptestid FROM httptest WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT graphid FROM graphs WHERE templateid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers WHERE templateid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT httptestid FROM httptest WHERE hostid='".$template['hostid']."'"));
 	}
 }

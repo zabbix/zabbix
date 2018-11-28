@@ -744,16 +744,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		memset(&stat, 0, sizeof(stat));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, db_httpstep.name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, ZBX_NULL2EMPTY_STR(httpstep.posts));
 
-		if (NULL != httpstep.posts && '\0' != *httpstep.posts)
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
-			{
-				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				goto httpstep_error;
-			}
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POST, (NULL != httpstep.posts &&

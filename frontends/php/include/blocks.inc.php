@@ -54,6 +54,7 @@ function getSystemStatusData(array $filter) {
 			if ($filter_groupids === null) {
 				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
+					'real_hosts' => true,
 					'preservekeys' => true
 				]));
 			}
@@ -224,6 +225,31 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		]);
 
+		// Remove problems that were resolved between requests or set tags.
+		foreach ($data['groups'] as $groupid => &$group) {
+			foreach ($group['stats'] as $severity => &$stat) {
+				foreach (['problems', 'problems_unack'] as $key) {
+					foreach ($stat[$key] as $event_no => &$problem) {
+						if (array_key_exists($problem['eventid'], $problems_data)) {
+							$problem['tags'] = $problems_data[$problem['eventid']]['tags'];
+						}
+						else {
+							if ($key === 'problems') {
+								$data['groups'][$groupid]['stats'][$severity]['count']--;
+							}
+							else {
+								$data['groups'][$groupid]['stats'][$severity]['count_unack']--;
+							}
+							unset($data['groups'][$groupid]['stats'][$severity][$key][$event_no]);
+						}
+					}
+					unset($problem);
+				}
+			}
+			unset($stat);
+		}
+		unset($group);
+
 		// actions
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($problems_data, $data['triggers']);
@@ -240,22 +266,6 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			])
 		];
-
-		// tags
-		foreach ($data['groups'] as &$group) {
-			foreach ($group['stats'] as &$stat) {
-				foreach (['problems', 'problems_unack'] as $key) {
-					foreach ($stat[$key] as &$problem) {
-						$problem['tags'] = array_key_exists($problem['eventid'], $problems_data)
-							? $problems_data[$problem['eventid']]['tags']
-							: [];
-					}
-					unset($problem);
-				}
-			}
-			unset($stat);
-		}
-		unset($group);
 	}
 
 	return $data;

@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup hosts
  */
-class testPageHostPrototypes extends CWebTest {
+class testPageHostPrototypes extends CLegacyWebTest {
 
 	public static function getSelectedData() {
 		return [
@@ -131,7 +131,7 @@ class testPageHostPrototypes extends CWebTest {
 					' WHERE host IN ('.implode(',', $names).')';
 		}
 
-		$this->assertEquals(0, DBcount($sql.$status_criteria));
+		$this->assertEquals(0, CDBHelper::getCount($sql.$status_criteria));
 	}
 
 	/**

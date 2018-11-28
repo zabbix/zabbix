@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
  */
-class testInheritanceItemPrototype extends CWebTest {
+class testInheritanceItemPrototype extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
@@ -37,7 +37,7 @@ class testInheritanceItemPrototype extends CWebTest {
 
 	// returns list of item prototypes from a template
 	public static function update() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT i.itemid,id.parent_itemid'.
 			' FROM items i,item_discovery id'.
 			' WHERE i.itemid=id.itemid'.
@@ -51,14 +51,14 @@ class testInheritanceItemPrototype extends CWebTest {
 	 */
 	public function testInheritanceItemPrototype_SimpleUpdate($data) {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 
 		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('Item prototype updated');
 
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
 
 	// Returns create data

@@ -370,34 +370,46 @@ ul.top-nav-icons {
   -ms-transform: scale(0.9999);
   transform: scale(0.9999); }
 
-.header-title {
+.header-title,
+.object-group {
+  min-height: 24px;
+  line-height: 24px;
+  padding: 10px 0 6px;
   position: relative;
-  width: 100%;
-  padding: 0 0 6px 0;
-  margin: 0 0 10px 0;
-  text-align: right;
-  border-bottom: 1px solid #dfe4e7; }
+  vertical-align: top; }
+
+.header-title {
+  border-bottom: 1px solid #dfe4e7;
+  margin-top: -10px;
+  padding: 10px 0 6px;
+  width: 100%; }
   .header-title .cell:first-child {
     max-width: calc(100vw - 370px); }
   .header-title h1 {
-    text-align: left;
-    white-space: nowrap;
+    line-height: 24px;
+    overflow: hidden;
+    padding-top: 1px;
     text-overflow: ellipsis;
-    overflow: hidden; }
+    white-space: nowrap; }
   .header-title form {
     display: flex;
     justify-content: flex-end; }
-  .header-title ul li {
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    padding: 0 0 0 10px; }
-  .header-title ul ul li:first-child {
-    padding-left: 0; }
+  .header-title ul {
+    text-align: right; }
+    .header-title ul li {
+      display: inline-block;
+      vertical-align: top;
+      position: relative;
+      padding: 0 0 0 10px; }
+    .header-title ul ul li:first-child {
+      padding-left: 0; }
+    .header-title ul button {
+      line-height: 22px; }
   .header-title .dashbrd-edit {
     position: relative;
     display: inline-block;
     background-color: #fff;
+    margin-right: 5px;
     -webkit-box-shadow: 0 0 0 4px #fff;
     -moz-box-shadow: 0 0 0 4px #fff;
     box-shadow: 0 0 0 4px #fff; }
@@ -422,9 +434,7 @@ article, main {
   padding: 10px 10px 0 10px; }
 
 .object-group {
-  min-height: 24px;
-  line-height: 24px;
-  margin-bottom: 5px; }
+  margin-bottom: -1px; }
   .object-group li {
     float: left;
     margin-right: 5px; }
@@ -447,6 +457,10 @@ article, main {
     border-radius: 2px; }
   .object-group .arrow-right {
     border-left-color: #1f2c33; }
+  .object-group button {
+    line-height: 22px; }
+  .object-group .btn-link {
+    line-height: 14px; }
 
 .hor-list li {
   display: inline-block;
@@ -458,25 +472,28 @@ article, main {
 
 .filter-breadcrumb {
   display: inline-block;
-  position: relative;
-  top: 0;
-  z-index: 3;
-  margin-bottom: 0; }
-  .filter-breadcrumb > li:first-child {
-    float: left;
-    white-space: nowrap; }
-    .filter-breadcrumb > li:first-child > span {
+  z-index: 3; }
+  .filter-breadcrumb li {
+    line-height: 14px;
+    vertical-align: top; }
+    .filter-breadcrumb li .status-container {
+      padding-top: 3px; }
+    .filter-breadcrumb li > span {
       display: inline-block;
-      line-height: 1;
-      padding: 4px 7px; }
-      .filter-breadcrumb > li:first-child > span a {
-        display: inline-block;
+      height: 18px;
+      padding: 4px 7px 0; }
+      .filter-breadcrumb li > span a {
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
         vertical-align: top; }
+  .filter-breadcrumb > li {
+    padding: 1px 0; }
+  .filter-breadcrumb > li:first-child {
+    float: left;
+    white-space: nowrap; }
   .filter-breadcrumb + .filter-space {
-    margin-top: -28px; }
+    margin-top: -29px; }
 
 footer {
   position: absolute;
@@ -984,9 +1001,6 @@ output {
     padding: 0 5px 5px 0;
     vertical-align: middle; }
 
-.hidden {
-  display: none !important; }
-
 .multiselect-wrapper {
   position: relative;
   vertical-align: top;
@@ -1268,9 +1282,9 @@ output {
       position: relative;
       z-index: 1; }
     .radio-segmented input[type="radio"]:checked:focus + label {
-      color: #fff;
-      background-color: #02659f;
-      border-color: #02659f;
+      -webkit-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+      -moz-box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
@@ -1310,6 +1324,8 @@ textarea {
   overflow: auto; }
   textarea[readonly] {
     color: #1f2c33 !important; }
+    textarea[readonly]:focus {
+      border-color: #02659f; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -1679,13 +1695,14 @@ button {
   background-color: #fff;
   border: 1px solid #dfe4e7;
   border-bottom: none;
-  margin: 0 0 0 6px;
-  padding: 0 34px 7px 10px;
+  margin: -1px 0 0 6px;
+  padding: 1px 34px 7px 10px;
   -webkit-border-radius: 2px 2px 0 0;
   -moz-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0; }
 .ui-tabs-nav .ui-tabs-active .btn-time:after {
-  background-position: -246px -583px; }
+  background-position: -246px -583px;
+  top: 1px; }
 .ui-tabs-nav .ui-tabs-active .filter-trigger:after {
   background-position: -246px -547px; }
 .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-time,
@@ -1698,7 +1715,8 @@ button {
   box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 .filter-space {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  margin-top: 10px; }
   .filter-space li a.ui-tabs-anchor {
     vertical-align: top; }
   .filter-space ul.ui-tabs-nav li:focus {
@@ -1883,7 +1901,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border-color: #ccd5d9;
   cursor: default; }
 
-.radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
@@ -2159,7 +2177,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-container {
   position: relative;
-  margin: -.25rem; }
+  margin: -4px; }
 
 .dashbrd-grid-widget-placeholder {
   border-color: #dadfe3 !important;
@@ -2991,6 +3009,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   margin: -3px; }
 
 .debug-output {
+  display: none;
   max-height: 600px;
   overflow-y: auto;
   padding: 11px;
@@ -3815,6 +3834,9 @@ tr.cursor-move td * {
 .flickerfreescreen {
   position: relative; }
 
+.graph-wrapper {
+  display: inline; }
+
 .clock {
   padding: 0 10px;
   height: 99%;
@@ -3862,7 +3884,8 @@ svg {
   width: calc(100% - 20px);
   border: 10px solid #fff;
   background: #fff;
-  display: block; }
+  display: block;
+  margin: 4px 0; }
   .sysmap-scroll-container .map-container {
     display: table; }
   .sysmap-scroll-container .table-forms-container, .sysmap-scroll-container .browser-warning-container {

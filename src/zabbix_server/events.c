@@ -704,8 +704,8 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		else
 			value = "0";
 
-		zbx_replace_string(&expression, token.token.l, &token.token.r, value);
-		pos = token.token.r;
+		zbx_replace_string(&expression, token.loc.l, &token.loc.r, value);
+		pos = token.loc.r;
 	}
 
 	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), NULL))
@@ -980,8 +980,8 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 			goto out;
 		}
 
-		zbx_replace_string(&expression, token.token.l, &token.token.r, filter);
-		pos = token.token.r;
+		zbx_replace_string(&expression, token.loc.l, &token.loc.r, filter);
+		pos = token.loc.r;
 		zbx_free(filter);
 	}
 

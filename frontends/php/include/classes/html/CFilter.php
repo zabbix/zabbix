@@ -25,8 +25,16 @@ class CFilter extends CDiv {
 	private $form;
 	// Filter form object name and id attribute.
 	private $name = 'zbx_filter';
-	// Visibility of 'Apply', 'Reset' from buttons. Visibility is set to all tabs.
+	// Visibility of 'Apply', 'Reset' form buttons. Visibility is set to all tabs.
 	private $show_buttons = true;
+
+	/**
+	 * Filter page URL.
+	 *
+	 * @var object
+	 */
+	private $url;
+
 	// Array of filter tab headers. Every header is mapped to it content via href(header) and id(content) attribute.
 	protected $headers = [];
 	// Array of filter tab content.
@@ -41,7 +49,7 @@ class CFilter extends CDiv {
 	protected $idx2 = 0;
 
 	/**
-	 * List of predefined time ranges. Start and end of time range are separated by semicolon.
+	 * List of predefined time ranges.
 	 */
 	protected $time_ranges = [
 		[
@@ -83,10 +91,14 @@ class CFilter extends CDiv {
 		]
 	];
 
-	public function __construct() {
+	public function __construct(CUrl $url) {
 		parent::__construct();
 
-		$this->addClass('filter-space')
+		$this->url = $url;
+
+		$this
+			->setAttribute('data-accessible', 1)
+			->addClass('filter-space')
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
@@ -190,11 +202,6 @@ class CFilter extends CDiv {
 			->addItem($row);
 
 		if ($this->show_buttons) {
-			$url = (new CUrl())
-				->removeArgument('filter_set')
-				->removeArgument('ddreset')
-				->setArgument('filter_rst', 1);
-
 			$body[] = (new CDiv())
 				->addClass(ZBX_STYLE_FILTER_FORMS)
 				->addItem(
@@ -202,7 +209,11 @@ class CFilter extends CDiv {
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				)
 				->addItem(
-					(new CRedirectButton(_('Reset'), $url->getUrl()))
+					(new CRedirectButton(_('Reset'),
+						$this->url
+							->setArgument('filter_rst', 1)
+							->getUrl()
+					))
 						->addClass(ZBX_STYLE_BTN_ALT)
 						->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 				);
@@ -227,71 +238,82 @@ class CFilter extends CDiv {
 	 *
 	 * @param string $from    Start date. (can be in relative time format, example: now-1w)
 	 * @param string $to      End date. (can be in relative time format, example: now-1w)
+	 * @param bool   $visible Either to make time selector visible or hidden.
 	 * @param string $format  Date and time format used in CDateSelector.
 	 *
 	 * @return CFilter
 	 */
-	public function addTimeSelector($from, $to, $format = ZBX_FULL_DATE_TIME) {
+	public function addTimeSelector($from, $to, $visible = true, $format = ZBX_FULL_DATE_TIME) {
 		$header = relativeDateToText($from, $to);
 
-		$this->addTab(new CDiv([
-			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-			(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
-			(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
-		]), null);
+		if ($visible) {
+			$this->addTab(new CDiv([
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+			]), null);
 
-		$predefined_ranges = [];
+			$predefined_ranges = [];
 
-		foreach ($this->time_ranges as $column_ranges) {
-			$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
+			foreach ($this->time_ranges as $column_ranges) {
+				$column = (new CList())->addClass(ZBX_STYLE_TIME_QUICK);
 
-			foreach ($column_ranges as $range) {
-				$label = relativeDateToText($range[0], $range[1]);
-				$is_selected = ($header === $label);
+				foreach ($column_ranges as $range) {
+					$label = relativeDateToText($range[0], $range[1]);
+					$is_selected = ($header === $label);
 
-				$column->addItem((new CLink($label))
-					->setAttribute('data-from', $range[0])
-					->setAttribute('data-to', $range[1])
-					->setAttribute('data-label', $label)
-					->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
-				);
+					$column->addItem((new CLink($label))
+						->setAttribute('data-from', $range[0])
+						->setAttribute('data-to', $range[1])
+						->setAttribute('data-label', $label)
+						->addClass($is_selected ? ZBX_STYLE_SELECTED : null)
+					);
+				}
+
+				$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 			}
 
-			$predefined_ranges[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
-		}
+			$anchor = 'tab_'.count($this->tabs);
 
-		$anchor = 'tab_'.count($this->tabs);
-
-		$this->addTab(
-			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
-			(new CDiv([
+			$this->addTab(
+				(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
 				(new CDiv([
-					new CList([
-						new CLabel(_('From'), 'from'),
-						(new CDateSelector('from', $from))->setDateFormat($format)
-					]),
-					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-						->setAttribute('data-error-for', 'from')
-						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-						->addStyle('display: none'),
-					new CList([
-						new CLabel(_('To'), 'to'),
-						(new CDateSelector('to', $to))->setDateFormat($format)
-					]),
-					(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
-						->setAttribute('data-error-for', 'to')
-						->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
-						->addStyle('display: none'),
-					new CList([
-						(new CButton('apply', _('Apply')))
-					])
-				]))->addClass(ZBX_STYLE_TIME_INPUT),
-				(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
-			]))
-				->addClass(ZBX_STYLE_FILTER_CONTAINER)
-				->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
-				->setId($anchor)
-		);
+					(new CDiv([
+						new CList([
+							new CLabel(_('From'), 'from'),
+							(new CDateSelector('from', $from))->setDateFormat($format)
+						]),
+						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+							->setAttribute('data-error-for', 'from')
+							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+							->addStyle('display: none'),
+						new CList([
+							new CLabel(_('To'), 'to'),
+							(new CDateSelector('to', $to))->setDateFormat($format)
+						]),
+						(new CList([(new CListItem(''))->addClass(ZBX_STYLE_RED)]))
+							->setAttribute('data-error-for', 'to')
+							->addClass(ZBX_STYLE_TIME_INPUT_ERROR)
+							->addStyle('display: none'),
+						new CList([
+							new CButton('apply', _('Apply'))
+						])
+					]))->addClass(ZBX_STYLE_TIME_INPUT),
+					(new CDiv($predefined_ranges))->addClass(ZBX_STYLE_TIME_QUICK_RANGE)
+				]))
+					->addClass(ZBX_STYLE_FILTER_CONTAINER)
+					->addClass(ZBX_STYLE_TIME_SELECTION_CONTAINER)
+					->setId($anchor)
+			);
+		}
+		else {
+			$this
+				->setAttribute('data-accessible', 0)
+				->addTab(null, (new CDiv([
+					new CVar('from', $from),
+					new CVar('to', $to)
+				])));
+		}
 
 		return $this;
 	}
@@ -300,7 +322,7 @@ class CFilter extends CDiv {
 	 * Add tab.
 	 *
 	 * @param string|CTag $header    Tab header title string or CTag contaier.
-	 * @param array  $body           Array of body elements.
+	 * @param array       $body      Array of body elements.
 	 *
 	 * @return CFilter
 	 */
@@ -353,6 +375,7 @@ class CFilter extends CDiv {
 	 */
 	public function toString($destroy = true) {
 		$headers = (new CList())->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER);
+		$headers_cnt = 0;
 
 		if ($this->tabs_options['active'] !== false
 				&& !array_key_exists($this->tabs_options['active'], $this->headers)) {
@@ -360,21 +383,28 @@ class CFilter extends CDiv {
 		}
 
 		foreach ($this->headers as $index => $header) {
-			$headers->addItem($header);
+			if ($header) {
+				$headers->addItem($header);
+				$headers_cnt++;
+			}
 
 			if ($this->tabs[$index] !== null && $index !== $this->tabs_options['active']) {
 				$this->tabs[$index]->addStyle('display: none');
 			}
 		}
 
-		$this->form->addItem($this->tabs);
-
 		$this
 			->addStyle('display:none')
-			->addItem($headers)
-			->addItem($this->form)
-			->setAttribute('aria-label', _('Filter'));
+			->form->addItem($this->tabs);
 
-		return parent::toString($destroy).get_js($this->getJS());
+		if ($headers_cnt) {
+			$this
+				->addItem($headers)
+				->setAttribute('aria-label', _('Filter'));
+		}
+
+		$this->addItem($this->form);
+
+		return parent::toString($destroy).($headers_cnt ? get_js($this->getJS()) : '');
 	}
 }

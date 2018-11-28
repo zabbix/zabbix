@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup httptest
  */
-class testWebScenario extends CZabbixTest {
+class testWebScenario extends CAPITest {
 
 	public static function httptest_create() {
 		return [
@@ -372,7 +373,7 @@ class testWebScenario extends CZabbixTest {
 		else {
 			foreach ([$httptests] as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -536,7 +537,7 @@ class testWebScenario extends CZabbixTest {
 		else {
 			foreach ($httptests as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -1286,7 +1287,7 @@ class testWebScenario extends CZabbixTest {
 				$this->assertEquals($dbRow['name'], $httptests['name']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
 			}
 		}
 	}
@@ -1343,7 +1344,7 @@ class testWebScenario extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from httptest where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where httptestid='.zbx_dbstr($id)));
 			}
 		}
 	}

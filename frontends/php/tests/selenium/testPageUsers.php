@@ -18,16 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageUsers extends CWebTest {
+class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
 	public $userRole = 'Zabbix Super Admin';
 
 	public static function allUsers() {
-		return DBdata('select * from users');
+		return CDBHelper::getDataProvider('select * from users');
 	}
 
 	public function testPageUsers_CheckLayout() {
@@ -70,11 +70,11 @@ class testPageUsers extends CWebTest {
 		DBexecute('UPDATE users SET autologout=0 WHERE userid=2');
 
 		$sqlHashUser = 'select * from users where userid='.$userid;
-		$oldHashUser = DBhash($sqlHashUser);
+		$oldHashUser = CDBHelper::getHash($sqlHashUser);
 		$sqlHashGroup = 'select * from users_groups where userid='.$userid.' order by id';
-		$oldHashGroup = DBhash($sqlHashGroup);
+		$oldHashGroup = CDBHelper::getHash($sqlHashGroup);
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
-		$oldHashMedia = DBhash($sqlHashMedia);
+		$oldHashMedia = CDBHelper::getHash($sqlHashMedia);
 
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
@@ -88,9 +88,9 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestTextPresent($alias);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
-		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
-		$this->assertEquals($oldHashMedia, DBhash($sqlHashMedia));
+		$this->assertEquals($oldHashUser, CDBHelper::getHash($sqlHashUser));
+		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
+		$this->assertEquals($oldHashMedia, CDBHelper::getHash($sqlHashMedia));
 	}
 
 	public function testPageUsers_FilterByAlias() {
@@ -158,20 +158,20 @@ class testPageUsers extends CWebTest {
 			$this->zbxTestCheckTitle('Configuration of users');
 			if ($alias === 'guest' || $alias === 'Admin') {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');
-				$this->assertNotEquals(0, DBcount("select * from users where userid=$id"));
-				$this->assertNotEquals(0, DBcount("select * from users_groups where userid=$id"));
+				$this->assertNotEquals(0, CDBHelper::getCount("select * from users where userid=$id"));
+				$this->assertNotEquals(0, CDBHelper::getCount("select * from users_groups where userid=$id"));
 				if ($alias === 'Admin') {
-					$this->assertNotEquals(0, DBcount("select * from media where userid=$id"));
+					$this->assertNotEquals(0, CDBHelper::getCount("select * from media where userid=$id"));
 				}
 				else {
-					$this->assertEquals(0, DBcount("select * from media where userid=$id"));
+					$this->assertEquals(0, CDBHelper::getCount("select * from media where userid=$id"));
 				}
 			}
 			else {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'User deleted');
-				$this->assertEquals(0, DBcount("select * from users where userid=$id"));
-				$this->assertEquals(0, DBcount("select * from users_groups where userid=$id"));
-				$this->assertEquals(0, DBcount("select * from media where userid=$id"));
+				$this->assertEquals(0, CDBHelper::getCount("select * from users where userid=$id"));
+				$this->assertEquals(0, CDBHelper::getCount("select * from users_groups where userid=$id"));
+				$this->assertEquals(0, CDBHelper::getCount("select * from media where userid=$id"));
 			}
 		}
 	}

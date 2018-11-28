@@ -34,7 +34,7 @@ $widget = (new CWidget())
 	);
 
 $triggerDOFormList = (new CFormList())
-	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))
+	->addRow(_('Use custom event status colours'), (new CCheckBox('custom_color'))
 		->setChecked($data['custom_color'] == EVENT_CUSTOM_COLOR_ENABLED)
 		->setAttribute('autofocus', 'autofocus')
 	)
