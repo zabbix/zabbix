@@ -43,6 +43,10 @@ class CMultiSelect extends CTag {
 			)
 			->js_event_name = sprintf('multiselect_%s_init', $this->getId());
 
+		if (array_key_exists('disabled', $options) && $options['disabled']) {
+			$this->setAttribute('aria-disabled', 'true');
+		}
+
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
