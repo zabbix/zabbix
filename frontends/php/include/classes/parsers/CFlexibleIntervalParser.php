@@ -63,29 +63,26 @@ class CFlexibleIntervalParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
-
-		$p = $pos;
 		$this->update_interval = '';
 		$this->time_period = '';
+
+		$p = $pos;
 
 		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
 			return self::PARSE_FAIL;
 		}
-		$this->update_interval = $this->simple_interval_parser->getMatch();
+		$update_interval = $this->simple_interval_parser->getMatch();
 		$p += $this->simple_interval_parser->getLength();
 
 		if (!isset($source[$p]) || $source[$p] !== '/') {
-			$this->update_interval = '';
-
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if ($this->time_period_parser->parse($source, $p) == self::PARSE_FAIL) {
-			$this->update_interval = '';
-
 			return self::PARSE_FAIL;
 		}
+		$this->update_interval = $update_interval;
 		$this->time_period = $this->time_period_parser->getMatch();
 		$p += $this->time_period_parser->getLength();
 
