@@ -465,7 +465,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
-			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"][contains(text(),"copied")]');
+			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"copied")]');
 
 			// DB check, if copy target was host or template.
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {

@@ -103,6 +103,7 @@ static zbx_vmware_t	*vmware = NULL;
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS	64
+#define ZBX_MAXQUERYMETRICS_UNLIMITED	1000
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -3602,16 +3603,32 @@ static int	vmware_service_get_maxquerymetrics(CURL *easyhandle, int *max_qm, cha
 		zbx_free(*error);
 	}
 
+	ret = SUCCEED;
+
 	if (NULL == (val = zbx_xml_read_doc_value(doc, ZBX_XPATH_MAXQUERYMETRICS())))
 	{
 		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
 		zabbix_log(LOG_LEVEL_DEBUG, "maxQueryMetrics used default value %d", ZBX_VPXD_STATS_MAXQUERYMETRICS);
-		ret = SUCCEED;
 		goto out;
 	}
 
-	if (SUCCEED != (ret = is_uint31(val, max_qm)))
-		*error = zbx_dsprintf(*error, "Cannot convert maxQueryMetrics from %s.",  val);
+	/* vmware article 2107096                                                                    */
+	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server */
+	/* To disable the limit, set a value to -1                                                   */
+	/* Edit the web.xml file. To disable the limit, set a value 0                                */
+	if (-1 == atoi(val))
+	{
+		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+	}
+	else if (SUCCEED != is_uint31(val, max_qm))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot convert maxQueryMetrics from %s.", val);
+		*max_qm = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+	}
+	else if (0 == *max_qm)
+	{
+		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
+	}
 
 	zbx_free(val);
 out:
@@ -4205,7 +4222,6 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vec
  *             entities     - [IN] the performance collector entities to      *
  *                                 retrieve counters for                      *
  *             counters_max - [IN] the maximum number of counters per query.  *
- *                                 0 - unlimited.                             *
  *             perfdata     - [OUT] the performance counter values            *
  *                                                                            *
  ******************************************************************************/
@@ -4221,9 +4237,6 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 	xmlDoc				*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counters_max:%d", __function_name, counters_max);
-
-	if (0 == counters_max)
-		counters_max = INT_MAX;
 
 	while (0 != entities->values_num)
 	{
@@ -4259,8 +4272,8 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 
 				/* add startTime for entity performance counter request for decrease XML data load */
 				st_raw = zbx_time() - SEC_PER_HOUR;
-				st = *gmtime(&st_raw);
-				strftime(st_str, sizeof(st_str), "%Y-%m-%dT%XZ", &st);
+				gmtime_r(&st_raw, &st);
+				strftime(st_str, sizeof(st_str), "%Y-%m-%dT%TZ", &st);
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:startTime>%s</ns0:startTime>",
 						st_str);
 			}
@@ -4451,7 +4464,7 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 
 	zbx_vmware_unlock();
 
-	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, 0, &perfdata);
+	vmware_service_retrieve_perf_counters(service, easyhandle, &entities, ZBX_MAXQUERYMETRICS_UNLIMITED, &perfdata);
 	vmware_service_retrieve_perf_counters(service, easyhandle, &hist_entities, service->data->max_query_metrics,
 			&perfdata);
 
