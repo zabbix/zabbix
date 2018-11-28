@@ -179,7 +179,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
-		$element['name'] = nbsp(CHtml::encode($element['name']));
+		$element['name'] = CHtml::encode($element['name']);
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
@@ -192,6 +192,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 				' ',
 				new CSup($element['count'])
 			]))
+				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_SUBFILTER)
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
@@ -220,7 +221,9 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					$link,
 					' ',
 					new CSup(($subfilter ? '+' : '').$element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
+				]))
+					->addClass(ZBX_STYLE_NOWRAP)
+					->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
 	}
