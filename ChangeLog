@@ -2094,6 +2094,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions, fixed constraint error when importing new data.tmpl (kalimulin)
 ..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
 A......... [ZBX-14977] fixed creation of unneeded database record if host prototype inventory mode is disabled; fixed validation for host and host prototype inventory mode (miks)
 A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
