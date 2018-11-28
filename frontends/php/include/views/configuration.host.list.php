@@ -49,7 +49,7 @@ $widget = (new CWidget())
 	]));
 
 // filter
-$filter = new CFilter();
+$filter = new CFilter(new CUrl('hosts.php'));
 
 $filter
 	->setProfile($data['profileIdx'])

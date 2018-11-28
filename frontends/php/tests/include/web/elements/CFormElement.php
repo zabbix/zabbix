@@ -72,7 +72,11 @@ class CFormElement extends CElement {
 			foreach ($this->getLabels() as $label) {
 				$element = $label->query($selector.'/*[@name]')->one(false);
 				if ($element === null) {
-					$element = $label->query($selector.'/div[@class="multiselect-wrapper"]')->one(false);
+					$element = $label->query($selector.'/div[@class="multiselect-wrapper"]')->asMultiselect()->one(false);
+				}
+
+				if ($element === null) {
+					$element = $label->query($selector.'/ul[@class="radio-segmented"]')->asSegmentedRadio()->one(false);
 				}
 
 				if ($element !== null) {
@@ -106,11 +110,46 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Switch to tab by tab name.
+	 *
+	 * @return $this
+	 */
+	public function selectTab($name) {
+		$xpath = './/ul[contains(@class, "ui-tabs-nav")]//a[text()='.CXPathHelper::escapeQuotes($name).']';
+		return $this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+	}
+
+	/**
+	 * Get text of selected tab.
+	 *
+	 * @return string
+	 */
+	public function getSelectedTab() {
+		return $this->query('xpath:.//ul[contains(@class, "ui-tabs-nav")]'.
+				'//li[@aria-selected="true"]/a')->waitUntilPresent()->one()->getText();
+	}
+
+	/**
+	 * Get message of form in overlay dialog.
+	 *
+	 * @return CMessageElement
+	 */
+	public function getOverlayMessage() {
+		return $this->parents('class:overlay-dialogue-body')->one()
+				->query('tag:output')->waitUntilPresent()->asMessage()->one();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function submit() {
-		parent::submit();
-		$this->waitUntilNotPresent();
+		$submit = $this->query('xpath:.//button[@type="submit"]')->one(false);
+		if ($submit !== null) {
+			$submit->click();
+		}
+		else {
+			parent::submit();
+		}
 
 		return $this;
 	}

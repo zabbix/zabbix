@@ -1038,8 +1038,9 @@ function calculateAvailability($triggerId, $startTime, $endTime) {
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
 			$startValue = $row['value'];
-			$min = $startTime;
 		}
+
+		$min = $startTime;
 	}
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.

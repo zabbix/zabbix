@@ -53,10 +53,6 @@ function local_generateHeader($data) {
 		header('X-Frame-Options: '.$x_frame_options);
 	}
 
-	if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
-			|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
-		header('strict-transport-security: max-age=31557600');
-	}
 
 	// construct menu
 	$main_menu = [];
@@ -103,7 +99,7 @@ function local_generateHeader($data) {
 	echo '<main>';
 
 	// should be replaced with addPostJS() at some point
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

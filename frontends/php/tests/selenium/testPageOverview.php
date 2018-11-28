@@ -466,6 +466,61 @@ class testPageOverview extends CLegacyWebTest {
 						'3_item'
 					]
 				]
+			],
+			// Show suppressed problems with type Triggers.
+			[
+				[
+					'main_filter' => [
+						'groupid' => 'Host group for suppression',
+						'type' => 'Triggers'
+					],
+					'result_hosts' => [
+						'Host for suppression'
+					],
+					'result_triggers' => [
+						'Trigger_for_suppression'
+					],
+					'show_suppressed' => true
+				]
+			],
+			// Do not show suppressed problems with type Triggers.
+			[
+				[
+					'main_filter' => [
+						'groupid' => 'Host group for suppression',
+						'type' => 'Triggers'
+					]
+				]
+			],
+			// Check suppressed problems with type Data.
+			[
+				[
+					'main_filter' => [
+						'groupid' => 'Host group for suppression',
+						'type' => 'Data'
+					],
+					'result_hosts' => [
+						'Host for suppression'
+					],
+					'result_items' => [
+						'Trapper_for_suppression'
+					],
+					'show_suppressed' => true
+				]
+			],
+			[
+				[
+					'main_filter' => [
+						'groupid' => 'Host group for suppression',
+						'type' => 'Data'
+					],
+					'result_hosts' => [
+						'Host for suppression'
+					],
+					'result_items' => [
+						'Trapper_for_suppression'
+					]
+				]
 			]
 		];
 	}
@@ -551,6 +606,10 @@ class testPageOverview extends CLegacyWebTest {
 			}
 		}
 
+		if (array_key_exists('show_suppressed', $data)) {
+			$this->zbxTestCheckboxSelect('show_suppressed', $data['show_suppressed']);
+		}
+
 		// Make trigger in problem or resolved state.
 		if (array_key_exists('problem', $data)) {
 			foreach ($data['problem'] as $trigger => $state) {
@@ -591,6 +650,11 @@ class testPageOverview extends CLegacyWebTest {
 			else {
 				$this->zbxTestAssertElementPresentXpath('//th[text()="Hosts"]');
 				$this->checkResultsInTable($main_filter['view_style'], $data['result_items'], $data['result_hosts']);
+			}
+
+			// Suppressed trigger contains background color.
+			if (array_key_exists('show_suppressed', $data)) {
+				$this->zbxTestAssertElementPresentXpath('//table[@class="list-table"]//td[contains(@class, "-bg")]');
 			}
 		}
 	}
@@ -633,10 +697,10 @@ class testPageOverview extends CLegacyWebTest {
 				[
 					'type' => 'Data',
 					'links' => [
-						'action=showgraph&period=3600',
-						'action=showgraph&period=604800',
-						'action=showgraph&period=2678400',
-						'action=showvalues&period=3600'
+						'action=showgraph&to=now&from=now-1h',
+						'action=showgraph&to=now&from=now-7d',
+						'action=showgraph&to=now&from=now-1M',
+						'action=showvalues&to=now&from=now-1h'
 					],
 					'links_text' => ['Last hour graph', 'Last week graph', 'Last month graph', 'Latest values']
 				]
@@ -652,7 +716,8 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestClickButtonText('Reset');
 
-		// Select type and open context menu.
+		// Select group and type, then open context menu.
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');

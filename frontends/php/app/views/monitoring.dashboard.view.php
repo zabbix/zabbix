@@ -160,15 +160,12 @@ else {
 
 	$timeline = null;
 	if ($data['show_timeselector']) {
-		$timeline = (new CFilter())
+		$timeline = (new CFilter(new CUrl()))
 			->setProfile($data['timeline']['profileIdx'], $data['timeline']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
-
-		if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-			$timeline = (new CDiv($timeline))->addStyle('display: none;');
+			->addTimeSelector($data['timeline']['from'], $data['timeline']['to'],
+				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
 		}
-	}
 
 	$widget
 		->addItem($timeline)
@@ -195,7 +192,8 @@ else {
 	$dashboard_options = [
 		'max-rows' => DASHBOARD_MAX_ROWS,
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
-		'editable' => $data['dashboard']['editable']
+		'editable' => $data['dashboard']['editable'],
+		'edit_mode' => $data['dashboard_edit_mode']
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];

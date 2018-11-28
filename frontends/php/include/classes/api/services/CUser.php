@@ -1195,7 +1195,7 @@ class CUser extends CApiService {
 				'values' => [
 					'attempt_failed' => ++$db_user['attempt_failed'],
 					'attempt_clock' => time(),
-					'attempt_ip' => $db_user['userip']
+					'attempt_ip' => substr($db_user['userip'], 0, 39)
 				],
 				'where' => ['userid' => $db_user['userid']]
 			]);

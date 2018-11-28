@@ -35,20 +35,21 @@ function getMenuPopupHistory(options) {
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
+		url.setArgument('to', 'now');
 
-		url.setArgument('period', '3600');
+		url.setArgument('from', 'now-1h');
 		items.push({
 			label: t('Last hour graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '604800');
+		url.setArgument('from', 'now-7d');
 		items.push({
 			label: t('Last week graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '2678400');
+		url.setArgument('from', 'now-1M');
 		items.push({
 			label: t('Last month graph'),
 			url: url.getUrl()
@@ -57,7 +58,7 @@ function getMenuPopupHistory(options) {
 
 	// latest values
 	url.setArgument('action', 'showvalues');
-	url.setArgument('period', '3600');
+	url.setArgument('from', 'now-1h');
 	items.push({
 		label: t('Latest values'),
 		url: url.getUrl()
@@ -470,7 +471,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						if (link.data('value') == currentRate) {
 							link
 								.addClass('selected')
-								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 						}
 						else {
 							link
@@ -501,7 +502,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 								if (link.data('value') == currentRate) {
 									link
 										.addClass('selected')
-										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 								}
 								else {
 									link
@@ -670,7 +671,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	}
 
 	sections[sections.length] = {
-		label: t('Trigger'),
+		label: t('S_TRIGGER'),
 		items: items
 	};
 
@@ -1262,7 +1263,7 @@ jQuery(function($) {
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {
