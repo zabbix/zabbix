@@ -1,7 +1,7 @@
 Changes for 4.2.0alpha2
 
 New features:
-..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs)
+..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
 ..F....... [ZBX-15020] fixed negative time selector offset when selecting time range in graph (miks)
