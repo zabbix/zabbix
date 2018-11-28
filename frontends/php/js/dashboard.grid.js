@@ -305,7 +305,7 @@
 
 					return !('affected_axis' in box) && rectOverlap(pos, box.pos) ? box : null;
 				}).each(function(box) {
-					if ('affected_axis' in box) {
+					if ('affected_axis' in box && box.affected_axis != axis_key) {
 
 						return;
 					}
@@ -331,14 +331,8 @@
 				});
 			};
 
-		var boundary = $.extend({}, widget.pos);
-
-		boundary[axis_key] += axis_key in axis ? axis[axis_key] : boundary[size_key];
-		boundary[size_key] = axis[size_key];
-		boundary[opposite_size_key] = widget.current_pos[opposite_size_key];
-
 		// Get array of only affected by resize operation widgets.
-		affected = getAffectedTreeAsArray(boundary);
+		affected = getAffectedTreeAsArray(axis.boundary);
 
 		var margins = {},
 			axis_pos = $.extend(widget.current_pos);
@@ -519,7 +513,13 @@
 				size_key: 'width',
 				size_min: 1,
 				size_max: data.options['max-columns'],
-				width: changes.width
+				width: changes.width,
+				boundary: {
+					x: widget.current_pos.x,
+					y: widget['height' in changes ? 'pos' : 'current_pos'].y,
+					width: widget.current_pos.width,
+					height: widget['height' in changes ? 'pos' : 'current_pos'].height
+				}
 			}
 
 			if ('x' in changes) {
@@ -536,7 +536,8 @@
 				size_key: 'height',
 				size_min: data.options['widget-min-rows'],
 				size_max: data.options['max-rows'],
-				height: changes.height
+				height: changes.height,
+				boundary: $.extend({}, widget.current_pos)
 			}
 
 			if ('y' in changes) {
