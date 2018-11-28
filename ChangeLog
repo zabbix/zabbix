@@ -1,11 +1,48 @@
+Changes for 4.0.3rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-9038] fixed memory of performance counters consumed during vmware update (MVekslers)
+....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions (kalimulin)
+A......... [ZBX-15078] fixed API authentication for ldap users having gui access disabled (gcalenko)
+A.F....... [ZBX-14880] fixed misleading ldap authentication error messages (gcalenko)
+..F....... [ZBX-14877] fixed style of disabled action on high contrast theme (Andzs, ashubin)
+..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
+..F....... [ZBX-15020] fixed negative time selector offset when selecting time range in graph (miks)
+A......... [ZBX-14977] fixed creation of unneeded database record if host prototype inventory mode is disabled; fixed validation for host and host prototype inventory mode (miks)
+A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
+..F....... [ZBX-15148] fixed web scenario item selection in SVG graph widget (miks)
+...G...... [ZBX-15107] fixed error handling in logrt[] items if regular expression for file name is not valid (Andris)
+..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
+.......PS. [ZBX-15200] fixed host, trigger and item count calculation; fixed required performance calculation (vso)
+....I....T [ZBX-15158] fixed graph name for cache usage in proxy and server templates (kalimulin)
+...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.2
+
+4.0.2rc1 was released as 4.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.2rc1
 
 New features:
+.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 ....I..... [ZBXNEXT-4841] removed hardcoded locations for iconv.h and pthread.h; thanks to Helmut Grohne for the patch (kalimulin)
 ...G...... [ZBXNEXT-3047] fixed compilation errors on Windows platform with static OpenSSL libraries (Andris, viktors)
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
 
 Bug fixes:
+.......PS. [ZBX-15171] fixed crash in ODBC when creating JSON from null db values, fixed memory leak (kalimulin)
+..F....... [ZBX-15045] fixed a case where a disable multiselect looks like a similar to enabled text field (vasilijs)
+..F....... [ZBX-14927] fixed filter by host group without real hosts in triggers top 100, dashboard widgets, screens (talbergs)
+....I..... [ZBX-13662] fixed duplication of file system type in global regular expression for file systems discovery (MVekslers)
+....I....T [ZBX-15036] added system.cpu.util[,guest], system.cpu.util[,guest_nice] to OS Linux template (kalimulin)
+...G...PS. [ZBX-15106] improved error messages for item preprocessing, general pcre code improvements (Andris, kalimulin, wiper)
+........S. [ZBX-15095] fixed curl error handling for elasticsearch history backend (MVekslers)
+....I..... [ZBX-15129] added optional upgrade patches to rename TRIGGER.NAME macros to EVENT.NAME in action operation messages and custom scripts (wiper)
+.......PS. [ZBX-14858] fixed processing of unlimited vmware maxQueryMetrics value (MVekslers)
 .......PS. [ZBX-14635] fixed rare LLD failures when moving host between groups (kalimulin)
 ..F....... [ZBX-13719] fixed loss of calc_fnc index in graph edit form (vasilijs)
 ........S. [ZBX-14964] improved escalator performance during maintenance by checking paused escalations less frequently (vso)
@@ -23,10 +60,10 @@ Bug fixes:
 ....I..... [ZBX-14941] fixed issue with autoreconf/automake for source tarball (MVekslers)
 .......PS. [ZBX-15142] fixed time format for vmware performance counters query (MVekslers)
 ...G...... [ZBX-15010] fixed regexp compilation error for patterns with referenced subpatterns (vjaceslavs)
-..F....... [ZBX-14724] fixed breadcrumb jumping in EI browser (ashubin)
+..F....... [ZBX-14724] fixed breadcrumb jumping in IE browser (ashubin)
 A......... [ZBX-15083] fixed API so that macros {TRIGGER.ID} works in map element URLs (vasilijs)
 .......PS. [ZBX-15127] fixed possible crash when communication problem occurred in the middle of vmware update (MVekslers)
-A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
+A......... [ZBX-14396] fixed excessive memory usage during template full clone (gcalenko, Sasha)
 .D.G...PS. [ZBX-14848] clarified process type names for log level increase/decrease in help messages and man pages (kalimulin)
 A......... [ZBX-14833] fixed selectHosts option in dservice.get API method to return the list of hosts by IP and proxy (Ivo, Sasha)
 .......PS. [ZBX-15062] fixed binary heap trying to reallocate slots on every insert (wiper)
@@ -676,7 +713,7 @@ Bug fixes:
 ........S. [ZBX-14875] fixed discovery and auto registration escalations being kept for one hour instead of deleted immediately (vso)
 A.F....... [ZBX-14422] fixed SQL queries being logged when accessing API, even if debug mode is disabled (agriscenko)
 ...G...PS. [ZBX-15027] fixed startup failures due to orphaned or zombie processes remaining when zabbix daemon is terminated during startup (vso)
-A......... [ZBX-14396] fixed memory usage during template full clone (gcalenko, Sasha)
+A......... [ZBX-14396] fixed excessive memory usage during template full clone (gcalenko, Sasha)
 ...G...... [ZBX-14779] extended support of system.stat[ent], system.stat[cpu,pc], system.stat[cpu,ec] on IBM AIX to LPAR type 'dedicated' (Andris)
 ........S. [ZBX-14851] fixed the host visible name in the event details/messages from server when using long utf8 text (MVekslers)
 .......P.. [ZBX-14887] fixed max count of records in the single json that proxy can send to the server (MVekslers)
@@ -2049,6 +2086,21 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.25rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
+A......... [ZBX-14977] fixed creation of unneeded database record if host prototype inventory mode is disabled; fixed validation for host and host prototype inventory mode (miks)
+A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.24
+
+3.0.24rc1 was released as 3.0.24 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.24rc1
