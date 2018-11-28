@@ -1407,12 +1407,14 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 			zbx_lrtrim(param2, " \t");
 
 			if ('\0' != *param1 && FAIL == (ret = is_double(param1)))
+			{
 				zbx_snprintf(err, sizeof(err), "first parameter is not numeric: %s", param1);
-
-			if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+			}
+			else if ('\0' != *param2 && FAIL == (ret = is_double(param2)))
+			{
 				zbx_snprintf(err, sizeof(err), "second parameter is not numeric: %s", param2);
-
-			if ('\0' == *param1 && '\0' == *param2)
+			}
+			else if ('\0' == *param1 && '\0' == *param2)
 			{
 				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s", pp->params);
 				ret = FAIL;
