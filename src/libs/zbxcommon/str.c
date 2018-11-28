@@ -3244,8 +3244,8 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_USER_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + macro_r;
+	token->loc.l = offset;
+	token->loc.r = offset + macro_r;
 
 	/* initialize token data */
 	data = &token->data.user_macro;
@@ -3266,7 +3266,7 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 	}
 	else
 	{
-		data->name.r = token->token.r - 1;
+		data->name.r = token->loc.r - 1;
 		data->context.l = 0;
 		data->context.r = 0;
 	}
@@ -3316,13 +3316,13 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_LLD_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.lld_macro;
 	data->name.l = offset + 2;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3370,13 +3370,13 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_OBJECTID;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.objectid;
 	data->name.l = offset + 1;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3423,13 +3423,13 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_MACRO;
-	token->token.l = offset;
-	token->token.r = offset + (ptr - macro);
+	token->loc.l = offset;
+	token->loc.r = offset + (ptr - macro);
 
 	/* initialize token data */
 	data = &token->data.macro;
 	data->name.l = offset + 1;
-	data->name.r = token->token.r - 1;
+	data->name.r = token->loc.r - 1;
 
 	return SUCCEED;
 }
@@ -3518,8 +3518,8 @@ static int	zbx_token_parse_func_macro(const char *expression, const char *macro,
 
 	/* initialize token */
 	token->type = token_type;
-	token->token.l = offset;
-	token->token.r = ptr - expression;
+	token->loc.l = offset;
+	token->loc.r = ptr - expression;
 
 	/* initialize token data */
 	data = ZBX_TOKEN_FUNC_MACRO == token_type ? &token->data.func_macro : &token->data.lld_func_macro;
@@ -3571,7 +3571,7 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 		if (SUCCEED != zbx_token_parse_macro(expression, key, &key_token))
 			return FAIL;
 
-		ptr = expression + key_token.token.r + 1;
+		ptr = expression + key_token.loc.r + 1;
 	}
 
 	/* If the key is without parameters, then parse_key() will move cursor past function name - */
@@ -3606,8 +3606,8 @@ static int	zbx_token_parse_simple_macro_key(const char *expression, const char *
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_SIMPLE_MACRO;
-	token->token.l = offset;
-	token->token.r = ptr - expression;
+	token->loc.l = offset;
+	token->loc.r = ptr - expression;
 
 	/* initialize token data */
 	data = &token->data.simple_macro;
@@ -3754,7 +3754,7 @@ static int	zbx_token_parse_nested_macro(const char *expression, const char *macr
  *                                                                            *
  *           zbx_token_t token = {0};                                         *
  *                                                                            *
- *           while (SUCCEED == zbx_token_find(expression, token.token.r + 1,  *
+ *           while (SUCCEED == zbx_token_find(expression, token.loc.r + 1,    *
  *                       &token))                                             *
  *           {                                                                *
  *                   process_token(expression, &token);                       *
@@ -3785,8 +3785,8 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 
 					token->data.reference.index = dollar[1] - '0';
 					token->type = ZBX_TOKEN_REFERENCE;
-					token->token.l = dollar - expression;
-					token->token.r = token->token.l + 1;
+					token->loc.l = dollar - expression;
+					token->loc.r = token->loc.l + 1;
 					return SUCCEED;
 				}
 
@@ -3863,7 +3863,7 @@ static size_t	zbx_no_function(const char *expr)
 		else if ('{' == *ptr && '{' == *(ptr + 1) && '#' == *(ptr + 2) &&
 				SUCCEED == zbx_token_parse_nested_macro(ptr, ptr, &token))
 		{
-			ptr += token.token.r - token.token.l + 1;
+			ptr += token.loc.r - token.loc.l + 1;
 		}
 		else if (SUCCEED != is_function_char(*ptr))
 		{
@@ -4628,7 +4628,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			else if ('{' == (*data)[i] && '{' == (*data)[i + 1] && '#' == (*data)[i + 2] &&
 					SUCCEED == zbx_token_parse_nested_macro(&(*data)[i], &(*data)[i], &token))
 			{
-				i += token.token.r - token.token.l + 1;
+				i += token.loc.r - token.loc.l + 1;
 			}
 			else if ('[' != (*data)[i])
 			{
