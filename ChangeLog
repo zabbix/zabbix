@@ -3,6 +3,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
 ..F....... [ZBX-15148] fixed web scenario item selection in SVG graph widget (miks)
 ...G...... [ZBX-15107] fixed error handling in logrt[] items if regular expression for file name is not valid (Andris)
 ..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
@@ -2084,6 +2085,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.24
