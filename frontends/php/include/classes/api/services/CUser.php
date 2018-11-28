@@ -1089,7 +1089,7 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
 		}
 	}
 
@@ -1191,7 +1191,7 @@ class CUser extends CApiService {
 				'values' => [
 					'attempt_failed' => ++$db_user['attempt_failed'],
 					'attempt_clock' => time(),
-					'attempt_ip' => $db_user['userip']
+					'attempt_ip' => substr($db_user['userip'], 0, 39)
 				],
 				'where' => ['userid' => $db_user['userid']]
 			]);
