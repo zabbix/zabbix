@@ -2650,8 +2650,8 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 
 #	define ZBX_POST_HV_PARENT										\
 		"<ns0:propSet>"											\
-			"<urn:type>HostSystem</urn:type>"							\
-			"<urn:pathSet>parent</urn:pathSet>"							\
+			"<ns0:type>HostSystem</ns0:type>"							\
+			"<ns0:pathSet>parent</ns0:pathSet>"							\
 		"</ns0:propSet>"
 
 	const char	*__function_name = "vmware_hv_get_parent_data";
@@ -2665,7 +2665,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
 			vmware_service_objects[service->type].property_collector,
 			NULL == hv->clusterid ? ZBX_VMWARE_SOAP_FOLDER : ZBX_VMWARE_SOAP_CLUSTER,
-			NULL == hv->clusterid ? "<urn:pathSet>parent</urn:pathSet>": "",
+			NULL == hv->clusterid ? "<ns0:pathSet>parent</ns0:pathSet>": "",
 			NULL == hv->clusterid ? ZBX_POST_HV_PARENT : "", hv->id);
 
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
