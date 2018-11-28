@@ -2601,11 +2601,6 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 						"<ns0:type>Datacenter</ns0:type>"				\
 						"<ns0:pathSet>name</ns0:pathSet>"				\
 					"</ns0:propSet>"							\
-					"<ns0:propSet>"								\
-						"<ns0:type>%s</ns0:type>"					\
-						"<ns0:pathSet>name</ns0:pathSet>"				\
-						"%s"								\
-					"</ns0:propSet>"							\
 					"%s"									\
 					"<ns0:objectSet>"							\
 						"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
@@ -2645,13 +2640,26 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 						"</ns0:selectSet>"						\
 					"</ns0:objectSet>"							\
 				"</ns0:specSet>"								\
+				"<ns0:options/>"								\
 			"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-#	define ZBX_POST_HV_PARENT										\
+#	define ZBX_POST_SOAP_FOLDER										\
+		"<ns0:propSet>"											\
+			"<ns0:type>Folder</ns0:type>"								\
+			"<ns0:pathSet>name</ns0:pathSet>"							\
+			"<ns0:pathSet>parent</ns0:pathSet>"							\
+			"<ns0:pathSet>childEntity</ns0:pathSet>"						\
+		"</ns0:propSet>"										\
 		"<ns0:propSet>"											\
 			"<ns0:type>HostSystem</ns0:type>"							\
 			"<ns0:pathSet>parent</ns0:pathSet>"							\
+		"</ns0:propSet>"
+
+#	define ZBX_POST_SOAP_CUSTER										\
+		"<ns0:propSet>"											\
+			"<ns0:type>ClusterComputeResource</ns0:type>"						\
+			"<ns0:pathSet>name</ns0:pathSet>"							\
 		"</ns0:propSet>"
 
 	const char	*__function_name = "vmware_hv_get_parent_data";
@@ -2664,9 +2672,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DATACENTER_NAME,
 			vmware_service_objects[service->type].property_collector,
-			NULL == hv->clusterid ? ZBX_VMWARE_SOAP_FOLDER : ZBX_VMWARE_SOAP_CLUSTER,
-			NULL == hv->clusterid ? "<ns0:pathSet>parent</ns0:pathSet>": "",
-			NULL == hv->clusterid ? ZBX_POST_HV_PARENT : "", hv->id);
+			NULL != hv->clusterid ? ZBX_POST_SOAP_CUSTER : ZBX_POST_SOAP_FOLDER, hv->id);
 
 	if (SUCCEED != zbx_soap_post(__function_name, easyhandle, tmp, &doc, error))
 		goto out;
