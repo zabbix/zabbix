@@ -1030,7 +1030,8 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 		char **errmsg)
 {
 	zbx_variant_t	value_num;
-	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
+	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max,
+			value_num_str[ZBX_MAX_UINT64_LEN + 1];
 	zbx_variant_t	range_min, range_max;
 	int		ret = FAIL;
 
@@ -1063,15 +1064,17 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 
 	if (ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "value must be greater or equal to %s",
-				zbx_variant_value_desc(&range_min));
+		zbx_strlcpy(value_num_str, zbx_variant_value_desc(&value_num), sizeof(value_num_str));
+		*errmsg = zbx_dsprintf(*errmsg, "value '%s' must be greater or equal to %s",
+				value_num_str, zbx_variant_value_desc(&range_min));
 		goto out;
 	}
 
 	if (ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "value must be less or equal to %s",
-				zbx_variant_value_desc(&range_max));
+		zbx_strlcpy(value_num_str, zbx_variant_value_desc(&value_num), sizeof(value_num_str));
+		*errmsg = zbx_dsprintf(*errmsg, "value '%s' must be less or equal to %s",
+				value_num_str, zbx_variant_value_desc(&range_max));
 		goto out;
 	}
 	ret = SUCCEED;
