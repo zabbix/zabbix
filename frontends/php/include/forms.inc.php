@@ -1134,7 +1134,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['key'] = $data['item']['key_'];
 		$data['interfaceid'] = $data['item']['interfaceid'];
 		$data['type'] = $data['item']['type'];
-		$data['snmp_community'] = $data['item']['snmp_community'];
+		if ($data['item']['snmp_community'] !== '') {
+			$data['snmp_community'] = $data['item']['snmp_community'];
+		}
 		$data['snmp_oid'] = $data['item']['snmp_oid'];
 		$data['port'] = $data['item']['port'];
 		$data['value_type'] = $data['item']['value_type'];
