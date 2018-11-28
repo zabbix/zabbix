@@ -411,6 +411,7 @@ class CSvgGraphHelper {
 					],
 					'selectHosts' => ['hostid', 'name'],
 					'hostids' => array_keys($hosts),
+					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 					],
