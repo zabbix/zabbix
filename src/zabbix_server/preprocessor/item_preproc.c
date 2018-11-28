@@ -1228,6 +1228,14 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 
 	zbx_free(*error);
 	zbx_json_value_dyn(&jp_out, error, &data_alloc);
+
+	zbx_lrtrim(*error, " \t\n\r");
+	if ('\0' == **error)
+	{
+		zbx_free(*error);
+		goto out;
+	}
+
 	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
@@ -1320,6 +1328,13 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 			break;
 	}
 
+	zbx_lrtrim(*error, " \t\n\r");
+	if ('\0' == **error)
+	{
+		zbx_free(*error);
+		goto out;
+	}
+
 	ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
@@ -1390,7 +1405,16 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 	}
 
 	if (NULL != *error)
+	{
+		zbx_lrtrim(*error, " \t\n\r");
+		if ('\0' == **error)
+		{
+			zbx_free(*error);
+			goto out;
+		}
+
 		ret = FAIL;
+	}
 out:
 	zbx_variant_clear(&value_str);
 
