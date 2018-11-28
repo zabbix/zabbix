@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+A.F....... [ZBX-14880] fixed misleading ldap authentication error messages (gcalenko)
 ..F....... [ZBX-14877] fixed style of disabled action on high contrast theme (Andzs, ashubin)
 ..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
 ..F....... [ZBX-15020] fixed negative time selector offset when selecting time range in graph (miks)
