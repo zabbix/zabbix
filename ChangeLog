@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha2
 
 New features:
+..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs)
 
 Bug fixes:
 A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
