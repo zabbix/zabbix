@@ -346,12 +346,12 @@ class testWebScenario extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $key => $id) {
-				$db_result_web = DBSelect('SELECT * FROM `httptest` WHERE httptestid='.zbx_dbstr($id));
+				$db_result_web = DBSelect('SELECT * FROM httptest WHERE httptestid='.zbx_dbstr($id));
 				$db_row_web = DBFetch($db_result_web);
 				$this->assertEquals($db_row_web['name'], $httptests[$key]['name']);
 				$this->assertEquals($db_row_web['hostid'], $httptests[$key]['hostid']);
 
-				$db_result_steps = DBSelect('SELECT * FROM `httpstep` WHERE httptestid='.zbx_dbstr($id).' order by `no`;');
+				$db_result_steps = DBSelect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($id).' order by no;');
 				$db_rows_steps = DBFetchArray($db_result_steps);
 				$this->assertCount(count($httptests[$key]['steps']), $db_rows_steps);
 
