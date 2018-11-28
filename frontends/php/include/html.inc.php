@@ -74,10 +74,6 @@ function make_decoration($haystack, $needle, $class = null) {
 	return $result;
 }
 
-function nbsp($str) {
-	return str_replace(' ', SPACE, $str);
-}
-
 function prepareUrlParam($value, $name = null) {
 	if (is_array($value)) {
 		$result = '';
