@@ -547,9 +547,7 @@ class CFrontendSetup {
 	 * @return array
 	 */
 	public function checkPhpLdapModule() {
-		$current = function_exists('ldap_connect') && function_exists('ldap_set_option') && function_exists('ldap_bind')
-				&& function_exists('ldap_search') && function_exists('ldap_get_entries')
-				&& function_exists('ldap_free_result') && function_exists('ldap_start_tls');
+		$current = (new CLdap())->error !== CLdap::ERR_PHP_EXTENSION;
 
 		return [
 			'name' => _('PHP LDAP'),
