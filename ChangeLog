@@ -1,7 +1,7 @@
 Changes for 4.2.0alpha2
 
 New features:
-..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
+..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
 .......PS. [ZBX-9038] fixed memory of performance counters consumed during vmware update (MVekslers)
