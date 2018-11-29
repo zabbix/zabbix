@@ -95,9 +95,8 @@ abstract class CValidator {
 	 * Adds a validation error with custom parameter support. The value of $objectName will be passed as the
 	 * first parameter.
 	 *
-	 * @param string 	$message
-	 * @param mixed 	$param 		parameter to be replace the first placeholder
-	 * @param mixed 	$param,... 	unlimited number of optional parameters
+	 * @param string    $message   Message optionally containing placeholders to substitute.
+	 * @param mixed     $param     Unlimited number of optional parameters to replace sequential placeholders.
 	 *
 	 * @return string
 	 */
@@ -113,7 +112,7 @@ abstract class CValidator {
 
 
 	/**
-	 * Returns string represenation of a variable
+	 * Returns string representation of a variable.
 	 *
 	 * @param mixed $value
 	 * @return string

@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageHistory extends CWebTest {
+class testPageHistory extends CLegacyWebTest {
 
 	public static function checkLayoutItems() {
-		return DBdata(
+		return CDBHelper::getDataProvider(
 			'SELECT i.itemid,i.value_type,i.key_,i.name'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.

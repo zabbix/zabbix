@@ -40,7 +40,7 @@ $filterColumn->addRow(_('Recipient'), [
 ]);
 
 $auditWidget->addItem(
-	(new CFilter())
+	(new CFilter(new CUrl('auditacts.php')))
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])

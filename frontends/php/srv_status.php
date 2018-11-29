@@ -147,7 +147,7 @@ else {
 			'reason' => _('Reason'),
 			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
 			'sla2' => null,
-			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla3' => _('SLA').' / '._('Acceptable SLA')
 		]
 	);
 
@@ -174,7 +174,6 @@ else {
 					),
 				(new CTag('nav', true, get_icon('fullscreen')))->setAttribute('aria-label', _('Content controls'))
 			]))
-			->addItem(BR())
 			->addItem($tree->getHTML())
 			->show();
 	}

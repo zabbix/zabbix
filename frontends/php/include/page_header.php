@@ -132,11 +132,6 @@ switch ($page['type']) {
 			header('X-Frame-Options: '.$x_frame_options);
 		}
 
-		if ((array_key_exists('https', $_SERVER) && ($_SERVER['https'] == 1 || $_SERVER['https'] === 'on'))
-				|| (array_key_exists('SERVER_PORT', $_SERVER) && $_SERVER['SERVER_PORT'] == 443)) {
-			header('strict-transport-security: max-age=31557600');
-		}
-
 		global $ZBX_SERVER_NAME;
 
 		// page title
@@ -273,7 +268,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
-	zbx_add_post_js('initMessages({});');
+	zbx_add_post_js('initMessages();');
 }
 
 // if a user logs in after several unsuccessful attempts, display a warning

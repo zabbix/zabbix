@@ -747,16 +747,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		memset(&stat, 0, sizeof(stat));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, db_httpstep.name);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, ZBX_NULL2EMPTY_STR(httpstep.posts));
 
-		if (NULL != httpstep.posts && '\0' != *httpstep.posts)
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
-
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
-			{
-				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				goto httpstep_error;
-			}
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POST, (NULL != httpstep.posts &&
@@ -1055,7 +1051,7 @@ int	process_httptests(int httppoller_num, int now)
 	{
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		strscpy(host.host, row[1]);
-		strscpy(host.name, row[2]);
+		zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
 
 		ZBX_STR2UINT64(httptest.httptest.httptestid, row[3]);
 		httptest.httptest.name = row[4];
