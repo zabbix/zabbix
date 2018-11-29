@@ -2196,7 +2196,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: .25rem;
   width: calc(100% / 6 - .65rem);
   z-index: 999;
-  color: #737373; }
+  color: #737373;
+  cursor: pointer; }
   .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
   .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
   .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
@@ -2212,7 +2213,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -webkit-box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
     box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5);
-    background: #010101; }
+    background: #010101;
+    cursor: crosshair; }
   .dashbrd-grid-new-widget-placeholder .dashbrd-grid-new-widget-label {
     position: absolute;
     left: 0;
