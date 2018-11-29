@@ -624,9 +624,9 @@
 					setDivPosition(this['div'], data, this['current_pos'], false);
 				}
 			});
-		}
 
-		resizeDashboardGrid($obj, data, pos.y + pos.height);
+			resizeDashboardGrid($obj, data, pos.y + pos.height);
+		}
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
@@ -1242,7 +1242,15 @@
 				.find('.dashbrd-grid-widget-new-box')
 					.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position')
 						.find('.dashbrd-grid-new-widget-label')
-							.text(t('Add a new widget'));
+							.empty()
+							.append($('<a>', {
+								href: '#',
+								text: t('Add a new widget'),
+								click: function (e) {
+									methods.addNewWidget.call($obj, this);
+									return cancelEvent(e);
+								}
+							}));
 
 		}).on('mouseenter mousemove', function(event) {
 			var drag = data['pos-action'] == 'add';
@@ -1617,25 +1625,27 @@
 				var	$this = $(this),
 					new_widget_placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(
 						$('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(
-							$('<div>', {
-								class: 'dashbrd-grid-new-widget-label',
-								text: t('Add a new widget')
-							})
+							$('<div>', {class: 'dashbrd-grid-new-widget-label'}).append(
+								$('<a>', {
+									href: '#',
+									text: t('Add a new widget')
+								})
+							)
 						)
 					);
 
 				if (options['editable']) {
+					new_widget_placeholder.find('a').on('click', function (e) {
+						if (!methods.isEditMode.call($this)) {
+							showEditMode();
+						}
+
+						methods.addNewWidget.call($this, this);
+						return cancelEvent(e);
+					});
+
 					if (options['kioskmode']) {
 						new_widget_placeholder = $('<h1>').text(t('Cannot add widgets in kiosk mode'));
-					}
-					else {
-						new_widget_placeholder.on('click', function() {
-							// Add new widget handler when not in edit mode.
-							if (!methods.isEditMode.call($this)) {
-								showEditMode();
-								methods.addNewWidget.call($this, this);
-							}
-						});
 					}
 				}
 				else {
