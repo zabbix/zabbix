@@ -2752,7 +2752,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 	{
 		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_FOLDER);
 	}
-	else if (0 < strlen(hv->datacenter_name))
+	else if ('\0' != *hv->datacenter_name)
 	{
 		hv->parent_name = zbx_strdup(NULL, hv->datacenter_name);
 		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DATACENTER);
