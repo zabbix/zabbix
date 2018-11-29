@@ -173,7 +173,8 @@
 				colorbox.css({
 					'color': background,
 					'background': background,
-				}).attr('title', background);
+				})
+				.attr('title', background);
 
 				input.val(color);
 			},
