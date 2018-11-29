@@ -806,7 +806,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				goto httpstep_error;
 		}
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_body_cb)) ||
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_header_cb)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
