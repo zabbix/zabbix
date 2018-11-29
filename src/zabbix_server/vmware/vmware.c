@@ -2752,10 +2752,15 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 	{
 		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_FOLDER);
 	}
-	else
+	else if (0 < strlen(hv->datacenter_name))
 	{
 		hv->parent_name = zbx_strdup(NULL, hv->datacenter_name);
 		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DATACENTER);
+	}
+	else
+	{
+		hv->parent_name = zbx_strdup(NULL, ZBX_VMWARE_TYPE_VCENTER == service->type ? "Vcenter" : "ESXi");
+		hv->parent_type = zbx_strdup(NULL, ZBX_VMWARE_SOAP_DEFAULT);
 	}
 
 	ret = SUCCEED;
