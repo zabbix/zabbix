@@ -1030,8 +1030,7 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 		char **errmsg)
 {
 	zbx_variant_t	value_num;
-	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max,
-			value_num_str[ZBX_MAX_UINT64_LEN + 1];
+	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
 	zbx_variant_t	range_min, range_max;
 	int		ret = FAIL;
 
@@ -1062,21 +1061,14 @@ static int	item_preproc_validate_range(unsigned char value_type, const zbx_varia
 		goto out;
 	}
 
-	if (ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min))
+	if ((ZBX_VARIANT_NONE != range_min.type && 0 > zbx_variant_compare(&value_num, &range_min)) ||
+			(ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num)))
 	{
-		zbx_strlcpy(value_num_str, zbx_variant_value_desc(&value_num), sizeof(value_num_str));
-		*errmsg = zbx_dsprintf(*errmsg, "value '%s' must be greater or equal to %s",
-				value_num_str, zbx_variant_value_desc(&range_min));
+		*errmsg = zbx_dsprintf(*errmsg, "range validation error with value '%s'",
+				zbx_variant_value_desc(&value_num));
 		goto out;
 	}
 
-	if (ZBX_VARIANT_NONE != range_max.type && 0 > zbx_variant_compare(&range_max, &value_num))
-	{
-		zbx_strlcpy(value_num_str, zbx_variant_value_desc(&value_num), sizeof(value_num_str));
-		*errmsg = zbx_dsprintf(*errmsg, "value '%s' must be less or equal to %s",
-				value_num_str, zbx_variant_value_desc(&range_max));
-		goto out;
-	}
 	ret = SUCCEED;
 out:
 	zbx_variant_clear(&value_num);
@@ -1122,7 +1114,10 @@ static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *p
 	}
 
 	if (0 != zbx_regexp_match_precompiled(value_str.data.str, regex))
-		*errmsg = zbx_strdup(*errmsg, "value must match the specified regular expression");
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "regular expression validation error with value '%s'",
+				zbx_variant_value_desc(&value_str));
+	}
 	else
 		ret = SUCCEED;
 
@@ -1169,7 +1164,10 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 	}
 
 	if (0 == zbx_regexp_match_precompiled(value_str.data.str, regex))
-		*errmsg = zbx_strdup(*errmsg, "value must not match the specified regular expression");
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "regular expression validation error with value '%s'",
+				zbx_variant_value_desc(&value_str));
+	}
 	else
 		ret = SUCCEED;
 
