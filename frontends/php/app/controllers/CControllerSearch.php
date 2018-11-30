@@ -255,9 +255,8 @@ class CControllerSearch extends CController {
 			if ($this->admin) {
 				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
 			}
+			$data['search'] = $this->search;
 		}
-
-		$data['search'] = $this->search;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Search'));
