@@ -25,6 +25,10 @@
 class CSvgGraph extends CSvg {
 
 	const SVG_GRAPH_X_AXIS_HEIGHT = 20;
+	const SVG_GRAPH_DEFAULT_COLOR = '#b0af07';
+	const SVG_GRAPH_DEFAULT_TRANSPARENCY = 5;
+	const SVG_GRAPH_DEFAULT_POINTSIZE = 1;
+	const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
 
 	protected $canvas_height;
 	protected $canvas_width;
@@ -882,23 +886,11 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths) && ($metric['options']['type'] == SVG_GRAPH_TYPE_LINE
 					|| $metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE)) {
-				$group = (new CSvgGroup())
-					->setAttribute('data-set', $metric['options']['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-					->setAttribute('data-metric', CHtml::encode($metric['name']))
-					->setAttribute('data-color', $metric['options']['color']);
-
 				if ($metric['options']['fill'] > 0) {
 					$this->drawMetricArea($metric, $this->paths[$index]);
 				}
 
-				foreach ($this->paths[$index] as $path) {
-					$group->addItem(new CSvgGraphLine($path, $metric));
-				}
-
-				$this->addItem($group->addItem(
-					(new CSvgCircle(-10, -10, $metric['options']['width'] + 4))
-						->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
-				));
+				$this->addItem(new CSvgGraphLineGroup($this->paths[$index], $metric));
 			}
 		}
 	}

@@ -33,10 +33,10 @@ class CSvgGraphPoints extends CSvgGroup {
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->options = $metric['options'] + [
-			'color' => '#b0af07',
-			'order' => 1,
-			'pointsize' => 1,
-			'transparency' => 5
+			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
+			'pointsize' => CSvgGraph::SVG_GRAPH_DEFAULT_POINTSIZE,
+			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
+			'order' => 1
 		];
 	}
 

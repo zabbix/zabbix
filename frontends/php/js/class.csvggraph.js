@@ -246,11 +246,25 @@ jQuery(function ($) {
 					var direction_string = '',
 						label = [],
 						data_set = nodes[i].getAttribute('data-set'),
-						paths = nodes[i].querySelectorAll('.svg-graph-line');
+						data_nodes = nodes[i].childNodes,
+						elmnt_label,
+						cx,
+						cy;
 
-					for (var index = 0, len = paths.length; index < len; index++) {
-						direction_string += ' ' + paths[index].getAttribute('d');
-						label.push(paths[index].getAttribute('label'));
+					for (var index = 0, len = data_nodes.length; index < len; index++) {
+						elmnt_label = data_nodes[index].getAttribute('label');
+						if (elmnt_label) {
+							label.push(elmnt_label);
+
+							if (data_nodes[index].tagName.toLowerCase() === 'circle') {
+								cx = data_nodes[index].getAttribute('cx');
+								cy = data_nodes[index].getAttribute('cy');
+								direction_string += ' _' + cx + ',' + cy;
+							}
+							else {
+								direction_string += ' ' + data_nodes[index].getAttribute('d');
+							}
+						}
 					}
 
 					label = label.join(',').split(',');
