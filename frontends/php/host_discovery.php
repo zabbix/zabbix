@@ -517,24 +517,10 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$discovery_rules = API::DiscoveryRule()->get([
-		'output' => [],
-		'itemids' => getRequest('g_hostdruleid'),
-		'editable' => true,
-		'monitored' => true,
-		'filter' => ['type' => checkNowAllowedTypes()],
-		'preservekeys' => true
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('g_hostdruleid')
 	]);
-
-	if ($discovery_rules) {
-		$result = (bool) API::Task()->create([
-			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => array_keys($discovery_rules)
-		]);
-	}
-	else {
-		$result = true;
-	}
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));

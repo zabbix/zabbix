@@ -1316,24 +1316,10 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$items = API::Item()->get([
-		'output' => [],
-		'itemids' => getRequest('group_itemid'),
-		'editable' => true,
-		'monitored' => true,
-		'filter' => ['type' => checkNowAllowedTypes()],
-		'preservekeys' => true
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('group_itemid')
 	]);
-
-	if ($items) {
-		$result = (bool) API::Task()->create([
-			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => array_keys($items)
-		]);
-	}
-	else {
-		$result = true;
-	}
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
