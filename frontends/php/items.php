@@ -1286,29 +1286,9 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
-	DBstart();
-
 	$group_itemid = getRequest('group_itemid');
 
-	$itemsToDelete = API::Item()->get([
-		'output' => ['key_', 'itemid'],
-		'selectHosts' => ['name'],
-		'itemids' => $group_itemid,
-		'preservekeys' => true
-	]);
-
 	$result = API::Item()->delete($group_itemid);
-
-	if ($result) {
-		foreach ($itemsToDelete as $item) {
-			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
-				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
-			);
-		}
-	}
-
-	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
