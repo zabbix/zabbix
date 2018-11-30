@@ -539,6 +539,7 @@ class CWidgetHelper {
 									'multiselect' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
+									'with_webitems' => 1,
 									'orig_names' => 1,
 									'dstfrm' => $form_name
 								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
@@ -881,7 +882,7 @@ class CWidgetHelper {
 									'reference' => 'name',
 									'multiselect' => 1,
 									'dstfrm' => $form_name
-								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
+								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv([
@@ -897,7 +898,6 @@ class CWidgetHelper {
 								CJs::encodeJson([
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
-									'srcfld2' => 'name',
 									'reference' => 'name_expanded',
 									'multiselect' => 1,
 									'real_hosts' => 1,
@@ -905,7 +905,7 @@ class CWidgetHelper {
 									'with_webitems' => 1,
 									'orig_names' => 1,
 									'dstfrm' => $form_name
-								]) . ', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
+								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
 							)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
@@ -915,8 +915,7 @@ class CWidgetHelper {
 					(new CButton())
 						->setAttribute('title', _('Delete'))
 						->addClass(ZBX_STYLE_REMOVE_BTN)
-				]))
-					->addClass(ZBX_STYLE_COLUMN_5)
+				]))->addClass(ZBX_STYLE_COLUMN_5)
 			]))
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass(ZBX_STYLE_COLUMNS),

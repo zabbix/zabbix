@@ -885,7 +885,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		// data
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
-				$columns = [nbsp($trigger_name)];
+				$columns = [(new CColHeader($trigger_name))->addClass(ZBX_STYLE_NOWRAP)];
 
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
