@@ -199,19 +199,14 @@ $graph_time->insertFlickerfreeJs();
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
-$widget = (new CWidget())->setWebLayoutMode($page['web_layout_mode']);
-
-$filter = (new CFilter())
-	->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
-	->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
-	->addTimeSelector($timeline['from'], $timeline['to']);
-
-if ($page['web_layout_mode'] === ZBX_LAYOUT_KIOSKMODE) {
-	$filter->addClass(ZBX_STYLE_HIDDEN);
-}
-$widget->addItem($filter);
-
-$widget
+$widget = (new CWidget())
+	->setWebLayoutMode($page['web_layout_mode'])
+	->addItem(
+		(new CFilter(new CUrl()))
+			->setProfile($timeline['profileIdx'], $timeline['profileIdx2'])
+			->setActiveTab(CProfile::get($timeline['profileIdx'].'.active', 1))
+			->addTimeSelector($timeline['from'], $timeline['to'], $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE)
+	)
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 

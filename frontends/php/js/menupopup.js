@@ -35,20 +35,21 @@ function getMenuPopupHistory(options) {
 	// latest graphs
 	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
+		url.setArgument('to', 'now');
 
-		url.setArgument('period', '3600');
+		url.setArgument('from', 'now-1h');
 		items.push({
 			label: t('Last hour graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '604800');
+		url.setArgument('from', 'now-7d');
 		items.push({
 			label: t('Last week graph'),
 			url: url.getUrl()
 		});
 
-		url.setArgument('period', '2678400');
+		url.setArgument('from', 'now-1M');
 		items.push({
 			label: t('Last month graph'),
 			url: url.getUrl()
@@ -57,7 +58,7 @@ function getMenuPopupHistory(options) {
 
 	// latest values
 	url.setArgument('action', 'showvalues');
-	url.setArgument('period', '3600');
+	url.setArgument('from', 'now-1h');
 	items.push({
 		label: t('Latest values'),
 		url: url.getUrl()
@@ -410,15 +411,16 @@ function getMenuPopupMap(options, trigger_elmnt) {
 /**
  * Get menu popup refresh section data.
  *
- * @param string   options['widgetName']   Widget name.
- * @param string   options['currentRate']  Current rate value.
- * @param bool     options['multiplier']   Multiplier or time mode.
- * @param array    options['params']       Url parameters (optional).
- * @param callback options['callback']     Callback function on success (optional).
+ * @param {string}   options['widgetName']   Widget name.
+ * @param {string}   options['currentRate']  Current rate value.
+ * @param {bool}     options['multiplier']   Multiplier or time mode.
+ * @param {array}    options['params']       Url parameters (optional).
+ * @param {callback} options['callback']     Callback function on success (optional).
+ * @param {object}   trigger_elmnt           UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupRefresh(options) {
+function getMenuPopupRefresh(options, trigger_elmnt) {
 	var items = [],
 		params = (typeof options.params === 'undefined' || options.params.length == 0) ? {} : options.params,
 		intervals = options.multiplier
@@ -469,7 +471,7 @@ function getMenuPopupRefresh(options) {
 						if (link.data('value') == currentRate) {
 							link
 								.addClass('selected')
-								.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+								.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 						}
 						else {
 							link
@@ -478,7 +480,7 @@ function getMenuPopupRefresh(options) {
 						}
 					});
 
-					obj.closest('.action-menu').menuPopup('close', null);
+					obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -500,7 +502,7 @@ function getMenuPopupRefresh(options) {
 								if (link.data('value') == currentRate) {
 									link
 										.addClass('selected')
-										.attr('aria-label', sprintf(t('%1$s, selected'), link.data('aria-label')));
+										.attr('aria-label', sprintf(t('S_SELECTED_SR'), link.data('aria-label')));
 								}
 								else {
 									link
@@ -509,13 +511,13 @@ function getMenuPopupRefresh(options) {
 								}
 							});
 
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-widget-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.action-menu').menuPopup('close', null);
+							obj.closest('.action-menu').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
@@ -575,21 +577,23 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 /**
  * Get menu popup trigger section data.
  *
- * @param string options['triggerid']               Trigger ID.
- * @param object options['items']                   Link to trigger item history page (optional).
- * @param string options['items'][]['name']         Item name.
- * @param object options['items'][]['params']       Item url parameters ("name" => "value").
- * @param object options['acknowledge']             Link to acknowledge page (optional).
- * @param string options['acknowledge']['eventid']  Event ID
- * @param string options['acknowledge']['backurl']  Return url.
- * @param object options['configuration']           Link to trigger configuration page (optional).
- * @param bool	 options['show_description']		Show Description item in context menu. Default: true.
- * @param bool	 options['description_enabled']		Show Description item enabled. Default: true.
- * @param string options['url']                     Trigger url link (optional).
+ * @param {string} options['triggerid']               Trigger ID.
+ * @param {object} options['items']                   Link to trigger item history page (optional).
+ * @param {string} options['items'][]['name']         Item name.
+ * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
+ * @param {object} options['acknowledge']             Link to acknowledge page (optional).
+ * @param {string} options['acknowledge']['eventid']  Event ID
+ * @param {string} options['acknowledge']['backurl']  Return URL.
+ * @param {object} options['configuration']           Link to trigger configuration page (optional).
+ * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
+ * @param {bool}   options['show_description']        Show Description item in context menu. Default: true.
+ * @param {bool}   options['description_enabled']     Show Description item enabled. Default: true.
+ * @param {string} options['url']                     Trigger URL link (optional).
+ * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTrigger(options) {
+function getMenuPopupTrigger(options, trigger_elmnt) {
 	var sections = [],
 		items = [];
 
@@ -634,12 +638,12 @@ function getMenuPopupTrigger(options) {
 		};
 
 		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
-			trigger_descr.clickCallback = function(event) {
+			trigger_descr.clickCallback = function() {
 				jQuery(this).closest('.action-menu').menuPopup('close', null);
 
 				return PopUp('popup.trigdesc.view', {
 					triggerid: options.triggerid
-				}, null, event.target);
+				}, null, trigger_elmnt);
 			}
 		}
 		else {
@@ -667,7 +671,7 @@ function getMenuPopupTrigger(options) {
 	}
 
 	sections[sections.length] = {
-		label: t('Trigger'),
+		label: t('S_TRIGGER'),
 		items: items
 	};
 
@@ -882,7 +886,7 @@ function getMenuPopupScriptData(scripts, hostId, trigger_elmnt) {
 
 				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
 					item.clickCallback = function(e) {
-						jQuery(this).closest('.action-menu-top').menuPopup('close', null, false);
+						jQuery(this).closest('.action-menu-top').menuPopup('close', trigger_elm, false);
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation, trigger_elm);
 						cancelEvent(e);
 					};
@@ -932,10 +936,12 @@ jQuery(function($) {
 				target = event;
 			}
 
-			// Close other action menus.
-			$('.action-menu-top').not('#' + id).menuPopup('close');
+			opener.attr('data-expanded', 'true');
 
 			if (menuPopup.length > 0) {
+				// Close other action menus.
+				$('.action-menu-top').not('#' + id).menuPopup('close');
+
 				var display = menuPopup.css('display');
 
 				// Hide current action menu sub-levels.
@@ -943,6 +949,7 @@ jQuery(function($) {
 
 				if (display === 'block') {
 					menuPopup.fadeOut(0);
+					$(opener).removeAttr('data-expanded');
 				}
 				else {
 					menuPopup.fadeIn(50);
@@ -1045,7 +1052,7 @@ jQuery(function($) {
 			addToOverlaysStack('contextmenu', event.target, 'contextmenu');
 
 			$(document)
-				.on('click', {menu: menuPopup}, menuPopupDocumentCloseHandler)
+				.on('click', {menu: menuPopup, opener: opener}, menuPopupDocumentCloseHandler)
 				.on('keydown', {menu: menuPopup}, menuPopupKeyDownHandler);
 
 			menuPopup.focus();
@@ -1054,6 +1061,7 @@ jQuery(function($) {
 			var menuPopup = $(this);
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
+				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
 				$('.highlighted', menuPopup).removeClass('highlighted');
@@ -1127,7 +1135,7 @@ jQuery(function($) {
 	};
 
 	function menuPopupDocumentCloseHandler(event) {
-		$(event.data.menu[0]).menuPopup('close');
+		$(event.data.menu[0]).menuPopup('close', event.data.opener);
 	}
 
 	function menuPopupKeyDownHandler(event) {
@@ -1255,7 +1263,7 @@ jQuery(function($) {
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
-				'aria-label': options.selected ? sprintf(t('%1$s, selected'), options.ariaLabel) : options.ariaLabel
+				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
 		if (typeof options.label !== 'undefined') {

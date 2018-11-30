@@ -18,15 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup media_type
  */
-class testFormAdministrationMediaTypes extends CWebTest {
+class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 	public static function allMediaTypes() {
-		return DBdata('SELECT * FROM media_type');
+		return CDBHelper::getDataProvider('SELECT * FROM media_type');
 	}
 
 	public static function layout() {
@@ -34,19 +34,19 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost'
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com'
 				]
 			],
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'STARTTLS',
 					'smtp_authentication' => 'Username and password'
 				]
@@ -54,11 +54,21 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'localhost',
+					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'localhost',
-					'smtp_email' => 'zabbix@localhost',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'SSL/TLS'
+				]
+			],
+			[
+				[
+					'type' => 'Email',
+					'smtp_server' => 'mail.example.com',
+					'smtp_port' => 25,
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
+					'message_format' => 'Plain text'
 				]
 			],
 			[
@@ -83,7 +93,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'type' => 'Ez Texting',
 					'eztext_limit' => 'USA (160 characters)',
 				]
-			],
+			]
 		];
 	}
 
@@ -99,7 +109,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestCheckFatalErrors();
 
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email', 'Connection security', 'Authentication']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
+			'Connection security', 'Authentication', 'Message format']);
 
 		$this->zbxTestAssertElementPresentId('description');
 		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
@@ -171,6 +182,14 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$this->zbxTestAssertNotVisibleId('smtp_username');
 					$this->zbxTestAssertNotVisibleId('passwd');
 				}
+
+				if (array_key_exists('message_format', $data)) {
+					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_1'));
+				}
+				else {
+					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_0'));
+				}
 				break;
 			case 'Script':
 				$this->zbxTestAssertVisibleId('exec_path');
@@ -227,7 +246,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$name = $mediatype['description'];
 
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
-		$oldHashMediaType = DBhash($sql);
+		$oldHashMediaType = CDBHelper::getHash($sql);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
@@ -238,14 +257,15 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
 
-		$this->assertEquals($oldHashMediaType, DBhash($sql));
+		$this->assertEquals($oldHashMediaType, CDBHelper::getHash($sql));
 	}
 
 	public static function newMediaTypes() {
-		$data=[
+		$data = [
 			[
 				'Email', ['Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
-						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com']
+						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com',
+						'message_format' => 'Plain text']
 			],
 			[
 				'Email', ['Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
@@ -287,6 +307,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
 				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
 				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
+				if (array_key_exists('message_format', $data)) {
+					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+				}
 				break;
 			case 'Script':
 				$this->zbxTestDropdownSelectWait('type', $type);
@@ -328,7 +351,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
 		$name = $mediatype['description'];
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
-		$oldHashMediaType=DBhash($sqlMediaType);
+		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestClickLinkTextWait($name);
@@ -337,7 +360,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckFatalErrors();
 
-		$newHashMediaType = DBhash($sqlMediaType);
+		$newHashMediaType = CDBHelper::getHash($sqlMediaType);
 		$this->assertEquals($oldHashMediaType, $newHashMediaType);
 	}
 
@@ -368,8 +391,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
 			$this->zbxTestCheckFatalErrors();
-			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
-			$this->assertEquals(0, DBcount($sql));
+			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id);
+			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 	}
 
@@ -562,6 +585,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
+	 * Test media type creation with properties from tab "Options".
+	 *
 	 * @dataProvider create_options
 	 */
 	public function testFormAdministrationMediaTypes_CreateWithOptions($data) {
@@ -623,7 +648,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				}
 
 				$sql = "SELECT * FROM media_type WHERE description = '".$data['name']."'";
-				$this->assertEquals(0, DBcount($sql));
+				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 		}
 

@@ -18,12 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+
+require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup httptest
  */
-class testWebScenario extends CZabbixTest {
+class testWebScenario extends CAPITest {
 
 	public static function httptest_create() {
 		return [
@@ -275,8 +276,63 @@ class testWebScenario extends CZabbixTest {
 							'no' => 0,
 						]
 					]
-				]
+				]],
+				'expected_error' => null
+			],
+			[
+				'httptest' => [
+				[
+					'name' => 'API Create two web scenarios 3',
+					'hostid' => '50009',
+					'steps' => [
+						[
+							'name' => 'API create step',
+							'url' => 'http://zabbix.com',
+							'no' => 0,
+							'retrieve_mode' => 2
+						]
+					]
 				],
+				[
+					'name' => 'API Create two web scenarios 4',
+					'hostid' => '50009',
+					'steps' => [
+						[
+							'name' => 'API create step',
+							'url' => 'http://zabbix.com',
+							'no' => 0,
+							'retrieve_mode' => 3
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/2/steps/1/retrieve_mode": value must be one of 0, 1, 2.'
+			],
+			[
+				'httptest' => [
+				[
+					'name' => 'API Create two web scenarios 5',
+					'hostid' => '50009',
+					'steps' => [
+						[
+							'name' => 'API create step 1',
+							'url' => 'http://zabbix.com',
+							'no' => 0,
+							'retrieve_mode' => 0
+						],
+						[
+							'name' => 'API create step 2',
+							'url' => 'http://zabbix.com',
+							'no' => 1,
+							'retrieve_mode' => 1
+						],
+						[
+							'name' => 'API create step 3',
+							'url' => 'http://zabbix.com',
+							'no' => 2,
+							'retrieve_mode' => 2
+						]
+					]
+				]],
 				'expected_error' => null
 			]
 		];
@@ -290,17 +346,34 @@ class testWebScenario extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $key => $id) {
-				$dbResultWeb = DBSelect('select * from httptest where httptestid='.zbx_dbstr($id));
-				$dbRowWeb = DBFetch($dbResultWeb);
-				$this->assertEquals($dbRowWeb['name'], $httptests[$key]['name']);
-				$this->assertEquals($dbRowWeb['hostid'], $httptests[$key]['hostid']);
-				$this->assertEquals(1, DBcount('select * from httpstep where httptestid='.zbx_dbstr($id)));
+				$db_result_web = DBSelect('SELECT * FROM httptest WHERE httptestid='.zbx_dbstr($id));
+				$db_row_web = DBFetch($db_result_web);
+				$this->assertEquals($db_row_web['name'], $httptests[$key]['name']);
+				$this->assertEquals($db_row_web['hostid'], $httptests[$key]['hostid']);
+
+				$db_result_steps = DBSelect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($id).' order by no;');
+				$db_rows_steps = DBFetchArray($db_result_steps);
+				$this->assertCount(count($httptests[$key]['steps']), $db_rows_steps);
+
+				// It is assumed dataset steps array is sorted by 'no' field.
+				foreach($db_rows_steps as $no => $db_step) {
+					$dataset_step = $httptests[$key]['steps'][$no];
+					// Defaults are to be tested.
+					if (!array_key_exists('retrieve_mode', $dataset_step)) {
+						$dataset_step['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
+					}
+
+					foreach ($dataset_step as $property_name => $expected) {
+						$debug_msg = 'Case, httptest['.$key.']->step['.$no.']->property['.$property_name.']';
+						$this->assertEquals($expected, $db_step[$property_name], $debug_msg);
+					}
+				}
 			}
 		}
 		else {
 			foreach ([$httptests] as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -413,6 +486,19 @@ class testWebScenario extends CZabbixTest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check successfully web scenario update. Including steps.
+			// 15012 has one step.
+			// 15013 has two steps.
+			[
+				'httptest' => [
+					[
+						'httptestid' => '15012',
+						'name' => 'Api updated into scenario without steps.',
+						'steps' => []
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/steps": cannot be empty.'
 			]
 		];
 	}
@@ -451,7 +537,7 @@ class testWebScenario extends CZabbixTest {
 		else {
 			foreach ($httptests as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
 				}
 			}
 		}
@@ -1201,7 +1287,7 @@ class testWebScenario extends CZabbixTest {
 				$this->assertEquals($dbRow['name'], $httptests['name']);
 			}
 			else {
-				$this->assertEquals(0, DBcount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptests['name'])));
 			}
 		}
 	}
@@ -1258,7 +1344,7 @@ class testWebScenario extends CZabbixTest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['httptestids'] as $id) {
-				$this->assertEquals(0, DBcount('select * from httptest where httptestid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('select * from httptest where httptestid='.zbx_dbstr($id)));
 			}
 		}
 	}

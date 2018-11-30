@@ -157,10 +157,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				$this->response->setMessageError($this->hasInput('test')
-					? _('LDAP login was not successful')
-					: _('Login name or password is incorrect!')
-				);
+				$this->response->setMessageError($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}
@@ -186,7 +183,7 @@ class CControllerAuthenticationUpdate extends CController {
 			return;
 		}
 
-		$data = DB::getDefaults('config');
+		$config = select_config();
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'ldap_configured' => ZBX_AUTH_LDAP_DISABLED,
@@ -215,22 +212,19 @@ class CControllerAuthenticationUpdate extends CController {
 				$fields['ldap_bind_password'] = '';
 			}
 			else {
-				unset($data['ldap_bind_password']);
+				unset($config['ldap_bind_password']);
 			}
 		}
 
-		$data = array_merge($data, $fields);
+		$data = array_merge($config, $fields);
 		$this->getInputs($data, array_keys($fields));
-
-		$config = select_config();
 		$data = array_diff_assoc($data, $config);
 
 		if ($data) {
 			$result = update_config($data);
 
 			if ($result) {
-				if (array_key_exists('authentication_type', $data)
-						&& $config['authentication_type'] != $data['authentication_type']) {
+				if (array_key_exists('authentication_type', $data)) {
 					$this->invalidateSessions();
 				}
 

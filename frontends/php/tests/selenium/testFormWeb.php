@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 /**
  * @backup httptest
  */
-class testFormWeb extends CWebTest {
+class testFormWeb extends CLegacyWebTest {
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -392,7 +392,7 @@ class testFormWeb extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from httptest where hostid = 40001 and name LIKE 'testFormWeb%'");
+		return CDBHelper::getDataProvider("select * from httptest where hostid = 40001 and name LIKE 'testFormWeb%'");
 	}
 
 	/**
@@ -402,7 +402,7 @@ class testFormWeb extends CWebTest {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items ORDER BY itemid";
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
@@ -414,7 +414,7 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
 
 	public static function create() {
@@ -1601,7 +1601,7 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestAcceptAlert();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
-			$this->assertEquals(0, DBcount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
+			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
 				"step.httptestid = test.httptestid ".
 				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));
 		}

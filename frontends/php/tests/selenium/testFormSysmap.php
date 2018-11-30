@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup sysmaps
  */
-class testFormSysmap extends CWebTest {
+class testFormSysmap extends CLegacyWebTest {
 
 	public $mapName = 'Test map 1';
 	public $edit_map_name = 'Local network';
@@ -291,7 +291,7 @@ class testFormSysmap extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent('Page received incorrect data', 'Cannot add network map');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
-				$this->assertEquals(1, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$data['name']."'"));
+				$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$data['name']."'"));
 				break;
 
 		case TEST_BAD:
@@ -342,8 +342,8 @@ class testFormSysmap extends CWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map updated');
 		$this->zbxTestTextPresent($new_map_name);
-		$this->assertEquals(1, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$new_map_name."'"));
-		$this->assertEquals(0, DBcount("SELECT sysmapid FROM sysmaps WHERE name='$this->edit_map_name'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$new_map_name."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='$this->edit_map_name'"));
 	}
 
 	public function testFormSysmap_CloneMap() {
@@ -356,7 +356,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
-		$this->assertEquals(1, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 		$this->zbxTestTextPresent($mapName);
 		return $mapName;
 
@@ -372,6 +372,6 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
-		$this->assertEquals(0, DBcount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
+		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 	}
 }

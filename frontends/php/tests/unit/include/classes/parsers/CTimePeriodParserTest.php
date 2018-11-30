@@ -84,6 +84,27 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				'{$M: "context"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "context"}'
+				]
+			],
+			[
+				'{$M: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: ";"}'
+				]
+			],
+			[
+				'{$M: "/"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$M: "/"}'
+				]
+			],
+			[
 				'{#M}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -389,6 +410,27 @@ class CTimePeriodParserTest extends PHPUnit_Framework_TestCase {
 			// User macros are not enabled.
 			[
 				'{$M}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "context"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: ";"}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{$M: "/"}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

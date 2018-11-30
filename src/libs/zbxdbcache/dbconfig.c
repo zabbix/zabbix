@@ -828,7 +828,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == *value)
 		return FAIL;
 
-	if (0 != *value && value_min > *value)
+	if (0 != *value && (value_min > *value || ZBX_HK_PERIOD_MAX < *value))
 		return FAIL;
 
 	return SUCCEED;
@@ -3112,6 +3112,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 			zbx_strpool_release(trigger->description);
 			zbx_strpool_release(trigger->expression);
+			zbx_strpool_release(trigger->recovery_expression);
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
 
@@ -4363,6 +4364,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 			}
 		}
 
+		zbx_strpool_release(op->params);
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
@@ -4420,12 +4422,14 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (last_groupid != groupid || 0 == last_groupid)
+		if (last_groupid != groupid)
 		{
-			if (NULL == (group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid)))
-				continue;
+			group = (zbx_dc_hostgroup_t *)zbx_hashset_search(&config->hostgroups, &groupid);
 			last_groupid = groupid;
 		}
+
+		if (NULL == group)
+			continue;
 
 		ZBX_STR2UINT64(hostid, row[1]);
 		zbx_hashset_insert(&group->hostids, &hostid, sizeof(hostid));
@@ -5829,7 +5833,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	strscpy(dst_host->host, src_host->host);
-	strscpy(dst_host->name, src_host->name);
+	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;
@@ -7109,6 +7113,9 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					(trigger->timespec.sec == timespecs[i].sec &&
 					trigger->timespec.ns < timespecs[i].ns))
 			{
+				/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+				/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+				/* same time, so its safe to update trigger timespec within read lock.             */
 				trigger->timespec = timespecs[i];
 			}
 		}
@@ -7201,6 +7208,10 @@ void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_ve
 			trigger_local.triggerid = dc_trigger->triggerid;
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
 			DCget_trigger(trigger, dc_trigger);
+
+			/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+			/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+			/* same time, so its safe to update trigger timespec within read lock.             */
 			trigger->timespec = *ts;
 			trigger->flags = flags;
 
@@ -9277,10 +9288,10 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.token.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
 			continue;
 
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.token.l - last_pos);
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
 		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
@@ -9294,14 +9305,14 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		}
 		else
 		{
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.token.l,
-					token.token.r - token.token.l + 1);
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
 		}
 
 		zbx_free(name);
 		zbx_free(context);
 
-		pos = token.token.r;
+		pos = token.loc.r;
 		last_pos = pos + 1;
 	}
 
@@ -9777,7 +9788,7 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9809,7 +9820,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9836,7 +9847,7 @@ zbx_uint64_t	DCget_trigger_count(void)
 {
 	zbx_uint64_t	count;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 

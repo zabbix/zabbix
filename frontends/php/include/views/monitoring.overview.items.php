@@ -75,7 +75,7 @@ $widget = (new CWidget())
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	// filter
-	$widget->addItem((new CFilter())
+	$widget->addItem((new CFilter((new CUrl('overview.php'))->setArgument('type', 1)))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [

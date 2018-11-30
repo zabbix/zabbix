@@ -18,14 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageTemplates extends CWebTest {
+class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Template OS Linux';
 
 	public static function allTemplates() {
-		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
+		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -58,7 +58,7 @@ class testPageTemplates extends CWebTest {
 		$name = $template['name'];
 
 		$sqlTemplate = "select * from hosts where host='$host'";
-		$oldHashTemplate = DBhash($sqlTemplate);
+		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
 		$sqlHosts =
 				'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
@@ -67,11 +67,11 @@ class testPageTemplates extends CWebTest {
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
 			' ORDER BY hostid';
-		$oldHashHosts = DBhash($sqlHosts);
+		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
-		$oldHashItems = DBhash($sqlItems);
+		$oldHashItems = CDBHelper::getHash($sqlItems);
 		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
-		$oldHashTriggers = DBhash($sqlTriggers);
+		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
@@ -86,18 +86,33 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestTextPresent('Template updated');
 		$this->zbxTestTextPresent($name);
 
-		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
-		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
-		$this->assertEquals($oldHashItems, DBhash($sqlItems));
-		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+		$this->assertEquals($oldHashTemplate, CDBHelper::getHash($sqlTemplate));
+		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
+		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
+		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
 	}
 
-	public function testPageTemplates_FilterTemplate() {
+	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+	}
+
+	public function testPageTemplates_FilterByLinkedTemplate() {
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestClickButtonText('Reset');
+		$this->zbxTestClickButtonMultiselect('filter_templates_');
+		$this->zbxTestLaunchOverlayDialog('Templates');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//select/option[text()="Templates"]');
+		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//a[text()="Template Module ICMP Ping"]');
+		$this->zbxTestClickButtonText('Apply');
+		$this->zbxTestWaitForPageToLoad();
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv1']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template Module Generic SNMPv2']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
 	}
 

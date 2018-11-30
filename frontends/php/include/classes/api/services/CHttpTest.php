@@ -313,7 +313,7 @@ class CHttpTest extends CApiService {
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
@@ -409,7 +409,7 @@ class CHttpTest extends CApiService {
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httpstep_field', 'value')]
 				]],
 				'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
-				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS])],
+				'retrieve_mode' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH])],
 				'timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0:'.SEC_PER_HOUR],
 				'required' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'required')],
 				'status_codes' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httpstep', 'status_codes')]
@@ -1063,21 +1063,19 @@ class CHttpTest extends CApiService {
 					else {
 						$db_httptest = $db_httptests[$httptest['httptestid']];
 						$db_httpstep = $db_httptest['steps'][$httpstep['httpstepid']];
-						$httpstep += ['retrieve_mode' => $db_httpstep['retrieve_mode']];
 						$httpstep += [
-							'posts' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
+							'retrieve_mode' => $db_httpstep['retrieve_mode'],
+							'required' => $db_httpstep['required'],
+							'posts' => ($db_httpstep['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 								? $db_httpstep['posts']
-								: '',
-							'required' => ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
-								? $db_httpstep['required']
 								: ''
 						];
 					}
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+						if ($httpstep['posts'] !== '' && $httpstep['posts'] !== []) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
+								_s('Incorrect value for field "%1$s": %2$s.', 'posts', _('should be empty'))
 							);
 						}
 					}

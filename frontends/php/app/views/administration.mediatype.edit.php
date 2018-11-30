@@ -34,6 +34,7 @@ $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
@@ -44,18 +45,20 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Type'), 'type')), [
-		(new CComboBox('type', $data['type'], null, [
-			MEDIA_TYPE_EMAIL => _('Email'),
-			MEDIA_TYPE_EXEC => _('Script'),
-			MEDIA_TYPE_SMS => _('SMS'),
-			MEDIA_TYPE_JABBER => _('Jabber')
-		]))
-			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]),
-		(new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
+	->addRow((new CLabel(_('Type'), 'type')), (new CHorList())
+		->addItem((new CComboBox('type', $data['type'], null, [
+				MEDIA_TYPE_EMAIL => _('Email'),
+				MEDIA_TYPE_EXEC => _('Script'),
+				MEDIA_TYPE_SMS => _('SMS'),
+				MEDIA_TYPE_JABBER => _('Jabber')
+			]))
+			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
+		)
+		->addItem((new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
 			->setId('eztext_link')
 			->setTarget('_blank')
-	])
+		)
+	)
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -166,8 +169,14 @@ $mediatype_formlist
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 	]))
+	->addRow((new CLabel(_('Message format'), 'content_type')),
+		(new CRadioButtonList('content_type', (int) $data['content_type']))
+			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
+			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
+			->setModern(true)
+	)
 	->addRow(_('Enabled'),
-		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 	);
 $tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
 
