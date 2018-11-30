@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
 .......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
 ..F....... [ZBX-15153] fixed custom interval validation; fixed parsing of custom intervals when user macros context contains forward slash (Ivo, miks)
 .......PS. [ZBX-9038] fixed memory of performance counters consumed during vmware update (MVekslers)
