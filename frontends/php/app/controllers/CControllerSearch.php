@@ -21,6 +21,27 @@
 
 class CControllerSearch extends CController {
 
+	/**
+	 * Identifies whether the current user admin.
+	 *
+	 * @var bool
+	 */
+	private $admin;
+
+	/**
+	 * Search string.
+	 *
+	 * @var string
+	 */
+	private $search;
+
+	/**
+	 * Limit search string.
+	 *
+	 * @var int
+	 */
+	private $limit;
+
 	protected function init() {
 		$this->disableSIDValidation();
 
@@ -28,20 +49,18 @@ class CControllerSearch extends CController {
 			USER_TYPE_ZABBIX_ADMIN,
 			USER_TYPE_SUPER_ADMIN
 		]);
+
+		$this->limit = CWebUser::$data['rows_per_page'];
 	}
 
 	/**
-	 * Validates input according to validation rules.
-	 * Only validated fields are readable, remaining fields are unset.
+	 * Validates input according to validation rules. Only validated fields are readable, remaining fields are unset.
 	 *
 	 * @return bool
 	 */
 	protected function checkInput() {
-		$fields = [
-			'search' => 'string'
-		];
+		$ret = $this->validateInput(['search' => 'string']);
 
-		$ret = $this->validateInput($fields);
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -54,39 +73,14 @@ class CControllerSearch extends CController {
 	}
 
 	/**
-	 * Preforms API request and returns ordered result
-	 * based on search query.
+	 * Gathers template data, sorts according to search pattern and sets editable flag if necessary.
 	 *
-	 * @param string $search  Initial search query.
-	 *
-	 * @return array|HostGroup[]  Exact matches are hoisted.
+	 * @return array  Returns templates, template count and total count all together.
 	 */
-	protected function findHostGroups($search) {
-		$host_groups = API::HostGroup()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_COUNT,
-			'selectTemplates' => API_OUTPUT_COUNT,
-			'search' => ['name' => $search],
-			'limit' => CWebUser::$data['rows_per_page'],
-		]);
-		order_result($host_groups, 'name');
-
-		return selectByPattern($host_groups, 'name', $search, CWebUser::$data['rows_per_page']);
-	}
-
-	/**
-	 * Preforms API request and returns ordered result
-	 * based on search query.
-	 *
-	 * @param string $search  Initial search query.
-	 *
-	 * @return array|Template[]  Exact matches are hoisted.
-	 */
-	protected function findTemplates($search) {
+	protected function getTemplatesData() {
 		$templates = API::Template()->get([
 			'output' => ['name', 'host'],
 			'selectGroups' => ['groupid'],
-			'sortfield' => 'name',
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
@@ -95,35 +89,105 @@ class CControllerSearch extends CController {
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
 			'search' => [
-				'host' => $search,
-				'name' => $search
+				'host' => $this->search,
+				'name' => $this->search
 			],
 			'searchByAny' => true,
-			'limit' => CWebUser::$data['rows_per_page'],
+			'sortfield' => 'name',
+			'limit' => $this->limit,
+			'preservekeys' => true
 		]);
-		order_result($templates, 'name');
 
-		return selectByPattern($templates, 'name', $search, CWebUser::$data['rows_per_page']);
+		if (!$templates) {
+			return [];
+		}
+
+		CArrayHelper::sort($templates, ['name']);
+		$templates = CArrayHelper::sortByPattern($templates, 'name', $this->search, $this->limit);
+
+		$rw_templates = API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($templates),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($templates as $templateid => &$template) {
+			$template['editable'] = array_key_exists($templateid, $rw_templates);
+		}
+		unset($template);
+
+		$total_count = API::Template()->get([
+			'search' => [
+				'host' => $this->search,
+				'name' => $this->search
+			],
+			'searchByAny' => true,
+			'countOutput' => true
+		]);
+
+		return [
+			'rows' => $templates,
+			'count' => count($templates),
+			'total_count' => $total_count
+		];
 	}
 
 	/**
-	 * Preforms API request and returns ordered result
-	 * based on search query.
+	 * Gathers host group data, sorts according to search pattern and sets editable flag if necessary.
 	 *
-	 * @param string $search  Initial search query.
-	 *
-	 * @return array|Host[]  Exact matches are hoisted.
+	 * @return array  Returns host groups, group count and total count all together.
 	 */
-	protected function findHosts($search) {
+	protected function getHostGroupsData() {
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
+			'selectHosts' => API_OUTPUT_COUNT,
+			'selectTemplates' => API_OUTPUT_COUNT,
+			'search' => ['name' => $this->search],
+			'limit' => $this->limit,
+			'preservekeys' => true
+		]);
+
+		if (!$groups) {
+			return [];
+		}
+
+		CArrayHelper::sort($groups, ['name']);
+		$groups = CArrayHelper::sortByPattern($groups, 'name', $this->search, $this->limit);
+
+		$rw_groups = API::HostGroup()->get([
+			'output' => [],
+			'groupids' => array_keys($groups),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($groups as $groupid => &$group) {
+			$group['editable'] = ($this->admin && array_key_exists($groupid, $rw_groups));
+		}
+		unset($group);
+
+		$total_count = API::HostGroup()->get([
+			'search' => ['name' => $this->search],
+			'countOutput' => true
+		]);
+
+		return [
+			'rows' => $groups,
+			'count' => count($groups),
+			'total_count' => $total_count
+		];
+	}
+
+	/**
+	 * Gathers host data, sorts according to search pattern and sets editable flag if necessary.
+	 *
+	 * @return array  Returns hosts, host count and total count all together.
+	 */
+	protected function getHostsData() {
 		$hosts = API::Host()->get([
-			'search' => [
-				'host' => $search,
-				'name' => $search,
-				'dns' => $search,
-				'ip' => $search
-			],
-			'limit' => CWebUser::$data['rows_per_page'],
-			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'output' => ['name', 'status', 'host'],
+			'selectInterfaces' => ['ip', 'dns'],
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
@@ -131,129 +195,85 @@ class CControllerSearch extends CController {
 			'selectScreens' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveries' => API_OUTPUT_COUNT,
-			'output' => ['name', 'status', 'host'],
-			'searchByAny' => true
+			'search' => [
+				'host' => $this->search,
+				'name' => $this->search,
+				'dns' => $this->search,
+				'ip' => $this->search
+			],
+			'searchByAny' => true,
+			'limit' => $this->limit,
+			'preservekeys' => true
 		]);
-		order_result($hosts, 'name');
 
-		return selectByPattern($hosts, 'name', $search, CWebUser::$data['rows_per_page']);
-	}
-
-	/**
-	 * Performs additional API requests if meta information is needed.
-	 * Prepares view-compatible format.
-	 *
-	 * @param string $search  Initial search query.
-	 * @param array &$view  View object that is filled with results.
-	 */
-	protected function collectTemplatesViewData($search, array &$view) {
-		$templates = $this->findTemplates($search);
-		if (zbx_empty($templates)) {
-			return;
+		if (!$hosts) {
+			return [];
 		}
-		$rw_templates = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => zbx_objectValues($templates, 'templateid'),
-			'editable' => true
-		]);
-		$view['rows'] = $templates;
-		$view['editable_rows'] = zbx_toHash($rw_templates, 'templateid');
-		$view['count'] = count($templates);
-		$view['overall_count'] = API::Template()->get([
-			'search' => ['host' => $search, 'name' => $search], 'countOutput' => true, 'searchByAny' => true
-		]);
-	}
 
-	/**
-	 * Performs additional API requests if meta information is needed.
-	 * Prepares view-compatible format.
-	 *
-	 * @param string $search  Initial search query.
-	 * @param array &$view  View object that is filled with results.
-	 */
-	protected function collectHostsGroupsViewData($search, array &$view) {
-		$host_groups = $this->findHostGroups($search);
-		if (zbx_empty($host_groups)) {
-			return;
-		}
-		$rw_host_groups = API::HostGroup()->get([
-			'output' => ['groupid'],
-			'groupids' => zbx_objectValues($host_groups, 'groupid'),
-			'editable' => true
-		]);
-		$view['rows'] = $host_groups;
-		$view['editable_rows'] = zbx_toHash($rw_host_groups, 'groupid');
-		$view['count'] = count($host_groups);
-		$view['overall_count'] = API::HostGroup()->get([
-			'search' => ['name' => $search],
-			'countOutput' => true
-		]);
-	}
+		CArrayHelper::sort($hosts, ['name']);
+		$hosts = CArrayHelper::sortByPattern($hosts, 'name', $this->search, $this->limit);
 
-	/**
-	 * Performs additional API requests if meta information is needed.
-	 * Prepares view-compatible format.
-	 *
-	 * @param string $search  Initial search query.
-	 * @param array &$view  View object that is filled with results.
-	 */
-	protected function collectHostsViewData($search, array &$view) {
-		$hosts = $this->findHosts($search);
-		if (zbx_empty($hosts)) {
-			return;
-		}
 		$rw_hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'editable' => true
+			'hostids' => array_keys($hosts),
+			'editable' => true,
+			'preservekeys' => true
 		]);
-		$view['rows'] = $hosts;
-		$view['count'] = count($hosts);
-		$view['editable_rows'] = zbx_toHash($rw_hosts, 'hostid');
-		$view['overall_count'] = API::Host()->get([
-			'search' => ['host' => $search, 'name' => $search, 'dns' => $search, 'ip' => $search],
-			'countOutput' => true, 'searchByAny' => true
-		]);
-	}
 
-	/**
-	 * Based on search query gathers view data.
-	 *
-	 * @param string $search  Initial search query.
-	 *
-	 * @return array  View-compatible object.
-	 */
-	protected function getViewData($search) {
-		$view_table = ['rows' => [], 'editable_rows' => [], 'overall_count' => 0, 'count' => 0];
-		$view_data = [
-			'search' => _('Search pattern is empty'),
-			'admin' => $this->admin,
-			'hosts' => ['hat' => 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state'] + $view_table,
-			'host_groups' => ['hat' => 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state'] + $view_table,
-			'templates' => ['hat' => 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state'] + $view_table
-		];
-
-		if ($search !== '') {
-			$view_data['search'] = $search;
-
-			$this->collectHostsViewData($search, $view_data['hosts']);
-			$this->collectHostsGroupsViewData($search, $view_data['host_groups']);
-
-			if ($this->admin) {
-				$this->collectTemplatesViewData($search, $view_data['templates']);
-			}
+		foreach ($hosts as $hostid => &$host) {
+			$host['editable'] = ($this->admin && array_key_exists($hostid, $rw_hosts));
 		}
+		unset($host);
 
-		return $view_data;
+		$total_count = API::Host()->get([
+			'search' => [
+				'host' => $this->search,
+				'name' => $this->search,
+				'dns' => $this->search,
+				'ip' => $this->search
+			],
+			'searchByAny' => true,
+			'countOutput' => true
+		]);
+
+		return [
+			'rows' => $hosts,
+			'count' => count($hosts),
+			'total_count' => $total_count
+		];
 	}
 
 	/**
 	 * Creates and sets response object with data.
 	 */
 	protected function doAction() {
-		$search = trim($this->getInput('search', ''));
+		$this->search = trim($this->getInput('search', ''));
 
-		$response = new CControllerResponseData($this->getViewData($search));
+		$default = [
+			'rows' => [],
+			'count' => 0,
+			'total_count' => 0
+		];
+		$data = [
+			'search' => _('Search pattern is empty'),
+			'admin' => $this->admin,
+			'hosts' => $default,
+			'groups' => $default,
+			'templates' => $default
+		];
+
+		if ($this->search !== '') {
+			$data['hosts'] = $this->getHostsData();
+			$data['groups'] = $this->getHostGroupsData();
+
+			if ($this->admin) {
+				$data['templates'] = $this->getTemplatesData();
+			}
+		}
+
+		$data['search'] = $this->search;
+
+		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Search'));
 		$this->setResponse($response);
 	}

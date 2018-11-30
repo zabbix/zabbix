@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-extract($data);
+
 $widgets = [];
 
 $table = (new CTableInfo())
@@ -40,89 +40,57 @@ $table = (new CTableInfo())
 	])
 	->removeId();
 
-foreach ($hosts['rows'] as $host) {
-	$hostid = $host['hostid'];
-
+foreach ($data['hosts']['rows'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
-	$host['ip'] = $interface['ip'];
-	$host['dns'] = $interface['dns'];
-	$host['port'] = $interface['port'];
 	$link = 'hostid='.$hostid;
-	$visible_name = make_decoration($host['name'], $search);
+	$visible_name = make_decoration($host['name'], $data['search']);
+	$name = $host['editable'] ? new CLink($visible_name, 'hosts.php?form=update&'.$link) : new CSpan($visible_name);
+	$app_count = CViewHelper::showNum($host['applications']);
+	$item_count = CViewHelper::showNum($host['items']);
+	$trigger_count = CViewHelper::showNum($host['triggers']);
+	$graph_count = CViewHelper::showNum($host['graphs']);
+	$discovery_count = CViewHelper::showNum($host['discoveries']);
+	$httptest_count = CViewHelper::showNum($host['httpTests']);
 
-	if ($admin && array_key_exists($hostid, $hosts['editable_rows'])) {
-		$host_name = new CLink($visible_name, 'hosts.php?form=update&'.$link);
-		$applications_link = [
-			new CLink(_('Applications'), 'applications.php?'.$link),
-			CViewHelper::showNum($host['applications'])
-		];
-		$items_link = [
-			new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-			CViewHelper::showNum($host['items'])
-		];
-		$triggers_link = [
-			new CLink(_('Triggers'), 'triggers.php?'.$link),
-			CViewHelper::showNum($host['triggers'])
-		];
-		$graphs_link = [
-			new CLink(_('Graphs'), 'graphs.php?'.$link),
-			CViewHelper::showNum($host['graphs'])
-		];
-		$discovery_link = [
-			new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-			CViewHelper::showNum($host['discoveries'])
-		];
-		$httptests_link = [
-			new CLink(_('Web'), 'httpconf.php?'.$link),
-			CViewHelper::showNum($host['httpTests'])
-		];
-	}
-	else {
-		$host_name = new CSpan($visible_name);
-		$applications_link = [
-			_('Applications'),
-			CViewHelper::showNum($host['applications'])
-		];
-		$items_link = [
-			_('Items'),
-			CViewHelper::showNum($host['items'])
-		];
-		$triggers_link = [
-			_('Triggers'),
-			CViewHelper::showNum($host['triggers'])
-		];
-		$graphs_link = [
-			_('Graphs'),
-			CViewHelper::showNum($host['graphs'])
-		];
-		$discovery_link = [
-			_('Discovery'),
-			CViewHelper::showNum($host['discoveries'])
-		];
-		$httptests_link = [
-			_('Web'),
-			CViewHelper::showNum($host['httpTests'])
-		];
-	}
+	$applications_link = $host['editable']
+		? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+		: [_('Applications'), $app_count];
+
+	$items_link = $host['editable']
+		? [new CLink(_('Items'), 'items.php?filter_set=1&'.$link), $item_count]
+		: [_('Items'), $item_count];
+
+	$triggers_link = $host['editable']
+		? [new CLink(_('Triggers'), 'triggers.php?'.$link), $trigger_count]
+		: [_('Triggers'), $trigger_count];
+
+	$graphs_link = $host['editable']
+		? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+		: [_('Graphs'), $graph_count];
+
+	$discovery_link = $host['editable']
+		? [new CLink(_('Discovery'), 'host_discovery.php?'.$link), $discovery_count]
+		: [_('Discovery'), $discovery_count];
+
+	$httptests_link = $host['editable']
+		? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+		: [_('Web'), $httptest_count];
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$host_name
+		$name
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_RED);
 	}
 
-	// display the host name only if it matches the search string and is different from the visible name
-	if ($host['host'] !== $host['name'] && stripos($host['host'], $search) !== false) {
-		$host_name = [$host_name, BR(), '(', make_decoration($host['host'], $search), ')'];
+	// Display the host name only if it matches the search string and is different from the visible name.
+	if ($host['host'] !== $host['name'] && stripos($host['host'], $data['search']) !== false) {
+		$name = [$name, BR(), '(', make_decoration($host['host'], $data['search']), ')'];
 	}
 
-	$hostip = make_decoration($host['ip'], $search);
-	$hostdns = make_decoration($host['dns'], $search);
-
 	$table->addRow([
-		$host_name,
-		$hostip,
-		$hostdns,
+		$name,
+		make_decoration($interface['ip'], $data['search']),
+		make_decoration($interface['dns'], $data['search']),
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
 		new CLink(_('Problems'),
 		(new CUrl('zabbix.php'))
@@ -141,11 +109,13 @@ foreach ($hosts['rows'] as $host) {
 		$httptests_link
 	]);
 }
-$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
-	->setExpanded((bool) CProfile::get($hosts['hat'], true))
-	->setHeader(_('Hosts'), [], false, $hosts['hat'])
-	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $hosts['count'], $hosts['overall_count'])]));
 
+$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
+	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
+	->setHeader(_('Hosts'), [], false, 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state')
+	->setFooter(new CList([
+		_s('Displaying %1$s of %2$s found', $data['hosts']['count'], $data['hosts']['total_count'])
+	]));
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -154,55 +124,38 @@ $table = (new CTableInfo())
 		_('Problems'),
 		_('Graphs'),
 		_('Web'),
-		$admin ? _('Hosts') : null,
-		$admin ? _('Templates') : null
+		$data['admin'] ? _('Hosts') : null,
+		$data['admin'] ? _('Templates') : null
 	]);
 
-foreach ($host_groups['rows'] as $group) {
-	$hostgroupid = $group['groupid'];
-	$caption = make_decoration($group['name'], $search);
-	$link = 'groupid='.$hostgroupid.'&hostid=0';
-
+foreach ($data['groups']['rows'] as $groupid => $group) {
+	$caption = make_decoration($group['name'], $data['search']);
+	$link = 'groupid='.$groupid.'&hostid=0';
 	$hosts_link = null;
 	$templates_link = null;
-	$hgroup_link = new CSpan($caption);
 
-	if ($admin) {
-		if (array_key_exists($hostgroupid, $host_groups['editable_rows'])) {
-			if ($group['hosts']) {
-				$hosts_link = [
-					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid),
-					CViewHelper::showNum($group['hosts'])
-				];
-			}
-			else {
-				$hosts_link = _('Hosts');
-			}
+	if ($data['admin']) {
+		$hosts_link = $group['editable']
+			? $group['hosts']
+				? [new CLink(_('Hosts'), 'hosts.php?groupid='.$groupid), CViewHelper::showNum($group['hosts'])]
+				: _('Hosts')
+			: _('Hosts');
 
-			if ($group['templates']) {
-				$templates_link = [
-					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid),
+		$templates_link = $group['editable']
+			? $group['templates']
+				? [new CLink(_('Templates'), 'templates.php?groupid='.$groupid),
 					CViewHelper::showNum($group['templates'])
-				];
-			}
-			else {
-				$templates_link = _('Templates');
-			}
-
-			$hgroup_link = new CLink($caption, 'hostgroups.php?form=update&'.$link);
-		}
-		else {
-			$hosts_link = _('Hosts');
-			$templates_link = _('Templates');
-		}
+				]
+				: _('Templates')
+			: _('Templates');
 	}
 
 	$table->addRow([
-		$hgroup_link,
-		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
+		$group['editable'] ? new CLink($caption, 'hostgroups.php?form=update&'.$link) : new CSpan($caption),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$groupid),
 		new CLink(_('Problems'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'problem.view')
-			->setArgument('filter_groupids[]', $hostgroupid)
+			->setArgument('filter_groupids[]', $groupid)
 			->setArgument('filter_set', '1')
 		),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
@@ -213,91 +166,81 @@ foreach ($host_groups['rows'] as $group) {
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
-	->setExpanded((bool) CProfile::get($host_groups['hat'], true))
-	->setHeader(_('Host groups'), [], false, $host_groups['hat'])
-	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $host_groups['count'], $host_groups['overall_count'])]));
+	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
+	->setHeader(_('Host groups'), [], false, 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state')
+	->setFooter(new CList([
+		_s('Displaying %1$s of %2$s found', $data['groups']['count'], $data['groups']['total_count'])
+	]));
 
-
-if ($admin) {
+if ($data['admin']) {
 	$table = (new CTableInfo())->setHeader([
 		_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'), _('Screens'), _('Discovery'), _('Web')
 	]);
 
-	foreach ($templates['rows'] as $template) {
-		$templateid = $template['templateid'];
+	foreach ($data['templates']['rows'] as $templateid => $template) {
 		$link = 'groupid='.$template['groups'][0]['groupid'].'&hostid='.$templateid;
+		$visible_name = make_decoration($template['name'], $data['search']);
+		$app_count = CViewHelper::showNum($template['applications']);
+		$item_count = CViewHelper::showNum($template['items']);
+		$trigger_count = CViewHelper::showNum($template['triggers']);
+		$graph_count = CViewHelper::showNum($template['graphs']);
+		$screen_count = CViewHelper::showNum($template['screens']);
+		$discovery_count = CViewHelper::showNum($template['discoveries']);
+		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
-		$visible_name = make_decoration($template['name'], $search);
-		if (array_key_exists($templateid, $templates['editable_rows'])) {
-			$template_cell = [new CLink($visible_name,
-				'templates.php?form=update&'.'&templateid='.$templateid
-			)];
-			$applications_link = [
-				new CLink(_('Applications'), 'applications.php?'.$link),
-				CViewHelper::showNum($template['applications'])
-			];
-			$items_link = [
-				new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-				CViewHelper::showNum($template['items'])
-			];
-			$triggers_link = [
-				new CLink(_('Triggers'), 'triggers.php?'.$link),
-				CViewHelper::showNum($template['triggers'])
-			];
-			$graphs_link = [
-				new CLink(_('Graphs'), 'graphs.php?'.$link),
-				CViewHelper::showNum($template['graphs'])
-			];
-			$screens_link = [
-				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
-				CViewHelper::showNum($template['screens'])
-			];
-			$discovery_link = [
-				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-				CViewHelper::showNum($template['discoveries'])
-			];
-			$httptests_link = [
-				new CLink(_('Web'), 'httpconf.php?'.$link),
-				CViewHelper::showNum($template['httpTests'])
-			];
-		}
-		else {
-			$template_cell = [new CSpan($visible_name)];
-			$applications_link = _('Applications').' ('.$template['applications'].')';
-			$items_link = _('Items').' ('.$template['items'].')';
-			$triggers_link = _('Triggers').' ('.$template['triggers'].')';
-			$graphs_link = _('Graphs').' ('.$template['graphs'].')';
-			$screens_link = _('Screens').' ('.$template['screens'].')';
-			$discovery_link = _('Discovery').' ('.$template['discoveries'].')';
-			$httptests_link = _('Web').' ('.$template['httpTests'].')';
-		}
+		$template_cell = $template['editable']
+			? [new CLink($visible_name,'templates.php?form=update&'.'&templateid='.$templateid)]
+			: [new CSpan($visible_name)];
 
-		if ($template['host'] !== $template['name'] && strpos($template['host'], $search) !== false) {
+		$applications_link = $template['editable']
+			? [new CLink(_('Applications'), 'applications.php?'.$link), $app_count]
+			: [_('Applications'), $app_count];
+
+		$items_link = $template['editable']
+			? [new CLink(_('Items'), 'items.php?filter_set=1&'.$link), $item_count]
+			: [_('Items'), $item_count];
+
+		$triggers_link = $template['editable']
+			? [new CLink(_('Triggers'), 'triggers.php?'.$link), $trigger_count]
+			: [_('Triggers'), $trigger_count];
+
+		$graphs_link = $template['editable']
+			? [new CLink(_('Graphs'), 'graphs.php?'.$link), $graph_count]
+			: [_('Graphs'), $graph_count];
+
+		$screens_link = $template['editable']
+			? [new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), $screen_count]
+			: [_('Screens'), $screen_count];
+
+		$discovery_link = $template['editable']
+			? [new CLink(_('Discovery'), 'host_discovery.php?'.$link), $discovery_count]
+			: [_('Discovery'), $discovery_count];
+
+		$httptests_link = $template['editable']
+			? [new CLink(_('Web'), 'httpconf.php?'.$link), $httptest_count]
+			: [_('Web'), $httptest_count];
+
+		if ($template['host'] !== $template['name'] && strpos($template['host'], $data['search']) !== false) {
 			$template_cell[] = BR();
 			$template_cell[] = '(';
-			$template_cell[] = make_decoration($template['host'], $search);
+			$template_cell[] = make_decoration($template['host'], $data['search']);
 			$template_cell[] = ')';
 		}
 
-		$table->addRow([
-			$template_cell,
-			$applications_link,
-			$items_link,
-			$triggers_link,
-			$graphs_link,
-			$screens_link,
-			$discovery_link,
-			$httptests_link
+		$table->addRow([$template_cell, $applications_link, $items_link, $triggers_link, $graphs_link, $screens_link,
+			$discovery_link, $httptests_link
 		]);
 	}
 
 	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
-		->setExpanded((bool) CProfile::get($templates['hat'], true))
-		->setHeader(_('Templates'), [], false, $templates['hat'])
-		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $templates['count'], $templates['overall_count'])]));
+		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
+		->setHeader(_('Templates'), [], false, 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state')
+		->setFooter(new CList([
+			_s('Displaying %1$s of %2$s found', $data['templates']['count'], $data['templates']['total_count'])
+		]));
 }
 
 (new CWidget())
-	->setTitle(_('Search').':'.SPACE.$search)
+	->setTitle(_('Search').':'.SPACE.$data['search'])
 	->addItem(new CDiv($widgets))
 	->show();
