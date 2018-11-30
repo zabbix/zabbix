@@ -2485,10 +2485,9 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             items           - [IN/OUT] sorted list of items                *
- *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items, char **error)
+static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_t			*item;
@@ -5064,7 +5063,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vec
 
 	lld_items_get(&item_prototypes, &items);
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, error);
-	lld_items_preproc_make(&item_prototypes, &items, error);
+	lld_items_preproc_make(&item_prototypes, &items);
 
 	lld_link_dependent_items(&items, &items_index);
 
