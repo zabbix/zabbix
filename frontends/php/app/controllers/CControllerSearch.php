@@ -99,7 +99,7 @@ class CControllerSearch extends CController {
 		]);
 
 		if (!$templates) {
-			return [];
+			return [[], 0];
 		}
 
 		CArrayHelper::sort($templates, ['name']);
@@ -126,11 +126,7 @@ class CControllerSearch extends CController {
 			'countOutput' => true
 		]);
 
-		return [
-			'rows' => $templates,
-			'count' => count($templates),
-			'total_count' => $total_count
-		];
+		return [$templates, $total_count];
 	}
 
 	/**
@@ -149,7 +145,7 @@ class CControllerSearch extends CController {
 		]);
 
 		if (!$groups) {
-			return [];
+			return [[], 0];
 		}
 
 		CArrayHelper::sort($groups, ['name']);
@@ -172,11 +168,7 @@ class CControllerSearch extends CController {
 			'countOutput' => true
 		]);
 
-		return [
-			'rows' => $groups,
-			'count' => count($groups),
-			'total_count' => $total_count
-		];
+		return [$groups, $total_count];
 	}
 
 	/**
@@ -207,7 +199,7 @@ class CControllerSearch extends CController {
 		]);
 
 		if (!$hosts) {
-			return [];
+			return [[], 0];
 		}
 
 		CArrayHelper::sort($hosts, ['name']);
@@ -236,11 +228,7 @@ class CControllerSearch extends CController {
 			'countOutput' => true
 		]);
 
-		return [
-			'rows' => $hosts,
-			'count' => count($hosts),
-			'total_count' => $total_count
-		];
+		return [$hosts, $total_count];
 	}
 
 	/**
@@ -249,25 +237,23 @@ class CControllerSearch extends CController {
 	protected function doAction() {
 		$this->search = trim($this->getInput('search', ''));
 
-		$default = [
-			'rows' => [],
-			'count' => 0,
-			'total_count' => 0
-		];
 		$data = [
 			'search' => _('Search pattern is empty'),
 			'admin' => $this->admin,
-			'hosts' => $default,
-			'groups' => $default,
-			'templates' => $default
+			'hosts' => [],
+			'groups' => [],
+			'templates' => [],
+			'total_groups_cnt' => 0,
+			'total_hosts_cnt' => 0,
+			'total_templates_cnt' => 0,
 		];
 
 		if ($this->search !== '') {
-			$data['hosts'] = $this->getHostsData();
-			$data['groups'] = $this->getHostGroupsData();
+			list($data['hosts'], $data['total_hosts_cnt']) = $this->getHostsData();
+			list($data['groups'], $data['total_groups_cnt']) = $this->getHostGroupsData();
 
 			if ($this->admin) {
-				$data['templates'] = $this->getTemplatesData();
+				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
 			}
 		}
 

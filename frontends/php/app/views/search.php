@@ -40,7 +40,7 @@ $table = (new CTableInfo())
 	])
 	->removeId();
 
-foreach ($data['hosts']['rows'] as $hostid => $host) {
+foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
 	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
@@ -114,7 +114,7 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
 	->setHeader(_('Hosts'), [], false, 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state')
 	->setFooter(new CList([
-		_s('Displaying %1$s of %2$s found', $data['hosts']['count'], $data['hosts']['total_count'])
+		_s('Displaying %1$s of %2$s found', count($data['hosts']), $data['total_hosts_cnt'])
 	]));
 
 $table = (new CTableInfo())
@@ -128,7 +128,7 @@ $table = (new CTableInfo())
 		$data['admin'] ? _('Templates') : null
 	]);
 
-foreach ($data['groups']['rows'] as $groupid => $group) {
+foreach ($data['groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
 	$link = 'groupid='.$groupid.'&hostid=0';
 	$hosts_link = null;
@@ -169,7 +169,7 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
 	->setHeader(_('Host groups'), [], false, 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state')
 	->setFooter(new CList([
-		_s('Displaying %1$s of %2$s found', $data['groups']['count'], $data['groups']['total_count'])
+		_s('Displaying %1$s of %2$s found', count($data['groups']), $data['total_groups_cnt'])
 	]));
 
 if ($data['admin']) {
@@ -177,7 +177,7 @@ if ($data['admin']) {
 		_('Template'), _('Applications'), _('Items'), _('Triggers'), _('Graphs'), _('Screens'), _('Discovery'), _('Web')
 	]);
 
-	foreach ($data['templates']['rows'] as $templateid => $template) {
+	foreach ($data['templates'] as $templateid => $template) {
 		$link = 'groupid='.$template['groups'][0]['groupid'].'&hostid='.$templateid;
 		$visible_name = make_decoration($template['name'], $data['search']);
 		$app_count = CViewHelper::showNum($template['applications']);
@@ -236,7 +236,7 @@ if ($data['admin']) {
 		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
 		->setHeader(_('Templates'), [], false, 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state')
 		->setFooter(new CList([
-			_s('Displaying %1$s of %2$s found', $data['templates']['count'], $data['templates']['total_count'])
+			_s('Displaying %1$s of %2$s found', count($data['templates']), $data['total_templates_cnt'])
 		]));
 }
 
