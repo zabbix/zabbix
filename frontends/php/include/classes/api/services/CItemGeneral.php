@@ -1246,6 +1246,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
 			$delta = false;
+			$throttling = false;
 
 			foreach ($item['preprocessing'] as $preprocessing) {
 				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
@@ -1308,7 +1309,6 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 					case ZBX_PREPROC_ERROR_FIELD_JSON:
 					case ZBX_PREPROC_ERROR_FIELD_XML:
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1323,7 +1323,6 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_REGSUB:
 					case ZBX_PREPROC_ERROR_FIELD_REGEX:
-					case ZBX_PREPROC_VALIDATE_RANGE:
 						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1350,6 +1349,46 @@ abstract class CItemGeneral extends CApiService {
 						}
 						break;
 
+					case ZBX_PREPROC_VALIDATE_RANGE:
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif (trim($preprocessing['params']) === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						$params = explode("\n", $preprocessing['params']);
+
+						if ($params[0] !== '' && !is_numeric($params[0])
+								&& (new CUserMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS
+								&& (!($this instanceof CItemPrototype)
+									|| ((new CLLDMacroFunctionParser())->parse($params[0]) != CParser::PARSE_SUCCESS
+										&& (new CLLDMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('a numeric value is expected')
+							));
+						}
+
+						if ($params[1] !== '' && !is_numeric($params[1])
+								&& (new CUserMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS
+								&& (!($this instanceof CItemPrototype)
+									|| ((new CLLDMacroFunctionParser())->parse($params[1]) != CParser::PARSE_SUCCESS
+										&& (new CLLDMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS))) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('a numeric value is expected')
+							));
+						}
+
+						if (is_numeric($params[0]) && is_numeric($params[1]) && !($params[0] < $params[1])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _s('"%1$s" value must be greater than "%2$s" value', _('max'), _('min'))
+							));
+						}
+						break;
+
 					case ZBX_PREPROC_BOOL2DEC:
 					case ZBX_PREPROC_OCT2DEC:
 					case ZBX_PREPROC_HEX2DEC:
@@ -1363,6 +1402,15 @@ abstract class CItemGeneral extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
 							);
+						}
+
+						if ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_VALUE) {
+							if ($throttling) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
+							}
+							else {
+								$throttling = true;
+							}
 						}
 						break;
 
@@ -1385,6 +1433,27 @@ abstract class CItemGeneral extends CApiService {
 						}
 						else {
 							$delta = true;
+						}
+						break;
+
+					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+						$api_input_rules = [
+							'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+								? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
+								: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
+							'in' => '1:'.ZBX_MAX_TIMESHIFT
+						];
+
+						if (!CApiInputValidator::validate($api_input_rules, $preprocessing['params'], 'params',
+								$error)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
+
+						if ($throttling) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
+						}
+						else {
+							$throttling = true;
 						}
 						break;
 				}
