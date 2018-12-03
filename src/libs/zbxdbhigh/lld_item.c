@@ -1349,6 +1349,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 	char		err[MAX_STRING_LEN];
 	char		param1[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *param2;
 	const char*	regexp_err = NULL;
+	zbx_uint64_t	value_ui64;
 
 	*err = '\0';
 
@@ -1446,8 +1447,11 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 				zbx_strlcpy(err, regexp_err, sizeof(err));
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			if (SUCCEED != (ret = is_time_suffix(pp->params, NULL, strlen(pp->params))))
+			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
+			{
 				zbx_snprintf(err, sizeof(err), "invalid time interval: %s", pp->params);
+				ret = FAIL;
+			}
 			break;
 	}
 
