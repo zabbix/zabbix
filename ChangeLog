@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
 .......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
 ..F....... [ZBX-15105] fixed colorpicker tooltip update (talbergs)
@@ -36,6 +37,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
 .......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
 ..F....... [ZBX-15105] fixed colorpicker tooltip update (talbergs)
