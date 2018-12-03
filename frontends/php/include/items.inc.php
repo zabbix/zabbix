@@ -1171,7 +1171,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
-				$tableRow = [nbsp($item_name)];
+				$tableRow = [(new CColHeader($item_name))->addClass(ZBX_STYLE_NOWRAP)];
 				foreach ($host_names as $host_name) {
 					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $host_name);
 				}

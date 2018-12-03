@@ -51,12 +51,9 @@ typedef struct
 }
 zbx_httppage_t;
 
-#define ZBX_RETRIEVE_MODE_CONTENT	0
-#define ZBX_RETRIEVE_MODE_HEADERS	1
-
 static zbx_httppage_t	page;
 
-static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t	r_size = size * nmemb;
 
@@ -75,7 +72,7 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	return r_size;
 }
 
-static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	ZBX_UNUSED(ptr);
 	ZBX_UNUSED(userdata);
@@ -665,8 +662,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
@@ -686,6 +681,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	while (NULL != (row = DBfetch(result)))
 	{
 		struct curl_slist	*headers_slist = NULL;
+		size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+		size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -790,6 +787,32 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
+		switch (db_httpstep.retrieve_mode)
+		{
+			case ZBX_RETRIEVE_MODE_CONTENT:
+				curl_header_cb = curl_ignore_cb;
+				curl_body_cb = curl_write_cb;
+				break;
+			case ZBX_RETRIEVE_MODE_BOTH:
+				curl_header_cb = curl_body_cb = curl_write_cb;
+				break;
+			case ZBX_RETRIEVE_MODE_HEADERS:
+				curl_header_cb = curl_write_cb;
+				curl_body_cb = curl_ignore_cb;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				err_str = zbx_strdup(err_str, "invalid retrieve mode");
+				goto httpstep_error;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_body_cb)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_header_cb)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
+
 		/* enable/disable fetching the body */
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY,
 				ZBX_RETRIEVE_MODE_HEADERS == db_httpstep.retrieve_mode ? 1L : 0L)))
@@ -829,6 +852,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
+			char	*var_err_str = NULL;
+
 			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __function_name, httpstep.url,
 					page.data);
 
@@ -862,52 +887,45 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				speed_download_num++;
 			}
 
-			if (ZBX_RETRIEVE_MODE_CONTENT == db_httpstep.retrieve_mode)
+			/* required pattern */
+			if (NULL == err_str && '\0' != *db_httpstep.required &&
+					NULL == zbx_regexp_match(page.data, db_httpstep.required, NULL))
 			{
-				char	*var_err_str = NULL;
-
-				/* required pattern */
-				if (NULL == err_str && '\0' != *db_httpstep.required &&
-						NULL == zbx_regexp_match(page.data, db_httpstep.required, NULL))
-				{
-					err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
-							db_httpstep.required, httpstep.url);
-				}
-
-				/* variables defined in scenario */
-				if (NULL == err_str && FAIL == http_process_variables(httptest,
-						&httptest->variables, page.data, &var_err_str))
-				{
-					char	*variables = NULL;
-					size_t	alloc_len = 0, offset;
-
-					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
-							&httptest->variables);
-
-					err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
-							variables, var_err_str);
-
-					zbx_free(variables);
-				}
-
-				/* variables defined in a step */
-				if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables,
-						page.data, &var_err_str))
-				{
-					char	*variables = NULL;
-					size_t	alloc_len = 0, offset;
-
-					httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ",
-							&httpstep.variables);
-
-					err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
-							variables, var_err_str);
-
-					zbx_free(variables);
-				}
-
-				zbx_free(var_err_str);
+				err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
+						db_httpstep.required, httpstep.url);
 			}
+
+			/* variables defined in scenario */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httptest->variables, page.data,
+					&var_err_str))
+			{
+				char	*variables = NULL;
+				size_t	alloc_len = 0, offset;
+
+				httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ", &httptest->variables);
+
+				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s", variables,
+						var_err_str);
+
+				zbx_free(variables);
+			}
+
+			/* variables defined in a step */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables, page.data,
+					&var_err_str))
+			{
+				char	*variables = NULL;
+				size_t	alloc_len = 0, offset;
+
+				httpstep_pairs_join(&variables, &alloc_len, &offset, "=", " ", &httpstep.variables);
+
+				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s", variables,
+						var_err_str);
+
+				zbx_free(variables);
+			}
+
+			zbx_free(var_err_str);
 
 			zbx_timespec(&ts);
 			process_step_data(db_httpstep.httpstepid, &stat, &ts);
