@@ -918,7 +918,6 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	{
 		if (NULL != vault)
 		{
-			zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 			zbx_vector_ptr_destroy(&vault->history);
 			zbx_hashset_remove_direct(&manager->history_cache, vault);
 		}
