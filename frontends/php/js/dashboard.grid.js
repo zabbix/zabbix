@@ -1191,6 +1191,7 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
 						widget['update_paused'] = true;
+						return;
 					}
 				});
 			});
@@ -1205,6 +1206,7 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
 						widget['update_paused'] = false;
+						return;
 					}
 				});
 			});
