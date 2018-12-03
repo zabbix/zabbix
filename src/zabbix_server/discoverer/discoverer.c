@@ -699,7 +699,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	process_discovery(int now)
+static int	process_discovery(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -707,6 +707,7 @@ static int	process_discovery(int now)
 	int		rule_count = 0, delay;
 	char		*delay_str = NULL;
 	zbx_uint64_t	druleid;
+	int		now;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
@@ -718,7 +719,7 @@ static int	process_discovery(int now)
 				" and r.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d",
 			DRULE_STATUS_MONITORED,
-			now,
+			time(NULL),
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
@@ -739,6 +740,7 @@ static int	process_discovery(int now)
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
 			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
+			now = time(NULL);
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
 					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
 					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
@@ -761,13 +763,16 @@ static int	process_discovery(int now)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(druleid);
 
+		now = time(NULL);
 		if (0 > now + delay)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow", row[2]);
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, ZBX_JAN_2038, druleid);
 		}
 		else
+		{
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, now + delay, druleid);
+		}
 	}
 	DBfree_result(result);
 
@@ -812,7 +817,7 @@ static int	get_minnextcheck(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-	int	now, nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
+	int	nextcheck, sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -850,8 +855,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					old_total_sec);
 		}
 
-		now = time(NULL);
-		rule_count += process_discovery(now);
+		rule_count += process_discovery();
 		total_sec += zbx_time() - sec;
 
 		nextcheck = get_minnextcheck();
