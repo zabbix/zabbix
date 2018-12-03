@@ -44,8 +44,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groups' =>					[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'new_groups' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'remove_groups' =>			[T_ZBX_STR, O_OPT, P_SYS,			DB_ID,		null],
+	'mass_update_groups' =>		[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
+										ZBX_MASSUPDATE_ACTION_REMOVE
+									]),
+									null
+								],
 	'hostids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'groupids' =>				[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		null],
@@ -68,8 +72,12 @@ $fields = [
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'tags' =>					[T_ZBX_STR, O_OPT, null,			null,		null],
-	'new_tags' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
-	'remove_tags' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
+	'mass_update_tags' =>		[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
+										ZBX_MASSUPDATE_ACTION_REMOVE
+									]),
+									null
+								],
 	'templates' =>				[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
 	'add_template' =>			[T_ZBX_STR, O_OPT, null,			null,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, null,			DB_ID,		null],
@@ -340,7 +348,7 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid'
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
 elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
-	$hostIds = getRequest('hosts', []);
+	$hostids = getRequest('hosts', []);
 	$visible = getRequest('visible', []);
 	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
 	$_REQUEST['templates'] = getRequest('templates', []);
@@ -351,14 +359,18 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		// filter only normal and discovery created hosts
 		$options = [
 			'output' => ['hostid', 'flags'],
-			'hostids' => $hostIds,
 			'selectInventory' => ['inventory_mode'],
 			'selectGroups' => ['groupid'],
+			'hostids' => $hostids,
 			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		];
 
-		if (array_key_exists('new_tags', $visible) || array_key_exists('remove_tags', $visible)) {
-			$options['selectTags'] = ['tag', 'value'];
+		if (array_key_exists('tags', $visible)) {
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD);
+
+			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
 		}
 
 		if (array_key_exists('templates', $visible) && !hasRequest('mass_replace_tpls')) {
@@ -371,158 +383,117 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 			'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'description'
 		];
 
-		$newValues = [];
+		$new_values = [];
 		foreach ($properties as $property) {
 			if (isset($visible[$property])) {
-				$newValues[$property] = $_REQUEST[$property];
+				$new_values[$property] = $_REQUEST[$property];
 			}
 		}
 
-		if (isset($visible['status'])) {
-			$newValues['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
+		if (array_key_exists('status', $visible)) {
+			$new_values['status'] = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		}
 
 		if (array_key_exists('encryption', $visible)) {
-			$newValues['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
-			$newValues['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
+			$new_values['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
+			$new_values['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
 
-			if ($newValues['tls_connect'] == HOST_ENCRYPTION_PSK || ($newValues['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$newValues['tls_psk_identity'] = getRequest('tls_psk_identity', '');
-				$newValues['tls_psk'] = getRequest('tls_psk', '');
+			if ($new_values['tls_connect'] == HOST_ENCRYPTION_PSK
+					|| ($new_values['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				$new_values['tls_psk_identity'] = getRequest('tls_psk_identity', '');
+				$new_values['tls_psk'] = getRequest('tls_psk', '');
 			}
 
-			if ($newValues['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
-					|| ($newValues['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-				$newValues['tls_issuer'] = getRequest('tls_issuer', '');
-				$newValues['tls_subject'] = getRequest('tls_subject', '');
-			}
-		}
-
-		$templateids = [];
-		if (isset($visible['templates'])) {
-			$templateids = $_REQUEST['templates'];
-		}
-
-		/*
-		 * Step 2. Add new host groups. This is actually done later, but before we can do that we need to check what
-		 * groups will be added and first of all actually create them and get the new IDs.
-		 */
-		$new_groupids = [];
-
-		if (array_key_exists('new_groups', $visible)) {
-			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-				$ins_groups = [];
-
-				foreach (getRequest('new_groups', []) as $new_group) {
-					if (is_array($new_group) && array_key_exists('new', $new_group)) {
-						$ins_groups[] = ['name' => $new_group['new']];
-					}
-					else {
-						$new_groupids[] = $new_group;
-					}
-				}
-
-				if ($ins_groups) {
-					if (!$result = API::HostGroup()->create($ins_groups)) {
-						throw new Exception();
-					}
-
-					$new_groupids = array_merge($new_groupids, $result['groupids']);
-				}
-			}
-			else {
-				$new_groupids = getRequest('new_groups', []);
+			if ($new_values['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
+					|| ($new_values['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				$new_values['tls_issuer'] = getRequest('tls_issuer', '');
+				$new_values['tls_subject'] = getRequest('tls_subject', '');
 			}
 		}
 
-		// Step 1. Replace existing groups.
 		if (array_key_exists('groups', $visible)) {
-			$replace_groupids = [];
+			$new_groupids = [];
+			$remove_groupids = [];
+			$mass_update_groups = getRequest('mass_update_groups', ZBX_MASSUPDATE_ACTION_ADD);
 
-			if (hasRequest('groups')) {
-				// First (step 1.) we try to replace existing groups and add new groups in the process (step 2.).
-				$replace_groupids = array_unique(array_merge(getRequest('groups'), $new_groupids));
-			}
-			elseif ($new_groupids) {
-				/*
-				 * If no groups need to be replaced, use same variable as if new groups are added. This is used in
-				 * step 3. The only difference is that we try to remove all existing groups by replacing with nothing
-				 * since we left it empty.
-				 */
-				$replace_groupids = $new_groupids;
-			}
+			if ($mass_update_groups == ZBX_MASSUPDATE_ACTION_ADD
+					|| $mass_update_groups == ZBX_MASSUPDATE_ACTION_REPLACE) {
+				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+					$ins_groups = [];
 
-			$newValues['groups'] = zbx_toObject($replace_groupids, 'groupid');
-		}
+					foreach (getRequest('groups', []) as $new_group) {
+						if (is_array($new_group) && array_key_exists('new', $new_group)) {
+							$ins_groups[] = ['name' => $new_group['new']];
+						}
+						else {
+							$new_groupids[] = $new_group;
+						}
+					}
 
-		$new_tags = [];
-		if (array_key_exists('new_tags', $visible)) {
-			foreach (getRequest('new_tags', []) as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
+					if ($ins_groups) {
+						if (!$result = API::HostGroup()->create($ins_groups)) {
+							throw new Exception();
+						}
+
+						$new_groupids = array_merge($new_groupids, $result['groupids']);
+					}
 				}
-
-				$new_tags[] = $tag;
+				else {
+					$new_groupids = getRequest('groups', []);
+				}
+			}
+			elseif ($mass_update_groups == ZBX_MASSUPDATE_ACTION_REMOVE) {
+				$remove_groupids = getRequest('groups', []);
 			}
 		}
 
-		$replace_tags = [];
 		if (array_key_exists('tags', $visible)) {
+			$unique_tags = [];
+
 			foreach (getRequest('tags', []) as $tag) {
 				if ($tag['tag'] === '' && $tag['value'] === '') {
 					continue;
 				}
 
-				$replace_tags[] = $tag;
-			}
-
-			$unique_tags = [];
-			foreach (array_merge($replace_tags, $new_tags) as $tag) {
 				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 			}
 
-			$newValues['tags'] = array_values($unique_tags);
+			$tags = array_values($unique_tags);
 		}
 
-		$remove_tags = [];
-		if (array_key_exists('remove_tags', $visible)) {
-			foreach (getRequest('remove_tags', []) as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
-				$remove_tags[] = $tag;
-			}
+		$templateids = [];
+		if (array_key_exists('templates', $visible)) {
+			$templateids = $_REQUEST['templates'];
 		}
 
-		if (isset($_REQUEST['mass_replace_tpls'])) {
-			if (isset($_REQUEST['mass_clear_tpls'])) {
-				$hostTemplates = API::Template()->get([
+		if (hasRequest('mass_replace_tpls')) {
+			if (hasRequest('mass_clear_tpls')) {
+				$host_templates = API::Template()->get([
 					'output' => ['templateid'],
-					'hostids' => $hostIds
+					'hostids' => $hostids
 				]);
 
-				$hostTemplateIds = zbx_objectValues($hostTemplates, 'templateid');
-				$templatesToDelete = array_diff($hostTemplateIds, $templateids);
+				$host_templateids = zbx_objectValues($host_templates, 'templateid');
+				$templates_to_delete = array_diff($host_templateids, $templateids);
 
-				$newValues['templates_clear'] = zbx_toObject($templatesToDelete, 'templateid');
+				$new_values['templates_clear'] = zbx_toObject($templates_to_delete, 'templateid');
 			}
 
-			$newValues['templates'] = $templateids;
+			$new_values['templates'] = $templateids;
 		}
 
 		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
 
 		if (hasRequest('inventory_mode') && array_key_exists('inventory_mode', $visible)) {
-			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
+			$new_values['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 
-			if ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+			if ($new_values['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				$host_inventory = [];
 			}
 		}
 
 		foreach ($hosts as &$host) {
-			if (array_key_exists('inventory_mode', $newValues)) {
+			if (array_key_exists('inventory_mode', $new_values)) {
 				$host['inventory'] = $host_inventory;
 			}
 			elseif (array_key_exists('inventory_mode', $host['inventory'])
@@ -533,93 +504,58 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				$host['inventory'] = [];
 			}
 
-			/*
-			 * Step 3. Case when groups need to be removed. This is done inside the loop, since each host may have
-			 * different existing groups. So we need to know what can we remove.
-			 */
-			if (array_key_exists('remove_groups', $visible)) {
-				$remove_groups = getRequest('remove_groups', []);
-
-				if (array_key_exists('groups', $visible)) {
-					/*
-					 * Previously we determined what groups for ALL hosts will be replaced.
-					 * The $replace_groupids holds both - groups to replace and new groups to add.
-					 * New $replace_groupids is the difference between the replaceable groups and removable groups.
-					 */
-					$replace_groupids = array_diff($replace_groupids, $remove_groups);
-				}
-				else {
-					/*
-					 * The $new_groupids holds only groups that need to be added. So $replace_groupids is
-					 * the difference between the groups that already exist + groups that need to be added and
-					 * removable groups.
-					 */
+			if (array_key_exists('groups', $visible)) {
+				if ($new_groupids && $mass_update_groups == ZBX_MASSUPDATE_ACTION_ADD) {
 					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
-
-					$replace_groupids = array_diff(array_unique(array_merge($current_groupids, $new_groupids)),
-						$remove_groups
+					$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
+						'groupid'
 					);
 				}
-
-				$newValues['groups'] = zbx_toObject($replace_groupids, 'groupid');
+				elseif ($new_groupids && $mass_update_groups == ZBX_MASSUPDATE_ACTION_REPLACE) {
+					$host['groups'] = zbx_toObject($new_groupids, 'groupid');
+				}
+				elseif ($remove_groupids) {
+					$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+					$host['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
+				}
 			}
 
-			// Case when we only need to add new groups to host.
-			if ($new_groupids && !array_key_exists('groups', $visible)
-					&& !array_key_exists('remove_groups', $visible)) {
-				$current_groupids = zbx_objectValues($host['groups'], 'groupid');
+			if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if (array_key_exists('tags', $visible)) {
+					if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+						$unique_tags = [];
 
-				$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)), 'groupid');
-			}
-			else {
-				// In all other cases we first clear out the old values. And simply replace with $newValues later.
-				unset($host['groups']);
+						foreach (array_merge($host['tags'], $tags) as $tag) {
+							$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+						}
+
+						$host['tags'] = array_values($unique_tags);
+					}
+					elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+						$host['tags'] = $tags;
+					}
+					elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+						$diff_tags = [];
+
+						foreach ($host['tags'] as $a) {
+							foreach ($tags as $b) {
+								if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+									continue 2;
+								}
+							}
+
+							$diff_tags[] = $a;
+						}
+
+						$host['tags'] = $diff_tags;
+					}
+				}
 			}
 
 			if ($templateids && array_key_exists('parentTemplates', $host)) {
 				$host['templates'] = array_unique(
 					array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'))
 				);
-			}
-
-			$new_values = $newValues;
-
-			if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				if (array_key_exists('remove_tags', $visible)) {
-					if (!array_key_exists('tags', $visible)) {
-						$unique_tags = [];
-						foreach (array_merge($host['tags'], $new_tags) as $tag) {
-							$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-						}
-						$replace_tags = array_values($unique_tags);
-					}
-
-					$diff_tags = [];
-					foreach ($replace_tags as $a) {
-						foreach ($remove_tags as $b) {
-							if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-								continue 2;
-							}
-						}
-						$diff_tags[] = $a;
-					}
-
-					$new_values['tags'] = $diff_tags;
-				}
-
-				if ($new_tags && !array_key_exists('tags', $visible) && !array_key_exists('remove_tags', $visible)) {
-					$unique_tags = [];
-					foreach (array_merge($host['tags'], $new_tags) as $tag) {
-						$unique_tags[$tag['tag'] . ':' . $tag['value']] = $tag;
-					}
-					$host['tags'] = array_values($unique_tags);
-				}
-				else {
-					unset($host['tags']);
-				}
-			}
-			else {
-				unset($host['tags'], $new_values['tags']);
 			}
 
 			unset($host['flags'], $host['parentTemplates']);

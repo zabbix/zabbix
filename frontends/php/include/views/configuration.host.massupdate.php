@@ -29,7 +29,7 @@ $hostView = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
-	->setAttribute('id', 'hostForm');
+	->setId('hostForm');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -37,162 +37,71 @@ foreach ($data['hosts'] as $hostid) {
 // create form list
 $hostFormList = new CFormList('hostFormList');
 
-// replace host groups
-$hostgroups_to_replace = isset($_REQUEST['groups'])
+// update host groups
+$groups_to_update = $data['groups']
 	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
-		'groupids' => $_REQUEST['groups'],
+		'groupids' => $data['groups'],
 		'editable' => true
 	]), ['groupid' => 'id'])
 	: [];
 
-$replaceGroups = (new CDiv(
-	(new CMultiSelect([
-		'name' => 'groups[]',
-		'object_name' => 'hostGroup',
-		'data' => $hostgroups_to_replace,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'host_groups',
-				'srcfld1' => 'groupid',
-				'dstfrm' => $hostView->getName(),
-				'dstfld1' => 'groups_',
-				'editable' => true
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-))->setId('replaceGroups');
-
 $hostFormList->addRow(
-	(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
-		->setLabel(_('Replace host groups'))
-		->setChecked(isset($data['visible']['groups']))
+	(new CVisibilityBox('visible[groups]', 'groups_div', _('Original')))
+		->setLabel(_('Host groups'))
+		->setChecked(array_key_exists('groups', $data['visible']))
 		->setAttribute('autofocus', 'autofocus'),
-	$replaceGroups
-);
-
-// add new or existing host groups
-$hostgroups_to_add = [];
-if (isset($_REQUEST['new_groups'])) {
-	$groupids = [];
-
-	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
-		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
-			$hostgroups_to_add[] = [
-				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'].' ('._x('new', 'new element in multiselect').')',
-				'isNew' => true
-			];
-		}
-		else {
-			$groupids[] = $newHostGroup;
-		}
-	}
-
-	$hostgroups_to_add = array_merge($hostgroups_to_add, $groupids
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $groupids
-		]), ['groupid' => 'id'])
-		: []);
-}
-
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
-		->setLabel((CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
-			? _('Add new or existing host groups')
-			: _('New host group')
-		)
-		->setChecked(isset($data['visible']['new_groups'])),
-	(new CDiv(
+	(new CDiv([
+		(new CRadioButtonList('mass_update_groups', ZBX_MASSUPDATE_ACTION_ADD))
+			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+			->setModern(true)
+			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
-			'name' => 'new_groups[]',
+			'name' => 'groups[]',
 			'object_name' => 'hostGroup',
 			'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			'data' => $hostgroups_to_add,
+			'data' => $groups_to_update,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'new_groups_',
+					'dstfld1' => 'groups_',
 					'editable' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('newGroups')
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('groups_div')
 );
 
-// Get list of host groups to remove if unsuccessful submit.
-$host_groups_to_remove = getRequest('remove_groups')
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => getRequest('remove_groups'),
-		'editable' => true
-	]), ['groupid' => 'id'])
-	: [];
-
-// Remove host groups control.
+// update tags
 $hostFormList->addRow(
-	(new CVisibilityBox('visible[remove_groups]', 'remove_groups', _('Original')))
-		->setLabel(_('Remove host groups'))
-		->setChecked(array_key_exists('remove_groups', $data['visible'])),
-	(new CDiv(
-		(new CMultiSelect([
-			'name' => 'remove_groups[]',
-			'object_name' => 'hostGroup',
-			'data' => $host_groups_to_remove,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $hostView->getName(),
-					'dstfld1' => 'remove_groups_',
-					'editable' => true
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->setId('remove_groups')
-);
-
-// Replace tags.
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags', _('Original')))
-		->setLabel(_('Replace tags'))
+	(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
+		->setLabel(_('Tags'))
 		->setChecked(array_key_exists('tags', $data['visible'])),
-	(new CDiv(renderTagTable($data['tags'], 'tags')->setId('tbl-tags')))
+	(new CDiv([
+		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
+			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+			->setModern(true),
+		renderTagTable($data['tags'], 'tags')->setId('tbl-tags')
+	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('tags')
-);
-
-// Add tags.
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[new_tags]', 'new_tags', _('Original')))
-		->setLabel(_('Add tags'))
-		->setChecked(array_key_exists('new_tags', $data['visible'])),
-	(new CDiv(renderTagTable($data['new_tags'], 'new_tags')->setId('tbl-new-tags')))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('new_tags')
-);
-
-// Remove tags.
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[remove_tags]', 'remove_tags', _('Original')))
-		->setLabel(_('Remove tags'))
-		->setChecked(array_key_exists('remove_tags', $data['visible'])),
-	(new CDiv(renderTagTable($data['remove_tags'], 'remove_tags')->setId('tbl-remove-tags')))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('remove_tags')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('tags_div')
 );
 
 // append description to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
 		->setLabel(_('Description'))
-		->setChecked(isset($data['visible']['description'])),
+		->setChecked(array_key_exists('description', $data['visible'])),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
@@ -387,6 +296,7 @@ $hostTab = (new CTabView())
 	->addTab('templatesTab', _('Templates'), $templatesFormList)
 	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
 	->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
