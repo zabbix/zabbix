@@ -1419,6 +1419,24 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, co
 				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s", pp->params);
 				ret = FAIL;
 			}
+			else if ('\0' != *param1 && '\0' != *param2)
+			{
+				/* use variants to handle uint64 and double values */
+				zbx_variant_t	min, max;
+
+				zbx_variant_set_numeric(&min, param1);
+				zbx_variant_set_numeric(&max, param2);
+
+				if (0 < zbx_variant_compare(&min, &max))
+				{
+					zbx_snprintf(err, sizeof(err), "first parameter '%s' must be less than second "
+							"'%s'", param1, param2);
+					ret = FAIL;
+				}
+
+				zbx_variant_clear(&min);
+				zbx_variant_clear(&max);
+			}
 
 			break;
 		case ZBX_PREPROC_VALIDATE_REGEX:
