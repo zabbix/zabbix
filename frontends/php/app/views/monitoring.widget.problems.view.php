@@ -57,6 +57,7 @@ $table = (new CTableInfo())
 			' &bullet; ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
+		$data['fields']['show_latest_values'] ? _('Latest values') : null,
 		_('Duration'),
 		_('Ack'),
 		_('Actions'),
@@ -215,6 +216,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
+		$data['fields']['show_latest_values'] ? CScreenProblem::getLatestValues($trigger) : null,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))

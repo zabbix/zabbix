@@ -326,7 +326,7 @@ class CScreenProblem extends CScreenBase {
 					$options = [
 						'output' => ['priority', 'url', 'flags', 'expression', 'comments'],
 						'selectHosts' => ['hostid', 'name', 'status'],
-						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
 						'skipDependent' => true,
@@ -866,6 +866,7 @@ class CScreenProblem extends CScreenBase {
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
+						$this->data['filter']['show_latest_values'] ? _('Latest values') : null,
 						_('Duration'),
 						_('Ack'),
 						_('Actions'),
@@ -1011,6 +1012,12 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
+				$latest_values = null;
+
+				if ($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view']) {
+					$latest_values = self::getLatestValues($trigger);
+				}
+
 				if ($show_timeline) {
 					if ($last_clock != 0) {
 						self::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $this->data['sortorder']);
@@ -1049,6 +1056,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
+					$this->data['filter']['show_latest_values'] ? $latest_values : null,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
@@ -1144,5 +1152,79 @@ class CScreenProblem extends CScreenBase {
 
 			return zbx_toCSV($csv);
 		}
+	}
+
+	/**
+	 * Get Latest values
+	 *
+	 * @param array $trigger
+	 *
+	 * @static
+	 *
+	 * @return CCol
+	 */
+	public static function getLatestValues(array $trigger) {
+		$last_values = [];
+		$items = [];
+
+		foreach ($trigger['items'] as $item) {
+			$items[$item['itemid']] = $item;
+			$last_value = Manager::History()->getLastValues([$item], 1, ZBX_HISTORY_PERIOD);
+			foreach ($last_value as $itemid => $item_values) {
+				$last_values[$itemid] = $item_values[0];
+			}
+		}
+		$hint_table = new CTable();
+
+		foreach ($last_values as $itemid => $lastHistory) {
+			if ($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT ||
+					$items[$itemid]['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+				$actions = new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$itemid);
+			}
+			else {
+				$actions = new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$itemid);
+			}
+
+			$hint_table->addRow([
+				(new CCol([
+					$items[$itemid]['name']
+				]))
+					->addStyle('max-width: 200px; padding-right: 15px;'),
+				(new CCol([
+					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock'])
+				]))
+					->addStyle('padding-right: 15px;'),
+				(new CCol([
+					formatHistoryValue($lastHistory['value'], $items[$itemid], false)
+				]))
+					->addStyle('padding-right: 15px;'),
+				$actions
+			]);
+		}
+
+		$tooltip = (new CCol([
+			(new CLinkAction(''))
+				->addClass('main-hint')
+				->setHint($hint_table, '', true)
+		]));
+		$comma = null;
+
+		foreach ($last_values as $itemid => $lastHistory) {
+			$value = formatHistoryValue($lastHistory['value'], $items[$itemid], false);
+
+			if ($value === '*UNKNOWN*') {
+				$tooltip->addItem($value);
+				continue;
+			}
+			if ($comma === null) {
+				$comma = ', ';
+			}
+			else {
+				$tooltip->addItem($comma);
+			}
+			$tooltip->addItem((new CLinkAction($value))->addClass('hint-item'));
+		}
+
+		return $tooltip;
 	}
 }
