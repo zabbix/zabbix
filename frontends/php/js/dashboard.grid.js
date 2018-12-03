@@ -1220,7 +1220,7 @@
 						.removeClass('dashbrd-grid-widget-set-position')
 						.addClass('dashbrd-grid-widget-set-size')
 						.find('.dashbrd-grid-new-widget-label')
-							.text(t('Release to create a new widget in the selected area.'));
+							.text(t('Release to create a new widget.'));
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function(event) {
@@ -1264,7 +1264,7 @@
 					.find('.dashbrd-grid-widget-new-box')
 						.addClass('dashbrd-grid-widget-set-position')
 						.find('.dashbrd-grid-new-widget-label')
-							.text(t('Click and drag to mark desired widget size.'));
+							.text(t('Click and drag to desired size.'));
 			}
 
 			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
