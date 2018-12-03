@@ -1533,8 +1533,8 @@ clean:
  *                                                                            *
  * Parameters:                                                                *
  *     filename_regexp - [IN] regexp to be compiled                           *
- *     re              - [OUT] compiled regexp                             *
- *     err_msg         - [OUT] error message why regexp could not be       *
+ *     re              - [OUT] compiled regexp                                *
+ *     err_msg         - [OUT] error message why regexp could not be          *
  *                       compiled                                             *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -1546,10 +1546,8 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 
 	if (SUCCEED != zbx_regexp_compile(filename_regexp, re, &regexp_err))
 	{
-		char	err_buf[MAX_STRING_LEN];
-
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
-				err_buf);
+				regexp_err);
 		return FAIL;
 	}
 

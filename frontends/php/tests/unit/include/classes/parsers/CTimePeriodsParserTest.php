@@ -59,6 +59,14 @@ class CTimePeriodsParserTest extends PHPUnit_Framework_TestCase {
 					'periods' => ['{$MACRO1}', '{$MACRO2}']
 				]
 			],
+			[
+				'{$MACRO1: ";"};{$MACRO2: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO1: ";"};{$MACRO2: ";"}',
+					'periods' => ['{$MACRO1: ";"}', '{$MACRO2: ";"}']
+				]
+			],
 			// fail
 			[
 				'', 0, [],

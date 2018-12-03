@@ -1348,6 +1348,8 @@ textarea {
   overflow: auto; }
   textarea[readonly] {
     color: #f2f2f2 !important; }
+    textarea[readonly]:focus {
+      border-color: #768d99; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -1918,12 +1920,15 @@ button {
   padding: 0; }
 
 button[disabled], button[disabled]:hover, button[disabled]:active {
-  color: #525252;
+  color: #525252 !important;
   background-color: transparent;
   border-color: #3d3d3d;
   cursor: default; }
+  button.icon-cal[disabled] {
+    opacity: 0.3;
+    background-color: transparent; }
 
-.radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
+.multiselect[aria-disabled], .radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[disabled] + label span {
   color: #525252;
   background-color: #2b2b2b !important;
   border-color: #3d3d3d; }
@@ -3671,15 +3676,17 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     border: 1px solid #4f4f4f;
     background: url(../img/icon-sprite.svg) no-repeat -323px -411px;
     cursor: pointer; }
-  .input-color-picker input[readonly] + div, .input-color-picker input:disabled + div {
-    cursor: default; }
+  .input-color-picker input[readonly],
+  .input-color-picker input:disabled {
+    color: #525252 !important; }
+    .input-color-picker input[readonly] + div,
+    .input-color-picker input:disabled + div {
+      cursor: default; }
+  .input-color-picker input:disabled + div {
+    background: #525252 !important;
+    border: 1px solid #525252; }
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
-  .input-color-picker.disabled {
-    opacity: 1; }
-    .input-color-picker.disabled div {
-      background: #525252 !important;
-      border: 1px solid #525252; }
 
 .in-progress {
   position: relative; }

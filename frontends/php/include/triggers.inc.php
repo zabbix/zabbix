@@ -889,7 +889,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		// data
 		foreach ($data as $trigger_name => $trigger_data) {
 			foreach ($trigger_data as $trigger_hosts) {
-				$columns = [nbsp($trigger_name)];
+				$columns = [(new CColHeader($trigger_name))->addClass(ZBX_STYLE_NOWRAP)];
 
 				foreach ($host_names as $host_name) {
 					$columns[] = getTriggerOverviewCells(
@@ -1042,8 +1042,9 @@ function calculateAvailability($triggerId, $startTime, $endTime) {
 				' ORDER BY e.eventid DESC';
 		if ($row = DBfetch(DBselect($sql, 1))) {
 			$startValue = $row['value'];
-			$min = $startTime;
 		}
+
+		$min = $startTime;
 	}
 
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
