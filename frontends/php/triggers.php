@@ -375,10 +375,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
-	DBstart();
-
 	$result = API::Trigger()->delete([getRequest('triggerid')]);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);

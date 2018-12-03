@@ -1,0 +1,171 @@
+test case: "min"
+in:
+  str: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "max"
+in:
+  str: '86400'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed"
+in:
+  str: '86401'
+out:
+  return: 'FAIL'
+---
+test case: "min seconds"
+in:
+  str: '1s'
+out:
+  return: 'SUCCEED'
+---
+test case: "max seconds"
+in:
+  str: '86400s'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed seconds"
+in:
+  str: '86401s'
+out:
+  return: 'FAIL'
+---
+test case: "min minutes"
+in:
+  str: '1m'
+out:
+  return: 'SUCCEED'
+---
+test case: "max minutes"
+in:
+  str: '1440m'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed minutes"
+in:
+  str: '1441m'
+out:
+  return: 'FAIL'
+---
+test case: "min hours"
+in:
+  str: '1h'
+out:
+  return: 'SUCCEED'
+---
+test case: "max hours"
+in:
+  str: '24h'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed hours"
+in:
+  str: '25h'
+out:
+  return: 'FAIL'
+---
+test case: "min/max days"
+in:
+  str: '1d'
+out:
+  return: 'SUCCEED'
+---
+test case: "more than allowed days"
+in:
+  str: '2d'
+out:
+  return: 'FAIL'
+---
+test case: "weeks not allowed"
+in:
+  str: '1w'
+out:
+  return: 'FAIL'
+---
+test case: "zero alone are not allowed"
+in:
+  str: '0'
+out:
+  return: 'FAIL'
+---
+test case: "zero seconds alone are not allowed"
+in:
+  str: '0s'
+out:
+  return: 'FAIL'
+---
+test case: "custom intervals don't matter so we cannot determine if 0 is OK"
+in:
+  str: '0'
+  no_custom: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "custom intervals don't matter so we cannot determine if 0 seconds is OK"
+in:
+  str: '0s'
+  no_custom: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "custom intervals don't matter even if are invalid"
+in:
+  str: '1;foo/bar,00:00-23:00;0/1-6,00:00-23:00;baz1-5h9-18;;;;'
+  no_custom: '1'
+out:
+  return: 'SUCCEED'
+---
+test case: "don't allow invalid custom intervals if matter"
+in:
+  str: '1;foo/bar,00:00-23:00;0/1-6,00:00-23:00;baz1-5h9-18;;;;'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 update interval even if custom is used and still 0"
+in:
+  str: '0;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 simple update interval if one of custom update intervals has 0 update interval"
+in:
+  str: '0;1/1-6,00:00-23:00;0/1-6,00:00-23:00'
+out:
+  return: 'FAIL'
+---
+test case: "don't allow 0 update interval if one of custom update intervals has 0 update interval and scheduling"
+in:
+  str: '0;0/1-6,00:00-23:00;1/1-6,00:00-23:00;wd1-5h9-18'
+out:
+  return: 'FAIL'
+---
+test case: "allow 0 update interval even if custom has non 0"
+in:
+  str: '0;1/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "allow 0 custom update interval even if custom is 0"
+in:
+  str: '1;0/1-6,00:00-23:00'
+out:
+  return: 'SUCCEED'
+---
+test case: "allow 0 simple update interval if only scheduling is present"
+in:
+  str: '0;wd1-5h9-18'
+out:
+  return: 'SUCCEED'
+---
+test case: "custom intervals are missing, there is only separator"
+in:
+  str: '0;'
+out:
+  return: 'FAIL'
+...
