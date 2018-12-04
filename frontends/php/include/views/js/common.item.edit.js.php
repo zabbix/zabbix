@@ -56,11 +56,14 @@
 				))->addClass(ZBX_STYLE_COLUMN_20),
 				(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
 					->addClass(ZBX_STYLE_COLUMN_10)
-					->addStyle('justify-content: center;'),
+					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+					->addClass(ZBX_STYLE_COLUMN_CENTER),
 				(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-				))->addClass(ZBX_STYLE_COLUMN_10)
+				))
+					->addClass(ZBX_STYLE_COLUMN_10)
+					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 			]))
 				->addClass(ZBX_STYLE_COLUMNS)
 				->addClass('preprocessing-step'),
@@ -82,7 +85,9 @@
 							->setEnabled(false)
 							->addStyle('display: none;')
 					)
-				]))->addClass(ZBX_STYLE_COLUMN_80)
+				]))
+					->addClass(ZBX_STYLE_COLUMN_80)
+					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 			]))
 				->addClass(ZBX_STYLE_COLUMNS)
 				->addClass('on-fail-options')

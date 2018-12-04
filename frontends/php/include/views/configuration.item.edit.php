@@ -1097,7 +1097,9 @@ foreach ($data['preprocessing'] as $i => $step) {
 			new CDiv(new CLabel(_('Custom on fail'))),
 			new CDiv($error_handler->setReadonly($readonly)),
 			new CDiv($error_handler_params->setReadonly($readonly))
-		]))->addClass(ZBX_STYLE_COLUMN_80)
+		]))
+			->addClass(ZBX_STYLE_COLUMN_80)
+			->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 	]))
 		->addClass(ZBX_STYLE_COLUMNS)
 		->addClass('on-fail-options');
@@ -1117,12 +1119,15 @@ foreach ($data['preprocessing'] as $i => $step) {
 				(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 				(new CDiv($on_fail))
 					->addClass(ZBX_STYLE_COLUMN_10)
-					->addStyle('justify-content: center;'),
+					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+					->addClass(ZBX_STYLE_COLUMN_CENTER),
 				(new CDiv((new CButton('param_add', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 					->setEnabled(!$readonly)
-				))->addClass(ZBX_STYLE_COLUMN_10),
+				))
+					->addClass(ZBX_STYLE_COLUMN_10)
+					->addClass(ZBX_STYLE_COLUMN_MIDDLE),
 			]))
 				->addClass(ZBX_STYLE_COLUMNS)
 				->addClass('preprocessing-step'),

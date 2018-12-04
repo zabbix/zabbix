@@ -1382,7 +1382,7 @@ abstract class CItemGeneral extends CApiService {
 							));
 						}
 
-						if (is_numeric($params[0]) && is_numeric($params[1]) && !($params[0] < $params[1])) {
+						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] >= $params[1]) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _s('"%1$s" value must be greater than "%2$s" value', _('max'), _('min'))
 							));
@@ -1438,7 +1438,8 @@ abstract class CItemGeneral extends CApiService {
 
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 						$api_input_rules = [
-							'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
+							'type' => API_TIME_UNIT,
+							'flags' => ($this instanceof CItemPrototype)
 								? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
 								: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
 							'in' => '1:'.ZBX_MAX_TIMESHIFT
