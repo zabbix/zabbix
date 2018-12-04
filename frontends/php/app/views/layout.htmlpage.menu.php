@@ -24,7 +24,7 @@ $user_navigation = (new CList())
 		(new CForm('post', 'zabbix.php'))
 			->cleanItems()
 			->addItem([
-				(new CInput('hidden', 'action', 'search'))->removeAttribute('id'),
+				(new CVar('action', 'search'))->removeId(),
 				(new CTextBox('search', '', false, 255))
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH)
