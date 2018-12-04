@@ -1142,7 +1142,7 @@
 	}
 
 	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
-		var edit_mode = (widget !== null);
+		var edit_mode = (widget !== null && 'type' in widget);
 
 		data.dialogue = {};
 		data.dialogue.widget = widget;
