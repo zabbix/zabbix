@@ -113,7 +113,7 @@
 		});
 
 		if (data['options']['rows'] == 0) {
-			data.new_widget_placeholder.show();
+			data.new_widget_placeholder.container.show();
 		}
 
 		if (typeof(min_rows) != 'undefined' && data['options']['rows'] < min_rows) {
@@ -1175,6 +1175,57 @@
 		updateWidgetConfigDialogue();
 	}
 
+	function createNewWidgetPlaceholder() {
+		var label = $('<div>', {class: 'dashbrd-grid-new-widget-label'}),
+			inner_box = $('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(label),
+			placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(inner_box),
+			updateLabelVisibility = function() {
+				if (!inner_box.is('.dashbrd-grid-widget-set-size,.dashbrd-grid-widget-set-position')) {
+					return;
+				}
+
+				var message = inner_box.is('.dashbrd-grid-widget-set-size')
+						? t('Click and drag to desired size.')
+						: t('Release to create a new widget.'),
+					callback = function () {
+						if (label.children().first().height()) {
+							label.text(label.height() >= label.children().first().height() ? message : '');
+						}
+						else {
+							window.requestAnimationFrame(callback);
+						}
+					}
+
+				// Create container to detect text overflow on y axis. Message div container will be removed on repaint.
+				$('<div>').text(message).appendTo(label);
+
+				callback();
+			};
+
+		return {
+			container: placeholder,
+			inner_box: inner_box,
+			label: label,
+			isClickable: function(callback) {
+				inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
+				label.empty().append($('<a>', {
+					href: '#',
+					text: t('Add a new widget'),
+					click: callback
+				}));
+			},
+			setPositioning: function() {
+				inner_box.removeClass('dashbrd-grid-widget-set-size').addClass('dashbrd-grid-widget-set-position');
+				updateLabelVisibility();
+			},
+			setResizing: function() {
+				inner_box.removeClass('dashbrd-grid-widget-set-position').addClass('dashbrd-grid-widget-set-size');
+				updateLabelVisibility();
+			},
+			updateLabelVisibility: updateLabelVisibility
+		};
+	}
+
 	function setModeEditDashboard($obj, data) {
 		$.each(data['widgets'], function(index, widget) {
 			widget['rf_rate'] = 0;
@@ -1211,16 +1262,10 @@
 			}
 
 			if (data['pos-action'] == '' && ($(event.target).is($obj))
-					|| $(event.target).is(data.new_widget_placeholder)
-					|| $(event.target).parent().is(data.new_widget_placeholder)) {
+					|| $(event.target).closest(data.new_widget_placeholder.container)) {
 				setResizableState('disable', data.widgets, '');
 				data['pos-action'] = 'add';
-				data.new_widget_placeholder
-					.find('.dashbrd-grid-widget-new-box')
-						.removeClass('dashbrd-grid-widget-set-position')
-						.addClass('dashbrd-grid-widget-set-size')
-						.find('.dashbrd-grid-new-widget-label')
-							.text(t('Release to create a new widget.'));
+				data.new_widget_placeholder.setResizing();
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function(event) {
@@ -1231,26 +1276,17 @@
 			data.add_widget_dimension = {};
 
 			if (data.widgets.length) {
-				data.new_widget_placeholder.hide();
+				data.new_widget_placeholder.container.hide();
 			}
 			else {
-				data.new_widget_placeholder.removeAttr('style');
+				data.new_widget_placeholder.container.removeAttr('style');
 			}
 
 			resizeDashboardGrid($obj, data);
-			data.new_widget_placeholder
-				.find('.dashbrd-grid-widget-new-box')
-					.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position')
-						.find('.dashbrd-grid-new-widget-label')
-							.empty()
-							.append($('<a>', {
-								href: '#',
-								text: t('Add a new widget'),
-								click: function (e) {
-									methods.addNewWidget.call($obj, this);
-									return cancelEvent(e);
-								}
-							}));
+			data.new_widget_placeholder.isClickable(function (e) {
+				methods.addNewWidget.call($obj, this);
+				return cancelEvent(e);
+			});
 
 		}).on('mouseenter mousemove', function(event) {
 			var drag = data['pos-action'] == 'add';
@@ -1260,20 +1296,14 @@
 			}
 
 			if (event.type == 'mouseenter' && data['pos-action'] == '') {
-				data.new_widget_placeholder.show()
-					.find('.dashbrd-grid-widget-new-box')
-						.addClass('dashbrd-grid-widget-set-position')
-						.find('.dashbrd-grid-new-widget-label')
-							.text(t('Click and drag to desired size.'));
+				data.new_widget_placeholder.container.show();
+				data.new_widget_placeholder.setPositioning();
 			}
 
-			if (!drag && !$(event.target).is($obj) && !$(event.target).is(data.new_widget_placeholder)
-					&& !$(event.target).closest(data.new_widget_placeholder)) {
+			if (!drag && !$(event.target).is($obj) && !$(event.target).closest(data.new_widget_placeholder.container)) {
 				resizeDashboardGrid($obj, data);
 				data.add_widget_dimension = {};
-				data.new_widget_placeholder.hide()
-					.find('.dashbrd-grid-widget-new-box')
-						.removeClass('dashbrd-grid-widget-set-size');
+				data.new_widget_placeholder.container.hide();
 				return;
 			}
 
@@ -1349,9 +1379,7 @@
 
 				if (overlap) {
 					data.add_widget_dimension = {};
-					data.new_widget_placeholder.hide()
-						.find('.dashbrd-grid-widget-new-box')
-							.removeClass('dashbrd-grid-widget-set-size');
+					data.new_widget_placeholder.container.hide();
 					return;
 				}
 			}
@@ -1359,13 +1387,15 @@
 			resizeDashboardGrid($obj, data, pos.y + pos.height);
 			data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
-			data.new_widget_placeholder.css({
+			data.new_widget_placeholder.container.css({
 				position: 'absolute',
 				top: data.add_widget_dimension.y * o['widget-height'] + 'px',
 				left: data.add_widget_dimension.x * o['widget-width'] + '%',
 				height: data.add_widget_dimension.height * o['widget-height'] + 'px',
 				width: data.add_widget_dimension.width * o['widget-width'] + '%'
 			}).show();
+
+			data.new_widget_placeholder.updateLabelVisibility();
 		});
 
 		return;
@@ -1623,19 +1653,10 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					new_widget_placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(
-						$('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(
-							$('<div>', {class: 'dashbrd-grid-new-widget-label'}).append(
-								$('<a>', {
-									href: '#',
-									text: t('Add a new widget')
-								})
-							)
-						)
-					);
+					new_widget_placeholder = createNewWidgetPlaceholder();
 
 				if (options['editable']) {
-					new_widget_placeholder.find('a').on('click', function (e) {
+					new_widget_placeholder.isClickable(function (e) {
 						if (!methods.isEditMode.call($this)) {
 							showEditMode();
 						}
@@ -1649,10 +1670,10 @@
 					}
 				}
 				else {
-					new_widget_placeholder.addClass('disabled');
+					new_widget_placeholder.container.addClass('disabled');
 				}
 
-				$this.append(new_widget_placeholder);
+				$this.append(new_widget_placeholder.container);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -1684,6 +1705,7 @@
 					// Recalculate dashboard container minimal required height.
 					data.minimalHeight = calculateGridMinHeight($this);
 					data['cell-width'] = getCurrentCellWidth(data);
+					data.new_widget_placeholder.updateLabelVisibility();
 				});
 			});
 		},
@@ -1755,7 +1777,7 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
-				data.new_widget_placeholder.hide();
+				data.new_widget_placeholder.container.hide();
 			});
 		},
 
