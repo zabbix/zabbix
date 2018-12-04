@@ -286,5 +286,12 @@
 
 			t.data('editableTable', et);
 		});
+
+		$('input[name=item_application_action]').change(function() {
+			var item_application_action = $('input[name=item_application_action]:checked').val(),
+				add_new = !(item_application_action == <?= ZBX_MULTISELECT_REMOVE ?>);
+
+			$('#applications_').multiSelect('modify', {'addNew' : add_new});
+		});
 	});
 </script>

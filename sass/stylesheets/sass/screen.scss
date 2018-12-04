@@ -11,15 +11,16 @@ html {
 }
 
 body {
-	font: {
-		family: $font-stack;
-		size: $font-body-size;
-	}
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 60px;
 	min-width: 950px;
+
+	font: {
+		family: $font-stack;
+		size: $font-body-size;
+	}
 }
 
 a {
@@ -1724,6 +1725,7 @@ output {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
+		position: relative;
 
 		&.has-before {
 			padding-top: 0px;
@@ -1753,10 +1755,12 @@ output {
 				}
 			}
 		}
-	}
 
-	.table-forms-td-right {
-		position: relative;
+		.table-forms-separator {
+			.radio-segmented + .multiselect-wrapper {
+				margin-top: 5px;
+			}
+		}
 	}
 
 	h4 {
