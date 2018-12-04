@@ -1175,6 +1175,11 @@
 		updateWidgetConfigDialogue();
 	}
 
+	/**
+	 * Creates placeholder object for 'Add a new Widget'.
+	 *
+	 * @returns {object}    Placeholder object with DOM elements and additional methods to set visual style.
+	 */
 	function createNewWidgetPlaceholder() {
 		var label = $('<div>', {class: 'dashbrd-grid-new-widget-label'}),
 			inner_box = $('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(label),
