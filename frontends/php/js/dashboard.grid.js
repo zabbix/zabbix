@@ -1185,8 +1185,8 @@
 				}
 
 				var message = inner_box.is('.dashbrd-grid-widget-set-size')
-						? t('Click and drag to desired size.')
-						: t('Release to create a new widget.'),
+						? t('Release to create a new widget.')
+						: t('Click and drag to desired size.'),
 					callback = function () {
 						if (label.children().first().height()) {
 							label.text(label.height() >= label.children().first().height() ? message : '');
@@ -1206,7 +1206,7 @@
 			container: placeholder,
 			inner_box: inner_box,
 			label: label,
-			isClickable: function(callback) {
+			setDefault: function(callback) {
 				inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
 				label.empty().append($('<a>', {
 					href: '#',
@@ -1283,7 +1283,7 @@
 			}
 
 			resizeDashboardGrid($obj, data);
-			data.new_widget_placeholder.isClickable(function (e) {
+			data.new_widget_placeholder.setDefault(function (e) {
 				methods.addNewWidget.call($obj, this);
 				return cancelEvent(e);
 			});
@@ -1656,7 +1656,7 @@
 					new_widget_placeholder = createNewWidgetPlaceholder();
 
 				if (options['editable']) {
-					new_widget_placeholder.isClickable(function (e) {
+					new_widget_placeholder.setDefault(function (e) {
 						if (!methods.isEditMode.call($this)) {
 							showEditMode();
 						}
