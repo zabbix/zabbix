@@ -679,7 +679,7 @@ jQuery(function($) {
 					data[data.length] = {
 						id: value,
 						prefix: '',
-						name: value + ' (' + options.labels['new'] + ')',
+						name: value + ' {{' + options.labels['new'] + '}}',
 						isNew: true
 					};
 				}
@@ -871,7 +871,10 @@ jQuery(function($) {
 			search = values.search.toLowerCase(),
 			start = 0,
 			end = 0,
-			searchLength = search.length;
+			searchLength = search.length,
+			pattern = '{{' + options.labels['new'] + '}}';
+
+		text = text.replace(pattern, '');
 
 		while (text.indexOf(search, end) > -1) {
 			end = text.indexOf(search, end);
@@ -892,6 +895,7 @@ jQuery(function($) {
 		}
 
 		if (end < item.name.length) {
+			item.name = item.name.replace('{{','(').replace('}}', ')');
 			li.append($('<span>', {
 				text: item.name.substring(end, item.name.length)
 			}));
