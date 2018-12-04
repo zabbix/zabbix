@@ -186,7 +186,7 @@ $fields = [
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	//'applications' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'applications' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'item_application_action' =>	[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE,
 											ZBX_MULTISELECT_REMOVE
