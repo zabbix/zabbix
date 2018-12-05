@@ -53,11 +53,6 @@ class CControllerSearch extends CController {
 		$this->limit = CWebUser::$data['rows_per_page'];
 	}
 
-	/**
-	 * Validates input according to validation rules. Only validated fields are readable, remaining fields are unset.
-	 *
-	 * @return bool
-	 */
 	protected function checkInput() {
 		$ret = $this->validateInput(['search' => 'string']);
 
@@ -70,6 +65,35 @@ class CControllerSearch extends CController {
 
 	protected function checkPermissions() {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
+	}
+
+	protected function doAction() {
+		$this->search = trim($this->getInput('search', ''));
+
+		$data = [
+			'search' => _('Search pattern is empty'),
+			'admin' => $this->admin,
+			'hosts' => [],
+			'groups' => [],
+			'templates' => [],
+			'total_groups_cnt' => 0,
+			'total_hosts_cnt' => 0,
+			'total_templates_cnt' => 0,
+		];
+
+		if ($this->search !== '') {
+			list($data['hosts'], $data['total_hosts_cnt']) = $this->getHostsData();
+			list($data['groups'], $data['total_groups_cnt']) = $this->getHostGroupsData();
+
+			if ($this->admin) {
+				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
+			}
+			$data['search'] = $this->search;
+		}
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Search'));
+		$this->setResponse($response);
 	}
 
 	/**
@@ -229,37 +253,5 @@ class CControllerSearch extends CController {
 		]);
 
 		return [$hosts, $total_count];
-	}
-
-	/**
-	 * Creates and sets response object with data.
-	 */
-	protected function doAction() {
-		$this->search = trim($this->getInput('search', ''));
-
-		$data = [
-			'search' => _('Search pattern is empty'),
-			'admin' => $this->admin,
-			'hosts' => [],
-			'groups' => [],
-			'templates' => [],
-			'total_groups_cnt' => 0,
-			'total_hosts_cnt' => 0,
-			'total_templates_cnt' => 0,
-		];
-
-		if ($this->search !== '') {
-			list($data['hosts'], $data['total_hosts_cnt']) = $this->getHostsData();
-			list($data['groups'], $data['total_groups_cnt']) = $this->getHostGroupsData();
-
-			if ($this->admin) {
-				list($data['templates'], $data['total_templates_cnt'])  = $this->getTemplatesData();
-			}
-			$data['search'] = $this->search;
-		}
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Search'));
-		$this->setResponse($response);
 	}
 }

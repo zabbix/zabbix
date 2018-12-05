@@ -241,6 +241,6 @@ if ($data['admin']) {
 }
 
 (new CWidget())
-	->setTitle(_('Search').':'.SPACE.$data['search'])
+	->setTitle(_('Search').': '.$data['search'])
 	->addItem(new CDiv($widgets))
 	->show();
