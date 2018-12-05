@@ -1,9 +1,16 @@
 Changes for 4.2.0alpha2
 
 New features:
-..F....... [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
+..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
+A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
+A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
+.......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
+..F....... [ZBX-15105] fixed colorpicker tooltip update (talbergs)
+A.F....... [ZBX-14928] fixed "check now" being executed for active items and templates (talbergs)
+..F....... [ZBX-15153] fixed custom interval validation; fixed parsing of custom intervals when user macros context contains forward slash (Ivo, miks)
 .......PS. [ZBX-9038] fixed memory of performance counters consumed during vmware update (MVekslers)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions (kalimulin)
 A......... [ZBX-15078] fixed API authentication for ldap users having gui access disabled (gcalenko)
@@ -15,6 +22,7 @@ A......... [ZBX-14977] fixed creation of unneeded database record if host protot
 A......... [ZBX-15146] fixed SQL error occurred when too long IP address is attempted to be written in database (miks)
 ..F....... [ZBX-15148] fixed web scenario item selection in SVG graph widget (miks)
 ...G...... [ZBX-15107] fixed error handling in logrt[] items if regular expression for file name is not valid (Andris)
+..F....... [ZBX-14800] fixed resolving of functional macros in graph widget name (Ivo)
 ...G....S. [ZBX-15178] fixed wrong behaviour when referencing unexisting capture groups in item regexp preprocessing, general pcre code improvements (Andris, kalimulin)
 
 --------------------------------------------------------------------------------
@@ -30,6 +38,13 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
+A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
+A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
+.......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
+..F....... [ZBX-15105] fixed colorpicker tooltip update (talbergs)
+A.F....... [ZBX-14928] fixed "check now" being executed for active items and templates (talbergs)
+..F....... [ZBX-15153] fixed custom interval validation; fixed parsing of custom intervals when user macros context contains forward slash (Ivo, miks)
 ..F....... [ZBX-15069] fixed community default value in edit scenario (talbergs)
 .......PS. [ZBX-9038] fixed memory of performance counters consumed during vmware update (MVekslers)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions (kalimulin)
@@ -56,7 +71,7 @@ Changes for 4.0.2
 Changes for 4.0.2rc1
 
 New features:
-.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
+........S. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 ....I..... [ZBXNEXT-4841] removed hardcoded locations for iconv.h and pthread.h; thanks to Helmut Grohne for the patch (kalimulin)
 ...G...... [ZBXNEXT-3047] fixed compilation errors on Windows platform with static OpenSSL libraries (Andris, viktors)
 ...G...PS. [ZBXNEXT-4836] added license information and OpenSSL linking exception to README file, show crypto library version when started with '-V' (Andris)
@@ -228,7 +243,7 @@ Bug fixes:
 ..F....... [ZBX-14783] fixed align of the left column in several widgets and reports (Ivo)
 .........T [ZBX-13377] fixed naming of groups and applications (vitaly)
 ....I..... [ZBX-14335] fixed bug in proxy makefile (Andris)
-.......PS. [ZBX-14850] reverted ZBXNEXT-3848 fix because of broken update interval validation during low-level discovery (vso)
+........S. [ZBX-14850] reverted ZBXNEXT-3848 fix because of broken update interval validation during low-level discovery (vso)
 ........S. [ZBX-14830] fixed possible deadlock when history syncer was trying to update escalations with recovery event id (wiper)
 .........T [ZBX-13377] fixed naming issue for "Server Hardware" host group (vitaly)
 A.F....... [ZBXNEXT-4573] fixed HTTP authentication page issues, HTTP case sensitive option and moved HTTP authentication from API to HTTP form page (gcalenko)
@@ -244,7 +259,7 @@ New features:
 A.F....... [ZBXNEXT-3860] added ability to filter triggers by tags (agriscenko)
 ..F....... [ZBXNEXT-4606] implemented kiosk mode for all pages (vasilijs)
 ........S. [ZBXNEXT-4696] improved history syncer performance by moving trigger locking outside history cache lock (wiper)
-.......PS. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
+........S. [ZBXNEXT-3848] added validation of update interval, custom interval, history storage period and trend storage period in low-level discovery (vso)
 .........T [ZBXNEXT-4224] implemented templates for server hardware: IBM,HP,Dell,Supermicro (vitaly)
 
 Bug fixes:
