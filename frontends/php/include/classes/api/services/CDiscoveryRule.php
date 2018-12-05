@@ -517,10 +517,8 @@ class CDiscoveryRule extends CItemGeneral {
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
-		if (!empty($iprototypeids)) {
-			if (!API::ItemPrototype()->delete($iprototypeids, true)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
-			}
+		if ($iprototypeids) {
+			CItemPrototypeManager::delete($iprototypeids);
 		}
 
 		// delete host prototypes

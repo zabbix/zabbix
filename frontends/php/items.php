@@ -522,6 +522,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (!in_array($type, [ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
+		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
+		$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
 		foreach (getRequest('delay_flex') as $interval) {
 			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -529,12 +532,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['delay'], ';') !== false) {
+				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif (strpos($interval['period'], ';') !== false) {
+				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
@@ -547,7 +550,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
-				if (strpos($interval['schedule'], ';') !== false) {
+				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
@@ -927,6 +930,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 		if (hasRequest('delay_flex')) {
 			$intervals = [];
+			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
+			$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
+			$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
 
 			foreach (getRequest('delay_flex') as $interval) {
 				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
@@ -934,12 +940,12 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						continue;
 					}
 
-					if (strpos($interval['delay'], ';') !== false) {
+					if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['delay']));
 						break;
 					}
-					elseif (strpos($interval['period'], ';')  !== false) {
+					elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['period']));
 						break;
@@ -952,7 +958,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 						continue;
 					}
 
-					if (strpos($interval['schedule'], ';') !== false) {
+					if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 						$result = false;
 						info(_s('Invalid interval "%1$s".', $interval['schedule']));
 						break;
@@ -1304,29 +1310,9 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
-	DBstart();
-
 	$group_itemid = getRequest('group_itemid');
 
-	$itemsToDelete = API::Item()->get([
-		'output' => ['key_', 'itemid'],
-		'selectHosts' => ['name'],
-		'itemids' => $group_itemid,
-		'preservekeys' => true
-	]);
-
 	$result = API::Item()->delete($group_itemid);
-
-	if ($result) {
-		foreach ($itemsToDelete as $item) {
-			$host = reset($item['hosts']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
-				_('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '._('Host').' ['.$host['name'].']'
-			);
-		}
-	}
-
-	$result = DBend($result);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
@@ -1334,24 +1320,10 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$items = API::Item()->get([
-		'output' => [],
-		'itemids' => getRequest('group_itemid'),
-		'editable' => true,
-		'monitored' => true,
-		'filter' => ['type' => checkNowAllowedTypes()],
-		'preservekeys' => true
+	$result = (bool) API::Task()->create([
+		'type' => ZBX_TM_TASK_CHECK_NOW,
+		'itemids' => getRequest('group_itemid')
 	]);
-
-	if ($items) {
-		$result = (bool) API::Task()->create([
-			'type' => ZBX_TM_TASK_CHECK_NOW,
-			'itemids' => array_keys($items)
-		]);
-	}
-	else {
-		$result = true;
-	}
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
