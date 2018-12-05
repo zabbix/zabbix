@@ -1188,34 +1188,36 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					if (array_key_exists($itemid, $items)) {
 						if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 							if ($item) {
-								if ($applicationids) {
-									$db_applicationids = zbx_objectValues($items[$itemid]['applications'],
-										'applicationid'
-									);
+								if (array_key_exists('applications', $visible)) {
+									if ($applicationids) {
+										$db_applicationids = zbx_objectValues($items[$itemid]['applications'],
+											'applicationid'
+										);
 
-									switch ($massupdate_app_action) {
-										case ZBX_MULTISELECT_ADD:
-											$applicationids = array_merge($applicationids, $db_applicationids);
-											break;
+										switch ($massupdate_app_action) {
+											case ZBX_MULTISELECT_ADD:
+												$applicationids = array_merge($applicationids, $db_applicationids);
+												break;
 
-										case ZBX_MULTISELECT_REPLACE:
-											$applicationids = array_merge(
-												array_diff($applicationids, $db_applicationids),
-												array_intersect($db_applicationids, $applicationids)
-											);
-											break;
+											case ZBX_MULTISELECT_REPLACE:
+												$applicationids = array_merge(
+													array_diff($applicationids, $db_applicationids),
+													array_intersect($db_applicationids, $applicationids)
+												);
+												break;
 
-										case ZBX_MULTISELECT_REMOVE:
-											$applicationids = array_diff($db_applicationids, $applicationids);
-											break;
+											case ZBX_MULTISELECT_REMOVE:
+												$applicationids = array_diff($db_applicationids, $applicationids);
+												break;
+										}
+
+										$item['applications'] = array_keys(array_flip($applicationids));
 									}
-
-									$item['applications'] = array_keys(array_flip($applicationids));
-								}
-								else {
-									if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD,
-											ZBX_MULTISELECT_REMOVE])) {
-										unset($item['applications']);
+									else {
+										if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD,
+												ZBX_MULTISELECT_REMOVE])) {
+											unset($item['applications']);
+										}
 									}
 								}
 
