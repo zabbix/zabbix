@@ -20,7 +20,8 @@ SUBDIRS = \
 	ipmi \
 	odbc \
 	scripts \
-	preprocessor
+	preprocessor \
+	lld
 
 sbin_PROGRAMS = zabbix_server
 
@@ -62,6 +63,7 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
+	lld/libzbxlld.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
