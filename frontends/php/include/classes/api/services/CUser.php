@@ -1089,7 +1089,11 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ldapValidator->getError());
+			self::exception($ldapValidator->getErrorCode() === CLdap::ERR_USER_NOT_FOUND
+					? ZBX_API_ERROR_PERMISSIONS
+					: ZBX_API_ERROR_PARAMETERS,
+				$ldapValidator->getError()
+			);
 		}
 	}
 
@@ -1167,12 +1171,12 @@ class CUser extends CApiService {
 
 					case ZBX_AUTH_INTERNAL:
 						if (md5($user['password']) !== $db_user['passwd']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
+							self::exception(ZBX_API_ERROR_PERMISSIONS, _('Login name or password is incorrect.'));
 						}
 						break;
 
 					default:
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 						break;
 				}
 			}
@@ -1187,13 +1191,12 @@ class CUser extends CApiService {
 				]);
 
 				// Check if user is blocked.
-				if (!$this->isUserBlocked($db_user, true)) {
+				if (!$this->isUserBlocked($db_user, true, $e->getCode() == ZBX_API_ERROR_PERMISSIONS)) {
 					$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
 						$db_user['userip']
 					);
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 				}
+				self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 			}
 		}
 
@@ -1210,20 +1213,20 @@ class CUser extends CApiService {
 	/**
 	 * Check if user is blocked.
 	 *
-	 * @param array		$db_user		User info array.
-	 * @param boolean	$first_bloker	True if the first actuation of the block process.
+	 * @param array		$db_user			User info array.
+	 * @param boolean	$first_bloker		True if the first actuation of the block process.
+	 * @param boolean	$permissions_error	True if permissions error.
 	 *
 	 * @throws Exception if account is blocked.
 	 *
 	 * @return boolean
 	 */
-	private function isUserBlocked(array $db_user, $first_bloker = false) {
-		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-
+	private function isUserBlocked(array $db_user, $first_bloker = false, $permissions_error = true) {
+		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS && $permissions_error) {
 			$time_left = $first_bloker ? ZBX_LOGIN_BLOCK : ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
 
 			if ($time_left > 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
 				);
 			}

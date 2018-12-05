@@ -79,4 +79,13 @@ class CLdapAuthValidator extends CValidator {
 
 		return array_key_exists($error, $messages) ? $messages[$error] : '';
 	}
+
+	/**
+	 * Return error code.
+	 *
+	 * @return integer
+	 */
+	public function getErrorCode() {
+		return parent::getError();
+	}
 }
