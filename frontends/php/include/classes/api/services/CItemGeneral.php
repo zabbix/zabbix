@@ -1382,9 +1382,11 @@ abstract class CItemGeneral extends CApiService {
 							));
 						}
 
-						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] >= $params[1]) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _s('"%1$s" value must be greater than "%2$s" value', _('max'), _('min'))
+						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] > $params[1]) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value for field "%1$s": %2$s.',
+								'params',
+								_s('"%1$s" value must be less than or equal to "%2$s" value', _('min'), _('max'))
 							));
 						}
 						break;
