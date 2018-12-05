@@ -1158,7 +1158,7 @@ class CUser extends CApiService {
 		);
 
 		// Set massage if user is blocked.
-		if (!$this->UserIsBlocked($db_user)) {
+		if (!$this->isUserBlocked($db_user)) {
 			try {
 				switch ($group_to_auth_map[$db_user['gui_access']]) {
 					case ZBX_AUTH_LDAP:
@@ -1187,7 +1187,7 @@ class CUser extends CApiService {
 				]);
 
 				// Check if user is blocked.
-				if (!$this->UserIsBlocked($db_user, true)) {
+				if (!$this->isUserBlocked($db_user, true)) {
 					$this->addAuditDetails(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _('Login failed.'), $db_user['userid'],
 						$db_user['userip']
 					);
@@ -1217,7 +1217,7 @@ class CUser extends CApiService {
 	 *
 	 * @return boolean
 	 */
-	private function UserIsBlocked(array $db_user, $first_bloker = false) {
+	private function isUserBlocked(array $db_user, $first_bloker = false) {
 		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
 
 			$time_left = $first_bloker ? ZBX_LOGIN_BLOCK : ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
@@ -1227,12 +1227,6 @@ class CUser extends CApiService {
 					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $time_left)
 				);
 			}
-
-			DB::update('users', [
-				'values' => ['attempt_clock' => time()],
-				'where' => ['userid' => $db_user['userid']]
-			]);
-			return true;
 		}
 
 		return false;
