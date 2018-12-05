@@ -114,7 +114,8 @@ function SVGMap(options) {
 					type: 'text',
 					attributes: {
 						class: 'map-timestamp',
-						x: options.canvas.width - 80,
+						'text-anchor': 'end',
+						x: options.canvas.width - 6,
 						y: options.canvas.height - 6
 					}
 				}

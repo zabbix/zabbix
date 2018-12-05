@@ -347,7 +347,8 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'groupids_'
+								'dstfld1' => 'groupids_',
+								'real_hosts' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -542,7 +543,6 @@ foreach ($items as $key => $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;
@@ -697,7 +697,6 @@ foreach ($items as $item) {
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
 		]);
-		$change = nbsp($change);
 	}
 	else {
 		$change = UNKNOWN_VALUE;

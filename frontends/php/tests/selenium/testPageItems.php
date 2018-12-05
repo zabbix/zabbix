@@ -90,7 +90,14 @@ class testPageItems extends CLegacyWebTest {
 
 		$this->zbxTestClick('all_items');
 		$this->zbxTestClickButtonText('Check now');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot send request');
+			$this->zbxTestTextPresentInMessageDetails('Cannot send request: host is not monitored.');
+		}
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		}
 		$this->zbxTestCheckFatalErrors();
 	}
 }
