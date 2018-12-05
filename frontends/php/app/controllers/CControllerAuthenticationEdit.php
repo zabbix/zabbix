@@ -84,9 +84,6 @@ class CControllerAuthenticationEdit extends CController {
 		];
 
 		if ($this->hasInput('form_refresh')) {
-			// Fill value for unchecked state to prevent defaults values from database to be set.
-			$data += array_fill_keys(['http_case_sensitive', 'ldap_case_sensitive'], 0);
-
 			$this->getInputs($data, [
 				'form_refresh',
 				'change_bind_password',
@@ -109,10 +106,6 @@ class CControllerAuthenticationEdit extends CController {
 			]);
 
 			$data += select_config();
-
-			if ($data['ldap_configured'] != ZBX_AUTH_LDAP_ENABLED) {
-				$data['change_bind_password'] = 1;
-			}
 		}
 		else {
 			$data += select_config();

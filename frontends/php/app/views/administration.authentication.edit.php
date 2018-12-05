@@ -37,6 +37,7 @@ $http_tab = (new CFormList('list_http'))
 	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+			->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
 	)
 	->addRow(new CLabel(_('Default login form'), 'http_login_form'),
 		(new CComboBox('http_login_form', $data['http_login_form'], null, [
@@ -53,6 +54,7 @@ $http_tab = (new CFormList('list_http'))
 		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
 			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 );
 
 // LDAP configuration fields.
@@ -79,6 +81,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 		? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
 		: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
 			->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
 	)
 	->addRow((new CLabel(_('LDAP host'), 'ldap_host'))->setAsteriskMark(),
 		(new CTextBox('ldap_host', $data['ldap_host']))
@@ -113,6 +116,7 @@ $ldap_tab = (new CFormList('list_ldap'))
 		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
 			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
 			->setEnabled($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
 	)
 	->addRow(new CLabel(_('Bind password'), 'ldap_bind_password'), $password_box)
 	->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']')
