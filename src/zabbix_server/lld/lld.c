@@ -20,7 +20,7 @@
 #include "lld.h"
 #include "db.h"
 #include "log.h"
-#include "events.h"
+#include "../events.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
