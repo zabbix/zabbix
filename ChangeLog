@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+....I....T [ZBX-13773] fixed naming inconsistencies in agent template, added more trigger descriptions in proxy and server templates (kalimulin)
 ..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
 A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
