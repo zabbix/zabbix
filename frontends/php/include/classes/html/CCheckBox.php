@@ -129,8 +129,8 @@ class CCheckBox extends CInput {
 		$unchecked = '';
 
 		if ($this->unchecked_value !== null) {
-			$unchecked = (new CInput('hidden', $this->getName(), $this->unchecked_value))
-				->setId(null)
+			$unchecked = (new CVar($this->getName(), $this->unchecked_value))
+				->removeId()
 				->setEnabled(!$this->getAttribute('disabled'))
 				->toString();
 		}
