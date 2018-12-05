@@ -3,6 +3,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
 ..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
 A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
