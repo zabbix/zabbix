@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-11-21T16:44:34Z</date>
+    <date>2018-11-23T12:26:02Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -2002,7 +2002,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description>Consider increasing CacheSize in the zabbix_server.conf configuration file</description>
+            <description>Consider increasing CacheSize in the zabbix_proxy.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2018,7 +2018,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing HistoryCacheSize in the zabbix_proxy.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2034,7 +2034,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing HistoryIndexCacheSize in the zabbix_proxy.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2050,7 +2050,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
