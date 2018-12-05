@@ -606,7 +606,7 @@ if ($data['displayApplications']) {
 	}
 
 	$applications_div = (new CDiv([
-		(new CRadioButtonList('item_application_action', (int) $data['item_application_action']))
+		(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
 			->addValue(_('Add'), ZBX_MULTISELECT_ADD)
 			->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
 			->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
