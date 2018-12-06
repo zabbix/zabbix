@@ -45,6 +45,13 @@ typedef struct
 }
 lld_filter_t;
 
+typedef struct
+{
+	char		*macro;
+	char		*value;
+}
+zbx_lld_itemmacro_t;
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_condition_free                                               *
@@ -517,6 +524,70 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_itemmacros_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort item macros by unique name               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_itemmacros_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_itemmacro_t	*r1 = *(const zbx_lld_itemmacro_t **)d1;
+	const zbx_lld_itemmacro_t	*r2 = *(const zbx_lld_itemmacro_t **)d2;
+
+	return strcmp(r1->macro, r2->macro);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_itemmacros_get                                               *
+ *                                                                            *
+ * Purpose: retrieve list of item macros                                      *
+ *                                                                            *
+ * Parameters: lld_ruleid - [IN] low level discovery rule id                  *
+ *             itemmacros - [OUT] list of itemmacros                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmacros)
+{
+	const char		*__function_name = "lld_itemmacros_get";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_itemmacro_t	*itemmacro;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select macro,value"
+			" from itemmacro"
+			" where itemid=" ZBX_FS_UI64,
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		itemmacro = (zbx_lld_itemmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_itemmacro_t));
+
+		itemmacro->macro = zbx_strdup(NULL, row[0]);
+		itemmacro->value = zbx_strdup(NULL, row[1]);
+
+		zbx_vector_ptr_append(itemmacros, itemmacro);
+	}
+	DBfree_result(result);
+
+	zbx_vector_ptr_sort(itemmacros, lld_itemmacros_compare);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	lld_itemmacro_free(zbx_lld_itemmacro_t *itemmacro)
+{
+	zbx_free(itemmacro->value);
+	zbx_free(itemmacro->macro);
+	zbx_free(itemmacro);
+}
+
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **info,
 		char **error)
 {
@@ -605,7 +676,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
 	unsigned char		state;
 	int			lifetime;
-	zbx_vector_ptr_t	lld_rows;
+	zbx_vector_ptr_t	lld_rows, itemmacros;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
@@ -623,6 +694,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	}
 
 	zbx_vector_ptr_create(&lld_rows);
+	zbx_vector_ptr_create(&itemmacros);
 
 	lld_filter_init(&filter);
 
@@ -669,6 +741,8 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
 		goto error;
+
+	lld_itemmacros_get(lld_ruleid, &itemmacros);
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
 		goto error;
@@ -763,6 +837,8 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
+	zbx_vector_ptr_clear_ext(&itemmacros, (zbx_clean_func_t)lld_itemmacro_free);
+	zbx_vector_ptr_destroy(&itemmacros);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
