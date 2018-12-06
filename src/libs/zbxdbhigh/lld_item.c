@@ -2387,6 +2387,158 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_items_preproc_split_regsub_params                            *
+ *                                                                            *
+ * Purpose: splitting regsub params for escaping symbols in items             *
+ *          preprocessing steps for discovery process                         *
+ *                                                                            *
+ * Parameters: params - [IN] regsub params, separated by a newline            *
+ *             param1 - [IN/OUT] first param (pattern)                        *
+ *             param2 - [IN/OUT] second param (output)                        *
+ *                                                                            *
+ * Return value: SUCCEED - if delimiter is found                              *
+ *               FAIL    - if delimiter is not found                          *
+ *                                                                            *
+ ******************************************************************************/
+static int lld_items_preproc_split_regsub_params(const char *params, char **param1, char **param2)
+{
+	int	ret = FAIL;
+	size_t	param1_size;
+	size_t	param2_size;
+	char	*delimiter;
+
+	delimiter = strchr(params, '\n');
+	if (NULL == delimiter)
+	{
+		goto out;
+	}
+
+	param1_size = (size_t)(delimiter - params) + 1;
+	param2_size = strlen(params) - (size_t)(delimiter - params) + 1;
+
+	*param1 = zbx_malloc(NULL, param1_size);
+	*param2 = zbx_malloc(NULL, param2_size);
+	if (NULL == *param1 || NULL == *param2)
+	{
+		zbx_free(*param2);
+		zbx_free(*param1);
+		goto out;
+	}
+
+	zbx_strlcpy(*param1, params, param1_size);
+	zbx_strlcpy(*param2, delimiter + 1, param2_size);
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_items_preproc_step_esc_regsub                                *
+ *                                                                            *
+ * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
+ *          process (regsub version)                                          *
+ *                                                                            *
+ * Parameters: pp         - [IN] the item preprocessing step                  *
+ *             lld_row    - [IN] lld source value                             *
+ *             item_key   - [IN] Item name for logging                        *
+ *             sub_params - [IN/OUT] the pp params value after substitute     *
+ *             error      - [IN/OUT] the lld error message                    *
+ *                                                                            *
+ * Return value: SUCCEED - if preprocessing steps are valid                   *
+ *               FAIL    - if substitute_lld_macros fails                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row,
+		const char *item_key, char **sub_params, char **error)
+{
+	int	ret;
+	char	*param1 = NULL, *param2 = NULL;
+	char	err[MAX_STRING_LEN];
+	size_t	sub_params_size;
+
+	*err = '\0';
+
+	if (SUCCEED != (ret = lld_items_preproc_split_regsub_params(pp->params, &param1, &param2)))
+	{
+		zbx_snprintf(err, sizeof(err), "cannot split params \"%s\"", pp->params);
+		goto out;
+	}
+	if (SUCCEED != (ret = substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, err,
+			sizeof(err))))
+	{
+		goto out;
+	}
+	if (SUCCEED != (ret = substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY, err, sizeof(err))))
+	{
+		goto out;
+	}
+
+	sub_params_size = strlen(param1) + strlen(param2) + 2;
+	*sub_params = zbx_malloc(NULL, sub_params_size);
+	if (*sub_params == NULL)
+	{
+		zbx_strlcpy(err, "out of memory", sizeof(err));
+		goto out;
+	}
+
+	zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+	ret = SUCCEED;
+out:
+	if (SUCCEED != ret)
+	{
+		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
+				"%s.\n", item_key, pp->step, err);
+	}
+	zbx_free(param1);
+	zbx_free(param2);
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_items_preproc_step_esc_generic                               *
+ *                                                                            *
+ * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
+ *          process (generic version)                                         *
+ *                                                                            *
+ * Parameters: pp         - [IN] the item preprocessing step                  *
+ *             lld_row    - [IN] lld source value                             *
+ *             item_key   - [IN] Item name for logging                        *
+ *             sub_params - [IN/OUT] the pp params value after substitute     *
+ *             error      - [IN/OUT] the lld error message                    *
+ *                                                                            *
+ * Return value: SUCCEED - if preprocessing steps are valid                   *
+ *               FAIL    - if substitute_lld_macros fails                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_items_preproc_step_esc_generic(const zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row,
+		const char *item_key, char **sub_params, char **error)
+{
+	int	ret, token_type = ZBX_MACRO_ANY;
+	char	err[MAX_STRING_LEN];
+
+	*err = '\0';
+
+	if (pp->type == ZBX_PREPROC_XPATH)
+	{
+		token_type |= ZBX_TOKEN_XPATH;
+	}
+
+	*sub_params = zbx_strdup(NULL, pp->params);
+
+	if (SUCCEED != (ret = substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, err, sizeof(err))))
+	{
+		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
+				"%s.\n", item_key, pp->step, err);
+		zbx_free(*sub_params);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_items_preproc_step_esc                                       *
  *                                                                            *
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
@@ -2405,30 +2557,15 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const zbx_lld_row_t * lld_row,
 		const char *item_key, char **sub_params, char **error)
 {
-	int	ret, token_type = ZBX_MACRO_ANY;
-	char	err[MAX_STRING_LEN];
-
-	*err = '\0';
-
-	switch (pp->type)
+	int	ret;
+	if (pp->type == ZBX_PREPROC_REGSUB)
 	{
-		case ZBX_PREPROC_REGSUB:
-			token_type |= ZBX_TOKEN_REGEXP;
-			break;
-		case ZBX_PREPROC_XPATH:
-			token_type |= ZBX_TOKEN_XPATH;
-			break;
+		ret = lld_items_preproc_step_esc_regsub(pp, lld_row, item_key, sub_params, error);
 	}
-
-	*sub_params = zbx_strdup(NULL, pp->params);
-
-	if (SUCCEED != (ret = substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, err, sizeof(err))))
+	else
 	{
-		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
-				"%s.\n", item_key, pp->step, err);
-		zbx_free(*sub_params);
+		ret = lld_items_preproc_step_esc_generic(pp, lld_row, item_key, sub_params, error);
 	}
-
 	return ret;
 }
 
