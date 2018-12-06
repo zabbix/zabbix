@@ -160,8 +160,6 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	DCconfig_clean_items(&item, &errcode, 1);
 out:
-	sleep(1);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

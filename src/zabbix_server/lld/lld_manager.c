@@ -68,6 +68,9 @@ typedef struct
 	/* LLD rule queue, ordered by the oldest values */
 	zbx_binary_heap_t	rule_queue;
 
+	/* the number of queued LLD rules */
+	zbx_uint64_t		queued_num;
+
 }
 zbx_lld_manager_t;
 
@@ -194,6 +197,8 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 
 		zbx_vector_ptr_append(&manager->workers, worker);
 	}
+
+	manager->queued_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -345,6 +350,8 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, zbx_ipc_message_t *mes
 		rule->tail->next = data;
 		rule->tail = data;
 	}
+
+	manager->queued_num++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -527,6 +534,11 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 				case ZBX_IPC_LLD_DONE:
 					lld_process_result(&manager, client);
 					processed_num++;
+					manager.queued_num--;
+					break;
+				case ZBX_IPC_LLD_QUEUE:
+					zbx_ipc_client_send(client, message->code, (unsigned char *)&manager.queued_num,
+							sizeof(zbx_uint64_t));
 					break;
 			}
 

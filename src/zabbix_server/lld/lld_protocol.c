@@ -26,7 +26,7 @@
 /******************************************************************************
  *                                                                            *
  * Function: zbx_lld_serialize_item_value                                     *
- *                                                                            *
+ *                                                            goto cleanup;                *
  ******************************************************************************/
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
 		const zbx_timespec_t *ts, const char *error)
@@ -101,4 +101,50 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
 	}
 
 	zbx_free(data);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_get_queue_size                                           *
+ *                                                                            *
+ * Purpose: get queue size (enqueued value count) of LLD manager              *
+ *                                                                            *
+ * Parameters: size  - [OUT] the queue size                                   *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the queue size was returned successfully           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_lld_get_queue_size(zbx_uint64_t *size, char **error)
+{
+	zbx_ipc_message_t	message;
+	zbx_ipc_socket_t	lld_socket;
+	int			ret = FAIL;
+
+	if (FAIL == zbx_ipc_socket_open(&lld_socket, ZBX_IPC_SERVICE_LLD, SEC_PER_MIN, error))
+		return FAIL;
+
+	zbx_ipc_message_init(&message);
+
+	if (FAIL == zbx_ipc_socket_write(&lld_socket, ZBX_IPC_LLD_QUEUE, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send queue request to LLD manager service");
+		goto out;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(&lld_socket, &message))
+	{
+		*error = zbx_strdup(NULL, "cannot read queue response from LLD manager service");
+		goto out;
+	}
+
+	memcpy(size, message.data, sizeof(zbx_uint64_t));
+	ret = SUCCEED;
+out:
+	zbx_ipc_socket_close(&lld_socket);
+	zbx_ipc_message_clean(&message);
+
+	return size;
 }
