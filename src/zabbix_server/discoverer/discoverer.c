@@ -703,11 +703,8 @@ static int	process_discovery(void)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_DRULE	drule;
-	int		rule_count = 0, delay;
+	int		rule_count = 0;
 	char		*delay_str = NULL;
-	zbx_uint64_t	druleid;
-	int		now;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
@@ -725,6 +722,9 @@ static int	process_discovery(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int		now, delay;
+		zbx_uint64_t	druleid;
+
 		rule_count++;
 
 		ZBX_STR2UINT64(druleid, row[0]);
@@ -739,17 +739,23 @@ static int	process_discovery(void)
 
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
+
 			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
+
 			now = (int)time(NULL);
+
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
 					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
 					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
+
 			zbx_config_clean(&cfg);
 			continue;
 		}
 
 		if (SUCCEED == DBis_null(row[4]))
 		{
+			DB_DRULE	drule;
+
 			memset(&drule, 0, sizeof(drule));
 
 			drule.druleid = druleid;
@@ -766,13 +772,12 @@ static int	process_discovery(void)
 		now = (int)time(NULL);
 		if (0 > now + delay)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow", row[2]);
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow",
+					row[2]);
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, ZBX_JAN_2038, druleid);
 		}
 		else
-		{
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, now + delay, druleid);
-		}
 	}
 	DBfree_result(result);
 
