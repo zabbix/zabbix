@@ -1215,9 +1215,10 @@
 				inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
 				label.empty().append($('<a>', {
 					href: '#',
-					text: t('Add a new widget'),
-					click: callback
+					text: t('Add a new widget')
 				}));
+
+				placeholder.click(callback);
 			},
 			setPositioning: function() {
 				inner_box.removeClass('dashbrd-grid-widget-set-size').addClass('dashbrd-grid-widget-set-position');

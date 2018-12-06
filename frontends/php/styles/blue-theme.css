@@ -3256,13 +3256,13 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #0e4123; }
 
 .info-bg {
-  color: #00268d; }
+  color: #00268e; }
   .info-bg a.link-action,
   .info-bg input[type="radio"]:checked + label {
-    color: #00268d; }
+    color: #00268e; }
 
 .log-info-bg {
-  color: #00268d;
+  color: #00268e;
   background-color: #7499ff; }
 
 .average-bg {

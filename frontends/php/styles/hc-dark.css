@@ -3243,13 +3243,13 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
     color: #0e4123; }
 
 .info-bg {
-  color: #00268d; }
+  color: #00268e; }
   .info-bg a.link-action,
   .info-bg input[type="radio"]:checked + label {
-    color: #00268d; }
+    color: #00268e; }
 
 .log-info-bg {
-  color: #00268d;
+  color: #00268e;
   background-color: #7499ff; }
 
 .average-bg {
@@ -4953,7 +4953,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   color: #f8f8f8; }
 
 .log-info-bg:before {
-  color: #00268d !important;
+  color: #00268e !important;
   background-color: #7499ff !important; }
 
 .info-bg:before, .log-info-bg:before {
