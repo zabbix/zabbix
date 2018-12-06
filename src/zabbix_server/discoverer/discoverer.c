@@ -817,8 +817,6 @@ static int	get_minnextcheck(void)
  *                                                                            *
  * Purpose: periodically try to find new hosts and services                   *
  *                                                                            *
- * Comments: executes once per 30 seconds (hardcoded)                         *
- *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
