@@ -437,17 +437,23 @@ var hintBox = {
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
-			var target = jQuery(this);
+
+			if (jQuery(this).hasClass('hint-item')) {
+				var target = jQuery(this).siblings('.main-hint');
+			}
+			else {
+				var target = jQuery(this);
+			}
 
 			switch (e.type) {
 				case 'mouseenter':
-					hintBox.showHint(e, this, target.next('.hint-box').html(), target.data('hintbox-class'), false,
+					hintBox.showHint(e, target[0], target.next('.hint-box').html(), target.data('hintbox-class'), false,
 						target.data('hintbox-style')
 					);
 					break;
 
 				case 'mouseleave':
-					hintBox.hideHint(this, false);
+					hintBox.hideHint(target[0], false);
 					break;
 
 				case 'keydown':
@@ -459,7 +465,7 @@ var hintBox = {
 						e.clientY = offset.top - w.scrollTop() + (target.height() / 2);
 						e.preventDefault();
 
-						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
 							target.data('hintbox-style')
 						);
 					}
@@ -467,7 +473,7 @@ var hintBox = {
 
 				case 'click':
 					if (target.data('hintbox-static') == 1) {
-						hintBox.showStaticHint(e, this, target.data('hintbox-class'), false,
+						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
 							target.data('hintbox-style')
 						);
 					}
@@ -674,40 +680,6 @@ var hintBox = {
 		return hintboxid;
 	}
 };
-
-/*
- * HintList class.
- */
-var hintList = {
-	/**
-	 * Initialize hint list event handlers.
-	 */
-	bindEvents: function () {
-		jQuery(document).on('click mouseenter mouseleave', '.hint-item', function (e) {
-			var target = jQuery(this).siblings('.main-hint');
-
-			switch (e.type) {
-				case 'mouseenter':
-					hintBox.showHint(e, target[0], target.next('.hint-box').html(), target.data('hintbox-class'), false,
-						target.data('hintbox-style')
-					);
-					break;
-
-				case 'mouseleave':
-					hintBox.hideHint(target[0], false);
-					break;
-
-				case 'click':
-					if (target.data('hintbox-static') == 1) {
-						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
-							target.data('hintbox-style')
-						);
-					}
-					break;
-			}
-		});
-	}
-}
 
 /**
  * Add object to the list of favourites.

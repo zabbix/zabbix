@@ -190,7 +190,4 @@ jQuery(function($) {
 
 	// Initialize hintBox event handlers.
 	hintBox.bindEvents();
-
-	// Initialize hintList event handlers.
-	hintList.bindEvents();
 });

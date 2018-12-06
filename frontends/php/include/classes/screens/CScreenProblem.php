@@ -1226,7 +1226,10 @@ class CScreenProblem extends CScreenBase {
 			else {
 				$tooltip->addItem($comma);
 			}
-			$tooltip->addItem((new CLinkAction($value))->addClass('hint-item'));
+			$tooltip->addItem((new CLinkAction($value))
+				->addClass('hint-item')
+				->setAttribute('data-hintbox', '1')
+			);
 		}
 
 		return $tooltip;
