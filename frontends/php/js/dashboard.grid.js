@@ -1689,7 +1689,7 @@
 					widgets: [],
 					widget_defaults: {},
 					triggers: {},
-					placeholder: $this.find('.dashbrd-grid-widget-placeholder').hide(),
+					placeholder: $('<div class="dashbrd-grid-widget-placeholder"/>').hide().appendTo($this),
 					new_widget_placeholder: new_widget_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {

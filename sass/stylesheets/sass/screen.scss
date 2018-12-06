@@ -3158,6 +3158,8 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
 	position: absolute;
 	z-index: 999;
 }
