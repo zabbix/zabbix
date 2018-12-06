@@ -740,7 +740,7 @@ static int	process_discovery(void)
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
 					row[2], delay_str);
 			zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
-			now = time(NULL);
+			now = (int)time(NULL);
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
 					(0 == cfg.refresh_unsupported || 0 > now + cfg.refresh_unsupported ?
 					ZBX_JAN_2038 : now + cfg.refresh_unsupported), druleid);
@@ -763,7 +763,7 @@ static int	process_discovery(void)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(druleid);
 
-		now = time(NULL);
+		now = (int)time(NULL);
 		if (0 > now + delay)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": nextcheck update causes overflow", row[2]);
