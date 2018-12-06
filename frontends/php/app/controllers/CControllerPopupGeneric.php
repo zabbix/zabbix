@@ -364,7 +364,8 @@ class CControllerPopupGeneric extends CController {
 			'orig_names' =>					'in 1',
 			'writeonly' =>					'in 1',
 			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1'
+			'submit_parent' =>				'in 1',
+			'enrich_parent_groups' =>		'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -719,6 +720,9 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::HostGroup()->get($options);
+				if ($this->hasInput('enrich_parent_groups')) {
+					$records = CPageFilter::enrichParentGroups($records);
+				}
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
