@@ -591,27 +591,25 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *                                                                            *
  * Purpose: add or update items, triggers and graphs for discovery item       *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery item identificator from database   *
+ * Parameters: lld_ruleid - [IN] discovery item identifier from database      *
  *             value      - [IN] received value from agent                    *
+ *             error      - [OUT] error or informational message. Will be set *
+ *                               to empty string on successful discovery      *
+ *                               without additional information.              *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, const zbx_timespec_t *ts)
+int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
 	const char		*__function_name = "lld_process_discovery_rule";
 
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
-	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
-	unsigned char		state;
-	int			lifetime;
+	char			*discovery_key = NULL, *info = NULL;
+	int			lifetime, ret = SUCCEED;
 	zbx_vector_ptr_t	lld_rows;
-	char			*sql = NULL;
-	size_t			sql_alloc = 128, sql_offset = 0;
-	const char		*sql_start = "update items set ", *sql_continue = ",";
 	lld_filter_t		filter;
 	time_t			now;
-	zbx_item_diff_t		lld_rule_diff = {.itemid = lld_ruleid, .flags = ZBX_FLAGS_ITEM_DIFF_UNSET};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
@@ -626,10 +624,9 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	lld_filter_init(&filter);
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
-			"select hostid,key_,state,evaltype,formula,error,lifetime"
+			"select hostid,key_,evaltype,formula,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -640,12 +637,9 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
-		state = (unsigned char)atoi(row[2]);
-		filter.evaltype = atoi(row[3]);
-		filter.expression = zbx_strdup(NULL, row[4]);
-		db_error = zbx_strdup(db_error, row[5]);
-
-		lifetime_str = zbx_strdup(NULL, row[6]);
+		filter.evaltype = atoi(row[2]);
+		filter.expression = zbx_strdup(NULL, row[3]);
+		lifetime_str = zbx_strdup(NULL, row[4]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 
@@ -667,17 +661,23 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 		goto clean;
 	}
 
-	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
-		goto error;
+	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, error))
+	{
+		ret = FAIL;
+		goto clean;
+	}
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
-		goto error;
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, error))
+	{
+		ret = FAIL;
+		goto clean;
+	}
 
-	error = zbx_strdup(error, "");
+	*error = zbx_strdup(*error, "");
 
 	now = time(NULL);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, error, lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -686,78 +686,31 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error))
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto clean;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error))
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
 		goto clean;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, now);
-
-	if (ITEM_STATE_NOTSUPPORTED == state)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported", zbx_host_key_string(lld_ruleid));
-
-		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
-		zbx_process_events(NULL, NULL);
-		zbx_clean_events();
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
-		sql_start = sql_continue;
-
-		lld_rule_diff.state = ITEM_STATE_NORMAL;
-		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
-	}
+	lld_update_hosts(lld_ruleid, &lld_rows, error, lifetime, now);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
-		error = zbx_strdcat(error, info);
-error:
-	if (NULL != error && 0 != strcmp(error, db_error))
-	{
-		error_esc = DBdyn_escape_field("items", "error", error);
+		*error = zbx_strdcat(*error, info);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s'", sql_start, error_esc);
-		sql_start = sql_continue;
-
-		zbx_free(error_esc);
-
-		lld_rule_diff.error = error;
-		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
-	}
-
-	if (sql_start == sql_continue)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
-		DBexecute("%s", sql);
-	}
-
-	if (ZBX_FLAGS_ITEM_DIFF_UNSET != lld_rule_diff.flags)
-	{
-		zbx_vector_ptr_t	diffs;
-
-		zbx_vector_ptr_create(&diffs);
-		zbx_vector_ptr_append(&diffs, &lld_rule_diff);
-		DCconfig_items_apply_changes(&diffs);
-		zbx_vector_ptr_destroy(&diffs);
-	}
 clean:
 	DCconfig_unlock_lld_rule(lld_ruleid);
 
 	zbx_free(info);
-	zbx_free(error);
-	zbx_free(db_error);
 	zbx_free(discovery_key);
-	zbx_free(sql);
 
 	lld_filter_clean(&filter);
 
@@ -765,4 +718,6 @@ clean:
 	zbx_vector_ptr_destroy(&lld_rows);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }

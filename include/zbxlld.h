@@ -17,29 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LLD_PROTOCOL_H
-#define ZABBIX_LLD_PROTOCOL_H
+#ifndef ZABBIX_LLD_H
+#define ZABBIX_LLD_H
 
 #include "common.h"
 
-#define ZBX_IPC_SERVICE_LLD	"lld"
+void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_timespec_t *ts, const char *error);
 
-/* LLD -> manager */
-#define ZBX_IPC_LLD_REGISTER		1000
-#define ZBX_IPC_LLD_DONE		1001
-
-
-/* manager -> LLD */
-#define ZBX_IPC_LLD_TASK		1100
-
-/* manager -> LLD */
-#define ZBX_IPC_LLD_REQUEST		1200
-
-
-zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
-		const zbx_timespec_t *ts, const char *error);
-
-void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, char **value,
-		zbx_timespec_t *ts, char **error);
-
-#endif
+#endif	/* ZABBIX_LLD_H */

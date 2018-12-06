@@ -27,10 +27,12 @@
 #include "sysinfo.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
+#include "zbxlld.h"
 
 #include "preprocessing.h"
 #include "preproc_manager.h"
 #include "linked_list.h"
+
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num, CONFIG_PREPROCESSOR_FORKS;
@@ -388,8 +390,18 @@ static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
  ******************************************************************************/
 static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
 {
-	dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts, value->state,
-			value->error);
+	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE))
+	{
+		dc_add_history(value->itemid, value->item_value_type, value->item_flags, value->result, value->ts,
+				value->state, value->error);
+	}
+	else
+	{
+		const char	*value_text;
+
+		value_text = (NULL != value->result ? *GET_TEXT_RESULT(value->result) : NULL);
+		zbx_lld_process_value(value->itemid, value_text, value->ts, value->error);
+	}
 }
 
 /******************************************************************************
