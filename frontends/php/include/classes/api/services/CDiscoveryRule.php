@@ -1806,7 +1806,6 @@ class CDiscoveryRule extends CItemGeneral {
 				'limit' => $options['limitSelects'],
 				'preservekeys' => true
 			]);
-			$application_prototypes = $this->unsetExtraFields($application_prototypes, ['application_prototypeid'], []);
 
 			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
 				$options['limitSelects']
