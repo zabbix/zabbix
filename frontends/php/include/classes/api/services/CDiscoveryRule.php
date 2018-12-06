@@ -54,38 +54,39 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'interfaceids'				=> null,
-			'inherited'					=> null,
-			'templated'					=> null,
-			'monitored'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'interfaceids'					=> null,
+			'inherited'						=> null,
+			'templated'						=> null,
+			'monitored'						=> null,
+			'editable'						=> false,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> false,
+			'excludeSearch'					=> false,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectItems'				=> null,
-			'selectTriggers'			=> null,
-			'selectGraphs'				=> null,
-			'selectHostPrototypes'		=> null,
-			'selectFilter'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHosts'					=> null,
+			'selectItems'					=> null,
+			'selectTriggers'				=> null,
+			'selectGraphs'					=> null,
+			'selectHostPrototypes'			=> null,
+			'selectApplicationPrototypes'	=> null,
+			'selectFilter'					=> null,
+			'countOutput'					=> false,
+			'groupCount'					=> false,
+			'preservekeys'					=> false,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null,
+			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -1791,6 +1792,25 @@ class CDiscoveryRule extends CItemGeneral {
 					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		if ($options['selectApplicationPrototypes'] !== null
+				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
+				'application_prototype'
+			);
+
+			$application_prototypes = API::getApiService()->select('application_prototype', [
+				'output' => $options['selectApplicationPrototypes'],
+				'filter' => ['application_prototypeid' => $relation_map->getRelatedIds()],
+				'limit' => $options['limitSelects'],
+				'preservekeys' => true
+			]);
+			$application_prototypes = $this->unsetExtraFields($application_prototypes, ['application_prototypeid'], []);
+
+			$result = $relation_map->mapMany($result, $application_prototypes, 'applicationPrototypes',
+				$options['limitSelects']
+			);
 		}
 
 		if ($options['selectFilter'] !== null) {
