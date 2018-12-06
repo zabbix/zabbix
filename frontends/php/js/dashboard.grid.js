@@ -239,7 +239,8 @@
 	 * @param {object} widget  Moved widget object.
 	 */
 	function realignWidget(data, widget) {
-		var realignDrag = function (widget) {
+		var initial_pos = widget.current_pos,
+			realignDrag = function (widget) {
 				var pos = widget.current_pos,
 					to_row = pos.y + pos.height;
 
@@ -251,7 +252,8 @@
 					return box2.current_pos.y - box1.current_pos.y;
 				})
 				.each(function (box) {
-					if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0) {
+					if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0
+							&& rectOverlap(box.current_pos, initial_pos)) {
 						var free;
 						box.current_pos.y = pos.y - box.current_pos.height;
 
