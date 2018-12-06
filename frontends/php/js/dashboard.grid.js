@@ -582,20 +582,27 @@
 	 */
 	function doWidgetResize($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = getDivPosition($obj, data, $div);
+			pos = getDivPosition($obj, data, $div),
+			rows = 0;
 
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
 			realignResize(data, widget);
 
 			data.widgets.each(function(box) {
-				if (widget.uniqueid != box.uniqueid && 'current_pos' in box) {
+				if (widget.uniqueid != box.uniqueid) {
 					setDivPosition(box['div'], data, box['current_pos'], false);
 				}
+
+				rows = Math.max(rows, box.current_pos.y + box.current_pos.height);
 			});
 
 			setDivPosition(data['placeholder'], data, pos, true);
-			resizeDashboardGrid($obj, data, pos.y + pos.height);
+
+			if (rows != data['options']['rows']) {
+				data['options']['rows'] = rows;
+				resizeDashboardGrid($obj, data, rows);
+			}
 		}
 		else {
 			setDivPosition(data['placeholder'], data, pos, false);
@@ -611,7 +618,8 @@
 	 */
 	function doWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = getDivPosition($obj, data, $div);
+			pos = getDivPosition($obj, data, $div),
+			rows = 0;
 
 		setDivPosition(data['placeholder'], data, pos, true);
 
@@ -621,13 +629,18 @@
 
 			realignWidget(data, widget);
 
-			$.each(data['widgets'], function() {
-				if (widget != this) {
-					setDivPosition(this['div'], data, this['current_pos'], false);
+			data.widgets.each(function(box) {
+				if (widget.uniqueid != box.uniqueid) {
+					setDivPosition(box['div'], data, box['current_pos'], false);
 				}
+
+				rows = Math.max(rows, box.current_pos.y + box.current_pos.height);
 			});
 
-			resizeDashboardGrid($obj, data, pos.y + pos.height);
+			if (rows != data['options']['rows']) {
+				data['options']['rows'] = rows;
+				resizeDashboardGrid($obj, data, rows);
+			}
 		}
 	}
 
