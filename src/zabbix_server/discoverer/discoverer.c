@@ -719,7 +719,7 @@ static int	process_discovery(void)
 				" and r.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(r.druleid,%d) "=%d",
 			DRULE_STATUS_MONITORED,
-			time(NULL),
+			(int)time(NULL),
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
