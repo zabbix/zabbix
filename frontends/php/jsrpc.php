@@ -263,6 +263,10 @@ switch ($data['method']) {
 				]);
 
 				if ($hostGroups) {
+					if (array_key_exists('enrich_parent_groups', $data)) {
+						$hostGroups = CPageFilter::enrichParentGroups($hostGroups);
+					}
+
 					CArrayHelper::sort($hostGroups, [
 						['field' => 'name', 'order' => ZBX_SORT_UP]
 					]);
