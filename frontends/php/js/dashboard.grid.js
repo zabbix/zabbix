@@ -1253,6 +1253,7 @@
 			}
 
 			var dimension = $.extend({}, data.add_widget_dimension);
+
 			if (dimension.width == 1 && dimension.height == 2) {
 				delete dimension.width;
 				delete dimension.height;
@@ -1280,7 +1281,7 @@
 				return;
 			}
 
-			//data.add_widget_dimension = {};
+			data.add_widget_dimension = {};
 
 			if (data.widgets.length) {
 				data.new_widget_placeholder.container.hide();
