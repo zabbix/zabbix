@@ -51,6 +51,35 @@ static int	DBpatch_4010002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4010003(void)
+{
+	const ZBX_TABLE table =
+			{"itemmacro", "itemmacroid", 0,
+				{
+					{"itemmacroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4010004(void)
+{
+	return DBcreate_index("itemmacro", "itemmacro_1", "itemid,macro", 1);
+}
+
+static int	DBpatch_4010005(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("itemmacro", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -59,5 +88,8 @@ DBPATCH_START(4010)
 
 DBPATCH_ADD(4010001, 0, 1)
 DBPATCH_ADD(4010002, 0, 1)
+DBPATCH_ADD(4010003, 0, 1)
+DBPATCH_ADD(4010004, 0, 1)
+DBPATCH_ADD(4010005, 0, 1)
 
 DBPATCH_END()
