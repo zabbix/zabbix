@@ -128,6 +128,25 @@ static void	lld_data_free(zbx_lld_data_t *data)
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_rule_clear                                                   *
+ *                                                                            *
+ * Purpose: clears LLD rule                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_rule_clear(zbx_lld_rule_t *rule)
+{
+	zbx_lld_data_t	*data;
+
+	while (NULL != rule->head)
+	{
+		data = rule->head;
+		rule->head = data->next;
+		lld_data_free(data);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_worker_free                                                  *
  *                                                                            *
  * Purpose: frees LLD worker                                                  *
@@ -135,7 +154,6 @@ static void	lld_data_free(zbx_lld_data_t *data)
  ******************************************************************************/
 static void	lld_worker_free(zbx_lld_worker_t *worker)
 {
-	zbx_ipc_client_close(worker->client);
 	zbx_free(worker);
 }
 
@@ -160,7 +178,10 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 	zbx_queue_ptr_create(&manager->free_workers);
 	zbx_hashset_create(&manager->workers_client, 0, worker_hash_func, worker_compare_func);
 
-	zbx_hashset_create(&manager->rule_index, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create_ext(&manager->rule_index, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			(zbx_clean_func_t)lld_rule_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	zbx_binary_heap_create(&manager->rule_queue, rule_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
 
 	manager->next_worker_index = 0;
@@ -188,6 +209,8 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
  ******************************************************************************/
 static void	lld_manager_destroy(zbx_lld_manager_t *manager)
 {
+	zbx_binary_heap_destroy(&manager->rule_queue);
+	zbx_hashset_destroy(&manager->rule_index);
 	zbx_queue_ptr_destroy(&manager->free_workers);
 	zbx_hashset_destroy(&manager->workers_client);
 	zbx_vector_ptr_clear_ext(&manager->workers, (zbx_clean_func_t)lld_worker_free);
@@ -296,13 +319,19 @@ static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
  ******************************************************************************/
 static void	lld_queue_request(zbx_lld_manager_t *manager, zbx_ipc_message_t *message)
 {
+	const char	*__function_name = "lld_queue_request";
+
 	zbx_uint64_t	itemid;
 	zbx_lld_rule_t	*rule;
 	zbx_lld_data_t	*data;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	data = (zbx_lld_data_t *)zbx_malloc(NULL, sizeof(zbx_lld_data_t));
 	data->next = NULL;
 	zbx_lld_deserialize_item_value(message->data, &itemid, &data->value, &data->ts, &data->error);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule:" ZBX_FS_UI64, itemid);
 
 	if (NULL == (rule = zbx_hashset_search(&manager->rule_index, &itemid)))
 	{
@@ -316,6 +345,8 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, zbx_ipc_message_t *mes
 		rule->tail->next = data;
 		rule->tail = data;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -379,11 +410,17 @@ static void	lld_process_queue(zbx_lld_manager_t *manager)
  ******************************************************************************/
 static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *client)
 {
+	const char		*__function_name = "lld_process_result";
+
 	zbx_lld_worker_t	*worker;
 	zbx_lld_rule_t		*rule;
 	zbx_lld_data_t		*data;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
 	worker = lld_get_worker_by_client(manager, client);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "discovery rule:" ZBX_FS_UI64 " has been processed", worker->rule->itemid);
 
 	rule = worker->rule;
 	worker->rule = NULL;
@@ -402,6 +439,8 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 		lld_process_next_request(manager, worker);
 	else
 		zbx_queue_ptr_push(&manager->free_workers, worker);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -499,7 +538,6 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	}
 
 	zbx_ipc_service_close(&lld_service);
-
 	lld_manager_destroy(&manager);
 
 	return 0;

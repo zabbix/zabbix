@@ -617,7 +617,6 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	lld_filter_init(&filter);
 
-
 	result = DBselect(
 			"select hostid,key_,evaltype,formula,lifetime"
 			" from items"
@@ -651,19 +650,19 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (NULL == row)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
-		goto clean;
+		goto out;
 	}
 
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, error))
 	{
 		ret = FAIL;
-		goto clean;
+		goto out;
 	}
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, error))
 	{
 		ret = FAIL;
-		goto clean;
+		goto out;
 	}
 
 	*error = zbx_strdup(*error, "");
@@ -674,7 +673,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
 	lld_item_links_sort(&lld_rows);
@@ -683,14 +682,14 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
 	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
-		goto clean;
+		goto out;
 	}
 
 	lld_update_hosts(lld_ruleid, &lld_rows, error, lifetime, now);
@@ -699,7 +698,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 
-clean:
+out:
 	zbx_free(info);
 	zbx_free(discovery_key);
 
@@ -707,7 +706,7 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;

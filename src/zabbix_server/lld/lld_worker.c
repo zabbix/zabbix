@@ -80,6 +80,8 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	if (SUCCEED != errcode)
 		goto out;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "processing discovery rule:" ZBX_FS_UI64, itemid);
+
 	diff.flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 
 	if (NULL == error && SUCCEED == lld_process_discovery_rule(itemid, value, &error))
@@ -158,6 +160,8 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	DCconfig_clean_items(&item, &errcode, 1);
 out:
+	sleep(1);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
