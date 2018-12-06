@@ -571,7 +571,7 @@ static int	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmac
 	{
 		if (SUCCEED != (ret = zbx_json_path_check(row[1], err, sizeof(err))))
 		{
-			*error = zbx_strdcatf(*error, "Invalid json path for macro \"%s\": %s.\n", row[0], err);
+			*error = zbx_dsprintf(*error, "Invalid json path for macro \"%s\": %s.\n", row[0], err);
 			break;
 		}
 
