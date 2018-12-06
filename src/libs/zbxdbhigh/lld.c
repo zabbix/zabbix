@@ -549,13 +549,15 @@ static int	lld_itemmacros_compare(const void *d1, const void *d2)
  *             itemmacros - [OUT] list of itemmacros                          *
  *                                                                            *
  ******************************************************************************/
-static void	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmacros)
+static int	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmacros, char **error)
 {
 	const char		*__function_name = "lld_itemmacros_get";
 
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_lld_itemmacro_t	*itemmacro;
+	int			ret = SUCCEED;
+	char			err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -567,6 +569,12 @@ static void	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemma
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (SUCCEED != (ret = zbx_json_path_check(row[1], err, sizeof(err))))
+		{
+			*error = zbx_strdcatf(*error, "Invalid json path for macro \"%s\": %s.\n", row[0], err);
+			break;
+		}
+
 		itemmacro = (zbx_lld_itemmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_itemmacro_t));
 
 		itemmacro->macro = zbx_strdup(NULL, row[0]);
@@ -579,6 +587,8 @@ static void	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemma
 	zbx_vector_ptr_sort(itemmacros, lld_itemmacros_compare);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
 }
 
 static void	lld_itemmacro_free(zbx_lld_itemmacro_t *itemmacro)
@@ -742,7 +752,8 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
 		goto error;
 
-	lld_itemmacros_get(lld_ruleid, &itemmacros);
+	if (SUCCEED != lld_itemmacros_get(lld_ruleid, &itemmacros, &error))
+		goto error;
 
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
 		goto error;
