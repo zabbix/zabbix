@@ -1166,15 +1166,26 @@ class CScreenProblem extends CScreenBase {
 	public static function getLatestValues(array $trigger) {
 		$last_values = [];
 		$items = [];
+		$history_values = Manager::History()->getLastValues($trigger['items'], 1, ZBX_HISTORY_PERIOD);
 
 		foreach ($trigger['items'] as $item) {
 			$items[$item['itemid']] = $item;
-			$last_value = Manager::History()->getLastValues([$item], 1, ZBX_HISTORY_PERIOD);
-			foreach ($last_value as $itemid => $item_values) {
-				$last_values[$itemid] = $item_values[0];
+			if ($history_values) {
+				foreach ($history_values as $itemid => $item_values) {
+					$last_values[$itemid] = $item_values[0];
+				}
+			}
+			else {
+				$last_values[$item['itemid']] = [
+					'itemid' => '23255',
+					'clock' => null,
+					'value' => '*UNKNOWN*',
+					'ns' => null
+				];
 			}
 		}
-		$hint_table = new CTable();
+
+		$hint_table = (new CTable())->addClass('list-table');
 
 		foreach ($last_values as $itemid => $lastHistory) {
 			if ($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT ||
@@ -1188,22 +1199,19 @@ class CScreenProblem extends CScreenBase {
 			$hint_table->addRow([
 				(new CCol([
 					$items[$itemid]['name']
-				]))
-					->addStyle('max-width: 200px; padding-right: 15px;'),
+				])),
 				(new CCol([
 					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock'])
-				]))
-					->addStyle('padding-right: 15px;'),
+				])),
 				(new CCol([
 					formatHistoryValue($lastHistory['value'], $items[$itemid], false)
-				]))
-					->addStyle('padding-right: 15px;'),
+				])),
 				$actions
 			]);
 		}
 
 		$tooltip = (new CCol([
-			(new CLinkAction(''))
+			(new CDiv())
 				->addClass('main-hint')
 				->setHint($hint_table, '', true)
 		]));
@@ -1212,10 +1220,6 @@ class CScreenProblem extends CScreenBase {
 		foreach ($last_values as $itemid => $lastHistory) {
 			$value = formatHistoryValue($lastHistory['value'], $items[$itemid], false);
 
-			if ($value === '*UNKNOWN*') {
-				$tooltip->addItem($value);
-				continue;
-			}
 			if ($comma === null) {
 				$comma = ', ';
 			}
