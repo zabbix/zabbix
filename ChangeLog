@@ -3,6 +3,12 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
+..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
+A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
+A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
+.......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
+..F....... [ZBX-15105] fixed colorpicker tooltip update (talbergs)
 A.F....... [ZBX-14928] fixed "check now" being executed for active items and templates (talbergs)
 ..F....... [ZBX-15153] fixed custom interval validation; fixed parsing of custom intervals when user macros context contains forward slash (Ivo, miks)
 ..F....... [ZBX-15069] fixed community default value in edit scenario (talbergs)
