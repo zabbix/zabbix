@@ -63,6 +63,7 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	preprocessor/libpreprocessor.a \
+	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
