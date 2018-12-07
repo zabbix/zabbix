@@ -54,12 +54,12 @@ static int	DBpatch_4010002(void)
 static int	DBpatch_4010003(void)
 {
 	const ZBX_TABLE table =
-			{"itemmacro", "itemmacroid", 0,
+			{"lld_macro", "lld_macroid", 0,
 				{
-					{"itemmacroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"lld_macroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lld_macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"json_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -70,14 +70,14 @@ static int	DBpatch_4010003(void)
 
 static int	DBpatch_4010004(void)
 {
-	return DBcreate_index("itemmacro", "itemmacro_1", "itemid,macro", 1);
+	return DBcreate_index("lld_macro", "lld_macro_1", "itemid,lld_macro", 1);
 }
 
 static int	DBpatch_4010005(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("itemmacro", 1, &field);
+	return DBadd_foreign_key("lld_macro", 1, &field);
 }
 
 #endif

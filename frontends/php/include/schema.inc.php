@@ -7543,10 +7543,10 @@ return [
 			],
 		],
 	],
-	'itemmacro' => [
-		'key' => 'itemmacroid',
+	'lld_macro' => [
+		'key' => 'lld_macroid',
 		'fields' => [
-			'itemmacroid' => [
+			'lld_macroid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -7558,13 +7558,13 @@ return [
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
 			],
-			'macro' => [
+			'lld_macro' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
 			],
-			'value' => [
+			'json_path' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
