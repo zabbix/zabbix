@@ -4,6 +4,10 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+.......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
+..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
+....I....T [ZBX-13773] fixed naming inconsistencies in agent template, added more trigger descriptions in proxy and server templates (kalimulin)
+..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
 A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
 .......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
@@ -37,6 +41,9 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
+..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
+..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
 A.F....... [ZBX-15124] fixed trigger overview behavior when show "any" (vasilijs)
 A......... [ZBX-14648] fixed performance with deletion of item in template linked to many hosts (Sasha)
 .......PS. [ZBX-9011] added new LLD macros for vmware HV low-level discovery (MVekslers)
@@ -2134,6 +2141,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions, fixed constraint error when importing new data.tmpl (kalimulin)
 ..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
 A......... [ZBX-14977] fixed creation of unneeded database record if host prototype inventory mode is disabled; fixed validation for host and host prototype inventory mode (miks)
