@@ -146,5 +146,5 @@ out:
 	zbx_ipc_socket_close(&lld_socket);
 	zbx_ipc_message_clean(&message);
 
-	return size;
+	return ret;
 }
