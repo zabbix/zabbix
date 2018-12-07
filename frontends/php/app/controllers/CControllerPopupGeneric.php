@@ -605,9 +605,9 @@ class CControllerPopupGeneric extends CController {
 			$page_options['hostid'] = $hostid;
 		}
 
-		$option_fields_binary = ['monitored_hosts', 'noempty', 'normal_only', 'numeric', 'real_hosts', 'submit_parent',
-			'templated_hosts', 'with_applications', 'with_graphs', 'with_items', 'with_monitored_triggers',
-			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+		$option_fields_binary = ['enrich_parent_groups', 'monitored_hosts', 'noempty', 'normal_only', 'numeric',
+			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs', 'with_items',
+			'with_monitored_triggers', 'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = true;
@@ -720,9 +720,10 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::HostGroup()->get($options);
-				if ($this->hasInput('enrich_parent_groups')) {
+				if (array_key_exists('enrich_parent_groups', $page_options)) {
 					$records = CPageFilter::enrichParentGroups($records);
 				}
+
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
