@@ -1015,7 +1015,7 @@ class CScreenProblem extends CScreenBase {
 				$latest_values = null;
 
 				if ($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view']) {
-					$latest_values = self::getLatestValues($trigger);
+					$latest_values = self::getLatestValues($trigger['items']);
 				}
 
 				if ($show_timeline) {
@@ -1155,83 +1155,60 @@ class CScreenProblem extends CScreenBase {
 	}
 
 	/**
-	 * Get Latest values
+	 * Get Latest values column markup with hintBox.
 	 *
-	 * @param array $trigger
+	 * @param array $trigger_items    Array of trigger items.
 	 *
 	 * @static
 	 *
 	 * @return CCol
 	 */
-	public static function getLatestValues(array $trigger) {
-		$last_values = [];
-		$items = [];
-		$history_values = Manager::History()->getLastValues($trigger['items'], 1, ZBX_HISTORY_PERIOD);
+	public static function getLatestValues(array $trigger_items) {
+		$trigger_items = zbx_toHash($trigger_items, 'itemid');
+		$history_values = Manager::History()->getLastValues($trigger_items, 1, ZBX_HISTORY_PERIOD);
+		$tooltip = [];
+		$hint_table = (new CTable())->addClass('list-table');
 
-		foreach ($trigger['items'] as $item) {
-			$items[$item['itemid']] = $item;
-			if ($history_values) {
-				foreach ($history_values as $itemid => $item_values) {
-					$last_values[$itemid] = $item_values[0];
-				}
+		foreach ($trigger_items as $itemid => $item) {
+			if (array_key_exists($itemid, $history_values)) {
+				$last_value = reset($history_values[$itemid]);
+				$last_value['value'] = formatHistoryValue($last_value['value'], $item, false);
 			}
 			else {
-				$last_values[$item['itemid']] = [
-					'itemid' => '23255',
+				$last_value = [
+					'itemid' => null,
 					'clock' => null,
-					'value' => '*UNKNOWN*',
+					'value' => _('Unknown'),
 					'ns' => null
 				];
 			}
-		}
-
-		$hint_table = (new CTable())->addClass('list-table');
-
-		foreach ($last_values as $itemid => $lastHistory) {
-			if ($items[$itemid]['value_type'] == ITEM_VALUE_TYPE_FLOAT ||
-					$items[$itemid]['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				$actions = new CLink(_('Graph'), 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$itemid);
-			}
-			else {
-				$actions = new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$itemid);
-			}
 
 			$hint_table->addRow([
-				(new CCol([
-					$items[$itemid]['name']
-				])),
-				(new CCol([
-					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $lastHistory['clock'])
-				])),
-				(new CCol([
-					formatHistoryValue($lastHistory['value'], $items[$itemid], false)
-				])),
-				$actions
+				new CCol($item['name']),
+				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])),
+				new CCol($last_value['value']),
+				new CLink(_('Graph'), (new CUrl('history.php'))
+					->setArgument('itemids', [$itemid])
+					->setArgument('action',
+						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+							? HISTORY_GRAPH : HISTORY_VALUES
+					)
+					->getUrl()
+				),
 			]);
-		}
 
-		$tooltip = (new CCol([
-			(new CDiv())
-				->addClass('main-hint')
-				->setHint($hint_table, '', true)
-		]));
-		$comma = null;
-
-		foreach ($last_values as $itemid => $lastHistory) {
-			$value = formatHistoryValue($lastHistory['value'], $items[$itemid], false);
-
-			if ($comma === null) {
-				$comma = ', ';
-			}
-			else {
-				$tooltip->addItem($comma);
-			}
-			$tooltip->addItem((new CLinkAction($value))
+			$tooltip[] = (new CLinkAction($last_value['value']))
 				->addClass('hint-item')
-				->setAttribute('data-hintbox', '1')
-			);
+				->setAttribute('data-hintbox', '1');
+			$tooltip[] = ', ';
 		}
 
-		return $tooltip;
+		array_pop($tooltip);
+		array_unshift($tooltip, (new CDiv())
+			->addClass('main-hint')
+			->setHint($hint_table, '', true)
+		);
+
+		return new CCol($tooltip);
 	}
 }
