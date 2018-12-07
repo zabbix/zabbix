@@ -286,6 +286,32 @@ out:
 	return ret;
 }
 
+static int	filter_condition_match(const struct zbx_json_parse *jp_row, const lld_condition_t *condition)
+{
+	char	*value = NULL;
+	size_t	value_alloc = 0;
+	int	ret;
+
+	if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+	{
+		switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
+		{
+			case ZBX_REGEXP_MATCH:
+				ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
+				break;
+			case ZBX_REGEXP_NO_MATCH:
+				ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
+				break;
+			default:
+				ret = FAIL;
+		}
+	}
+
+	zbx_free(value);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: filter_evaluate_and_or                                           *
@@ -304,8 +330,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 	const char	*__function_name = "filter_evaluate_and_or";
 
 	int		i, ret = SUCCEED, rc = SUCCEED;
-	char		*lastmacro = NULL, *value = NULL;
-	size_t		value_alloc = 0;
+	char		*lastmacro = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -313,27 +338,13 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
-			{
-				case ZBX_REGEXP_MATCH:
-					rc = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				case ZBX_REGEXP_NO_MATCH:
-					rc = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				default:
-					rc = FAIL;
-			}
-		}
-
+		rc = filter_condition_match(jp_row, condition);
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
 		{
 			/* if any of condition groups are false the evaluation returns false */
 			if (FAIL == ret)
-				goto out;
+				break;
 
 			ret = rc;
 		}
@@ -345,8 +356,6 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 
 		lastmacro = condition->macro;
 	}
-out:
-	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -371,36 +380,15 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 	const char	*__function_name = "filter_evaluate_and";
 
 	int		i, ret = SUCCEED;
-	char		*value = NULL;
-	size_t		value_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
-
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
-			{
-				case ZBX_REGEXP_MATCH:
-					ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				case ZBX_REGEXP_NO_MATCH:
-					ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				default:
-					ret = FAIL;
-			}
-		}
-
 		/* if any of conditions are false the evaluation returns false */
-		if (SUCCEED != ret)
+		if (SUCCEED != (ret = filter_condition_match(jp_row, (lld_condition_t *)filter->conditions.values[i])))
 			break;
 	}
-
-	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -425,36 +413,15 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 	const char	*__function_name = "filter_evaluate_or";
 
 	int		i, ret = SUCCEED;
-	char		*value = NULL;
-	size_t		value_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
-
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
-			{
-				case ZBX_REGEXP_MATCH:
-					ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				case ZBX_REGEXP_NO_MATCH:
-					ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				default:
-					ret = FAIL;
-			}
-		}
-
 		/* if any of conditions are true the evaluation returns true */
-		if (SUCCEED == ret)
+		if (SUCCEED == (ret = filter_condition_match(jp_row, (lld_condition_t *)filter->conditions.values[i])))
 			break;
 	}
-
-	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -493,26 +460,9 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
-		char			*value = NULL;
-		size_t			value_alloc = 0;
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
-			{
-				case ZBX_REGEXP_MATCH:
-					ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				case ZBX_REGEXP_NO_MATCH:
-					ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
-					break;
-				default:
-					ret = FAIL;
-			}
-		}
-
-		zbx_free(value);
+		ret = filter_condition_match(jp_row, condition);
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
