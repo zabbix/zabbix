@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="tag-row">
-	<?= renderTagTableRow('tags', '#{rowNum}') ?>
+	<?= renderTagTableRow('#{rowNum}') ?>
 </script>
 
 <script type="text/javascript">
@@ -7,8 +7,8 @@
 		<?php if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN): ?>
 			$('input[name=mass_update_groups]').on('change', function() {
 				$('#groups_').multiSelect('setOption', 'addNew',
-					(this.value == '<?php echo ZBX_MASSUPDATE_ACTION_ADD ?>'
-						|| this.value == '<?php echo ZBX_MASSUPDATE_ACTION_REPLACE ?>')
+					(this.value == <?= ZBX_MASSUPDATE_ACTION_ADD ?>
+						|| this.value == <?= ZBX_MASSUPDATE_ACTION_REPLACE ?>)
 				);
 			});
 		<?php endif ?>
@@ -19,31 +19,11 @@
 
 		$('#mass_replace_tpls').on('change', function() {
 			$('#mass_clear_tpls').prop('disabled', !this.checked);
-		}).change();
+		}).trigger('change');
 
 		$('#inventory_mode').change(function() {
 			$('.formrow-inventory').toggle($(this).val() !== '<?php echo HOST_INVENTORY_DISABLED; ?>');
 		}).change();
-
-		$('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			// If certificate is selected or checked.
-			if ($('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
-					|| $('#tls_in_cert').is(':checked')) {
-				$('#tls_issuer, #tls_subject').closest('tr').show();
-			}
-			else {
-				$('#tls_issuer, #tls_subject').closest('tr').hide();
-			}
-
-			// If PSK is selected or checked.
-			if ($('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
-					|| $('#tls_in_psk').is(':checked')) {
-				$('#tls_psk, #tls_psk_identity').closest('tr').show();
-			}
-			else {
-				$('#tls_psk, #tls_psk_identity').closest('tr').hide();
-			}
-		});
 
 		$('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			// If certificate is selected or checked.

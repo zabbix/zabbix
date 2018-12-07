@@ -49,10 +49,6 @@
 </tr>
 </script>
 
-<script type="text/x-jquery-tmpl" id="tag-row">
-	<?= renderTagTableRow('tags', '#{rowNum}') ?>
-</script>
-
 <script type="text/javascript">
 	var hostInterfacesManager = (function() {
 		'use strict';
@@ -438,10 +434,6 @@
 		});
 		jQuery('#addIPMIInterface').on('click', function() {
 			hostInterfacesManager.addNew('ipmi');
-		});
-
-		jQuery('#tbl-tags').dynamicRows({
-			template: '#tag-row'
 		});
 
 		// radio button of inventory modes was clicked

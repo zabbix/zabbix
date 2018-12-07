@@ -2120,7 +2120,6 @@ function getTimeperiodForm(array $data) {
 /**
  * Renders tag table row.
  *
- * @param string     $prefix
  * @param int|string $index
  * @param string     $tag       (optional)
  * @param string     $value     (optional)
@@ -2128,16 +2127,16 @@ function getTimeperiodForm(array $data) {
  *
  * @return CRow
  */
-function renderTagTableRow($prefix, $index, $tag = '', $value = '', $readonly = false) {
+function renderTagTableRow($index, $tag = '', $value = '', $readonly = false) {
 	return (new CRow([
-		(new CTextBox($prefix.'['.$index.'][tag]', $tag, $readonly))
+		(new CTextBox('tags['.$index.'][tag]', $tag, $readonly))
 			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('tag')),
-		(new CTextBox($prefix.'['.$index.'][value]', $value, $readonly))
+		(new CTextBox('tags['.$index.'][value]', $value, $readonly))
 			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 			->setAttribute('placeholder', _('value')),
 		new CCol(
-			(new CButton($prefix.'['.$index.'][remove]', _('Remove')))
+			(new CButton('tags['.$index.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->setEnabled(!$readonly)
@@ -2151,16 +2150,15 @@ function renderTagTableRow($prefix, $index, $tag = '', $value = '', $readonly = 
  * @param array  $tags
  * @param array  $tags[]['tag']
  * @param array  $tags[]['value']
- * @param string $prefix
  * @param bool   $readonly         (optional)
  *
  * @return CTable
  */
-function renderTagTable(array $tags, $prefix, $readonly = false) {
+function renderTagTable(array $tags, $readonly = false) {
 	$table = new CTable();
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($prefix, $index, $tag['tag'], $tag['value'], $readonly));
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $readonly));
 	}
 
 	return $table->setFooter(new CCol(

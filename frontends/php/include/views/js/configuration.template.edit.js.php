@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="tag-row">
-	<?= renderTagTableRow('tags', '#{rowNum}') ?>
+	<?= renderTagTableRow('#{rowNum}') ?>
 </script>
 
 <script type="text/javascript">

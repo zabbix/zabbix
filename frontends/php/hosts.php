@@ -113,6 +113,7 @@ $fields = [
 	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
+	'show_inherited_tags' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -244,21 +245,41 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-$filter['ip'] = CProfile::get('web.hosts.filter_ip', '');
-$filter['dns'] = CProfile::get('web.hosts.filter_dns', '');
-$filter['host'] = CProfile::get('web.hosts.filter_host', '');
-$filter['templates'] = CProfile::getArray('web.hosts.filter_templates', []);
-$filter['port'] = CProfile::get('web.hosts.filter_port', '');
-$filter['monitored_by'] = CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY);
-$filter['proxyids'] = CProfile::getArray('web.hosts.filter_proxyids', []);
-$filter['evaltype'] = CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
-$filter['tags'] = [];
+$filter = [
+	'ip' => CProfile::get('web.hosts.filter_ip', ''),
+	'dns' => CProfile::get('web.hosts.filter_dns', ''),
+	'host' => CProfile::get('web.hosts.filter_host', ''),
+	'templates' => CProfile::getArray('web.hosts.filter_templates', []),
+	'port' => CProfile::get('web.hosts.filter_port', ''),
+	'monitored_by' => CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY),
+	'proxyids' => CProfile::getArray('web.hosts.filter_proxyids', []),
+	'evaltype' => CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+	'tags' => []
+];
+
 foreach (CProfile::getArray('web.hosts.filter.tags.tag', []) as $i => $tag) {
 	$filter['tags'][] = [
 		'tag' => $tag,
 		'value' => CProfile::get('web.hosts.filter.tags.value', null, $i),
 		'operator' => CProfile::get('web.hosts.filter.tags.operator', null, $i)
 	];
+}
+
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+
+	// remove inherited tags
+	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
 }
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
@@ -450,11 +471,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		if (array_key_exists('tags', $visible)) {
 			$unique_tags = [];
 
-			foreach (getRequest('tags', []) as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
+			foreach ($tags as $tag) {
 				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 			}
 
@@ -682,15 +699,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$groups = array_merge($groups, $new_groupid['groupids']);
 			}
 
-			$tags = getRequest('tags', []);
-
-			// Remove empty new tag lines.
-			foreach ($tags as $key => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($tags[$key]);
-				}
-			}
-
 			// Host data.
 			$host = [
 				'host' => getRequest('host'),
@@ -707,8 +715,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'groups' => zbx_toObject($groups, 'groupid'),
 				'templates' => $templates,
 				'interfaces' => $interfaces,
-				'macros' => $macros,
 				'tags' => $tags,
+				'macros' => $macros,
 				'inventory_mode' => getRequest('inventory_mode'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? []
@@ -936,9 +944,7 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
-		'tags' => getRequest('tags', []),
-		'new_tags' => getRequest('tags', []),
-		'remove_tags' => getRequest('tags', []),
+		'tags' => $tags,
 		'status' => getRequest('status', HOST_STATUS_MONITORED),
 		'description' => getRequest('description'),
 		'proxy_hostid' => getRequest('proxy_hostid', ''),
@@ -961,15 +967,8 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 	// sort templates
 	natsort($data['templates']);
 
-	// get tags
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-	if (!$data['new_tags']) {
-		$data['new_tags'][] = ['tag' => '', 'value' => ''];
-	}
-	if (!$data['remove_tags']) {
-		$data['remove_tags'][] = ['tag' => '', 'value' => ''];
 	}
 
 	// get proxies
@@ -1003,7 +1002,6 @@ elseif (hasRequest('form')) {
 		'visiblename' => getRequest('visiblename', ''),
 		'interfaces' => getRequest('interfaces', []),
 		'mainInterfaces' => getRequest('mainInterfaces', []),
-		'tags' => getRequest('tags', []),
 		'description' => getRequest('description', ''),
 		'proxy_hostid' => getRequest('proxy_hostid', 0),
 		'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
@@ -1013,12 +1011,17 @@ elseif (hasRequest('form')) {
 		'clear_templates' => getRequest('clear_templates', []),
 		'original_templates' => [],
 		'linked_templates' => [],
+		'parent_templates' => [],
 
 		// IPMI
 		'ipmi_authtype' => getRequest('ipmi_authtype', IPMI_AUTHTYPE_DEFAULT),
 		'ipmi_privilege' => getRequest('ipmi_privilege', IPMI_PRIVILEGE_USER),
 		'ipmi_username' => getRequest('ipmi_username', ''),
 		'ipmi_password' => getRequest('ipmi_password', ''),
+
+		// Tags
+		'tags' => $tags,
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 
 		// Macros
 		'macros' => $macros,
@@ -1075,10 +1078,6 @@ elseif (hasRequest('form')) {
 			$data['proxy_hostid'] = $dbHost['proxy_hostid'];
 			$data['status'] = $dbHost['status'];
 
-			// Tags
-			$data['tags'] = $dbHost['tags'];
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-
 			// Templates
 			$data['templates'] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 			$data['original_templates'] = array_combine($data['templates'], $data['templates']);
@@ -1088,6 +1087,9 @@ elseif (hasRequest('form')) {
 			$data['ipmi_privilege'] = $dbHost['ipmi_privilege'];
 			$data['ipmi_username'] = $dbHost['ipmi_username'];
 			$data['ipmi_password'] = $dbHost['ipmi_password'];
+
+			// Tags
+			$data['tags'] = $dbHost['tags'];
 
 			// Macros
 			$data['macros'] = $dbHost['macros'];
@@ -1173,10 +1175,6 @@ elseif (hasRequest('form')) {
 		$groups = getRequest('groups', []);
 	}
 
-	if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED && !$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-
 	if ($data['hostid'] != 0) {
 		// get items that populate host inventory fields
 		$data['inventory_items'] = API::Item()->get([
@@ -1212,6 +1210,42 @@ elseif (hasRequest('form')) {
 		$proxy = $proxy['host'];
 	}
 	unset($proxy);
+
+	if ($data['show_inherited_tags']) {
+		$data['parent_templates'] = getHostParentTemplates(array_flip($data['templates']));
+
+		$inherited_tags = [];
+
+		foreach ($data['parent_templates'] as $templateid => $template) {
+			foreach ($template['tags'] as $tag) {
+				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+						'templateids' => [$templateid => $templateid],
+						'type' => ZBX_PROPERTY_INHERITED
+					];
+				}
+				else {
+					$inherited_tags[$tag['tag'].':'.$tag['value']]['templateids'] += [$templateid => $templateid];
+				}
+			}
+		}
+
+		foreach ($data['tags'] as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+		}
+
+		$data['tags'] = array_values($inherited_tags);
+	}
+
+	if (!$data['tags'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 	if ($data['show_inherited_macros']) {
 		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros($data['templates']));

@@ -47,7 +47,7 @@ $groups_to_update = $data['groups']
 	: [];
 
 $hostFormList->addRow(
-	(new CVisibilityBox('visible[groups]', 'groups_div', _('Original')))
+	(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
 		->setLabel(_('Host groups'))
 		->setChecked(array_key_exists('groups', $data['visible']))
 		->setAttribute('autofocus', 'autofocus'),
@@ -76,12 +76,12 @@ $hostFormList->addRow(
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('groups_div')
+		->setId('groups-div')
 );
 
 // update tags
 $hostFormList->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags_div', _('Original')))
+	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
 		->setLabel(_('Tags'))
 		->setChecked(array_key_exists('tags', $data['visible'])),
 	(new CDiv([
@@ -90,11 +90,11 @@ $hostFormList->addRow(
 			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
 			->setModern(true),
-		renderTagTable($data['tags'], 'tags')->setId('tbl-tags')
+		renderTagTable($data['tags'])->setId('tbl-tags')
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('tags_div')
+		->setId('tags-div')
 );
 
 // append description to form list

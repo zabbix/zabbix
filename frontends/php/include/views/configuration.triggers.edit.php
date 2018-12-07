@@ -513,7 +513,7 @@ $triggersFormList
 		'correlation_tag_row'
 	)
 	->addRow(_('Tags'),
-		(new CDiv(renderTagTable($data['tags'], 'tags', $discovered_trigger)->setId('tbl-tags')))
+		(new CDiv(renderTagTable($data['tags'], $discovered_trigger)->setId('tbl-tags')))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)

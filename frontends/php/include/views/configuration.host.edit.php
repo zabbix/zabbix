@@ -261,14 +261,6 @@ else {
 	);
 }
 
-if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$hostList->addRow(_('Tags'),
-		(new CDiv(renderTagTable($data['tags'], 'tags')->setId('tbl-tags')))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	);
-}
-
 $hostList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
@@ -687,6 +679,18 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		)
 );
+
+/*
+ * Tags
+ */
+$tags_view = new CView('configuration.tags.tab', [
+	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
+	'parent_templates' => $data['parent_templates'],
+	'is_template' => false,
+	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+]);
+$divTabs->addTab('tagTab', _('Tags'), $tags_view->render());
 
 /*
  * Macros

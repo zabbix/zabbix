@@ -108,7 +108,7 @@ $templateList = (new CFormList('hostlist'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Tags'),
-		(new CDiv(renderTagTable($data['tags'], 'tags')->setId('tbl-tags')))
+		(new CDiv(renderTagTable($data['tags'])->setId('tbl-tags')))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)

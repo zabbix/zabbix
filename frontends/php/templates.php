@@ -73,6 +73,7 @@ $fields = [
 	'visible'			=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'mass_replace_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
 	'mass_clear_tpls'	=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'show_inherited_tags'	=> [T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -143,6 +144,23 @@ if ($exportData) {
 	}
 
 	exit;
+}
+
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+
+	// remove inherited tags
+	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
 }
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
@@ -278,11 +296,7 @@ elseif (hasRequest('action') && getRequest('action') == 'template.massupdate' &&
 		if (array_key_exists('tags', $visible)) {
 			$unique_tags = [];
 
-			foreach (getRequest('tags', []) as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
+			foreach ($tags as $tag) {
 				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 			}
 
@@ -447,14 +461,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$templatesClear = getRequest('clear_templates', []);
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 		$templateName = getRequest('template_name', '');
-		$tags = getRequest('tags', []);
-
-		// Remove empty new tag lines.
-		foreach ($tags as $key => $tag) {
-			if ($tag['tag'] === '' && $tag['value'] === '') {
-				unset($tags[$key]);
-			}
-		}
 
 		// create / update template
 		$template = [
@@ -670,9 +676,7 @@ if ((getRequest('action') === 'template.massupdateform' || hasRequest('masssave'
 		'mass_replace_tpls' => getRequest('mass_replace_tpls'),
 		'mass_clear_tpls' => getRequest('mass_clear_tpls'),
 		'groups' => getRequest('groups', []),
-		'tags' => getRequest('tags', []),
-		'new_tags' => getRequest('tags', []),
-		'remove_tags' => getRequest('tags', []),
+		'tags' => $tags,
 		'description' => getRequest('description'),
 		'linked_templates' => getRequest('linked_templates', [])
 	];
@@ -680,15 +684,8 @@ if ((getRequest('action') === 'template.massupdateform' || hasRequest('masssave'
 	// sort templates
 	natsort($data['linked_templates']);
 
-	// get tags
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-	if (!$data['new_tags']) {
-		$data['new_tags'][] = ['tag' => '', 'value' => ''];
-	}
-	if (!$data['remove_tags']) {
-		$data['remove_tags'][] = ['tag' => '', 'value' => ''];
 	}
 
 	// get templates data
@@ -739,7 +736,7 @@ elseif (hasRequest('form')) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
-		$data['tags'] = getRequest('tags', []);
+		$data['tags'] = $tags;
 	}
 
 	if (!$data['tags']) {
@@ -871,9 +868,10 @@ else {
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
 		'templates' => CProfile::getArray('web.templates.filter_templates', null),
-		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR)
+		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+		'tags' => []
 	];
-	$filter['tags'] = [];
+
 	foreach (CProfile::getArray('web.templates.filter.tags.tag', []) as $i => $tag) {
 		$filter['tags'][] = [
 			'tag' => $tag,
