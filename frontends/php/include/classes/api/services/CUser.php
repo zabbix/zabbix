@@ -1089,9 +1089,9 @@ class CUser extends CApiService {
 			return true;
 		}
 		else {
-			self::exception($ldapValidator->getErrorCode() === CLdap::ERR_USER_NOT_FOUND
-					? ZBX_API_ERROR_PERMISSIONS
-					: ZBX_API_ERROR_PARAMETERS,
+			self::exception($ldapValidator->isConnectionError()
+					? ZBX_API_ERROR_PARAMETERS
+					: ZBX_API_ERROR_PERMISSIONS,
 				$ldapValidator->getError()
 			);
 		}
