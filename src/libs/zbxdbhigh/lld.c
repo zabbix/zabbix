@@ -286,13 +286,28 @@ out:
 	return ret;
 }
 
-static int	filter_condition_match(const struct zbx_json_parse *jp_row, const lld_condition_t *condition)
+static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *itemmacros,
+		const lld_condition_t *condition)
 {
-	char	*value = NULL;
-	size_t	value_alloc = 0;
-	int	ret;
+	char			*value = NULL;
+	size_t			value_alloc = 0;
+	int			ret, index;
+	zbx_lld_itemmacro_t	itemmacro_local, *itemmacro;
+	struct zbx_json_parse	jp_out;
 
-	if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
+	itemmacro_local.macro = condition->macro;
+
+	if (FAIL != (index = zbx_vector_ptr_bsearch(itemmacros, &itemmacro_local, lld_itemmacros_compare)))
+	{
+		itemmacro = (zbx_lld_itemmacro_t *)itemmacros->values[index];
+
+		if (FAIL != (ret = zbx_json_path_open(jp_row, itemmacro->value, &jp_out)))
+			zbx_json_value_dyn(&jp_out, &value, &value_alloc);
+	}
+	else
+		ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc);
+
+	if (SUCCEED == ret)
 	{
 		switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 		{
@@ -325,7 +340,8 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const lld
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
+static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+		zbx_vector_ptr_t *itemmacros)
 {
 	const char	*__function_name = "filter_evaluate_and_or";
 
@@ -338,7 +354,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		rc = filter_condition_match(jp_row, condition);
+		rc = filter_condition_match(jp_row, itemmacros, condition);
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
 		{
@@ -375,7 +391,8 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
+static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+		zbx_vector_ptr_t *itemmacros)
 {
 	const char	*__function_name = "filter_evaluate_and";
 
@@ -386,8 +403,11 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		/* if any of conditions are false the evaluation returns false */
-		if (SUCCEED != (ret = filter_condition_match(jp_row, (lld_condition_t *)filter->conditions.values[i])))
+		if (SUCCEED != (ret = filter_condition_match(jp_row, itemmacros,
+				(lld_condition_t *)filter->conditions.values[i])))
+		{
 			break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -408,7 +428,8 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
+static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+		zbx_vector_ptr_t *itemmacros)
 {
 	const char	*__function_name = "filter_evaluate_or";
 
@@ -419,8 +440,11 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		/* if any of conditions are true the evaluation returns true */
-		if (SUCCEED == (ret = filter_condition_match(jp_row, (lld_condition_t *)filter->conditions.values[i])))
+		if (SUCCEED == (ret = filter_condition_match(jp_row, itemmacros,
+				(lld_condition_t *)filter->conditions.values[i])))
+		{
 			break;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -446,7 +470,8 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  *           2) call evaluate() to calculate the final result                 *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
+static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+		zbx_vector_ptr_t *itemmacros)
 {
 	const char	*__function_name = "filter_evaluate_expression";
 
@@ -462,7 +487,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		ret = filter_condition_match(jp_row, condition);
+		ret = filter_condition_match(jp_row, itemmacros, condition);
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
@@ -500,18 +525,19 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_parse *jp_row)
+static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+		zbx_vector_ptr_t *itemmacros)
 {
 	switch (filter->evaltype)
 	{
 		case CONDITION_EVAL_TYPE_AND_OR:
-			return filter_evaluate_and_or(filter, jp_row);
+			return filter_evaluate_and_or(filter, jp_row, itemmacros);
 		case CONDITION_EVAL_TYPE_AND:
-			return filter_evaluate_and(filter, jp_row);
+			return filter_evaluate_and(filter, jp_row, itemmacros);
 		case CONDITION_EVAL_TYPE_OR:
-			return filter_evaluate_or(filter, jp_row);
+			return filter_evaluate_or(filter, jp_row, itemmacros);
 		case CONDITION_EVAL_TYPE_EXPRESSION:
-			return filter_evaluate_expression(filter, jp_row);
+			return filter_evaluate_expression(filter, jp_row, itemmacros);
 	}
 
 	return FAIL;
@@ -605,7 +631,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 		lld_check_received_data_for_filter(filter, &jp_row, itemmacros, info);
 
-		if (SUCCEED != filter_evaluate(filter, &jp_row))
+		if (SUCCEED != filter_evaluate(filter, &jp_row, itemmacros))
 			continue;
 
 		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
