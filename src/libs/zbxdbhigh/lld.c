@@ -47,7 +47,6 @@ lld_filter_t;
 
 typedef struct
 {
-
 	char	*lld_macro;
 	char	*json_path;
 }
