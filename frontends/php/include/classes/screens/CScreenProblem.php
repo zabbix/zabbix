@@ -758,6 +758,12 @@ class CScreenProblem extends CScreenBase {
 
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
+
+			// prepare filter for host url
+			foreach ($triggers_hosts as &$host) {
+				$host[0]['show_latest_values'] = $this->data['filter']['show_latest_values'];
+			}
+			unset($host);
 		}
 
 		if ($this->data['action'] === 'problem.view') {
