@@ -491,6 +491,7 @@ function overlayDialogueDestroy(dialogueid, xhr) {
 		}
 
 		removeFromOverlaysStack(dialogueid);
+		jQuery.publish('overlay.close', {dialogueid: dialogueid});
 	}
 }
 

@@ -1262,6 +1262,26 @@
 		/**
 		 * Add new widget user interaction handlers.
 		 */
+		$.subscribe('overlay.close', function(e, widget) {
+			if (data['pos-action'] == 'addmodal' && widget.dialogueid == 'widgetConfg') {
+				data['pos-action'] = '';
+				data.add_widget_dimension = {};
+
+				if (data.widgets.length) {
+					data.new_widget_placeholder.container.hide();
+				}
+				else {
+					data.new_widget_placeholder.container.removeAttr('style');
+				}
+
+				resizeDashboardGrid($obj, data);
+				data.new_widget_placeholder.setDefault(function (e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
+				});
+			}
+		});
+
 		$(document).on('click mouseup dragend', function() {
 			if (data['pos-action'] != 'add') {
 				return;
@@ -1274,8 +1294,7 @@
 				delete dimension.height;
 			}
 
-			data['pos-action'] = '';
-			data.add_widget_dimension = {};
+			data['pos-action'] = 'addmodal';
 			setResizableState('enable', data.widgets, '');
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		});
@@ -1292,7 +1311,7 @@
 				return cancelEvent(event);
 			}
 		}).on('mouseleave', function(event) {
-			if (data['pos-action'] == 'add') {
+			if (data['pos-action'] == 'add' || data['pos-action'] == 'addmodal') {
 				return;
 			}
 
