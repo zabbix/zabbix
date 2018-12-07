@@ -54,6 +54,80 @@ zbx_lld_itemmacro_t;
 
 /******************************************************************************
  *                                                                            *
+ * Function: lld_itemmacros_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort item macros by unique name               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_itemmacros_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_itemmacro_t	*r1 = *(const zbx_lld_itemmacro_t **)d1;
+	const zbx_lld_itemmacro_t	*r2 = *(const zbx_lld_itemmacro_t **)d2;
+
+	return strcmp(r1->macro, r2->macro);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_itemmacros_get                                               *
+ *                                                                            *
+ * Purpose: retrieve list of item macros                                      *
+ *                                                                            *
+ * Parameters: lld_ruleid - [IN] low level discovery rule id                  *
+ *             itemmacros - [OUT] list of itemmacros                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmacros, char **error)
+{
+	const char		*__function_name = "lld_itemmacros_get";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_itemmacro_t	*itemmacro;
+	int			ret = SUCCEED;
+	char			err[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select macro,value"
+			" from itemmacro"
+			" where itemid=" ZBX_FS_UI64,
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (SUCCEED != (ret = zbx_json_path_check(row[1], err, sizeof(err))))
+		{
+			*error = zbx_dsprintf(*error, "Cannot process LLD macro \"%s\": %s.\n", row[0], err);
+			break;
+		}
+
+		itemmacro = (zbx_lld_itemmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_itemmacro_t));
+
+		itemmacro->macro = zbx_strdup(NULL, row[0]);
+		itemmacro->value = zbx_strdup(NULL, row[1]);
+
+		zbx_vector_ptr_append(itemmacros, itemmacro);
+	}
+	DBfree_result(result);
+
+	zbx_vector_ptr_sort(itemmacros, lld_itemmacros_compare);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return ret;
+}
+
+static void	lld_itemmacro_free(zbx_lld_itemmacro_t *itemmacro)
+{
+	zbx_free(itemmacro->value);
+	zbx_free(itemmacro->macro);
+	zbx_free(itemmacro);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_condition_free                                               *
  *                                                                            *
  * Purpose: release resources allocated by filter condition                   *
@@ -507,13 +581,31 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
  *                                                                            *
  ******************************************************************************/
 static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-			char **info)
+		zbx_vector_ptr_t *itemmacros, char **info)
 {
-	int	i;
+	int			i, index;
+	zbx_lld_itemmacro_t	itemmacro_local, *itemmacro;
+	struct zbx_json_parse	jp_out;
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
+
+		itemmacro_local.macro = condition->macro;
+
+		if (FAIL != (index = zbx_vector_ptr_bsearch(itemmacros, &itemmacro_local, lld_itemmacros_compare)))
+		{
+			itemmacro = (zbx_lld_itemmacro_t *)itemmacros->values[index];
+
+			if (FAIL == zbx_json_path_open(jp_row, itemmacro->value, &jp_out))
+			{
+				*info = zbx_strdcatf(*info,
+						"Cannot accurately apply filter: no value received for macro \"%s\""
+						" json path '%s'.\n", itemmacro->macro, itemmacro->value);
+			}
+
+			continue;
+		}
 
 		if (NULL == zbx_json_pair_by_name(jp_row, condition->macro))
 		{
@@ -524,82 +616,8 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_itemmacros_compare                                           *
- *                                                                            *
- * Purpose: sorting function to sort item macros by unique name               *
- *                                                                            *
- ******************************************************************************/
-static int	lld_itemmacros_compare(const void *d1, const void *d2)
-{
-	const zbx_lld_itemmacro_t	*r1 = *(const zbx_lld_itemmacro_t **)d1;
-	const zbx_lld_itemmacro_t	*r2 = *(const zbx_lld_itemmacro_t **)d2;
-
-	return strcmp(r1->macro, r2->macro);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_itemmacros_get                                               *
- *                                                                            *
- * Purpose: retrieve list of item macros                                      *
- *                                                                            *
- * Parameters: lld_ruleid - [IN] low level discovery rule id                  *
- *             itemmacros - [OUT] list of itemmacros                          *
- *                                                                            *
- ******************************************************************************/
-static int	lld_itemmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *itemmacros, char **error)
-{
-	const char		*__function_name = "lld_itemmacros_get";
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_lld_itemmacro_t	*itemmacro;
-	int			ret = SUCCEED;
-	char			err[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select macro,value"
-			" from itemmacro"
-			" where itemid=" ZBX_FS_UI64,
-			lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (SUCCEED != (ret = zbx_json_path_check(row[1], err, sizeof(err))))
-		{
-			*error = zbx_dsprintf(*error, "Cannot process LLD macro \"%s\": %s.\n", row[0], err);
-			break;
-		}
-
-		itemmacro = (zbx_lld_itemmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_itemmacro_t));
-
-		itemmacro->macro = zbx_strdup(NULL, row[0]);
-		itemmacro->value = zbx_strdup(NULL, row[1]);
-
-		zbx_vector_ptr_append(itemmacros, itemmacro);
-	}
-	DBfree_result(result);
-
-	zbx_vector_ptr_sort(itemmacros, lld_itemmacros_compare);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return ret;
-}
-
-static void	lld_itemmacro_free(zbx_lld_itemmacro_t *itemmacro)
-{
-	zbx_free(itemmacro->value);
-	zbx_free(itemmacro->macro);
-	zbx_free(itemmacro);
-}
-
-static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows, char **info,
-		char **error)
+static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
+		zbx_vector_ptr_t *itemmacros, char **info, char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
@@ -635,7 +653,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			continue;
 
-		lld_check_received_data_for_filter(filter, &jp_row, info);
+		lld_check_received_data_for_filter(filter, &jp_row, itemmacros, info);
 
 		if (SUCCEED != filter_evaluate(filter, &jp_row))
 			continue;
@@ -755,7 +773,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (SUCCEED != lld_itemmacros_get(lld_ruleid, &itemmacros, &error))
 		goto error;
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &itemmacros, &info, &error))
 		goto error;
 
 	error = zbx_strdup(error, "");
