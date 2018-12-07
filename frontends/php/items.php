@@ -1196,22 +1196,22 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 										switch ($massupdate_app_action) {
 											case ZBX_MULTISELECT_ADD:
-												$applicationids = array_merge($applicationids, $db_applicationids);
+												$upd_applicationids = array_merge($applicationids, $db_applicationids);
 												break;
 
 											case ZBX_MULTISELECT_REPLACE:
-												$applicationids = array_merge(
+												$upd_applicationids = array_merge(
 													array_diff($applicationids, $db_applicationids),
 													array_intersect($db_applicationids, $applicationids)
 												);
 												break;
 
 											case ZBX_MULTISELECT_REMOVE:
-												$applicationids = array_diff($db_applicationids, $applicationids);
+												$upd_applicationids = array_diff($db_applicationids, $applicationids);
 												break;
 										}
 
-										$item['applications'] = array_keys(array_flip($applicationids));
+										$item['applications'] = array_keys(array_flip($upd_applicationids));
 									}
 									else {
 										if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD,
