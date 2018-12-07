@@ -79,11 +79,6 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
-			// prepare filter for host url
-			foreach ($data['triggers_hosts'] as &$host) {
-				$host[0]['show_latest_values'] = $fields['show_latest_values'];
-			}
-			unset($host);
 		}
 
 		$this->setResponse(new CControllerResponseData([

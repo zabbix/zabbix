@@ -65,9 +65,6 @@ class CMenuPopupHelper {
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $has_goto
 		];
-		if (array_key_exists('show_latest_values', $host) && $host['show_latest_values']) {
-			$data['showLatestValues'] = (int) $host['show_latest_values'];
-		}
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {

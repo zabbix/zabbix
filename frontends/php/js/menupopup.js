@@ -139,9 +139,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
-			if (options.showLatestValues) {
-				url.setArgument('filter_show_latest_values', options.showLatestValues);
-			}
 			problems.url = url.getUrl();
 		}
 
