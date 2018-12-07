@@ -2469,7 +2469,8 @@ static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, 
 	{
 		goto out;
 	}
-	if (SUCCEED != (ret = substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY, err, sizeof(err))))
+	if (SUCCEED != (ret = substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT,
+			err, sizeof(err))))
 	{
 		goto out;
 	}
