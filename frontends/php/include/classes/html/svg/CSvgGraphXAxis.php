@@ -39,6 +39,13 @@ class CSvgGraphXAxis extends CSvgTag {
 	const GRID_PIXELS = 30;
 
 	/**
+	 * Label degrees to rotate.
+	 *
+	 * @var int
+	 */
+	const LABEL_ROTATE_DEGREES = 270;
+
+	/**
 	 * CSS class name for axis container.
 	 *
 	 * @var array
@@ -87,8 +94,26 @@ class CSvgGraphXAxis extends CSvgTag {
 	 */
 	private $line_color;
 
+	/**
+	 * Color for main grid lines.
+	 *
+	 * @var string
+	 */
 	private $main_grid_color;
+
+	/**
+	 * Color for highlighted labels.
+	 *
+	 * @var string
+	 */
 	private $highlight_color;
+
+	/**
+	 * Label top offset in pixels.
+	 *
+	 * @var int
+	 */
+	private $label_top_offset;
 
 	/**
 	 * Canvas width.
@@ -104,12 +129,36 @@ class CSvgGraphXAxis extends CSvgTag {
 	 */
 	private $canvas_height;
 
+	/**
+	 * Array of grid objects.
+	 *
+	 * @var array
+	 */
+	private $grids;
+
+	/**
+	 * Array of main grid values.
+	 *
+	 * @var array
+	 */
+	private $main_grid_positions;
+
+	/**
+	 * Array of secondary grid values.
+	 *
+	 * @var array
+	 */
+	private $sub_grid_positions;
+
 	public function __construct($time_from, $time_till) {
 		$this->time_from = $time_from;
 		$this->time_till = $time_till;
+
+		$this->main_grid_positions = [];
+		$this->sub_grid_positions = [];
+
 		$this->labels = [];
-		$this->grid = [];
-		$this->grid_bold = [];
+		$this->grids = [];
 
 		$this->period = $this->time_till - $this->time_from;
 		$this->time_format = (date('Y', $this->time_from) === date('Y', $this->time_till))
@@ -126,6 +175,19 @@ class CSvgGraphXAxis extends CSvgTag {
 	 */
 	public function setTextColor($color) {
 		$this->text_color = $color;
+
+		return $this;
+	}
+
+	/**
+	 * Set label top offset.
+	 *
+	 * @param int $top_offset  Label top offset in pixels.
+	 *
+	 * @return CSvgGraphXAxis
+	 */
+	public function setLabelTopOffset($top_offset) {
+		$this->label_top_offset = (int) $top_offset;
 
 		return $this;
 	}
@@ -150,7 +212,7 @@ class CSvgGraphXAxis extends CSvgTag {
 	 *
 	 * @return CSvgGraphXAxis
 	 */
-	public function setMainLineColor($color) {
+	public function setGridMainColor($color) {
 		$this->main_grid_color = $color;
 
 		return $this;
@@ -170,17 +232,30 @@ class CSvgGraphXAxis extends CSvgTag {
 	}
 
 	/**
+	 * Function creates grids for main and sub milestones on X axis.
+	 */
+	protected function makeGrids() {
+		// Add grid for detailed values.
+		$this->grids[] = (new CSvgGraphGrid($this->sub_grid_positions))
+			->setDimension(CSvgGraphGrid::GRID_DIMENSION_VERTICAL)
+			->setPosition($this->x, $this->y - $this->canvas_height)
+			->setSize($this->canvas_width, $this->canvas_height)
+			->setColor($this->line_color);
+
+		// Add grid for main values.
+		$this->grids[] = (new CSvgGraphGrid($this->main_grid_positions))
+			->setPosition($this->x, $this->y - $this->canvas_height)
+			->setSize($this->canvas_width, $this->canvas_height)
+			->setColor($this->main_grid_color);
+	}
+
+	/**
 	 * Return CSS style definitions for axis as array.
 	 *
 	 * @return array
 	 */
 	public function makeStyles() {
-		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_BOUNDARIES => [
-				'text-anchor' => 'end',
-				'fill' => $this->highlight_color,
-				'font-size' => '11px'
-			],
+		$styles = [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN => [
 				'text-anchor' => 'end',
 				'fill' => $this->highlight_color,
@@ -191,38 +266,37 @@ class CSvgGraphXAxis extends CSvgTag {
 				'font-size' => '10px'
 			]
 		];
+
+		$this->getDateTimeIntervals();
+		$this->makeGrids();
+
+		foreach ($this->grids as $grid) {
+			foreach ($grid->makeStyles() as $grid_style_key => $grid_style) {
+				$styles['.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.$grid_style_key] = $grid_style;
+			}
+		}
+
+		return $styles;
 	}
 
 	public function toString($destroy = true) {
-		$this->getDateTimeIntervals();
+		$time_formatted_from = zbx_date2str(_($this->time_format), $this->time_from);
+		$time_formatted_till = zbx_date2str(_($this->time_format), $this->time_till);
 
 		return (new CSvgGroup())
-			->addItem(
-				// Add vertical grid.
-				(new CSvgGraphGrid($this->grid, GRAPH_VERTICAL_GRID))
-					->setPosition($this->x, $this->y - $this->canvas_height)
-					->setSize($this->canvas_width, $this->canvas_height)
-					->setColor($this->line_color)
-			)
-			->addItem(
-				// Add vertical grid with bold lines.
-				(new CSvgGraphGrid($this->grid_bold, GRAPH_VERTICAL_GRID))
-					->setPosition($this->x, $this->y - $this->canvas_height)
-					->setSize($this->canvas_width, $this->canvas_height)
-					->setColor($this->main_grid_color)
-			)
 			->addItem([
+				$this->grids,
 				$this->makeArrow(),
 				// Add period start label.
-				(new CSvgText($this->x, $this->y + 7, zbx_date2str(_($this->time_format), $this->time_from)))
-					->setAttribute('transform', 'rotate(270 '.$this->x.','.($this->y + 7).')')
-					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_BOUNDARIES),
+				(new CSvgText($this->x, $this->y + $this->label_top_offset, $time_formatted_from))
+					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN)
+					->rotate(self::LABEL_ROTATE_DEGREES, $this->x, $this->y + $this->label_top_offset),
 				// Add time interval labels.
 				$this->labels,
 				// Add period end label.
-				(new CSvgText($this->x + $this->width, $this->y + 7, zbx_date2str(_($this->time_format), $this->time_till)))
-					->setAttribute('transform', 'rotate(270 '.($this->x + $this->width).','.($this->y + 7).')')
-					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_BOUNDARIES)
+				(new CSvgText($this->x + $this->width, $this->y + $this->label_top_offset, $time_formatted_till))
+					->addClass(CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN)
+					->rotate(self::LABEL_ROTATE_DEGREES, $this->x + $this->width, $this->y + $this->label_top_offset)
 			])
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.CSvgTag::ZBX_STYLE_GRAPH_AXIS_BOTTOM)
 			->toString($destroy);
@@ -252,7 +326,7 @@ class CSvgGraphXAxis extends CSvgTag {
 	 * Set axis container position.
 	 *
 	 * @param int $x        Horizontal position of container element.
-	 * @param int $y        Veritical position of container element.
+	 * @param int $y        Vertical position of container element.
 	 *
 	 * @return CSvgTag
 	 */
@@ -394,7 +468,6 @@ class CSvgGraphXAxis extends CSvgTag {
 		}
 
 		$position = 0;
-		//$this->sizeX = 1018;
 
 		$testcnt = 200;
 		while (true) {
@@ -442,20 +515,20 @@ class CSvgGraphXAxis extends CSvgTag {
 			$delta_x = bcsub($time, $prev_time) * $this->width / $this->period;
 			$position += $delta_x;
 
-			if (($this->x + $position) <= ($this->x + $this->width)) {
-				if ($draw_main) {
-					$time_formated = $dt['main']->format($format['main']);
-					$label_style = CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN;
-					$this->grid_bold[] = $position;
-				}
-				else {
-					$time_formated = $dt['sub']->format($format['sub']);
-					$label_style = CSvgTag::ZBX_STYLE_GRAPH_LABEL_SUB;
-					$this->grid[] = $position;
-				}
+			if ($draw_main) {
+				$time_formatted = $dt['main']->format($format['main']);
+				$label_style = CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN;
+				$this->main_grid_positions[] = $position;
+			}
+			else {
+				$time_formatted = $dt['sub']->format($format['sub']);
+				$label_style = CSvgTag::ZBX_STYLE_GRAPH_LABEL_SUB;
+				$this->sub_grid_positions[] = $position;
+			}
 
-				$this->labels[] = (new CSvgText($position + $this->x + 1, $this->y + 7, $time_formated))
-					->setAttribute('transform', 'rotate(270 '.($position + $this->x + 1).','.($this->y + 7).')')
+			if ($position > 10 && $position <= ($this->width - 10)) {
+				$this->labels[] = (new CSvgText($position + $this->x + 1, $this->y + $this->label_top_offset, $time_formatted))
+					->rotate(self::LABEL_ROTATE_DEGREES, $position + $this->x + 1, $this->y + $this->label_top_offset)
 					->addClass($label_style);
 			}
 

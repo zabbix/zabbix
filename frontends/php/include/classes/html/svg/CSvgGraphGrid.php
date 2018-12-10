@@ -21,24 +21,26 @@
 
 class CSvgGraphGrid extends CSvgTag {
 
+	const GRID_DIMENSION_HORIZONTAL = 0;
+	const GRID_DIMENSION_VERTICAL = 1;
+
 	protected $grid_points = [];
-	protected $grid_type;
+	protected $grid_dimension;
 	protected $color;
+
+	// Instance counter is used to make separate CSS style for each grid instance.
 	protected static $counter = 0;
 	protected $instance_counter;
 
-	public function __construct(array $grid_points, $grid_type) {
+	public function __construct(array $grid_points) {
 		parent::__construct('g', true);
 
-		$this->grid_type = $grid_type;
+		$this->grid_dimension = self::GRID_DIMENSION_HORIZONTAL;
 		$this->grid_points = $grid_points;
-
 		$this->instance_counter = ++self::$counter;
 	}
 
 	public function makeStyles() {
-		$this->instance_counter = ++self::$counter;
-
 		return [
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_GRID.'-'.$this->instance_counter.' path' => [
 				'stroke-dasharray' => '2,2',
@@ -48,7 +50,7 @@ class CSvgGraphGrid extends CSvgTag {
 	}
 
 	/**
-	 * Set color.
+	 * Set grid line color.
 	 *
 	 * @param string $color  Color value.
 	 *
@@ -56,6 +58,19 @@ class CSvgGraphGrid extends CSvgTag {
 	 */
 	public function setColor($color) {
 		$this->color = $color;
+
+		return $this;
+	}
+
+	/**
+	 * Set grid dimension.
+	 *
+	 * @param int $dimension  Grid dimension.
+	 *
+	 * @return CSvgGraphGrid
+	 */
+	public function setDimension($dimension) {
+		$this->grid_dimension = $dimension;
 
 		return $this;
 	}
@@ -93,7 +108,7 @@ class CSvgGraphGrid extends CSvgTag {
 			->setAttribute('shape-rendering', 'crispEdges')
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_GRID.'-'.$this->instance_counter);
 
-		parent::addItem($this->grid_type == GRAPH_HORIZONTAL_GRID
+		parent::addItem($this->grid_dimension == self::GRID_DIMENSION_HORIZONTAL
 			? $this->drawHorizontalGrid()
 			: $this->drawVerticalGrid()
 		);

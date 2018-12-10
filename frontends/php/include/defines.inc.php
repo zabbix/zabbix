@@ -941,9 +941,6 @@ define('GRAPH_YAXIS_SIDE_LEFT',		0);
 define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 define('GRAPH_YAXIS_SIDE_BOTTOM',	2);
 
-define('GRAPH_HORIZONTAL_GRID',	0);
-define('GRAPH_VERTICAL_GRID',	1);
-
 define('GRAPH_ITEM_SIMPLE',			0);
 define('GRAPH_ITEM_SUM',			2);
 

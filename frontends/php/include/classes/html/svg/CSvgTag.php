@@ -45,7 +45,6 @@ class CSvgTag extends CTag {
 	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
 	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
 
-	const ZBX_STYLE_GRAPH_LABEL_BOUNDARIES = 'svg-graph-label-boundaries';
 	const ZBX_STYLE_GRAPH_LABEL_MAIN = 'svg-graph-label-main';
 	const ZBX_STYLE_GRAPH_LABEL_SUB = 'svg-graph-label-sub';
 
@@ -76,7 +75,7 @@ class CSvgTag extends CTag {
 	 */
 	public function addItem($value) {
 		if ($value instanceof CSvgTag) {
-			$this->styles = $value->makeStyles() + $this->styles;
+			$this->styles += $value->makeStyles();
 		}
 
 		return parent::addItem($value);

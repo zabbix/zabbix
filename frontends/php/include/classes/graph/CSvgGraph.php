@@ -50,8 +50,18 @@ class CSvgGraph extends CSvg {
 	 */
 	protected $grid_color;
 
+	/**
+	 * Grid color for main values on X axis.
+	 *
+	 * @var string
+	 */
 	protected $main_grid_color;
 
+	/**
+	 * Grid color for detailed values on X axis.
+	 *
+	 * @var string
+	 */
 	protected $highlight_color;
 
 	/**
@@ -149,8 +159,7 @@ class CSvgGraph extends CSvg {
 		$theme = getUserGraphTheme();
 		$this->text_color = '#' . $theme['textcolor'];
 		$this->grid_color = '#' . $theme['gridcolor'];
-		//$this->main_grid_color = '#' . $theme['maingridcolor'];
-		$this->main_grid_color = '#FF0000';
+		$this->main_grid_color = '#' . $theme['maingridcolor'];
 		$this->highlight_color = '#' . $theme['highlightcolor'];
 
 		$this
@@ -571,14 +580,14 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to left side of graph.
 	 */
 	protected function drawCanvasLeftYAxis() {
-		$left_side_grid = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+		$left_side_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
 
 		$this->addItem([
-			(new CSvgGraphGrid(array_keys($left_side_grid), GRAPH_HORIZONTAL_GRID))
+			(new CSvgGraphGrid(array_keys($left_side_values)))
 				->setPosition($this->canvas_x, $this->canvas_y)
 				->setSize($this->canvas_width, $this->canvas_height)
 				->setColor($this->grid_color),
-			(new CSvgGraphYAxis($left_side_grid, GRAPH_YAXIS_SIDE_LEFT))
+			(new CSvgGraphYAxis($left_side_values, GRAPH_YAXIS_SIDE_LEFT))
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
 				->setTextColor($this->text_color)
@@ -590,19 +599,19 @@ class CSvgGraph extends CSvg {
 	 * Add Y axis with labels to right side of graph.
 	 */
 	protected function drawCanvasRightYAxis() {
-		$right_side_grid = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+		$right_side_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
 
 		// Draw grid only if one is not drawn for left side Y axis.
-		$grid = (!$this->left_y_show)
-			? (new CSvgGraphGrid(array_keys($right_side_grid), GRAPH_HORIZONTAL_GRID))
+		$grid = $this->left_y_show
+			? null
+			: (new CSvgGraphGrid(array_keys($right_side_values)))
 				->setPosition($this->canvas_x, $this->canvas_y)
 				->setSize($this->canvas_width, $this->canvas_height)
-				->setColor($this->grid_color)
-			: null;
+				->setColor($this->grid_color);
 
 		$this->addItem([
 			$grid,
-			(new CSvgGraphYAxis($right_side_grid, GRAPH_YAXIS_SIDE_RIGHT))
+			(new CSvgGraphYAxis($right_side_values, GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
 				->setTextColor($this->text_color)
@@ -614,15 +623,15 @@ class CSvgGraph extends CSvg {
 	 * Add X axis with labels to graph.
 	 */
 	protected function drawCanvasXAxis() {
-		$this->addItem(
-			(new CSvgGraphXAxis($this->time_from, $this->time_till))
-				->setSize($this->canvas_width, $this->xaxis_height)
-				->setCanvasSize($this->canvas_width, $this->canvas_height)
-				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-				->setTextColor($this->text_color)
-				->setLineColor($this->grid_color)
-				->setMainLineColor($this->main_grid_color)
-				->setHighlightColor($this->highlight_color)
+		$this->addItem((new CSvgGraphXAxis($this->time_from, $this->time_till))
+			->setSize($this->canvas_width, $this->xaxis_height)
+			->setCanvasSize($this->canvas_width, $this->canvas_height)
+			->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
+			->setTextColor($this->text_color)
+			->setLineColor($this->grid_color)
+			->setGridMainColor($this->main_grid_color)
+			->setHighlightColor($this->highlight_color)
+			->setLabelTopOffset($this->problems ? 10 : 5)
 		);
 	}
 
