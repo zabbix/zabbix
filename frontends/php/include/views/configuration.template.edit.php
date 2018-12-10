@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.template.edit.js.php';
-
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
@@ -28,7 +26,7 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 }
 
 $divTabs = new CTabView();
-if (!isset($_REQUEST['form_refresh'])) {
+if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
@@ -106,11 +104,6 @@ $templateList = (new CFormList('hostlist'))
 		]))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Tags'),
-		(new CDiv(renderTagTable($data['tags'])->setId('tbl-tags')))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -425,6 +418,16 @@ $tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
+
+// tags
+$tags_view = new CView('configuration.tags.tab', [
+	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
+	'parent_templates' => $data['parent_templates'],
+	'is_template' => true,
+	'readonly' => false
+]);
+$divTabs->addTab('tagTab', _('Tags'), $tags_view->render());
 
 // macros
 if (!$macros) {

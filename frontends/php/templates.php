@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'template.export' && hasRequest('templates')) {
+if (hasRequest('templates') && hasRequest('action') && getRequest('action') === 'template.export') {
 	$exportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -178,7 +178,7 @@ if (hasRequest('macros')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
+if (hasRequest('add_template') && hasRequest('add_templates')) {
 	$_REQUEST['templates'] = array_merge($templateIds, $_REQUEST['add_templates']);
 }
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
@@ -196,7 +196,7 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
-elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('templateid')) {
+elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
 	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
 
 	$groups = getRequest('groups', []);
@@ -230,7 +230,7 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('templat
 		unset($_REQUEST['templateid']);
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'template.massupdate' && hasRequest('masssave')) {
+elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' && hasRequest('masssave')) {
 	$templateids = getRequest('templates', []);
 	$visible = getRequest('visible', []);
 
@@ -594,7 +594,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_error_message($messageFailed);
 	}
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
+elseif (hasRequest('templateid') && hasRequest('delete')) {
 	DBstart();
 
 	$result = API::Template()->massUpdate([
@@ -614,7 +614,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	unset($_REQUEST['delete']);
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
-elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
+elseif (hasRequest('templateid') && hasRequest('delete_and_clear')) {
 	DBstart();
 
 	$result = API::Template()->delete([getRequest('templateid')]);
@@ -628,7 +628,7 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	unset($_REQUEST['delete']);
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), ['template.massdelete', 'template.massdeleteclear']) && hasRequest('templates')) {
+elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getRequest('action'), ['template.massdelete', 'template.massdeleteclear'])) {
 	$templates = getRequest('templates');
 
 	DBstart();
@@ -669,7 +669,7 @@ $pageFilter = new CPageFilter([
 ]);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-if ((getRequest('action') === 'template.massupdateform' || hasRequest('masssave')) && hasRequest('templates')) {
+if (hasRequest('templates') && (getRequest('action') === 'template.massupdateform' || hasRequest('masssave'))) {
 	$data = [
 		'templates' => getRequest('templates', []),
 		'visible' => getRequest('visible', []),
@@ -702,6 +702,11 @@ elseif (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
+		'linked_templates' => getRequest('templates', []),
+		'original_templates' => [],
+		'parent_templates' => [],
+		'tags' => $tags,
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	];
 
@@ -721,27 +726,52 @@ elseif (hasRequest('form')) {
 			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
 		}
 	}
-	else {
-		$data['original_templates'] = [];
-	}
 
 	// description
 	$data['description'] = ($data['templateid'] != 0 && !hasRequest('form_refresh'))
 		? $data['dbTemplate']['description']
 		: getRequest('description', '');
 
-	// Tags
-	if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
-		$data['tags'] = $data['dbTemplate']['tags'];
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
-	else {
-		$data['tags'] = $tags;
+	// tags
+	if ($data['show_inherited_tags']) {
+		$data['parent_templates'] = getHostParentTemplates(array_flip($data['linked_templates']));
+
+		$inherited_tags = [];
+
+		foreach ($data['parent_templates'] as $templateid => $template) {
+			foreach ($template['tags'] as $tag) {
+				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+						'templateids' => [$templateid => $templateid],
+						'type' => ZBX_PROPERTY_INHERITED
+					];
+				}
+				else {
+					$inherited_tags[$tag['tag'].':'.$tag['value']]['templateids'] += [$templateid => $templateid];
+				}
+			}
+		}
+
+		foreach ($data['tags'] as $tag) {
+			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+			else {
+				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+		}
+
+		$data['tags'] = array_values($inherited_tags);
 	}
 
 	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
+		$tag = ['tag' => '', 'value' => ''];
+		if ($data['show_inherited_tags']) {
+			$tag['type'] = ZBX_PROPERTY_OWN;
+		}
+		$data['tags'][] = $tag;
 	}
+	CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 	$templateIds = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
 

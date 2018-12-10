@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
+if (hasRequest('action') && getRequest('action') === 'host.export' && hasRequest('hosts')) {
 	$page['file'] = 'zbx_export_hosts.xml';
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
@@ -230,7 +230,7 @@ if (hasRequest('filter_set')) {
 	CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
-	DBStart();
+	DBstart();
 	CProfile::delete('web.hosts.filter_ip');
 	CProfile::delete('web.hosts.filter_dns');
 	CProfile::delete('web.hosts.filter_host');
@@ -295,11 +295,11 @@ foreach ($macros as $idx => $macro) {
 /*
  * Actions
  */
-if (isset($_REQUEST['add_template']) && isset($_REQUEST['add_templates'])) {
+if (hasRequest('add_template') && hasRequest('add_templates')) {
 	$_REQUEST['templates'] = getRequest('templates', []);
 	$_REQUEST['templates'] = array_merge($_REQUEST['templates'], $_REQUEST['add_templates']);
 }
-if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
+if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
 
 	$unlinkTemplates = [];
@@ -323,7 +323,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		unset($_REQUEST['templates'][array_search($templateId, $_REQUEST['templates'])]);
 	}
 }
-elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid')) {
+elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone'))) {
 	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
 
 	$groups = getRequest('groups', []);
@@ -368,7 +368,7 @@ elseif ((hasRequest('clone') || hasRequest('full_clone')) && hasRequest('hostid'
 
 	unset($_REQUEST['hostid'], $_REQUEST['flags']);
 }
-elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && hasRequest('masssave')) {
+elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && hasRequest('masssave')) {
 	$hostids = getRequest('hosts', []);
 	$visible = getRequest('visible', []);
 	$_REQUEST['proxy_hostid'] = getRequest('proxy_hostid', 0);
@@ -406,8 +406,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 
 		$new_values = [];
 		foreach ($properties as $property) {
-			if (isset($visible[$property])) {
-				$new_values[$property] = $_REQUEST[$property];
+			if (array_key_exists($property, $visible)) {
+				$new_values[$property] = getRequest($property);
 			}
 		}
 
@@ -501,7 +501,7 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 
 		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
 
-		if (hasRequest('inventory_mode') && array_key_exists('inventory_mode', $visible)) {
+		if (array_key_exists('inventory_mode', $visible) && hasRequest('inventory_mode')) {
 			$new_values['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 
 			if ($new_values['inventory_mode'] == HOST_INVENTORY_DISABLED) {
@@ -537,35 +537,33 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				}
 			}
 
-			if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				if (array_key_exists('tags', $visible)) {
-					if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
-						$unique_tags = [];
+			if (array_key_exists('tags', $visible) && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+					$unique_tags = [];
 
-						foreach (array_merge($host['tags'], $tags) as $tag) {
-							$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-						}
-
-						$host['tags'] = array_values($unique_tags);
+					foreach (array_merge($host['tags'], $tags) as $tag) {
+						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
 					}
-					elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
-						$host['tags'] = $tags;
-					}
-					elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
-						$diff_tags = [];
 
-						foreach ($host['tags'] as $a) {
-							foreach ($tags as $b) {
-								if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-									continue 2;
-								}
+					$host['tags'] = array_values($unique_tags);
+				}
+				elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+					$host['tags'] = $tags;
+				}
+				elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+					$diff_tags = [];
+
+					foreach ($host['tags'] as $a) {
+						foreach ($tags as $b) {
+							if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+								continue 2;
 							}
-
-							$diff_tags[] = $a;
 						}
 
-						$host['tags'] = $diff_tags;
+						$diff_tags[] = $a;
 					}
+
+					$host['tags'] = $diff_tags;
 				}
 			}
 
@@ -798,10 +796,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 			]);
 
-			if ($dbTriggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $hostId, $srcHostId)) {
-					throw new Exception();
-				}
+			if ($dbTriggers && !copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $hostId, $srcHostId)) {
+				throw new Exception();
 			}
 
 			// copy discovery rules
@@ -875,7 +871,7 @@ elseif (hasRequest('delete') && hasRequest('hostid')) {
 
 	unset($_REQUEST['delete']);
 }
-elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && hasRequest('hosts')) {
+elseif (hasRequest('hosts') && hasRequest('action') && getRequest('action') === 'host.massdelete') {
 	DBstart();
 
 	$result = API::Host()->delete(getRequest('hosts'));
@@ -886,8 +882,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massdelete' && has
 	}
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), ['host.massenable', 'host.massdisable']) && hasRequest('hosts')) {
-	$enable =(getRequest('action') == 'host.massenable');
+elseif (hasRequest('hosts') && hasRequest('action') && str_in_array(getRequest('action'), ['host.massenable', 'host.massdisable'])) {
+	$enable = (getRequest('action') === 'host.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 
 	$actHosts = API::Host()->get([
@@ -937,7 +933,7 @@ $_REQUEST['hostid'] = getRequest('hostid', 0);
 
 $config = select_config();
 
-if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) && hasRequest('hosts')) {
+if (hasRequest('hosts') && (getRequest('action') === 'host.massupdateform' || hasRequest('masssave'))) {
 	$data = [
 		'hosts' => getRequest('hosts'),
 		'visible' => getRequest('visible', []),
@@ -980,7 +976,7 @@ if ((getRequest('action') === 'host.massupdateform' || hasRequest('masssave')) &
 	order_result($data['proxies'], 'host');
 
 	// get templates data
-	$data['linkedTemplates'] = !empty($data['templates'])
+	$data['templates'] = $data['templates']
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
 			'templateids' => $data['templates']
@@ -1211,6 +1207,7 @@ elseif (hasRequest('form')) {
 	}
 	unset($proxy);
 
+	// tags
 	if ($data['show_inherited_tags']) {
 		$data['parent_templates'] = getHostParentTemplates(array_flip($data['templates']));
 
@@ -1243,10 +1240,15 @@ elseif (hasRequest('form')) {
 	}
 
 	if (!$data['tags'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
+		$tag = ['tag' => '', 'value' => ''];
+		if ($data['show_inherited_tags']) {
+			$tag['type'] = ZBX_PROPERTY_OWN;
+		}
+		$data['tags'][] = $tag;
 	}
 	CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
+	// macros
 	if ($data['show_inherited_macros']) {
 		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros($data['templates']));
 	}

@@ -114,7 +114,7 @@ foreach ($data['proxies'] as $proxie) {
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
 		->setLabel(_('Monitored by proxy'))
-		->setChecked(isset($data['visible']['proxy_hostid'])),
+		->setChecked(array_key_exists('proxy_hostid', $data['visible'])),
 	$proxyComboBox
 );
 
@@ -122,7 +122,7 @@ $hostFormList->addRow(
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[status]', 'status', _('Original')))
 		->setLabel(_('Status'))
-		->setChecked(isset($data['visible']['status'])),
+		->setChecked(array_key_exists('status', $data['visible'])),
 	new CComboBox('status', $data['status'], null, [
 		HOST_STATUS_MONITORED => _('Enabled'),
 		HOST_STATUS_NOT_MONITORED => _('Disabled')
@@ -137,7 +137,7 @@ $newTemplateTable = (new CTable())
 		(new CMultiSelect([
 			'name' => 'templates[]',
 			'object_name' => 'templates',
-			'data' => $data['linkedTemplates'],
+			'data' => $data['templates'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -165,7 +165,7 @@ $newTemplateTable = (new CTable())
 $templatesFormList->addRow(
 	(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
 		->setLabel(_('Link templates'))
-		->setChecked(isset($data['visible']['templates'])),
+		->setChecked(array_key_exists('templates', $data['visible'])),
 	(new CDiv($newTemplateTable))
 		->setId('templateDiv')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -178,28 +178,28 @@ $ipmiFormList = new CFormList('ipmiFormList');
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
 		->setLabel(_('Authentication algorithm'))
-		->setChecked(isset($data['visible']['ipmi_authtype'])),
+		->setChecked(array_key_exists('ipmi_authtype', $data['visible'])),
 	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
 		->setLabel(_('Privilege level'))
-		->setChecked(isset($data['visible']['ipmi_privilege'])),
+		->setChecked(array_key_exists('ipmi_privilege', $data['visible'])),
 	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
 		->setLabel(_('Username'))
-		->setChecked(isset($data['visible']['ipmi_username'])),
+		->setChecked(array_key_exists('ipmi_username', $data['visible'])),
 	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
 		->setLabel(_('Password'))
-		->setChecked(isset($data['visible']['ipmi_password'])),
+		->setChecked(array_key_exists('ipmi_password', $data['visible'])),
 	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
@@ -209,7 +209,7 @@ $inventoryFormList = new CFormList('inventoryFormList');
 $inventoryFormList->addRow(
 	(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
 		->setLabel(_('Inventory mode'))
-		->setChecked(isset($data['visible']['inventory_mode'])),
+		->setChecked(array_key_exists('inventory_mode', $data['visible'])),
 	(new CDiv(
 		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
@@ -221,7 +221,7 @@ $inventoryFormList->addRow(
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 foreach ($data['inventories'] as $field => $fieldInfo) {
-	if (!isset($data['host_inventory'][$field])) {
+	if (!array_key_exists($field, $data['host_inventory'])) {
 		$data['host_inventory'][$field] = '';
 	}
 
@@ -238,7 +238,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	$inventoryFormList->addRow(
 		(new CVisibilityBox('visible['.$field.']', 'host_inventory['.$field.']', _('Original')))
 			->setLabel($fieldInfo['title'])
-			->setChecked(isset($data['visible'][$field])),
+			->setChecked(array_key_exists($field, $data['visible'])),
 		$fieldInput, null, 'formrow-inventory'
 	);
 }
@@ -283,7 +283,7 @@ $encryption_table = (new CTable())
 $encryption_form_list->addRow(
 	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
 		->setLabel(_('Connections'))
-		->setChecked(isset($data['visible']['encryption'])),
+		->setChecked(array_key_exists('encryption', $data['visible'])),
 	(new CDiv($encryption_table))
 		->setId('encryption_div')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

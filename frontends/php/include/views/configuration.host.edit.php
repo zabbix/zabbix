@@ -690,7 +690,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'is_template' => false,
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
-$divTabs->addTab('tagTab', _('Tags'), $tags_view->render());
+$divTabs->addTab('tag-tab', _('Tags'), $tags_view->render());
 
 /*
  * Macros
