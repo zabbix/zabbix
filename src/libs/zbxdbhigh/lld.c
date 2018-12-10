@@ -615,7 +615,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		*error = zbx_strdup(*error, "Value should be a JSON object.");
+		*error = zbx_strdup(*error, "Value should be a JSON array.");
 		goto out;
 	}
 
