@@ -606,7 +606,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 {
 	const char		*__function_name = "lld_rows_get";
 
-	struct zbx_json_parse	jp, jp_data, jp_row;
+	struct zbx_json_parse	jp, jp_array, jp_row;
 	const char		*p;
 	zbx_lld_row_t		*lld_row;
 	int			ret = FAIL;
@@ -615,13 +615,19 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		*error = zbx_strdup(*error, "Value should be a JSON object.");
+		*error = zbx_dsprintf(*error, "Cannot open received JSON: %s", zbx_json_strerror());
 		goto out;
 	}
 
-	/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-	/*         ^-------------------------------------------^  */
-	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	if ('[' == *jp.start)
+	{
+		if (SUCCEED != zbx_json_brackets_open(jp.start, &jp_array))
+		{
+			*error = zbx_dsprintf(*error, "Cannot open received JSON array.");
+			goto out;
+		}
+	}
+	else if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_array))
 	{
 		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);
@@ -629,12 +635,8 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 	}
 
 	p = NULL;
-	/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-	/*          ^                                             */
-	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	while (NULL != (p = zbx_json_next(&jp_array, p)))
 	{
-		/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-		/*          ^------------------^                          */
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			continue;
 
