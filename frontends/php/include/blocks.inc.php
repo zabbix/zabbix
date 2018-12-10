@@ -160,6 +160,7 @@ function getSystemStatusData(array $filter) {
 			'output' => ['priority'],
 			'selectGroups' => ['groupid'],
 			'selectHosts' => ['name'],
+			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
 			'skipDependent' => true,
@@ -520,6 +521,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$header_time = new CColHeader([_('Time'), (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN)]);
 
 	$show_timeline = (array_key_exists('show_timeline', $filter) && $filter['show_timeline']);
+	$show_latest_values = (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values']);
 
 	if ($show_timeline) {
 		$header = [
@@ -537,6 +539,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			_('Info'),
 			_('Host'),
 			_('Problem'),
+			$show_latest_values ? _('Latest values') : null,
 			_('Duration'),
 			_('Ack'),
 			_('Actions'),
@@ -609,6 +612,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
 			getSeverityCell($problem['severity'], null, $problem['name']),
+			$show_latest_values ? CScreenProblem::getLatestValues($trigger['items']) : null,
 			zbx_date2age($problem['clock']),
 			$ack,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],
