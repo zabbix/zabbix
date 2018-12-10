@@ -1178,7 +1178,7 @@ class CScreenProblem extends CScreenBase {
 				$last_value = [
 					'itemid' => null,
 					'clock' => null,
-					'value' => _('Unknown'),
+					'value' => UNRESOLVED_MACRO_STRING,
 					'ns' => null
 				];
 			}

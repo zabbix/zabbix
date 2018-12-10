@@ -666,6 +666,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
+				jQuery(target).siblings('.hint-item:first').focus();
 				delete target.isStatic;
 			}
 		}
