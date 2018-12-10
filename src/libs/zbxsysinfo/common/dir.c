@@ -159,8 +159,8 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	{
 		if (SUCCEED != zbx_regexp_compile(regex_excl_dir_str, regex_excl_dir, &error))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
-					"Invalid regular expression in sixth parameter: %s", error));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
+					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
 			return FAIL;
 		}
 	}
