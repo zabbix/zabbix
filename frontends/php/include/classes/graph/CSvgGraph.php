@@ -24,8 +24,6 @@
  */
 class CSvgGraph extends CSvg {
 
-	const SVG_GRAPH_X_AXIS_HEIGHT = 20;
-
 	protected $canvas_height;
 	protected $canvas_width;
 	protected $canvas_x;
@@ -51,6 +49,10 @@ class CSvgGraph extends CSvg {
 	 * @var string
 	 */
 	protected $grid_color;
+
+	protected $main_grid_color;
+
+	protected $highlight_color;
 
 	/**
 	 * Array of graph metrics data.
@@ -132,7 +134,7 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @var int
 	 */
-	protected $xaxis_height = 20;
+	protected $xaxis_height = 70;
 
 	/**
 	 * SVG default size.
@@ -147,6 +149,9 @@ class CSvgGraph extends CSvg {
 		$theme = getUserGraphTheme();
 		$this->text_color = '#' . $theme['textcolor'];
 		$this->grid_color = '#' . $theme['gridcolor'];
+		//$this->main_grid_color = '#' . $theme['maingridcolor'];
+		$this->main_grid_color = '#FF0000';
+		$this->highlight_color = '#' . $theme['highlightcolor'];
 
 		$this
 			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
@@ -341,62 +346,6 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
-	 * Return array of horizontal labels with positions. Array key will be position, value will be label.
-	 *
-	 * @return array
-	 */
-	public function getTimeGridWithPosition() {
-		$intervals = [
-			1 => ['H:i:s', 'H:i:s'],					// 1 second
-			5 => ['H:i:s', 'H:i:s'],					// 5 seconds
-			10 => ['H:i:s', 'H:i:s'],					// 10 seconds
-			30 => ['H:i:s', 'H:i:s'],					// 30 seconds
-			SEC_PER_MIN => ['H:i:s', 'H:i:s'],			// 1 minute
-			SEC_PER_MIN * 2 => ['H:i','H:i'],			// 2 minutes
-			SEC_PER_MIN * 5 => ['H:i', 'H:i'],			// 5 minutes
-			SEC_PER_MIN * 15 => ['H:i', 'H:i'],			// 15 minutes
-			SEC_PER_MIN * 30 => ['H:i', 'H:i'],			// 30 minutes
-			SEC_PER_HOUR => ['H:i', 'H:i'],				// 1 hours
-			SEC_PER_HOUR * 3 => ['H:i', 'n-d H:i'],		// 3 hours
-			SEC_PER_HOUR * 6 => ['H:i', 'n-d H:i'],		// 6 hours
-			SEC_PER_HOUR * 12 => ['H:i', 'n-d H:i'],	// 12 hours
-			SEC_PER_DAY => ['H:i', 'n-d H:i'],			// 1 day
-			SEC_PER_WEEK => ['n-d', 'n-d'],				// 1 week
-			SEC_PER_WEEK * 2 => ['n-d', 'n-d'],			// 2 weeks
-			SEC_PER_MONTH => ['n-d', 'Y-n-d'],			// 30 days
-			SEC_PER_MONTH * 3 => ['Y-n-d', 'Y-n-d'],	// 90 days
-			SEC_PER_MONTH * 4 => ['Y-n-d', 'Y-n-d'],	// 120 days
-			SEC_PER_MONTH * 6 => ['Y-n-d', 'Y-n-d'],	// 180 days
-			SEC_PER_YEAR => ['Y-n-d', 'Y-n-d'],			// 1 year
-			SEC_PER_YEAR * 2 => ['Y-n-d', 'Y-n-d']		// 2 years
-		];
-
-		$period = $this->time_till - $this->time_from;
-		$step = $period / $this->canvas_width * 100; // Grid cell (100px) in seconds.
-		$same_day = (date('d', $this->time_till) === date('d', $this->time_from));
-		$same_year = (date('y', $this->time_till) === date('y', $this->time_from));
-		$time_fmt = 'Y-n-d';
-
-		foreach ($intervals as $interval => $format) {
-			if ($interval > $step) {
-				$fmt = $same_day && $same_year ? 0 : 1;
-				$time_fmt = $format[$fmt];
-				break;
-			}
-		}
-
-		$grid_values = [];
-		$start = $this->time_from + $step - $this->time_from % $step;
-
-		for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
-			$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $period);
-			$grid_values[$relative_pos] = date($time_fmt, $clock);
-		}
-
-		return $grid_values;
-	}
-
-	/**
 	 * Add UI selection box element to graph.
 	 *
 	 * @return CSvgGraph
@@ -431,8 +380,6 @@ class CSvgGraph extends CSvg {
 		$this->calculateYAxis();
 		$this->calculateDimensions();
 		$this->calculatePaths();
-
-		$this->drawGrid();
 
 		if ($this->left_y_show) {
 			$this->drawCanvasLeftYAxis();
@@ -505,7 +452,7 @@ class CSvgGraph extends CSvg {
 	protected function calculateDimensions() {
 		// Canvas height must be specified before call self::getValuesGridWithPosition.
 		$this->offset_top = 10;
-		$this->offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
+		$this->offset_bottom = $this->xaxis_height;
 		$this->canvas_height = $this->height - $this->offset_top - $this->offset_bottom;
 		$this->canvas_y = $this->offset_top;
 
@@ -623,27 +570,44 @@ class CSvgGraph extends CSvg {
 	/**
 	 * Add Y axis with labels to left side of graph.
 	 */
-	protected function drawCanvasLeftYaxis() {
-		$this->addItem(
-			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT), GRAPH_YAXIS_SIDE_LEFT))
+	protected function drawCanvasLeftYAxis() {
+		$left_side_grid = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
+
+		$this->addItem([
+			(new CSvgGraphGrid(array_keys($left_side_grid), GRAPH_HORIZONTAL_GRID))
+				->setPosition($this->canvas_x, $this->canvas_y)
+				->setSize($this->canvas_width, $this->canvas_height)
+				->setColor($this->grid_color),
+			(new CSvgGraphYAxis($left_side_grid, GRAPH_YAXIS_SIDE_LEFT))
 				->setSize($this->offset_left, $this->canvas_height)
 				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
 				->setTextColor($this->text_color)
 				->setLineColor($this->grid_color)
-		);
+		]);
 	}
 
 	/**
 	 * Add Y axis with labels to right side of graph.
 	 */
 	protected function drawCanvasRightYAxis() {
-		$this->addItem(
-			(new CSvgGraphAxis($this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT), GRAPH_YAXIS_SIDE_RIGHT))
+		$right_side_grid = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
+
+		// Draw grid only if one is not drawn for left side Y axis.
+		$grid = (!$this->left_y_show)
+			? (new CSvgGraphGrid(array_keys($right_side_grid), GRAPH_HORIZONTAL_GRID))
+				->setPosition($this->canvas_x, $this->canvas_y)
+				->setSize($this->canvas_width, $this->canvas_height)
+				->setColor($this->grid_color)
+			: null;
+
+		$this->addItem([
+			$grid,
+			(new CSvgGraphYAxis($right_side_grid, GRAPH_YAXIS_SIDE_RIGHT))
 				->setSize($this->offset_right, $this->canvas_height)
 				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
 				->setTextColor($this->text_color)
 				->setLineColor($this->grid_color)
-		);
+		]);
 	}
 
 	/**
@@ -651,11 +615,14 @@ class CSvgGraph extends CSvg {
 	 */
 	protected function drawCanvasXAxis() {
 		$this->addItem(
-			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
+			(new CSvgGraphXAxis($this->time_from, $this->time_till))
 				->setSize($this->canvas_width, $this->xaxis_height)
+				->setCanvasSize($this->canvas_width, $this->canvas_height)
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
 				->setTextColor($this->text_color)
 				->setLineColor($this->grid_color)
+				->setMainLineColor($this->main_grid_color)
+				->setHighlightColor($this->highlight_color)
 		);
 	}
 
@@ -694,35 +661,6 @@ class CSvgGraph extends CSvg {
 		}
 
 		return $res;
-	}
-
-	/**
-	 * Add grid to graph.
-	 */
-	protected function drawGrid() {
-		$time_points = $this->x_show ? $this->getTimeGridWithPosition() : [];
-		$value_points = [];
-
-		if ($this->left_y_show) {
-			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT);
-
-			unset($time_points[0]);
-		}
-		elseif ($this->right_y_show) {
-			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT);
-
-			unset($time_points[$this->canvas_width]);
-		}
-
-		if ($this->x_show) {
-			unset($value_points[0]);
-		}
-
-		$this->addItem((new CSvgGraphGrid($value_points, $time_points))
-			->setPosition($this->canvas_x, $this->canvas_y)
-			->setSize($this->canvas_width, $this->canvas_height)
-			->setColor($this->grid_color)
-		);
 	}
 
 	/**
