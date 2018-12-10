@@ -621,11 +621,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	if ('[' == *jp.start)
 	{
-		if (SUCCEED != zbx_json_brackets_open(jp.start, &jp_array))
-		{
-			*error = zbx_dsprintf(*error, "Cannot open received JSON array.");
-			goto out;
-		}
+		jp_array = jp;
 	}
 	else if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_array))
 	{
