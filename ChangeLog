@@ -3,6 +3,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
 ..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)

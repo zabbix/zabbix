@@ -18,9 +18,9 @@
 --
 
 TABLE |users
-FIELDS|userid|alias|name  |surname      |passwd                          |url|autologin|autologout|lang |refresh|type|theme  |rows_per_page|
-ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30s    |3   |default|50           |
-ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|   |0        |15m       |en_GB|30s    |1   |default|50           |
+FIELDS|userid|alias|name  |surname      |passwd                          |url |autologin|autologout|lang |refresh|type|theme  |rows_per_page|
+ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|    |1        |0         |en_GB|30s    |3   |default|50           |
+ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|    |0        |15m       |en_GB|30s    |1   |default|50           |
 
 TABLE |hstgrp
 FIELDS|groupid|name                       |internal|flags|
@@ -61,9 +61,9 @@ ROW   |11      |Enabled debug mode       |0         |0           |1         |
 ROW   |12      |No access to the frontend|3         |0           |0         |
 
 TABLE |users_groups
-FIELDS|id|usrgrpid|userid|
-ROW   |2 |8       |2     |
-ROW   |4 |7       |1     |
+FIELDS|id  |usrgrpid|userid|
+ROW   |2   |8       |2     |
+ROW   |4   |7       |1     |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|
@@ -147,14 +147,177 @@ ROW   |4       |Windows service names for discovery         |SysmonLog  |
 ROW   |5       |Windows service startup states for discovery|automatic  |
 
 TABLE |expressions
-FIELDS|expressionid|regexpid|expression                                                                                                                                                           |expression_type|exp_delimiter|case_sensitive|
+FIELDS|expressionid|regexpid|expression                                                                                                                                                  |expression_type|exp_delimiter|case_sensitive|
 ROW   |1           |1       |^(btrfs&pipe;ext2&pipe;ext3&pipe;ext4&pipe;reiser&pipe;xfs&pipe;ffs&pipe;ufs&pipe;jfs&pipe;jfs2&pipe;vxfs&pipe;hfs&pipe;refs&pipe;ntfs&pipe;fat32&pipe;zfs)$|3              |,            |0             |
-ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                                       |4              |,            |1             |
-ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                                        |4              |,            |1             |
-ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                                 |3              |,            |1             |
-ROW   |7           |2       |^Software Loopback Interface                                                                                                                                         |4              |,            |1             |
-ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                                        |4              |,            |1             |
-ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                                        |4              |,            |1             |
-ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                                       |4              |,            |1             |
-ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                          |4              |,            |1             |
-ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                          |4              |,            |1             |
+ROW   |3           |3       |^(Physical memory&pipe;Virtual memory&pipe;Memory buffers&pipe;Cached memory&pipe;Swap space)$                                                              |4              |,            |1             |
+ROW   |5           |4       |^(MMCSS&pipe;gupdate&pipe;SysmonLog&pipe;clr_optimization_v2.0.50727_32&pipe;clr_optimization_v4.0.30319_32)$                                               |4              |,            |1             |
+ROW   |6           |5       |^(automatic&pipe;automatic delayed)$                                                                                                                        |3              |,            |1             |
+ROW   |7           |2       |^Software Loopback Interface                                                                                                                                |4              |,            |1             |
+ROW   |8           |2       |^(In)?[Ll]oop[Bb]ack[0-9._]*$                                                                                                                               |4              |,            |1             |
+ROW   |9           |2       |^NULL[0-9.]*$                                                                                                                                               |4              |,            |1             |
+ROW   |10          |2       |^[Ll]o[0-9.]*$                                                                                                                                              |4              |,            |1             |
+ROW   |11          |2       |^[Ss]ystem$                                                                                                                                                 |4              |,            |1             |
+ROW   |12          |2       |^Nu[0-9.]*$                                                                                                                                                 |4              |,            |1             |
+
+TABLE |dashboard
+FIELDS|dashboardid|name                |userid|private|
+ROW   |1          |Global view         |1     |0      |
+ROW   |2          |Zabbix server health|1     |1      |
+
+TABLE |dashboard_usrgrp
+FIELDS|dashboard_usrgrpid|dashboardid|usrgrpid|permission|
+ROW   |1                 |2          |7       |3         |
+
+TABLE |widget
+FIELDS|widgetid|dashboardid|type        |name                             |x   |y   |width|height|
+ROW   |1       |1          |systeminfo  |                                 |0   |0   |4    |4     |
+ROW   |2       |1          |problemsbysv|                                 |4   |0   |6    |4     |
+ROW   |3       |1          |clock       |                                 |10  |0   |2    |4     |
+ROW   |4       |1          |problems    |                                 |0   |4   |10   |10    |
+ROW   |5       |1          |favmaps     |                                 |10  |4   |2    |5     |
+ROW   |6       |1          |favgraphs   |                                 |10  |9   |2    |5     |
+ROW   |7       |2          |problems    |Zabbix server problems           |0   |0   |10   |4     |
+ROW   |8       |2          |clock       |Local time                       |10  |0   |2    |4     |
+ROW   |9       |2          |svggraph    |Values processed per second      |0   |4   |4    |5     |
+ROW   |10      |2          |svggraph    |Utilization of data collectors   |4   |4   |4    |5     |
+ROW   |11      |2          |svggraph    |Utilization of internal processes|8   |4   |4    |5     |
+ROW   |12      |2          |svggraph    |Cache usage                      |0   |9   |4    |5     |
+ROW   |13      |2          |svggraph    |Value cache effectiveness        |4   |9   |4    |5     |
+ROW   |14      |2          |svggraph    |Queue size                       |8   |9   |4    |5     |
+
+TABLE |widget_field
+FIELDS|widget_fieldid|widgetid|type|name                |value_int|value_str                             |value_groupid|value_hostid|value_itemid|value_graphid|value_sysmapid|
+ROW   |1             |2       |0   |hide_empty_groups   |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |2             |4       |0   |show                |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |3             |4       |0   |show_tags           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |4             |7       |3   |hostids             |0        |                                      |NULL         |10084       |NULL        |NULL         |NULL          |
+ROW   |5             |9       |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |6             |9       |0   |ds.fill.0           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |7             |9       |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |8             |9       |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |9             |9       |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |10            |9       |0   |ds.width.0          |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |11            |9       |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |12            |9       |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |13            |9       |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |14            |9       |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |15            |9       |1   |ds.color.0          |0        |00BFFF                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |16            |9       |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |17            |9       |1   |ds.items.0.0        |0        |Number of processed *values per second|NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |18            |9       |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |19            |9       |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |20            |9       |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |21            |10      |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |22            |10      |0   |ds.fill.0           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |23            |10      |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |24            |10      |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |25            |10      |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |26            |10      |0   |ds.width.0          |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |27            |10      |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |28            |10      |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |29            |10      |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |30            |10      |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |31            |10      |1   |ds.color.0          |0        |E57373                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |32            |10      |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |33            |10      |1   |ds.items.0.0        |0        |Utilization of * data collector *     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |34            |10      |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |35            |10      |1   |lefty_max           |0        |100                                   |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |36            |10      |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |37            |10      |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |38            |11      |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |39            |11      |0   |ds.fill.0           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |40            |11      |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |41            |11      |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |42            |11      |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |43            |11      |0   |ds.width.0          |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |44            |11      |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |45            |11      |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |46            |11      |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |47            |11      |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |48            |11      |1   |ds.color.0          |0        |E57373                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |49            |11      |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |50            |11      |1   |ds.items.0.0        |0        |Utilization of * internal *           |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |51            |11      |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |52            |11      |1   |lefty_max           |0        |100                                   |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |53            |11      |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |54            |11      |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |55            |12      |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |56            |12      |0   |ds.fill.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |57            |12      |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |58            |12      |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |59            |12      |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |60            |12      |0   |ds.width.0          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |61            |12      |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |62            |12      |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |63            |12      |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |64            |12      |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |65            |12      |1   |ds.color.0          |0        |4DB6AC                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |66            |12      |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |67            |12      |1   |ds.items.0.0        |0        |Zabbix*cache*% used                   |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |68            |12      |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |69            |12      |1   |lefty_max           |0        |100                                   |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |70            |12      |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |71            |12      |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |72            |13      |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |73            |13      |0   |ds.axisy.1          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |74            |13      |0   |ds.fill.0           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |75            |13      |0   |ds.fill.1           |3        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |76            |13      |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |77            |13      |0   |ds.missingdatafunc.1|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |78            |13      |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |79            |13      |0   |ds.transparency.1   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |80            |13      |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |81            |13      |0   |ds.type.1           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |82            |13      |0   |ds.width.0          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |83            |13      |0   |ds.width.1          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |84            |13      |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |85            |13      |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |86            |13      |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |87            |13      |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |88            |13      |1   |ds.color.0          |0        |9CCC65                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |89            |13      |1   |ds.color.1          |0        |FF465C                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |90            |13      |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |91            |13      |1   |ds.hosts.1.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |92            |13      |1   |ds.items.0.0        |0        |Zabbix value cache hits               |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |93            |13      |1   |ds.items.1.0        |0        |Zabbix value cache misses             |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |94            |13      |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |95            |13      |1   |ds.timeshift.1      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |96            |13      |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |97            |13      |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |98            |14      |0   |ds.axisy.0          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |99            |14      |0   |ds.axisy.1          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |100           |14      |0   |ds.axisy.2          |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |101           |14      |0   |ds.fill.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |102           |14      |0   |ds.fill.1           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |103           |14      |0   |ds.fill.2           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |104           |14      |0   |ds.missingdatafunc.0|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |105           |14      |0   |ds.missingdatafunc.1|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |106           |14      |0   |ds.missingdatafunc.2|0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |107           |14      |0   |ds.transparency.0   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |108           |14      |0   |ds.transparency.1   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |109           |14      |0   |ds.transparency.2   |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |110           |14      |0   |ds.type.0           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |111           |14      |0   |ds.type.1           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |112           |14      |0   |ds.type.2           |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |113           |14      |0   |ds.width.0          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |114           |14      |0   |ds.width.1          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |115           |14      |0   |ds.width.2          |2        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |116           |14      |0   |graph_item_problems |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |117           |14      |0   |legend              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |118           |14      |0   |righty              |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |119           |14      |0   |show_problems       |1        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |120           |14      |1   |ds.color.0          |0        |B0AF07                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |121           |14      |1   |ds.color.1          |0        |E53935                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |122           |14      |1   |ds.color.2          |0        |0275B8                                |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |123           |14      |1   |ds.hosts.0.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |124           |14      |1   |ds.hosts.1.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |125           |14      |1   |ds.hosts.2.0        |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |126           |14      |1   |ds.items.0.0        |0        |Zabbix queue                          |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |127           |14      |1   |ds.items.1.0        |0        |Zabbix queue over 10 minutes          |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |128           |14      |1   |ds.items.2.0        |0        |Zabbix preprocessing queue            |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |129           |14      |1   |ds.timeshift.0      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |130           |14      |1   |ds.timeshift.1      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |131           |14      |1   |ds.timeshift.2      |0        |                                      |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |132           |14      |1   |lefty_min           |0        |0                                     |NULL         |NULL        |NULL        |NULL         |NULL          |
+ROW   |133           |14      |1   |problemhosts.0      |0        |Zabbix server                         |NULL         |NULL        |NULL        |NULL         |NULL          |
+
