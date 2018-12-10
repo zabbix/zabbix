@@ -268,7 +268,8 @@ switch ($data['method']) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
 						$hostGroups = enrichParentGroups($hostGroups, [
 							'search' => $options['search'],
-							'editable' => $options['editable']
+							'editable' => $options['editable'],
+							'filter' => $options['filter']
 						]);
 					}
 

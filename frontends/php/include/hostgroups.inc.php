@@ -101,11 +101,13 @@ function enrichParentGroups(array $groups, array $options = []) {
 	}
 
 	if ($parents) {
-		$groups += API::HostGroup()->get($options + [
-			'output' => ['groupid', 'name'],
-			'filter' => ['name' => array_keys($parents)],
-			'preservekeys' => true
-		]);
+		if (!array_key_exists('filter', $options)) {
+			$options['filter'] = [];
+		}
+		$options['output'] = ['groupid', 'name'];
+		$options['filter']['name'] = array_keys($parents);
+		$options['preservekeys'] = true;
+		$groups += API::HostGroup()->get($options);
 	}
 
 	return $groups;
