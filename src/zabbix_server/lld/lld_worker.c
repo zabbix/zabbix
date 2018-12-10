@@ -82,8 +82,6 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "processing discovery rule:" ZBX_FS_UI64, itemid);
 
-	diff.flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
-
 	if (NULL == error && SUCCEED == lld_process_discovery_rule(itemid, value, &error))
 		state = ITEM_STATE_NORMAL;
 	else

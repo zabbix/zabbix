@@ -30,6 +30,21 @@ extern int		server_num, process_num;
 
 extern int	CONFIG_LLDWORKER_FORKS;
 
+/*
+ * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,
+ * sorted by their oldest value timestamps. The values are stored in linked lists,
+ * each rule having its own list of values. Values inside list are not sorted, so
+ * in the case a LLD rule received a value with past timestamp, it will be processed
+ * in queuing order, not the value chronological order.
+ *
+ * During processing the rule with oldest value is popped from queue and sent
+ * to a free worker. After processing the rule worker sends done response and
+ * manager removes the oldest value from rule's value list. If there are no more
+ * values in the list the rule is removed from the index (rule_index hashset),
+ * otherwise the rule is enqueued back in LLD queue.
+ *
+ */
+
 typedef struct zbx_lld_value
 {
 	char			*value;
@@ -40,10 +55,16 @@ typedef struct zbx_lld_value
 }
 zbx_lld_data_t;
 
+/* queue of values for one LLD rule */
 typedef struct
 {
+	/* the LLD rule id */
 	zbx_uint64_t	itemid;
+
+	/* the oldest value in queue */
 	zbx_lld_data_t	*tail;
+
+	/* the newest value in queue */
 	zbx_lld_data_t	*head;
 }
 zbx_lld_rule_t;
@@ -59,7 +80,7 @@ typedef struct
 	/* workers indexed by IPC service clients */
 	zbx_hashset_t		workers_client;
 
-	/* the next woerker index to be assigned to new IPC service clients */
+	/* the next worker index to be assigned to new IPC service clients */
 	int			next_worker_index;
 
 	/* index of queued LLD rules */
@@ -80,8 +101,6 @@ typedef struct
 	zbx_lld_rule_t		*rule;
 }
 zbx_lld_worker_t;
-
-
 
 /* workers_client hashset support */
 static zbx_hash_t	worker_hash_func(const void *d)
@@ -226,7 +245,7 @@ static void	lld_manager_destroy(zbx_lld_manager_t *manager)
  *                                                                            *
  * Function: lld_get_worker_by_client                                         *
  *                                                                            *
- * Purpose: returns alerter by connected client                               *
+ * Purpose: returns worker by connected IPC client data                       *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
  *             client  - [IN] the connected worker                            *
@@ -257,7 +276,7 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
  * Purpose: registers worker                                                  *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected worker                            *
+ *             client  - [IN] the connected worker IPC client data            *
  *             message - [IN] the received message                            *
  *                                                                            *
  ******************************************************************************/
