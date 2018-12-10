@@ -721,7 +721,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::HostGroup()->get($options);
 				if (array_key_exists('enrich_parent_groups', $page_options)) {
-					$records = CPageFilter::enrichParentGroups($records);
+					$records = enrichParentGroups($records);
 				}
 
 				CArrayHelper::sort($records, ['name']);
