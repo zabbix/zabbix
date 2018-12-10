@@ -137,7 +137,7 @@ class CControllerPopupGeneric extends CController {
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
 				'allowed_src_fields' => 'application_prototypeid,name',
 				'form' => [
-					'name' => 'application_prototypeform',
+					'name' => 'application_prototype_form',
 					'id' => 'application_prototypes'
 				],
 				'table_columns' => [
