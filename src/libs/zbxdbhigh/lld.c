@@ -603,7 +603,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	DB_ROW			row;
 	zbx_uint64_t		hostid;
 	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
-	unsigned char		state;
+	unsigned char		db_state, state = ITEM_STATE_NOTSUPPORTED;
 	int			lifetime;
 	zbx_vector_ptr_t	lld_rows;
 	char			*sql = NULL;
@@ -640,7 +640,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
-		state = (unsigned char)atoi(row[2]);
+		db_state = (unsigned char)atoi(row[2]);
 		filter.evaltype = atoi(row[3]);
 		filter.expression = zbx_strdup(NULL, row[4]);
 		db_error = zbx_strdup(db_error, row[5]);
@@ -673,6 +673,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &info, &error))
 		goto error;
 
+	state = ITEM_STATE_NORMAL;
 	error = zbx_strdup(error, "");
 
 	now = time(NULL);
@@ -702,26 +703,39 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, now);
 
-	if (ITEM_STATE_NOTSUPPORTED == state)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported", zbx_host_key_string(lld_ruleid));
-
-		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
-		zbx_process_events(NULL, NULL);
-		zbx_clean_events();
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
-		sql_start = sql_continue;
-
-		lld_rule_diff.state = ITEM_STATE_NORMAL;
-		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
-	}
-
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
 		error = zbx_strdcat(error, info);
 error:
+	if (db_state != state)
+	{
+		lld_rule_diff.state = state;
+		lld_rule_diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
+
+		if (ITEM_STATE_NORMAL == state)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became supported",
+					zbx_host_key_string(lld_ruleid));
+
+			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
+					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became  not supported: %s",
+					zbx_host_key_string(lld_ruleid), error);
+
+			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts,
+					ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, error);
+		}
+
+		zbx_process_events(NULL, NULL);
+		zbx_clean_events();
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, state);
+		sql_start = sql_continue;
+	}
+
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_field("items", "error", error);
