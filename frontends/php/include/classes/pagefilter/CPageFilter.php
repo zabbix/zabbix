@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../hostgroups.inc.php';
 
 /**
  * @property string $groupid
@@ -374,6 +373,45 @@ class CPageFilter {
 	}
 
 	/**
+	 * Enriches host groups array by parent groups.
+	 *
+	 * @param array  $groups
+	 * @param string $groups[<groupid>]['groupid']
+	 * @param string $groups[<groupid>]['name']
+	 *
+	 * @return array
+	 */
+	public static function enrichParentGroups(array $groups, array $options = []) {
+		$parents = [];
+		foreach ($groups as $group) {
+			$parent = explode('/', $group['name']);
+			for (array_pop($parent); $parent; array_pop($parent)) {
+				$parents[implode('/', $parent)] = true;
+			}
+		}
+
+		if ($parents) {
+			foreach ($groups as $group) {
+				if (array_key_exists($group['name'], $parents)) {
+					unset($parents[$group['name']]);
+				}
+			}
+		}
+
+		if ($parents) {
+			if (!array_key_exists('filter', $options)) {
+				$options['filter'] = [];
+			}
+			$options['output'] = ['groupid', 'name'];
+			$options['filter']['name'] = array_keys($parents);
+			$options['preservekeys'] = true;
+			$groups += API::HostGroup()->get($options);
+		}
+
+		return $groups;
+	}
+
+	/**
 	 * Load available host groups, choose the selected host group and remember the selection.
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
@@ -389,7 +427,7 @@ class CPageFilter {
 		];
 		$options = zbx_array_merge($defaultOptions, $options);
 		$this->data['groups'] = API::HostGroup()->get($options);
-		$this->data['groups'] = enrichParentGroups($this->data['groups']);
+		$this->data['groups'] = self::enrichParentGroups($this->data['groups']);
 
 		CArrayHelper::sort($this->data['groups'], ['name']);
 
