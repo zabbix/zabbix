@@ -286,28 +286,37 @@ out:
 	return ret;
 }
 
-static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *lld_macros,
-		const lld_condition_t *condition)
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
+		const char *macro, char **value, size_t *value_alloc)
 {
-	char			*value = NULL;
-	size_t			value_alloc = 0;
-	int			ret, index;
 	zbx_lld_macro_t		lld_macro_local, *lld_macro;
+	int			index;
 	struct zbx_json_parse	jp_out;
+	int			ret;
 
-	lld_macro_local.lld_macro = condition->macro;
+	lld_macro_local.lld_macro = (char *)macro;
 
 	if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macros, &lld_macro_local, lld_macros_compare)))
 	{
 		lld_macro = (zbx_lld_macro_t *)lld_macros->values[index];
 
-		if (FAIL != (ret = zbx_json_path_open(jp_row, lld_macro->lld_macro, &jp_out)))
-			zbx_json_value_dyn(&jp_out, &value, &value_alloc);
+		if (FAIL != (ret = zbx_json_path_open(jp_row, lld_macro->json_path, &jp_out)))
+			zbx_json_value_dyn(&jp_out, value, value_alloc);
 	}
 	else
-		ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc);
+		ret = zbx_json_value_by_name_dyn(jp_row, macro, value, value_alloc);
 
-	if (SUCCEED == ret)
+	return ret;
+}
+
+static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *lld_macros,
+		const lld_condition_t *condition)
+{
+	char	*value = NULL;
+	size_t	value_alloc = 0;
+	int	ret;
+
+	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macros, condition->macro, &value, &value_alloc)))
 	{
 		switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 		{

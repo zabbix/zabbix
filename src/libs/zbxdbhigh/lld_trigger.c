@@ -1528,7 +1528,7 @@ out:
 }
 
 static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
-		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros, char **error)
+		const zbx_vector_ptr_t *lld_rows, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				i, j;
@@ -3468,7 +3468,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 	lld_triggers_make(&trigger_prototypes, &triggers, &items, lld_rows, lld_macros, error);
 	lld_triggers_validate(hostid, &triggers, error);
-	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, lld_macros, error);
+	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macros);
 	lld_trigger_tags_validate(&triggers, error);
