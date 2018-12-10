@@ -287,7 +287,7 @@ out:
 }
 
 int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
-		const char *name, char **value, size_t *value_alloc)
+		const char *macro, char **value, size_t *value_alloc)
 {
 	zbx_lld_macro_t		lld_macro_local, *lld_macro;
 	int			index;
