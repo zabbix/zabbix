@@ -704,9 +704,7 @@ class CControllerPopupGeneric extends CController {
 			case 'host_groups':
 				$options = [
 					'output' => ['groupid', 'name'],
-					'preservekeys' => true,
-					'editable' => null,
-					'filter' => null
+					'preservekeys' => true
 				];
 
 				if (array_key_exists('real_hosts', $page_options)) {
@@ -724,9 +722,8 @@ class CControllerPopupGeneric extends CController {
 				$records = API::HostGroup()->get($options);
 				if (array_key_exists('enrich_parent_groups', $page_options)) {
 					$records = CPageFilter::enrichParentGroups($records, [
-						'editable' => $options['editable'],
-						'filter' => $options['filter']
-					]);
+						'real_hosts' => null
+					] + $options);
 				}
 
 				CArrayHelper::sort($records, ['name']);

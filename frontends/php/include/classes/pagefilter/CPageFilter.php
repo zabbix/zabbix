@@ -399,12 +399,20 @@ class CPageFilter {
 		}
 
 		if ($parents) {
+			if (!array_key_exists('output', $options)) {
+				$options['output'] = ['groupid', 'name'];
+			}
+
 			if (!array_key_exists('filter', $options)) {
 				$options['filter'] = [];
 			}
-			$options['output'] = ['groupid', 'name'];
+
 			$options['filter']['name'] = array_keys($parents);
-			$options['preservekeys'] = true;
+
+			if (!array_key_exists('preservekeys', $options)) {
+				$options['preservekeys'] = true;
+			}
+
 			$groups += API::HostGroup()->get($options);
 		}
 

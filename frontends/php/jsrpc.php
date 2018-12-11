@@ -266,10 +266,8 @@ switch ($data['method']) {
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
 						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
-							'search' => $options['search'],
-							'editable' => $options['editable'],
-							'filter' => $options['filter']
-						]);
+							'real_hosts' => null
+						] + $options);
 					}
 
 					CArrayHelper::sort($hostGroups, [
