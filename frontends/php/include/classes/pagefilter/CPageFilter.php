@@ -378,6 +378,7 @@ class CPageFilter {
 	 * @param array  $groups
 	 * @param string $groups[<groupid>]['groupid']
 	 * @param string $groups[<groupid>]['name']
+	 * @param array  $options                        HostGroup API call parameters.
 	 *
 	 * @return array
 	 */
@@ -409,10 +410,7 @@ class CPageFilter {
 
 			$options['filter']['name'] = array_keys($parents);
 
-			if (!array_key_exists('preservekeys', $options)) {
-				$options['preservekeys'] = true;
-			}
-
+			$options['preservekeys'] = true;
 			$groups += API::HostGroup()->get($options);
 		}
 
