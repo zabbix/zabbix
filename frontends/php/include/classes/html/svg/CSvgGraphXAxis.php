@@ -46,13 +46,6 @@ class CSvgGraphXAxis extends CSvgTag {
 	const LABEL_ROTATE_DEGREES = 270;
 
 	/**
-	 * CSS class name for axis container.
-	 *
-	 * @var array
-	 */
-	private $css_class;
-
-	/**
 	 * Time period start.
 	 *
 	 * @var int
@@ -88,7 +81,7 @@ class CSvgGraphXAxis extends CSvgTag {
 	private $text_color;
 
 	/**
-	 * Color for axis.
+	 * Color for grid and axis.
 	 *
 	 * @var string
 	 */
@@ -135,6 +128,13 @@ class CSvgGraphXAxis extends CSvgTag {
 	 * @var array
 	 */
 	private $grids;
+
+	/**
+	 * Array of labels on X axis.
+	 *
+	 * @var array
+	 */
+	private $labels;
 
 	/**
 	 * Array of main grid values.
@@ -219,7 +219,7 @@ class CSvgGraphXAxis extends CSvgTag {
 	}
 
 	/**
-	 * Set highlight color.
+	 * Set color for highlighted labels.
 	 *
 	 * @param string $color  Color value.
 	 *
@@ -267,12 +267,13 @@ class CSvgGraphXAxis extends CSvgTag {
 			]
 		];
 
+		// Grids must be created here because makeStyles is called before toString.
 		$this->getDateTimeIntervals();
 		$this->makeGrids();
 
 		foreach ($this->grids as $grid) {
-			foreach ($grid->makeStyles() as $grid_style_key => $grid_style) {
-				$styles['.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.$grid_style_key] = $grid_style;
+			foreach ($grid->makeStyles() as $grid_class_name => $grid_style) {
+				$styles['.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' '.$grid_class_name] = $grid_style;
 			}
 		}
 
@@ -323,10 +324,10 @@ class CSvgGraphXAxis extends CSvgTag {
 	}
 
 	/**
-	 * Set axis container position.
+	 * Set canvas size.
 	 *
-	 * @param int $x        Horizontal position of container element.
-	 * @param int $y        Vertical position of container element.
+	 * @param int $width        Canvas width.
+	 * @param int $height       Canvas height.
 	 *
 	 * @return CSvgTag
 	 */
@@ -469,18 +470,14 @@ class CSvgGraphXAxis extends CSvgTag {
 
 		$position = 0;
 
-		$testcnt = 200;
 		while (true) {
-			if (--$testcnt == 0) break;
-
 			$dt['sub']->modify($modifier['sub']);
 
-			// 'sub' intervāls ir startp stundu un dienu.
 			if (SEC_PER_HOUR < $interval['sub'] && $interval['sub'] < SEC_PER_DAY) {
 				if ($do_align) {
 					$hours = $interval['sub'] / SEC_PER_HOUR;
-					$hour = (int) $dt['sub']->format('H'); // dabon apaļu stundu
-					if ($hour % $hours) { // ir atlikums - $dt['sub'] nav apaļa stunda
+					$hour = (int) $dt['sub']->format('H');
+					if ($hour % $hours) {
 						$dt['sub']->modify($dst_offset.' second');
 					}
 
@@ -489,7 +486,7 @@ class CSvgGraphXAxis extends CSvgTag {
 
 				$dst = (bool) $dt['sub']->format('I');
 
-				// ja šaja periodā ir notikusi pārslēgšanās uz daylight saving time...
+				// Check if in particular period time was switched to daylight saving time.
 				if ($dst && $prev_dst != $dst) {
 					$dst_offset -= $dt['sub']->getOffset();
 					$do_align = ($interval['sub'] > abs($dst_offset));
@@ -526,7 +523,11 @@ class CSvgGraphXAxis extends CSvgTag {
 				$this->sub_grid_positions[] = $position;
 			}
 
-			if ($position > 10 && $position <= ($this->width - 10)) {
+			if ($position >= ($this->width - 10)) {
+				// Do not continue once position is out of canvas.
+				break;
+			}
+			elseif ($position > 10) {
 				$this->labels[] = (new CSvgText($position + $this->x + 1, $this->y + $this->label_top_offset, $time_formatted))
 					->rotate(self::LABEL_ROTATE_DEGREES, $position + $this->x + 1, $this->y + $this->label_top_offset)
 					->addClass($label_style);
