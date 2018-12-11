@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+.......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
 ....I....T [ZBX-13773] fixed naming inconsistencies in agent template, added more trigger descriptions in proxy and server templates (kalimulin)
@@ -41,6 +42,7 @@ Changes for 4.0.3rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
 ..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
