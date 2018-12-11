@@ -469,7 +469,7 @@ jQuery(function($) {
 					hideAvailable($obj);
 				}
 			})
-			.on('keypress keydown', function(e) {
+			.on('keydown', function(e) {
 				switch (e.which) {
 
 					case KEY.TAB:
