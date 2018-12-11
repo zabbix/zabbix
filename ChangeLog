@@ -1,6 +1,7 @@
 Changes for 4.0.3rc1
 
 New features:
+..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
 
 Bug fixes:
 .......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
