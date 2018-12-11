@@ -1090,6 +1090,11 @@ output {
   font-weight: bold;
   color: #ffa20d; }
 
+.suggest-new {
+  border-top: 1px solid #666; }
+  .suggest-new span:first-child {
+    font-weight: bold; }
+
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #000;

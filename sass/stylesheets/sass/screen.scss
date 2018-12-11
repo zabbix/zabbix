@@ -1643,6 +1643,14 @@ output {
 	color: $dark-yellow;
 }
 
+.suggest-new {
+	border-top: 1px solid $form-border-color;
+
+	span:first-child {
+		font-weight: bold;
+	}
+}
+
 // Forms
 .table-forms-container {
 	margin: 0 0 10px 0;

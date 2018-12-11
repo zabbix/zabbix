@@ -1127,6 +1127,11 @@ output {
   font-weight: bold;
   color: #e99003; }
 
+.suggest-new {
+  border-top: 1px solid #4f4f4f; }
+  .suggest-new span:first-child {
+    font-weight: bold; }
+
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #2b2b2b;
