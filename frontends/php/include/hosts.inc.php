@@ -598,23 +598,17 @@ function getHostParentTemplates(array $templateids) {
 		])
 		: [];
 
-	$is_super_admin = CWebUser::getType() == USER_TYPE_SUPER_ADMIN;
-
-	if (!$is_super_admin) {
-		$rw_templates = $parent_templates
-			? API::Template()->get([
-				'output' => [],
-				'templateids' => array_keys($parent_templates),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
-	}
+	$rw_templates = $parent_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($parent_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
 
 	foreach ($parent_templates as $templateid => &$template) {
-		$template['permission'] = ($is_super_admin || array_key_exists($templateid, $rw_templates))
-			? PERM_READ_WRITE
-			: PERM_READ;
+		$template['permission'] = array_key_exists($templateid, $rw_templates) ? PERM_READ_WRITE : PERM_READ;
 	}
 	unset($template);
 
@@ -625,7 +619,7 @@ function getHostParentTemplates(array $templateids) {
  * Get parent templates for each given application.
  *
  * @param array  $applications                     An array of applications.
- * @param string $applications[]['applicationid']  ID of an applications.
+ * @param string $applications[]['applicationid']  ID of an application.
  * @param array  $applications[]['templateids]     IDs of parent template applications.
  *
  * @return array
