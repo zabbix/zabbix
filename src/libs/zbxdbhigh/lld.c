@@ -623,7 +623,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 	{
 		jp_array = jp;
 	}
-	else if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_array))
+	else if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_array))	/* deprecated */
 	{
 		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);

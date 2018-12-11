@@ -600,8 +600,7 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 		}
 	}
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != (row = zbx_odbc_fetch(query_result)))
 	{
