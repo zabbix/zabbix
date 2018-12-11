@@ -525,7 +525,7 @@ class CSvgGraphXAxis extends CSvgTag {
 			}
 
 			if ($position >= ($this->width - 10)) {
-				// Do not continue once position is out of canvas.
+				// Stop once calculated position is out of canvas or overlaps ending label.
 				break;
 			}
 			elseif ($position > 10) {

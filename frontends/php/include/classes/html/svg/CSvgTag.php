@@ -140,4 +140,19 @@ class CSvgTag extends CTag {
 
 		return $this;
 	}
+
+	/**
+	 * Rotate tag.
+	 *
+	 * @param int $degrees    Degrees to rotate.
+	 * @param int $x          X value for transform:rotate().
+	 * @param int $y          Y value for transform:rotate().
+	 *
+	 * @return CSvgTag
+	 */
+	public function rotate($degrees, $x, $y) {
+		$this->setAttribute('transform', 'rotate('.$degrees.' '.$x.','.$y.')');
+
+		return $this;
+	}
 }

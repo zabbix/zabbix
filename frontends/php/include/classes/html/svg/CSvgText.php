@@ -28,19 +28,4 @@ class CSvgText extends CSvgTag {
 		$this->setAttribute('y', $y);
 		$this->addItem($text);
 	}
-
-	/**
-	 * Rotate Text tag.
-	 *
-	 * @param int $degrees    Degries to rotate.
-	 * @param int $x          X value for transform:rotate().
-	 * @param int $y          Y value for transform:rotate().
-	 *
-	 * @return CSvgText
-	 */
-	public function rotate($degrees, $x, $y) {
-		$this->setAttribute('transform', 'rotate('.$degrees.' '.$x.','.$y.')');
-
-		return $this;
-	}
 }
