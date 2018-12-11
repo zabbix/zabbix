@@ -244,6 +244,7 @@ class CSvgGraphXAxis extends CSvgTag {
 
 		// Add grid for main values.
 		$this->grids[] = (new CSvgGraphGrid($this->main_grid_positions))
+			->setDimension(CSvgGraphGrid::GRID_DIMENSION_VERTICAL)
 			->setPosition($this->x, $this->y - $this->canvas_height)
 			->setSize($this->canvas_width, $this->canvas_height)
 			->setColor($this->main_grid_color);
