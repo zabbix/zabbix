@@ -163,6 +163,16 @@ my %postgresql = (
 	"t_varchar"	=>	"varchar"
 );
 
+my %timescaledb = %postgresql;
+for ("history", "history_uint", "history_log", "history_text", "trends", "trends_uint")
+{
+	$timescaledb{"after"} .= <<EOF
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400);
+SELECT set_adaptive_chunking('$_', chunk_target_size => 'estimate');
+EOF
+;
+}
+
 my %sqlite3 = (
 	"type"		=>	"sql",
 	"database"	=>	"sqlite3",
@@ -625,7 +635,7 @@ sub process_row
 
 sub usage
 {
-	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
+	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
@@ -688,13 +698,14 @@ sub main
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
 
-	if ($format eq 'c')		{ %output = %c; }
-	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
-	elsif ($format eq 'mysql')	{ %output = %mysql; }
-	elsif ($format eq 'oracle')	{ %output = %oracle; }
-	elsif ($format eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($format eq 'sqlite3')	{ %output = %sqlite3; }
-	else				{ usage(); }
+	if ($format eq 'c')			{ %output = %c; }
+	elsif ($format eq 'ibm_db2')		{ %output = %ibm_db2; }
+	elsif ($format eq 'mysql')		{ %output = %mysql; }
+	elsif ($format eq 'oracle')		{ %output = %oracle; }
+	elsif ($format eq 'postgresql')		{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')		{ %output = %sqlite3; }
+	elsif ($format eq 'timescaledb')	{ %output = %timescaledb; }
+	else					{ usage(); }
 
 	process();
 

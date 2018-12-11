@@ -1725,6 +1725,7 @@ AC_OUTPUT([
 	database/oracle/Makefile
 	database/postgresql/Makefile
 	database/sqlite3/Makefile
+	database/timescaledb/Makefile
 	misc/Makefile
 	src/Makefile
 	src/libs/Makefile

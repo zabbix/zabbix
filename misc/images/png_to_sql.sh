@@ -32,6 +32,7 @@ imagefile="images.sql"
 
 imagefile_mysql="$sqlbasedir/mysql/$imagefile"
 imagefile_pgsql="$sqlbasedir/postgresql/$imagefile"
+imagefile_timescaledb="$sqlbasedir/timescaledb/$imagefile"
 imagefile_sqlite3="$sqlbasedir/sqlite3/$imagefile"
 imagefile_oracle="$sqlbasedir/oracle/$imagefile"
 imagefile_ibm_db2="$sqlbasedir/ibm_db2/$imagefile"
@@ -57,8 +58,8 @@ for imagefile in $pngdir/*.png; do
 	image_data=$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")
 	# ----- MySQL
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',0x$image_data);" >> "$imagefile_mysql"
-	# ----- PostgreSQL
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$image_data','hex'));" >> "$imagefile_pgsql"
+	# ----- PostgreSQL/TimescaleDB
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$image_data','hex'));" | tee -a "$imagefile_pgsql" "$imagefile_timescaledb" >/dev/null
 	# ----- Oracle
 	echo -e "\tLOAD_IMAGE($imagesdone,1,'$imagename','$imagefile');" >> "$imagefile_oracle"
 	# ----- SQLite
