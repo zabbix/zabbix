@@ -55,8 +55,8 @@ else {
 		$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 255))
 			->addClass('macro')
 			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-			->setReadOnly(
-				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
+			->setReadonly(
+				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & ZBX_PROPERTY_INHERITED))
 			)
 			->setAttribute('placeholder', '{$MACRO}');
 
@@ -66,7 +66,7 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
-			if ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED)) {
+			if ($data['show_inherited_macros'] && ($macro['type'] & ZBX_PROPERTY_INHERITED)) {
 				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]',
 					array_key_exists('template', $macro) ? $macro['template']['value'] : $macro['global']['value']
 				);
@@ -79,8 +79,8 @@ else {
 
 		$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-			->setReadOnly(
-				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & MACRO_TYPE_HOSTMACRO))
+			->setReadonly(
+				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & ZBX_PROPERTY_OWN))
 			)
 			->setAttribute('placeholder', _('value'));
 
@@ -88,14 +88,14 @@ else {
 
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
-				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
+				if (($macro['type'] & ZBX_PROPERTY_BOTH) == ZBX_PROPERTY_BOTH) {
 					$row[] = (new CCol(
 						(new CButton('macros['.$i.'][change]', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-change')
 					))->addClass(ZBX_STYLE_NOWRAP);
 				}
-				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
+				elseif ($macro['type'] & ZBX_PROPERTY_INHERITED) {
 					$row[] = (new CCol(
 						(new CButton('macros['.$i.'][change]', _x('Change', 'verb')))
 							->addClass(ZBX_STYLE_BTN_LINK)

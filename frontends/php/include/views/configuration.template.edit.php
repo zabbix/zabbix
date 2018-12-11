@@ -433,7 +433,7 @@ $divTabs->addTab('tagTab', _('Tags'), $tags_view->render());
 if (!$macros) {
 	$macro = ['macro' => '', 'value' => ''];
 	if ($data['show_inherited_macros']) {
-		$macro['type'] = MACRO_TYPE_HOSTMACRO;
+		$macro['type'] = ZBX_PROPERTY_OWN;
 	}
 	$macros[] = $macro;
 }

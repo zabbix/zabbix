@@ -27,9 +27,9 @@
 		$('#tbl_macros').on('click', 'button.element-table-change', function() {
 			var macroNum = $(this).attr('id').split('_')[1];
 
-			if ($('#macros_' + macroNum + '_type').val() & <?= MACRO_TYPE_HOSTMACRO ?>) {
+			if ($('#macros_' + macroNum + '_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
 				$('#macros_' + macroNum + '_type')
-					.val($('#macros_' + macroNum + '_type').val() & (~<?= MACRO_TYPE_HOSTMACRO ?>));
+					.val($('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
 				$('#macros_' + macroNum + '_value')
 					.attr('readonly', 'readonly')
 					.val($('#macros_' + macroNum + '_inherited_value').val());
@@ -38,7 +38,7 @@
 			}
 			else {
 				$('#macros_' + macroNum + '_type')
-					.val($('#macros_' + macroNum + '_type').val() | <?= MACRO_TYPE_HOSTMACRO ?>);
+					.val($('#macros_' + macroNum + '_type').val() | <?= ZBX_PROPERTY_OWN ?>);
 				$('#macros_' + macroNum + '_value')
 					.removeAttr('readonly')
 					.focus();

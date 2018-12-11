@@ -1239,7 +1239,7 @@ function getInheritedMacros(array $hostids) {
  *   array(
  *       '{$MACRO}' => array(
  *           'macro' => '{$MACRO}',
- *           'type' => 0x03,						<- MACRO_TYPE_INHERITED, MACRO_TYPE_HOSTMACRO or MACRO_TYPE_BOTH
+ *           'type' => 0x03,                        <- ZBX_PROPERTY_INHERITED, ZBX_PROPERTY_OWN or ZBX_PROPERTY_BOTH
  *           'value' => 'effective value',
  *           'hostmacroid' => 7532,                 <- optional
  *           'template' => array(                   <- optional
@@ -1253,8 +1253,8 @@ function getInheritedMacros(array $hostids) {
  *       )
  *   )
  *
- * @param array $host_macros		the list of host macros
- * @param array $inherited_macros	the list of inherited macros (the output of the getInheritedMacros() function)
+ * @param array $host_macros       The list of host macros.
+ * @param array $inherited_macros  The list of inherited macros (the output of the getInheritedMacros() function).
  *
  * @return array
  */
@@ -1262,7 +1262,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	$user_macro_parser = new CUserMacroParser();
 
 	foreach ($inherited_macros as &$inherited_macro) {
-		$inherited_macro['type'] = MACRO_TYPE_INHERITED;
+		$inherited_macro['type'] = ZBX_PROPERTY_INHERITED;
 		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
 			? $inherited_macro['template']['value']
 			: $inherited_macro['global']['value'];
@@ -1319,7 +1319,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 			}
 		}
 
-		$host_macro['type'] |= MACRO_TYPE_HOSTMACRO;
+		$host_macro['type'] |= ZBX_PROPERTY_OWN;
 	}
 	unset($host_macro);
 
@@ -1339,7 +1339,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
  */
 function cleanInheritedMacros(array $macros) {
 	foreach ($macros as $idx => $macro) {
-		if (array_key_exists('type', $macro) && !($macro['type'] & MACRO_TYPE_HOSTMACRO)) {
+		if (array_key_exists('type', $macro) && !($macro['type'] & ZBX_PROPERTY_OWN)) {
 			unset($macros[$idx]);
 		}
 		else {

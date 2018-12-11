@@ -1694,16 +1694,11 @@ define('ZBX_STYLE_COLUMN_90', 'column-90'); // column occupies 90% width of colu
 define('ZBX_STYLE_COLUMN_95', 'column-95'); // column occupies 95% width of column wrapper.
 
 // server variables
-define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
+define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 
 define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);
 define('ZBX_PROPERTY_BOTH',			0x03);	// ZBX_PROPERTY_INHERITED | ZBX_PROPERTY_OWN
-
-// configuration -> hosts (macro inheritance)
-define('MACRO_TYPE_INHERITED',	0x01);
-define('MACRO_TYPE_HOSTMACRO',	0x02);
-define('MACRO_TYPE_BOTH',		0x03);	// MACRO_TYPE_INHERITED | MACRO_TYPE_HOSTMACRO
 
 // if magic quotes on, then get rid of them
 if (get_magic_quotes_gpc()) {
