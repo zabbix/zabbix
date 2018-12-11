@@ -504,6 +504,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	list, descriptors;
 	zbx_stat_t		status;
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
+	size_t			dir_len;
 
 	if (SUCCEED != prepare_mode_parameter(request, result, &mode))
 		return ret;
@@ -516,6 +517,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
+
+	dir_len = strlen(dir);	/* store this value before giving away pointer ownership */
 
 	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
 	{
@@ -592,7 +595,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != regex_excl_dir && 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				/* consider only path relative to path given in first parameter */
-				if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+				if (0 == zbx_regexp_match_precompiled(path + dir_len + 1, regex_excl_dir))
 				{
 					zbx_free(wpath);
 					zbx_free(path);
@@ -674,6 +677,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_vector_ptr_t	list, descriptors;
 	zbx_stat_t		status;
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
+	size_t			dir_len;
 
 	if (SUCCEED != prepare_mode_parameter(request, result, &mode))
 		return ret;
@@ -686,6 +690,8 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
+
+	dir_len = strlen(dir);	/* store this value before giving away pointer ownership */
 
 	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
 	{
@@ -741,7 +747,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (NULL != regex_excl_dir && 0 != S_ISDIR(status.st_mode))
 				{
 					/* consider only path relative to path given in first parameter */
-					if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+					if (0 == zbx_regexp_match_precompiled(path + dir_len + 1, regex_excl_dir))
 					{
 						zbx_free(path);
 						continue;
@@ -841,6 +847,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
 	zbx_uint64_t		min_size = 0, max_size = 0x7fffffffffffffff;
 	time_t			min_time = 0, max_time = 0x7fffffff;
+	size_t			dir_len;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -853,6 +860,8 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
+
+	dir_len = strlen(dir);	/* store this value before giving away pointer ownership */
 
 	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
 	{
@@ -921,7 +930,7 @@ static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != regex_excl_dir && 0 != (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
 				/* consider only path relative to path given in first parameter */
-				if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+				if (0 == zbx_regexp_match_precompiled(path + dir_len + 1, regex_excl_dir))
 				{
 					zbx_free(path);
 					zbx_free(name);
@@ -1012,6 +1021,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_regexp_t		*regex_incl = NULL, *regex_excl = NULL, *regex_excl_dir = NULL;
 	zbx_uint64_t		min_size = 0, max_size = 0x7FFFffffFFFFffff;
 	time_t			min_time = 0, max_time = 0x7fffffff;
+	size_t			dir_len;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -1023,6 +1033,8 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	zbx_vector_ptr_create(&list);
+
+	dir_len = strlen(dir);	/* store this value before giving away pointer ownership */
 
 	if (SUCCEED != queue_directory(&list, dir, -1, max_depth))	/* put top directory into list */
 	{
@@ -1068,7 +1080,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (NULL != regex_excl_dir && 0 != S_ISDIR(status.st_mode))
 				{
 					/* consider only path relative to path given in first parameter */
-					if (0 == zbx_regexp_match_precompiled(path + strlen(dir) + 1, regex_excl_dir))
+					if (0 == zbx_regexp_match_precompiled(path + dir_len + 1, regex_excl_dir))
 					{
 						zbx_free(path);
 						continue;
