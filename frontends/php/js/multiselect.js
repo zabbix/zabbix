@@ -868,7 +868,7 @@ jQuery(function($) {
 
 		// highlight matched
 		var text = item.name.toLowerCase(),
-			search = values.search.toLowerCase().trim(),
+			search = values.search.toLowerCase(),
 			is_new = item.isNew || false,
 			start = 0,
 			end = 0;
