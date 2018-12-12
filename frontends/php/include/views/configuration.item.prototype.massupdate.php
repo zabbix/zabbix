@@ -641,9 +641,9 @@ if (hasRequest('application_prototypes')) {
 	$application_prototypes = array_merge($application_prototypes, $application_prototypeids
 		? CArrayHelper::renameObjectsKeys(
 			DBfetchArray(DBselect(
-				'SELECT application_prototypeid, name'.
-				' FROM application_prototype'.
-				' WHERE '.dbConditionId('application_prototypeid', $application_prototypeids)
+				'SELECT ap.application_prototypeid, ap.name'.
+				' FROM application_prototype ap'.
+				' WHERE '.dbConditionId('ap.application_prototypeid', $application_prototypeids)
 			)), ['application_prototypeid' => 'id'])
 		: []);
 }

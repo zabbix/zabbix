@@ -1041,9 +1041,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								if ($upd_application_prototypeids) {
 									// Collect existing application prototype names. Those are required by API.
 									$db_application_prototypes = DBfetchArray(DBselect(
-										'SELECT application_prototypeid, name'.
-										' FROM application_prototype'.
-										' WHERE '.dbConditionId('application_prototypeid',
+										'SELECT ap.application_prototypeid, ap.name'.
+										' FROM application_prototype ap'.
+										' WHERE '.dbConditionId('ap.application_prototypeid',
 											$upd_application_prototypeids
 									)));
 
