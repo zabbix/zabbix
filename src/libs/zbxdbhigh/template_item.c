@@ -904,8 +904,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	}
 }
 
-static void	DBupdate_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_db_insert_t *db_insert)
+static void	update_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc,
+		size_t *sql_offset, zbx_db_insert_t *db_insert)
 {
 	int				i, j, index;
 	zbx_lld_rule_map_t		*rule;
@@ -971,6 +971,73 @@ static void	DBupdate_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql
 	zbx_vector_uint64_destroy(&item_conditionids);
 }
 
+static void	update_lld_macros(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_db_insert_t *db_insert)
+{
+	int				i, j, index;
+	zbx_lld_rule_map_t		*rule;
+	zbx_lld_rule_lld_macro_t	*lld_macro;
+	char				*lld_macro_esc, *json_path_esc;
+	zbx_vector_uint64_t		lld_macroids_del;
+
+	zbx_vector_uint64_create(&lld_macroids_del);
+
+	/* update lld rule macros for existing items */
+	for (i = 0; i < rules->values_num; i++)
+	{
+		rule = (zbx_lld_rule_map_t *)rules->values[i];
+
+		/* skip lld rules of new items */
+		if (0 == rule->itemid)
+			continue;
+
+		index = MIN(rule->lld_macros.values_num, rule->lld_macroids.values_num);
+
+		/* update intersecting rule conditions */
+		for (j = 0; j < index; j++)
+		{
+			lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
+
+			lld_macro_esc = DBdyn_escape_string(lld_macro->lld_macro);
+			json_path_esc = DBdyn_escape_string(lld_macro->json_path);
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update lld_macro"
+					" set lld_macro='%s',json_path='%s'"
+					" where lld_macroid=" ZBX_FS_UI64 ";\n",
+					lld_macro_esc, json_path_esc, rule->lld_macroids.values[j]);
+
+			DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+			zbx_free(json_path_esc);
+			zbx_free(lld_macro_esc);
+		}
+
+		/* delete removed rule conditions */
+		for (j = index; j < rule->lld_macroids.values_num; j++)
+			zbx_vector_uint64_append(&lld_macroids_del, rule->lld_macroids.values[j]);
+
+		/* insert new rule conditions */
+		for (j = index; j < rule->lld_macros.values_num; j++)
+		{
+			lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
+
+			zbx_db_insert_add_values(db_insert, rule->lld_macroid++, rule->itemid, lld_macro->lld_macro,
+					lld_macro->json_path);
+		}
+	}
+
+	/* delete removed item macros */
+	if (0 != lld_macroids_del.values_num)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "delete from lld_macros where");
+		DBadd_condition_alloc(sql, sql_alloc, sql_offset, "lld_macroid", lld_macroids_del.values,
+				lld_macroids_del.values_num);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	}
+
+	zbx_vector_uint64_destroy(&lld_macroids_del);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: save_template_lld_rules                                          *
@@ -988,7 +1055,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		int new_lld_macros)
 {
 	int				i, j, index;
-	zbx_db_insert_t			db_insert, db_insert_lld_macros;
+	zbx_db_insert_t			db_insert_conditions, db_insert_lld_macros;
 	zbx_lld_rule_map_t		*rule;
 	zbx_lld_rule_condition_t	*condition;
 	zbx_lld_rule_lld_macro_t	*lld_macro;
@@ -1000,13 +1067,13 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 	if (0 != new_conditions || 0 != new_lld_macros)
 	{
-		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator", "macro",
-				"value", NULL);
+		zbx_db_insert_prepare(&db_insert_conditions, "item_condition", "item_conditionid", "itemid",
+				"operator", "macro", "value", NULL);
 
 		zbx_db_insert_prepare(&db_insert_lld_macros, "lld_macro", "lld_macroid", "itemid", "lld_macro",
 				"json_path", NULL);
 
-		/* insert lld rule conditions for new items */
+		/* insert lld rule conditions and lld macros for new items */
 		for (i = 0; i < items->values_num; i++)
 		{
 			zbx_template_item_t	*item = (zbx_template_item_t *)items->values[i];
@@ -1031,7 +1098,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			{
 				condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
 
-				zbx_db_insert_add_values(&db_insert, rule->conditionid++, item->itemid,
+				zbx_db_insert_add_values(&db_insert_conditions, rule->conditionid++, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
 			}
 
@@ -1048,7 +1115,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	DBupdate_conditions(rules, &sql, &sql_alloc, &sql_offset, &db_insert);
+	update_conditions(rules, &sql, &sql_alloc, &sql_offset, &db_insert_conditions);
+	update_lld_macros(rules, &sql, &sql_alloc, &sql_offset, &db_insert_lld_macros)
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1057,8 +1125,8 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 	if (0 != new_conditions || 0 != new_lld_macros)
 	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
+		zbx_db_insert_execute(&db_insert_conditions);
+		zbx_db_insert_clean(&db_insert_conditions);
 		zbx_db_insert_execute(&db_insert_lld_macros);
 		zbx_db_insert_clean(&db_insert_lld_macros);
 	}
