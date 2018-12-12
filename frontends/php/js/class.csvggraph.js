@@ -69,7 +69,7 @@ jQuery(function ($) {
 		var widgets_boxing = 0; // Number of widgets with active SBox.
 		$('.dashbrd-grid-widget-container').data('dashboardGrid')['widgets'].forEach(function(w) {
 			if (w !== graph.data('widget') && w['type'] === 'svggraph') {
-				let svg_graph = $('svg', w['content_body']);
+				var svg_graph = $('svg', w['content_body']);
 				if (svg_graph.length && svg_graph.data('options')['boxing']) {
 					widgets_boxing++;
 				}
