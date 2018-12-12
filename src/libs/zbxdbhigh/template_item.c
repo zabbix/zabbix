@@ -454,6 +454,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		rule->conditionid = 0;
 		zbx_vector_uint64_create(&rule->conditionids);
 		zbx_vector_uint64_create(&rule->lld_macroids);
+		rule->lld_macroid = 0;
 		zbx_vector_ptr_create(&rule->conditions);
 		zbx_vector_ptr_create(&rule->lld_macros);
 
