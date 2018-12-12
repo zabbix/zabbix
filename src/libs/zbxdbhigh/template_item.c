@@ -904,8 +904,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	}
 }
 
-static void	update_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc,
-		size_t *sql_offset, zbx_db_insert_t *db_insert)
+static void	update_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		zbx_db_insert_t *db_insert)
 {
 	int				i, j, index;
 	zbx_lld_rule_map_t		*rule;
