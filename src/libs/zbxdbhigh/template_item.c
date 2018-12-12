@@ -289,6 +289,63 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
+
+static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
+{
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_t			itemid, item_conditionid;
+	int				i, index;
+	zbx_lld_rule_map_t		*rule;
+	zbx_lld_rule_condition_t	*condition;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		if (FAIL != index)
+		{
+			/* read template lld conditions */
+
+			rule = (zbx_lld_rule_map_t *)rules->values[index];
+
+			condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
+
+			ZBX_STR2UINT64(condition->item_conditionid, row[0]);
+			ZBX_STR2UCHAR(condition->op, row[2]);
+			condition->macro = zbx_strdup(NULL, row[3]);
+			condition->value = zbx_strdup(NULL, row[4]);
+
+			zbx_vector_ptr_append(&rule->conditions, condition);
+		}
+		else
+		{
+			/* read host lld conditions identifiers */
+
+			for (i = 0; i < rules->values_num; i++)
+			{
+				rule = (zbx_lld_rule_map_t *)rules->values[i];
+
+				if (itemid != rule->itemid)
+					continue;
+
+				ZBX_STR2UINT64(item_conditionid, row[0]);
+				zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
+
+				break;
+			}
+
+			if (i == rules->values_num)
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+	DBfree_result(result);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_template_lld_rule_map                                        *
@@ -304,14 +361,10 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 {
 	zbx_template_item_t		*item;
 	zbx_lld_rule_map_t		*rule;
-	zbx_lld_rule_condition_t	*condition;
-	int				i, index;
+	int				i;
 	zbx_vector_uint64_t		itemids;
-	DB_RESULT			result;
-	DB_ROW				row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t			itemid, item_conditionid;
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -347,51 +400,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 				"select item_conditionid,itemid,operator,macro,value from item_condition where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(itemid, row[1]);
-
-			index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-			if (FAIL != index)
-			{
-				/* read template lld conditions */
-
-				rule = (zbx_lld_rule_map_t *)rules->values[index];
-
-				condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
-
-				ZBX_STR2UINT64(condition->item_conditionid, row[0]);
-				ZBX_STR2UCHAR(condition->op, row[2]);
-				condition->macro = zbx_strdup(NULL, row[3]);
-				condition->value = zbx_strdup(NULL, row[4]);
-
-				zbx_vector_ptr_append(&rule->conditions, condition);
-			}
-			else
-			{
-				/* read host lld conditions identifiers */
-
-				for (i = 0; i < rules->values_num; i++)
-				{
-					rule = (zbx_lld_rule_map_t *)rules->values[i];
-
-					if (itemid != rule->itemid)
-						continue;
-
-					ZBX_STR2UINT64(item_conditionid, row[0]);
-					zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
-
-					break;
-				}
-
-				if (i == rules->values_num)
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-		}
-		DBfree_result(result);
+		DBget_lld_rule_conditions(sql, rules);
 
 		zbx_free(sql);
 	}
