@@ -1030,7 +1030,7 @@ static void	update_lld_macros(zbx_vector_ptr_t *rules, char **sql, size_t *sql_a
 	/* delete removed item macros */
 	if (0 != lld_macroids_del.values_num)
 	{
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "delete from lld_macros where");
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "delete from lld_macro where");
 		DBadd_condition_alloc(sql, sql_alloc, sql_offset, "lld_macroid", lld_macroids_del.values,
 				lld_macroids_del.values_num);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
@@ -1110,7 +1110,6 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_db_insert_add_values(&db_insert_lld_macros, rule->lld_macroid++, item->itemid,
 						lld_macro->lld_macro, lld_macro->json_path);
 			}
-
 		}
 	}
 
