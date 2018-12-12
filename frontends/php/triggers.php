@@ -61,6 +61,7 @@ $fields = [
 	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
@@ -173,6 +174,23 @@ if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
 
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+
+	// remove inherited tags
+	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
+}
+
 /*
  * Actions
  */
@@ -219,16 +237,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$tags = getRequest('tags', []);
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-
-	// Remove empty new tag lines.
-	foreach ($tags as $key => $tag) {
-		if ($tag['tag'] === '' && $tag['value'] === '') {
-			unset($tags[$key]);
-		}
-	}
-
 	$description = getRequest('description', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
@@ -410,15 +419,6 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 		]);
 
 		if ($triggers) {
-			$tags = getRequest('tags', []);
-
-			// Remove empty new tag lines.
-			foreach ($tags as $key => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($tags[$key]);
-				}
-			}
-
 			foreach ($triggerids as $triggerid) {
 				if (array_key_exists($triggerid, $triggers)) {
 					$trigger = ['triggerid' => $triggerid];
@@ -454,7 +454,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.massenable', 'trigger.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') == 'trigger.massenable');
+	$enable = (getRequest('action') === 'trigger.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = [];
 
@@ -536,7 +536,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 		show_error_message(_('No target selected'));
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.massdelete' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
@@ -581,10 +581,12 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
+		'parent_templates' => [],
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => getRequest('tags', []),
+		'tags' => $tags,
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
@@ -595,7 +597,7 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->render();
 	$triggersView->show();
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
 	$triggersView = new CView('configuration.copy.elements', $data);

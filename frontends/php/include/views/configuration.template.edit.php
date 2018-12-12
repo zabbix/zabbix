@@ -424,7 +424,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'show_inherited_tags' => $data['show_inherited_tags'],
 	'parent_templates' => $data['parent_templates'],
-	'is_template' => true,
+	'form_type' => 'templates',
 	'readonly' => false
 ]);
 $divTabs->addTab('tagTab', _('Tags'), $tags_view->render());

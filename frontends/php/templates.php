@@ -725,6 +725,8 @@ elseif (hasRequest('form')) {
 		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
 		}
+
+		$data['tags'] = $data['dbTemplate']['tags'];
 	}
 
 	// description
@@ -764,13 +766,6 @@ elseif (hasRequest('form')) {
 		$data['tags'] = array_values($inherited_tags);
 	}
 
-	if (!$data['tags']) {
-		$tag = ['tag' => '', 'value' => ''];
-		if ($data['show_inherited_tags']) {
-			$tag['type'] = ZBX_PROPERTY_OWN;
-		}
-		$data['tags'][] = $tag;
-	}
 	CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 	$templateIds = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);

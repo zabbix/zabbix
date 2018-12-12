@@ -1,7 +1,3 @@
-<script type="text/x-jquery-tmpl" id="tag-row">
-	<?= renderTagTableRow('#{rowNum}') ?>
-</script>
-
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
 		// Refresh field visibility on document load.
@@ -44,10 +40,6 @@
 					&& correlation_mode == <?= ZBX_TRIGGER_CORRELATION_TAG ?>
 				);
 		}
-
-		$('#tbl-tags').dynamicRows({
-			template: '#tag-row'
-		});
 	});
 
 	/**

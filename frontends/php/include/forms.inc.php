@@ -1487,31 +1487,31 @@ function getTriggerMassupdateFormData() {
 /**
  * Generate data for the trigger configuration form.
  *
- * @param array $data											Trigger data array.
- * @param string $data['form']									Form action.
- * @param string $data['form_refresh']							Form refresh.
- * @param null|string $data['parent_discoveryid']					Parent discovery.
- * @param array $data['dependencies']							Trigger dependencies.
- * @param array $data['db_dependencies']						DB trigger dependencies.
- * @param string $data['triggerid']								Trigger ID.
- * @param string $data['expression']							Trigger expression.
- * @param string $data['recovery_expression']					Trigger recovery expression.
- * @param string $data['expr_temp']								Trigger temporary expression.
- * @param string $data['recovery_expr_temp']					Trigger temporary recovery expression.
- * @param string $data['recovery_mode']							Trigger recovery mode.
- * @param string $data['description']							Trigger description.
- * @param int $data['type']										Trigger problem event generation mode.
- * @param string $data['priority']								Trigger severity.
- * @param int $data['status']									Trigger status.
- * @param string $data['comments']								Trigger description.
- * @param string $data['url']									Trigger URL.
- * @param string $data['expression_constructor']				Trigger expression constructor mode.
- * @param string $data['recovery_expression_constructor']		Trigger recovery expression constructor mode.
- * @param bool $data['limited']									Templated trigger.
- * @param array $data['templates']								Trigger templates.
- * @param string $data['hostid']								Host ID.
- * @param string $data['expression_action']						Trigger expression action.
- * @param string $data['recovery_expression_action']			Trigger recovery expression action.
+ * @param array       $data                                     Trigger data array.
+ * @param string      $data['form']                             Form action.
+ * @param string      $data['form_refresh']                     Form refresh.
+ * @param null|string $data['parent_discoveryid']               Parent discovery ID.
+ * @param array       $data['dependencies']                     Trigger dependencies.
+ * @param array       $data['db_dependencies']                  DB trigger dependencies.
+ * @param string      $data['triggerid']                        Trigger ID.
+ * @param string      $data['expression']                       Trigger expression.
+ * @param string      $data['recovery_expression']              Trigger recovery expression.
+ * @param string      $data['expr_temp']                        Trigger temporary expression.
+ * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
+ * @param string      $data['recovery_mode']                    Trigger recovery mode.
+ * @param string      $data['description']                      Trigger description.
+ * @param int         $data['type']                             Trigger problem event generation mode.
+ * @param string      $data['priority']                         Trigger severity.
+ * @param int         $data['status']                           Trigger status.
+ * @param string      $data['comments']                         Trigger description.
+ * @param string      $data['url']                              Trigger URL.
+ * @param string      $data['expression_constructor']           Trigger expression constructor mode.
+ * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
+ * @param bool        $data['limited']                          Templated trigger.
+ * @param array       $data['templates']                        Trigger templates.
+ * @param string      $data['hostid']                           Host ID.
+ * @param string      $data['expression_action']                Trigger expression action.
+ * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
  *
  * @return array
  */
@@ -1550,9 +1550,49 @@ function getTriggerFormData(array $data) {
 		}
 
 		// Get templates.
-		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag
-		);
+		$parent_templates = getTriggerParentTemplates([$trigger], $flag);
+		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'], $parent_templates, $flag);
+		$data['parent_templates'] = $parent_templates['templates'];
+
+		if ($data['show_inherited_tags']) {
+			$db_templates = API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($data['parent_templates']),
+				'preservekeys' => true
+			]);
+
+			$inherited_tags = [];
+
+			foreach ($data['parent_templates'] as $templateid => $template) {
+				if (array_key_exists($templateid, $db_templates)) {
+					foreach ($db_templates[$templateid]['tags'] as $tag) {
+						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
+								'templateids' => [$templateid => $templateid],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+						}
+						else {
+							$inherited_tags[$tag['tag'].':'.$tag['value']]['templateids'] += [
+								$templateid => $templateid
+							];
+						}
+					}
+				}
+			}
+
+			foreach ($data['tags'] as $tag) {
+				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
+					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+				}
+				else {
+					$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+				}
+			}
+
+			$data['tags'] = array_values($inherited_tags);
+		}
 
 		$data['limited'] = ($trigger['templateid'] != 0);
 
@@ -1734,10 +1774,6 @@ function getTriggerFormData(array $data) {
 	unset($dependency);
 
 	order_result($data['db_dependencies'], 'description');
-
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
 
 	return $data;
 }

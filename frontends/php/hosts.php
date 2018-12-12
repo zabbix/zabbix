@@ -1239,13 +1239,6 @@ elseif (hasRequest('form')) {
 		$data['tags'] = array_values($inherited_tags);
 	}
 
-	if (!$data['tags'] && $data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-		$tag = ['tag' => '', 'value' => ''];
-		if ($data['show_inherited_tags']) {
-			$tag['type'] = ZBX_PROPERTY_OWN;
-		}
-		$data['tags'][] = $tag;
-	}
 	CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 	// macros

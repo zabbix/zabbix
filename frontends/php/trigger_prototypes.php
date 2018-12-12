@@ -54,6 +54,7 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 														ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
@@ -141,6 +142,23 @@ if ($triggerPrototypeIds) {
 	}
 }
 
+$tags = getRequest('tags', []);
+foreach ($tags as $key => $tag) {
+	// remove empty new tag lines
+	if ($tag['tag'] === '' && $tag['value'] === '') {
+		unset($tags[$key]);
+		continue;
+	}
+
+	// remove inherited tags
+	if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+		unset($tags[$key]);
+	}
+	else {
+		unset($tags[$key]['type']);
+	}
+}
+
 /*
  * Actions
  */
@@ -187,16 +205,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$tags = getRequest('tags', []);
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-
-	// Remove empty new tag lines.
-	foreach ($tags as $key => $tag) {
-		if ($tag['tag'] === '' && $tag['value'] === '') {
-			unset($tags[$key]);
-		}
-	}
-
 	$description = getRequest('description', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
@@ -375,15 +384,6 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 		]);
 
 		if ($triggers) {
-			$tags = getRequest('tags', []);
-
-			// Remove empty new tag lines.
-			foreach ($tags as $key => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($tags[$key]);
-				}
-			}
-
 			foreach ($triggerids as $triggerid) {
 				if (array_key_exists($triggerid, $triggers)) {
 					$trigger = ['triggerid' => $triggerid];
@@ -504,10 +504,12 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
+		'parent_templates' => [],
 		'hostid' => $discoveryRule['hostid'],
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => getRequest('tags', []),
+		'tags' => $tags,
+		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)

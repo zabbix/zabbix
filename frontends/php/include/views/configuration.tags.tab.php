@@ -35,6 +35,16 @@ $table = (new CTable())
 		$data['show_inherited_tags'] ? _('Parent templates') : null
 	]);
 
+if (!$data['tags']) {
+	$data['tags'][] = ['tag' => '', 'value' => ''];
+}
+foreach ($data['tags'] as &$tag) {
+	if (!array_key_exists('type', $tag)) {
+		$tag['type'] = ZBX_PROPERTY_OWN;
+	}
+}
+unset($tag);
+
 // fields
 foreach ($data['tags'] as $i => $tag) {
 	$readonly = ($data['readonly'] || ($data['show_inherited_tags'] && !($tag['type'] & ZBX_PROPERTY_OWN)));
@@ -105,13 +115,29 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
+switch ($data['form_type']) {
+	case 'hosts':
+		$tags_own = _('Host tags');
+		$tags_both = _('Inherited and host tags');
+		break;
+
+	case 'templates':
+		$tags_own = _('Template tags');
+		$tags_both = _('Inherited and template tags');
+		break;
+
+	case 'triggers':
+	case 'trigger_prototypes':
+		$tags_own = _('Trigger tags');
+		$tags_both = _('Inherited and trigger tags');
+		break;
+}
+
 $tags_form_list
 	->addRow(null,
 		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue($data['is_template'] ? _('Template tags') : _('Host tags'), 0, null, 'this.form.submit()')
-			->addValue($data['is_template'] ? _('Inherited and template tags') : _('Inherited and host tags'), 1,
-				null, 'this.form.submit()'
-			)
+			->addValue($tags_own, 0, null, 'this.form.submit()')
+			->addValue($tags_both, 1, null, 'this.form.submit()')
 			->setModern(true)
 	)
 	->addRow(null, $table);

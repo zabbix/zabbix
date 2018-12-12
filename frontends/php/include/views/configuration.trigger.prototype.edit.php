@@ -486,11 +486,6 @@ $triggersFormList
 			->setAriaRequired(),
 		'correlation_tag_row'
 	)
-	->addRow(_('Tags'),
-		(new CDiv(renderTagTable($data['tags'])->setId('tbl-tags')))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	)
 	->addRow(_('Allow manual close'),
 		(new CCheckBox('manual_close'))
 			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
@@ -518,6 +513,18 @@ if (!$data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
+
+/*
+ * Tags tab
+ */
+$tags_view = new CView('configuration.tags.tab', [
+	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
+	'parent_templates' => $data['parent_templates'],
+	'form_type' => 'trigger_prototypes',
+	'readonly' => false
+]);
+$triggersTab->addTab('tag-tab', _('Tags'), $tags_view->render());
 
 /*
  * Dependencies tab

@@ -687,7 +687,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'show_inherited_tags' => $data['show_inherited_tags'],
 	'parent_templates' => $data['parent_templates'],
-	'is_template' => false,
+	'form_type' => 'hosts',
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
 $divTabs->addTab('tag-tab', _('Tags'), $tags_view->render());
