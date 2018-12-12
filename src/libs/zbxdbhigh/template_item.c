@@ -98,6 +98,15 @@ typedef struct
 }
 zbx_lld_rule_condition_t;
 
+/* lld rule macro */
+typedef struct
+{
+	zbx_uint64_t	lld_macroid;
+	char		*lld_macro;
+	char		*json_path;
+}
+zbx_lld_rule_lld_macro_t;
+
 /* lld rule */
 typedef struct
 {
@@ -105,6 +114,8 @@ typedef struct
 	zbx_uint64_t		templateid;
 	/* discovery rule source conditions */
 	zbx_vector_ptr_t	conditions;
+	/* discovery rule source LLD macro mappings */
+	zbx_vector_ptr_t	lld_macros;
 
 	/* discovery rule destination id */
 	zbx_uint64_t		itemid;
@@ -112,6 +123,10 @@ typedef struct
 	zbx_uint64_t		conditionid;
 	/* discovery rule destination condition ids */
 	zbx_vector_uint64_t	conditionids;
+	/* the starting id to be used for destination macro ids */
+	zbx_uint64_t		lld_macroid;
+	/* discovery rule destination macro ids */
+	zbx_vector_uint64_t	lld_macroids;
 }
 zbx_lld_rule_map_t;
 
@@ -289,15 +304,13 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-
 static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_uint64_t			itemid, item_conditionid;
-	int				i, index;
-	zbx_lld_rule_map_t		*rule;
-	zbx_lld_rule_condition_t	*condition;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		itemid;
+	int			i, index;
+	zbx_lld_rule_map_t	*rule;
 
 	result = DBselect("%s", sql);
 
@@ -310,6 +323,7 @@ static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
 		if (FAIL != index)
 		{
 			/* read template lld conditions */
+			zbx_lld_rule_condition_t	*condition;
 
 			rule = (zbx_lld_rule_map_t *)rules->values[index];
 
@@ -325,6 +339,7 @@ static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
 		else
 		{
 			/* read host lld conditions identifiers */
+			zbx_uint64_t	item_conditionid;
 
 			for (i = 0; i < rules->values_num; i++)
 			{
@@ -335,6 +350,62 @@ static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
 
 				ZBX_STR2UINT64(item_conditionid, row[0]);
 				zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
+
+				break;
+			}
+
+			if (i == rules->values_num)
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+	DBfree_result(result);
+}
+
+static void	DBget_lld_rule_lld_macros(const char *sql, zbx_vector_ptr_t *rules)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		itemid;
+	int			i, index;
+	zbx_lld_rule_map_t	*rule;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[1]);
+
+		index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		if (FAIL != index)
+		{
+			/* read template lld macros */
+			zbx_lld_rule_lld_macro_t	*lld_macro;
+
+			rule = (zbx_lld_rule_map_t *)rules->values[index];
+
+			lld_macro = (zbx_lld_rule_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_lld_macro_t));
+
+			ZBX_STR2UINT64(lld_macro->lld_macroid, row[0]);
+			lld_macro->lld_macro = zbx_strdup(NULL, row[2]);
+			lld_macro->json_path = zbx_strdup(NULL, row[3]);
+
+			zbx_vector_ptr_append(&rule->lld_macros, lld_macro);
+		}
+		else
+		{
+			/* read host lld macro identifiers */
+			zbx_uint64_t	lld_macroid;
+
+			for (i = 0; i < rules->values_num; i++)
+			{
+				rule = (zbx_lld_rule_map_t *)rules->values[i];
+
+				if (itemid != rule->itemid)
+					continue;
+
+				ZBX_STR2UINT64(lld_macroid, row[0]);
+				zbx_vector_uint64_append(&rule->lld_macroids, lld_macroid);
 
 				break;
 			}
@@ -382,7 +453,9 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		rule->templateid = item->templateid;
 		rule->conditionid = 0;
 		zbx_vector_uint64_create(&rule->conditionids);
+		zbx_vector_uint64_create(&rule->lld_macroids);
 		zbx_vector_ptr_create(&rule->conditions);
+		zbx_vector_ptr_create(&rule->lld_macros);
 
 		zbx_vector_ptr_append(rules, rule);
 
@@ -401,6 +474,13 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
 		DBget_lld_rule_conditions(sql, rules);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select lld_macroid,itemid,lld_macro,json_path from lld_macro where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+
+		DBget_lld_rule_lld_macros(sql, rules);
 
 		zbx_free(sql);
 	}
