@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
 
 Bug fixes:
+..F....... [ZBX-15236] fixed display parent host groups without hosts in multiselect (talbergs)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
