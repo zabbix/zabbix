@@ -919,13 +919,15 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
  *                                    be inserted                             *
  *                                                                            *
  ******************************************************************************/
-static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions)
+static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions,
+		int new_lld_macros)
 {
 	char				*macro_esc, *value_esc;
 	int				i, j, index;
-	zbx_db_insert_t			db_insert;
+	zbx_db_insert_t			db_insert, db_insert_lld_macros;
 	zbx_lld_rule_map_t		*rule;
 	zbx_lld_rule_condition_t	*condition;
+	zbx_lld_rule_lld_macro_t	*lld_macro;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t		item_conditionids;
@@ -935,10 +937,13 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 
 	zbx_vector_uint64_create(&item_conditionids);
 
-	if (0 != new_conditions)
+	if (0 != new_conditions || 0 != new_lld_macros)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator", "macro",
 				"value", NULL);
+
+		zbx_db_insert_prepare(&db_insert_lld_macros, "lld_macro", "lld_macroid", "itemid", "lld_macro",
+				"json_path", NULL);
 
 		/* insert lld rule conditions for new items */
 		for (i = 0; i < items->values_num; i++)
@@ -968,6 +973,15 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 				zbx_db_insert_add_values(&db_insert, rule->conditionid++, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
 			}
+
+			for (j = 0; j < rule->lld_macros.values_num; j++)
+			{
+				lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
+
+				zbx_db_insert_add_values(&db_insert_lld_macros, rule->lld_macroid++, item->itemid,
+						lld_macro->lld_macro, lld_macro->json_path);
+			}
+
 		}
 	}
 
@@ -1031,10 +1045,12 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
 
-	if (0 != new_conditions)
+	if (0 != new_conditions || 0 != new_lld_macros)
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+		zbx_db_insert_execute(&db_insert_lld_macros);
+		zbx_db_insert_clean(&db_insert_lld_macros);
 	}
 
 	zbx_free(sql);
@@ -1521,7 +1537,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	link_template_dependent_items(&items);
 	save_template_items(hostid, &items);
-	save_template_lld_rules(&items, &lld_rules, new_conditions);
+	save_template_lld_rules(&items, &lld_rules, new_conditions, new_lld_macros);
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
 	copy_template_items_preproc(templateids, &items);
