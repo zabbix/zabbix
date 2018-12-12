@@ -20,7 +20,7 @@ AC_TRY_LINK(
 [
 	const char* error = NULL;
 	int error_offset = -1;
-	pcre *regexp = pcre_compile("test", PCRE_UTF8, error, error_offset, 0);
+	pcre *regexp = pcre_compile("test", PCRE_UTF8, &error, &error_offset, NULL);
 	pcre_free(regexp);
 ],
 found_libpcre="yes")
