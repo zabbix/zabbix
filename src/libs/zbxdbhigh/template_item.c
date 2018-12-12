@@ -490,20 +490,22 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: calculate_template_lld_rule_conditionids                         *
+ * Function: calculate_template_lld_rule_ids                                  *
  *                                                                            *
- * Purpose: calculate identifiers for new item conditions                     *
+ * Purpose: calculate identifiers for new item conditions and macros          *
  *                                                                            *
- * Parameters: rules - [IN] the ldd rule mapping                              *
- *                                                                            *
- * Return value: The number of new item conditions to be inserted.            *
+ * Parameters: rules          - [IN] the ldd rule mapping                     *
+ *             new_conditions - [OUT] conditions to be inserted               *
+ *             new_lld_macros - [OUT] macros to be inserted                   *
  *                                                                            *
  ******************************************************************************/
-static int	calculate_template_lld_rule_conditionids(zbx_vector_ptr_t *rules)
+static void	calculate_template_lld_rule_ids(zbx_vector_ptr_t *rules, int *new_conditions, int *new_lld_macros)
 {
+	zbx_uint64_t		conditionid, lld_macroid;
 	zbx_lld_rule_map_t	*rule;
-	int			i, conditions_num = 0;
-	zbx_uint64_t		conditionid;
+	int			i;
+
+	*new_conditions = *new_lld_macros = 0;
 
 	/* calculate the number of new conditions to be inserted */
 	for (i = 0; i < rules->values_num; i++)
@@ -511,27 +513,38 @@ static int	calculate_template_lld_rule_conditionids(zbx_vector_ptr_t *rules)
 		rule = (zbx_lld_rule_map_t *)rules->values[i];
 
 		if (rule->conditions.values_num > rule->conditionids.values_num)
-			conditions_num += rule->conditions.values_num - rule->conditionids.values_num;
+			*new_conditions += rule->conditions.values_num - rule->conditionids.values_num;
+
+		if (rule->lld_macros.values_num > rule->lld_macroids.values_num)
+			*new_lld_macros += rule->lld_macros.values_num - rule->lld_macroids.values_num;
 	}
 
-	/* reserve ids for the new conditions to be inserted and assign to lld rules */
-	if (0 == conditions_num)
-		goto out;
+	if (0 == *new_conditions && 0 == *new_lld_macros)
+		return;
 
-	conditionid = DBget_maxid_num("item_condition", conditions_num);
+	/* reserve ids for the new conditions to be inserted and assign to lld rules */
+	if (0 != *new_conditions)
+		conditionid = DBget_maxid_num("item_condition", *new_conditions);
+
+	if (0 != *new_lld_macros)
+		lld_macroid = DBget_maxid_num("lld_macro", *new_lld_macros);
 
 	for (i = 0; i < rules->values_num; i++)
 	{
 		rule = (zbx_lld_rule_map_t *)rules->values[i];
 
-		if (rule->conditions.values_num <= rule->conditionids.values_num)
-			continue;
+		if (rule->conditions.values_num > rule->conditionids.values_num)
+		{
+			rule->conditionid = conditionid;
+			conditionid += rule->conditions.values_num - rule->conditionids.values_num;
+		}
 
-		rule->conditionid = conditionid;
-		conditionid += rule->conditions.values_num - rule->conditionids.values_num;
+		if (rule->lld_macros.values_num > rule->lld_macroids.values_num)
+		{
+			rule->lld_macroid = lld_macroid;
+			lld_macroid += rule->lld_macros.values_num - rule->lld_macroids.values_num;
+		}
 	}
-out:
-	return conditions_num;
 }
 
 /******************************************************************************
@@ -1489,7 +1502,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	const char		*__function_name = "DBcopy_template_items";
 
 	zbx_vector_ptr_t	items, lld_rules;
-	int			new_conditions = 0;
+	int			new_conditions, new_lld_macros;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1503,7 +1516,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	get_template_lld_rule_map(&items, &lld_rules);
 
-	new_conditions = calculate_template_lld_rule_conditionids(&lld_rules);
+	calculate_template_lld_rule_ids(&lld_rules, &new_conditions, &new_lld_macros);
 	update_template_lld_rule_formulas(&items, &lld_rules);
 
 	link_template_dependent_items(&items);
