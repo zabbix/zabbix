@@ -330,12 +330,13 @@ jQuery(function ($) {
 	 * this function. Tolerance is used to find exacly matched point only.
 	 */
 	function getDataPointTolerance(ds) {
-		if (ds.getAttribute('data-set') === 'points') {
-			// Take radius of first real data set point (the 0th is .svg-point-highlight).
+		var data_tag = ds.querySelector(':not(.svg-point-highlight)');
+
+		if (data_tag.tagName.toLowerCase() === 'circle') {
 			return +ds.childNodes[1].getAttribute('r');
 		}
 		else {
-			return +window.getComputedStyle(ds.querySelectorAll('path')[0])['strokeWidth'];
+			return +window.getComputedStyle(data_tag)['strokeWidth'];
 		}
 	}
 
