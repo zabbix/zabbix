@@ -2387,53 +2387,6 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_items_preproc_split_regsub_params                            *
- *                                                                            *
- * Purpose: splitting regsub params for escaping symbols in items             *
- *          preprocessing steps for discovery process                         *
- *                                                                            *
- * Parameters: params - [IN] regsub params, separated by a newline            *
- *             param1 - [IN/OUT] first param (pattern)                        *
- *             param2 - [IN/OUT] second param (output)                        *
- *                                                                            *
- * Return value: SUCCEED - if delimiter is found                              *
- *               FAIL    - if delimiter is not found                          *
- *                                                                            *
- ******************************************************************************/
-static int lld_items_preproc_split_regsub_params(const char *params, char **param1, char **param2)
-{
-	int	ret = FAIL;
-	size_t	param1_size;
-	size_t	param2_size;
-	char	*delimiter;
-
-	delimiter = strchr(params, '\n');
-	if (NULL == delimiter)
-	{
-		goto out;
-	}
-
-	param1_size = (size_t)(delimiter - params) + 1;
-	param2_size = strlen(params) - (size_t)(delimiter - params) + 1;
-
-	*param1 = zbx_malloc(NULL, param1_size);
-	*param2 = zbx_malloc(NULL, param2_size);
-	if (NULL == *param1 || NULL == *param2)
-	{
-		zbx_free(*param2);
-		zbx_free(*param1);
-		goto out;
-	}
-
-	zbx_strlcpy(*param1, params, param1_size);
-	zbx_strlcpy(*param2, delimiter + 1, param2_size);
-	ret = SUCCEED;
-out:
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_items_preproc_step_esc_regsub                                *
  *                                                                            *
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
@@ -2459,7 +2412,9 @@ static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, 
 
 	*err = '\0';
 
-	if (SUCCEED != (ret = lld_items_preproc_split_regsub_params(pp->params, &param1, &param2)))
+	zbx_strsplit(pp->params, '\n', &param1, &param2);
+
+	if (NULL == param2)
 	{
 		zbx_snprintf(err, sizeof(err), "cannot split params \"%s\"", pp->params);
 		goto out;

@@ -348,6 +348,47 @@ void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
 	(*str)[*offset] = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strsplit                                                     *
+ *                                                                            *
+ * Purpose: splits string                                                     *
+ *                                                                            *
+ * Parameters: src       - [IN] source string                                 *
+ *             delimiter - [IN] delimiter                                     *
+ *             left      - [IN/OUT] first part of the string                  *
+ *             right     - [IN/OUT] second part of the string or NULL, if     *
+ *                                  delimiter was not found                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
+{
+	char	*delimiter_pos;
+
+	*left = NULL;
+	*right = NULL;
+
+	if (NULL == (delimiter_pos = strchr(src, delimiter)))
+	{
+		*left = strdup(src);
+	}
+	else
+	{
+		size_t	left_size;
+		size_t	right_size;
+
+		left_size = (size_t)(delimiter_pos - src) + 1;
+		right_size = strlen(src) - (size_t)(delimiter_pos - src);
+
+		*left = zbx_malloc(NULL, left_size);
+		*right = zbx_malloc(NULL, right_size);
+
+		memcpy(*left, src, left_size - 1);
+		(*left)[left_size - 1] = '\0';
+		memcpy(*right, delimiter_pos + 1, right_size);
+	}
+}
+
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
 {
 	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));

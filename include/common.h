@@ -1100,6 +1100,8 @@ void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char 
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
+
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
