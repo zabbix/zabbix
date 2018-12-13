@@ -27,7 +27,7 @@ if (!$data['readonly']) {
 $tags_form_list = new CFormList('tagsFormList');
 
 $table = (new CTable())
-	->setId('tbl-tags')
+	->setId('tags-table')
 	->setHeader([
 		_('Name'),
 		_('Value'),

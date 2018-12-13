@@ -524,7 +524,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'form_type' => 'trigger_prototypes',
 	'readonly' => false
 ]);
-$triggersTab->addTab('tag-tab', _('Tags'), $tags_view->render());
+$triggersTab->addTab('tags_tab', _('Tags'), $tags_view->render());
 
 /*
  * Dependencies tab

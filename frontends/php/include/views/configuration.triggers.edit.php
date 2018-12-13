@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
 
-// append host summary to widget header
-if (!empty($data['hostid'])) {
+// Append host summary to widget header.
+if ($data['hostid'] != 0) {
 	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
@@ -552,7 +552,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'form_type' => 'triggers',
 	'readonly' => false
 ]);
-$triggersTab->addTab('tag-tab', _('Tags'), $tags_view->render());
+$triggersTab->addTab('tags_tab', _('Tags'), $tags_view->render());
 
 /*
  * Dependencies tab

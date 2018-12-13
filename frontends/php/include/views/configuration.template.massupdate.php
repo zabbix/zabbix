@@ -23,20 +23,22 @@ require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));
 
-// create form
-$view = (new CForm())
+// Create form.
+$form = (new CForm())
 	->setName('templateForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'template.massupdate')
 	->setId('templateForm');
+
 foreach ($data['templates'] as $templateid) {
-	$view->addVar('templates['.$templateid.']', $templateid);
+	$form->addVar('templates['.$templateid.']', $templateid);
 }
 
-// create form list
-$template_form_list = new CFormList('templateFormList');
+/*
+ * Template tab
+ */
+$template_form_list = new CFormList('template-form-list');
 
-// update host groups
 $groups_to_update = $data['groups']
 	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
@@ -45,50 +47,51 @@ $groups_to_update = $data['groups']
 	]), ['groupid' => 'id'])
 	: [];
 
-$template_form_list->addRow(
-	(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
-		->setLabel(_('Host groups'))
-		->setChecked(array_key_exists('groups', $data['visible']))
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv([
-		(new CRadioButtonList('mass_update_groups', ZBX_MASSUPDATE_ACTION_ADD))
-			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
-			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
-			->setModern(true)
-			->addStyle('margin-bottom: 5px;'),
-		(new CMultiSelect([
-			'name' => 'groups[]',
-			'object_name' => 'hostGroup',
-			'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			'data' => $groups_to_update,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $view->getName(),
-					'dstfld1' => 'groups_',
-					'editable' => true
+$template_form_list
+	->addRow(
+		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
+			->setLabel(_('Host groups'))
+			->setChecked(array_key_exists('groups', $data['visible']))
+			->setAttribute('autofocus', 'autofocus'),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_groups', ZBX_MASSUPDATE_ACTION_ADD))
+				->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+				->setModern(true)
+				->addStyle('margin-bottom: 5px;'),
+			(new CMultiSelect([
+				'name' => 'groups[]',
+				'object_name' => 'hostGroup',
+				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
+				'data' => $groups_to_update,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'srcfld1' => 'groupid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'groups_',
+						'editable' => true
+					]
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('groups-div')
-);
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setId('groups-div')
+	)
+	->addRow(
+		(new CVisibilityBox('visible[description]', 'description', _('Original')))
+			->setLabel(_('Description'))
+			->setChecked(array_key_exists('description', $data['visible'])),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
-// append description to form list
-$template_form_list->addRow(
-	(new CVisibilityBox('visible[description]', 'description', _('Original')))
-		->setLabel(_('Description'))
-		->setChecked(array_key_exists('description', $data['visible'])),
-	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+/*
+ * Linked templates tab
+ */
+$linked_templates_form_list = new CFormList('linked-templates-form-list');
 
-$linked_templates_form_list = new CFormList('linkedTemplatesFormList');
-
-// append templates table to form list
 $new_template_table = (new CTable())
 	->addRow([
 		(new CMultiSelect([
@@ -100,7 +103,7 @@ $new_template_table = (new CTable())
 					'srctbl' => 'templates',
 					'srcfld1' => 'hostid',
 					'srcfld2' => 'host',
-					'dstfrm' => $view->getName(),
+					'dstfrm' => $form->getName(),
 					'dstfld1' => 'linked_templates_'
 				]
 			]
@@ -120,54 +123,55 @@ $new_template_table = (new CTable())
 	]);
 
 $linked_templates_form_list->addRow(
-	(new CVisibilityBox('visible[linked_templates]', 'templateDiv', _('Original')))
+	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
 		->setLabel(_('Link templates'))
 		->setChecked(array_key_exists('linked_templates', $data['visible'])),
 	(new CDiv($new_template_table))
-		->setId('templateDiv')
+		->setId('linked-templates-div')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-$tags_form_list = new CFormList('tagsFormList');
+/*
+ * Tags tab
+ */
+$tags_form_list = (new CFormList('tags-form-list'))
+	->addRow(
+		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
+			->setLabel(_('Tags'))
+			->setChecked(array_key_exists('tags', $data['visible'])),
+		(new CDiv([
+			(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
+				->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+				->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+				->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+				->setModern(true),
+			renderTagTable($data['tags'])->setId('tags-table')
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setId('tags-div')
+	);
 
-// append tags table to form list
-$tags_form_list->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
-		->setLabel(_('Tags'))
-		->setChecked(array_key_exists('tags', $data['visible'])),
-	(new CDiv([
-		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
-			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
-			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
-			->setModern(true),
-		renderTagTable($data['tags'])->setId('tbl-tags')
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('tags-div')
-);
+// Append tabs to the form.
+$tabs = (new CTabView())
+	->addTab('template_tab', _('Template'), $template_form_list)
+	->addTab('linked_templates_tab', _('Linked templates'), $linked_templates_form_list)
+	->addTab('tags_tab', _('Tags'), $tags_form_list);
 
-// append tabs to form
-$tab = (new CTabView())
-	->addTab('templateTab', _('Template'), $template_form_list)
-	->addTab('linkedTemplatesTab', _('Linked templates'), $linked_templates_form_list)
-	->addTab('tagsTab', _('Tags'), $tags_form_list);
-
-// reset the tab when opening the form for the first time
+// Reset tabs when opening the form for the first time.
 if (!hasRequest('masssave')) {
-	$tab->setSelected(0);
+	$tabs->setSelected(0);
 }
 
-// append buttons to form
-$tab->setFooter(makeFormFooter(
+// Append buttons to the form.
+$tabs->setFooter(makeFormFooter(
 	new CSubmit('masssave', _('Update')),
 	[new CButtonCancel(url_param('groupid'))]
 ));
 
-$view->addItem($tab);
+$form->addItem($tabs);
 
-$widget->addItem($view);
+$widget->addItem($form);
 
 return $widget;

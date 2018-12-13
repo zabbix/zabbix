@@ -1436,7 +1436,6 @@ function getCopyElementsFormData($elementsField, $title = null) {
 function getTriggerMassupdateFormData() {
 	$data = [
 		'visible' => getRequest('visible', []),
-		'priority' => getRequest('priority', ''),
 		'dependencies' => getRequest('dependencies', []),
 		'tags' => getRequest('tags', []),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),

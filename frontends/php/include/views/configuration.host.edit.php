@@ -690,7 +690,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'form_type' => 'hosts',
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
-$divTabs->addTab('tag-tab', _('Tags'), $tags_view->render());
+$divTabs->addTab('tags_tab', _('Tags'), $tags_view->render());
 
 /*
  * Macros

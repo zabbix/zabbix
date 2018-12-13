@@ -23,7 +23,7 @@ class CLink extends CTag {
 
 	private	$use_sid = false;
 	private	$confirm_message = '';
-	private $url = null;
+	private $url;
 
 	public function __construct($item = null, $url = null) {
 		parent::__construct('a', true);

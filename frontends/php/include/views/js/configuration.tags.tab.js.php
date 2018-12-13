@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#tbl-tags')
+		$('#tags-table')
 			.dynamicRows({
 				template: '#tag-row'
 			})

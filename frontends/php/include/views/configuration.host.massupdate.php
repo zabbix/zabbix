@@ -214,7 +214,7 @@ $tags_form_list->addRow(
 			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
 			->setModern(true),
-		renderTagTable($data['tags'])->setId('tbl-tags')
+		renderTagTable($data['tags'])->setId('tags-table')
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

@@ -13,7 +13,7 @@
 			});
 		<?php endif ?>
 
-		$('#tbl-tags').dynamicRows({
+		$('#tags-table').dynamicRows({
 			template: '#tag-row'
 		});
 
