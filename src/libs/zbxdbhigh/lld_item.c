@@ -2432,7 +2432,7 @@ static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, 
 
 	sub_params_size = strlen(param1) + strlen(param2) + 2;
 	*sub_params = zbx_malloc(NULL, sub_params_size);
-	if (*sub_params == NULL)
+	if (NULL == *sub_params)
 	{
 		zbx_strlcpy(err, "out of memory", sizeof(err));
 		goto out;
@@ -2476,7 +2476,7 @@ static int	lld_items_preproc_step_esc_generic(const zbx_lld_item_preproc_t * pp,
 
 	*err = '\0';
 
-	if (pp->type == ZBX_PREPROC_XPATH)
+	if (ZBX_PREPROC_XPATH == pp->type)
 	{
 		token_type |= ZBX_TOKEN_XPATH;
 	}
@@ -2514,7 +2514,7 @@ static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const z
 		const char *item_key, char **sub_params, char **error)
 {
 	int	ret;
-	if (pp->type == ZBX_PREPROC_REGSUB)
+	if (ZBX_PREPROC_REGSUB == pp->type)
 	{
 		ret = lld_items_preproc_step_esc_regsub(pp, lld_row, item_key, sub_params, error);
 	}
