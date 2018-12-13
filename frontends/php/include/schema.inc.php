@@ -7543,10 +7543,10 @@ return [
 			],
 		],
 	],
-	'lld_macro' => [
-		'key' => 'lld_macroid',
+	'lld_macro_path' => [
+		'key' => 'lld_macro_pathid',
 		'fields' => [
-			'lld_macroid' => [
+			'lld_macro_pathid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -7564,7 +7564,7 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'json_path' => [
+			'path' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,

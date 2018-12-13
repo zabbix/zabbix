@@ -54,12 +54,12 @@ static int	DBpatch_4010002(void)
 static int	DBpatch_4010003(void)
 {
 	const ZBX_TABLE table =
-			{"lld_macro", "lld_macroid", 0,
+			{"lld_macro_path", "lld_macro_pathid", 0,
 				{
-					{"lld_macroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"lld_macro_pathid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"lld_macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"json_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -77,7 +77,7 @@ static int	DBpatch_4010005(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("lld_macro", 1, &field);
+	return DBadd_foreign_key("lld_macro_path", 1, &field);
 }
 
 #endif
