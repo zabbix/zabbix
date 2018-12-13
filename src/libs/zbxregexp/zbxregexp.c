@@ -936,7 +936,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
 	size_t		len = 0;
 	const char	*sptr;
 
-	if (NULL == string)
+	if (NULL == string )
 		return 0;
 
 	for (sptr = string; '\0' != *sptr; sptr++)
@@ -976,7 +976,7 @@ static size_t	zbx_regexp_escape_stringsize(const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Function: zbx_regexp_escape_string                                             *
+ * Function: zbx_regexp_escape_insstring                                          *
  *                                                                                *
  * Purpose: replace . \ + * ? [ ^ ] $ ( ) { } = ! < > | : - symbols in string     *
  *          with combination of \ and escaped symbol                              *
@@ -1049,90 +1049,3 @@ void zbx_regexp_escape(char **string)
 	*string = buffer;
 }
 
-/**********************************************************************************
- *                                                                                *
- * Function: zbx_regexp_output_escape_stringsize                                  *
- *                                                                                *
- * Purpose: calculate a string size after symbols escaping                        *
- *                                                                                *
- * Parameters: string - [IN] the string to check                                  *
- *                                                                                *
- * Return value: new size of the string                                           *
- *                                                                                *
- **********************************************************************************/
-static size_t	zbx_regexp_output_escape_stringsize(const char *string)
-{
-	size_t		len = 0;
-	const char	*sptr;
-
-	if (NULL == string)
-		return 0;
-
-	for (sptr = string; '\0' != *sptr; sptr++)
-	{
-		if (*sptr == '\\')
-		{
-			len += 2;
-		}
-		else
-		{
-			len++;
-		}
-	}
-
-	return len;
-}
-
-/**********************************************************************************
- *                                                                                *
- * Function: zbx_regexp_output_escape_string                                      *
- *                                                                                *
- * Purpose: replace \ symbols in string with combination of \ and escaped symbol  *
- *                                                                                *
- * Parameters: p      - [IN/OUT] buffer for new string after update               *
- *             string - [IN] the string to update                                 *
- *                                                                                *
- **********************************************************************************/
-static void zbx_regexp_output_escape_string(char *p, const char *string)
-{
-	const char	*sptr;
-
-	for (sptr = string; '\0' != *sptr; sptr++)
-	{
-		switch (*sptr)
-		{
-			case '\\':
-				*p++ = '\\';
-				*p++ = *sptr;
-				break;
-			default:
-				*p++ = *sptr;
-		}
-	}
-
-	return;
-}
-
-/**********************************************************************************
- *                                                                                *
- * Function: zbx_regexp_output_escape                                             *
- *                                                                                *
- * Purpose: escaping of symbols for using in regexp output expression             *
- *                                                                                *
- * Parameters: string - [IN/OUT] the string to update                             *
- *                                                                                *
- **********************************************************************************/
-void zbx_regexp_output_escape(char **string)
-{
-	size_t	size;
-	char	*buffer;
-
-	if (0 == (size = zbx_regexp_output_escape_stringsize(*string)))
-		return;
-
-	buffer = zbx_malloc(NULL, size + 1);
-	buffer[size] = '\0';
-	zbx_regexp_output_escape_string(buffer, *string);
-	zbx_free(*string);
-	*string = buffer;
-}
