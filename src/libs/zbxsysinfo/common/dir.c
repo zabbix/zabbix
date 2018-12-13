@@ -426,7 +426,7 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  * Return value: TRUE, if timeout was detected, FALSE otherwise.              *
  *                                                                            *
  ******************************************************************************/
-static BOOL	has_timed_out(ZBX_EVENT_HANDLE timeout_event)
+static BOOL	has_timed_out(HANDLE timeout_event)
 {
 	return WAIT_OBJECT_0 == WaitForSingleObject(timeout_event, 0) ? TRUE : FALSE;
 }
@@ -499,7 +499,7 @@ static int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descri
 	return FAIL;
 }
 
-static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, ZBX_EVENT_HANDLE timeout_event)
+static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	const char		*__function_name = "vfs_dir_size";
 	char			*dir = NULL;
@@ -812,7 +812,7 @@ int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                                                            *
  *****************************************************************************/
 #ifdef _WINDOWS
-static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result, ZBX_EVENT_HANDLE timeout_event)
+static int	vfs_dir_count(const AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	const char		*__function_name = "vfs_dir_count";
 	char			*dir = NULL;

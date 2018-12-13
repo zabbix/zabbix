@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, ZBX_EVENT_HANDLE timeout_event)
+static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	char		*path, *mode;
 	wchar_t 	*wpath;

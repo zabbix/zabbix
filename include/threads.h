@@ -31,8 +31,6 @@
 	#define ZBX_THREAD_HANDLE	HANDLE
 	#define ZBX_THREAD_HANDLE_NULL	NULL
 
-	#define ZBX_EVENT_HANDLE	HANDLE
-
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name) \
 		unsigned (__stdcall *pointer_name)(void *)
 

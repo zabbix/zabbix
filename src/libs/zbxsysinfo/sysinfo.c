@@ -1361,7 +1361,7 @@ typedef struct
 	AGENT_REQUEST		*request;
 	AGENT_RESULT		*result;
 	zbx_uint32_t		mutex_flag; /* in regular case should always be = ZBX_MUTEX_ALL_ALLOW */
-	ZBX_EVENT_HANDLE	timeout_event;
+	HANDLE			timeout_event;
 	int			agent_ret;
 }
 zbx_metric_thread_args_t;
@@ -1415,7 +1415,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create timeout event for data thread: %s",
 				strerror_from_system(GetLastError())));
-		return SYSINFO_RET_FAIL
+		return SYSINFO_RET_FAIL;
 	}
 
 	thread_args.args = (void *)&metric_args;
