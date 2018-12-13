@@ -98,15 +98,6 @@ typedef struct
 }
 zbx_lld_rule_condition_t;
 
-/* lld rule macro */
-typedef struct
-{
-	zbx_uint64_t	lld_macroid;
-	char		*lld_macro;
-	char		*json_path;
-}
-zbx_lld_rule_lld_macro_t;
-
 /* lld rule */
 typedef struct
 {
@@ -114,8 +105,6 @@ typedef struct
 	zbx_uint64_t		templateid;
 	/* discovery rule source conditions */
 	zbx_vector_ptr_t	conditions;
-	/* discovery rule source LLD macro mappings */
-	zbx_vector_ptr_t	lld_macros;
 
 	/* discovery rule destination id */
 	zbx_uint64_t		itemid;
@@ -123,10 +112,6 @@ typedef struct
 	zbx_uint64_t		conditionid;
 	/* discovery rule destination condition ids */
 	zbx_vector_uint64_t	conditionids;
-	/* the starting id to be used for destination macro ids */
-	zbx_uint64_t		lld_macroid;
-	/* discovery rule destination macro ids */
-	zbx_vector_uint64_t	lld_macroids;
 }
 zbx_lld_rule_map_t;
 
@@ -304,119 +289,6 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-static void	DBget_lld_rule_conditions(const char *sql, zbx_vector_ptr_t *rules)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		itemid;
-	int			i, index;
-	zbx_lld_rule_map_t	*rule;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[1]);
-
-		index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL != index)
-		{
-			/* read template lld conditions */
-			zbx_lld_rule_condition_t	*condition;
-
-			rule = (zbx_lld_rule_map_t *)rules->values[index];
-
-			condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
-
-			ZBX_STR2UINT64(condition->item_conditionid, row[0]);
-			ZBX_STR2UCHAR(condition->op, row[2]);
-			condition->macro = zbx_strdup(NULL, row[3]);
-			condition->value = zbx_strdup(NULL, row[4]);
-
-			zbx_vector_ptr_append(&rule->conditions, condition);
-		}
-		else
-		{
-			/* read host lld conditions identifiers */
-			zbx_uint64_t	item_conditionid;
-
-			for (i = 0; i < rules->values_num; i++)
-			{
-				rule = (zbx_lld_rule_map_t *)rules->values[i];
-
-				if (itemid != rule->itemid)
-					continue;
-
-				ZBX_STR2UINT64(item_conditionid, row[0]);
-				zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
-
-				break;
-			}
-
-			if (i == rules->values_num)
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-	}
-	DBfree_result(result);
-}
-
-static void	DBget_lld_rule_lld_macros(const char *sql, zbx_vector_ptr_t *rules)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		itemid;
-	int			i, index;
-	zbx_lld_rule_map_t	*rule;
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[1]);
-
-		index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-		if (FAIL != index)
-		{
-			/* read template lld macros */
-			zbx_lld_rule_lld_macro_t	*lld_macro;
-
-			rule = (zbx_lld_rule_map_t *)rules->values[index];
-
-			lld_macro = (zbx_lld_rule_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_lld_macro_t));
-
-			ZBX_STR2UINT64(lld_macro->lld_macroid, row[0]);
-			lld_macro->lld_macro = zbx_strdup(NULL, row[2]);
-			lld_macro->json_path = zbx_strdup(NULL, row[3]);
-
-			zbx_vector_ptr_append(&rule->lld_macros, lld_macro);
-		}
-		else
-		{
-			/* read host lld macro identifiers */
-			zbx_uint64_t	lld_macroid;
-
-			for (i = 0; i < rules->values_num; i++)
-			{
-				rule = (zbx_lld_rule_map_t *)rules->values[i];
-
-				if (itemid != rule->itemid)
-					continue;
-
-				ZBX_STR2UINT64(lld_macroid, row[0]);
-				zbx_vector_uint64_append(&rule->lld_macroids, lld_macroid);
-
-				break;
-			}
-
-			if (i == rules->values_num)
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-	}
-	DBfree_result(result);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: get_template_lld_rule_map                                        *
@@ -432,10 +304,14 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 {
 	zbx_template_item_t		*item;
 	zbx_lld_rule_map_t		*rule;
-	int				i;
+	zbx_lld_rule_condition_t	*condition;
+	int				i, index;
 	zbx_vector_uint64_t		itemids;
+	DB_RESULT			result;
+	DB_ROW				row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t			itemid, item_conditionid;
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -453,10 +329,7 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		rule->templateid = item->templateid;
 		rule->conditionid = 0;
 		zbx_vector_uint64_create(&rule->conditionids);
-		zbx_vector_uint64_create(&rule->lld_macroids);
-		rule->lld_macroid = 0;
 		zbx_vector_ptr_create(&rule->conditions);
-		zbx_vector_ptr_create(&rule->lld_macros);
 
 		zbx_vector_ptr_append(rules, rule);
 
@@ -473,13 +346,52 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select item_conditionid,itemid,operator,macro,value from item_condition where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-		DBget_lld_rule_conditions(sql, rules);
 
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select lld_macroid,itemid,lld_macro,json_path from lld_macro where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-		DBget_lld_rule_lld_macros(sql, rules);
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[1]);
+
+			index = zbx_vector_ptr_bsearch(rules, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+			if (FAIL != index)
+			{
+				/* read template lld conditions */
+
+				rule = (zbx_lld_rule_map_t *)rules->values[index];
+
+				condition = (zbx_lld_rule_condition_t *)zbx_malloc(NULL, sizeof(zbx_lld_rule_condition_t));
+
+				ZBX_STR2UINT64(condition->item_conditionid, row[0]);
+				ZBX_STR2UCHAR(condition->op, row[2]);
+				condition->macro = zbx_strdup(NULL, row[3]);
+				condition->value = zbx_strdup(NULL, row[4]);
+
+				zbx_vector_ptr_append(&rule->conditions, condition);
+			}
+			else
+			{
+				/* read host lld conditions identifiers */
+
+				for (i = 0; i < rules->values_num; i++)
+				{
+					rule = (zbx_lld_rule_map_t *)rules->values[i];
+
+					if (itemid != rule->itemid)
+						continue;
+
+					ZBX_STR2UINT64(item_conditionid, row[0]);
+					zbx_vector_uint64_append(&rule->conditionids, item_conditionid);
+
+					break;
+				}
+
+				if (i == rules->values_num)
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+		}
+		DBfree_result(result);
 
 		zbx_free(sql);
 	}
@@ -489,22 +401,20 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: calculate_template_lld_rule_ids                                  *
+ * Function: calculate_template_lld_rule_conditionids                         *
  *                                                                            *
- * Purpose: calculate identifiers for new item conditions and macros          *
+ * Purpose: calculate identifiers for new item conditions                     *
  *                                                                            *
- * Parameters: rules          - [IN] the ldd rule mapping                     *
- *             new_conditions - [OUT] conditions to be inserted               *
- *             new_lld_macros - [OUT] macros to be inserted                   *
+ * Parameters: rules - [IN] the ldd rule mapping                              *
+ *                                                                            *
+ * Return value: The number of new item conditions to be inserted.            *
  *                                                                            *
  ******************************************************************************/
-static void	calculate_template_lld_rule_ids(zbx_vector_ptr_t *rules, int *new_conditions, int *new_lld_macros)
+static int	calculate_template_lld_rule_conditionids(zbx_vector_ptr_t *rules)
 {
-	zbx_uint64_t		conditionid, lld_macroid;
 	zbx_lld_rule_map_t	*rule;
-	int			i;
-
-	*new_conditions = *new_lld_macros = 0;
+	int			i, conditions_num = 0;
+	zbx_uint64_t		conditionid;
 
 	/* calculate the number of new conditions to be inserted */
 	for (i = 0; i < rules->values_num; i++)
@@ -512,38 +422,27 @@ static void	calculate_template_lld_rule_ids(zbx_vector_ptr_t *rules, int *new_co
 		rule = (zbx_lld_rule_map_t *)rules->values[i];
 
 		if (rule->conditions.values_num > rule->conditionids.values_num)
-			*new_conditions += rule->conditions.values_num - rule->conditionids.values_num;
-
-		if (rule->lld_macros.values_num > rule->lld_macroids.values_num)
-			*new_lld_macros += rule->lld_macros.values_num - rule->lld_macroids.values_num;
+			conditions_num += rule->conditions.values_num - rule->conditionids.values_num;
 	}
 
-	if (0 == *new_conditions && 0 == *new_lld_macros)
-		return;
-
 	/* reserve ids for the new conditions to be inserted and assign to lld rules */
-	if (0 != *new_conditions)
-		conditionid = DBget_maxid_num("item_condition", *new_conditions);
+	if (0 == conditions_num)
+		goto out;
 
-	if (0 != *new_lld_macros)
-		lld_macroid = DBget_maxid_num("lld_macro", *new_lld_macros);
+	conditionid = DBget_maxid_num("item_condition", conditions_num);
 
 	for (i = 0; i < rules->values_num; i++)
 	{
 		rule = (zbx_lld_rule_map_t *)rules->values[i];
 
-		if (rule->conditions.values_num > rule->conditionids.values_num)
-		{
-			rule->conditionid = conditionid;
-			conditionid += rule->conditions.values_num - rule->conditionids.values_num;
-		}
+		if (rule->conditions.values_num <= rule->conditionids.values_num)
+			continue;
 
-		if (rule->lld_macros.values_num > rule->lld_macroids.values_num)
-		{
-			rule->lld_macroid = lld_macroid;
-			lld_macroid += rule->lld_macros.values_num - rule->lld_macroids.values_num;
-		}
+		rule->conditionid = conditionid;
+		conditionid += rule->conditions.values_num - rule->conditionids.values_num;
 	}
+out:
+	return conditions_num;
 }
 
 /******************************************************************************
@@ -905,140 +804,6 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	}
 }
 
-static void	update_conditions(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_db_insert_t *db_insert)
-{
-	int				i, j, index;
-	zbx_lld_rule_map_t		*rule;
-	zbx_lld_rule_condition_t	*condition;
-	char				*macro_esc, *value_esc;
-	zbx_vector_uint64_t		item_conditionids;
-
-	zbx_vector_uint64_create(&item_conditionids);
-
-	/* update lld rule conditions for existing items */
-	for (i = 0; i < rules->values_num; i++)
-	{
-		rule = (zbx_lld_rule_map_t *)rules->values[i];
-
-		/* skip lld rules of new items */
-		if (0 == rule->itemid)
-			continue;
-
-		index = MIN(rule->conditions.values_num, rule->conditionids.values_num);
-
-		/* update intersecting rule conditions */
-		for (j = 0; j < index; j++)
-		{
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
-
-			macro_esc = DBdyn_escape_string(condition->macro);
-			value_esc = DBdyn_escape_string(condition->value);
-
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_condition"
-					" set operator=%d,macro='%s',value='%s'"
-					" where item_conditionid=" ZBX_FS_UI64 ";\n",
-					(int)condition->op, macro_esc, value_esc, rule->conditionids.values[j]);
-
-			DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
-
-			zbx_free(value_esc);
-			zbx_free(macro_esc);
-		}
-
-		/* delete removed rule conditions */
-		for (j = index; j < rule->conditionids.values_num; j++)
-			zbx_vector_uint64_append(&item_conditionids, rule->conditionids.values[j]);
-
-		/* insert new rule conditions */
-		for (j = index; j < rule->conditions.values_num; j++)
-		{
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
-
-			zbx_db_insert_add_values(db_insert, rule->conditionid++, rule->itemid,
-					(int)condition->op, condition->macro, condition->value);
-		}
-	}
-
-	/* delete removed item conditions */
-	if (0 != item_conditionids.values_num)
-	{
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "delete from item_condition where");
-		DBadd_condition_alloc(sql, sql_alloc, sql_offset, "item_conditionid", item_conditionids.values,
-				item_conditionids.values_num);
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
-	}
-
-	zbx_vector_uint64_destroy(&item_conditionids);
-}
-
-static void	update_lld_macros(zbx_vector_ptr_t *rules, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_db_insert_t *db_insert)
-{
-	int				i, j, index;
-	zbx_lld_rule_map_t		*rule;
-	zbx_lld_rule_lld_macro_t	*lld_macro;
-	char				*lld_macro_esc, *json_path_esc;
-	zbx_vector_uint64_t		lld_macroids_del;
-
-	zbx_vector_uint64_create(&lld_macroids_del);
-
-	/* update lld rule macros for existing items */
-	for (i = 0; i < rules->values_num; i++)
-	{
-		rule = (zbx_lld_rule_map_t *)rules->values[i];
-
-		/* skip lld rules of new items */
-		if (0 == rule->itemid)
-			continue;
-
-		index = MIN(rule->lld_macros.values_num, rule->lld_macroids.values_num);
-
-		/* update intersecting rule conditions */
-		for (j = 0; j < index; j++)
-		{
-			lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
-
-			lld_macro_esc = DBdyn_escape_string(lld_macro->lld_macro);
-			json_path_esc = DBdyn_escape_string(lld_macro->json_path);
-
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update lld_macro"
-					" set lld_macro='%s',json_path='%s'"
-					" where lld_macroid=" ZBX_FS_UI64 ";\n",
-					lld_macro_esc, json_path_esc, rule->lld_macroids.values[j]);
-
-			DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
-
-			zbx_free(json_path_esc);
-			zbx_free(lld_macro_esc);
-		}
-
-		/* delete removed rule conditions */
-		for (j = index; j < rule->lld_macroids.values_num; j++)
-			zbx_vector_uint64_append(&lld_macroids_del, rule->lld_macroids.values[j]);
-
-		/* insert new rule conditions */
-		for (j = index; j < rule->lld_macros.values_num; j++)
-		{
-			lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
-
-			zbx_db_insert_add_values(db_insert, rule->lld_macroid++, rule->itemid, lld_macro->lld_macro,
-					lld_macro->json_path);
-		}
-	}
-
-	/* delete removed item macros */
-	if (0 != lld_macroids_del.values_num)
-	{
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "delete from lld_macro where");
-		DBadd_condition_alloc(sql, sql_alloc, sql_offset, "lld_macroid", lld_macroids_del.values,
-				lld_macroids_del.values_num);
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
-	}
-
-	zbx_vector_uint64_destroy(&lld_macroids_del);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: save_template_lld_rules                                          *
@@ -1052,29 +817,28 @@ static void	update_lld_macros(zbx_vector_ptr_t *rules, char **sql, size_t *sql_a
  *                                    be inserted                             *
  *                                                                            *
  ******************************************************************************/
-static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions,
-		int new_lld_macros)
+static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *rules, int new_conditions)
 {
+	char				*macro_esc, *value_esc;
 	int				i, j, index;
-	zbx_db_insert_t			db_insert_conditions, db_insert_lld_macros;
+	zbx_db_insert_t			db_insert;
 	zbx_lld_rule_map_t		*rule;
 	zbx_lld_rule_condition_t	*condition;
-	zbx_lld_rule_lld_macro_t	*lld_macro;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t		item_conditionids;
 
 	if (0 == rules->values_num)
 		return;
 
-	if (0 != new_conditions || 0 != new_lld_macros)
+	zbx_vector_uint64_create(&item_conditionids);
+
+	if (0 != new_conditions)
 	{
-		zbx_db_insert_prepare(&db_insert_conditions, "item_condition", "item_conditionid", "itemid",
-				"operator", "macro", "value", NULL);
+		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator", "macro",
+				"value", NULL);
 
-		zbx_db_insert_prepare(&db_insert_lld_macros, "lld_macro", "lld_macroid", "itemid", "lld_macro",
-				"json_path", NULL);
-
-		/* insert lld rule conditions and lld macros for new items */
+		/* insert lld rule conditions for new items */
 		for (i = 0; i < items->values_num; i++)
 		{
 			zbx_template_item_t	*item = (zbx_template_item_t *)items->values[i];
@@ -1099,39 +863,80 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			{
 				condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
 
-				zbx_db_insert_add_values(&db_insert_conditions, rule->conditionid++, item->itemid,
+				zbx_db_insert_add_values(&db_insert, rule->conditionid++, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
-			}
-
-			for (j = 0; j < rule->lld_macros.values_num; j++)
-			{
-				lld_macro = (zbx_lld_rule_lld_macro_t *)rule->lld_macros.values[j];
-
-				zbx_db_insert_add_values(&db_insert_lld_macros, rule->lld_macroid++, item->itemid,
-						lld_macro->lld_macro, lld_macro->json_path);
 			}
 		}
 	}
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	update_conditions(rules, &sql, &sql_alloc, &sql_offset, &db_insert_conditions);
-	update_lld_macros(rules, &sql, &sql_alloc, &sql_offset, &db_insert_lld_macros)
+	/* update lld rule conditions for existing items */
+	for (i = 0; i < rules->values_num; i++)
+	{
+		rule = (zbx_lld_rule_map_t *)rules->values[i];
+
+		/* skip lld rules of new items */
+		if (0 == rule->itemid)
+			continue;
+
+		index = MIN(rule->conditions.values_num, rule->conditionids.values_num);
+
+		/* update intersecting rule conditions */
+		for (j = 0; j < index; j++)
+		{
+			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+
+			macro_esc = DBdyn_escape_string(condition->macro);
+			value_esc = DBdyn_escape_string(condition->value);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update item_condition"
+					" set operator=%d,macro='%s',value='%s'"
+					" where item_conditionid=" ZBX_FS_UI64 ";\n",
+					(int)condition->op, macro_esc, value_esc, rule->conditionids.values[j]);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+			zbx_free(value_esc);
+			zbx_free(macro_esc);
+		}
+
+		/* delete removed rule conditions */
+		for (j = index; j < rule->conditionids.values_num; j++)
+			zbx_vector_uint64_append(&item_conditionids, rule->conditionids.values[j]);
+
+		/* insert new rule conditions */
+		for (j = index; j < rule->conditions.values_num; j++)
+		{
+			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+
+			zbx_db_insert_add_values(&db_insert, rule->conditionid++, rule->itemid,
+					(int)condition->op, condition->macro, condition->value);
+		}
+	}
+
+	/* delete removed item conditions */
+	if (0 != item_conditionids.values_num)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_condition where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "item_conditionid", item_conditionids.values,
+				item_conditionids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
 
-	if (0 != new_conditions || 0 != new_lld_macros)
+	if (0 != new_conditions)
 	{
-		zbx_db_insert_execute(&db_insert_conditions);
-		zbx_db_insert_clean(&db_insert_conditions);
-		zbx_db_insert_execute(&db_insert_lld_macros);
-		zbx_db_insert_clean(&db_insert_lld_macros);
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
 
 	zbx_free(sql);
+	zbx_vector_uint64_destroy(&item_conditionids);
 }
 
 /******************************************************************************
@@ -1391,22 +1196,6 @@ static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: free_lld_rule_condition                                          *
- *                                                                            *
- * Purpose: frees lld rule condition                                          *
- *                                                                            *
- * Parameters:  item  - [IN] the lld rule condition                           *
- *                                                                            *
- ******************************************************************************/
-static void	free_lld_rule_lld_macro(zbx_lld_rule_lld_macro_t *lld_macro)
-{
-	zbx_free(lld_macro->lld_macro);
-	zbx_free(lld_macro->json_path);
-	zbx_free(lld_macro);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: free_lld_rule_map                                                *
  *                                                                            *
  * Purpose: frees lld rule mapping                                            *
@@ -1416,11 +1205,6 @@ static void	free_lld_rule_lld_macro(zbx_lld_rule_lld_macro_t *lld_macro)
  ******************************************************************************/
 static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
-	zbx_vector_ptr_clear_ext(&rule->lld_macros, (zbx_clean_func_t)free_lld_rule_lld_macro);
-	zbx_vector_ptr_destroy(&rule->lld_macros);
-
-	zbx_vector_uint64_destroy(&rule->lld_macroids);
-
 	zbx_vector_ptr_clear_ext(&rule->conditions, (zbx_clean_func_t)free_lld_rule_condition);
 	zbx_vector_ptr_destroy(&rule->conditions);
 
@@ -1616,7 +1400,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	const char		*__function_name = "DBcopy_template_items";
 
 	zbx_vector_ptr_t	items, lld_rules;
-	int			new_conditions, new_lld_macros;
+	int			new_conditions = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1630,12 +1414,12 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	get_template_lld_rule_map(&items, &lld_rules);
 
-	calculate_template_lld_rule_ids(&lld_rules, &new_conditions, &new_lld_macros);
+	new_conditions = calculate_template_lld_rule_conditionids(&lld_rules);
 	update_template_lld_rule_formulas(&items, &lld_rules);
 
 	link_template_dependent_items(&items);
 	save_template_items(hostid, &items);
-	save_template_lld_rules(&items, &lld_rules, new_conditions, new_lld_macros);
+	save_template_lld_rules(&items, &lld_rules, new_conditions);
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
 	copy_template_items_preproc(templateids, &items);
