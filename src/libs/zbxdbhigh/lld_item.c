@@ -2416,7 +2416,7 @@ static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, 
 
 	if (NULL == param2)
 	{
-		zbx_snprintf(err, sizeof(err), "cannot split params \"%s\"", pp->params);
+		zbx_snprintf(err, sizeof(err), "cannot parse parameters \"%s\"", pp->params);
 		goto out;
 	}
 	if (SUCCEED != (ret = substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, err,
