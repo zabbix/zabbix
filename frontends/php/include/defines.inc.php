@@ -1215,6 +1215,7 @@ define('API_H_NAME',			21);
 define('API_RANGE_TIME',		22);
 define('API_COLOR',				23);
 define('API_NUMERIC',			24);
+define('API_LLD_MACRO',			25);
 
 // flags
 define('API_REQUIRED',				0x0001);

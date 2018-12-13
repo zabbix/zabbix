@@ -127,6 +127,9 @@ class CApiInputValidator {
 			case API_USER_MACRO:
 				return self::validateUserMacro($rule, $data, $path, $error);
 
+			case API_LLD_MACRO:
+				return self::validateLLDMacro($rule, $data, $path, $error);
+
 			case API_RANGE_TIME:
 				return self::validateRangeTime($rule, $data, $path, $error);
 
@@ -180,6 +183,7 @@ class CApiInputValidator {
 			case API_NUMERIC:
 			case API_SCRIPT_NAME:
 			case API_USER_MACRO:
+			case API_LLD_MACRO:
 			case API_RANGE_TIME:
 			case API_TIME_PERIOD:
 			case API_TIME_UNIT:
@@ -1024,6 +1028,35 @@ class CApiInputValidator {
 
 		if ((new CUserMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a user macro is expected'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * LLD macro validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateLLDMacro($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		if ((new CLLDMacroParser())->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a low-level discovery macro is expected'));
 			return false;
 		}
 
