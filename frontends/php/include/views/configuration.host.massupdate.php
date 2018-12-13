@@ -79,24 +79,6 @@ $hostFormList->addRow(
 		->setId('groups-div')
 );
 
-// update tags
-$hostFormList->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
-		->setLabel(_('Tags'))
-		->setChecked(array_key_exists('tags', $data['visible'])),
-	(new CDiv([
-		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
-			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
-			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
-			->setModern(true),
-		renderTagTable($data['tags'])->setId('tbl-tags')
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('tags-div')
-);
-
 // append description to form list
 $hostFormList->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
@@ -131,7 +113,7 @@ $hostFormList->addRow(
 
 $templatesFormList = new CFormList('templatesFormList');
 
-// append templates table to from list
+// append templates table to form list
 $newTemplateTable = (new CTable())
 	->addRow([
 		(new CMultiSelect([
@@ -219,6 +201,26 @@ $inventoryFormList->addRow(
 	))->setId('inventory_mode_div')
 );
 
+$tags_form_list = new CFormList('tagsFormList');
+
+// append tags table to form list
+$tags_form_list->addRow(
+	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
+		->setLabel(_('Tags'))
+		->setChecked(array_key_exists('tags', $data['visible'])),
+	(new CDiv([
+		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
+			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+			->setModern(true),
+		renderTagTable($data['tags'])->setId('tbl-tags')
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('tags-div')
+);
+
 $hostInventoryTable = DB::getSchema('host_inventory');
 foreach ($data['inventories'] as $field => $fieldInfo) {
 	if (!array_key_exists($field, $data['host_inventory'])) {
@@ -295,13 +297,14 @@ $hostTab = (new CTabView())
 	->addTab('hostTab', _('Host'), $hostFormList)
 	->addTab('templatesTab', _('Templates'), $templatesFormList)
 	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
-	->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+	->addTab('tagsTab', _('Tags'), $tags_form_list)
+	->addTab('inventoryTab', _('Inventory'), $inventoryFormList)
+	->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
-$hostTab->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

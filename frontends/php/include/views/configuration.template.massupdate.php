@@ -78,24 +78,6 @@ $template_form_list->addRow(
 		->setId('groups-div')
 );
 
-// update tags
-$template_form_list->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
-		->setLabel(_('Tags'))
-		->setChecked(array_key_exists('tags', $data['visible'])),
-	(new CDiv([
-		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
-			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
-			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
-			->setModern(true),
-		renderTagTable($data['tags'])->setId('tbl-tags')
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('tags-div')
-);
-
 // append description to form list
 $template_form_list->addRow(
 	(new CVisibilityBox('visible[description]', 'description', _('Original')))
@@ -147,10 +129,31 @@ $linked_templates_form_list->addRow(
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+$tags_form_list = new CFormList('tagsFormList');
+
+// append tags table to form list
+$tags_form_list->addRow(
+	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))
+		->setLabel(_('Tags'))
+		->setChecked(array_key_exists('tags', $data['visible'])),
+	(new CDiv([
+		(new CRadioButtonList('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD))
+			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
+			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
+			->setModern(true),
+		renderTagTable($data['tags'])->setId('tbl-tags')
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->setId('tags-div')
+);
+
 // append tabs to form
 $tab = (new CTabView())
 	->addTab('templateTab', _('Template'), $template_form_list)
-	->addTab('linkedTemplatesTab', _('Linked templates'), $linked_templates_form_list);
+	->addTab('linkedTemplatesTab', _('Linked templates'), $linked_templates_form_list)
+	->addTab('tagsTab', _('Tags'), $tags_form_list);
 
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave')) {
