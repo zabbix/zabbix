@@ -1316,7 +1316,7 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zbx_vector_uint64_destroy(&itemids);
 }
 
-static void	copy_template_lld_macros(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
+static void	copy_template_lld_macro_paths(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
 {
 	zbx_vector_uint64_t		itemids;
 	zbx_hashset_t			items_t;
@@ -1353,17 +1353,17 @@ static void	copy_template_lld_macros(const zbx_vector_uint64_t *templateids, con
 	{
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_macro where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from lld_macro_path where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 		DBexecute("%s", sql);
 		sql_offset = 0;
 	}
 
-	zbx_db_insert_prepare(&db_insert, "lld_macro", "lld_macroid", "itemid", "lld_macro", "json_path", NULL);
+	zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path", NULL);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select l.itemid,l.lld_macro,l.json_path"
-				" from lld_macro l,items i"
+			"select l.itemid,l.lld_macro,l.path"
+				" from lld_macro_path l,items i"
 				" where l.itemid=i.itemid"
 				" and");
 
@@ -1385,7 +1385,7 @@ static void	copy_template_lld_macros(const zbx_vector_uint64_t *templateids, con
 	}
 	DBfree_result(result);
 
-	zbx_db_insert_autoincrement(&db_insert, "lld_macroid");
+	zbx_db_insert_autoincrement(&db_insert, "lld_macro_pathid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
@@ -1501,7 +1501,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	save_template_item_applications(&items);
 	save_template_discovery_prototypes(hostid, &items);
 	copy_template_items_preproc(templateids, &items);
-	copy_template_lld_macros(templateids, &items);
+	copy_template_lld_macro_paths(templateids, &items);
 out:
 	zbx_vector_ptr_clear_ext(&lld_rules, (zbx_clean_func_t)free_lld_rule_map);
 	zbx_vector_ptr_destroy(&lld_rules);

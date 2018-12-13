@@ -48,42 +48,42 @@ lld_filter_t;
 typedef struct
 {
 	char	*lld_macro;
-	char	*json_path;
+	char	*path;
 }
-zbx_lld_macro_t;
+zbx_lld_macro_path_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_macros_compare                                               *
+ * Function: lld_macro_paths_compare                                          *
  *                                                                            *
  * Purpose: sorting function to sort LLD macros by unique name                *
  *                                                                            *
  ******************************************************************************/
-static int	lld_macros_compare(const void *d1, const void *d2)
+static int	lld_macro_paths_compare(const void *d1, const void *d2)
 {
-	const zbx_lld_macro_t	*r1 = *(const zbx_lld_macro_t **)d1;
-	const zbx_lld_macro_t	*r2 = *(const zbx_lld_macro_t **)d2;
+	const zbx_lld_macro_path_t	*r1 = *(const zbx_lld_macro_path_t **)d1;
+	const zbx_lld_macro_path_t	*r2 = *(const zbx_lld_macro_path_t **)d2;
 
 	return strcmp(r1->lld_macro, r2->lld_macro);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_macros_get                                                   *
+ * Function: lld_macro_paths_get                                              *
  *                                                                            *
  * Purpose: retrieve list of LLD macros                                       *
  *                                                                            *
  * Parameters: lld_ruleid - [IN] LLD id                                       *
- *             lld_macros - [OUT] list of LLD macros                          *
+ *             lld_macro_paths - [OUT] list of LLD macro paths                *
  *                                                                            *
  ******************************************************************************/
-static int	lld_macros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macros, char **error)
+static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
-	const char		*__function_name = "lld_macros_get";
+	const char		*__function_name = "lld_macro_paths_get";
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_lld_macro_t		*lld_macro;
+	zbx_lld_macro_path_t	*lld_macro_path;
 	int			ret = SUCCEED;
 	char			err[MAX_STRING_LEN];
 
@@ -103,27 +103,27 @@ static int	lld_macros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macros,
 			break;
 		}
 
-		lld_macro = (zbx_lld_macro_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_t));
+		lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
 
-		lld_macro->lld_macro = zbx_strdup(NULL, row[0]);
-		lld_macro->json_path = zbx_strdup(NULL, row[1]);
+		lld_macro_path->lld_macro = zbx_strdup(NULL, row[0]);
+		lld_macro_path->path = zbx_strdup(NULL, row[1]);
 
-		zbx_vector_ptr_append(lld_macros, lld_macro);
+		zbx_vector_ptr_append(lld_macro_paths, lld_macro_path);
 	}
 	DBfree_result(result);
 
-	zbx_vector_ptr_sort(lld_macros, lld_macros_compare);
+	zbx_vector_ptr_sort(lld_macro_paths, lld_macro_paths_compare);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
 
-static void	lld_macro_free(zbx_lld_macro_t *lld_macro)
+static void	lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
 {
-	zbx_free(lld_macro->json_path);
-	zbx_free(lld_macro->lld_macro);
-	zbx_free(lld_macro);
+	zbx_free(lld_macro_path->path);
+	zbx_free(lld_macro_path->lld_macro);
+	zbx_free(lld_macro_path);
 }
 
 /******************************************************************************
@@ -286,21 +286,21 @@ out:
 	return ret;
 }
 
-int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		const char *macro, char **value, size_t *value_alloc)
 {
-	zbx_lld_macro_t		lld_macro_local, *lld_macro;
+	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
 	int			index;
 	struct zbx_json_parse	jp_out;
 	int			ret;
 
-	lld_macro_local.lld_macro = (char *)macro;
+	lld_macro_path_local.lld_macro = (char *)macro;
 
-	if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macros, &lld_macro_local, lld_macros_compare)))
+	if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macro_paths, &lld_macro_path_local, lld_macro_paths_compare)))
 	{
-		lld_macro = (zbx_lld_macro_t *)lld_macros->values[index];
+		lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
 
-		if (FAIL != (ret = zbx_json_path_open(jp_row, lld_macro->json_path, &jp_out)))
+		if (FAIL != (ret = zbx_json_path_open(jp_row, lld_macro_path->path, &jp_out)))
 			zbx_json_value_dyn(&jp_out, value, value_alloc);
 	}
 	else
@@ -309,14 +309,15 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 	return ret;
 }
 
-static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *lld_macros,
+static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *lld_macro_paths,
 		const lld_condition_t *condition)
 {
 	char	*value = NULL;
 	size_t	value_alloc = 0;
 	int	ret;
 
-	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macros, condition->macro, &value, &value_alloc)))
+	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value,
+			&value_alloc)))
 	{
 		switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 		{
@@ -350,7 +351,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vecto
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macros)
+		zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_and_or";
 
@@ -363,7 +364,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		rc = filter_condition_match(jp_row, lld_macros, condition);
+		rc = filter_condition_match(jp_row, lld_macro_paths, condition);
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
 		{
@@ -401,7 +402,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macros)
+		zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_and";
 
@@ -412,7 +413,7 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		/* if any of conditions are false the evaluation returns false */
-		if (SUCCEED != (ret = filter_condition_match(jp_row, lld_macros,
+		if (SUCCEED != (ret = filter_condition_match(jp_row, lld_macro_paths,
 				(lld_condition_t *)filter->conditions.values[i])))
 		{
 			break;
@@ -438,7 +439,7 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macros)
+		zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_or";
 
@@ -449,7 +450,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		/* if any of conditions are true the evaluation returns true */
-		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macros,
+		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths,
 				(lld_condition_t *)filter->conditions.values[i])))
 		{
 			break;
@@ -480,7 +481,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macros)
+		zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_expression";
 
@@ -496,7 +497,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		ret = filter_condition_match(jp_row, lld_macros, condition);
+		ret = filter_condition_match(jp_row, lld_macro_paths, condition);
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
@@ -535,18 +536,18 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macros)
+		zbx_vector_ptr_t *lld_macro_paths)
 {
 	switch (filter->evaltype)
 	{
 		case CONDITION_EVAL_TYPE_AND_OR:
-			return filter_evaluate_and_or(filter, jp_row, lld_macros);
+			return filter_evaluate_and_or(filter, jp_row, lld_macro_paths);
 		case CONDITION_EVAL_TYPE_AND:
-			return filter_evaluate_and(filter, jp_row, lld_macros);
+			return filter_evaluate_and(filter, jp_row, lld_macro_paths);
 		case CONDITION_EVAL_TYPE_OR:
-			return filter_evaluate_or(filter, jp_row, lld_macros);
+			return filter_evaluate_or(filter, jp_row, lld_macro_paths);
 		case CONDITION_EVAL_TYPE_EXPRESSION:
-			return filter_evaluate_expression(filter, jp_row, lld_macros);
+			return filter_evaluate_expression(filter, jp_row, lld_macro_paths);
 	}
 
 	return FAIL;
@@ -566,27 +567,28 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
  *                                                                            *
  ******************************************************************************/
 static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *itemmacros, char **info)
+		zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
 	int			i, index;
-	zbx_lld_macro_t		lld_macro_local, *lld_macro;
+	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
 	struct zbx_json_parse	jp_out;
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		lld_macro_local.lld_macro = condition->macro;
+		lld_macro_path_local.lld_macro = condition->macro;
 
-		if (FAIL != (index = zbx_vector_ptr_bsearch(itemmacros, &lld_macro_local, lld_macros_compare)))
+		if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macro_paths, &lld_macro_path_local,
+				lld_macro_paths_compare)))
 		{
-			lld_macro = (zbx_lld_macro_t *)itemmacros->values[index];
+			lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
 
-			if (FAIL == zbx_json_path_open(jp_row, lld_macro->json_path, &jp_out))
+			if (FAIL == zbx_json_path_open(jp_row, lld_macro_path->path, &jp_out))
 			{
 				*info = zbx_strdcatf(*info,
 						"Cannot accurately apply filter: no value received for macro \"%s\""
-						" json path '%s'.\n", lld_macro->lld_macro, lld_macro->json_path);
+						" json path '%s'.\n", lld_macro_path->lld_macro, lld_macro_path->path);
 			}
 
 			continue;
@@ -602,7 +604,7 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
-		zbx_vector_ptr_t *lld_macros, char **info, char **error)
+		zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
@@ -636,9 +638,9 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 		if (FAIL == zbx_json_brackets_open(p, &jp_row))
 			continue;
 
-		lld_check_received_data_for_filter(filter, &jp_row, lld_macros, info);
+		lld_check_received_data_for_filter(filter, &jp_row, lld_macro_paths, info);
 
-		if (SUCCEED != filter_evaluate(filter, &jp_row, lld_macros))
+		if (SUCCEED != filter_evaluate(filter, &jp_row, lld_macro_paths))
 			continue;
 
 		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
@@ -687,7 +689,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	char			*discovery_key = NULL, *error = NULL, *db_error = NULL, *error_esc, *info = NULL;
 	unsigned char		state;
 	int			lifetime;
-	zbx_vector_ptr_t	lld_rows, lld_macros;
+	zbx_vector_ptr_t	lld_rows, lld_macro_paths;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
@@ -705,7 +707,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	}
 
 	zbx_vector_ptr_create(&lld_rows);
-	zbx_vector_ptr_create(&lld_macros);
+	zbx_vector_ptr_create(&lld_macro_paths);
 
 	lld_filter_init(&filter);
 
@@ -753,17 +755,17 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &error))
 		goto error;
 
-	if (SUCCEED != lld_macros_get(lld_ruleid, &lld_macros, &error))
+	if (SUCCEED != lld_macro_paths_get(lld_ruleid, &lld_macro_paths, &error))
 		goto error;
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macros, &info, &error))
+	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &info, &error))
 		goto error;
 
 	error = zbx_strdup(error, "");
 
 	now = time(NULL);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macros, &error, lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error, lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -772,21 +774,21 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, cons
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macros, &error))
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto clean;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macros, &error))
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
 		goto clean;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macros, &error, lifetime, now);
+	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, &error, lifetime, now);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -849,8 +851,8 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&lld_rows, (zbx_clean_func_t)lld_row_free);
 	zbx_vector_ptr_destroy(&lld_rows);
-	zbx_vector_ptr_clear_ext(&lld_macros, (zbx_clean_func_t)lld_macro_free);
-	zbx_vector_ptr_destroy(&lld_macros);
+	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)lld_macro_path_free);
+	zbx_vector_ptr_destroy(&lld_macro_paths);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -3049,8 +3049,8 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
-void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macros,
-		char **error, int lifetime, int lastcheck)
+void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	const char		*__function_name = "lld_update_hosts";
 
@@ -3150,8 +3150,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		{
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-			host = lld_host_make(&hosts, host_proto, name_proto, &lld_row->jp_row, lld_macros);
-			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row, lld_macros);
+			host = lld_host_make(&hosts, host_proto, name_proto, &lld_row->jp_row, lld_macro_paths);
+			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row, lld_macro_paths);
 		}
 
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
