@@ -2432,19 +2432,14 @@ static int	lld_items_preproc_step_esc_regsub(const zbx_lld_item_preproc_t * pp, 
 
 	sub_params_size = strlen(param1) + strlen(param2) + 2;
 	*sub_params = zbx_malloc(NULL, sub_params_size);
-	if (NULL == *sub_params)
-	{
-		zbx_strlcpy(err, "out of memory", sizeof(err));
-		goto out;
-	}
 
 	zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
-				"%s.\n", item_key, pp->step, err);
+		*error = zbx_strdcatf(*error, "Cannot create %s item: invalid value for preprocessing step #%d: %s.\n",
+				item_key, pp->step, err);
 	}
 	zbx_free(param1);
 	zbx_free(param2);
@@ -2485,8 +2480,8 @@ static int	lld_items_preproc_step_esc_generic(const zbx_lld_item_preproc_t * pp,
 
 	if (SUCCEED != (ret = substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, err, sizeof(err))))
 	{
-		*error = zbx_strdcatf(*error, "Item \"%s\" was not created. Invalid value for preprocessing step #%d: "
-				"%s.\n", item_key, pp->step, err);
+		*error = zbx_strdcatf(*error, "Cannot create %s item: invalid value for preprocessing step #%d: %s.\n",
+				item_key, pp->step, err);
 		zbx_free(*sub_params);
 	}
 
