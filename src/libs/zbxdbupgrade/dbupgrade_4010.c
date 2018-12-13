@@ -70,7 +70,7 @@ static int	DBpatch_4010003(void)
 
 static int	DBpatch_4010004(void)
 {
-	return DBcreate_index("lld_macro", "lld_macro_1", "itemid,lld_macro", 1);
+	return DBcreate_index("lld_macro_path", "lld_macro_1", "itemid,lld_macro", 1);
 }
 
 static int	DBpatch_4010005(void)
