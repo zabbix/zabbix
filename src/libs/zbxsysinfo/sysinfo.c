@@ -1463,8 +1463,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			}
 			else if (WAIT_TIMEOUT == timeout_rc)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread: %s",
-						strerror_from_system(GetLastError()));
+				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread while processing key: %s", request->key);
 				TerminateThread(thread, 0);
 			}
 		}
