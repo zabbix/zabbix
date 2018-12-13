@@ -1361,6 +1361,7 @@ typedef struct
 	AGENT_REQUEST		*request;
 	AGENT_RESULT		*result;
 	zbx_uint32_t		mutex_flag; /* in regular case should always be = ZBX_MUTEX_ALL_ALLOW */
+	ZBX_EVENT_HANDLE	timeout_event;
 	int			agent_ret;
 }
 zbx_metric_thread_args_t;
@@ -1372,7 +1373,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing in data thread for key:'%s'", args->request->key);
 
-	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->request, args->result)))
+	if (SYSINFO_RET_FAIL == (args->agent_ret = args->func(args->request, args->result, args->timeout_event)))
 	{
 		if (NULL == GET_MSG_RESULT(args->result))
 			SET_MSG_RESULT(args->result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
@@ -1401,45 +1402,80 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	const char			*__function_name = "zbx_execute_threaded_metric";
 
 	ZBX_THREAD_HANDLE		thread;
-	zbx_thread_args_t		args;
+	zbx_thread_args_t		thread_args;
 	zbx_metric_thread_args_t	metric_args = {metric_func, request, result, ZBX_MUTEX_THREAD_DENIED |
 							ZBX_MUTEX_LOGGING_DENIED};
 	DWORD				rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
 
-	args.args = (void *)&metric_args;
+	metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	zbx_thread_start(agent_metric_thread, &args, &thread);
+	if (NULL == metric_args.timeout_event)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create timeout event for data thread: %s",
+				strerror_from_system(GetLastError())));
+		return SYSINFO_RET_FAIL
+	}
+
+	thread_args.args = (void *)&metric_args;
+
+	zbx_thread_start(agent_metric_thread, &thread_args, &thread);
 
 	if (ZBX_THREAD_ERROR == thread)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
 				strerror_from_system(GetLastError())));
+		CloseHandle(metric_args.timeout_event);
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000)))
+	rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000);
+
+	if (WAIT_FAILED == rc)
 	{
+		/* unexpected error */
+
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot wait for data: %s",
 				strerror_from_system(GetLastError())));
 		TerminateThread(thread, 0);
-		CloseHandle(thread);
-		return SYSINFO_RET_FAIL;
 	}
 	else if (WAIT_TIMEOUT == rc)
 	{
+		/* timeout; give a thread few seconds to clean up and exit, then terminate if stuck */
+
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for data."));
-		TerminateThread(thread, 0);
-		CloseHandle(thread);
-		return SYSINFO_RET_FAIL;
+
+		if (FALSE == SetEvent(metric_args.timeout_event))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "SetEvent() failed: %s", strerror_from_system(GetLastError()));
+			TerminateThread(thread, 0);
+		}
+		else
+		{
+			DWORD	timeout_rc = WaitForSingleObject(thread, 3000);
+
+			if (WAIT_FAILED == timeout_rc)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot wait for data: %s",
+						strerror_from_system(GetLastError()));
+				TerminateThread(thread, 0);
+			}
+			else if (WAIT_TIMEOUT == timeout_rc)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread: %s",
+						strerror_from_system(GetLastError()));
+				TerminateThread(thread, 0);
+			}
+		}
 	}
 
 	CloseHandle(thread);
+	CloseHandle(metric_args.timeout_event);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s '%s'", __function_name,
 			zbx_sysinfo_ret_string(metric_args.agent_ret), ISSET_MSG(result) ? result->msg : "");
 
-	return metric_args.agent_ret;
+	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
