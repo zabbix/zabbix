@@ -1680,10 +1680,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
  *                                                                            *
  * Purpose: substitutes lld macros in calculated item formula expression      *
  *                                                                            *
- * Parameters: data          - [IN/OUT] the expression                        *
- *             jp_row        - [IN] the lld data row                          *
- *             error         - [IN] pointer to string for reporting errors    *
- *             max_error_len - [IN] size of 'error' string                    *
+ * Parameters: data            - [IN/OUT] the expression                      *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [IN] pointer to string for reporting errors  *
+ *             max_error_len   - [IN] size of 'error' string                  *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
@@ -1764,8 +1765,9 @@ out:
  *                                                                            *
  * Purpose: creates a new item based on item prototype and lld data row       *
  *                                                                            *
- * Parameters: item_prototype - [IN] the item prototype                       *
- *             lld_row        - [IN] the lld row                              *
+ * Parameters: item_prototype  - [IN] the item prototype                      *
+ *             lld_row         - [IN] the lld row                             *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Returns: The created item or NULL if cannot create new item from prototype *
  *                                                                            *
@@ -1959,9 +1961,10 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
  *                                                                            *
  * Purpose: updates an existing item based on item prototype and lld data row *
  *                                                                            *
- * Parameters: item_prototype - [IN] the item prototype                       *
- *             lld_row        - [IN] the lld row                              *
- *             item           - [IN] an existing item or NULL                 *
+ * Parameters: item_prototype  - [IN] the item prototype                      *
+ *             lld_row         - [IN] the lld row                             *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             item            - [IN] an existing item or NULL                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
@@ -2287,6 +2290,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
  *             lld_rows        - [IN] the lld data rows                       *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row  *
  *             items           - [IN/OUT] sorted list of items                *
  *             items_index     - [OUT] index of items based on prototype ids  *
  *                                     and lld rows. Used to quckly find an   *
@@ -2397,11 +2401,12 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
  *          process                                                           *
  *                                                                            *
- * Parameters: pp         - [IN] the item preprocessing step                  *
- *             lld_row    - [IN] lld source value                             *
- *             item_key   - [IN] Item name for logging                        *
- *             sub_params - [IN/OUT] the pp params value after substitute     *
- *             error      - [IN/OUT] the lld error message                    *
+ * Parameters: pp              - [IN] the item preprocessing step             *
+ *             lld_row         - [IN] lld source value                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             item_key        - [IN] Item name for logging                   *
+ *             sub_params      - [IN/OUT] the pp params value after substitute*
+ *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing steps are valid                   *
  *               FAIL    - if substitute_lld_macros fails                     *
@@ -2445,6 +2450,7 @@ static int	lld_items_preproc_step_esc(const zbx_lld_item_preproc_t * pp, const z
  *          based on item item prototypes                                     *
  *                                                                            *
  * Parameters: item_prototypes - [IN] the item prototypes                     *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *             error           - [IN/OUT] the lld error message               *
  *                                                                            *
@@ -4223,6 +4229,8 @@ static void	lld_applications_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *appl
  *                                                                            *
  * Parameters: application_prototype - [IN] the application prototype         *
  *             lld_row               - [IN] the lld row                       *
+ *             lld_macro_paths       - [IN] use json path to extract from     *
+ *                                          lld_row                           *
  *             applications          - [IN/OUT] the applications              *
  *             applications_index    - [IN/OUT] the application index by      *
  *                                              prototype id and lld row      *

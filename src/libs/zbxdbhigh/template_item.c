@@ -1316,6 +1316,16 @@ static void	copy_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zbx_vector_uint64_destroy(&itemids);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: copy_template_lld_macro_paths                                    *
+ *                                                                            *
+ * Purpose: copy template discovery item lld macro paths                      *
+ *                                                                            *
+ * Parameters: templateids - [IN] array of template IDs                       *
+ *             items       - [IN] array of new/updated items                  *
+ *                                                                            *
+ ******************************************************************************/
 static void	copy_template_lld_macro_paths(const zbx_vector_uint64_t *templateids, const zbx_vector_ptr_t *items)
 {
 	zbx_vector_uint64_t		itemids;

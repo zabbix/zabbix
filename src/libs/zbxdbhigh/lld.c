@@ -73,8 +73,9 @@ static int	lld_macro_paths_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: retrieve list of LLD macros                                       *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] LLD id                                       *
- *             lld_macro_paths - [OUT] list of LLD macro paths                *
+ * Parameters: lld_ruleid      - [IN] LLD id                                  *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             error           - [OUT] in case json path is invalid           *
  *                                                                            *
  ******************************************************************************/
 static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error)
@@ -90,8 +91,8 @@ static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_ma
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select lld_macro,json_path"
-			" from lld_macro"
+			"select lld_macro,path"
+			" from lld_macro_path"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
@@ -119,6 +120,15 @@ static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_ma
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_macro_path_free                                              *
+ *                                                                            *
+ * Purpose: release resources allocated by lld macro path                     *
+ *                                                                            *
+ * Parameters: lld_macro_path - [IN] json path to extract from lld_row        *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
 {
 	zbx_free(lld_macro_path->path);
@@ -286,6 +296,20 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_lld_macro_value_by_name                                      *
+ *                                                                            *
+ * Purpose: get value of LLD macro using json path if available or by         *
+ *          searching for such key in key value pairs of array entry          *
+ *                                                                            *
+ * Parameters: jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             macro           - [IN] LLD macro                               *
+ *             value           - [OUT] value extracted from jp_row            *
+ *             value_alloc     - [OUT] allocated memory size for value        *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		const char *macro, char **value, size_t *value_alloc)
 {
@@ -343,8 +367,9 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vecto
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation by and/or rule     *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -394,8 +419,9 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation by and rule        *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -431,8 +457,9 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation by or rule         *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -469,8 +496,9 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  * Purpose: check if the lld data passes filter evaluation by custom          *
  *          expression                                                        *
  *                                                                            *
- * Parameters: filter - [IN] the lld filter                                   *
- *             jp_row - [IN] the lld data row                                 *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -528,8 +556,9 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation                    *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -561,9 +590,10 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
  *          Create an informative warning for every macro that has not        *
  *          received any value.                                               *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             jp_row     - [IN] the lld data row                             *
- *             info       - [OUT] the warning description                     *
+ * Parameters: filter          - [IN] the lld filter                          *
+ *             jp_row          - [IN] the lld data row                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             info            - [OUT] the warning description                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struct zbx_json_parse *jp_row,
