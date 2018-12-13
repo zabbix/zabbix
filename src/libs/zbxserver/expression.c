@@ -5244,7 +5244,11 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	}
 	else if (0 != (flags & ZBX_TOKEN_REGEXP_OUTPUT))
 	{
-		zbx_regexp_output_escape(&replace_to);
+		char	*replace_to_esc;
+
+		replace_to_esc = zbx_dyn_escape_string(replace_to, "\\");
+		zbx_free(replace_to);
+		replace_to = replace_to_esc;
 	}
 	else if (0 != (flags & ZBX_TOKEN_XPATH))
 	{
