@@ -333,7 +333,7 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 	return ret;
 }
 
-static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vector_ptr_t *lld_macro_paths,
+static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
 		const lld_condition_t *condition)
 {
 	char	*value = NULL;
@@ -376,7 +376,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, zbx_vecto
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_and_or";
 
@@ -428,7 +428,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_and";
 
@@ -466,7 +466,7 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_or";
 
@@ -509,7 +509,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	const char	*__function_name = "filter_evaluate_expression";
 
@@ -565,7 +565,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	switch (filter->evaltype)
 	{
@@ -597,7 +597,7 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
  *                                                                            *
  ******************************************************************************/
 static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struct zbx_json_parse *jp_row,
-		zbx_vector_ptr_t *lld_macro_paths, char **info)
+		const zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
 	int			i, index;
 	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
@@ -634,7 +634,7 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 }
 
 static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_t *lld_rows,
-		zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
+		const zbx_vector_ptr_t *lld_macro_paths, char **info, char **error)
 {
 	const char		*__function_name = "lld_rows_get";
 
