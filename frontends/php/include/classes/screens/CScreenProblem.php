@@ -333,7 +333,8 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					if (array_key_exists('details', $filter) && $filter['details'] == 1) {
+					if ((array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1)
+							|| (array_key_exists('details', $filter) && $filter['details'] == 1)) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
 					}
 
@@ -571,7 +572,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
-		if ($filter['details'] == 1) {
+		if ($filter['details'] == 1 || $filter['show_latest_values'] == 1) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -584,7 +585,27 @@ class CScreenProblem extends CScreenBase {
 				'resolve_macros' => true,
 				'sources' => ['expression_html', 'recovery_expression_html']
 			]);
+
+			// Sort items.
+			if ($filter['show_latest_values'] == 1) {
+				foreach ($data['triggers'] as &$trigger) {
+					if (count($trigger['items']) > 1) {
+						$order = [];
+						$pos = 0;
+						foreach ($trigger['expression_html'] as $expression_parts) {
+							if ($expression_parts[1] instanceof CLink) {
+								$order[$expression_parts[1]->getAttribute('data-itemid')] = $pos++;
+							}
+						}
+						usort($trigger['items'], function ($a, $b) use ($order) {
+							return ($order[$a['itemid']] > $order[$b['itemid']]) ? 1 : -1;
+						});
+					}
+				}
+				unset($trigger);
+			}
 		}
+
 		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 		if ($resolve_comments) {
 			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);

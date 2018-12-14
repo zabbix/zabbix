@@ -68,7 +68,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
-			'details' => 0
+			'details' => 0,
+			'show_latest_values' => $fields['show_latest_values']
 		], true);
 
 		if ($fields['show_tags']) {

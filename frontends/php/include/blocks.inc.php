@@ -167,6 +167,13 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		];
 
+		if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
+			$options['output'] = array_merge(
+				$options['output'],
+				['url', 'expression', 'recovery_mode','recovery_expression']
+			);
+		}
+
 		$data['triggers'] = API::Trigger()->get($options);
 
 		foreach ($data['triggers'] as &$trigger) {
@@ -267,6 +274,12 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			])
 		];
+	}
+
+	if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
+		$maked_data = CScreenProblem::makeData(['problems' => $problems_data, 'triggers' => $data['triggers']],
+			['show' => 0, 'details' => 0, 'show_latest_values' => $filter['show_latest_values']], false);
+		$data['triggers'] = $maked_data['triggers'];
 	}
 
 	return $data;
