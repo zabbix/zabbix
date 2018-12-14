@@ -660,7 +660,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		*error = zbx_strdup(*error, "Value should be a JSON array.");
+		*error = zbx_dsprintf(*error, "Cannot parse received values: %s", zbx_json_strerror());
 		goto out;
 	}
 
