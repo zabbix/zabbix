@@ -61,6 +61,12 @@ $fields = [
 	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
+														ZBX_MASSUPDATE_ACTION_REMOVE
+													]),
+													null
+												],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -411,12 +417,30 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 		$triggerids = getRequest('g_triggerid');
 		$triggers_to_update = [];
 
-		$triggers = API::Trigger()->get([
+		$options = [
 			'output' => ['triggerid', 'templateid'],
 			'triggerids' => $triggerids,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
-		]);
+		];
+
+		if (array_key_exists('tags', $visible)) {
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD);
+
+			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			$unique_tags = [];
+
+			foreach ($tags as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$tags = array_values($unique_tags);
+		}
+
+		$triggers = API::Trigger()->get($options);
 
 		if ($triggers) {
 			foreach ($triggerids as $triggerid) {
@@ -432,7 +456,33 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 					}
 
 					if (array_key_exists('tags', $visible)) {
-						$trigger['tags'] = $tags;
+						if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+							$unique_tags = [];
+
+							foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
+								$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+							}
+
+							$trigger['tags'] = array_values($unique_tags);
+						}
+						elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+							$trigger['tags'] = $tags;
+						}
+						elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+							$diff_tags = [];
+
+							foreach ($triggers[$triggerid]['tags'] as $a) {
+								foreach ($tags as $b) {
+									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+										continue 2;
+									}
+								}
+
+								$diff_tags[] = $a;
+							}
+
+							$trigger['tags'] = $diff_tags;
+						}
 					}
 
 					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {

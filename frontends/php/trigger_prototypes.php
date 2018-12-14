@@ -54,6 +54,12 @@ $fields = [
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'mass_update_tags'	=>						[T_ZBX_INT, O_OPT, null,
+													IN([ZBX_MASSUPDATE_ACTION_ADD, ZBX_MASSUPDATE_ACTION_REPLACE,
+														ZBX_MASSUPDATE_ACTION_REMOVE
+													]),
+													null
+												],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -377,11 +383,29 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 		$triggerids = getRequest('g_triggerid');
 		$triggers_to_update = [];
 
-		$triggers = API::TriggerPrototype()->get([
+		$options = [
 			'output' => ['triggerid', 'templateid'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
-		]);
+		];
+
+		if (array_key_exists('tags', $visible)) {
+			$mass_update_tags = getRequest('mass_update_tags', ZBX_MASSUPDATE_ACTION_ADD);
+
+			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			$unique_tags = [];
+
+			foreach ($tags as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$tags = array_values($unique_tags);
+		}
+
+		$triggers = API::TriggerPrototype()->get($options);
 
 		if ($triggers) {
 			foreach ($triggerids as $triggerid) {
@@ -397,7 +421,33 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 					}
 
 					if (array_key_exists('tags', $visible)) {
-						$trigger['tags'] = $tags;
+						if ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD) {
+							$unique_tags = [];
+
+							foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
+								$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+							}
+
+							$trigger['tags'] = array_values($unique_tags);
+						}
+						elseif ($mass_update_tags == ZBX_MASSUPDATE_ACTION_REPLACE) {
+							$trigger['tags'] = $tags;
+						}
+						elseif ($tags && $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
+							$diff_tags = [];
+
+							foreach ($triggers[$triggerid]['tags'] as $a) {
+								foreach ($tags as $b) {
+									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
+										continue 2;
+									}
+								}
+
+								$diff_tags[] = $a;
+							}
+
+							$trigger['tags'] = $diff_tags;
+						}
 					}
 
 					if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
@@ -419,7 +469,7 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massu
 	show_messages($result, _('Trigger prototypes updated'), _('Cannot update trigger prototypes'));
 }
 elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprototype.massenable', 'triggerprototype.massdisable']) && hasRequest('g_triggerid')) {
-	$status = (getRequest('action') == 'triggerprototype.massenable')
+	$status = (getRequest('action') === 'triggerprototype.massenable')
 		? TRIGGER_STATUS_ENABLED
 		: TRIGGER_STATUS_DISABLED;
 	$update = [];
@@ -456,7 +506,7 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
 
 	if ($result) {

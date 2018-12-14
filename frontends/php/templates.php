@@ -256,6 +256,14 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
 				$options['selectTags'] = ['tag', 'value'];
 			}
+
+			$unique_tags = [];
+
+			foreach ($tags as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$tags = array_values($unique_tags);
 		}
 
 		$templates = API::Template()->get($options);
@@ -321,16 +329,6 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			}
 
 			$new_values['templates'] = $linked_templateids;
-		}
-
-		if (array_key_exists('tags', $visible)) {
-			$unique_tags = [];
-
-			foreach ($tags as $tag) {
-				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-			}
-
-			$tags = array_values($unique_tags);
 		}
 
 		foreach ($templates as &$template) {

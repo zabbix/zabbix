@@ -399,6 +399,14 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			if ($mass_update_tags == ZBX_MASSUPDATE_ACTION_ADD || $mass_update_tags == ZBX_MASSUPDATE_ACTION_REMOVE) {
 				$options['selectTags'] = ['tag', 'value'];
 			}
+
+			$unique_tags = [];
+
+			foreach ($tags as $tag) {
+				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+			}
+
+			$tags = array_values($unique_tags);
 		}
 
 		$hosts = API::Host()->get($options);
@@ -473,16 +481,6 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 				$new_values['templates'] = $templateids;
 			}
-		}
-
-		if (array_key_exists('tags', $visible)) {
-			$unique_tags = [];
-
-			foreach ($tags as $tag) {
-				$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-			}
-
-			$tags = array_values($unique_tags);
 		}
 
 		$host_inventory = array_intersect_key(getRequest('host_inventory', []), $visible);
