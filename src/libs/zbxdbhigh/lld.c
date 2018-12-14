@@ -660,7 +660,7 @@ static int	lld_rows_get(const char *value, lld_filter_t *filter, zbx_vector_ptr_
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		*error = zbx_dsprintf(*error, "Cannot parse received value: %s", zbx_json_strerror());
+		*error = zbx_dsprintf(*error, "Invalid discovery rule value: %s", zbx_json_strerror());
 		goto out;
 	}
 
