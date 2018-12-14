@@ -93,7 +93,8 @@ static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_ma
 	result = DBselect(
 			"select lld_macro,path"
 			" from lld_macro_path"
-			" where itemid=" ZBX_FS_UI64,
+			" where itemid=" ZBX_FS_UI64
+			" order by lld_macro",
 			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -112,8 +113,6 @@ static int	lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_ma
 		zbx_vector_ptr_append(lld_macro_paths, lld_macro_path);
 	}
 	DBfree_result(result);
-
-	zbx_vector_ptr_sort(lld_macro_paths, lld_macro_paths_compare);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
