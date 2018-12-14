@@ -79,6 +79,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGraphs'				=> null,
 			'selectHostPrototypes'		=> null,
 			'selectFilter'				=> null,
+			'selectLLDMacroPaths'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -2170,6 +2171,30 @@ class CDiscoveryRule extends CItemGeneral {
 				$rule['filter'] = $filters[$rule['itemid']];
 			}
 			unset($rule);
+		}
+
+		// Add LLD macro paths.
+		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
+			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
+				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
+				'filter' => ['itemid' => $itemIds],
+			]);
+
+			foreach ($result as &$lld_macro_path) {
+				$lld_macro_path['lld_macro_paths'] = [];
+			}
+			unset($lld_macro_path);
+
+			foreach ($lld_macro_paths as $lld_macro_path) {
+				$itemid = $lld_macro_path['itemid'];
+
+				if (!$this->outputIsRequested('lld_macro_pathid', $options['selectLLDMacroPaths'])) {
+					unset($lld_macro_path['lld_macro_pathid']);
+				}
+				unset($lld_macro_path['itemid']);
+
+				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
+			}
 		}
 
 		return $result;
