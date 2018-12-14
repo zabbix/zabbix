@@ -2405,45 +2405,31 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 static int	lld_items_preproc_susbstitute_params_macros_regsub(const zbx_lld_item_preproc_t * pp,
 		const zbx_lld_row_t * lld_row, const char *item_key, char **sub_params, char **error)
 {
-	int	ret;
 	char	*param1 = NULL, *param2 = NULL;
-	char	err[MAX_STRING_LEN];
 	size_t	sub_params_size;
-
-	*err = '\0';
 
 	zbx_strsplit(pp->params, '\n', &param1, &param2);
 
 	if (NULL == param2)
 	{
-		zbx_snprintf(err, sizeof(err), "cannot parse parameters \"%s\"", pp->params);
-		goto out;
+		zbx_free(param1);
+		*error = zbx_strdcatf(*error, "Cannot create %s item: invalid preprocessing step #%d parameters: %s.\n",
+				item_key, pp->step, pp->params);
+		return FAIL;
 	}
-	if (SUCCEED != (ret = substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, err,
-			sizeof(err))))
-	{
-		goto out;
-	}
-	if (SUCCEED != (ret = substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT,
-			err, sizeof(err))))
-	{
-		goto out;
-	}
+
+	substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
+	substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
 
 	sub_params_size = strlen(param1) + strlen(param2) + 2;
 	*sub_params = zbx_malloc(NULL, sub_params_size);
 
 	zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-	{
-		*error = zbx_strdcatf(*error, "Cannot create %s item: invalid value for preprocessing step #%d: %s.\n",
-				item_key, pp->step, err);
-	}
+
 	zbx_free(param1);
 	zbx_free(param2);
-	return ret;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2466,10 +2452,7 @@ out:
 static int	lld_items_preproc_susbstitute_params_macros_generic(const zbx_lld_item_preproc_t * pp,
 		const zbx_lld_row_t * lld_row, const char *item_key, char **sub_params, char **error)
 {
-	int	ret, token_type = ZBX_MACRO_ANY;
-	char	err[MAX_STRING_LEN];
-
-	*err = '\0';
+	int	token_type = ZBX_MACRO_ANY;
 
 	if (ZBX_PREPROC_XPATH == pp->type)
 	{
@@ -2478,14 +2461,9 @@ static int	lld_items_preproc_susbstitute_params_macros_generic(const zbx_lld_ite
 
 	*sub_params = zbx_strdup(NULL, pp->params);
 
-	if (SUCCEED != (ret = substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, err, sizeof(err))))
-	{
-		*error = zbx_strdcatf(*error, "Cannot create %s item: invalid value for preprocessing step #%d: %s.\n",
-				item_key, pp->step, err);
-		zbx_free(*sub_params);
-	}
+	substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
