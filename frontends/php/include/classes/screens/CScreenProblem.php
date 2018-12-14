@@ -329,7 +329,7 @@ class CScreenProblem extends CScreenBase {
 						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
-						'skipDependent' => $filter['show'] == TRIGGERS_OPTION_ALL ? null : true,
+						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
 						'preservekeys' => true
 					];
 
