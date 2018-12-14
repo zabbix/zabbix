@@ -306,7 +306,7 @@ in:
 out:
   return: FAIL
 ---
-test case: succseed 1e+2
+test case: succeed 1e+2
 in:
   num: 1e+2
 out:
@@ -318,7 +318,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed 1e-2
+test case: succeed 1e-2
 in:
   num: 1e-2
 out:
@@ -330,7 +330,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed -1e+2
+test case: succeed -1e+2
 in:
   num: -1e+2
 out:
@@ -342,7 +342,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed -1e-2
+test case: succeed -1e-2
 in:
   num: -1e-2
 out:
@@ -354,7 +354,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed +1e+2
+test case: succeed +1e+2
 in:
   num: +1e+2
 out:
@@ -366,7 +366,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed +1e-2
+test case: succeed +1e-2
 in:
   num: +1e-2
 out:
@@ -378,181 +378,181 @@ in:
 out:
   return: SUCCEED
 ---
-test case: succseed 0.1e+2
+test case: succeed 0.1e+2
 in:
   num: 0.1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed 1.0e+2
+test case: succeed 1.0e+2
 in:
   num: 1.0e+2
 out:
   return: SUCCEED
 ---
-test case: succseed -0.1e+2
+test case: succeed -0.1e+2
 in:
   num: 0.1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed -1.0e+2
+test case: succeed -1.0e+2
 in:
   num: 1.0e+2
 out:
   return: SUCCEED
 ---
-test case: succseed +0.1e+2
+test case: succeed +0.1e+2
 in:
   num: +0.1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed +1.0e+2
+test case: succeed +1.0e+2
 in:
   num: +1.0e+2
 out:
   return: SUCCEED
 ---
-test case: succseed 0.1e-2
+test case: succeed 0.1e-2
 in:
   num: 0.1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed 1.0e-2
+test case: succeed 1.0e-2
 in:
   num: 1.0e-2
 out:
   return: SUCCEED
 ---
-test case: succseed -0.1e-2
+test case: succeed -0.1e-2
 in:
   num: 0.1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed -1.0e-2
+test case: succeed -1.0e-2
 in:
   num: 1.0e-2
 out:
   return: SUCCEED
 ---
-test case: succseed +0.1e-2
+test case: succeed +0.1e-2
 in:
   num: +0.1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed +1.0e-2
+test case: succeed +1.0e-2
 in:
   num: +1.0e-2
 out:
   return: SUCCEED
 ---
-test case: succseed .1e+2
+test case: succeed .1e+2
 in:
   num: .1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed 1.e+2
+test case: succeed 1.e+2
 in:
   num: 1.e+2
 out:
   return: SUCCEED
 ---
-test case: succseed -.1e+2
+test case: succeed -.1e+2
 in:
   num: .1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed -1.e+2
+test case: succeed -1.e+2
 in:
   num: 1.e+2
 out:
   return: SUCCEED
 ---
-test case: succseed +.1e+2
+test case: succeed +.1e+2
 in:
   num: +.1e+2
 out:
   return: SUCCEED
 ---
-test case: succseed +1.e+2
+test case: succeed +1.e+2
 in:
   num: +1.e+2
 out:
   return: SUCCEED
 ---
-test case: succseed .1e-2
+test case: succeed .1e-2
 in:
   num: .1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed 1.e-2
+test case: succeed 1.e-2
 in:
   num: 1.e-2
 out:
   return: SUCCEED
 ---
-test case: succseed -.1e-2
+test case: succeed -.1e-2
 in:
   num: .1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed -1.e-2
+test case: succeed -1.e-2
 in:
   num: 1.e-2
 out:
   return: SUCCEED
 ---
-test case: succseed +.1e-2
+test case: succeed +.1e-2
 in:
   num: +.1e-2
 out:
   return: SUCCEED
 ---
-test case: succseed +1.e-2
+test case: succeed +1.e-2
 in:
   num: +1.e-2
 out:
   return: SUCCEED
 ---
-test case: succseed 1234567890.0123456789e-1234567890
+test case: succeed 1234567890.0123456789e-1234567890
 in:
   num: 1234567890.0123456789e-1234567890
 out:
   return: SUCCEED
 ---
-test case: succseed -1234567890.0123456789e-1234567890
+test case: succeed -1234567890.0123456789e-1234567890
 in:
   num: -1234567890.0123456789e-1234567890
 out:
   return: SUCCEED
 ---
-test case: succseed +1234567890.0123456789e-1234567890
+test case: succeed +1234567890.0123456789e-1234567890
 in:
   num: +1234567890.0123456789e-1234567890
 out:
   return: SUCCEED
 ---
-test case: succseed 1234567890.0123456789e+1234567890
+test case: succeed 1234567890.0123456789e+1234567890
 in:
   num: 1234567890.0123456789e+1234567890
 out:
   return: SUCCEED
 ---
-test case: succseed -1234567890.0123456789e+1234567890
+test case: succeed -1234567890.0123456789e+1234567890
 in:
   num: -1234567890.0123456789e+1234567890
 out:
   return: SUCCEED
 ---
-test case: succseed +1234567890.0123456789e+1234567890
+test case: succeed +1234567890.0123456789e+1234567890
 in:
   num: +1234567890.0123456789e+1234567890
 out:
@@ -564,13 +564,13 @@ in:
 out:
   return: FAIL
 ---
-test case: succseed "1.e-2 "
+test case: succeed "1.e-2 "
 in:
   num: "1.e-2 "
 out:
   return: SUCCEED
 ---
-test case: succseed " 1.e-2 "
+test case: succeed " 1.e-2 "
 in:
   num: " 1.e-2 "
 out:
