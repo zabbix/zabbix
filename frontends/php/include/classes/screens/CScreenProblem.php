@@ -547,6 +547,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $filter
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
+	 * @param int   $filter['show_latest_values']
 	 * @param bool  $resolve_comments
 	 *
 	 * @static
