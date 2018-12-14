@@ -74,7 +74,7 @@ static int	lld_macro_paths_compare(const void *d1, const void *d2)
  * Purpose: retrieve list of LLD macros                                       *
  *                                                                            *
  * Parameters: lld_ruleid      - [IN] LLD id                                  *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             lld_macro_paths - [OUT] use json path to extract from jp_row   *
  *             error           - [OUT] in case json path is invalid           *
  *                                                                            *
  ******************************************************************************/
