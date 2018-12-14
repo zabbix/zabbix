@@ -1367,7 +1367,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'lld_macro_paths' =>	['type' => API_OBJECTS, 'fields' => [
 				'lld_macro_pathid' =>	['type' => API_ID],
 				'lld_macro' =>			['type' => API_LLD_MACRO, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
-				'path' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
+				'path' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
 			]]
 		];
 
@@ -1404,7 +1404,10 @@ class CDiscoveryRule extends CItemGeneral {
 							$lld_macro_pathids[$lld_macro_path['lld_macro_pathid']] = true;
 						}
 						else {
-							// In case "lld_macro_pathid", we need to treat it as a new LLD macro with both fields present.
+							/*
+							 * In case "lld_macro_pathid", we need to treat it as a new LLD macro with both fields
+							 * present.
+							 */
 							if (array_key_exists('lld_macro', $lld_macro_path)
 									&& !array_key_exists('path', $lld_macro_path)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,

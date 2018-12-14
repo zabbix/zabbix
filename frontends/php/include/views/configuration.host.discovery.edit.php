@@ -682,9 +682,67 @@ $conditionFormList->addRow(_('Filters'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
+/*
+ * LLD Macro tab.
+ */
+$lld_macro_paths_form_list = new CFormList();
+
+$lld_macro_paths_table = (new CTable())
+	->setId('lld_macro_paths')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('LLD Macro'), _('JSON path'), '']);
+
+$lld_macro_paths = $data['lld_macro_paths'];
+
+if (!$lld_macro_paths) {
+	$lld_macro_paths = [[
+		'lld_macro' => '',
+		'path' => ''
+	]];
+}
+elseif (!hasRequest('form_refresh')) {
+	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
+}
+
+foreach ($lld_macro_paths as $i => $lld_macro_path) {
+	$lld_macro = (new CTextBox('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'], false,
+		DB::getFieldLength('lld_macro_path', 'lld_macro')
+	))
+		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->addClass(ZBX_STYLE_UPPERCASE)
+		->setAttribute('placeholder', '{#MACRO}');
+
+	$path = (new CTextBox('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], false,
+		DB::getFieldLength('lld_macro_path', 'path')
+	))
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setAttribute('placeholder', _('$.path.to.node'));
+
+	$remove = [
+		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
+
+	$lld_macro_paths_table->addRow([$lld_macro, $path, (new CCol($remove))->addClass(ZBX_STYLE_NOWRAP)], 'form_row');
+}
+
+$lld_macro_paths_table->setFooter((new CCol(
+	(new CButton('lld_macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+))->setColSpan(3));
+
+$lld_macro_paths_form_list->addRow(_('LLD Macro'),
+	(new CDiv($lld_macro_paths_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append tabs to form
 $itemTab = (new CTabView())
 	->addTab('itemTab', $this->data['caption'], $itemFormList)
+	->addTab('lldMacroTab', _('LLD Macro'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList);
 if (!hasRequest('form_refresh')) {
 	$itemTab->setSelected(0);

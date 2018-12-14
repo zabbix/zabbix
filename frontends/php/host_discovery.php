@@ -142,6 +142,7 @@ $fields = [
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'lld_macro_paths' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
@@ -240,6 +241,7 @@ if (getRequest('itemid', false)) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
+		'selectLLDMacroPaths' => ['lld_macro', 'path'],
 		'editable' => true
 	]);
 	$item = reset($item);
@@ -428,6 +430,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		$newItem['filter'] = $filter;
 
+		$lld_macro_paths = getRequest('lld_macro_paths', []);
+
+		foreach ($lld_macro_paths as &$lld_macro_path) {
+			$lld_macro_path['lld_macro'] = mb_strtoupper($lld_macro_path['lld_macro']);
+		}
+		unset($lld_macro_path);
+
+		$newItem['lld_macro_paths'] = $lld_macro_paths;
+
 		if (hasRequest('update')) {
 			DBstart();
 
@@ -462,10 +473,47 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($newItem['filter']);
 			}
 
+			foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
+				if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
+					unset($newItem['lld_macro_paths'][$i]);
+				}
+			}
+
+			$lld_macro_paths_changed = false;
+
+			if (count($newItem['lld_macro_paths']) != count($item['lld_macro_paths'])) {
+				$lld_macro_paths_changed = true;
+			}
+			else {
+				$lld_macro_paths = array_values($item['lld_macro_paths']);
+				$newItem['lld_macro_paths'] = array_values($newItem['lld_macro_paths']);
+
+				foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
+					if (CArrayHelper::unsetEqualValues($lld_macro_path, $lld_macro_paths[$i])) {
+						$lld_macro_paths_changed = true;
+						break;
+					}
+				}
+			}
+
+			if (!$lld_macro_paths_changed) {
+				unset($newItem['lld_macro_paths']);
+			}
+
 			$result = API::DiscoveryRule()->update($newItem);
 			$result = DBend($result);
 		}
 		else {
+			foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
+				if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
+					unset($newItem['lld_macro_paths'][$i]);
+				}
+			}
+
+			if (!$newItem['lld_macro_paths']) {
+				unset($newItem['lld_macro_paths']);
+			}
+
 			$result = API::DiscoveryRule()->create([$newItem]);
 		}
 	}
@@ -541,6 +589,7 @@ if (isset($_REQUEST['form'])) {
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
+	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['host'] = $host;
 
 	// update form
@@ -549,6 +598,7 @@ if (isset($_REQUEST['form'])) {
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = $item['filter']['conditions'];
+		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
@@ -616,8 +666,7 @@ else {
 	}
 
 	// paging
-	$url = (new CUrl('host_discovery.php'))
-		->setArgument('hostid', $data['hostid']);
+	$url = (new CUrl('host_discovery.php'))->setArgument('hostid', $data['hostid']);
 
 	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
