@@ -1984,7 +1984,7 @@ function getMapLabels($map, $map_info) {
 		$labelLines[$selementId] = [];
 		$statusLines[$selementId] = [];
 
-		$msgs = explode("\n", CMacrosResolverHelper::resolveMapLabelMacrosAll($selement));
+		$msgs = explode("\n", $selement['label']);
 		foreach ($msgs as $msg) {
 			$labelLines[$selementId][] = ['content' => $msg];
 		}

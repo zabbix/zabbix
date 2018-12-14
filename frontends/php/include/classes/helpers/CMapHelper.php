@@ -51,9 +51,8 @@ class CMapHelper {
 			],
 			'selectLinks' => ['linkid', 'selementid1', 'selementid2', 'drawtype', 'color', 'label', 'linktriggers',
 				'permission'],
-			'selectUrls' => ['sysmapurlid', 'name', 'url'],
+			'selectUrls' => ['sysmapurlid', 'name', 'url', 'elementtype'],
 			'sysmapids' => $sysmapids,
-			'expandUrls' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
@@ -71,6 +70,7 @@ class CMapHelper {
 				'label_location' => MAP_LABEL_LOC_BOTTOM,
 				'selements' => [],
 				'links' => [],
+				'urls' => [],
 				'shapes' => [[
 					'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
 					'x' => 0,
@@ -93,6 +93,13 @@ class CMapHelper {
 				$options['severity_min'] = $map['severity_min'];
 			}
 
+			// Propagate map urls to map elements.
+			self::addMapUrlsToMapElements($map);
+
+			// Resolve macros in map element labels and url names/values.
+			$resolve_opt = ['resolve_element_urls' => true, 'resolve_element_label' => true];
+			$map['selements'] = CMacrosResolverHelper::resolveMacrosInMapElements($map['selements'], $resolve_opt);
+
 			self::resolveMapState($map, $options, $theme);
 		}
 
@@ -112,6 +119,33 @@ class CMapHelper {
 			'aria_label' => $map['aria_label'],
 			'timestamp' => zbx_date2str(DATE_TIME_FORMAT_SECONDS)
 		];
+	}
+
+	/**
+	 * Function adds map urls to same map's elements of particular element type.
+	 *
+	 * @param array $sysmap                                    Map data.
+	 * @param array $sysmap[urls]                              Map urls.
+	 * @param array $sysmap[urls][]['elementtype']             Map url's element type.
+	 * @param int   $sysmap['selements']                       Map elements.
+	 * @param int   $sysmap['selements'][]['elementtype']      Type of map element.
+	 * @param int   $sysmap['selements'][]['elementsubtype']   Subtype of map element.
+	 */
+	protected static function addMapUrlsToMapElements(array &$sysmap) {
+		if ($sysmap['urls'] && $sysmap['selements']) {
+			foreach ($sysmap['urls'] as $map_url) {
+				foreach ($sysmap['selements'] as $snum => $selement) {
+					if (($selement['elementtype'] == $map_url['elementtype']
+							&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP
+							)
+							|| ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+								&& $map_url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+							) {
+						$sysmap['selements'][$snum]['urls'][] = $map_url;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -198,7 +232,7 @@ class CMapHelper {
 
 			$element['icon'] = $icon;
 			if ($element['permission'] >= PERM_READ) {
-				$label = str_replace(['.', ','], ' ', CMacrosResolverHelper::resolveMapLabelMacrosAll($element));
+				$label = str_replace(['.', ','], ' ', $element['label']);
 
 				if ($map_info[$id]['problems_total'] > 0) {
 					$problems_total += $map_info[$id]['problems_total'];
@@ -232,6 +266,7 @@ class CMapHelper {
 				$element['highlight'] = '';
 				$element['actions'] = null;
 				$element['label'] = '';
+				// Why not unset 'urls'?
 			}
 
 			if ($sysmap['markelements']) {

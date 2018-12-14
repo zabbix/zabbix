@@ -223,13 +223,18 @@ foreach ($data['sysmap']['selements'] as &$selement) {
 		$selement['label'] = $selement['inherited_label'];
 	}
 
-	$selement['expanded'] = CMacrosResolverHelper::resolveMapLabelMacrosAll($selement);
-
 	if ($selement['inherited_label'] !== null) {
 		$selement['label'] = $label;
 	}
 }
 unset($selement);
+
+// Extend $selement adding resolved label as property named 'expanded'.
+$resolve_opt = ['resolve_element_label' => true];
+$selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['sysmap']['selements'], $resolve_opt);
+foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
+	$selement['expanded'] = $selements_resolved[$selementid]['label'];
+}
 
 // get links
 foreach ($data['sysmap']['links'] as &$link) {
