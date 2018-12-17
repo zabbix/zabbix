@@ -1926,18 +1926,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param string       $selements[]['urls'][]['url']        Map element url value.
 	 * @param int | array  $selements[]['elementid']            Element id linked to map element.
 	 * @param array        $options
-	 * @param bool         $options[resolve_element_urls]       Resolve macros in map element url name and value.
 	 * @param bool         $options[resolve_element_label]      Resolve macros in map element label.
+	 * @param bool         $options[resolve_element_urls]       Resolve macros in map element url name and value.
 	 *
 	 * @return array
 	 */
 	public function resolveMacrosInMapElements(array $selements, array $options) {
-		$default_options = ['resolve_element_urls' => false, 'resolve_element_label' => false];
-		$options = zbx_array_merge($default_options, $options);
+		$options += ['resolve_element_label' => false, 'resolve_element_urls' => false];
 
 		$supported_inventory_macros = $this->getSupportedHostInventoryMacrosMap();
-		$resolve_urls = $options['resolve_element_urls'];
-		$resolve_label = $options['resolve_element_label'];
 
 		// Macros supported by location.
 		$supported_macros = [
@@ -1973,74 +1970,58 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		// Define what macros are supported for each map element based on its type and subtype.
-		$supported_macros_by_selement_type = [
-			SYSMAP_ELEMENT_TYPE_HOST.'.0' => [
-				'macros' => [
-					'host' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['host']['label'] : [],
-						$resolve_urls ? $supported_macros['host']['urls'] : []
-					))),
-					'interface' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['interface']['label'] : [],
-						$resolve_urls ? $supported_macros['interface']['urls'] : []
-					))),
-					'inventory' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['inventory']['label'] : [],
-						$resolve_urls ? $supported_macros['inventory']['urls'] : []
-					)))
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_MAP.'.0' => [
+		$types_by_selement_type = [
+			SYSMAP_ELEMENT_TYPE_MAP => [
 				'macros' => [
 					'map' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['map']['label'] : [],
-						$resolve_urls ? $supported_macros['map']['urls'] : []
+						$options['resolve_element_label'] ? $supported_macros['map']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['map']['urls'] : []
 					)))
 				]
 			],
-			SYSMAP_ELEMENT_TYPE_TRIGGER.'.0' => [
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
+				'macros' => [
+					'hostgroup' => array_keys(array_flip(array_merge(
+						$options['resolve_element_label'] ? $supported_macros['hostgroup']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['hostgroup']['urls'] : []
+					)))
+				]
+			],
+			SYSMAP_ELEMENT_TYPE_HOST => [
+				'macros' => [
+					'host' => array_keys(array_flip(array_merge(
+						$options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
+					))),
+					'interface' => array_keys(array_flip(array_merge(
+						$options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
+					))),
+					'inventory' => array_keys(array_flip(array_merge(
+						$options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
+					)))
+				]
+			],
+			SYSMAP_ELEMENT_TYPE_TRIGGER => [
 				'macros' => [
 					'trigger' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['trigger']['label'] : [],
-						$resolve_urls ? $supported_macros['trigger']['urls'] : []
+						$options['resolve_element_label'] ? $supported_macros['trigger']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['trigger']['urls'] : []
 					)))
 				],
 				'macros_n' => [
 					'host' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['host']['label'] : [],
-						$resolve_urls ? $supported_macros['host']['urls'] : []
+						$options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
 					))),
 					'interface' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['interface']['label'] : [],
-						$resolve_urls ? $supported_macros['interface']['urls'] : []
+						$options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
 					))),
 					'inventory' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['inventory']['label'] : [],
-						$resolve_urls ? $supported_macros['inventory']['urls'] : []
-					)))
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP.'.'.SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP => [
-				'macros' => [
-					'hostgroup' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['hostgroup']['label'] : [],
-						$resolve_urls ? $supported_macros['hostgroup']['urls'] : []
-					)))
-				]
-			],
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP.'.'.SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS => [
-				'macros' => [
-					'hostgroup' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['hostgroup']['label'] : [],
-						$resolve_urls ? $supported_macros['hostgroup']['urls'] : []
-					))),
-					'interface' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['interface']['label'] : [],
-						$resolve_urls ? $supported_macros['interface']['urls'] : []
-					))),
-					'inventory' => array_keys(array_flip(array_merge(
-						$resolve_label ? $supported_macros['inventory']['label'] : [],
-						$resolve_urls ? $supported_macros['inventory']['urls'] : []
+						$options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
+						$options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
 					)))
 				]
 			]
@@ -2070,26 +2051,30 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macros = [];
 
 		foreach ($selements as $selid => $sel) {
-			if (!array_key_exists($sel['elementtype'].'.'.$sel['elementsubtype'], $supported_macros_by_selement_type)) {
+			$selement_type = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					&& $sel['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+				? SYSMAP_ELEMENT_TYPE_HOST
+				: $sel['elementtype'];
+
+			if (!array_key_exists($selement_type, $types_by_selement_type)) {
 				continue;
-}
+			}
 
 			// Collect strings to test for macros.
-			$strings_to_test = $resolve_label ? [$sel['label']] : [];
-			if ($resolve_urls && array_key_exists('urls', $sel)) {
+			$texts = $options['resolve_element_label'] ? [$sel['label']] : [];
+			if ($options['resolve_element_urls'] && array_key_exists('urls', $sel)) {
 				foreach ($sel['urls'] as $url) {
-					$strings_to_test[] = $url['name'];
-					$strings_to_test[] = $url['url'];
+					$texts[] = $url['name'];
+					$texts[] = $url['url'];
 				}
 			}
 
-			if (!$strings_to_test) {
+			if (!$texts) {
 				continue;
 			}
 
 			// Extract macros from collected strings.
-			$types = $supported_macros_by_selement_type[$sel['elementtype'].'.'.$sel['elementsubtype']];
-			$matched = $this->extractMacros($strings_to_test, $types);
+			$matched = $this->extractMacros($texts, $types_by_selement_type[$selement_type]);
 
 			// Map extracted macros to map elements.
 			if (array_key_exists('macros', $matched)) {
@@ -2219,11 +2204,23 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		foreach ($types_by_selement_type as &$types) {
+			$types = $this->transformToPositionTypes($types);
+		}
+		unset($types);
+
 		// Find value for each extracted macro.
 		foreach ($selements as $selid => &$sel) {
 			if (!array_key_exists($selid, $macros)) {
 				continue;
 			}
+
+			$selement_type = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					&& $sel['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+				? SYSMAP_ELEMENT_TYPE_HOST
+				: $sel['elementtype'];
+
+			$types = $types_by_selement_type[$selement_type];
 
 			// Get element id.
 			if (array_key_exists('elementid', $sel)) {
@@ -2411,13 +2408,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 			unset($matched_macro);
 
-			// Get types.
-			$types_key = $sel['elementtype'].'.'.$sel['elementsubtype'];
-			$position_types = $this->transformToPositionTypes($supported_macros_by_selement_type[$types_key]);
-
 			// Replace macros in selement label.
 			if ($options['resolve_element_label']) {
-				$macros_position = $this->getMacroPositions($sel['label'], $position_types);
+				$macros_position = $this->getMacroPositions($sel['label'], $types);
 				foreach (array_reverse($macros_position, true) as $pos => $macro) {
 					$value = array_key_exists('value', $matched_macros[$macro])
 						? $matched_macros[$macro]['value']
@@ -2430,7 +2423,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if ($options['resolve_element_urls']) {
 				foreach ($sel['urls'] as &$url) {
 					foreach (['name', 'url'] as $url_field) {
-						$macros_position = $this->getMacroPositions($url[$url_field], $position_types);
+						$macros_position = $this->getMacroPositions($url[$url_field], $types);
 						foreach (array_reverse($macros_position, true) as $pos => $macro) {
 							$value = array_key_exists('value', $matched_macros[$macro])
 								? $matched_macros[$macro]['value']
@@ -2451,9 +2444,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Function returns array holding of inventory macros as a keys and corresponding database fields as value.
 	 *
+	 * @static
+	 *
 	 * @return array
 	 */
-	private function getSupportedHostInventoryMacrosMap() {
+	private static function getSupportedHostInventoryMacrosMap() {
 		return [
 			'{INVENTORY.ALIAS}' => 'alias',
 			'{INVENTORY.ASSET.TAG}' => 'asset_tag',
