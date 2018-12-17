@@ -594,7 +594,7 @@ class CScreenProblem extends CScreenBase {
 						$order = [];
 						$pos = 0;
 						foreach ($trigger['expression_html'] as $expression_parts) {
-							if ($expression_parts[1] instanceof CLink) {
+							if (is_array($expression_parts) && $expression_parts[1] instanceof CLink) {
 								$order[$expression_parts[1]->getAttribute('data-itemid')] = $pos++;
 							}
 						}
