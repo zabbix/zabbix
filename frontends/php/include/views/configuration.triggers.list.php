@@ -108,7 +108,7 @@ $filter_tags_table->addRow(
 
 $filter_column2 = (new CFormList())->addRow(_('Tags'), $filter_tags_table);
 
-$filter = (new CFilter())
+$filter = (new CFilter(new CUrl('triggers.php')))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);

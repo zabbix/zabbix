@@ -56,7 +56,7 @@ class CTriggerExpression {
 	 * An options array
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true	low-level discovery macros can contain in trigger expression
+	 *   'lldmacros' => true	Enable low-level discovery macros usage in trigger expression.
 	 *
 	 * @var array
 	 */

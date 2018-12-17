@@ -56,6 +56,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
 						'output' => [],
+						'real_hosts' => true,
 						'preservekeys' => true
 					]));
 				}
@@ -88,6 +89,18 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'preservekeys' => true
 		]);
 
+		foreach ($groups as $groupid => $group) {
+			$groups[$groupid]['highest_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			$groups[$groupid]['hosts_total_count'] = 0;
+			$groups[$groupid]['hosts_problematic_unack_count'] = 0;
+			$groups[$groupid]['hosts_problematic_unack_list'] = [];
+
+			if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
+				$groups[$groupid]['hosts_problematic_count'] = 0;
+				$groups[$groupid]['hosts_problematic_list'] = [];
+			}
+		}
+
 		// Get hosts.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
@@ -117,23 +130,9 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 		// Add default values for each host group and count hosts inside.
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $group) {
-				if (!array_key_exists($group['groupid'], $groups)) {
-					continue;
+				if (array_key_exists($group['groupid'], $groups)) {
+					$groups[$group['groupid']]['hosts_total_count']++;
 				}
-
-				if (!array_key_exists('hosts_total_count', $groups[$group['groupid']])) {
-					$groups[$group['groupid']]['highest_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-					$groups[$group['groupid']]['hosts_total_count'] = 0;
-					$groups[$group['groupid']]['hosts_problematic_unack_count'] = 0;
-					$groups[$group['groupid']]['hosts_problematic_unack_list'] = [];
-
-					if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
-						$groups[$group['groupid']]['hosts_problematic_count'] = 0;
-						$groups[$group['groupid']]['hosts_problematic_list'] = [];
-					}
-				}
-
-				$groups[$group['groupid']]['hosts_total_count']++;
 			}
 		}
 
@@ -210,16 +209,21 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 		}
 
 		// Sort results.
-		CArrayHelper::sort($groups, ['name']);
+		foreach ($groups as $groupid => $group) {
+			if ($group['hosts_total_count'] != 0) {
+				CArrayHelper::sort($groups[$groupid]['hosts_problematic_unack_list'], ['name']);
 
-		foreach ($groups as &$group) {
-			if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
-				CArrayHelper::sort($group['hosts_problematic_list'], ['name']);
+				if ($filter_ext_ack != EXTACK_OPTION_UNACK) {
+					CArrayHelper::sort($groups[$groupid]['hosts_problematic_list'], ['name']);
+				}
 			}
-
-			CArrayHelper::sort($group['hosts_problematic_unack_list'], ['name']);
+			else {
+				// Unset groups without any monitored hosts.
+				unset($groups[$groupid]);
+			}
 		}
-		unset($group);
+
+		CArrayHelper::sort($groups, ['name']);
 
 		// Pass results to view.
 		$this->setResponse(new CControllerResponseData([

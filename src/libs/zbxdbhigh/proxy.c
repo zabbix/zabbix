@@ -1985,7 +1985,7 @@ try_again:
 	}
 	DBfree_result(result);
 
-	if (ZBX_MAX_HRECORDS == *records_num)
+	if (ZBX_MAX_HRECORDS == *records_num - records_num_last)
 		*more = ZBX_PROXY_DATA_MORE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64 " more:%d size:" ZBX_FS_SIZE_T,
@@ -2223,7 +2223,7 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	{
 		proxy_get_history_data(j, lastid, &id, &records_num, more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
 	}
 
@@ -2248,7 +2248,7 @@ int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	{
 		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
 	}
 
@@ -2274,7 +2274,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTO_REGISTRATION, &areg, lastid, &id, &records_num,
 				more);
 
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL < records_num)
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
 	}
 
@@ -3016,7 +3016,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL,
-				&allowed_peers, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 

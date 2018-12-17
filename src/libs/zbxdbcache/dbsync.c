@@ -3372,7 +3372,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_maintenance_tag(const zbx_dc_maintenance_tag_t *maintenance_tag, const DB_ROW dbrow)
 {
-	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->operator))
+	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->op))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[3], maintenance_tag->tag))
@@ -3757,7 +3757,8 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 			" from hosts_groups hg,hosts h"
 			" where hg.hostid=h.hostid"
 			" and h.status in (%d,%d)"
-			" and h.flags<>%d",
+			" and h.flags<>%d"
+			" order by hg.groupid",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 	{
 		return FAIL;

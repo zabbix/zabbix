@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxcompress.h"
 
 #ifdef HAVE_ZLIB
 #include "zlib.h"
@@ -80,14 +81,20 @@ const char	*zbx_compress_strerror(void)
  ******************************************************************************/
 int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
-	*size_out = compressBound(size_in);
-	*out = (char *)zbx_malloc(NULL, *size_out);
+	Bytef	*buf;
+	uLongf	buf_size;
 
-	if (Z_OK != (zbx_zlib_errno = compress((unsigned char *)*out, size_out, (const unsigned char *)in, size_in)))
+	buf_size = compressBound(size_in);
+	buf = (Bytef *)zbx_malloc(NULL, buf_size);
+
+	if (Z_OK != (zbx_zlib_errno = compress(buf, &buf_size, (const Bytef *)in, size_in)))
 	{
-		zbx_free(*out);
+		zbx_free(buf);
 		return FAIL;
 	}
+
+	*out = (char *)buf;
+	*size_out = buf_size;
 
 	return SUCCEED;
 }
@@ -101,7 +108,7 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
  * Parameters: in       - [IN] the data to uncompress                         *
  *             size_in  - [IN] the input data size                            *
  *             out      - [OUT] the uncompressed data                         *
- *             size_out - [IN] the uncompressed data size                     *
+ *             size_out - [IN/OUT] the buffer and uncompressed data size      *
  *                                                                            *
  * Return value: SUCCEED - the data was uncompressed successfully             *
  *               FAIL    - otherwise                                          *
@@ -109,8 +116,12 @@ int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
  ******************************************************************************/
 int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 {
-	if (Z_OK != (zbx_zlib_errno = uncompress((unsigned char *)out, size_out, (const unsigned char *)in, size_in)))
+	uLongf	size_o = *size_out;
+
+	if (Z_OK != (zbx_zlib_errno = uncompress((Bytef *)out, &size_o, (const Bytef *)in, size_in)))
 		return FAIL;
+
+	*size_out = size_o;
 
 	return SUCCEED;
 }
@@ -126,7 +137,7 @@ int zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 	return FAIL;
 }
 
-int zbx_uncompress(const char *in, size_t size_in, char *out, size_t size_out)
+int zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out)
 {
 	ZBX_UNUSED(in);
 	ZBX_UNUSED(size_in);

@@ -101,7 +101,8 @@
 			 * @param function       options.onUpdate  Callback function to execute once color has changed.
 			 */
 			init: function(options) {
-				var close = $('<button type="button" class="overlay-close-btn" title="' + t('Close') + '"/>').click(methods.hide);
+				var close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
+					.click(methods.hide);
 				options = $.extend(defaults, options||{});
 				overlay = $('<div class="overlay-dialogue" id="color_picker"/>').append(close).append(
 					$.map(options.palette, function(colors) {
@@ -172,8 +173,9 @@
 				colorbox.css({
 					'color': background,
 					'background': background,
-					'title': background
-				});
+				})
+				.attr('title', background);
+
 				input.val(color);
 			},
 			/**

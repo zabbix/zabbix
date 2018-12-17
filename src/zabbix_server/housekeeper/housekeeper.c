@@ -418,7 +418,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
 							tmp, row[0]);
 				}
-				else if (0 != history && ZBX_HK_HISTORY_MIN > history)
+				else if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'",
 							row[0]);
@@ -446,7 +446,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
 							tmp, row[0]);
 				}
-				else if (0 != trends && ZBX_HK_TRENDS_MIN > trends)
+				else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'",
 							row[0]);
@@ -1021,7 +1021,7 @@ static int	get_housekeeping_period(double time_slept)
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime;
-	double	sec, time_slept;
+	double	sec, time_slept, time_now;
 	char	sleeptext[25];
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -1055,9 +1055,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		else
 			zbx_sleep_loop(sleeptime);
 
-		zbx_handle_log();
-
-		time_slept = zbx_time() - sec;
+		time_now = zbx_time();
+		time_slept = time_now - sec;
+		zbx_update_env(time_now);
 
 		hk_period = get_housekeeping_period(time_slept);
 
@@ -1114,9 +1114,5 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 }

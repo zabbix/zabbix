@@ -203,7 +203,8 @@ class CScreenHistory extends CScreenBase {
 							$history_data = array_merge($history_data, $item_data);
 						}
 					}
-				} else {
+				}
+				else {
 					$history_data = API::History()->get($options);
 				}
 

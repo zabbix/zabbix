@@ -696,6 +696,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	for (;;)
 	{
 		sec = zbx_time();
+		zbx_update_env(sec);
 
 		if (1 == process_num)
 		{
@@ -766,12 +767,6 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_sleep_loop(1);
 
 		idle = 1;
-
-		zbx_handle_log();
-
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
-		zbx_update_resolver_conf();	/* handle /etc/resolv.conf update */
-#endif
 	}
 
 }

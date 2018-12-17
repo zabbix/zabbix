@@ -102,7 +102,9 @@ if ($data['action'] == 'problem.view') {
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_'
+						'dstfld1' => 'filter_groupids_',
+						'real_hosts' => true,
+						'enrich_parent_groups' => true
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -318,7 +320,7 @@ if ($data['action'] == 'problem.view') {
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		]);
 
-	$filter = (new CFilter())
+	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFormItem((new CVar('action', 'problem.view'))->removeId())

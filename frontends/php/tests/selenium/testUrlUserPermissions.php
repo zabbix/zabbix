@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testUrlUserPermissions extends CWebTest {
+class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function data() {
 		return [
@@ -750,24 +750,21 @@ class testUrlUserPermissions extends CWebTest {
 				else {
 					$this->zbxTestCheckHeader($data['header']);
 				}
-				$this->zbxTestCheckFatalErrors();
-				$this->webDriver->manage()->deleteAllcookies();
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestCheckTitle($data['title']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it does not exist!');
-				$this->zbxTestCheckFatalErrors();
-				$this->webDriver->manage()->deleteAllcookies();
 			}
 			else {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Access denied');
 				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no permissions to access this page.');
 				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
-				$this->zbxTestCheckFatalErrors();
-				$this->webDriver->manage()->deleteAllcookies();
 			}
+
+			$this->zbxTestCheckFatalErrors();
+			$this->webDriver->manage()->deleteAllCookies();
 		}
 	}
 

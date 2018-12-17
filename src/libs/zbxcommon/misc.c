@@ -1784,9 +1784,189 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_user_macro                                                 *
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str  - [IN] string to check                                    *
+ *             len  - [OUT] length of macro                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_user_macro(const char *str, int *len)
+{
+	int	macro_r, context_l, context_r;
+
+	if ('{' != *str || '$' != *(str + 1) || SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r))
+		return FAIL;
+
+	*len = macro_r + 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_simple_interval                                            *
+ *                                                                            *
+ * Purpose: parses user macro and finds it's length                           *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             len   - [OUT] length simple interval string until separator    *
+ *             sep   - [IN] separator to calculate length                     *
+ *             value - [OUT] interval value                                   *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - the macro was parsed successfully.                           *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	parse_simple_interval(const char *str, int *len, char sep, int *value)
+{
+	const char	*delim;
+
+	if (SUCCEED != is_time_suffix(str, value,
+			(int)(NULL == (delim = strchr(str, sep)) ? ZBX_LENGTH_UNLIMITED : delim - str)))
+	{
+		return FAIL;
+	}
+
+	*len = NULL == delim ? (int)strlen(str) : delim - str;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_interval                                            *
+ *                                                                            *
+ * Purpose: validate update interval, flexible and scheduling intervals       *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             error - [OUT] validation error                                 *
+ *                                                                            *
+ * Return Value:                                                              *
+ *     SUCCEED - parsed successfully.                                         *
+ *     FAIL    - parsing failed.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_interval(const char *str, char **error)
+{
+	int		simple_interval, interval, len, custom = 0, macro;
+	const char	*delim;
+
+	if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+	{
+		if ('\0' == *delim)
+			delim = NULL;
+
+		simple_interval = 1;
+	}
+	else if (SUCCEED == parse_simple_interval(str, &len, ';', &simple_interval))
+	{
+		if ('\0' == *(delim = str + len))
+			delim = NULL;
+	}
+	else
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%.*s\".",
+				NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str), str);
+		return FAIL;
+	}
+
+	while (NULL != delim)
+	{
+		str = delim + 1;
+
+		if ((SUCCEED == (macro = parse_user_macro(str, &len)) ||
+				SUCCEED == parse_simple_interval(str, &len, '/', &interval)) &&
+				'/' == *(delim = str + len))
+		{
+			zbx_time_period_t period;
+
+			custom = 1;
+
+			if (SUCCEED == macro)
+				interval = 1;
+
+			if (0 == interval && 0 == simple_interval)
+			{
+				*error = zbx_dsprintf(*error, "Invalid flexible interval \"%.*s\".", (int)(delim - str),
+						str);
+				return FAIL;
+			}
+
+			str = delim + 1;
+
+			if (SUCCEED == parse_user_macro(str, &len) && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
+				continue;
+			}
+
+			if (SUCCEED == time_period_parse(&period, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
+			{
+				continue;
+			}
+
+			*error = zbx_dsprintf(*error, "Invalid flexible period \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
+			return FAIL;
+		}
+		else
+		{
+			zbx_scheduler_interval_t	*new_interval;
+
+			custom = 1;
+
+			if (SUCCEED == macro && ('\0' == *(delim = str + len) || ';' == *delim))
+			{
+				if ('\0' == *delim)
+					delim = NULL;
+
+				continue;
+			}
+
+			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
+
+			if (SUCCEED == scheduler_interval_parse(new_interval, str,
+					NULL == (delim = strchr(str, ';')) ? (int)strlen(str) : (int)(delim - str)))
+			{
+				scheduler_interval_free(new_interval);
+				continue;
+			}
+			scheduler_interval_free(new_interval);
+
+			*error = zbx_dsprintf(*error, "Invalid custom interval \"%.*s\".",
+					NULL == delim ? (int)strlen(str) : (int)(delim - str), str);
+
+			return FAIL;
+		}
+	}
+
+	if ((0 == custom && 0 == simple_interval) || SEC_PER_DAY < simple_interval)
+	{
+		*error = zbx_dsprintf(*error, "Invalid update interval \"%d\"", simple_interval);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_interval_preproc                                             *
  *                                                                            *
- * Purpose: parses item and low-level discovery rule update interval          *
+ * Purpose: parses item and low-level discovery rule update intervals         *
  *                                                                            *
  * Parameters: interval_str     - [IN] update interval string to parse        *
  *             simple_interval  - [OUT] simple update interval                *
@@ -1807,17 +1987,16 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	zbx_flexible_interval_t		*flexible = NULL;
 	zbx_scheduler_interval_t	*scheduling = NULL;
 	const char			*delim, *interval_type;
-	int				ret;
 
-	if (SUCCEED != (ret = is_time_suffix(interval_str, simple_interval,
-			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str))))
+	if (SUCCEED != is_time_suffix(interval_str, simple_interval,
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
 	{
 		interval_type = "update";
-		goto out;
+		goto fail;
 	}
 
 	if (NULL == custom_intervals)	/* caller wasn't interested in custom intervals, don't parse them */
-		goto out;
+		return SUCCEED;
 
 	while (NULL != delim)
 	{
@@ -1830,12 +2009,13 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 
 			new_interval = (zbx_flexible_interval_t *)zbx_malloc(NULL, sizeof(zbx_flexible_interval_t));
 
-			if (SUCCEED != (ret = flexible_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
+			if (SUCCEED != flexible_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))) ||
+					(0 == *simple_interval && 0 == new_interval->delay))
 			{
 				zbx_free(new_interval);
 				interval_type = "flexible";
-				goto out;
+				goto fail;
 			}
 
 			new_interval->next = flexible;
@@ -1848,39 +2028,42 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 			new_interval = (zbx_scheduler_interval_t *)zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
 			memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
 
-			if (SUCCEED != (ret = scheduler_interval_parse(new_interval, interval_str,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)))))
+			if (SUCCEED != scheduler_interval_parse(new_interval, interval_str,
+					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str))))
 			{
-				zbx_free(new_interval);
+				scheduler_interval_free(new_interval);
 				interval_type = "scheduling";
-				goto out;
+				goto fail;
 			}
 
 			new_interval->next = scheduling;
 			scheduling = new_interval;
 		}
 	}
-out:
-	if (SUCCEED != ret)
-	{
-		if (NULL != error)
-		{
-			*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
-					(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
-					interval_str);
-		}
 
-		flexible_interval_free(flexible);
-		scheduler_interval_free(scheduling);
-	}
-	else if (NULL != custom_intervals)
+	if ((NULL == flexible && NULL == scheduling && 0 == *simple_interval) || SEC_PER_DAY < *simple_interval)
 	{
-		*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
-		(*custom_intervals)->flexible = flexible;
-		(*custom_intervals)->scheduling = scheduling;
+		interval_type = "update";
+		goto fail;
 	}
 
-	return ret;
+	*custom_intervals = (zbx_custom_interval_t *)zbx_malloc(NULL, sizeof(zbx_custom_interval_t));
+	(*custom_intervals)->flexible = flexible;
+	(*custom_intervals)->scheduling = scheduling;
+
+	return SUCCEED;
+fail:
+	if (NULL != error)
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s interval \"%.*s\".", interval_type,
+				(NULL == delim ? (int)strlen(interval_str) : (int)(delim - interval_str)),
+				interval_str);
+	}
+
+	flexible_interval_free(flexible);
+	scheduler_interval_free(scheduling);
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -3511,4 +3694,29 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	*ptr = '\0';
 
 	return token;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_env                                                   *
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] the time for compare in seconds                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+		zbx_update_resolver_conf();
+#endif
+	}
 }
