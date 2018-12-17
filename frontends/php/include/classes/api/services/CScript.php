@@ -814,7 +814,8 @@ class CScript extends CApiService {
 				'preservekeys' => true,
 				'editable' => true
 			]);
-		} else {
+		}
+		else {
 			$host_groups_with_write_access = $host_groups;
 		}
 
@@ -862,7 +863,8 @@ class CScript extends CApiService {
 				$script_groups = $script['host_access'] == PERM_READ_WRITE
 					? $host_groups_with_write_access
 					: $host_groups;
-			} else {
+			}
+			else {
 				$script_groups = $script['host_access'] == PERM_READ_WRITE
 					? array_intersect_key($host_groups_with_write_access, $hstgrp_branch[$script['groupid']])
 					: array_intersect_key($host_groups, $hstgrp_branch[$script['groupid']]);
