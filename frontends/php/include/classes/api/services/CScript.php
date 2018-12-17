@@ -114,7 +114,7 @@ class CScript extends CApiService {
 		$host_group_sources = [];
 		$host_groups = null;
 		// hostids selection source
-		if (!is_null($options['hostids'])) {
+		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
 			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -123,7 +123,7 @@ class CScript extends CApiService {
 			]));
 		}
 		// groupids selection source
-		if (!is_null($options['groupids'])) {
+		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
 			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -140,21 +140,21 @@ class CScript extends CApiService {
 			$host_groups = $host_group_sources[0];
 		}
 		// if any selection was attempted
-		if (!is_null($host_groups)) {
+		if ($host_groups !== null) {
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
 		}
 
 		$this->parent_host_groups = $host_groups;
 
 		// usrgrpids
-		if (!is_null($options['usrgrpids'])) {
+		if ($options['usrgrpids'] !== null) {
 			zbx_value2array($options['usrgrpids']);
 
 			$sqlParts['where'][] = '(s.usrgrpid IS NULL OR '.dbConditionInt('s.usrgrpid', $options['usrgrpids']).')';
 		}
 
 		// scriptids
-		if (!is_null($options['scriptids'])) {
+		if ($options['scriptids'] !== null) {
 			zbx_value2array($options['scriptids']);
 
 			$sqlParts['where'][] = dbConditionInt('s.scriptid', $options['scriptids']);
