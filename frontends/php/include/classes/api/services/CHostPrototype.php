@@ -547,7 +547,7 @@ class CHostPrototype extends CHostBase {
 					&& ($inventory['inventory_mode'] == HOST_INVENTORY_MANUAL
 						|| $inventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
 
-					if ($exHostPrototype['inventory']) {
+					if ($exHostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 						DB::update('host_inventory', [
 							'values' => $inventory,
 							'where' => ['hostid' => $hostPrototype['hostid']]
@@ -1242,28 +1242,18 @@ class CHostPrototype extends CHostBase {
 				'preservekeys' => true
 			]);
 
-			$output = [];
-			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
-				$output['hostid'] = true;
-			}
-			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
-				$output['inventory_mode'] = true;
-			}
-
 			foreach ($hostPrototypeIds as $host_prototypeid) {
-				// Only HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC values are stored in DB.
+				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
 				if (!array_key_exists($host_prototypeid, $inventory)) {
 					$inventory[$host_prototypeid] = [
 						'hostid' => (string) $host_prototypeid,
 						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
 					];
 				}
-
-				// Remove "hostid" and "inventory_mode" fields if not requested.
-				$inventory[$host_prototypeid] = array_intersect_key($inventory[$host_prototypeid], $output);
 			}
 
 			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
+			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 

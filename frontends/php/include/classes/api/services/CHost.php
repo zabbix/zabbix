@@ -1334,7 +1334,7 @@ class CHost extends CHostGeneral {
 			]);
 
 			foreach ($hostids as $hostid) {
-				// Only HOST_INVENTORY_MANUAL and HOST_INVENTORY_AUTOMATIC values are stored in DB.
+				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
 				if (!array_key_exists($hostid, $inventory)) {
 					$inventory[$hostid] = [
 						'hostid' => (string) $hostid,
@@ -1344,6 +1344,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
+			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
