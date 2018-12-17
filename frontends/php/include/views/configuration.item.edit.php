@@ -1114,7 +1114,10 @@ foreach ($data['preprocessing'] as $i => $step) {
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
-				(new CDiv($preproc_types_cbbox))->addClass(ZBX_STYLE_COLUMN_40),
+				(new CDiv([
+					(new CDiv(($i + 1).':'))->addClass('step-number'),
+					$preproc_types_cbbox
+				]))->addClass(ZBX_STYLE_COLUMN_40),
 				(new CDiv($params[0]))->addClass(ZBX_STYLE_COLUMN_20),
 				(new CDiv($params[1]))->addClass(ZBX_STYLE_COLUMN_20),
 				(new CDiv($on_fail))

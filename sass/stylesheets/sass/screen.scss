@@ -5790,7 +5790,7 @@ svg {
 .preprocessing-list {
 	display: table;
 	min-width: 60%;
-	padding-left: 15px;
+	padding-left: 10px;
 
 	.columns-wrapper {
 		position: relative;
@@ -5815,6 +5815,10 @@ svg {
 		[class^=column-] {
 			padding: 0;
 			color: $font-alt-color;
+
+			&:first-child {
+				padding-left: 20px;
+			}
 		}
 	}
 
@@ -5823,11 +5827,25 @@ svg {
 		.drag-icon {
 			position: absolute;
 			top: 5px;
-			margin-left: -25px;
+			margin-left: -20px;
+		}
+
+		.step-number {
+			width: 15px;
+			margin-right: 5px;
+			line-height: 24px;
+			text-align: right;
+		}
+
+		.preprocessing-step {
+
+			> .column-40 {
+				display: flex;
+			}
 		}
 
 		.on-fail-options {
-			margin-bottom: 5px;
+			margin: 0 0 5px 20px;
 
 			> .column-80 {
 
@@ -5846,7 +5864,7 @@ svg {
 		line-height: 24px;
 
 		> div {
-			margin-left: -15px;
+			margin-left: -10px;
 		}
 	}
 

@@ -4051,7 +4051,7 @@ svg {
 .preprocessing-list {
   display: table;
   min-width: 60%;
-  padding-left: 15px; }
+  padding-left: 10px; }
   .preprocessing-list .columns-wrapper {
     position: relative; }
     .preprocessing-list .columns-wrapper [class^=column-] {
@@ -4066,12 +4066,21 @@ svg {
     .preprocessing-list .preprocessing-list-head [class^=column-] {
       padding: 0;
       color: #768d99; }
+      .preprocessing-list .preprocessing-list-head [class^=column-]:first-child {
+        padding-left: 20px; }
   .preprocessing-list .preprocessing-list-item .drag-icon {
     position: absolute;
     top: 5px;
-    margin-left: -25px; }
+    margin-left: -20px; }
+  .preprocessing-list .preprocessing-list-item .step-number {
+    width: 15px;
+    margin-right: 5px;
+    line-height: 24px;
+    text-align: right; }
+  .preprocessing-list .preprocessing-list-item .preprocessing-step > .column-40 {
+    display: flex; }
   .preprocessing-list .preprocessing-list-item .on-fail-options {
-    margin-bottom: 5px; }
+    margin: 0 0 5px 20px; }
     .preprocessing-list .preprocessing-list-item .on-fail-options > .column-80 > div {
       padding-right: 5px; }
       .preprocessing-list .preprocessing-list-item .on-fail-options > .column-80 > div:last-child {
@@ -4079,7 +4088,7 @@ svg {
   .preprocessing-list .preprocessing-list-foot {
     line-height: 24px; }
     .preprocessing-list .preprocessing-list-foot > div {
-      margin-left: -15px; }
+      margin-left: -10px; }
   .preprocessing-list > li:nth-last-of-type(2) > .on-fail-options {
     margin-bottom: 0; }
 

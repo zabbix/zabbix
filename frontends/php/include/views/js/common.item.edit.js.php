@@ -47,7 +47,10 @@
 		echo (new CListItem([
 			(new CDiv([
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-				(new CDiv($preproc_types_cbbox))->addClass(ZBX_STYLE_COLUMN_40),
+				(new CDiv([
+					(new CDiv())->addClass('step-number'),
+					$preproc_types_cbbox
+				]))->addClass(ZBX_STYLE_COLUMN_40),
 				(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 					->setAttribute('placeholder', _('pattern'))
 				))->addClass(ZBX_STYLE_COLUMN_20),
@@ -119,10 +122,15 @@
 			template: '#delayFlexRow'
 		});
 
-		<?php if (!$data['is_discovery_rule'] && !$readonly) : ?>
+		<?php if (!$data['is_discovery_rule'] && !$readonly): ?>
+			function updateStepNumbers() {
+				$('.preprocessing-list-item .step-number').each(function(i) {
+					$(this).text(++i + ':');
+				});
+			}
+
 			var preproc_row_tpl = new Template($('#preprocessing_steps_row').html()),
-				preprocessing = $('#preprocessing'),
-				drag_icons = preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>');
+				preprocessing = $('#preprocessing');
 
 			preprocessing.sortable({
 				disabled: (preprocessing.find('li.sortable').length < 2),
@@ -132,19 +140,26 @@
 				containment: 'parent',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
-				opacity: 0.6
+				opacity: 0.6,
+				update: updateStepNumbers
 			});
 
 			preprocessing
 				.on('click', '.element-table-add', function() {
-					var row = $(this).closest('.preprocessing-list-foot');
+					var sortable_count,
+						row = $(this).closest('.preprocessing-list-foot');
 					row.before(preproc_row_tpl.evaluate({rowNum: preprocessing.find('li.sortable').length}));
 
 					$('.preprocessing-list-head').show();
+					sortable_count = preprocessing.find('li.sortable').length;
+					updateStepNumbers();
 
-					if (preprocessing.find('li.sortable').length > 1) {
+					if (sortable_count == 1) {
+						preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
+					}
+					else if (sortable_count > 1) {
 						preprocessing.sortable('enable');
-						drag_icons.removeClass('<?= ZBX_STYLE_DISABLED ?>');
+						preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').removeClass('<?= ZBX_STYLE_DISABLED ?>');
 					}
 				})
 				.on('click', '.element-table-remove', function() {
@@ -152,13 +167,14 @@
 
 					$(this).closest('li.sortable').remove();
 					sortable_count = preprocessing.find('li.sortable').length;
+					updateStepNumbers();
 
-					if (sortable_count == 1) {
-						preprocessing.sortable('disable');
-						drag_icons.addClass('<?= ZBX_STYLE_DISABLED ?>');
-					}
-					else if (sortable_count == 0) {
+					if (sortable_count == 0) {
 						$('.preprocessing-list-head').hide();
+					}
+					else if (sortable_count == 1) {
+						preprocessing.sortable('disable');
+						preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 					}
 				})
 				.on('change', 'select[name*="type"]', function() {
