@@ -1,6 +1,7 @@
 Changes for 4.0.3rc2
 
 Bug fixes:
+..F....... [ZBX-15333] fixed zoomout on doubleclick in graph widget (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3rc1
