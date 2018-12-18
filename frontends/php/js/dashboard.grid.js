@@ -223,13 +223,14 @@
 	 *
 	 * @param {object} pos1   Object with position and dimension.
 	 * @param {object} pos2   Object with position and dimension.
+	 *
 	 * @returns {boolean}
 	 */
 	function rectOverlap(pos1, pos2) {
-		return pos1.x < (pos2.x + pos2.width) &&
-			(pos1.x + pos1.width) > pos2.x &&
-			pos1.y < (pos2.y + pos2.height) &&
-			(pos1.y + pos1.height) > pos2.y;
+		return (pos1.x < (pos2.x + pos2.width)
+			&& (pos1.x + pos1.width) > pos2.x
+			&& pos1.y < (pos2.y + pos2.height)
+			&& (pos1.y + pos1.height) > pos2.y);
 	}
 
 	/**
@@ -240,18 +241,19 @@
 	 */
 	function realignWidget(data, widget) {
 		var initial_pos = widget.current_pos,
-			realignDrag = function (widget) {
+			realignDrag = function(widget) {
 				var pos = widget.current_pos,
 					to_row = pos.y + pos.height;
 
-				$.map(data.widgets, function (box) {
+				$.map(data.widgets, function(box) {
 					return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
-						? box : null
+						? box
+						: null;
 				})
-				.sort(function (box1, box2) {
+				.sort(function(box1, box2) {
 					return box2.current_pos.y - box1.current_pos.y;
 				})
-				.each(function (box) {
+				.each(function(box) {
 					if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0
 							&& rectOverlap(box.current_pos, initial_pos)) {
 						var free;
@@ -278,7 +280,7 @@
 	/**
 	 * Resize widgets.
 	 *
-	 * @param {object} widgets        Array of widget objects.
+	 * @param {array}  widgets        Array of widget objects.
 	 * @param {object} widget         Resized widget object.
 	 * @param {object} axis           Resized axis options.
 	 * @param {string} axis.axis_key  Axis key as string: 'x', 'y'.
@@ -291,24 +293,21 @@
 			size_key = axis.size_key,
 			size_min = axis.size_min,
 			size_max = axis.size_max,
-			opposite_axis_key = axis_key == 'x' ? 'y' : 'x',
-			opposite_size_key = size_key == 'width' ? 'height' : 'width',
+			opposite_axis_key = (axis_key === 'x') ? 'y' : 'x',
+			opposite_size_key = (size_key === 'width') ? 'height' : 'width',
 			new_max = 0,
 			affected,
 			getAffectedInBounds = function(bounds) {
-
 				return $.map(affected, function(box) {
-
 					return rectOverlap(bounds, box.current_pos) ? box : null;
 				});
 			},
 			getAffectedTreeAsArray = function(pos) {
 				$.map(widgets, function(box) {
-
-					return !('affected_axis' in box) && rectOverlap(pos, box.pos) ? box : null;
-				}).each(function(box) {
-					if ('affected_axis' in box && box.affected_axis != axis_key) {
-
+					return (!('affected_axis' in box) && rectOverlap(pos, box.pos)) ? box : null;
+				})
+				.each(function(box) {
+					if ('affected_axis' in box && box.affected_axis !== axis_key) {
 						return;
 					}
 
@@ -328,12 +327,12 @@
 				});
 
 				return $.map(widgets, function(box) {
-
-					return 'affected_axis' in box && box.affected_axis == axis_key && box.uniqueid != widget.uniqueid ? box : null;
+					return ('affected_axis' in box && box.affected_axis === axis_key
+								&& box.uniqueid !== widget.uniqueid) ? box : null;
 				});
 			};
 
-		// Get array of only affected by resize operation widgets.
+		// Get array containing only widgets affected by resize operation.
 		affected = getAffectedTreeAsArray(axis.boundary);
 
 		var margins = {},
@@ -353,27 +352,28 @@
 
 		// Compact widget and it affected siblings by removing empty columns.
 		affected.each(function(box) {
-			var newpos = axis_pos[axis_key] + axis_pos[size_key],
+			var new_pos = axis_pos[axis_key] + axis_pos[size_key],
 				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
 
 			for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
 				if (i in margins) {
-					newpos = Math.max(newpos, margins[i]);
+					new_pos = Math.max(new_pos, margins[i]);
 				}
 			}
 
 			for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
-				margins[i] = newpos + box.current_pos[size_key];
+				margins[i] = new_pos + box.current_pos[size_key];
 			}
 
-			if (box.current_pos[axis_key] <= newpos) {
-				box.current_pos[axis_key] = newpos;
-				new_max = Math.max(new_max, newpos + box.current_pos[size_key]);
+			if (box.current_pos[axis_key] <= new_pos) {
+				box.current_pos[axis_key] = new_pos;
+				new_max = Math.max(new_max, new_pos + box.current_pos[size_key]);
 			}
 		});
 
 		// Compact widget by resizing.
 		if (new_max > size_max) {
+			// Scanline is virtual box that utilizes whole width/height depending on its direction defined by size_key.
 			var scanline = {
 					x: 0,
 					y: 0,
@@ -405,11 +405,11 @@
 					box.new_pos = $.extend({}, box.current_pos);
 					box.new_pos[axis_key] = slot;
 
-					$.each(col, function(_, box1) {
-						if (rectOverlap(box1.current_pos, box.new_pos)) {
-							if (box1.current_pos[size_key] > size_min) {
-								box1.new_pos = $.extend({}, box1.current_pos);
-								box1.new_pos[size_key] -= scanline[size_key];
+					$.each(col, function(_, col_box) {
+						if (rectOverlap(col_box.current_pos, box.new_pos)) {
+							if (col_box.current_pos[size_key] > size_min) {
+								col_box.new_pos = $.extend({}, col_box.current_pos);
+								col_box.new_pos[size_key] -= scanline[size_key];
 							}
 							else {
 								collapsed = false;
@@ -481,8 +481,9 @@
 	/**
 	 * Rearrange widgets. Modifies widget.current_pos if desired size is greater than allowed by resize.
 	 *
-	 * @param {array}  data    Array of widgets objects.
-	 * @param {object} widget  Moved widget object.
+	 * @param {array}  data
+	 * @param {array}  data.widgets    Array of widgets objects.
+	 * @param {object} widget          Moved widget object.
 	 */
 	function realignResize(data, widget) {
 		var changes = {},
@@ -503,8 +504,8 @@
 			delete box.affected_axis;
 		});
 
-		// If there are no affected widgets exit.
-		if ('width' in changes == false && 'height' in changes == false) {
+		// Exit if there are no affected widgets.
+		if (('width' in changes) === false && ('height' in changes) === false) {
 			return;
 		}
 
@@ -520,9 +521,9 @@
 					x: widget.current_pos.x,
 					y: widget['height' in changes ? 'pos' : 'current_pos'].y,
 					width: widget.current_pos.width,
-					height: widget['height' in changes ? 'pos' : 'current_pos'].height
+					height: widget['height' in changes ? 'pos' : 'current_pos'].height // it always gives same result. why?
 				}
-			}
+			};
 
 			if ('x' in changes) {
 				axis.x = changes.x;
@@ -540,7 +541,7 @@
 				size_max: data.options['max-rows'],
 				height: changes.height,
 				boundary: $.extend({}, widget.current_pos)
-			}
+			};
 
 			if ('y' in changes) {
 				axis.y = changes.y;
@@ -551,7 +552,7 @@
 
 		// Force to repaint non changed widgets too.
 		data.widgets.each(function(box) {
-			if ('current_pos' in box == false) {
+			if (('current_pos' in box) === false) {
 				box.current_pos = $.extend({}, box.pos);
 			}
 		});
@@ -574,7 +575,7 @@
 	}
 
 	/**
-	 * User action handler for resize of widget
+	 * User action handler for resize of widget.
 	 *
 	 * @param {object} $obj  Dasboard DOM element.
 	 * @param {object} $div  Widget DOM element.
@@ -610,7 +611,7 @@
 	}
 
 	/**
-	 * User action handler for drag of widget
+	 * User action handler for drag of widget.
 	 *
 	 * @param {object} $obj  Dasboard DOM element.
 	 * @param {object} $div  Widget DOM element.
@@ -689,14 +690,13 @@
 				data['pos-action'] = 'drag';
 				data.calculated = {
 					'left-max': $obj.width() - ui.helper.width(),
-					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height(),
+					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
 				};
 
 				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning(ui.helper, data);
 			},
 			drag: function(event, ui) {
-
 				// Limit element draggable area for X and Y axis.
 				ui.position = {
 					left: Math.max(0, Math.min(ui.position.left, data.calculated['left-max'])),
@@ -782,7 +782,7 @@
 	 * @param {string} ignoreid  All widget except widget with such id will be affected.
 	 */
 	function setResizableState(state, widgets, ignoreid) {
-		widgets.each(function (widget) {
+		widgets.each(function(widget) {
 			if (widget.uniqueid !== ignoreid) {
 				widget.div.resizable(state);
 			}
@@ -1010,13 +1010,13 @@
 			ajax_data['fields'] = JSON.stringify(fields);
 		}
 
-		if (widget === null || 'type' in widget == false) {
+		if (widget === null || ('type' in widget) === false) {
 			if (widget && 'pos' in widget) {
-				pos = $.extend({}, data.widget_defaults[type].size, widget.pos);
+				pos = $.extend({}, data.widget_defaults[type].size, widget.pos); // pos contains unused properties left and top for some reason.
 
 				$.map(data.widgets, function(box) {
 					return rectOverlap(box.pos, pos) ? box : null;
-				}).each(function (box) {
+				}).each(function(box) {
 					if (!rectOverlap(box.pos, pos)) {
 						return;
 					}
@@ -1036,13 +1036,15 @@
 				pos = findEmptyPosition($obj, data, type);
 			}
 
-			preloader = $('<div/>').css({
-				position: 'absolute',
-				top: pos.y * data.options['widget-height'] + 'px',
-				left: pos.x * data.options['widget-width'] + '%',
-				height: pos.height * data.options['widget-height'] + 'px',
-				width: pos.width * data.options['widget-width'] + '%'
-			}).appendTo($obj);
+			preloader = $('<div/>') // it looks more like placeholder, not preloader.
+				.css({
+					position: 'absolute',
+					top: (pos.y * data.options['widget-height']) + 'px',
+					left: (pos.x * data.options['widget-width']) + '%',
+					height: (pos.height * data.options['widget-height']) + 'px',
+					width: (pos.width * data.options['widget-width']) + '%'
+				})
+				.appendTo($obj);
 		}
 
 		$.ajax({
@@ -1060,7 +1062,7 @@
 					// No errors, proceed with update.
 					overlayDialogueDestroy('widgetConfg');
 
-					if (widget === null || 'type' in widget == false) {
+					if (widget === null || ('type' in widget) === false) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 						var scroll_by = (pos['y'] * data['options']['widget-height'])
 								- $('.dashbrd-grid-widget-container').scrollTop(),
@@ -1113,11 +1115,12 @@
 					data['options']['updated'] = true;
 				}
 			}
-		}).always(function() {
-			if (preloader) {
-				preloader.remove();
-			}
-		});
+		})
+			.always(function() {
+				if (preloader) {
+					preloader.remove();
+				}
+			});
 	}
 
 	function findEmptyPosition($obj, data, type) {
@@ -1196,53 +1199,57 @@
 	 * @returns {object}    Placeholder object with DOM elements and additional methods to set visual style.
 	 */
 	function createNewWidgetPlaceholder() {
-		var label = $('<div>', {class: 'dashbrd-grid-new-widget-label'}),
-			inner_box = $('<div>', {class: 'dashbrd-grid-widget-new-box'}).append(label),
-			placeholder = $('<div>', {class: 'dashbrd-grid-new-widget-placeholder'}).append(inner_box),
+		var $label = $('<div>', {'class': 'dashbrd-grid-new-widget-label'}),
+			$inner_box = $('<div>', {'class': 'dashbrd-grid-widget-new-box'}).append($label),
+			$placeholder = $('<div>', {'class': 'dashbrd-grid-new-widget-placeholder'}).append($inner_box),
 			updateLabelVisibility = function() {
-				if (!inner_box.is('.dashbrd-grid-widget-set-size,.dashbrd-grid-widget-set-position')) {
+				if (!$inner_box.is('.dashbrd-grid-widget-set-size,.dashbrd-grid-widget-set-position')) {
 					return;
 				}
 
-				var message = inner_box.is('.dashbrd-grid-widget-set-size')
+				var message = $inner_box.is('.dashbrd-grid-widget-set-size')
 						? t('Release to create a new widget.')
 						: t('Click and drag to desired size.'),
-					callback = function () {
-						if (label.children().first().height()) {
-							label.text(label.height() >= label.children().first().height() ? message : '');
+					callback = function() {
+						if ($label.children().first().height()) {
+							$label.text($label.height() >= $label.children().first().height() ? message : '');
 						}
 						else {
 							window.requestAnimationFrame(callback);
 						}
-					}
+					};
 
 				// Create container to detect text overflow on y axis. Message div container will be removed on repaint.
-				$('<div>').text(message).appendTo(label);
+				$('<div>').text(message).appendTo($label);
 
 				callback();
 			};
 
 		return {
-			container: placeholder,
-			inner_box: inner_box,
-			label: label,
+			container: $placeholder,
+			inner_box: $inner_box,
+			label: $label,
 			setDefault: function(callback) {
-				inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
-				label.empty().append($('<a>', {
+				$inner_box.removeClass('dashbrd-grid-widget-set-size dashbrd-grid-widget-set-position');
+				$label.empty().append($('<a>', {
 					href: '#',
 					text: t('Add a new widget')
 				}));
 
-				placeholder.click(callback);
+				$placeholder.click(callback);
 			},
 			setPositioning: function() {
-				placeholder.off('click');
-				inner_box.removeClass('dashbrd-grid-widget-set-size').addClass('dashbrd-grid-widget-set-position');
+				$placeholder.off('click');
+				$inner_box
+					.removeClass('dashbrd-grid-widget-set-size')
+					.addClass('dashbrd-grid-widget-set-position');
 				updateLabelVisibility();
 			},
 			setResizing: function() {
-				placeholder.off('click');
-				inner_box.removeClass('dashbrd-grid-widget-set-position').addClass('dashbrd-grid-widget-set-size');
+				$placeholder.off('click');
+				$inner_box
+					.removeClass('dashbrd-grid-widget-set-position')
+					.addClass('dashbrd-grid-widget-set-size');
 				updateLabelVisibility();
 			},
 			updateLabelVisibility: updateLabelVisibility
@@ -1259,11 +1266,9 @@
 		data['cell-width'] = getCurrentCellWidth(data);
 		data['add_widget_dimension'] = {};
 
-		/**
-		 * Add new widget user interaction handlers.
-		 */
+		// Add new widget user interaction handlers.
 		$.subscribe('overlay.close', function(e, widget) {
-			if (data['pos-action'] == 'addmodal' && widget.dialogueid == 'widgetConfg') {
+			if (data['pos-action'] === 'addmodal' && widget.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 				data.add_widget_dimension = {};
 
@@ -1275,7 +1280,7 @@
 				}
 
 				resizeDashboardGrid($obj, data);
-				data.new_widget_placeholder.setDefault(function (e) {
+				data.new_widget_placeholder.setDefault(function(e) {
 					methods.addNewWidget.call($obj, this);
 					return cancelEvent(e);
 				});
@@ -1283,12 +1288,16 @@
 		});
 
 		$(document).on('click mouseup dragend', function() {
-			if (data['pos-action'] != 'add') {
+			if (data['pos-action'] !== 'add') {
 				return;
 			}
 
 			var dimension = $.extend({}, data.add_widget_dimension);
 
+			/**
+			 * Unset if dimension width/height is equal to size of placeholder.
+			 * Widget default size will be used.
+			 */
 			if (dimension.width == 1 && dimension.height == 2) {
 				delete dimension.width;
 				delete dimension.height;
@@ -1298,147 +1307,155 @@
 			setResizableState('enable', data.widgets, '');
 			$obj.dashboardGrid('addNewWidget', null, dimension);
 		});
-		$obj.on('mousedown', function(event) {
-			if (event.which != 1 ) {
-				return;
-			}
 
-			if (data['pos-action'] == '' && ($(event.target).is($obj))
-					|| $(event.target).closest(data.new_widget_placeholder.container).length) {
-				setResizableState('disable', data.widgets, '');
-				data['pos-action'] = 'add';
-				data.new_widget_placeholder.setResizing();
-				return cancelEvent(event);
-			}
-		}).on('mouseleave', function(event) {
-			if (data['pos-action'] == 'add' || data['pos-action'] == 'addmodal') {
-				return;
-			}
-
-			data.add_widget_dimension = {};
-
-			if (data.widgets.length) {
-				data.new_widget_placeholder.container.hide();
-			}
-			else {
-				data.new_widget_placeholder.container.removeAttr('style');
-			}
-
-			resizeDashboardGrid($obj, data);
-			data.new_widget_placeholder.setDefault(function (e) {
-				methods.addNewWidget.call($obj, this);
-				return cancelEvent(e);
-			});
-
-		}).on('mouseenter mousemove', function(event) {
-			var drag = data['pos-action'] == 'add';
-
-			if (data['pos-action'] !== '' && !drag) {
-				return;
-			}
-
-			if (event.type == 'mouseenter' && data['pos-action'] == '') {
-				data.new_widget_placeholder.container.show();
-				data.new_widget_placeholder.setPositioning();
-			}
-
-			if (!drag && !$(event.target).is($obj) && !$(event.target).closest(data.new_widget_placeholder.container)) {
-				resizeDashboardGrid($obj, data);
-				data.add_widget_dimension = {};
-				data.new_widget_placeholder.container.hide();
-				return;
-			}
-
-			var o = data.options,
-				offset = $obj.offset(),
-				y = Math.min(o['max-rows'] - 1,
-					Math.max(0, Math.floor((event.pageY - offset.top) / o['widget-height']))
-				),
-				x = Math.min(o['max-columns'] - 1,
-					Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
-				),
-				pos = {
-					y: y,
-					x: x,
-					height: o['widget-min-rows'],
-					width: 1
-				},
-				overlap = false;
-
-			if (drag) {
-				if ('top' in data.add_widget_dimension == false) {
-					data.add_widget_dimension = $.extend(data.add_widget_dimension, {
-						top: y,
-						left: x
-					});
-				}
-
-				pos = {
-					y: Math.min(y, data.add_widget_dimension.top),
-					x: Math.min(x, data.add_widget_dimension.left),
-					width: Math.abs(data.add_widget_dimension.left - x) + 1,
-					height: Math.max(2, Math.abs(data.add_widget_dimension.top - y) + 1 +
-						(data.add_widget_dimension.top > y)
-					)
-				}
-
-				$.each(data.widgets, function(_, box) {
-					overlap |= rectOverlap(box.pos, pos);
-
-					return !overlap;
-				});
-
-				if (overlap) {
-					pos = data.add_widget_dimension;
-				}
-			}
-			else {
-				// Proceed only when coordinates have been changed.
-				if (data.add_widget_dimension.y == y && data.add_widget_dimension.x == x) {
+		$obj
+			.on('mousedown', function(event) {
+				/**
+				 * 'mousedown' event is fired also when mouse right or middle buttons are pressed.
+				 * event.which == 1 is exclusive for mouse left button only.
+				 */
+				if (event.which != 1) {
 					return;
 				}
 
-				$.each(data.widgets, function(_, box) {
-					overlap |= rectOverlap(box.pos, pos);
+				if (data['pos-action'] === '' && ($(event.target).is($obj))
+						|| $(event.target).closest(data.new_widget_placeholder.container).length) {
+					setResizableState('disable', data.widgets, '');
+					data['pos-action'] = 'add';
+					data.new_widget_placeholder.setResizing();
+					return cancelEvent(event);
+				}
+			})
+			.on('mouseleave', function(event) {
+				if (data['pos-action'] === 'add' || data['pos-action'] === 'addmodal') {
+					return;
+				}
 
-					return !overlap;
+				data.add_widget_dimension = {};
+
+				if (data.widgets.length) {
+					data.new_widget_placeholder.container.hide();
+				}
+				else {
+					data.new_widget_placeholder.container.removeAttr('style');
+				}
+
+				resizeDashboardGrid($obj, data);
+				data.new_widget_placeholder.setDefault(function(e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
 				});
 
-				/**
-				 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
-				 * slot.
-				 */
-				if (overlap && pos.y > 0) {
+			})
+			.on('mouseenter mousemove', function(event) {
+				var drag = (data['pos-action'] === 'add');
+
+				if (data['pos-action'] !== '' && !drag) {
+					return;
+				}
+
+				if (event.type === 'mouseenter' && data['pos-action'] === '') {
+					data.new_widget_placeholder.container.show();
+					data.new_widget_placeholder.setPositioning();
+				}
+
+				if (!drag && !$(event.target).is($obj)
+						&& !$(event.target).closest(data.new_widget_placeholder.container)) {
+					resizeDashboardGrid($obj, data);
+					data.add_widget_dimension = {};
+					data.new_widget_placeholder.container.hide();
+					return;
+				}
+
+				var o = data.options,
+					offset = $obj.offset(),
+					y = Math.min(o['max-rows'] - 1,
+							Math.max(0, Math.floor((event.pageY - offset.top) / o['widget-height']))
+						),
+					x = Math.min(o['max-columns'] - 1,
+							Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
+						),
+					pos = {
+						y: y,
+						x: x,
+						height: o['widget-min-rows'],
+						width: 1
+					},
 					overlap = false;
-					--pos.y;
+
+				if (drag) {
+					if (('top' in data.add_widget_dimension) === false) {
+						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: y, left: x});
+					}
+
+					pos = {
+						y: Math.min(y, data.add_widget_dimension.top),
+						x: Math.min(x, data.add_widget_dimension.left),
+						width: Math.abs(data.add_widget_dimension.left - x) + 1,
+						height: Math.max(2, Math.abs(data.add_widget_dimension.top - y) + 1 +
+							(data.add_widget_dimension.top > y)
+						)
+					};
 
 					$.each(data.widgets, function(_, box) {
 						overlap |= rectOverlap(box.pos, pos);
 
 						return !overlap;
 					});
+
+					if (overlap) {
+						pos = data.add_widget_dimension;
+					}
+				}
+				else {
+					// Proceed only when coordinates have been changed.
+					if (data.add_widget_dimension.y == y && data.add_widget_dimension.x == x) {
+						return;
+					}
+
+					$.each(data.widgets, function(_, box) {
+						overlap |= rectOverlap(box.pos, pos);
+
+						return !overlap;
+					});
+
+					/**
+					 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
+					 * slot.
+					 */
+					if (overlap && pos.y > 0) {
+						overlap = false;
+						--pos.y;
+
+						$.each(data.widgets, function(_, box) {
+							overlap |= rectOverlap(box.pos, pos);
+
+							return !overlap;
+						});
+					}
+
+					if (overlap) {
+						data.add_widget_dimension = {};
+						data.new_widget_placeholder.container.hide();
+						return;
+					}
 				}
 
-				if (overlap) {
-					data.add_widget_dimension = {};
-					data.new_widget_placeholder.container.hide();
-					return;
-				}
-			}
+				resizeDashboardGrid($obj, data, pos.y + pos.height);
+				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
-			resizeDashboardGrid($obj, data, pos.y + pos.height);
-			data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
+				data.new_widget_placeholder.container
+					.css({
+						position: 'absolute',
+						top: (data.add_widget_dimension.y * o['widget-height']) + 'px',
+						left: (data.add_widget_dimension.x * o['widget-width']) + '%',
+						height: (data.add_widget_dimension.height * o['widget-height']) + 'px',
+						width: (data.add_widget_dimension.width * o['widget-width']) + '%'
+					})
+					.show();
 
-			data.new_widget_placeholder.container.css({
-				position: 'absolute',
-				top: data.add_widget_dimension.y * o['widget-height'] + 'px',
-				left: data.add_widget_dimension.x * o['widget-width'] + '%',
-				height: data.add_widget_dimension.height * o['widget-height'] + 'px',
-				width: data.add_widget_dimension.width * o['widget-width'] + '%'
-			}).show();
-
-			data.new_widget_placeholder.updateLabelVisibility();
-		});
+				data.new_widget_placeholder.updateLabelVisibility();
+			});
 
 		return;
 	}
@@ -1698,7 +1715,7 @@
 					new_widget_placeholder = createNewWidgetPlaceholder();
 
 				if (options['editable']) {
-					new_widget_placeholder.setDefault(function (e) {
+					new_widget_placeholder.setDefault(function(e) {
 						if (!methods.isEditMode.call($this)) {
 							showEditMode();
 						}
@@ -1723,7 +1740,7 @@
 					widgets: [],
 					widget_defaults: {},
 					triggers: {},
-					placeholder: $('<div class="dashbrd-grid-widget-placeholder"/>').hide().appendTo($this),
+					placeholder: $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).hide().appendTo($this),
 					new_widget_placeholder: new_widget_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
@@ -1736,19 +1753,21 @@
 
 				var	data = $this.data('dashboardGrid');
 
-				$(window).on('beforeunload', function() {
-					var	res = confirmExit($this, data);
+				$(window)
+					.on('beforeunload', function() {
+						var	res = confirmExit($this, data);
 
-					// Return value only if we need confirmation window, return nothing otherwise.
-					if (typeof res !== 'undefined') {
-						return res;
-					}
-				}).on('resize', function () {
-					// Recalculate dashboard container minimal required height.
-					data.minimalHeight = calculateGridMinHeight($this);
-					data['cell-width'] = getCurrentCellWidth(data);
-					data.new_widget_placeholder.updateLabelVisibility();
-				});
+						// Return value only if we need confirmation window, return nothing otherwise.
+						if (typeof res !== 'undefined') {
+							return res;
+						}
+					})
+					.on('resize', function() {
+						// Recalculate dashboard container minimal required height.
+						data.minimalHeight = calculateGridMinHeight($this);
+						data['cell-width'] = getCurrentCellWidth(data);
+						data.new_widget_placeholder.updateLabelVisibility();
+					});
 			});
 		},
 
