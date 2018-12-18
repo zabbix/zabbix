@@ -888,6 +888,8 @@ class CScript extends CApiService {
 				$script['hosts'] = array_values($script['hosts']);
 			}
 		}
+		unset($script);
+
 		return $result;
 	}
 }
