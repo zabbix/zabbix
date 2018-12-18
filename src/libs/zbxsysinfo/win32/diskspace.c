@@ -27,6 +27,8 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE time
 	wchar_t 	*wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
+	/* 'timeout_event' argument is here to make the vfs_fs_size() prototype as required by */
+	/* zbx_execute_threaded_metric() on MS Windows */
 	ZBX_UNUSED(timeout_event);
 
 	if (2 < request->nparam)
