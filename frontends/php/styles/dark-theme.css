@@ -4074,8 +4074,17 @@ svg {
 
 .preprocessing-list {
   display: table;
-  min-width: 60%;
+  min-width: 100%;
   padding-left: 10px; }
+  @media screen and (min-width: 1200px) {
+    .preprocessing-list {
+      min-width: 80%; } }
+  @media screen and (min-width: 1400px) {
+    .preprocessing-list {
+      min-width: 70%; } }
+  @media screen and (min-width: 1600px) {
+    .preprocessing-list {
+      min-width: 60%; } }
   .preprocessing-list .columns-wrapper {
     position: relative; }
     .preprocessing-list .columns-wrapper [class^=column-] {
@@ -4088,7 +4097,7 @@ svg {
   .preprocessing-list .preprocessing-list-head {
     line-height: 24px; }
     .preprocessing-list .preprocessing-list-head [class^=column-] {
-      padding: 0;
+      padding: 0 5px 0 0;
       color: #737373; }
       .preprocessing-list .preprocessing-list-head [class^=column-]:first-child {
         padding-left: 20px; }

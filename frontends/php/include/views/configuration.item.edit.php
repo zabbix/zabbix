@@ -935,7 +935,9 @@ $preprocessing = (new CList())
 			(new CDiv(_('Name')))->addClass(ZBX_STYLE_COLUMN_40),
 			(new CDiv(_('Parameters')))->addClass(ZBX_STYLE_COLUMN_20),
 			(new CDiv())->addClass(ZBX_STYLE_COLUMN_20),
-			(new CDiv(_('Custom on fail')))->addClass(ZBX_STYLE_COLUMN_10),
+			(new CDiv(_('Custom on fail')))
+				->addClass(ZBX_STYLE_COLUMN_10)
+				->addClass(ZBX_STYLE_COLUMN_CENTER),
 			(new CDiv(_('Action')))->addClass(ZBX_STYLE_COLUMN_10)
 		]))->addClass(ZBX_STYLE_COLUMNS)
 	))

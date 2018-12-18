@@ -5789,8 +5789,20 @@ svg {
 
 .preprocessing-list {
 	display: table;
-	min-width: 60%;
+	min-width: 100%;
 	padding-left: 10px;
+
+	@media screen and (min-width: 1200px) {
+		min-width: 80%;
+	}
+
+	@media screen and (min-width: 1400px) {
+		min-width: 70%;
+	}
+
+	@media screen and (min-width: 1600px) {
+		min-width: 60%;
+	}
 
 	.columns-wrapper {
 		position: relative;
@@ -5813,7 +5825,7 @@ svg {
 		line-height: 24px;
 
 		[class^=column-] {
-			padding: 0;
+			padding: 0 5px 0 0;
 			color: $font-alt-color;
 
 			&:first-child {
