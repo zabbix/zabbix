@@ -2129,8 +2129,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_HOST	*host;
-
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
