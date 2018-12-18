@@ -864,12 +864,12 @@ class CScript extends CApiService {
 
 		foreach ($result as $scriptid => &$script) {
 			if ($script['groupid'] === '0') {
-				$script_groups = $script['host_access'] == PERM_READ_WRITE
+				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
 					? $host_groups_with_write_access
 					: $host_groups;
 			}
 			else {
-				$script_groups = $script['host_access'] == PERM_READ_WRITE
+				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
 					? array_intersect_key($host_groups_with_write_access, $hstgrp_branch[$script['groupid']])
 					: array_intersect_key($host_groups, $hstgrp_branch[$script['groupid']]);
 			}
