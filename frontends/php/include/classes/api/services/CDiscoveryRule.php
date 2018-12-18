@@ -1291,13 +1291,12 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param array  $lld_macro_paths                 Array of items to validate.
 	 * @param string $lld_macro_paths[]['lld_macro']  LLD macro string (optional for update method).
+	 * @param array  $macro_names                     Array where existing macro names are collected.
 	 * @param string $path                            Path to API object.
 	 *
 	 * @throws APIException if same discovery rules contains duplicate LLD macro names.
 	 */
-	protected function checkDuplicateLLDMacros(array $lld_macro_paths, $path) {
-		$macro_names = [];
-
+	protected function checkDuplicateLLDMacros(array $lld_macro_paths, $macro_names, $path) {
 		foreach ($lld_macro_paths as $num => $lld_macro_path) {
 			if (array_key_exists('lld_macro', $lld_macro_path)) {
 				if (array_key_exists($lld_macro_path['lld_macro'], $macro_names)) {
@@ -1342,7 +1341,7 @@ class CDiscoveryRule extends CItemGeneral {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				$this->checkDuplicateLLDMacros($item['lld_macro_paths'], $path);
+				$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
 			}
 		}
 	}
@@ -1427,7 +1426,7 @@ class CDiscoveryRule extends CItemGeneral {
 						}
 					}
 
-					$this->checkDuplicateLLDMacros($item['lld_macro_paths'], $path);
+					$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
 
 					/*
 					 * Validate "lld_macro_pathid" field. If "lld_macro_pathid" doesn't correspond to given "itemid"
@@ -1436,18 +1435,29 @@ class CDiscoveryRule extends CItemGeneral {
 					if ($lld_macro_pathids) {
 						$lld_macro_pathids = array_keys($lld_macro_pathids);
 
-						$count_result = DBfetch(DBselect(
-							'SELECT COUNT(lmp.lld_macro_pathid) AS rowscount'.
+						$db_lld_macro_paths = DBfetchArrayAssoc(DBselect(
+							'SELECT lmp.lld_macro_pathid,lmp.lld_macro'.
 							' FROM lld_macro_path lmp'.
 							' WHERE lmp.itemid='.zbx_dbstr($itemid).
 								' AND '.dbConditionId('lmp.lld_macro_pathid', $lld_macro_pathids)
-						));
+						), 'lld_macro_pathid');
 
-						if ($count_result['rowscount'] != count($lld_macro_pathids)) {
+						if (count($db_lld_macro_paths) != count($lld_macro_pathids)) {
 							self::exception(ZBX_API_ERROR_PERMISSIONS,
 								_('No permissions to referred object or it does not exist!')
 							);
 						}
+
+						$db_macro_names = [];
+
+						foreach ($item['lld_macro_paths'] as $num => $lld_macro_path) {
+							if (array_key_exists('lld_macro_pathid', $lld_macro_path)) {
+								$db_lld_macro_path = $db_lld_macro_paths[$lld_macro_path['lld_macro_pathid']];
+								$db_macro_names[$db_lld_macro_path['lld_macro']] = true;
+							}
+						}
+
+						$this->checkDuplicateLLDMacros($item['lld_macro_paths'], $db_macro_names, $path);
 					}
 				}
 			}
