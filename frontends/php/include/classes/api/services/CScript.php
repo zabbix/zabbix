@@ -146,9 +146,8 @@ class CScript extends CApiService {
 		// if any selection attempt
 		if ($host_groups !== null) {
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
+			$this->parent_host_groups = $host_groups;
 		}
-
-		$this->parent_host_groups = $host_groups;
 
 		// usrgrpids
 		if ($options['usrgrpids'] !== null) {
