@@ -796,7 +796,9 @@ class CScript extends CApiService {
 			}
 
 			if ($group_search_names !== null) {
-				$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
+				if (array_key_exists($script['groupid'], $this->parent_host_groups)) {
+					$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
+				}
 			}
 		}
 
