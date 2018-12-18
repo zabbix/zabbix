@@ -143,6 +143,7 @@ class CScript extends CApiService {
 		elseif ($host_groups_by_groupids !== null) {
 			$host_groups = $host_groups_by_groupids;
 		}
+
 		// if any selection attempt
 		if ($host_groups !== null) {
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
@@ -789,21 +790,19 @@ class CScript extends CApiService {
 		foreach ($result as $script) {
 			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
 
-			if ($group_search_names === null) {
-				continue;
-			}
-
+			// If any script belongs to all host groups.
 			if ($script['groupid'] === '0') {
 				$group_search_names = null;
-				continue;
 			}
 
-			$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
+			if ($group_search_names !== null) {
+				$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
+			}
 		}
 
 		$select_groups = ['name', 'groupid'];
 		if ($options['selectGroups'] !== API_OUTPUT_EXTEND && is_array($options['selectGroups'])) {
-			$select_groups = $this->outputExtend($options['selectGroups'], $select_groups);
+			$select_groups = array_merge($options['selectGroups'], $select_groups);
 		}
 
 		$host_groups = API::HostGroup()->get([
@@ -837,10 +836,8 @@ class CScript extends CApiService {
 		}
 
 		if ($is_hosts_select) {
-			$sql = 'SELECT hostid,groupid FROM hosts_groups';
-			if ($group_search_names !== null) {
-				$sql .= ' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
-			}
+			$sql = 'SELECT hostid,groupid FROM hosts_groups'.
+				' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
 			$db_group_hosts = DBSelect($sql);
 
 			$all_hostids = [];
