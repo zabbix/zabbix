@@ -423,7 +423,7 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  * Parameters: timeout_event - [IN] handle of a timeout event that was passed *
  *                                  to the metric function                    *
  *                                                                            *
- * Return value: TRUE, if timeout was detected, FALSE otherwise.              *
+ * Return value: TRUE, if timeout was signaled, FALSE otherwise.              *
  *                                                                            *
  ******************************************************************************/
 static BOOL	has_timed_out(HANDLE timeout_event)
@@ -442,11 +442,9 @@ static BOOL	has_timed_out(HANDLE timeout_event)
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_FAILED: %s",
 					strerror_from_system(GetLastError()));
 			return TRUE;
-		case WAIT_ABANDONED:
-			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_ABANDONED");
-			return TRUE;
 		default:
-			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned unexpected error");
+			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned 0x%x", (unsigned int)rc);
+			THIS_SHOULD_NEVER_HAPPEN;
 			return TRUE;
 	}
 }
