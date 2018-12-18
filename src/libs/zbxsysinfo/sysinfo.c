@@ -1410,9 +1410,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
 
-	metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-	if (NULL == metric_args.timeout_event)
+	if (NULL == (metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create timeout event for data thread: %s",
 				strerror_from_system(GetLastError())));
@@ -1431,9 +1429,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		return SYSINFO_RET_FAIL;
 	}
 
-	rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000);
-
-	if (WAIT_FAILED == rc)
+	/* 1000 is multiplier for converting seconds into milliseconds */
+	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000)))
 	{
 		/* unexpected error */
 
@@ -1443,9 +1440,9 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	}
 	else if (WAIT_TIMEOUT == rc)
 	{
-		/* timeout; give a thread few seconds to clean up and exit, then terminate if stuck */
-
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for data."));
+
+		/* timeout; notify thread to clean up and exit, if stuck then terminate it */
 
 		if (FALSE == SetEvent(metric_args.timeout_event))
 		{
@@ -1454,7 +1451,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		}
 		else
 		{
-			DWORD	timeout_rc = WaitForSingleObject(thread, 3000);	/* wait for few seconds, if needed */
+			DWORD	timeout_rc = WaitForSingleObject(thread, 3000);	/* wait up to 3 seconds */
 
 			if (WAIT_FAILED == timeout_rc)
 			{
@@ -1467,6 +1464,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread while processing key: %s", request->key);
 				terminate_thread = TRUE;
 			}
+			/* timeout_rc must be WAIT_OBJECT_0 (signaled) */
 		}
 	}
 
