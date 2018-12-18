@@ -441,13 +441,13 @@ static BOOL	has_timed_out(HANDLE timeout_event)
 		case WAIT_FAILED:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_FAILED: %s",
 					strerror_from_system(GetLastError()));
-			THIS_SHOULD_NEVER_HAPPEN;
+			return FALSE;
 		case WAIT_ABANDONED:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_ABANDONED");
-			THIS_SHOULD_NEVER_HAPPEN;
+			return FALSE;
 		default:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned unexpected error");
-			THIS_SHOULD_NEVER_HAPPEN;
+			return FALSE;
 	}
 }
 
