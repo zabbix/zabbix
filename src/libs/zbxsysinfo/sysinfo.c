@@ -1455,13 +1455,13 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 			if (WAIT_FAILED == timeout_rc)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot wait for data: %s",
+				zabbix_log(LOG_LEVEL_ERR, "Waiting for data failed: %s",
 						strerror_from_system(GetLastError()));
 				terminate_thread = TRUE;
 			}
 			else if (WAIT_TIMEOUT == timeout_rc)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread while processing key: %s", request->key);
+				zabbix_log(LOG_LEVEL_ERR, "Stuck data thread");
 				terminate_thread = TRUE;
 			}
 			/* timeout_rc must be WAIT_OBJECT_0 (signaled) */
