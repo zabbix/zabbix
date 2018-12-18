@@ -42,6 +42,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.3rc2
 
 Bug fixes:
+..F....... [ZBX-15333] fixed zoomout on doubleclick in graph widget (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3rc1
