@@ -111,35 +111,39 @@ class CScript extends CApiService {
 					'))';
 		}
 
-		$host_group_sources = [];
+		$host_groups_by_hostids = null;
+		$host_groups_by_groupids = null;
+
 		$host_groups = null;
-		// hostids selection source
+		// Hostids and hroupids selection API calls must be made separately because
+		// we must intescect enriched groupids.
 		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
-			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
+			$host_groups_by_hostids = $this->enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'hostids' => $options['hostids'],
 				'preservekeys' => true
 			]));
 		}
-		// groupids selection source
 		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
-			$host_group_sources[] = $this->enrichParentGroups(API::HostGroup()->get([
+			$host_groups_by_groupids = $this->enrichParentGroups(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $options['groupids'],
 				'preservekeys' => true
 			]));
 		}
-		// if more that one source - intersect selection
-		if (array_key_exists(1, $host_group_sources)) {
-			$host_groups = call_user_func_array('array_intersect_key', $host_group_sources);
+
+		if ($host_groups_by_groupids !== null && $host_groups_by_hostids !== null) {
+			$host_groups = array_intersect_key($host_groups_by_hostids, $host_groups_by_groupids);
 		}
-		// if single selection source was used
-		elseif (array_key_exists(0, $host_group_sources)) {
-			$host_groups = $host_group_sources[0];
+		elseif ($host_groups_by_hostids !== null) {
+			$host_groups = $host_groups_by_hostids;
 		}
-		// if any selection was attempted
+		elseif ($host_groups_by_groupids !== null) {
+			$host_groups = $host_groups_by_groupids;
+		}
+		// if any selection attempt
 		if ($host_groups !== null) {
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', array_keys($host_groups)).' OR s.groupid IS NULL)';
 		}
