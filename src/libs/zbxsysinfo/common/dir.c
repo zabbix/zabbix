@@ -428,7 +428,27 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  ******************************************************************************/
 static BOOL	has_timed_out(HANDLE timeout_event)
 {
-	return WAIT_OBJECT_0 == WaitForSingleObject(timeout_event, 0) ? TRUE : FALSE;
+	DWORD rc;
+
+	rc = WaitForSingleObject(timeout_event, 0);
+
+	switch (rc)
+	{
+		case WAIT_OBJECT_0:
+			return TRUE;
+		case WAIT_TIMEOUT:
+			return FALSE;
+		case WAIT_FAILED:
+			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_FAILED: %s",
+					strerror_from_system(GetLastError()));
+			THIS_SHOULD_NEVER_HAPPEN;
+		case WAIT_ABANDONED:
+			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_ABANDONED");
+			THIS_SHOULD_NEVER_HAPPEN;
+		default:
+			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned unexpected error");
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
 }
 
 static int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *link_info, char **error)
