@@ -1470,9 +1470,18 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	if (TRUE == terminate_thread)
 	{
-		if (FALSE == TerminateThread(thread, 0))
+		if (FALSE != TerminateThread(thread, 0))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "TerminateThread() failed: %s", strerror_from_system(GetLastError()));
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] succeeded", __function_name,
+					request->key, (0 < request->nparam) ? request->params[0] : "",
+					(1 < request->nparam) ? ",..." : "");
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __function_name,
+					request->key, (0 < request->nparam) ? request->params[0] : "",
+					(1 < request->nparam) ? ",..." : "",
+					strerror_from_system(GetLastError()));
 		}
 	}
 
