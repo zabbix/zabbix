@@ -786,14 +786,20 @@ class CScript extends CApiService {
 		$host_groups_with_write_access = [];
 		$has_write_access_level = false;
 
-		$group_search = ['name' => []];
+		$group_search_names = [];
 		foreach ($result as $script) {
 			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
-			if ($script['groupid'] === '0') {
-				$group_search = null;
+
+			if ($group_search_names === null) {
 				continue;
 			}
-			$group_search['name'][] = $this->parent_host_groups[$script['groupid']]['name'];
+
+			if ($script['groupid'] === '0') {
+				$group_search_names = null;
+				continue;
+			}
+
+			$group_search_names[] = $this->parent_host_groups[$script['groupid']]['name'];
 		}
 
 		$select_groups = ['name', 'groupid'];
@@ -803,7 +809,7 @@ class CScript extends CApiService {
 
 		$host_groups = API::HostGroup()->get([
 			'output' => $select_groups,
-			'search' => $group_search,
+			'search' => $group_search_names ? ['name' => $group_search_names] : null,
 			'searchByAny' => true,
 			'startSearch' => true,
 			'preservekeys' => true
@@ -833,7 +839,7 @@ class CScript extends CApiService {
 
 		if ($is_hosts_select) {
 			$sql = 'SELECT hostid,groupid FROM hosts_groups';
-			if ($group_search !== null) {
+			if ($group_search_names !== null) {
 				$sql .= ' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
 			}
 			$db_group_hosts = DBSelect($sql);
