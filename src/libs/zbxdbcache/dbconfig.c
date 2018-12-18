@@ -836,7 +836,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
-#define SELECTED_FIELD_COUNT	27
+#define SELECTED_FIELD_COUNT	28
 
 	const char	*__function_name = "DCsync_config";
 	const ZBX_TABLE	*config_table;
@@ -847,7 +847,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode"};	/* sync with zbx_dbsync_compare_config() */
+					"default_inventory_mode", "db_extension"};	/* sync with zbx_dbsync_compare_config() */
 	const char	*row[SELECTED_FIELD_COUNT];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -911,6 +911,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
+	DCstrpool_replace(found, &config->config->db_extension, row[27]);
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -10240,6 +10241,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_HOUSEKEEPER))
 		cfg->hk = config->config->hk;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
+		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
@@ -10266,6 +10270,9 @@ void	zbx_config_clean(zbx_config_t *cfg)
 
 		zbx_free(cfg->severity_name);
 	}
+
+	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
+		zbx_free(cfg->db_extension);
 }
 
 /******************************************************************************

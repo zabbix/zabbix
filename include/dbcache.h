@@ -340,6 +340,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	char		*db_extension;
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
@@ -352,6 +353,10 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
 #define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
 #define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
+#define ZBX_CONFIG_FLAGS_DB_EXTENSION			0x00000040
+
+/* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
+#define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
 
 typedef struct
 {

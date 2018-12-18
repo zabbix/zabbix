@@ -52,7 +52,7 @@ my %postgresql = (
 
 my %timescaledb = %postgresql;
 $timescaledb{"after"} = <<EOF
-UPDATE config SET db_extension='timescaledb';
+UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
 COMMIT;
 EOF
 ;

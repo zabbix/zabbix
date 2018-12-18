@@ -164,7 +164,7 @@ my %postgresql = (
 );
 
 my %timescaledb = %postgresql;
-for ("history", "history_uint", "history_log", "history_text", "trends", "trends_uint")
+for ("history", "history_uint", "history_log", "history_text", "history_str", "trends", "trends_uint")
 {
 	$timescaledb{"after"} .= <<EOF
 SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400);

@@ -51,6 +51,13 @@ static int	DBpatch_4010002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4010003(void)
+{
+	const ZBX_FIELD	field = {"db_extension", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
 #endif
 
 DBPATCH_START(4010)
@@ -59,5 +66,6 @@ DBPATCH_START(4010)
 
 DBPATCH_ADD(4010001, 0, 1)
 DBPATCH_ADD(4010002, 0, 1)
+DBPATCH_ADD(4010003, 0, 1)
 
 DBPATCH_END()
