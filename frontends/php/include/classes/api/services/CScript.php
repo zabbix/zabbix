@@ -809,12 +809,10 @@ class CScript extends CApiService {
 			'preservekeys' => true
 		]);
 
-		if ($has_write_access_level) {
+		if ($has_write_access_level && $host_groups) {
 			$host_groups_with_write_access = API::HostGroup()->get([
 				'output' => $select_groups,
-				'search' => $group_search,
-				'searchByAny' => true,
-				'startSearch' => true,
+				'groupid' => array_keys($host_groups),
 				'preservekeys' => true,
 				'editable' => true
 			]);
