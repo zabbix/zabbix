@@ -997,6 +997,173 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		}
 	}
 
+	public static function getCustomOnFailValidationData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set value empty',
+					'key' => 'set-value-empty',
+					'custom_on_fail'=>[
+						['option' => 'Set value to', 'input'=>'']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set value number',
+					'key' => 'set-value-number',
+					'custom_on_fail'=>[
+						['option' => 'Set value to', 'input'=>'500']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set value string',
+					'key' => 'set-value-string',
+					'custom_on_fail'=>[
+						['option' => 'Set error to', 'input'=>'String']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set value special-symbols',
+					'key' => 'set-value-special-symbols',
+					'custom_on_fail'=>[
+						['option' => 'Set value to', 'input'=>'!@#$%^&*()_+<>,.\/']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Set error empty',
+					'key' => 'set-error-empty',
+					'custom_on_fail'=>[
+						['option' => 'Set error to', 'input'=>'']
+					],
+					'error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set error string',
+					'key' => 'set-error-string',
+					'custom_on_fail'=>[
+						['option' => 'Set error to', 'input'=>'Test error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set error number',
+					'key' => 'set-error-number',
+					'custom_on_fail'=>[
+						['option' => 'Set error to', 'input'=>'999']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Set error special symbols',
+					'key' => 'set-error-special-symbols',
+					'custom_on_fail'=>[
+						['option' => 'Set error to', 'input'=>'!@#$%^&*()_+<>,.\/']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCustomOnFailValidationData
+	 */
+	public function testFormItemPreprocessing_CustomOnFailValidation($data) {
+		$preprocessing = [
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'XML XPath', 'parameter_1' => '/xml/path'],
+						['type' => 'JSON Path', 'parameter_1' => '/json/path'],
+						['type' => 'Custom multiplier', 'parameter_1' => '5'],
+						['type' => 'Simple change'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'In range', 'parameter_1' => '-1', 'parameter_2' => '2'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'expression'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'not_expression'],
+					];
+
+		$dbRow = CDBHelper::getRow('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->host));
+		$hostid = $dbRow['hostid'];
+
+		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
+
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
+		$this->zbxTestTabSwitch('Preprocessing');
+
+		foreach ($preprocessing as $stepCount => $options) {
+			$this->zbxTestClickWait('param_add');
+			$this->zbxTestDropdownSelect('preprocessing_'.$stepCount.'_type', $options['type']);
+
+			if(array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)){
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['parameter_1']);
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_1', $options['parameter_2']);
+			}
+			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)){
+				$this->zbxTestInputType('preprocessing_'.$stepCount.'_params_0', $options['parameter_1']);
+			}
+
+			$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$stepCount.'_on_fail"][@type="checkbox"]');
+			$this->zbxTestClickWait('preprocessing_'.$stepCount.'_on_fail');
+
+
+			foreach ($data['custom_on_fail'] as $error_type) {
+				switch ($error_type['option']) {
+					case 'Set value to':
+						$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$stepCount.'_error_handler_1"]');
+						$this->zbxTestInputType('preprocessing_'.$stepCount.'_error_handler_params', $error_type['input']);
+						break;
+					case 'Set error to':
+						$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$stepCount.'_error_handler_2"]');
+						$this->zbxTestInputType('preprocessing_'.$stepCount.'_error_handler_params', $error_type['input']);
+						break;
+				}
+				break;
+			}
+		}
+		$this->zbxTestClickWait('add');
+
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
+				$this->zbxTestCheckFatalErrors();
+
+				$rowItem = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($data['key']));
+				$this->assertEquals($rowItem['name'], $data['name']);
+				$this->assertEquals($rowItem['key_'], $data['key']);
+				break;
+
+			case TEST_BAD:
+				$this->zbxTestCheckTitle('Configuration of items');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
+				$this->zbxTestTextPresent($data['error']);
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items where key_ = '.zbx_dbstr($data['key'])));
+				break;
+		}
+	}
+
 	/**
 	 * Check dropdowns and fields in saved form.
 	 *
