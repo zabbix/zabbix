@@ -41,7 +41,9 @@ class CSvgGraphLineGroup extends CSvgGroup {
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'order' => 1
 		];
-		$this->options['pointsize'] = $this->options['width'];
+
+		// Minimal point size is 3 to make single data points visible even for thin lines.
+		$this->options['pointsize'] = max($this->options['width'], 3);
 	}
 
 	public function makeStyles() {
