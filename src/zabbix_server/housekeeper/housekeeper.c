@@ -477,7 +477,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  * Purpose: prepares history housekeeping delete queue for the given history  *
  *          history rule if global housekeeping period is on                  *
  *                                                                            *
- * Parameters: rule   - [IN/OUT] the history housekeeping rule                    *
+ * Parameters: rule   - [IN/OUT] the history housekeeping rule                *
  *             now    - [IN] the current timestamp                            *
  *                                                                            *
  * Comments: This function also handles history rule initializing/releasing   *
