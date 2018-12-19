@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-19 15:56+0200\n"
+"POT-Creation-Date: 2018-12-19 18:13+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -59,8 +59,8 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr ""
 
-#: app/controllers/CControllerWidgetProblemsView.php:57
-#: include/classes/screens/CScreenHostTriggers.php:204
+#: app/controllers/CControllerWidgetProblemsView.php:58
+#: include/classes/screens/CScreenHostTriggers.php:205
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
@@ -178,14 +178,14 @@ msgid_plural "%1$s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/views/monitoring.widget.problems.view.php:239
+#: app/views/monitoring.widget.problems.view.php:241
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s widget"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:98
-#: app/views/monitoring.widget.problems.view.php:160
+#: app/views/monitoring.widget.problems.view.php:161
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
@@ -328,13 +328,13 @@ msgid_plural "Account is blocked for %1$s seconds."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/views/monitoring.widget.problems.view.php:61
+#: app/views/monitoring.widget.problems.view.php:62
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/blocks.inc.php:541
-#: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:848
-#: include/classes/screens/CScreenProblem.php:870
-#: include/classes/screens/CScreenProblem.php:1083 include/events.inc.php:250
+#: include/blocks.inc.php:558
+#: include/classes/screens/CScreenHostTriggers.php:243
+#: include/classes/screens/CScreenProblem.php:872
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:1111 include/events.inc.php:250
 #: include/events.inc.php:462 include/views/configuration.action.edit.php:1217
 msgid "Ack"
 msgstr "Потвърдено"
@@ -485,12 +485,12 @@ msgstr "Действие актуализирано"
 
 #: app/views/monitoring.dashboard.view.php:101
 #: app/views/monitoring.dashboard.view.php:105
-#: app/views/monitoring.widget.problems.view.php:62 include/blocks.inc.php:542
-#: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:849
-#: include/classes/screens/CScreenProblem.php:871
-#: include/classes/screens/CScreenProblem.php:1084
-#: include/classes/screens/CScreenProblem.php:1124 include/events.inc.php:251
+#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:559
+#: include/classes/screens/CScreenHostTriggers.php:243
+#: include/classes/screens/CScreenProblem.php:873
+#: include/classes/screens/CScreenProblem.php:896
+#: include/classes/screens/CScreenProblem.php:1112
+#: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:251
 #: include/menu.inc.php:215 include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
@@ -535,8 +535,8 @@ msgstr "Активно до"
 #: app/views/administration.script.edit.php:119
 #: app/views/dashboard.sharing.edit.php:28
 #: app/views/dashboard.sharing.edit.php:49
-#: app/views/monitoring.problem.view.php:209
-#: app/views/monitoring.problem.view.php:256 app/views/popup.httpstep.php:112
+#: app/views/monitoring.problem.view.php:210
+#: app/views/monitoring.problem.view.php:257 app/views/popup.httpstep.php:112
 #: app/views/popup.httpstep.php:161 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
@@ -754,12 +754,12 @@ msgstr "Администрация"
 msgid "Advanced labels"
 msgstr "Разширени етикети"
 
-#: include/classes/screens/CScreenHostTriggers.php:242
+#: include/classes/screens/CScreenHostTriggers.php:243
 #: include/events.inc.php:248
 msgid "Age"
 msgstr "Възраст"
 
-#: app/views/monitoring.problem.view.php:176
+#: app/views/monitoring.problem.view.php:177
 #: include/views/common.filter.trigger.php:68
 msgid "Age less than"
 msgstr "Възраст по-малка от"
@@ -823,7 +823,7 @@ msgstr ""
 #: app/views/administration.script.list.php:100
 #: app/views/administration.script.list.php:101
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:96
-#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:96
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:106
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.auditlogs.list.php:53
 #: include/views/administration.general.gui.edit.php:44
@@ -914,7 +914,7 @@ msgstr ""
 msgid "And"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:226
+#: app/views/monitoring.problem.view.php:227
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/views/configuration.action.edit.php:111
@@ -945,7 +945,7 @@ msgstr "Някой"
 msgid "Any character string included"
 msgstr "Всеки включващ символен низ"
 
-#: app/views/monitoring.problem.view.php:127 httpconf.php:40
+#: app/views/monitoring.problem.view.php:128 httpconf.php:40
 #: include/actions.inc.php:62 include/audit.inc.php:34
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
@@ -1459,11 +1459,11 @@ msgstr "По тригер шаблон "
 msgid "CERT"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:92
+#: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:946
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:945
-#: include/classes/screens/CScreenProblem.php:1106 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:970
+#: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
 #: include/events.inc.php:542
 msgid "CLOSING"
 msgstr ""
@@ -3261,7 +3261,7 @@ msgstr "Команди"
 msgid "Commercial"
 msgstr "Комерсиален"
 
-#: app/views/monitoring.problem.view.php:300
+#: app/views/monitoring.problem.view.php:301
 msgid "Compact view"
 msgstr ""
 
@@ -3605,7 +3605,7 @@ msgid "Contact"
 msgstr "Информация за контакти"
 
 #: app/views/monitoring.problem.view.js.php:21
-#: app/views/monitoring.problem.view.php:239
+#: app/views/monitoring.problem.view.php:240
 #: include/classes/widgets/CWidgetHelper.php:398
 #: include/classes/widgets/CWidgetHelper.php:444
 #: include/views/configuration.maintenance.edit.php:185
@@ -3624,7 +3624,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/monitoring.discovery.view.php:42
 #: app/views/monitoring.map.view.php:59
-#: app/views/monitoring.problem.view.php:354
+#: app/views/monitoring.problem.view.php:360
 #: app/views/monitoring.web.view.php:47 app/views/report.services.php:62
 #: httpdetails.php:92 include/classes/html/widget/CWidget.php:95
 #: include/views/administration.general.gui.edit.php:33
@@ -4768,7 +4768,7 @@ msgstr "Описание"
 msgid "Description updated"
 msgstr ""
 
-#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:419
+#: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
 #: include/func.inc.php:1885
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
@@ -5252,10 +5252,10 @@ msgstr ""
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:540
-#: include/classes/screens/CScreenProblem.php:847
-#: include/classes/screens/CScreenProblem.php:869
-#: include/classes/screens/CScreenProblem.php:1082 include/events.inc.php:249
+#: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:557
+#: include/classes/screens/CScreenProblem.php:871
+#: include/classes/screens/CScreenProblem.php:894
+#: include/classes/screens/CScreenProblem.php:1110 include/events.inc.php:249
 #: include/events.inc.php:461 include/views/configuration.action.edit.php:439
 msgid "Duration"
 msgstr "Продължителност"
@@ -5644,7 +5644,7 @@ msgid "English (en_US)"
 msgstr "Английски (US)"
 
 #: app/views/monitoring.problem.view.js.php:22
-#: app/views/monitoring.problem.view.php:240
+#: app/views/monitoring.problem.view.php:241
 #: include/classes/widgets/CWidgetHelper.php:399
 #: include/classes/widgets/CWidgetHelper.php:445
 #: include/views/configuration.maintenance.edit.php:186
@@ -5831,7 +5831,7 @@ msgstr "Разширено кръгова"
 msgid "Export"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:346
+#: app/views/monitoring.problem.view.php:352
 msgid "Export to CSV"
 msgstr "Експортиране в CSV"
 
@@ -6094,7 +6094,7 @@ msgstr "Запълване"
 #: app/views/administration.mediatype.list.php:37
 #: app/views/administration.proxy.list.php:37
 #: app/views/administration.script.list.php:37
-#: app/views/monitoring.problem.view.php:333
+#: app/views/monitoring.problem.view.php:339
 #: include/classes/html/CFilter.php:403
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
@@ -6251,7 +6251,7 @@ msgstr "Достъп до уеб интерфейс актуализиран"
 msgid "Frontend messaging"
 msgstr "Съобщения в уеб интерфейс"
 
-#: app/views/monitoring.problem.view.php:273
+#: app/views/monitoring.problem.view.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
 msgid "Full"
 msgstr ""
@@ -6363,6 +6363,7 @@ msgid "Gradient line"
 msgstr "Градиентна линия"
 
 #: charts.php:100 include/audit.inc.php:30
+#: include/classes/screens/CScreenProblem.php:1213
 #: include/classes/widgets/CWidgetConfig.php:46
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -6809,12 +6810,13 @@ msgstr ""
 msgid "High-contrast light"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:314
+#: app/views/monitoring.problem.view.php:315
 msgid "Highlight whole row"
 msgstr ""
 
 #: app/views/monitoring.acknowledge.edit.php:34
-#: app/views/monitoring.problem.view.php:92 history.php:27
+#: app/views/monitoring.problem.view.php:93 history.php:27
+#: include/classes/screens/CScreenProblem.php:1218
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:438 include/forms.inc.php:872
@@ -6874,19 +6876,19 @@ msgstr "Хоризонтално подравняване"
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
 #: app/views/popup.generic.php:137 httpconf.php:191 httpconf.php:492
 #: include/actions.inc.php:50 include/audit.inc.php:27
-#: include/blocks.inc.php:538 include/classes/screens/CScreenEvents.php:32
+#: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
-#: include/classes/screens/CScreenHostTriggers.php:185
+#: include/classes/screens/CScreenHostTriggers.php:186
 #: include/classes/screens/CScreenHttpTest.php:115
-#: include/classes/screens/CScreenProblem.php:843
 #: include/classes/screens/CScreenProblem.php:867
-#: include/classes/screens/CScreenProblem.php:1080
+#: include/classes/screens/CScreenProblem.php:891
+#: include/classes/screens/CScreenProblem.php:1108
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
-#: include/classes/widgets/forms/CWidgetFormProblems.php:190
-#: include/classes/widgets/forms/CWidgetFormProblems.php:191
+#: include/classes/widgets/forms/CWidgetFormProblems.php:200
+#: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/forms.inc.php:375 include/hostgroups.inc.php:251
 #: include/maps.inc.php:24 include/triggers.inc.php:1231
 #: include/views/configuration.application.list.php:35
@@ -6985,7 +6987,7 @@ msgstr[1] ""
 #: app/views/administration.script.list.php:61
 #: app/views/monitoring.widget.problemhosts.view.php:27
 #: app/views/monitoring.widget.web.view.php:26 include/actions.inc.php:48
-#: include/audit.inc.php:37 include/blocks.inc.php:325
+#: include/audit.inc.php:37 include/blocks.inc.php:340
 #: include/forms.inc.php:329 include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
@@ -7037,7 +7039,7 @@ msgid "Host group with ID \"%1$s\" is not available."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:100
-#: app/views/monitoring.problem.view.php:95
+#: app/views/monitoring.problem.view.php:96
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:31
@@ -7066,7 +7068,7 @@ msgstr "Информация за хостове"
 msgid "Host interface"
 msgstr "Хост интерфейс"
 
-#: app/views/monitoring.problem.view.php:281 hostinventories.php:27
+#: app/views/monitoring.problem.view.php:282 hostinventories.php:27
 #: include/views/common.filter.trigger.php:137
 #: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.prototype.edit.php:372
@@ -7214,7 +7216,7 @@ msgstr "Хост със същото видимо име \"%s\" вече същ�
 #: app/controllers/CControllerPopupGeneric.php:64
 #: app/controllers/CControllerPopupGeneric.php:88
 #: app/views/administration.proxy.list.php:72
-#: app/views/monitoring.problem.view.php:112
+#: app/views/monitoring.problem.view.php:113
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:49
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
@@ -8645,10 +8647,10 @@ msgstr "Индонезийски (id_ID)"
 #: app/views/monitoring.widget.actionlog.view.php:35
 #: app/views/monitoring.widget.problems.view.php:53
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/blocks.inc.php:537 include/classes/screens/CScreenActions.php:132
-#: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:842
+#: include/blocks.inc.php:553 include/classes/screens/CScreenActions.php:132
+#: include/classes/screens/CScreenHostTriggers.php:243
 #: include/classes/screens/CScreenProblem.php:866
+#: include/classes/screens/CScreenProblem.php:890
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.application.list.php:65
 #: include/views/configuration.host.discovery.list.php:60
@@ -9108,7 +9110,7 @@ msgstr "Режим на инвентарните данни"
 msgid "Is online?"
 msgstr "На линия ли е?"
 
-#: include/classes/screens/CScreenHostTriggers.php:186
+#: include/classes/screens/CScreenHostTriggers.php:187
 msgid "Issue"
 msgstr "Проблем"
 
@@ -9637,7 +9639,7 @@ msgstr "Последните 365 дни"
 msgid "Last 7 days"
 msgstr "Последните 7 дни"
 
-#: include/classes/screens/CScreenHostTriggers.php:187
+#: include/classes/screens/CScreenHostTriggers.php:188
 msgid "Last change"
 msgstr "Последна промяна"
 
@@ -9687,7 +9689,8 @@ msgstr "Графика за последната седмица"
 msgid "Latest data"
 msgstr "Последни данни"
 
-#: jsLoader.php:246
+#: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:556
+#: include/classes/screens/CScreenProblem.php:893 jsLoader.php:246
 msgid "Latest values"
 msgstr ""
 
@@ -10247,7 +10250,7 @@ msgstr "Маркирай избраните"
 msgid "Mask"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1067
+#: include/classes/screens/CScreenProblem.php:1095
 #: include/views/configuration.host.list.php:360
 #: include/views/configuration.item.list.php:291
 #: include/views/configuration.item.massupdate.php:717
@@ -10444,7 +10447,7 @@ msgstr "Време преди изключване на съобщенията"
 msgid "Message/Command"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1117
+#: include/classes/screens/CScreenProblem.php:1145
 msgid "Messages"
 msgstr "Съобщения"
 
@@ -10497,7 +10500,7 @@ msgid "Minimum required size of PHP post is %s (configuration option \"post_max_
 msgstr ""
 
 #: app/views/monitoring.map.view.php:39
-#: app/views/monitoring.problem.view.php:165
+#: app/views/monitoring.problem.view.php:166
 #: include/views/common.filter.trigger.php:57
 #: include/views/monitoring.sysmap.edit.php:219
 msgid "Minimum severity"
@@ -10917,12 +10920,12 @@ msgstr ""
 msgid "Next step"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:220
-#: include/actions.inc.php:33 include/blocks.inc.php:426
-#: include/blocks.inc.php:604
-#: include/classes/screens/CScreenHostTriggers.php:300
-#: include/classes/screens/CScreenProblem.php:1039
-#: include/classes/screens/CScreenProblem.php:1139 include/events.inc.php:176
+#: app/views/monitoring.widget.problems.view.php:222
+#: include/actions.inc.php:33 include/blocks.inc.php:441
+#: include/blocks.inc.php:621
+#: include/classes/screens/CScreenHostTriggers.php:301
+#: include/classes/screens/CScreenProblem.php:1064
+#: include/classes/screens/CScreenProblem.php:1167 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1268 include/triggers.inc.php:1273
 #: include/views/administration.users.list.php:111
@@ -11470,8 +11473,8 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:91
 #: app/views/administration.proxy.list.php:113
 #: app/views/administration.proxy.list.php:126
-#: app/views/monitoring.problem.view.php:264
-#: app/views/monitoring.problem.view.php:275
+#: app/views/monitoring.problem.view.php:265
+#: app/views/monitoring.problem.view.php:276
 #: include/classes/widgets/CWidgetHelper.php:644
 #: include/classes/widgets/CWidgetHelper.php:718
 #: include/classes/widgets/CWidgetHelper.php:986
@@ -11601,11 +11604,11 @@ msgstr ""
 msgid "Number of enabled items on the host."
 msgstr ""
 
-#: include/blocks.inc.php:430
+#: include/blocks.inc.php:445
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr ""
 
-#: include/blocks.inc.php:440
+#: include/blocks.inc.php:455
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr ""
 
@@ -11667,7 +11670,7 @@ msgstr "Брой на промените в състоянието"
 msgid "Number of steps"
 msgstr "Брой стъпки"
 
-#: include/blocks.inc.php:451
+#: include/blocks.inc.php:466
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr ""
 
@@ -11683,7 +11686,7 @@ msgstr ""
 msgid "Number of unsupported items on the host."
 msgstr ""
 
-#: include/blocks.inc.php:463
+#: include/blocks.inc.php:478
 msgid "Number of users (online)"
 msgstr "Брой на потребителите (на линия)"
 
@@ -11923,7 +11926,7 @@ msgstr ""
 msgid "Only administrators can set slide show owner."
 msgstr ""
 
-#: include/blocks.inc.php:441
+#: include/blocks.inc.php:456
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Преброени са само елементи на данните възложени за активни хостове"
 
@@ -11970,7 +11973,7 @@ msgstr ""
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr "Индикаторът показва само последните 20%%."
 
-#: include/blocks.inc.php:452
+#: include/blocks.inc.php:467
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Преброени са само тригерите възложени за активни хостове и зависими от активни елементи на данните"
 
@@ -12038,7 +12041,7 @@ msgstr "Оператор"
 msgid "Options"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:227
+#: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/triggers.inc.php:1332
@@ -12331,11 +12334,11 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: app/views/monitoring.widget.problems.view.php:92 chart5.php:199
+#: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:941
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:945
-#: include/classes/screens/CScreenProblem.php:1106 include/events.inc.php:340
+#: include/classes/screens/CScreenProblem.php:970
+#: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
 #: include/events.inc.php:542 include/maps.inc.php:438
 #: include/maps.inc.php:522 include/maps.inc.php:615 include/maps.inc.php:714
 #: include/triggers.inc.php:232 include/views/monitoring.overview.items.php:32
@@ -12384,7 +12387,7 @@ msgstr ""
 msgid "Page received incorrect data"
 msgstr "Страницата получи неверни данни"
 
-#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:419
+#: app/views/administration.mediatype.edit.php:104 include/blocks.inc.php:434
 msgid "Parameter"
 msgstr "Параметър"
 
@@ -12795,17 +12798,17 @@ msgstr "Файл с личен ключ"
 msgid "Privilege level"
 msgstr "Ниво на привилегия"
 
-#: app/views/monitoring.problem.view.php:162
-#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:539
-#: include/classes/screens/CScreenProblem.php:845
-#: include/classes/screens/CScreenProblem.php:868
-#: include/classes/screens/CScreenProblem.php:1006
-#: include/classes/screens/CScreenProblem.php:1081
+#: app/views/monitoring.problem.view.php:163
+#: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:555
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:1031
+#: include/classes/screens/CScreenProblem.php:1109
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:58
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:58
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
-#: include/classes/widgets/forms/CWidgetFormProblems.php:188
-#: include/classes/widgets/forms/CWidgetFormProblems.php:189
+#: include/classes/widgets/forms/CWidgetFormProblems.php:198
+#: include/classes/widgets/forms/CWidgetFormProblems.php:199
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
 #: include/views/configuration.item.list.php:183
 #: include/views/configuration.trigger.prototype.list.php:129
@@ -12820,7 +12823,7 @@ msgid "Problem created"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:95
-#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:95
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:105
 #: include/views/monitoring.sysmap.edit.php:211
 msgid "Problem display"
 msgstr "Показване на проблем"
@@ -12863,9 +12866,9 @@ msgstr "Проблем, ако всички деца имат проблеми"
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблем, ако най-малко едно дете има проблем"
 
-#: app/controllers/CControllerProblemView.php:348
-#: app/views/monitoring.problem.view.php:91
-#: app/views/monitoring.problem.view.php:338 app/views/report.services.php:66
+#: app/controllers/CControllerProblemView.php:354
+#: app/views/monitoring.problem.view.php:92
+#: app/views/monitoring.problem.view.php:344 app/views/report.services.php:66
 #: app/views/report.services.php:67 app/views/report.services.php:68
 #: app/views/report.services.php:69 chart4.php:168
 #: include/classes/widgets/CWidgetConfig.php:44
@@ -13015,11 +13018,11 @@ msgstr "Опашка"
 msgid "Queue of items to be updated"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:78
+#: app/views/monitoring.widget.problems.view.php:79
 #: include/classes/graph/CSvgGraph.php:937
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:931
-#: include/classes/screens/CScreenProblem.php:1094 include/events.inc.php:345
+#: include/classes/screens/CScreenProblem.php:956
+#: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
 #: include/events.inc.php:528
 msgid "RESOLVED"
 msgstr ""
@@ -13084,7 +13087,7 @@ msgstr "Причина"
 msgid "Received value"
 msgstr "Получената стойност"
 
-#: app/views/monitoring.problem.view.php:90
+#: app/views/monitoring.problem.view.php:91
 #: include/classes/widgets/forms/CWidgetFormProblems.php:34
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:32
 #: include/views/common.filter.trigger.php:37
@@ -13108,7 +13111,7 @@ msgstr "Получател (възходящ)"
 msgid "Recipient (descending)"
 msgstr "Получател (низходящ)"
 
-#: include/classes/screens/CScreenProblem.php:1007
+#: include/classes/screens/CScreenProblem.php:1032
 #: include/views/administration.users.edit.php:374
 #: include/views/configuration.item.list.php:184
 #: include/views/configuration.trigger.prototype.list.php:130
@@ -13136,9 +13139,9 @@ msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:51
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:840
-#: include/classes/screens/CScreenProblem.php:863
-#: include/classes/screens/CScreenProblem.php:1078 include/events.inc.php:246
+#: include/classes/screens/CScreenProblem.php:864
+#: include/classes/screens/CScreenProblem.php:887
+#: include/classes/screens/CScreenProblem.php:1106 include/events.inc.php:246
 #: include/events.inc.php:459
 msgid "Recovery time"
 msgstr ""
@@ -13231,8 +13234,8 @@ msgstr "Отдалечена команда"
 #: app/views/monitoring.dashboard.view.js.php:37
 #: app/views/monitoring.problem.view.js.php:6
 #: app/views/monitoring.problem.view.js.php:28
-#: app/views/monitoring.problem.view.php:199
-#: app/views/monitoring.problem.view.php:246 app/views/popup.media.php:41
+#: app/views/monitoring.problem.view.php:200
+#: app/views/monitoring.problem.view.php:247 app/views/popup.media.php:41
 #: app/views/popup.media.php:96 app/views/popup.triggerwizard.js.php:150
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
@@ -13447,7 +13450,7 @@ msgstr "Необходима производителност (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
-#: include/blocks.inc.php:467
+#: include/blocks.inc.php:482
 msgid "Required server performance, new values per second"
 msgstr "Необходима производителност на сървъра, нови стойности за секунда"
 
@@ -13497,29 +13500,29 @@ msgstr "Решено"
 msgid "Resolved by"
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:132
-#: include/classes/screens/CScreenHostTriggers.php:268
-#: include/classes/screens/CScreenProblem.php:962
+#: app/views/monitoring.widget.problems.view.php:133
+#: include/classes/screens/CScreenHostTriggers.php:269
+#: include/classes/screens/CScreenProblem.php:987
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr ""
 
-#: app/views/monitoring.widget.problems.view.php:135
-#: include/classes/screens/CScreenHostTriggers.php:271
-#: include/classes/screens/CScreenProblem.php:965
+#: app/views/monitoring.widget.problems.view.php:136
+#: include/classes/screens/CScreenHostTriggers.php:272
+#: include/classes/screens/CScreenProblem.php:990
 msgid "Resolved by correlation rule."
-msgstr ""
-
-#: app/views/monitoring.widget.problems.view.php:141
-#: include/classes/screens/CScreenHostTriggers.php:277
-#: include/classes/screens/CScreenProblem.php:971
-#, c-format
-msgid "Resolved by user \"%1$s\"."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:278
-#: include/classes/screens/CScreenProblem.php:972
+#: include/classes/screens/CScreenProblem.php:996
+#, c-format
+msgid "Resolved by user \"%1$s\"."
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:143
+#: include/classes/screens/CScreenHostTriggers.php:279
+#: include/classes/screens/CScreenProblem.php:997
 msgid "Resolved by user."
 msgstr ""
 
@@ -14160,7 +14163,7 @@ msgid "Security name"
 msgstr "Име на сигурност"
 
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:96
-#: app/views/monitoring.problem.view.php:131 app/views/popup.generic.php:642
+#: app/views/monitoring.problem.view.php:132 app/views/popup.generic.php:642
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
 #: app/views/popup.triggerwizard.php:131
 #: include/classes/html/CMultiSelect.php:70
@@ -14301,7 +14304,7 @@ msgid "Sep"
 msgstr "Сеп"
 
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:97
-#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:97
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:107
 #: include/views/monitoring.sysmap.edit.php:214
 msgid "Separated"
 msgstr "Разделен"
@@ -14466,14 +14469,14 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:144
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:259
-#: include/classes/screens/CScreenProblem.php:837
-#: include/classes/screens/CScreenProblem.php:859
-#: include/classes/screens/CScreenProblem.php:1076
+#: include/classes/screens/CScreenProblem.php:861
+#: include/classes/screens/CScreenProblem.php:883
+#: include/classes/screens/CScreenProblem.php:1104
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:67
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
-#: include/classes/widgets/forms/CWidgetFormProblems.php:186
-#: include/classes/widgets/forms/CWidgetFormProblems.php:187
+#: include/classes/widgets/forms/CWidgetFormProblems.php:196
+#: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:350
 #: include/events.inc.php:167 include/triggers.inc.php:1239
 #: include/views/configuration.item.list.php:149
@@ -14499,7 +14502,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1829
-#: include/classes/screens/CScreenProblem.php:1120
+#: include/classes/screens/CScreenProblem.php:1148
 msgid "Severity changes"
 msgstr ""
 
@@ -14540,12 +14543,12 @@ msgstr ""
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:274
+#: app/views/monitoring.problem.view.php:275
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
 msgid "Shortened"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:88
+#: app/views/monitoring.problem.view.php:89
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:188
@@ -14556,7 +14559,7 @@ msgstr ""
 msgid "Show"
 msgstr "Покажи"
 
-#: app/views/monitoring.problem.view.php:309 latest.php:392
+#: app/views/monitoring.problem.view.php:310 latest.php:392
 msgid "Show details"
 msgstr "Покажи детайли"
 
@@ -14568,6 +14571,12 @@ msgstr "Покажи хостове в поддръжка"
 msgid "Show items without data"
 msgstr "Покажи елементи на данните без данни"
 
+#: app/views/monitoring.problem.view.php:323
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:95
+#: include/classes/widgets/forms/CWidgetFormProblems.php:178
+msgid "Show latest values"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:274
 #: include/views/configuration.graph.edit.php:97
@@ -14576,7 +14585,7 @@ msgstr "Покажи легенда"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:48
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:55
-#: include/classes/widgets/forms/CWidgetFormProblems.php:221
+#: include/classes/widgets/forms/CWidgetFormProblems.php:231
 #: include/views/monitoring.screen.constructor.edit.php:456
 #: include/views/monitoring.screen.constructor.edit.php:551
 #: include/views/monitoring.screen.constructor.edit.php:571
@@ -14592,7 +14601,7 @@ msgstr ""
 msgid "Show selected"
 msgstr "Покажи избраните"
 
-#: app/views/monitoring.problem.view.php:290
+#: app/views/monitoring.problem.view.php:291
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:76
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
@@ -14605,7 +14614,7 @@ msgstr "Покажи избраните"
 msgid "Show suppressed problems"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:283
+#: app/views/monitoring.problem.view.php:284
 #: include/classes/widgets/forms/CWidgetFormProblems.php:116
 msgid "Show tags"
 msgstr ""
@@ -14615,9 +14624,9 @@ msgstr ""
 msgid "Show text as HTML"
 msgstr "Покажи текста като HTML"
 
-#: app/views/monitoring.problem.view.php:303
-#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:111
-#: include/classes/widgets/forms/CWidgetFormProblems.php:208
+#: app/views/monitoring.problem.view.php:304
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:121
+#: include/classes/widgets/forms/CWidgetFormProblems.php:218
 msgid "Show timeline"
 msgstr ""
 
@@ -14625,7 +14634,7 @@ msgstr ""
 msgid "Show triggers"
 msgstr "Покажи тригерите"
 
-#: app/views/monitoring.problem.view.php:294
+#: app/views/monitoring.problem.view.php:295
 #: include/classes/widgets/forms/CWidgetFormProblems.php:168
 msgid "Show unacknowledged only"
 msgstr ""
@@ -14844,7 +14853,7 @@ msgid "Software architecture information. Returns string"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:30
-#: include/classes/widgets/forms/CWidgetFormProblems.php:183
+#: include/classes/widgets/forms/CWidgetFormProblems.php:193
 #: include/views/monitoring.screen.constructor.edit.php:577
 msgid "Sort entries by"
 msgstr ""
@@ -14944,9 +14953,9 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:131
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:119
-#: include/classes/screens/CScreenProblem.php:841
 #: include/classes/screens/CScreenProblem.php:865
-#: include/classes/screens/CScreenProblem.php:1079
+#: include/classes/screens/CScreenProblem.php:889
+#: include/classes/screens/CScreenProblem.php:1107
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:247 include/events.inc.php:460
@@ -15251,7 +15260,7 @@ msgstr "Етикет"
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:284
+#: app/views/monitoring.problem.view.php:285
 #: include/classes/widgets/forms/CWidgetFormProblems.php:150
 msgid "Tag display priority"
 msgstr ""
@@ -15265,7 +15274,7 @@ msgstr ""
 msgid "Tag for matching"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:271
+#: app/views/monitoring.problem.view.php:272
 #: include/classes/widgets/forms/CWidgetFormProblems.php:136
 msgid "Tag name"
 msgstr ""
@@ -15274,11 +15283,11 @@ msgstr ""
 msgid "Tag value"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:282
-#: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:543
-#: include/classes/screens/CScreenProblem.php:819
-#: include/classes/screens/CScreenProblem.php:872
-#: include/classes/screens/CScreenProblem.php:1085
+#: app/views/monitoring.problem.view.php:283
+#: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:560
+#: include/classes/screens/CScreenProblem.php:843
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
 #: include/events.inc.php:235 include/events.inc.php:463
@@ -15659,15 +15668,15 @@ msgstr "До"
 #: app/views/popup.triggerexpr.php:128 app/views/popup.triggerexpr.php:132
 #: include/actions.inc.php:1775 include/actions.inc.php:1829
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
-#: include/actions.inc.php:2044 include/blocks.inc.php:520
+#: include/actions.inc.php:2044 include/blocks.inc.php:535
 #: include/classes/screens/CScreenActions.php:126
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:796
-#: include/classes/screens/CScreenProblem.php:1077
+#: include/classes/screens/CScreenProblem.php:820
+#: include/classes/screens/CScreenProblem.php:1105
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
-#: include/classes/widgets/forms/CWidgetFormProblems.php:184
-#: include/classes/widgets/forms/CWidgetFormProblems.php:185
+#: include/classes/widgets/forms/CWidgetFormProblems.php:194
+#: include/classes/widgets/forms/CWidgetFormProblems.php:195
 #: include/events.inc.php:171 include/events.inc.php:245
 #: include/events.inc.php:447 include/events.inc.php:453
 #: include/views/administration.auditacts.list.php:56
@@ -15748,7 +15757,7 @@ msgstr "Към"
 msgid "To set a host interface select a single item type for all items"
 msgstr "За да зададете интерфейс за хост изберете един тип елемент на данните за всички елементи на данните"
 
-#: include/classes/screens/CScreenProblem.php:682 include/func.inc.php:2681
+#: include/classes/screens/CScreenProblem.php:706 include/func.inc.php:2681
 #: srv_status.php:39
 msgid "Today"
 msgstr "Днеска"
@@ -16068,7 +16077,7 @@ msgid "Trigger updated"
 msgstr "Тригер актуализиран"
 
 #: app/controllers/CControllerPopupGeneric.php:136
-#: app/views/monitoring.problem.view.php:144 include/forms.inc.php:441
+#: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
 #: include/html.inc.php:388 include/triggers.inc.php:880
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
@@ -16332,7 +16341,7 @@ msgid "Unacknowledged RESOLVED events"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:98
-#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:98
+#: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:108
 #: include/views/monitoring.sysmap.edit.php:215
 msgid "Unacknowledged only"
 msgstr "Само непотвърдени"
@@ -17141,7 +17150,7 @@ msgstr ""
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
-#: include/blocks.inc.php:419 include/classes/graphdraw/CPieGraphDraw.php:343
+#: include/blocks.inc.php:434 include/classes/graphdraw/CPieGraphDraw.php:343
 #: include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHistory.php:264
 #: include/classes/screens/CScreenHistory.php:361
@@ -17713,12 +17722,12 @@ msgstr "Година"
 msgid "Yearly"
 msgstr "Ежегодно"
 
-#: app/views/monitoring.widget.problems.view.php:220
-#: include/actions.inc.php:32 include/blocks.inc.php:426
-#: include/blocks.inc.php:604
-#: include/classes/screens/CScreenHostTriggers.php:300
-#: include/classes/screens/CScreenProblem.php:1039
-#: include/classes/screens/CScreenProblem.php:1139 include/events.inc.php:176
+#: app/views/monitoring.widget.problems.view.php:222
+#: include/actions.inc.php:32 include/blocks.inc.php:441
+#: include/blocks.inc.php:621
+#: include/classes/screens/CScreenHostTriggers.php:301
+#: include/classes/screens/CScreenProblem.php:1064
+#: include/classes/screens/CScreenProblem.php:1167 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
 #: include/triggers.inc.php:1267 include/triggers.inc.php:1272
 #: include/views/administration.general.valuemapping.list.php:65
@@ -17732,7 +17741,7 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:690 include/func.inc.php:2675
+#: include/classes/screens/CScreenProblem.php:714 include/func.inc.php:2675
 msgid "Yesterday"
 msgstr ""
 
@@ -17911,7 +17920,7 @@ msgstr ""
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сървърът не работи: показаната информация може да не е актуална."
 
-#: include/blocks.inc.php:425
+#: include/blocks.inc.php:440
 msgid "Zabbix server is running"
 msgstr "Zabbix сървъра работи"
 
@@ -18091,10 +18100,10 @@ msgstr "като гервен"
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:34
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:38
-#: include/classes/widgets/forms/CWidgetFormProblems.php:185
-#: include/classes/widgets/forms/CWidgetFormProblems.php:187
-#: include/classes/widgets/forms/CWidgetFormProblems.php:189
-#: include/classes/widgets/forms/CWidgetFormProblems.php:191
+#: include/classes/widgets/forms/CWidgetFormProblems.php:195
+#: include/classes/widgets/forms/CWidgetFormProblems.php:197
+#: include/classes/widgets/forms/CWidgetFormProblems.php:199
+#: include/classes/widgets/forms/CWidgetFormProblems.php:201
 msgid "ascending"
 msgstr ""
 
@@ -18237,7 +18246,7 @@ msgstr ""
 msgid "colour"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:287
+#: app/views/monitoring.problem.view.php:288
 #: include/classes/widgets/views/widget.problems.form.view.php:92
 msgid "comma-separated list"
 msgstr ""
@@ -18276,7 +18285,7 @@ msgstr ""
 msgid "dayofweek() - Day of week"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:183
+#: app/views/monitoring.problem.view.php:184
 #: include/views/common.filter.trigger.php:75
 msgid "days"
 msgstr "дни"
@@ -18297,10 +18306,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:37
-#: include/classes/widgets/forms/CWidgetFormProblems.php:184
-#: include/classes/widgets/forms/CWidgetFormProblems.php:186
-#: include/classes/widgets/forms/CWidgetFormProblems.php:188
-#: include/classes/widgets/forms/CWidgetFormProblems.php:190
+#: include/classes/widgets/forms/CWidgetFormProblems.php:194
+#: include/classes/widgets/forms/CWidgetFormProblems.php:196
+#: include/classes/widgets/forms/CWidgetFormProblems.php:198
+#: include/classes/widgets/forms/CWidgetFormProblems.php:200
 msgid "descending"
 msgstr ""
 
@@ -18753,7 +18762,7 @@ msgid "number"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:116
-#: include/blocks.inc.php:392
+#: include/blocks.inc.php:407
 msgid "of"
 msgstr "на"
 
@@ -18954,7 +18963,7 @@ msgid "supplied credentials are not unique"
 msgstr ""
 
 #: app/views/monitoring.problem.view.js.php:18
-#: app/views/monitoring.problem.view.php:236
+#: app/views/monitoring.problem.view.php:237
 #: include/classes/api/services/CUserGroup.php:463
 #: include/classes/widgets/CWidgetHelper.php:393
 #: include/classes/widgets/CWidgetHelper.php:440
@@ -19102,7 +19111,7 @@ msgid "unsupported version number"
 msgstr ""
 
 #: app/views/monitoring.problem.view.js.php:25
-#: app/views/monitoring.problem.view.php:243
+#: app/views/monitoring.problem.view.php:244
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
