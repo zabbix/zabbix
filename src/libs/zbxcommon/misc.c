@@ -186,7 +186,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 			if (0 < last_tick.QuadPart)
 			{
-				LARGE_INTEGER	ntp_tick, qpc_diff_tick;
+				LARGE_INTEGER	ntp_tick, qpc_tick;
 				ntp_tick.QuadPart = (ts->sec - last_ts->sec + (ts->ns - last_ts->ns) / 1000000000)
 						* tickPerSecond.QuadPart;
 				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
