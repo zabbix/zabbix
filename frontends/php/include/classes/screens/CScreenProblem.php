@@ -1191,7 +1191,7 @@ class CScreenProblem extends CScreenBase {
 		foreach ($trigger_items as $itemid => $item) {
 			if (array_key_exists($itemid, $history_values)) {
 				$last_value = reset($history_values[$itemid]);
-				$last_value['value'] = formatHistoryValue($last_value['value'], $item, false);
+				$last_value['value'] = formatHistoryValue($last_value['value'], $item, true);
 			}
 			else {
 				$last_value = [
