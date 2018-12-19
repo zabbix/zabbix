@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-19 15:54+0200\n"
+"POT-Creation-Date: 2018-12-04 09:18+0200\n"
 "PO-Revision-Date: 2018-11-30 09:25+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -274,7 +274,7 @@ msgstr "1 minúta"
 msgid "10 seconds"
 msgstr "10 sekúnd"
 
-#: include/views/reports.toptriggers.php:113 toptriggers.php:26
+#: include/views/reports.toptriggers.php:112 toptriggers.php:26
 msgid "100 busiest triggers"
 msgstr "100 najčastejších spúšťačov"
 
@@ -306,7 +306,7 @@ msgstr "<manuálne>"
 msgid "<sub-menu/sub-menu/...>script"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:663
+#: include/classes/widgets/CWidgetHelper.php:662
 msgid "ADD OVERRIDE"
 msgstr ""
 
@@ -554,12 +554,12 @@ msgstr "Aktívny do"
 #: app/views/administration.script.edit.php:119
 #: app/views/dashboard.sharing.edit.php:28
 #: app/views/dashboard.sharing.edit.php:49
-#: app/views/monitoring.problem.view.php:209
-#: app/views/monitoring.problem.view.php:256 app/views/popup.httpstep.php:112
+#: app/views/monitoring.problem.view.php:208
+#: app/views/monitoring.problem.view.php:255 app/views/popup.httpstep.php:112
 #: app/views/popup.httpstep.php:157 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
-#: include/classes/widgets/CWidgetHelper.php:420
+#: include/classes/widgets/CWidgetHelper.php:419
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
 #: include/views/administration.general.iconmap.edit.php:142
@@ -705,7 +705,7 @@ msgstr "Pridať hosta"
 msgid "Add multiple maps"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1064
+#: include/classes/widgets/CWidgetHelper.php:1063
 msgid "Add new data set"
 msgstr ""
 
@@ -717,7 +717,7 @@ msgstr "Pridať novú alebo existujúcu aplikáciu"
 msgid "Add new or existing host groups"
 msgstr "Pridať novú alebo existujúcu skupinu zariadení"
 
-#: include/classes/widgets/CWidgetHelper.php:618
+#: include/classes/widgets/CWidgetHelper.php:617
 msgid "Add new override"
 msgstr ""
 
@@ -778,7 +778,7 @@ msgstr "Rozšírené poznámky"
 msgid "Age"
 msgstr "Trvanie"
 
-#: app/views/monitoring.problem.view.php:176
+#: app/views/monitoring.problem.view.php:175
 #: include/views/common.filter.trigger.php:68
 msgid "Age less than"
 msgstr "Trvanie menšie ako"
@@ -933,7 +933,7 @@ msgstr "Eventuálne to môžete napísať manuálne:"
 msgid "And"
 msgstr "A"
 
-#: app/views/monitoring.problem.view.php:226
+#: app/views/monitoring.problem.view.php:225
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/views/configuration.action.edit.php:111
@@ -964,7 +964,7 @@ msgstr "Akékoľvek"
 msgid "Any character string included"
 msgstr "Obsahuje ktorýkoľvek reťazec"
 
-#: app/views/monitoring.problem.view.php:127 httpconf.php:40
+#: app/views/monitoring.problem.view.php:126 httpconf.php:40
 #: include/actions.inc.php:60 include/audit.inc.php:34
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
@@ -1369,8 +1369,8 @@ msgstr "Obrázok pozadia"
 msgid "Base DN"
 msgstr "Koreňový DN"
 
-#: include/classes/widgets/CWidgetHelper.php:665
-#: include/classes/widgets/CWidgetHelper.php:930
+#: include/classes/widgets/CWidgetHelper.php:664
+#: include/classes/widgets/CWidgetHelper.php:929
 msgid "Base colour"
 msgstr ""
 
@@ -3242,7 +3242,7 @@ msgid "Close problem"
 msgstr ""
 
 #: include/classes/html/CCollapsibleUiWidget.php:50
-#: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:205
+#: include/classes/widgets/CWidgetHelper.php:869 jsLoader.php:205
 #: jsLoader.php:210
 msgid "Collapse"
 msgstr "Zavrieť"
@@ -3306,7 +3306,7 @@ msgstr "Príkazy"
 msgid "Commercial"
 msgstr "Komerčné"
 
-#: app/views/monitoring.problem.view.php:300
+#: app/views/monitoring.problem.view.php:299
 msgid "Compact view"
 msgstr ""
 
@@ -3562,9 +3562,9 @@ msgstr "Gratulácia! Práve ste úspešne nainštalovali Zabbix frontend."
 msgid "Connect to"
 msgstr "Pripojiť k"
 
-#: include/classes/widgets/CWidgetHelper.php:645
-#: include/classes/widgets/CWidgetHelper.php:719
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:644
+#: include/classes/widgets/CWidgetHelper.php:718
+#: include/classes/widgets/CWidgetHelper.php:986
 msgctxt "missing data function"
 msgid "Connected"
 msgstr ""
@@ -3649,9 +3649,9 @@ msgid "Contact"
 msgstr "Kontakt"
 
 #: app/views/monitoring.problem.view.js.php:21
-#: app/views/monitoring.problem.view.php:239
-#: include/classes/widgets/CWidgetHelper.php:398
-#: include/classes/widgets/CWidgetHelper.php:444
+#: app/views/monitoring.problem.view.php:238
+#: include/classes/widgets/CWidgetHelper.php:397
+#: include/classes/widgets/CWidgetHelper.php:443
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/configuration.maintenance.edit.php:206
 #: include/views/configuration.triggers.list.php:86
@@ -3668,7 +3668,7 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/monitoring.discovery.view.php:42
 #: app/views/monitoring.map.view.php:59
-#: app/views/monitoring.problem.view.php:354
+#: app/views/monitoring.problem.view.php:353
 #: app/views/monitoring.web.view.php:47 app/views/report.services.php:62
 #: httpdetails.php:92 include/classes/html/widget/CWidget.php:95
 #: include/views/administration.general.gui.edit.php:33
@@ -4419,8 +4419,8 @@ msgstr "Oneskorené o"
 #: app/views/monitoring.dashboard.list.php:76
 #: app/views/monitoring.dashboard.view.php:123
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:556
-#: include/classes/widgets/CWidgetHelper.php:917 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:555
+#: include/classes/widgets/CWidgetHelper.php:916 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.edit.php:108
@@ -5189,11 +5189,11 @@ msgstr "Stiahnuť konfiguračný súbor"
 msgid "Downtime"
 msgstr "Prestoj"
 
-#: include/classes/widgets/CWidgetHelper.php:636
+#: include/classes/widgets/CWidgetHelper.php:635
+#: include/classes/widgets/CWidgetHelper.php:678
 #: include/classes/widgets/CWidgetHelper.php:679
 #: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:681
-#: include/classes/widgets/CWidgetHelper.php:934
+#: include/classes/widgets/CWidgetHelper.php:933
 msgid "Draw"
 msgstr ""
 
@@ -5693,9 +5693,9 @@ msgid "English (en_US)"
 msgstr "Anglicky (en_US)"
 
 #: app/views/monitoring.problem.view.js.php:22
-#: app/views/monitoring.problem.view.php:240
-#: include/classes/widgets/CWidgetHelper.php:399
-#: include/classes/widgets/CWidgetHelper.php:445
+#: app/views/monitoring.problem.view.php:239
+#: include/classes/widgets/CWidgetHelper.php:398
+#: include/classes/widgets/CWidgetHelper.php:444
 #: include/views/configuration.maintenance.edit.php:186
 #: include/views/configuration.maintenance.edit.php:207
 #: include/views/configuration.triggers.list.php:87
@@ -5844,7 +5844,7 @@ msgid "Execution confirmation"
 msgstr "Potvrdenie vykonania"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:206
+#: include/classes/widgets/CWidgetHelper.php:869 jsLoader.php:206
 #: jsLoader.php:209
 msgid "Expand"
 msgstr "Rozbaliť"
@@ -5880,7 +5880,7 @@ msgstr "Koláčový"
 msgid "Export"
 msgstr "Export"
 
-#: app/views/monitoring.problem.view.php:346
+#: app/views/monitoring.problem.view.php:345
 msgid "Export to CSV"
 msgstr "Export do CSV súboru"
 
@@ -6120,7 +6120,8 @@ msgstr "Veľkosť súboru (v bytoch). Vráti celé číslo"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Informácie o čase súboru. Vráti celé číslo (Unix časová pečiatka)"
 
-#: include/classes/widgets/CWidgetHelper.php:641
+#: include/classes/widgets/CWidgetHelper.php:640
+#: include/classes/widgets/CWidgetHelper.php:694
 #: include/classes/widgets/CWidgetHelper.php:695
 #: include/classes/widgets/CWidgetHelper.php:696
 #: include/classes/widgets/CWidgetHelper.php:697
@@ -6131,8 +6132,7 @@ msgstr "Informácie o čase súboru. Vráti celé číslo (Unix časová pečiat
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:705
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:966
 msgid "Fill"
 msgstr ""
 
@@ -6143,7 +6143,7 @@ msgstr "Oblasť výplne"
 #: app/views/administration.mediatype.list.php:37
 #: app/views/administration.proxy.list.php:37
 #: app/views/administration.script.list.php:37
-#: app/views/monitoring.problem.view.php:333
+#: app/views/monitoring.problem.view.php:332
 #: include/classes/html/CFilter.php:403
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
@@ -6168,7 +6168,7 @@ msgstr "Oblasť výplne"
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
 #: include/views/monitoring.sysmap.list.php:40
-#: include/views/reports.toptriggers.php:76 latest.php:338 report2.php:425
+#: include/views/reports.toptriggers.php:75 latest.php:338 report2.php:425
 msgid "Filter"
 msgstr "Filtrovať"
 
@@ -6300,7 +6300,7 @@ msgstr "Frontend prístup aktualizovaný"
 msgid "Frontend messaging"
 msgstr "Povoliť frontend správy"
 
-#: app/views/monitoring.problem.view.php:273
+#: app/views/monitoring.problem.view.php:272
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
 msgid "Full"
 msgstr ""
@@ -6855,7 +6855,7 @@ msgstr ""
 msgid "High-contrast light"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:314
+#: app/views/monitoring.problem.view.php:313
 msgid "Highlight whole row"
 msgstr ""
 
@@ -6957,7 +6957,7 @@ msgstr "Vodorovné zarovnanie"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:81
-#: include/views/reports.toptriggers.php:79 items.php:900 items.php:1273
+#: include/views/reports.toptriggers.php:78 items.php:900 items.php:1273
 #: jsLoader.php:165 latest.php:421 latest.php:438 queue.php:254
 #: report2.php:409 report2.php:431 search.php:125
 msgid "Host"
@@ -7115,7 +7115,7 @@ msgstr "Info o hostovi"
 msgid "Host interface"
 msgstr "Rozhranie hosta"
 
-#: app/views/monitoring.problem.view.php:281 hostinventories.php:27
+#: app/views/monitoring.problem.view.php:280 hostinventories.php:27
 #: include/views/common.filter.trigger.php:137
 #: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.prototype.edit.php:372
@@ -7265,7 +7265,7 @@ msgstr "Host s rovnakým zobrazovaným menom\"%s\" už existuje."
 #: app/controllers/CControllerPopupGeneric.php:64
 #: app/controllers/CControllerPopupGeneric.php:88
 #: app/views/administration.proxy.list.php:72
-#: app/views/monitoring.problem.view.php:112
+#: app/views/monitoring.problem.view.php:111
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:49
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
@@ -7282,7 +7282,7 @@ msgstr "Host s rovnakým zobrazovaným menom\"%s\" už existuje."
 #: include/views/configuration.host.list.php:25
 #: include/views/configuration.host.massupdate.php:24
 #: include/views/configuration.maintenance.edit.php:251
-#: include/views/conf.import.php:29 include/views/reports.toptriggers.php:51
+#: include/views/conf.import.php:29 include/views/reports.toptriggers.php:50
 #: latest.php:356 search.php:254 search.php:292 search.php:309 search.php:314
 #: search.php:330
 msgid "Hosts"
@@ -8405,7 +8405,7 @@ msgstr "Nesprávne user group ID špecifikované pre obrazovku \"%1$s\"."
 msgid "Incorrect user group."
 msgstr "Neplatná používateľská skupina."
 
-#: app/controllers/CControllerPopupGeneric.php:387
+#: app/controllers/CControllerPopupGeneric.php:386
 #: include/classes/api/services/CAction.php:748
 #: include/classes/api/services/CAction.php:791
 #: include/classes/api/services/CAction.php:865
@@ -9750,9 +9750,9 @@ msgstr "Posledné hodnoty"
 msgid "Latvian (lv_LV)"
 msgstr "Litovsky (lv_LV)"
 
-#: include/classes/widgets/CWidgetHelper.php:648
-#: include/classes/widgets/CWidgetHelper.php:722
-#: include/classes/widgets/CWidgetHelper.php:998
+#: include/classes/widgets/CWidgetHelper.php:647
+#: include/classes/widgets/CWidgetHelper.php:721
+#: include/classes/widgets/CWidgetHelper.php:997
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9784,9 +9784,9 @@ msgstr ""
 msgid "Limit for search and filter results"
 msgstr "Obmedzenie počtu položiek pre vyhľadávanie/filter"
 
-#: include/classes/widgets/CWidgetHelper.php:637
-#: include/classes/widgets/CWidgetHelper.php:679
-#: include/classes/widgets/CWidgetHelper.php:936 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:636
+#: include/classes/widgets/CWidgetHelper.php:678
+#: include/classes/widgets/CWidgetHelper.php:935 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:304
 #: include/views/js/monitoring.sysmaps.js.php:353
 #: include/views/js/monitoring.sysmaps.js.php:699
@@ -10549,7 +10549,7 @@ msgid "Minimum required size of PHP post is %s (configuration option \"post_max_
 msgstr "Minimálna požadovaná velkosť PHP postov je %s (nastavenie \"post_max_size\")."
 
 #: app/views/monitoring.map.view.php:39
-#: app/views/monitoring.problem.view.php:165
+#: app/views/monitoring.problem.view.php:164
 #: include/views/common.filter.trigger.php:57
 #: include/views/monitoring.sysmap.edit.php:219
 msgid "Minimum severity"
@@ -10592,11 +10592,11 @@ msgstr "Chýbajúce pole \"name\" pre prototyp grafu."
 msgid "Missing \"name\" field for graph."
 msgstr "Chýbajúce pole \"name\" pre graf."
 
-#: include/classes/widgets/CWidgetHelper.php:643
+#: include/classes/widgets/CWidgetHelper.php:642
+#: include/classes/widgets/CWidgetHelper.php:717
 #: include/classes/widgets/CWidgetHelper.php:718
 #: include/classes/widgets/CWidgetHelper.php:719
-#: include/classes/widgets/CWidgetHelper.php:720
-#: include/classes/widgets/CWidgetHelper.php:982
+#: include/classes/widgets/CWidgetHelper.php:981
 msgid "Missing data"
 msgstr ""
 
@@ -11523,11 +11523,11 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:89
 #: app/views/administration.proxy.list.php:113
 #: app/views/administration.proxy.list.php:126
-#: app/views/monitoring.problem.view.php:264
-#: app/views/monitoring.problem.view.php:275
-#: include/classes/widgets/CWidgetHelper.php:644
-#: include/classes/widgets/CWidgetHelper.php:718
-#: include/classes/widgets/CWidgetHelper.php:986
+#: app/views/monitoring.problem.view.php:263
+#: app/views/monitoring.problem.view.php:274
+#: include/classes/widgets/CWidgetHelper.php:643
+#: include/classes/widgets/CWidgetHelper.php:717
+#: include/classes/widgets/CWidgetHelper.php:985
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -11711,7 +11711,7 @@ msgstr ""
 msgid "Number of slides"
 msgstr "Počet slajdov"
 
-#: include/views/reports.toptriggers.php:79
+#: include/views/reports.toptriggers.php:78
 msgid "Number of status changes"
 msgstr "Počet zmien stavu"
 
@@ -12092,7 +12092,7 @@ msgstr "Operátor"
 msgid "Options"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:227
+#: app/views/monitoring.problem.view.php:226
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/triggers.inc.php:1332
@@ -12669,7 +12669,8 @@ msgstr "Označte prosím dva elementy"
 msgid "Please specify element name."
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:642
+#: include/classes/widgets/CWidgetHelper.php:641
+#: include/classes/widgets/CWidgetHelper.php:706
 #: include/classes/widgets/CWidgetHelper.php:707
 #: include/classes/widgets/CWidgetHelper.php:708
 #: include/classes/widgets/CWidgetHelper.php:709
@@ -12679,14 +12680,13 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:713
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
-#: include/classes/widgets/CWidgetHelper.php:716
-#: include/classes/widgets/CWidgetHelper.php:950
+#: include/classes/widgets/CWidgetHelper.php:949
 msgid "Point size"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:638
-#: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:937
+#: include/classes/widgets/CWidgetHelper.php:637
+#: include/classes/widgets/CWidgetHelper.php:679
+#: include/classes/widgets/CWidgetHelper.php:936
 #: include/views/js/monitoring.sysmaps.js.php:373
 msgid "Points"
 msgstr ""
@@ -12847,7 +12847,7 @@ msgstr "Súbor so súkromným kľúčom"
 msgid "Privilege level"
 msgstr "Úroveň oprávnenia"
 
-#: app/views/monitoring.problem.view.php:162
+#: app/views/monitoring.problem.view.php:161
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:539
 #: include/classes/screens/CScreenProblem.php:845
 #: include/classes/screens/CScreenProblem.php:868
@@ -12917,7 +12917,7 @@ msgstr "Problém, ak najmenej jeden podriadený má problém"
 
 #: app/controllers/CControllerProblemView.php:348
 #: app/views/monitoring.problem.view.php:91
-#: app/views/monitoring.problem.view.php:338 app/views/report.services.php:66
+#: app/views/monitoring.problem.view.php:337 app/views/report.services.php:66
 #: app/views/report.services.php:67 app/views/report.services.php:68
 #: app/views/report.services.php:69 chart4.php:168
 #: include/classes/widgets/CWidgetConfig.php:44
@@ -13285,13 +13285,13 @@ msgstr "Vzdialený príkaz"
 #: app/views/monitoring.dashboard.view.js.php:37
 #: app/views/monitoring.problem.view.js.php:6
 #: app/views/monitoring.problem.view.js.php:28
-#: app/views/monitoring.problem.view.php:199
-#: app/views/monitoring.problem.view.php:246 app/views/popup.media.php:41
+#: app/views/monitoring.problem.view.php:198
+#: app/views/monitoring.problem.view.php:245 app/views/popup.media.php:41
 #: app/views/popup.media.php:96 app/views/popup.triggerwizard.js.php:150
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
-#: include/classes/widgets/CWidgetHelper.php:408
-#: include/classes/widgets/CWidgetHelper.php:452
+#: include/classes/widgets/CWidgetHelper.php:407
+#: include/classes/widgets/CWidgetHelper.php:451
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
 #: include/views/administration.general.regularexpressions.edit.php:77
@@ -13666,9 +13666,9 @@ msgstr "Vráti informácie príslušné k Zabbix Java gateway. Platné parametre
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí percento stratených ICMP ping paketov."
 
-#: include/classes/widgets/CWidgetHelper.php:649
-#: include/classes/widgets/CWidgetHelper.php:723
-#: include/classes/widgets/CWidgetHelper.php:999
+#: include/classes/widgets/CWidgetHelper.php:648
+#: include/classes/widgets/CWidgetHelper.php:722
+#: include/classes/widgets/CWidgetHelper.php:998
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:122
@@ -14218,16 +14218,16 @@ msgid "Security name"
 msgstr "Bezpečnostné meno"
 
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:96
-#: app/views/monitoring.problem.view.php:131 app/views/popup.generic.php:642
+#: app/views/monitoring.problem.view.php:130 app/views/popup.generic.php:642
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
 #: app/views/popup.triggerwizard.php:131
 #: include/classes/html/CMultiSelect.php:70
 #: include/classes/widgets/CWidgetHelper.php:155
-#: include/classes/widgets/CWidgetHelper.php:285
-#: include/classes/widgets/CWidgetHelper.php:512
-#: include/classes/widgets/CWidgetHelper.php:533
-#: include/classes/widgets/CWidgetHelper.php:877
-#: include/classes/widgets/CWidgetHelper.php:896 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:284
+#: include/classes/widgets/CWidgetHelper.php:511
+#: include/classes/widgets/CWidgetHelper.php:532
+#: include/classes/widgets/CWidgetHelper.php:876
+#: include/classes/widgets/CWidgetHelper.php:895 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:88
@@ -14542,8 +14542,8 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:32
 #: include/views/configuration.triggers.list.php:166
 #: include/views/configuration.triggers.massupdate.php:45
-#: include/views/reports.toptriggers.php:66
-#: include/views/reports.toptriggers.php:79
+#: include/views/reports.toptriggers.php:65
+#: include/views/reports.toptriggers.php:78
 msgid "Severity"
 msgstr "Závažnosť"
 
@@ -14598,7 +14598,7 @@ msgstr "Chýbajúce zdieľanie \"%1$s\" v hodnote pre mapu \"%2$s\"."
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
 msgstr "Nastavenie zdieľania \"%1$s\" chýba pre obrazovku \"%2$s\"."
 
-#: app/views/monitoring.problem.view.php:274
+#: app/views/monitoring.problem.view.php:273
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
 msgid "Shortened"
 msgstr ""
@@ -14614,7 +14614,7 @@ msgstr ""
 msgid "Show"
 msgstr "Zobraziť"
 
-#: app/views/monitoring.problem.view.php:309 latest.php:392
+#: app/views/monitoring.problem.view.php:308 latest.php:392
 msgid "Show details"
 msgstr "Zobraziť podrobnosti"
 
@@ -14650,7 +14650,7 @@ msgstr ""
 msgid "Show selected"
 msgstr "Zobraziť označené"
 
-#: app/views/monitoring.problem.view.php:290
+#: app/views/monitoring.problem.view.php:289
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:76
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
@@ -14663,7 +14663,7 @@ msgstr "Zobraziť označené"
 msgid "Show suppressed problems"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:283
+#: app/views/monitoring.problem.view.php:282
 #: include/classes/widgets/forms/CWidgetFormProblems.php:116
 msgid "Show tags"
 msgstr ""
@@ -14673,7 +14673,7 @@ msgstr ""
 msgid "Show text as HTML"
 msgstr "Zobraziť text ako HTML"
 
-#: app/views/monitoring.problem.view.php:303
+#: app/views/monitoring.problem.view.php:302
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:111
 #: include/classes/widgets/forms/CWidgetFormProblems.php:208
 msgid "Show timeline"
@@ -14683,7 +14683,7 @@ msgstr ""
 msgid "Show triggers"
 msgstr "Zobraziť spúšťače"
 
-#: app/views/monitoring.problem.view.php:294
+#: app/views/monitoring.problem.view.php:293
 #: include/classes/widgets/forms/CWidgetFormProblems.php:168
 msgid "Show unacknowledged only"
 msgstr ""
@@ -14955,9 +14955,9 @@ msgstr "Rýchlosť"
 msgid "Stacked"
 msgstr "Skladaný"
 
-#: include/classes/widgets/CWidgetHelper.php:639
-#: include/classes/widgets/CWidgetHelper.php:681
-#: include/classes/widgets/CWidgetHelper.php:938
+#: include/classes/widgets/CWidgetHelper.php:638
+#: include/classes/widgets/CWidgetHelper.php:680
+#: include/classes/widgets/CWidgetHelper.php:937
 msgid "Staircase"
 msgstr ""
 
@@ -15309,7 +15309,7 @@ msgstr "Označenie"
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:284
+#: app/views/monitoring.problem.view.php:283
 #: include/classes/widgets/forms/CWidgetFormProblems.php:150
 msgid "Tag display priority"
 msgstr ""
@@ -15323,7 +15323,7 @@ msgstr ""
 msgid "Tag for matching"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:271
+#: app/views/monitoring.problem.view.php:270
 #: include/classes/widgets/forms/CWidgetFormProblems.php:136
 msgid "Tag name"
 msgstr ""
@@ -15332,7 +15332,7 @@ msgstr ""
 msgid "Tag value"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:282
+#: app/views/monitoring.problem.view.php:281
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:543
 #: include/classes/screens/CScreenProblem.php:819
 #: include/classes/screens/CScreenProblem.php:872
@@ -15764,9 +15764,9 @@ msgstr "Časová perióda"
 #: app/controllers/CControllerPopupTriggerExpr.php:147
 #: app/controllers/CControllerPopupTriggerExpr.php:160
 #: app/controllers/CControllerPopupTriggerExpr.php:186
-#: include/classes/widgets/CWidgetHelper.php:650
-#: include/classes/widgets/CWidgetHelper.php:725
-#: include/classes/widgets/CWidgetHelper.php:1002
+#: include/classes/widgets/CWidgetHelper.php:649
+#: include/classes/widgets/CWidgetHelper.php:724
+#: include/classes/widgets/CWidgetHelper.php:1001
 msgid "Time shift"
 msgstr "Časový posun"
 
@@ -15858,7 +15858,8 @@ msgstr "Operácia nebola ukončená. Ukončujem ju..."
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Zmeň výstup SQL dotazu na JSON objekt pre nízko úrovňové zisťovanie."
 
-#: include/classes/widgets/CWidgetHelper.php:640
+#: include/classes/widgets/CWidgetHelper.php:639
+#: include/classes/widgets/CWidgetHelper.php:682
 #: include/classes/widgets/CWidgetHelper.php:683
 #: include/classes/widgets/CWidgetHelper.php:684
 #: include/classes/widgets/CWidgetHelper.php:685
@@ -15869,8 +15870,7 @@ msgstr "Zmeň výstup SQL dotazu na JSON objekt pre nízko úrovňové zisťovan
 #: include/classes/widgets/CWidgetHelper.php:690
 #: include/classes/widgets/CWidgetHelper.php:691
 #: include/classes/widgets/CWidgetHelper.php:692
-#: include/classes/widgets/CWidgetHelper.php:693
-#: include/classes/widgets/CWidgetHelper.php:958
+#: include/classes/widgets/CWidgetHelper.php:957
 msgid "Transparency"
 msgstr ""
 
@@ -15878,9 +15878,9 @@ msgstr ""
 msgid "Transport error."
 msgstr "Prenosová chyba."
 
-#: include/classes/widgets/CWidgetHelper.php:646
-#: include/classes/widgets/CWidgetHelper.php:720
-#: include/classes/widgets/CWidgetHelper.php:990
+#: include/classes/widgets/CWidgetHelper.php:645
+#: include/classes/widgets/CWidgetHelper.php:719
+#: include/classes/widgets/CWidgetHelper.php:989
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
@@ -15921,7 +15921,7 @@ msgstr "Trendy"
 #: include/views/configuration.triggers.edit.php:582
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:711
-#: include/views/reports.toptriggers.php:79 jsLoader.php:167 jsLoader.php:255
+#: include/views/reports.toptriggers.php:78 jsLoader.php:167 jsLoader.php:255
 #: services.php:354
 msgid "Trigger"
 msgstr "Spúšťač"
@@ -16132,7 +16132,7 @@ msgid "Trigger updated"
 msgstr "Spúšťač aktualizovaný"
 
 #: app/controllers/CControllerPopupGeneric.php:136
-#: app/views/monitoring.problem.view.php:144 include/forms.inc.php:441
+#: app/views/monitoring.problem.view.php:143 include/forms.inc.php:441
 #: include/html.inc.php:388 include/triggers.inc.php:880
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
@@ -17525,7 +17525,8 @@ msgstr "Vitajte"
 msgid "When active"
 msgstr "Iba v dňoch/časoch"
 
-#: graphs.php:43 include/classes/widgets/CWidgetHelper.php:635
+#: graphs.php:43 include/classes/widgets/CWidgetHelper.php:634
+#: include/classes/widgets/CWidgetHelper.php:666
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:669
@@ -17536,8 +17537,7 @@ msgstr "Iba v dňoch/časoch"
 #: include/classes/widgets/CWidgetHelper.php:674
 #: include/classes/widgets/CWidgetHelper.php:675
 #: include/classes/widgets/CWidgetHelper.php:676
-#: include/classes/widgets/CWidgetHelper.php:677
-#: include/classes/widgets/CWidgetHelper.php:942
+#: include/classes/widgets/CWidgetHelper.php:941
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:93
@@ -17727,10 +17727,10 @@ msgstr "Minimálna hodnota osy Y"
 msgid "Y axis side"
 msgstr "Strana osi Y"
 
-#: include/classes/widgets/CWidgetHelper.php:647
+#: include/classes/widgets/CWidgetHelper.php:646
+#: include/classes/widgets/CWidgetHelper.php:721
 #: include/classes/widgets/CWidgetHelper.php:722
-#: include/classes/widgets/CWidgetHelper.php:723
-#: include/classes/widgets/CWidgetHelper.php:996
+#: include/classes/widgets/CWidgetHelper.php:995
 msgid "Y-axis"
 msgstr ""
 
@@ -18088,7 +18088,7 @@ msgstr "agent"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1866
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:875
+#: include/classes/pagefilter/CPageFilter.php:867
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18303,7 +18303,7 @@ msgstr ""
 msgid "colour"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:287
+#: app/views/monitoring.problem.view.php:286
 #: include/classes/widgets/views/widget.problems.form.view.php:92
 msgid "comma-separated list"
 msgstr ""
@@ -18342,12 +18342,12 @@ msgstr ""
 msgid "dayofweek() - Day of week"
 msgstr ""
 
-#: app/views/monitoring.problem.view.php:183
+#: app/views/monitoring.problem.view.php:182
 #: include/views/common.filter.trigger.php:75
 msgid "days"
 msgstr "dní"
 
-#: include/classes/pagefilter/CPageFilter.php:749
+#: include/classes/pagefilter/CPageFilter.php:741
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18481,8 +18481,8 @@ msgstr "skupina"
 msgid "host is not monitored"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:508
-#: include/classes/widgets/CWidgetHelper.php:873
+#: include/classes/widgets/CWidgetHelper.php:507
+#: include/classes/widgets/CWidgetHelper.php:872
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "host pattern"
 msgstr ""
@@ -18587,8 +18587,8 @@ msgstr "položka"
 msgid "item is disabled"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:529
-#: include/classes/widgets/CWidgetHelper.php:892
+#: include/classes/widgets/CWidgetHelper.php:528
+#: include/classes/widgets/CWidgetHelper.php:891
 msgid "item pattern"
 msgstr ""
 
@@ -18782,7 +18782,7 @@ msgstr "nenájdené dáta"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1004
+#: include/classes/widgets/CWidgetHelper.php:1003
 msgid "none"
 msgstr ""
 
@@ -18797,8 +18797,8 @@ msgstr "mimo"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1126
+#: include/classes/pagefilter/CPageFilter.php:800
+#: include/classes/pagefilter/CPageFilter.php:867 include/forms.inc.php:1126
 #: include/views/monitoring.screen.php:63 slides.php:199
 msgid "not selected"
 msgstr "nie je vybratý"
@@ -19017,10 +19017,10 @@ msgid "supplied credentials are not unique"
 msgstr ""
 
 #: app/views/monitoring.problem.view.js.php:18
-#: app/views/monitoring.problem.view.php:236
+#: app/views/monitoring.problem.view.php:235
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/widgets/CWidgetHelper.php:393
-#: include/classes/widgets/CWidgetHelper.php:440
+#: include/classes/widgets/CWidgetHelper.php:392
+#: include/classes/widgets/CWidgetHelper.php:439
 #: include/views/administration.usergroups.edit.php:241
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:374
@@ -19165,9 +19165,9 @@ msgid "unsupported version number"
 msgstr "nepodporované číslo verzie"
 
 #: app/views/monitoring.problem.view.js.php:25
-#: app/views/monitoring.problem.view.php:243
-#: include/classes/widgets/CWidgetHelper.php:403
-#: include/classes/widgets/CWidgetHelper.php:448
+#: app/views/monitoring.problem.view.php:242
+#: include/classes/widgets/CWidgetHelper.php:402
+#: include/classes/widgets/CWidgetHelper.php:447
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:246
 #: include/views/administration.general.macros.edit.php:53
