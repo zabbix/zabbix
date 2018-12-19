@@ -192,7 +192,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
 				if (0 < qpc_tick.QuadPart && 0 == (qpc_tick.QuadPart / tickPerSecond.QuadPart))
-					ns = (int)1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart;
+					ns = (int)(1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart);
 			}
 
 			if (0 < ns && 1000000 > ns)	/*  value less than 1 millisecond */
