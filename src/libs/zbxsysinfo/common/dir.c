@@ -423,7 +423,7 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
  * Parameters: timeout_event - [IN] handle of a timeout event that was passed *
  *                                  to the metric function                    *
  *                                                                            *
- * Return value: TRUE, if timeout was signaled, FALSE otherwise.              *
+ * Return value: TRUE, if timeout or error was detected, FALSE otherwise.     *
  *                                                                            *
  ******************************************************************************/
 static BOOL	has_timed_out(HANDLE timeout_event)
