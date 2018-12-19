@@ -166,6 +166,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['show_suppressed']       (optional)
+	 * @param int    $filter['show_latest_values']    (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 *
@@ -1034,12 +1035,6 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				$latest_values = null;
-
-				if ($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view']) {
-					$latest_values = self::getLatestValues($trigger['items']);
-				}
-
 				if ($show_timeline) {
 					if ($last_clock != 0) {
 						self::addTimelineBreakpoint($table, $last_clock, $problem['clock'], $this->data['sortorder']);
@@ -1078,7 +1073,9 @@ class CScreenProblem extends CScreenBase {
 					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
-					$this->data['filter']['show_latest_values'] ? $latest_values : null,
+					($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view'])
+						? self::getLatestValues($trigger['items'])
+						: null,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
@@ -1209,14 +1206,18 @@ class CScreenProblem extends CScreenBase {
 				new CCol($item['name']),
 				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])),
 				new CCol($last_value['value']),
-				new CLink(_('Graph'), (new CUrl('history.php'))
-					->setArgument('itemids', [$itemid])
-					->setArgument('action',
-						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-							? HISTORY_GRAPH : HISTORY_VALUES
+				new CCol(($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+					? new CLink(_('Graph'), (new CUrl('history.php'))
+						->setArgument('action', HISTORY_GRAPH)
+						->setArgument('itemids[]', $itemid)
+						->getUrl()
 					)
-					->getUrl()
-				),
+					: new CLink(_('History'), (new CUrl('history.php'))
+						->setArgument('action', HISTORY_VALUES)
+						->setArgument('itemids[]', $itemid)
+						->getUrl()
+					)
+				)
 			]);
 
 			$tooltip[] = (new CLinkAction($last_value['value']))

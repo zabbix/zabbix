@@ -34,6 +34,7 @@ require_once dirname(__FILE__).'/users.inc.php';
  * @param int    $filter['show_suppressed']    (optional)
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
+ * @param int    $filter['show_latest_values'] (optional)
  *
  * @return array
  */
