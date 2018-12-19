@@ -73,10 +73,7 @@ $hostFormList->addRow(
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('groups-div')
+	]))->setId('groups-div')
 );
 
 // append description to form list
@@ -213,12 +210,12 @@ $tags_form_list->addRow(
 			->addValue(_('Add'), ZBX_MASSUPDATE_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_MASSUPDATE_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_MASSUPDATE_ACTION_REMOVE)
-			->setModern(true),
-		renderTagTable($data['tags'])->setId('tags-table')
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('tags-div')
+			->setModern(true)
+			->addStyle('margin-bottom: 10px;'),
+		renderTagTable($data['tags'])
+			->setHeader([_('Name'), _('Value'), _('Action')])
+			->setId('tags-table')
+	]))->setId('tags-div')
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
