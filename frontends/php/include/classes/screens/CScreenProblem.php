@@ -603,6 +603,7 @@ class CScreenProblem extends CScreenBase {
 							return ($order[$a['itemid']] > $order[$b['itemid']]) ? 1 : -1;
 						});
 					}
+					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 				}
 				unset($trigger);
 			}
@@ -1203,7 +1204,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$hint_table->addRow([
-				new CCol($item['name']),
+				new CCol($item['name_expanded']),
 				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])),
 				new CCol($last_value['value']),
 				new CCol(($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
