@@ -157,9 +157,10 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	static zbx_timespec_t	*last_ts = NULL;
 	static int		corr = 0;
 #ifdef _WINDOWS
-	LARGE_INTEGER	tickPerSecond, tick;
-	static int	boottime = 0;
-	BOOL		rc = FALSE;
+	LARGE_INTEGER		tickPerSecond, tick;
+	static LARGE_INTEGER	last_tick = {0};
+	BOOL			rc = FALSE;
+	struct _timeb		tb;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -172,30 +173,35 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		last_ts = (zbx_timespec_t *)zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
 
 #ifdef _WINDOWS
+	_ftime(&tb);
+
+	ts->sec = (int)tb.time;
+	ts->ns = tb.millitm * 1000000;
+
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
 		{
-			ts->ns = (int)(1000000000 * (tick.QuadPart % tickPerSecond.QuadPart) / tickPerSecond.QuadPart);
+			int	ns = 0;
 
-			tick.QuadPart = tick.QuadPart / tickPerSecond.QuadPart;
+			if (0 < last_tick.QuadPart)
+			{
+				LARGE_INTEGER	ntp_tick, qpc_diff_tick;
+				ntp_tick.QuadPart = (ts->sec - last_ts->sec + (ts->ns - last_ts->ns) / 1000000000)
+						* tickPerSecond.QuadPart;
+				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
-			if (0 == boottime)
-				boottime = (int)(time(NULL) - tick.QuadPart);
+				if (0 < qpc_tick.QuadPart && 0 == (qpc_tick.QuadPart / tickPerSecond.QuadPart))
+					ns = (int)1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart;
+			}
 
-			ts->sec = (int)(tick.QuadPart + boottime);
+			if (0 < ns && 1000000 > ns)	/*  value less than 1 millisecond */
+				ts->ns += ns;
+
+			last_tick = tick;
 		}
 	}
 
-	if (TRUE != rc)
-	{
-		struct _timeb   tb;
-
-		_ftime(&tb);
-
-		ts->sec = (int)tb.time;
-		ts->ns = tb.millitm * 1000000;
-	}
 #else	/* not _WINDOWS */
 #ifdef HAVE_TIME_CLOCK_GETTIME
 	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
