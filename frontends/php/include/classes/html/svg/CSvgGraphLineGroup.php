@@ -56,7 +56,7 @@ class CSvgGraphLineGroup extends CSvgGroup {
 				'fill' => 'none'
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
-				'opacity' => $this->options['transparency'] * 0.1,
+				'stroke-opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width']
 			] + $line_style,
