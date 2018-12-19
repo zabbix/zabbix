@@ -1456,13 +1456,18 @@ class CDiscoveryRule extends CItemGeneral {
 
 								if (array_key_exists('lld_macro', $lld_macro_path)) {
 									// Compare to existing, if not the same, then it's OK. Other wise add to existing.
-									if ($lld_macro_path['lld_macro'] === $db_lld_macro_path['lld_macro']) {
+									if ($lld_macro_path['lld_macro'] !== $db_lld_macro_path['lld_macro']) {
 										$macro_names[$db_lld_macro_path['lld_macro']] = true;
 									}
 								}
 								else {
+									// Gather names from DB, since "lld_macro" is not given as new.
 									$macro_names[$db_lld_macro_path['lld_macro']] = true;
 								}
+							}
+							else {
+								// A new macro is supposed to be set instead of another. Remove from comparison list.
+								unset($macro_names[$lld_macro_path['lld_macro']]);
 							}
 						}
 
