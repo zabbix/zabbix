@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha2
 
 New features:
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
 ..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
@@ -42,6 +43,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.3rc3
 
 New features:
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3rc2
