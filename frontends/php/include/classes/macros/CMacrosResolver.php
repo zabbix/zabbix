@@ -1969,60 +1969,60 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			]
 		];
 
-		// Define what macros are supported for each map element based on its type and subtype.
+		// Define what macros are supported for each type of map elements.
 		$types_by_selement_type = [
 			SYSMAP_ELEMENT_TYPE_MAP => [
 				'macros' => [
-					'map' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['map']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['map']['urls'] : []
-					)))
+					'map' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['map']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['map']['urls'] : []
+					]
 				]
 			],
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => [
 				'macros' => [
-					'hostgroup' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['hostgroup']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['hostgroup']['urls'] : []
-					)))
+					'hostgroup' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['hostgroup']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['hostgroup']['urls'] : []
+					]
 				]
 			],
 			SYSMAP_ELEMENT_TYPE_HOST => [
 				'macros' => [
-					'host' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
-					))),
-					'interface' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
-					))),
-					'inventory' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
-					)))
+					'host' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
+					],
+					'interface' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
+					],
+					'inventory' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
+					]
 				]
 			],
 			SYSMAP_ELEMENT_TYPE_TRIGGER => [
 				'macros' => [
-					'trigger' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['trigger']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['trigger']['urls'] : []
-					)))
+					'trigger' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['trigger']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['trigger']['urls'] : []
+					]
 				],
 				'macros_n' => [
-					'host' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
-					))),
-					'interface' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
-					))),
-					'inventory' => array_keys(array_flip(array_merge(
-						$options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
-						$options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
-					)))
+					'host' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
+					],
+					'interface' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['interface']['urls'] : []
+					],
+					'inventory' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['inventory']['label'] : [],
+						'urls' => $options['resolve_element_urls'] ? $supported_macros['inventory']['urls'] : []
+					]
 				]
 			]
 		];
@@ -2041,6 +2041,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'groupid'
 		];
 
+		$supported_label_macros = [];
+		$supported_urls_macros = [];
 		$itemids_by_functionids = [];
 		$hosts_by_itemids = [];
 		$query_interfaces = false;
@@ -2049,6 +2051,33 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$maps = [];
 		$hosts = [];
 		$macros = [];
+
+		foreach ($types_by_selement_type as $selement_type => &$types) {
+			$supported_label_macros[$selement_type] = [];
+			$supported_urls_macros[$selement_type] = [];
+
+			foreach ($types as $macros_type_key => $supported_macros_types) {
+				if (!array_key_exists($macros_type_key, $supported_label_macros[$selement_type])) {
+					$supported_label_macros[$selement_type][$macros_type_key] = [];
+				}
+				if (!array_key_exists($macros_type_key, $supported_urls_macros[$selement_type])) {
+					$supported_urls_macros[$selement_type][$macros_type_key] = [];
+				}
+
+				foreach ($supported_macros_types as $macros_supported) {
+					$supported_label_macros[$selement_type][$macros_type_key] = array_merge($supported_label_macros[$selement_type][$macros_type_key], $macros_supported['label']);
+					$supported_urls_macros[$selement_type][$macros_type_key] = array_merge($supported_urls_macros[$selement_type][$macros_type_key], $macros_supported['urls']);
+				}
+			}
+
+			foreach ($types as &$macro_types) {
+				$macro_types = array_map(function($macros_by_location) {
+					return array_keys(array_flip(call_user_func_array('array_merge', $macros_by_location)));
+				}, $macro_types);
+			}
+			unset($macro_types);
+		}
+		unset($types);
 
 		foreach ($selements as $selid => $sel) {
 			$selement_type = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
@@ -2219,8 +2248,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					&& $sel['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
 				? SYSMAP_ELEMENT_TYPE_HOST
 				: $sel['elementtype'];
-
-			$types = $types_by_selement_type[$selement_type];
 
 			// Get element id.
 			if (array_key_exists('elementid', $sel)) {
@@ -2398,10 +2425,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					default:
 						// Inventories:
-						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros)) {
-							$matched_macro['value'] = $host
-								? $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']]
-								: '';
+						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros) && $host
+								&& $host['inventory']) {
+							$matched_macro['value']
+								= $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']];
 						}
 						break;
 				}
@@ -2410,6 +2437,21 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Replace macros in selement label.
 			if ($options['resolve_element_label']) {
+				// Subtract unsupported macros from $types.
+				$types = $types_by_selement_type[$selement_type];
+				foreach (['macros', 'macros_n'] as $macros_type_key) {
+					if (array_key_exists($macros_type_key, $types)
+							&& array_key_exists($macros_type_key, $supported_label_macros[$selement_type])) {
+						$types[$macros_type_key] = array_intersect($types[$macros_type_key],
+							$supported_label_macros[$selement_type][$macros_type_key]
+						);
+
+						if (!$types[$macros_type_key]) {
+							unset($types[$macros_type_key]);
+						}
+					}
+				}
+
 				$macros_position = $this->getMacroPositions($sel['label'], $types);
 				foreach (array_reverse($macros_position, true) as $pos => $macro) {
 					$value = array_key_exists('value', $matched_macros[$macro])
@@ -2421,6 +2463,21 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Replace macros in selement URLs.
 			if ($options['resolve_element_urls']) {
+				// Subtract unsupported macros from $types.
+				$types = $types_by_selement_type[$selement_type];
+				foreach (['macros', 'macros_n'] as $macros_type_key) {
+					if (array_key_exists($macros_type_key, $types)
+							&& array_key_exists($macros_type_key, $supported_urls_macros[$selement_type])) {
+						$types[$macros_type_key] = array_intersect($types[$macros_type_key],
+							$supported_urls_macros[$selement_type][$macros_type_key]
+						);
+
+						if (!$types[$macros_type_key]) {
+							unset($types[$macros_type_key]);
+						}
+					}
+				}
+
 				foreach ($sel['urls'] as &$url) {
 					foreach (['name', 'url'] as $url_field) {
 						$macros_position = $this->getMacroPositions($url[$url_field], $types);
