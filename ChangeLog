@@ -1,7 +1,7 @@
 Changes for 4.0.3rc3
 
 New features:
-..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (vasilijs, gcalenko, ashubin)
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3rc2
