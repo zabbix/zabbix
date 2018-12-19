@@ -458,6 +458,8 @@ var hintBox = {
 
 				case 'keydown':
 					if (e.which == 13 && target.data('hintbox-static') == 1) {
+						jQuery('[data-focused]').removeAttr('data-focused');
+						jQuery(this).filter('.hint-item').attr('data-focused', 1);
 						var offset = target.offset(),
 							w = jQuery(window);
 						// Emulate click on left middle point of link.
@@ -473,6 +475,8 @@ var hintBox = {
 
 				case 'click':
 					if (target.data('hintbox-static') == 1) {
+						jQuery('[data-focused]').removeAttr('data-focused');
+						jQuery(this).filter('.hint-item').attr('data-focused', 1);
 						hintBox.showStaticHint(e, target[0], target.data('hintbox-class'), false,
 							target.data('hintbox-style')
 						);
@@ -666,7 +670,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				jQuery(target).siblings('.hint-item:first').focus();
+				jQuery(target).siblings('.hint-item[data-focused]').focus();
 				delete target.isStatic;
 			}
 		}
