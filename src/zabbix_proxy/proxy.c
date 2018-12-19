@@ -270,6 +270,8 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
+char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -470,6 +472,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
+
+	if (NULL == CONFIG_STATS_ALLOWED_IP)
+		CONFIG_STATS_ALLOWED_IP = zbx_strdup(CONFIG_STATS_ALLOWED_IP, "127.0.0.1");
 }
 
 /******************************************************************************
@@ -742,6 +747,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
+		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
