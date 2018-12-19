@@ -207,7 +207,15 @@ void	zbx_timespec(zbx_timespec_t *ts)
 			}
 
 			if (0 < ns && 1000000 > ns)	/*  value less than 1 millisecond */
+			{
 				ts->ns += ns;
+
+				while (ts->ns >= 1000000000)
+				{
+					ts->sec++;
+					ts->ns -= 1000000000;
+				}
+			}
 
 			last_tick = tick;
 		}
