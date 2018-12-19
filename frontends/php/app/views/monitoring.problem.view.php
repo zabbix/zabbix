@@ -48,7 +48,8 @@ $options = [
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
 			'details' => $data['filter']['details'],
-			'highlight_row' => $data['filter']['highlight_row']
+			'highlight_row' => $data['filter']['highlight_row'],
+			'show_latest_values' => $data['filter']['show_latest_values']
 		]
 	]
 ];
@@ -318,6 +319,11 @@ if ($data['action'] == 'problem.view') {
 			]))
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+		])
+		->addRow(_('Show latest values'), [
+			(new CCheckBox('filter_show_latest_values'))
+				->setChecked($data['filter']['show_latest_values'] == 1)
+				->setEnabled($data['filter']['compact_view'] == 0)
 		]);
 
 	$filter = (new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'problem.view')))
