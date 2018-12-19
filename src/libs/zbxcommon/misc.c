@@ -178,6 +178,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ts->sec = (int)tb.time;
 	ts->ns = tb.millitm * 1000000;
 
+
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
@@ -186,9 +187,19 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 			if (0 < last_tick.QuadPart)
 			{
-				LARGE_INTEGER	ntp_tick, qpc_tick;
-				ntp_tick.QuadPart = (ts->sec - last_ts->sec + (ts->ns - last_ts->ns) / 1000000000)
-						* tickPerSecond.QuadPart;
+				LARGE_INTEGER	qpc_tick, ntp_tick = {0};
+
+				/* _ftime () returns precision in milliseconds, but 'ns' could be increased */
+				if (ts->sec == last_ts->sec && ts->ns < last_ts->ns)
+				{
+					ts->ns = last_ts->ns;
+				}
+				else
+				{
+					ntp_tick.QuadPart = tickPerSecond.QuadPart * (ts->sec - last_ts->sec)
+						+ tickPerSecond.QuadPart * (ts->ns - last_ts->ns) / 1000000000;
+				}
+
 				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
 				if (0 < qpc_tick.QuadPart && 0 == (qpc_tick.QuadPart / tickPerSecond.QuadPart))
