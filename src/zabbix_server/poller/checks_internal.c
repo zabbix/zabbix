@@ -153,6 +153,11 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	return SUCCEED;
 }
 
+int	get_value_internal_stats(DC_ITEM *item, AGENT_RESULT *result)
+{
+
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value_internal                                               *
@@ -194,7 +199,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
+	if (0 == strcmp(tmp, "triggers"))			/* zabbix[triggers] */
 	{
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
@@ -207,7 +212,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_trigger_count());
 	}
-	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
+	else if (0 == strcmp(tmp, "items"))			/* zabbix[items] */
 	{
 		if (1 != nparams)
 		{
@@ -217,7 +222,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_item_count(0));
 	}
-	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
+	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix[items_unsupported] */
 	{
 		if (1 != nparams)
 		{
@@ -227,7 +232,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_item_unsupported_count(0));
 	}
-	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
+	else if (0 == strcmp(tmp, "hosts"))			/* zabbix[hosts] */
 	{
 		if (1 != nparams)
 		{
@@ -237,11 +242,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_host_count());
 	}
-	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
-			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */
-			0 == strcmp(tmp, "history_str") ||	/* zabbix["history_str"] */
-			0 == strcmp(tmp, "history_text") ||	/* zabbix["history_text"] */
-			0 == strcmp(tmp, "history_uint"))	/* zabbix["history_uint"] */
+	else if (0 == strcmp(tmp, "history") ||			/* zabbix[history] */
+			0 == strcmp(tmp, "history_log") ||	/* zabbix[history_log] */
+			0 == strcmp(tmp, "history_str") ||	/* zabbix[history_str] */
+			0 == strcmp(tmp, "history_text") ||	/* zabbix[history_text] */
+			0 == strcmp(tmp, "history_uint"))	/* zabbix[history_uint] */
 	{
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
@@ -254,8 +259,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DBget_row_count(tmp));
 	}
-	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
-			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
+	else if (0 == strcmp(tmp, "trends") ||			/* zabbix[trends] */
+			0 == strcmp(tmp, "trends_uint"))	/* zabbix[trends_uint] */
 	{
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
@@ -268,7 +273,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DBget_row_count(tmp));
 	}
-	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
+	else if (0 == strcmp(tmp, "queue"))			/* zabbix[queue,<from>,<to>] */
 	{
 		int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
@@ -300,7 +305,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, DCget_item_queue(NULL, from, to));
 	}
-	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
+	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix[requiredperformance] */
 	{
 		if (1 != nparams)
 		{
@@ -310,7 +315,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_DBL_RESULT(result, DCget_required_performance());
 	}
-	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
+	else if (0 == strcmp(tmp, "uptime"))			/* zabbix[uptime] */
 	{
 		if (1 != nparams)
 		{
@@ -320,7 +325,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
 	}
-	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
+	else if (0 == strcmp(tmp, "boottime"))			/* zabbix[boottime] */
 	{
 		if (1 != nparams)
 		{
@@ -330,7 +335,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
 	}
-	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
+	else if (0 == strcmp(tmp, "host"))			/* zabbix[host,*] */
 	{
 		if (3 != nparams)
 		{
@@ -340,7 +345,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		tmp = get_rparam(&request, 2);
 
-		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
+		if (0 == strcmp(tmp, "available"))		/* zabbix[host,<type>,available] */
 		{
 			tmp = get_rparam(&request, 1);
 
@@ -360,7 +365,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			result->ui64 = 2 - result->ui64;
 		}
-		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
+		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix[host,,maintenance] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
@@ -374,7 +379,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else
 				SET_UI64_RESULT(result, 0);
 		}
-		else if (0 == strcmp(tmp, "items"))	/* zabbix["host",,"items"] */
+		else if (0 == strcmp(tmp, "items"))	/* zabbix[host,,items] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
@@ -385,7 +390,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
 		}
-		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
+		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix[host,,items_unsupported] */
 		{
 			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
@@ -396,7 +401,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
 		}
-		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host","discovery","interfaces"] */
+		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix[host,discovery,interfaces] */
 		{
 			struct zbx_json	j;
 			char		*error = NULL;
@@ -424,7 +429,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 	}
-	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
+	else if (0 == strcmp(tmp, "proxy"))			/* zabbix[proxy,<hostname>,lastaccess] */
 	{
 		int	lastaccess;
 		char	*error = NULL;
@@ -452,7 +457,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, lastaccess);
 	}
-	else if (0 == strcmp(tmp, "java"))			/* zabbix["java",...] */
+	else if (0 == strcmp(tmp, "java"))			/* zabbix[java,...] */
 	{
 		int	res;
 
@@ -469,7 +474,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 	}
-	else if (0 == strcmp(tmp, "process"))			/* zabbix["process",<type>,<mode>,<state>] */
+	else if (0 == strcmp(tmp, "process"))			/* zabbix[process,<type>,<mode>,<state>] */
 	{
 		unsigned char	process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 		int		process_forks;
@@ -702,7 +707,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 	}
-	else if (0 == strcmp(tmp, "vcache"))
+	else if (0 == strcmp(tmp, "vcache"))			/* zabbix[vcache,...] */
 	{
 		zbx_vc_stats_t	stats;
 
@@ -766,7 +771,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 	}
-	else if (0 == strcmp(tmp, "proxy_history"))
+	else if (0 == strcmp(tmp, "proxy_history"))		/* zabbix[proxy_history] */
 	{
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 			goto out;
@@ -779,7 +784,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_UI64_RESULT(result, proxy_get_history_count());
 	}
-	else if (0 == strcmp(tmp, "vmware"))
+	else if (0 == strcmp(tmp, "vmware"))			/* zabbix[vmware,buffer,<mode>] */
 	{
 		zbx_vmware_stats_t	stats;
 
@@ -835,7 +840,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 	}
-	else if (0 == strcmp(tmp, "preprocessing_queue"))
+	else if (0 == strcmp(tmp, "preprocessing_queue"))	/* zabbix[preprocessing_queue] */
 	{
 		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			goto out;
