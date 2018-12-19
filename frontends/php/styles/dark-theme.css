@@ -2942,7 +2942,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-width: 2px; }
 
 .svg-point-highlight {
-  fill: #f2f2f2;
+  fill: #f2f2f2 !important;
   fill-opacity: 0.5; }
 
 .svg-graph-preview {

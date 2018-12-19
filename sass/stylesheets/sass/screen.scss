@@ -4245,7 +4245,7 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 .svg-point-highlight {
-	fill: $font-color;
+	fill: $font-color !important;
 	fill-opacity: 0.5;
 }
 

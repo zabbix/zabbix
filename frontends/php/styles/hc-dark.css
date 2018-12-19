@@ -2905,7 +2905,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke-width: 2px; }
 
 .svg-point-highlight {
-  fill: #fff;
+  fill: #fff !important;
   fill-opacity: 0.5; }
 
 .svg-graph-preview {
