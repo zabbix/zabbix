@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-04 09:18+0200\n"
-"PO-Revision-Date: 2018-12-02 17:24+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"POT-Creation-Date: 2018-12-19 15:54+0200\n"
+"PO-Revision-Date: 2018-12-04 07:55+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1543764293.000000\n"
+"X-POOTLE-MTIME: 1543902914.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -243,7 +243,7 @@ msgstr "1分"
 msgid "10 seconds"
 msgstr "10秒"
 
-#: include/views/reports.toptriggers.php:112 toptriggers.php:26
+#: include/views/reports.toptriggers.php:113 toptriggers.php:26
 msgid "100 busiest triggers"
 msgstr "障害発生数上位100項目"
 
@@ -275,7 +275,7 @@ msgstr "<マニュアル>"
 msgid "<sub-menu/sub-menu/...>script"
 msgstr "<サブメニュー/サブメニュー/...>スクリプト"
 
-#: include/classes/widgets/CWidgetHelper.php:662
+#: include/classes/widgets/CWidgetHelper.php:663
 msgid "ADD OVERRIDE"
 msgstr "オーバーライドの追加"
 
@@ -517,12 +517,12 @@ msgstr "設定有効期間の終了日時"
 #: app/views/administration.script.edit.php:119
 #: app/views/dashboard.sharing.edit.php:28
 #: app/views/dashboard.sharing.edit.php:49
-#: app/views/monitoring.problem.view.php:208
-#: app/views/monitoring.problem.view.php:255 app/views/popup.httpstep.php:112
+#: app/views/monitoring.problem.view.php:209
+#: app/views/monitoring.problem.view.php:256 app/views/popup.httpstep.php:112
 #: app/views/popup.httpstep.php:157 app/views/popup.media.php:48
 #: app/views/popup.media.php:112 app/views/popup.triggerwizard.php:169
 #: app/views/popup.triggerwizard.php:195
-#: include/classes/widgets/CWidgetHelper.php:419
+#: include/classes/widgets/CWidgetHelper.php:420
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/administration.general.iconmap.edit.php:101
 #: include/views/administration.general.iconmap.edit.php:142
@@ -668,7 +668,7 @@ msgstr "ホストを追加"
 msgid "Add multiple maps"
 msgstr "複数のマップを追加"
 
-#: include/classes/widgets/CWidgetHelper.php:1063
+#: include/classes/widgets/CWidgetHelper.php:1064
 msgid "Add new data set"
 msgstr "新しいデータセットの追加"
 
@@ -680,7 +680,7 @@ msgstr "アプリケーションの新規作成または追加"
 msgid "Add new or existing host groups"
 msgstr "ホストグループの新規作成または追加"
 
-#: include/classes/widgets/CWidgetHelper.php:617
+#: include/classes/widgets/CWidgetHelper.php:618
 msgid "Add new override"
 msgstr "新しいオーバーライドの追加"
 
@@ -741,7 +741,7 @@ msgstr "拡張ラベル"
 msgid "Age"
 msgstr "経過時間"
 
-#: app/views/monitoring.problem.view.php:175
+#: app/views/monitoring.problem.view.php:176
 #: include/views/common.filter.trigger.php:68
 msgid "Age less than"
 msgstr "表示期間"
@@ -896,7 +896,7 @@ msgstr "代わりに、手動でインストールすることができます:"
 msgid "And"
 msgstr "And"
 
-#: app/views/monitoring.problem.view.php:225
+#: app/views/monitoring.problem.view.php:226
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/views/configuration.action.edit.php:111
@@ -927,7 +927,7 @@ msgstr "すべて"
 msgid "Any character string included"
 msgstr "いずれかの文字列が含まれる"
 
-#: app/views/monitoring.problem.view.php:126 httpconf.php:40
+#: app/views/monitoring.problem.view.php:127 httpconf.php:40
 #: include/actions.inc.php:60 include/audit.inc.php:34
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:39
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:55
@@ -1330,8 +1330,8 @@ msgstr "背景のイメージ"
 msgid "Base DN"
 msgstr "Base DN"
 
-#: include/classes/widgets/CWidgetHelper.php:664
-#: include/classes/widgets/CWidgetHelper.php:929
+#: include/classes/widgets/CWidgetHelper.php:665
+#: include/classes/widgets/CWidgetHelper.php:930
 msgid "Base colour"
 msgstr "基本色"
 
@@ -1996,11 +1996,11 @@ msgstr "テンプレートのアプリケーションを削除できません。
 
 #: include/classes/api/services/CGraphPrototype.php:575
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "テンプレートのグラフのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "テンプレートのグラフを削除できません。"
 
 #: include/classes/api/services/CHostPrototype.php:1071
 msgid "Cannot delete templated host prototype."
@@ -2008,7 +2008,7 @@ msgstr "テンプレートのホストのプロトタイプを削除できませ
 
 #: include/classes/api/services/CItemPrototype.php:876
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "テンプレートのアイテムのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CItem.php:706
 msgid "Cannot delete templated item."
@@ -2026,7 +2026,7 @@ msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません�
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "テンプレートのトリガーのプロトタイプ\"%1$s:%2$s\"を削除できません。"
 
 #: include/classes/api/services/CHttpTest.php:557
 #, c-format
@@ -3130,7 +3130,7 @@ msgid "Close problem"
 msgstr "障害のクローズ"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50
-#: include/classes/widgets/CWidgetHelper.php:869 jsLoader.php:205
+#: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:205
 #: jsLoader.php:210
 msgid "Collapse"
 msgstr "縮小"
@@ -3194,7 +3194,7 @@ msgstr "コマンド"
 msgid "Commercial"
 msgstr "商用サービス"
 
-#: app/views/monitoring.problem.view.php:299
+#: app/views/monitoring.problem.view.php:300
 msgid "Compact view"
 msgstr "コンパクト表示"
 
@@ -3450,9 +3450,9 @@ msgstr "おめでとうございます！Webインターフェースのインス
 msgid "Connect to"
 msgstr "接続方法"
 
-#: include/classes/widgets/CWidgetHelper.php:644
-#: include/classes/widgets/CWidgetHelper.php:718
-#: include/classes/widgets/CWidgetHelper.php:986
+#: include/classes/widgets/CWidgetHelper.php:645
+#: include/classes/widgets/CWidgetHelper.php:719
+#: include/classes/widgets/CWidgetHelper.php:987
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "接続する"
@@ -3537,9 +3537,9 @@ msgid "Contact"
 msgstr "連絡先"
 
 #: app/views/monitoring.problem.view.js.php:21
-#: app/views/monitoring.problem.view.php:238
-#: include/classes/widgets/CWidgetHelper.php:397
-#: include/classes/widgets/CWidgetHelper.php:443
+#: app/views/monitoring.problem.view.php:239
+#: include/classes/widgets/CWidgetHelper.php:398
+#: include/classes/widgets/CWidgetHelper.php:444
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/configuration.maintenance.edit.php:206
 #: include/views/configuration.triggers.list.php:86
@@ -3556,7 +3556,7 @@ msgstr "含む"
 #: app/views/monitoring.dashboard.view.php:148
 #: app/views/monitoring.discovery.view.php:42
 #: app/views/monitoring.map.view.php:59
-#: app/views/monitoring.problem.view.php:353
+#: app/views/monitoring.problem.view.php:354
 #: app/views/monitoring.web.view.php:47 app/views/report.services.php:62
 #: httpdetails.php:92 include/classes/html/widget/CWidget.php:95
 #: include/views/administration.general.gui.edit.php:33
@@ -4299,8 +4299,8 @@ msgstr "遅延時間"
 #: app/views/monitoring.dashboard.list.php:76
 #: app/views/monitoring.dashboard.view.php:123
 #: include/classes/html/CButtonDelete.php:25
-#: include/classes/widgets/CWidgetHelper.php:555
-#: include/classes/widgets/CWidgetHelper.php:916 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:556
+#: include/classes/widgets/CWidgetHelper.php:917 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.edit.php:108
@@ -5063,11 +5063,11 @@ msgstr "設定ファイルのダウンロード"
 msgid "Downtime"
 msgstr "ダウンタイム"
 
-#: include/classes/widgets/CWidgetHelper.php:635
-#: include/classes/widgets/CWidgetHelper.php:678
+#: include/classes/widgets/CWidgetHelper.php:636
 #: include/classes/widgets/CWidgetHelper.php:679
 #: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:933
+#: include/classes/widgets/CWidgetHelper.php:681
+#: include/classes/widgets/CWidgetHelper.php:934
 msgid "Draw"
 msgstr "グラフの形式"
 
@@ -5567,9 +5567,9 @@ msgid "English (en_US)"
 msgstr "英語 (en_US)"
 
 #: app/views/monitoring.problem.view.js.php:22
-#: app/views/monitoring.problem.view.php:239
-#: include/classes/widgets/CWidgetHelper.php:398
-#: include/classes/widgets/CWidgetHelper.php:444
+#: app/views/monitoring.problem.view.php:240
+#: include/classes/widgets/CWidgetHelper.php:399
+#: include/classes/widgets/CWidgetHelper.php:445
 #: include/views/configuration.maintenance.edit.php:186
 #: include/views/configuration.maintenance.edit.php:207
 #: include/views/configuration.triggers.list.php:87
@@ -5716,7 +5716,7 @@ msgid "Execution confirmation"
 msgstr "実行の確認"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:869 jsLoader.php:206
+#: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:206
 #: jsLoader.php:209
 msgid "Expand"
 msgstr "展開"
@@ -5752,7 +5752,7 @@ msgstr "分解円グラフ"
 msgid "Export"
 msgstr "エクスポート"
 
-#: app/views/monitoring.problem.view.php:345
+#: app/views/monitoring.problem.view.php:346
 msgid "Export to CSV"
 msgstr "CSVエクスポート"
 
@@ -5992,8 +5992,7 @@ msgstr "バイト単位のファイルサイズ。整数値を返す。"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "ファイルの時刻情報。UNIXのタイムスタンプで整数値を返す。"
 
-#: include/classes/widgets/CWidgetHelper.php:640
-#: include/classes/widgets/CWidgetHelper.php:694
+#: include/classes/widgets/CWidgetHelper.php:641
 #: include/classes/widgets/CWidgetHelper.php:695
 #: include/classes/widgets/CWidgetHelper.php:696
 #: include/classes/widgets/CWidgetHelper.php:697
@@ -6004,7 +6003,8 @@ msgstr "ファイルの時刻情報。UNIXのタイムスタンプで整数値�
 #: include/classes/widgets/CWidgetHelper.php:702
 #: include/classes/widgets/CWidgetHelper.php:703
 #: include/classes/widgets/CWidgetHelper.php:704
-#: include/classes/widgets/CWidgetHelper.php:966
+#: include/classes/widgets/CWidgetHelper.php:705
+#: include/classes/widgets/CWidgetHelper.php:967
 msgid "Fill"
 msgstr "塗りつぶし"
 
@@ -6015,7 +6015,7 @@ msgstr "面"
 #: app/views/administration.mediatype.list.php:37
 #: app/views/administration.proxy.list.php:37
 #: app/views/administration.script.list.php:37
-#: app/views/monitoring.problem.view.php:332
+#: app/views/monitoring.problem.view.php:333
 #: include/classes/html/CFilter.php:403
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
@@ -6040,7 +6040,7 @@ msgstr "面"
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
 #: include/views/monitoring.sysmap.list.php:40
-#: include/views/reports.toptriggers.php:75 latest.php:338 report2.php:425
+#: include/views/reports.toptriggers.php:76 latest.php:338 report2.php:425
 msgid "Filter"
 msgstr "フィルター"
 
@@ -6172,7 +6172,7 @@ msgstr "Webインターフェースへのアクセスを更新しました"
 msgid "Frontend messaging"
 msgstr "Webインターフェースのアラート表示"
 
-#: app/views/monitoring.problem.view.php:272
+#: app/views/monitoring.problem.view.php:273
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
 msgid "Full"
 msgstr "すべて"
@@ -6723,7 +6723,7 @@ msgstr "High-contrast dark"
 msgid "High-contrast light"
 msgstr "High-contrast light"
 
-#: app/views/monitoring.problem.view.php:313
+#: app/views/monitoring.problem.view.php:314
 msgid "Highlight whole row"
 msgstr "行を強調表示"
 
@@ -6825,7 +6825,7 @@ msgstr "横位置"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:81
-#: include/views/reports.toptriggers.php:78 items.php:900 items.php:1273
+#: include/views/reports.toptriggers.php:79 items.php:900 items.php:1273
 #: jsLoader.php:165 latest.php:421 latest.php:438 queue.php:254
 #: report2.php:409 report2.php:431 search.php:125
 msgid "Host"
@@ -6977,7 +6977,7 @@ msgstr "ホスト情報"
 msgid "Host interface"
 msgstr "ホストインターフェース"
 
-#: app/views/monitoring.problem.view.php:280 hostinventories.php:27
+#: app/views/monitoring.problem.view.php:281 hostinventories.php:27
 #: include/views/common.filter.trigger.php:137
 #: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.prototype.edit.php:372
@@ -7124,7 +7124,7 @@ msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在し
 #: app/controllers/CControllerPopupGeneric.php:64
 #: app/controllers/CControllerPopupGeneric.php:88
 #: app/views/administration.proxy.list.php:72
-#: app/views/monitoring.problem.view.php:111
+#: app/views/monitoring.problem.view.php:112
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:49
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
@@ -7141,7 +7141,7 @@ msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在し
 #: include/views/configuration.host.list.php:25
 #: include/views/configuration.host.massupdate.php:24
 #: include/views/configuration.maintenance.edit.php:251
-#: include/views/conf.import.php:29 include/views/reports.toptriggers.php:50
+#: include/views/conf.import.php:29 include/views/reports.toptriggers.php:51
 #: latest.php:356 search.php:254 search.php:292 search.php:309 search.php:314
 #: search.php:330
 msgid "Hosts"
@@ -8264,7 +8264,7 @@ msgstr "スクリーン\"%1$s\"の指定されたユーザーグループIDが�
 msgid "Incorrect user group."
 msgstr "ユーザーグループが正しくありません。"
 
-#: app/controllers/CControllerPopupGeneric.php:386
+#: app/controllers/CControllerPopupGeneric.php:387
 #: include/classes/api/services/CAction.php:748
 #: include/classes/api/services/CAction.php:791
 #: include/classes/api/services/CAction.php:865
@@ -9588,9 +9588,9 @@ msgstr "最新の値"
 msgid "Latvian (lv_LV)"
 msgstr "ラトビア語 (lv_LV)"
 
-#: include/classes/widgets/CWidgetHelper.php:647
-#: include/classes/widgets/CWidgetHelper.php:721
-#: include/classes/widgets/CWidgetHelper.php:997
+#: include/classes/widgets/CWidgetHelper.php:648
+#: include/classes/widgets/CWidgetHelper.php:722
+#: include/classes/widgets/CWidgetHelper.php:998
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -9622,9 +9622,9 @@ msgstr "凡例"
 msgid "Limit for search and filter results"
 msgstr "検索/フィルターの項目の上限値"
 
-#: include/classes/widgets/CWidgetHelper.php:636
-#: include/classes/widgets/CWidgetHelper.php:678
-#: include/classes/widgets/CWidgetHelper.php:935 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:637
+#: include/classes/widgets/CWidgetHelper.php:679
+#: include/classes/widgets/CWidgetHelper.php:936 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:304
 #: include/views/js/monitoring.sysmaps.js.php:353
 #: include/views/js/monitoring.sysmaps.js.php:699
@@ -10379,7 +10379,7 @@ msgid "Minimum required size of PHP post is %s (configuration option \"post_max_
 msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オプション)。"
 
 #: app/views/monitoring.map.view.php:39
-#: app/views/monitoring.problem.view.php:164
+#: app/views/monitoring.problem.view.php:165
 #: include/views/common.filter.trigger.php:57
 #: include/views/monitoring.sysmap.edit.php:219
 msgid "Minimum severity"
@@ -10420,11 +10420,11 @@ msgstr "グラフのプロトタイプの\"name\"フィールドが存在しま�
 msgid "Missing \"name\" field for graph."
 msgstr "グラフの\"name\"フィールドが存在しません。"
 
-#: include/classes/widgets/CWidgetHelper.php:642
-#: include/classes/widgets/CWidgetHelper.php:717
+#: include/classes/widgets/CWidgetHelper.php:643
 #: include/classes/widgets/CWidgetHelper.php:718
 #: include/classes/widgets/CWidgetHelper.php:719
-#: include/classes/widgets/CWidgetHelper.php:981
+#: include/classes/widgets/CWidgetHelper.php:720
+#: include/classes/widgets/CWidgetHelper.php:982
 msgid "Missing data"
 msgstr "欠損データ"
 
@@ -11351,11 +11351,11 @@ msgstr "論理値ではないフラグは廃止予定です。"
 #: app/views/administration.mediatype.edit.php:89
 #: app/views/administration.proxy.list.php:113
 #: app/views/administration.proxy.list.php:126
-#: app/views/monitoring.problem.view.php:263
-#: app/views/monitoring.problem.view.php:274
-#: include/classes/widgets/CWidgetHelper.php:643
-#: include/classes/widgets/CWidgetHelper.php:717
-#: include/classes/widgets/CWidgetHelper.php:985
+#: app/views/monitoring.problem.view.php:264
+#: app/views/monitoring.problem.view.php:275
+#: include/classes/widgets/CWidgetHelper.php:644
+#: include/classes/widgets/CWidgetHelper.php:718
+#: include/classes/widgets/CWidgetHelper.php:986
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -11539,7 +11539,7 @@ msgstr "行数"
 msgid "Number of slides"
 msgstr "スライド数"
 
-#: include/views/reports.toptriggers.php:78
+#: include/views/reports.toptriggers.php:79
 msgid "Number of status changes"
 msgstr "ステータス変更の回数"
 
@@ -11918,7 +11918,7 @@ msgstr "オペレータ"
 msgid "Options"
 msgstr "オプション"
 
-#: app/views/monitoring.problem.view.php:226
+#: app/views/monitoring.problem.view.php:227
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/triggers.inc.php:1332
@@ -12495,8 +12495,7 @@ msgstr "2つの要素を選択してください"
 msgid "Please specify element name."
 msgstr "要素名を指定してください。"
 
-#: include/classes/widgets/CWidgetHelper.php:641
-#: include/classes/widgets/CWidgetHelper.php:706
+#: include/classes/widgets/CWidgetHelper.php:642
 #: include/classes/widgets/CWidgetHelper.php:707
 #: include/classes/widgets/CWidgetHelper.php:708
 #: include/classes/widgets/CWidgetHelper.php:709
@@ -12506,13 +12505,14 @@ msgstr "要素名を指定してください。"
 #: include/classes/widgets/CWidgetHelper.php:713
 #: include/classes/widgets/CWidgetHelper.php:714
 #: include/classes/widgets/CWidgetHelper.php:715
-#: include/classes/widgets/CWidgetHelper.php:949
+#: include/classes/widgets/CWidgetHelper.php:716
+#: include/classes/widgets/CWidgetHelper.php:950
 msgid "Point size"
 msgstr "ポイントサイズ"
 
-#: include/classes/widgets/CWidgetHelper.php:637
-#: include/classes/widgets/CWidgetHelper.php:679
-#: include/classes/widgets/CWidgetHelper.php:936
+#: include/classes/widgets/CWidgetHelper.php:638
+#: include/classes/widgets/CWidgetHelper.php:680
+#: include/classes/widgets/CWidgetHelper.php:937
 #: include/views/js/monitoring.sysmaps.js.php:373
 msgid "Points"
 msgstr "ポイント"
@@ -12673,7 +12673,7 @@ msgstr "秘密鍵ファイル"
 msgid "Privilege level"
 msgstr "特権レベル"
 
-#: app/views/monitoring.problem.view.php:161
+#: app/views/monitoring.problem.view.php:162
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:539
 #: include/classes/screens/CScreenProblem.php:845
 #: include/classes/screens/CScreenProblem.php:868
@@ -12743,7 +12743,7 @@ msgstr "子に一つでも障害があった場合に障害として検知"
 
 #: app/controllers/CControllerProblemView.php:348
 #: app/views/monitoring.problem.view.php:91
-#: app/views/monitoring.problem.view.php:337 app/views/report.services.php:66
+#: app/views/monitoring.problem.view.php:338 app/views/report.services.php:66
 #: app/views/report.services.php:67 app/views/report.services.php:68
 #: app/views/report.services.php:69 chart4.php:168
 #: include/classes/widgets/CWidgetConfig.php:44
@@ -13107,13 +13107,13 @@ msgstr "リモートコマンド"
 #: app/views/monitoring.dashboard.view.js.php:37
 #: app/views/monitoring.problem.view.js.php:6
 #: app/views/monitoring.problem.view.js.php:28
-#: app/views/monitoring.problem.view.php:198
-#: app/views/monitoring.problem.view.php:245 app/views/popup.media.php:41
+#: app/views/monitoring.problem.view.php:199
+#: app/views/monitoring.problem.view.php:246 app/views/popup.media.php:41
 #: app/views/popup.media.php:96 app/views/popup.triggerwizard.js.php:150
 #: app/views/popup.triggerwizard.js.php:335
 #: app/views/popup.triggerwizard.php:57 app/views/popup.triggerwizard.php:101
-#: include/classes/widgets/CWidgetHelper.php:407
-#: include/classes/widgets/CWidgetHelper.php:451
+#: include/classes/widgets/CWidgetHelper.php:408
+#: include/classes/widgets/CWidgetHelper.php:452
 #: include/views/administration.general.iconmap.edit.php:84
 #: include/views/administration.general.macros.edit.php:56
 #: include/views/administration.general.regularexpressions.edit.php:77
@@ -13488,9 +13488,9 @@ msgstr "関連付けられているZabbix Java Gatewayの情報返却。有効�
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "ICMP pingパケットのロスト率を返却。"
 
-#: include/classes/widgets/CWidgetHelper.php:648
-#: include/classes/widgets/CWidgetHelper.php:722
-#: include/classes/widgets/CWidgetHelper.php:998
+#: include/classes/widgets/CWidgetHelper.php:649
+#: include/classes/widgets/CWidgetHelper.php:723
+#: include/classes/widgets/CWidgetHelper.php:999
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:122
@@ -14038,16 +14038,16 @@ msgid "Security name"
 msgstr "セキュリティ名"
 
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:96
-#: app/views/monitoring.problem.view.php:130 app/views/popup.generic.php:642
+#: app/views/monitoring.problem.view.php:131 app/views/popup.generic.php:642
 #: app/views/popup.services.php:128 app/views/popup.triggerexpr.php:65
 #: app/views/popup.triggerwizard.php:131
 #: include/classes/html/CMultiSelect.php:70
 #: include/classes/widgets/CWidgetHelper.php:155
-#: include/classes/widgets/CWidgetHelper.php:284
-#: include/classes/widgets/CWidgetHelper.php:511
-#: include/classes/widgets/CWidgetHelper.php:532
-#: include/classes/widgets/CWidgetHelper.php:876
-#: include/classes/widgets/CWidgetHelper.php:895 include/forms.inc.php:411
+#: include/classes/widgets/CWidgetHelper.php:285
+#: include/classes/widgets/CWidgetHelper.php:512
+#: include/classes/widgets/CWidgetHelper.php:533
+#: include/classes/widgets/CWidgetHelper.php:877
+#: include/classes/widgets/CWidgetHelper.php:896 include/forms.inc.php:411
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:88
@@ -14362,8 +14362,8 @@ msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 #: include/views/configuration.triggers.list.php:32
 #: include/views/configuration.triggers.list.php:166
 #: include/views/configuration.triggers.massupdate.php:45
-#: include/views/reports.toptriggers.php:65
-#: include/views/reports.toptriggers.php:78
+#: include/views/reports.toptriggers.php:66
+#: include/views/reports.toptriggers.php:79
 msgid "Severity"
 msgstr "深刻度"
 
@@ -14418,7 +14418,7 @@ msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありませ�
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"の共有オプション\"%1$s\"の値がありません。"
 
-#: app/views/monitoring.problem.view.php:273
+#: app/views/monitoring.problem.view.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:138
 msgid "Shortened"
 msgstr "短縮"
@@ -14434,7 +14434,7 @@ msgstr "短縮"
 msgid "Show"
 msgstr "表示"
 
-#: app/views/monitoring.problem.view.php:308 latest.php:392
+#: app/views/monitoring.problem.view.php:309 latest.php:392
 msgid "Show details"
 msgstr "詳細を表示"
 
@@ -14470,7 +14470,7 @@ msgstr "障害の表示"
 msgid "Show selected"
 msgstr "選択を表示"
 
-#: app/views/monitoring.problem.view.php:289
+#: app/views/monitoring.problem.view.php:290
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:48
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:76
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:76
@@ -14483,7 +14483,7 @@ msgstr "選択を表示"
 msgid "Show suppressed problems"
 msgstr "メンテナンス中の障害を表示"
 
-#: app/views/monitoring.problem.view.php:282
+#: app/views/monitoring.problem.view.php:283
 #: include/classes/widgets/forms/CWidgetFormProblems.php:116
 msgid "Show tags"
 msgstr "タグを表示"
@@ -14493,7 +14493,7 @@ msgstr "タグを表示"
 msgid "Show text as HTML"
 msgstr "HTMLとしてテキストを表示"
 
-#: app/views/monitoring.problem.view.php:302
+#: app/views/monitoring.problem.view.php:303
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:111
 #: include/classes/widgets/forms/CWidgetFormProblems.php:208
 msgid "Show timeline"
@@ -14503,7 +14503,7 @@ msgstr "タイムラインを表示"
 msgid "Show triggers"
 msgstr "トリガーを表示"
 
-#: app/views/monitoring.problem.view.php:293
+#: app/views/monitoring.problem.view.php:294
 #: include/classes/widgets/forms/CWidgetFormProblems.php:168
 msgid "Show unacknowledged only"
 msgstr "未確認のみ表示"
@@ -14775,9 +14775,9 @@ msgstr "スピード"
 msgid "Stacked"
 msgstr "積算グラフ"
 
-#: include/classes/widgets/CWidgetHelper.php:638
-#: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:937
+#: include/classes/widgets/CWidgetHelper.php:639
+#: include/classes/widgets/CWidgetHelper.php:681
+#: include/classes/widgets/CWidgetHelper.php:938
 msgid "Staircase"
 msgstr "棒グラフ"
 
@@ -15129,7 +15129,7 @@ msgstr "タグ"
 msgid "Tag \"%1$s\" with value \"%2$s\" already exists."
 msgstr "値\"%2$s\"のタグ\"%1$s\"はすでに存在します。"
 
-#: app/views/monitoring.problem.view.php:283
+#: app/views/monitoring.problem.view.php:284
 #: include/classes/widgets/forms/CWidgetFormProblems.php:150
 msgid "Tag display priority"
 msgstr "タグ表示優先度"
@@ -15143,7 +15143,7 @@ msgstr "タグフィルター"
 msgid "Tag for matching"
 msgstr "クローズに利用するタグ名"
 
-#: app/views/monitoring.problem.view.php:270
+#: app/views/monitoring.problem.view.php:271
 #: include/classes/widgets/forms/CWidgetFormProblems.php:136
 msgid "Tag name"
 msgstr "タグ名"
@@ -15152,7 +15152,7 @@ msgstr "タグ名"
 msgid "Tag value"
 msgstr "タグの値"
 
-#: app/views/monitoring.problem.view.php:281
+#: app/views/monitoring.problem.view.php:282
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:543
 #: include/classes/screens/CScreenProblem.php:819
 #: include/classes/screens/CScreenProblem.php:872
@@ -15580,9 +15580,9 @@ msgstr "期間"
 #: app/controllers/CControllerPopupTriggerExpr.php:147
 #: app/controllers/CControllerPopupTriggerExpr.php:160
 #: app/controllers/CControllerPopupTriggerExpr.php:186
-#: include/classes/widgets/CWidgetHelper.php:649
-#: include/classes/widgets/CWidgetHelper.php:724
-#: include/classes/widgets/CWidgetHelper.php:1001
+#: include/classes/widgets/CWidgetHelper.php:650
+#: include/classes/widgets/CWidgetHelper.php:725
+#: include/classes/widgets/CWidgetHelper.php:1002
 msgid "Time shift"
 msgstr "タイムシフト"
 
@@ -15674,8 +15674,7 @@ msgstr "トランザクションがクローズされていません。終了し
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "変換したSQLクエリの実行結果をローレベルディスカバリのJSONオプジェクトに挿入。"
 
-#: include/classes/widgets/CWidgetHelper.php:639
-#: include/classes/widgets/CWidgetHelper.php:682
+#: include/classes/widgets/CWidgetHelper.php:640
 #: include/classes/widgets/CWidgetHelper.php:683
 #: include/classes/widgets/CWidgetHelper.php:684
 #: include/classes/widgets/CWidgetHelper.php:685
@@ -15686,7 +15685,8 @@ msgstr "変換したSQLクエリの実行結果をローレベルディスカバ
 #: include/classes/widgets/CWidgetHelper.php:690
 #: include/classes/widgets/CWidgetHelper.php:691
 #: include/classes/widgets/CWidgetHelper.php:692
-#: include/classes/widgets/CWidgetHelper.php:957
+#: include/classes/widgets/CWidgetHelper.php:693
+#: include/classes/widgets/CWidgetHelper.php:958
 msgid "Transparency"
 msgstr "透明度"
 
@@ -15694,9 +15694,9 @@ msgstr "透明度"
 msgid "Transport error."
 msgstr "転送エラー。"
 
-#: include/classes/widgets/CWidgetHelper.php:645
-#: include/classes/widgets/CWidgetHelper.php:719
-#: include/classes/widgets/CWidgetHelper.php:989
+#: include/classes/widgets/CWidgetHelper.php:646
+#: include/classes/widgets/CWidgetHelper.php:720
+#: include/classes/widgets/CWidgetHelper.php:990
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr "0とみなす"
@@ -15737,7 +15737,7 @@ msgstr "トレンド"
 #: include/views/configuration.triggers.edit.php:582
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:711
-#: include/views/reports.toptriggers.php:78 jsLoader.php:167 jsLoader.php:255
+#: include/views/reports.toptriggers.php:79 jsLoader.php:167 jsLoader.php:255
 #: services.php:354
 msgid "Trigger"
 msgstr "トリガー"
@@ -15939,7 +15939,7 @@ msgid "Trigger updated"
 msgstr "トリガーを更新しました"
 
 #: app/controllers/CControllerPopupGeneric.php:136
-#: app/views/monitoring.problem.view.php:143 include/forms.inc.php:441
+#: app/views/monitoring.problem.view.php:144 include/forms.inc.php:441
 #: include/html.inc.php:388 include/triggers.inc.php:880
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
@@ -17322,8 +17322,7 @@ msgstr "ようこそ"
 msgid "When active"
 msgstr "有効な時間帯"
 
-#: graphs.php:43 include/classes/widgets/CWidgetHelper.php:634
-#: include/classes/widgets/CWidgetHelper.php:666
+#: graphs.php:43 include/classes/widgets/CWidgetHelper.php:635
 #: include/classes/widgets/CWidgetHelper.php:667
 #: include/classes/widgets/CWidgetHelper.php:668
 #: include/classes/widgets/CWidgetHelper.php:669
@@ -17334,7 +17333,8 @@ msgstr "有効な時間帯"
 #: include/classes/widgets/CWidgetHelper.php:674
 #: include/classes/widgets/CWidgetHelper.php:675
 #: include/classes/widgets/CWidgetHelper.php:676
-#: include/classes/widgets/CWidgetHelper.php:941
+#: include/classes/widgets/CWidgetHelper.php:677
+#: include/classes/widgets/CWidgetHelper.php:942
 #: include/views/configuration.graph.edit.php:84
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:93
@@ -17524,10 +17524,10 @@ msgstr "Y軸の最小値"
 msgid "Y axis side"
 msgstr "Y軸"
 
-#: include/classes/widgets/CWidgetHelper.php:646
-#: include/classes/widgets/CWidgetHelper.php:721
+#: include/classes/widgets/CWidgetHelper.php:647
 #: include/classes/widgets/CWidgetHelper.php:722
-#: include/classes/widgets/CWidgetHelper.php:995
+#: include/classes/widgets/CWidgetHelper.php:723
+#: include/classes/widgets/CWidgetHelper.php:996
 msgid "Y-axis"
 msgstr "Y軸"
 
@@ -17885,7 +17885,7 @@ msgstr "エージェント"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1866
 #: include/classes/html/CSeverity.php:49
-#: include/classes/pagefilter/CPageFilter.php:867
+#: include/classes/pagefilter/CPageFilter.php:875
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
 #: include/classes/screens/CScreenHostTriggers.php:109
@@ -18100,7 +18100,7 @@ msgstr "循環するアイテムの依存関係は許可されていません"
 msgid "colour"
 msgstr "色"
 
-#: app/views/monitoring.problem.view.php:286
+#: app/views/monitoring.problem.view.php:287
 #: include/classes/widgets/views/widget.problems.form.view.php:92
 msgid "comma-separated list"
 msgstr "カンマ区切りのリスト"
@@ -18139,12 +18139,12 @@ msgstr "dayofmonth() - 月内の日付"
 msgid "dayofweek() - Day of week"
 msgstr "dayofweek() - 曜日(月曜 - 1、日曜 - 7)"
 
-#: app/views/monitoring.problem.view.php:182
+#: app/views/monitoring.problem.view.php:183
 #: include/views/common.filter.trigger.php:75
 msgid "days"
 msgstr "日"
 
-#: include/classes/pagefilter/CPageFilter.php:741
+#: include/classes/pagefilter/CPageFilter.php:749
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/widgets/CWidgetHelper.php:53
 #: include/views/js/monitoring.slideconf.edit.js.php:14
@@ -18278,8 +18278,8 @@ msgstr "ホストグループ"
 msgid "host is not monitored"
 msgstr "ホストが無効"
 
-#: include/classes/widgets/CWidgetHelper.php:507
-#: include/classes/widgets/CWidgetHelper.php:872
+#: include/classes/widgets/CWidgetHelper.php:508
+#: include/classes/widgets/CWidgetHelper.php:873
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "host pattern"
 msgstr "ホストパターン"
@@ -18384,8 +18384,8 @@ msgstr "アイテム"
 msgid "item is disabled"
 msgstr "アイテムが無効"
 
-#: include/classes/widgets/CWidgetHelper.php:528
-#: include/classes/widgets/CWidgetHelper.php:891
+#: include/classes/widgets/CWidgetHelper.php:529
+#: include/classes/widgets/CWidgetHelper.php:892
 msgid "item pattern"
 msgstr "アイテムパターン"
 
@@ -18579,7 +18579,7 @@ msgstr "データなし"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし、0 - それ以外)"
 
-#: include/classes/widgets/CWidgetHelper.php:1003
+#: include/classes/widgets/CWidgetHelper.php:1004
 msgid "none"
 msgstr "なし"
 
@@ -18594,8 +18594,8 @@ msgstr "期間外"
 
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
-#: include/classes/pagefilter/CPageFilter.php:800
-#: include/classes/pagefilter/CPageFilter.php:867 include/forms.inc.php:1126
+#: include/classes/pagefilter/CPageFilter.php:808
+#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1126
 #: include/views/monitoring.screen.php:63 slides.php:199
 msgid "not selected"
 msgstr "選択されていません"
@@ -18814,10 +18814,10 @@ msgid "supplied credentials are not unique"
 msgstr "指定された資格情報はユニークではありません"
 
 #: app/views/monitoring.problem.view.js.php:18
-#: app/views/monitoring.problem.view.php:235
+#: app/views/monitoring.problem.view.php:236
 #: include/classes/api/services/CUserGroup.php:463
-#: include/classes/widgets/CWidgetHelper.php:392
-#: include/classes/widgets/CWidgetHelper.php:439
+#: include/classes/widgets/CWidgetHelper.php:393
+#: include/classes/widgets/CWidgetHelper.php:440
 #: include/views/administration.usergroups.edit.php:241
 #: include/views/configuration.action.edit.php:364
 #: include/views/configuration.action.edit.php:374
@@ -18962,9 +18962,9 @@ msgid "unsupported version number"
 msgstr "サポートされていないバージョン番号です"
 
 #: app/views/monitoring.problem.view.js.php:25
-#: app/views/monitoring.problem.view.php:242
-#: include/classes/widgets/CWidgetHelper.php:402
-#: include/classes/widgets/CWidgetHelper.php:447
+#: app/views/monitoring.problem.view.php:243
+#: include/classes/widgets/CWidgetHelper.php:403
+#: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:246
 #: include/views/administration.general.macros.edit.php:53
