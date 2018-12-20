@@ -881,6 +881,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									'items.php?form=update&itemid='.$function['itemid']
 								))
 									->addClass(ZBX_STYLE_LINK_ALT)
+									->setAttribute('data-itemid', $function['itemid'])
 									->addClass($style);
 							}
 
