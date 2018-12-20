@@ -1,9 +1,34 @@
+Changes for 4.0.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3
+
+4.0.3rc3 was released as 4.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc3
+
+New features:
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-15333] fixed zoomout on doubleclick in graph widget (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.3rc1
 
 New features:
 ..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
 
 Bug fixes:
+..F....... [ZBX-15236] fixed display parent host groups without hosts in multiselect (talbergs)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)

@@ -202,7 +202,8 @@ class CWidgetHelper {
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form_name,
 					'dstfld1' => zbx_formatDomId($field_name),
-					'real_hosts' => true
+					'real_hosts' => true,
+					'enrich_parent_groups' => true
 				]
 			],
 			'add_post_js' => false
