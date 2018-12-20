@@ -113,7 +113,6 @@ $fields = [
 	'host_inventory' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	null,		null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,			null,		null],
-	'show_inherited_tags' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -1016,7 +1015,6 @@ elseif (hasRequest('form')) {
 
 		// Tags
 		'tags' => $tags,
-		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 
 		// Macros
 		'macros' => $macros,
@@ -1207,38 +1205,12 @@ elseif (hasRequest('form')) {
 	unset($proxy);
 
 	// tags
-	if ($data['show_inherited_tags']) {
-		$data['parent_templates'] = getHostParentTemplates(array_flip($data['templates']));
-
-		$inherited_tags = [];
-
-		foreach ($data['parent_templates'] as $templateid => $template) {
-			foreach ($template['tags'] as $tag) {
-				if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-					$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-						'templateids' => [$templateid => $templateid],
-						'type' => ZBX_PROPERTY_INHERITED
-					];
-				}
-				else {
-					$inherited_tags[$tag['tag'].':'.$tag['value']]['templateids'] += [$templateid => $templateid];
-				}
-			}
-		}
-
-		foreach ($data['tags'] as $tag) {
-			if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
-				$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-			}
-			else {
-				$inherited_tags[$tag['tag'].':'.$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-			}
-		}
-
-		$data['tags'] = array_values($inherited_tags);
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
-
-	CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	}
 
 	// macros
 	if ($data['show_inherited_macros']) {

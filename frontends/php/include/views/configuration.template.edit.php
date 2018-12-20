@@ -421,13 +421,11 @@ $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 
 // tags
 $tags_view = new CView('configuration.tags.tab', [
+	'source' => 'template',
 	'tags' => $data['tags'],
-	'show_inherited_tags' => $data['show_inherited_tags'],
-	'parent_templates' => $data['parent_templates'],
-	'form_type' => 'templates',
 	'readonly' => false
 ]);
-$divTabs->addTab('tagTab', _('Tags'), $tags_view->render());
+$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 // macros
 if (!$macros) {

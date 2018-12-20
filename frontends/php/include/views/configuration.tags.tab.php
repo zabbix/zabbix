@@ -23,6 +23,8 @@ if (!$data['readonly']) {
 	require_once dirname(__FILE__).'/js/configuration.tags.tab.js.php';
 }
 
+$show_inherited_tags = (array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags']);
+
 // form list
 $tags_form_list = new CFormList('tagsFormList');
 
@@ -32,22 +34,16 @@ $table = (new CTable())
 		_('Name'),
 		_('Value'),
 		_('Action'),
-		$data['show_inherited_tags'] ? _('Parent templates') : null
+		$show_inherited_tags ? _('Parent templates') : null
 	]);
-
-if (!$data['tags']) {
-	$data['tags'][] = ['tag' => '', 'value' => ''];
-}
-foreach ($data['tags'] as &$tag) {
-	if (!array_key_exists('type', $tag)) {
-		$tag['type'] = ZBX_PROPERTY_OWN;
-	}
-}
-unset($tag);
 
 // fields
 foreach ($data['tags'] as $i => $tag) {
-	$readonly = ($data['readonly'] || ($data['show_inherited_tags'] && !($tag['type'] & ZBX_PROPERTY_OWN)));
+	if (!array_key_exists('type', $tag)) {
+		$tag['type'] = ZBX_PROPERTY_OWN;
+	}
+
+	$readonly = ($data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED));
 
 	$tag_input = (new CTextBox('tags['.$i.'][tag]', $tag['tag'], $readonly))
 		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
@@ -55,7 +51,7 @@ foreach ($data['tags'] as $i => $tag) {
 
 	$tag_cell = [$tag_input];
 
-	if ($data['show_inherited_tags']) {
+	if ($show_inherited_tags) {
 		$tag_cell[] = new CVar('tags['.$i.'][type]', $tag['type']);
 	}
 
@@ -66,7 +62,7 @@ foreach ($data['tags'] as $i => $tag) {
 	$row = [$tag_cell, $value_input];
 
 	$row[] = (new CCol(
-		($data['show_inherited_tags'] && ($tag['type'] & ZBX_PROPERTY_INHERITED))
+		($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED))
 			? (new CButton('tags['.$i.'][disable]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-disable')
@@ -77,7 +73,7 @@ foreach ($data['tags'] as $i => $tag) {
 				->setEnabled(!$readonly)
 	))->addClass(ZBX_STYLE_NOWRAP);
 
-	if ($data['show_inherited_tags']) {
+	if ($show_inherited_tags) {
 		$template_list = [];
 
 		if (array_key_exists('templateids', $tag)) {
@@ -115,31 +111,15 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
-switch ($data['form_type']) {
-	case 'hosts':
-		$tags_own = _('Host tags');
-		$tags_both = _('Inherited and host tags');
-		break;
-
-	case 'templates':
-		$tags_own = _('Template tags');
-		$tags_both = _('Inherited and template tags');
-		break;
-
-	case 'triggers':
-	case 'trigger_prototypes':
-		$tags_own = _('Trigger tags');
-		$tags_both = _('Inherited and trigger tags');
-		break;
+if ($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype') {
+	$tags_form_list->addRow(null,
+		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
+			->addValue(_('Trigger tags'), 0, null, 'this.form.submit()')
+			->addValue(_('Inherited and trigger tags'), 1, null, 'this.form.submit()')
+			->setModern(true)
+	);
 }
 
-$tags_form_list
-	->addRow(null,
-		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue($tags_own, 0, null, 'this.form.submit()')
-			->addValue($tags_both, 1, null, 'this.form.submit()')
-			->setModern(true)
-	)
-	->addRow(null, $table);
+$tags_form_list->addRow(null, $table);
 
 return $tags_form_list;

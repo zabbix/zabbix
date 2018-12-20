@@ -684,13 +684,11 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
  * Tags
  */
 $tags_view = new CView('configuration.tags.tab', [
+	'source' => 'host',
 	'tags' => $data['tags'],
-	'show_inherited_tags' => $data['show_inherited_tags'],
-	'parent_templates' => $data['parent_templates'],
-	'form_type' => 'hosts',
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
-$divTabs->addTab('tags_tab', _('Tags'), $tags_view->render());
+$divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 /*
  * Macros

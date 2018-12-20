@@ -1603,6 +1603,14 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	// tags
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
+	else {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+	}
+
 	if ($data['hostid'] && (!array_key_exists('groupid', $data) || !$data['groupid'])) {
 		$db_hostgroups = API::HostGroup()->get([
 			'output' => ['groupid'],
