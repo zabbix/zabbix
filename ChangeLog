@@ -1,8 +1,38 @@
-Changes for 4.0.3rc1
+Changes for 4.0.4rc1
 
 New features:
 
 Bug fixes:
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
+...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3
+
+4.0.3rc3 was released as 4.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc3
+
+New features:
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-15333] fixed zoomout on doubleclick in graph widget (vmurzins)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc1
+
+New features:
+..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
+
+Bug fixes:
+..F....... [ZBX-15236] fixed display parent host groups without hosts in multiselect (talbergs)
+.......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
+.......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ..F....... [ZBX-13673] fixed regexp validation when pattern contain slash character (gcalenko)
 ..F....... [ZBX-14528] fixed incorrect keycode handling in multiselect input fields (miks)
@@ -2103,6 +2133,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions, fixed constraint error when importing new data.tmpl (kalimulin)
 ..F....... [ZBX-14606] removed strict-transport-security header from frontend (miks)
