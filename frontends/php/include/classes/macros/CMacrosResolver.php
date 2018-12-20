@@ -2441,18 +2441,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// Replace macros in selement label.
 			if ($options['resolve_element_label']) {
-				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
-				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-						|| $sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-					$sel['label'] = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-						? $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr)
-						: $this->resolveMapLabelMacros($sel['label'], [$host]);
-				}
-				else {
-					// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
-					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
-				}
-
 				// Subtract unsupported macros from $types.
 				$types = $types_by_selement_type[$selement_type];
 				foreach (['macros', 'macros_n'] as $macros_type_key) {
@@ -2475,6 +2463,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						: UNRESOLVED_MACRO_STRING;
 					$sel['label'] = substr_replace($sel['label'], $value, $pos, strlen($macro));
 				}
+
+				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
+				if ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
+						|| $sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+					$sel['label'] = ($sel['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+						? $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr)
+						: $this->resolveMapLabelMacros($sel['label'], [$host]);
+				}
+				else {
+					// Resolve functional macros like: {sampleHostName:log[{HOST.HOST}.log].last(0)}, if no host provided.
+					$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
+				}
+
 			}
 
 			// Replace macros in selement URLs.
