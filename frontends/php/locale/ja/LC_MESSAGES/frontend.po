@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-12-19 18:13+0200\n"
-"PO-Revision-Date: 2018-11-19 14:30+0300\n"
-"Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
+"PO-Revision-Date: 2018-12-20 03:54+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1542630602.000000\n"
+"X-POOTLE-MTIME: 1545270874.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1712,11 +1712,11 @@ msgstr "閲覧モードではウィジェットを追加できません"
 
 #: include/classes/validators/CLdapAuthValidator.php:72
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "匿名ではLDAPサーバーにバインドできません。"
 
 #: include/classes/validators/CLdapAuthValidator.php:71
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "LDAPサーバーにバインドできません。"
 
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
@@ -1752,7 +1752,7 @@ msgstr "障害をクローズできません: %1$s。"
 
 #: include/classes/validators/CLdapAuthValidator.php:70
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "LDAPサーバーに接続できません。"
 
 #: include/classes/setup/CSetupWizard.php:255
 msgid "Cannot connect to the database."
@@ -1998,11 +1998,11 @@ msgstr "テンプレートのアプリケーションを削除できません。
 
 #: include/classes/api/services/CGraphPrototype.php:575
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "テンプレートのグラフのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CGraph.php:559
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "テンプレートのグラフを削除できません。"
 
 #: include/classes/api/services/CHostPrototype.php:1071
 msgid "Cannot delete templated host prototype."
@@ -2010,7 +2010,7 @@ msgstr "テンプレートのホストのプロトタイプを削除できませ
 
 #: include/classes/api/services/CItemPrototype.php:876
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "テンプレートのアイテムのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CItem.php:706
 msgid "Cannot delete templated item."
@@ -2028,7 +2028,7 @@ msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません�
 #: include/classes/api/services/CTriggerPrototype.php:541
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "テンプレートのトリガーのプロトタイプ\"%1$s:%2$s\"を削除できません。"
 
 #: include/classes/api/services/CHttpTest.php:557
 #, c-format
@@ -2871,7 +2871,7 @@ msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMP�
 #: include/views/js/monitoring.sysmaps.js.php:11
 #: include/views/monitoring.screen.constructor.edit.php:872
 msgid "Centre"
-msgstr ""
+msgstr "中央"
 
 #: app/views/administration.proxy.edit.php:91
 #: app/views/administration.proxy.edit.php:99
@@ -5323,7 +5323,7 @@ msgstr "アイテムプロトタイプ\"%1$s\"内のアプリケーションプ�
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty colour."
-msgstr ""
+msgstr "色の設定が空白です。"
 
 #: include/classes/api/services/CCorrelation.php:699
 msgid "Empty correlation ID."
@@ -6602,7 +6602,7 @@ msgstr "H:i:s"
 
 #: app/views/administration.mediatype.edit.php:174
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: include/discovery.inc.php:51
 #: include/views/js/configuration.discovery.edit.js.php:184
@@ -10326,7 +10326,7 @@ msgstr "メッセージ"
 
 #: app/views/administration.mediatype.edit.php:172
 msgid "Message format"
-msgstr ""
+msgstr "メッセージフォーマット"
 
 #: app/views/administration.mediatype.edit.php:168
 msgid "Message text limit"
@@ -14341,15 +14341,15 @@ msgstr "インベントリモードの設定"
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Setting LDAP dereferencing mode failed."
-msgstr ""
+msgstr "LDAP逆参照モードの設定に失敗しました。"
 
 #: include/classes/validators/CLdapAuthValidator.php:74
 msgid "Setting LDAP protocol failed."
-msgstr ""
+msgstr "LDAPプロトコルの設定に失敗しました。"
 
 #: include/classes/validators/CLdapAuthValidator.php:76
 msgid "Setting LDAP referrals to \"Off\" failed."
-msgstr ""
+msgstr "LDAPリフェラルを「オフ」に設定できませんでした。"
 
 #: app/controllers/CControllerPopupGeneric.php:145
 #: app/controllers/CControllerPopupGeneric.php:159
@@ -14463,7 +14463,7 @@ msgstr "ヒストリがないアイテムを表示"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:95
 #: include/classes/widgets/forms/CWidgetFormProblems.php:178
 msgid "Show latest values"
-msgstr ""
+msgstr "最新の値を表示"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:274
@@ -14810,7 +14810,7 @@ msgstr "開始時刻"
 
 #: include/classes/validators/CLdapAuthValidator.php:75
 msgid "Starting TLS failed."
-msgstr ""
+msgstr "TLS接続の開始に失敗しました。"
 
 #: include/classes/items/CHelpItems.php:899
 msgid "Startup time of Zabbix server, Unix timestamp."
@@ -16551,7 +16551,7 @@ msgstr "bulkリクエストを使用"
 #: adm.triggerdisplayoptions.php:31
 #: include/views/administration.general.trigger.options.edit.php:37
 msgid "Use custom event status colours"
-msgstr ""
+msgstr "イベントのステータスの文字色を変更"
 
 #: app/views/popup.media.php:73
 #: include/views/administration.users.edit.php:243
