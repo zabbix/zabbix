@@ -6,6 +6,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
@@ -46,6 +47,7 @@ Changes for 4.0.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
 
 --------------------------------------------------------------------------------
