@@ -3,6 +3,7 @@ Changes for 4.0.4rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3
