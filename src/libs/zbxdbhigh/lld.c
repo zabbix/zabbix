@@ -722,7 +722,7 @@ error:
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became  not supported: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\" became not supported: %s",
 					zbx_host_key_string(lld_ruleid), error);
 
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts,
