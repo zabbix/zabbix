@@ -86,6 +86,10 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
+		if ($options['itemids'] !== null) {
+			zbx_value2array($options['itemids']);
+		}
+
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getFromElasticsearch($options);
