@@ -726,7 +726,7 @@ function updateUserProfile(idx, value_int, idx2) {
 	});
 }
 
-function changeWidgetState(obj, widgetId, url) {
+function changeWidgetState(obj, widgetId, idx) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
@@ -743,13 +743,9 @@ function changeWidgetState(obj, widgetId, url) {
 	}
 
 	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-
-	sendAjaxData(url, {
-		data: {
-			widget: widgetId,
-			state: state
-		}
-	});
+	if (idx !== '' && typeof idx !== 'undefined') {
+		updateUserProfile(idx, state, []);
+	}
 }
 
 /**

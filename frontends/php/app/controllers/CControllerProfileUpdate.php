@@ -65,6 +65,11 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.active':
+				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
+				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
+				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state':
 					$ret = true;
 					break;
 

@@ -1,6 +1,7 @@
 Changes for 4.2.0alpha2
 
 New features:
+..F....... [ZBXNEXT-4876] moved global search page to MVC framework (talbergs)
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 ..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
 ..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
