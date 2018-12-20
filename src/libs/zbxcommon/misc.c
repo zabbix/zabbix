@@ -178,7 +178,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ts->sec = (int)tb.time;
 	ts->ns = tb.millitm * 1000000;
 
-
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
