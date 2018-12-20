@@ -6,6 +6,7 @@ New features:
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
 ...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
 ........S. [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
@@ -49,6 +50,7 @@ Changes for 4.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
 ...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
 ........S. [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
