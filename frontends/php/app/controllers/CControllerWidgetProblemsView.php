@@ -48,7 +48,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'evaltype' => $fields['evaltype'],
 			'tags' => $fields['tags'],
 			'show_suppressed' => $fields['show_suppressed'],
-			'unacknowledged' => $fields['unacknowledged']
+			'unacknowledged' => $fields['unacknowledged'],
+			'show_latest_values' => $fields['show_latest_values']
 		], $config);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
@@ -67,7 +68,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
-			'details' => 0
+			'details' => 0,
+			'show_latest_values' => $fields['show_latest_values']
 		], true);
 
 		if ($fields['show_tags']) {
@@ -89,7 +91,8 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'show_timeline' => $fields['show_timeline'],
 				'tags' => $fields['tags'],
 				'tag_name_format' => $fields['tag_name_format'],
-				'tag_priority' => $fields['tag_priority']
+				'tag_priority' => $fields['tag_priority'],
+				'show_latest_values' => $fields['show_latest_values']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],

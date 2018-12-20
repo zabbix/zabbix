@@ -174,7 +174,7 @@ class CMultiSelect extends CTag {
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'webitems',
 					'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types', 'excludeids',
-					'disableids'];
+					'disableids', 'enrich_parent_groups'];
 
 				foreach ($parameters as $field => $value) {
 					if (!in_array($field, $valid_fields)) {
@@ -267,6 +267,11 @@ class CMultiSelect extends CTag {
 
 				if (array_key_exists('disableids', $parameters) && $parameters['disableids']) {
 					$popup_parameters['disableids'] = $parameters['disableids'];
+				}
+
+				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
+					$popup_parameters['enrich_parent_groups'] = '1';
+					$autocomplete_parameters['enrich_parent_groups'] = '1';
 				}
 			}
 		}
