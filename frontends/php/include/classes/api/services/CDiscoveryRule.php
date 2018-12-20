@@ -1370,9 +1370,13 @@ class CDiscoveryRule extends CItemGeneral {
 			]]
 		];
 
+		$items = $this->extendObjects('items', $items, ['templateid']);
+
 		foreach ($items as $key => $item) {
 			if (array_key_exists('lld_macro_paths', $item)) {
 				$itemid = $item['itemid'];
+				$templateid = $item['templateid'];
+
 				$item = array_intersect_key($item, $rules);
 				$path = '/'.($key + 1);
 
@@ -1381,6 +1385,14 @@ class CDiscoveryRule extends CItemGeneral {
 				}
 
 				if (array_key_exists('lld_macro_paths', $item)) {
+					if ($templateid != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths',
+								_('cannot update property for templated discovery rule')
+							)
+						);
+					}
+
 					$lld_macro_pathids = [];
 
 					// Check that fields exists, are not empty, do not duplicate and collect IDs to compare with DB.
