@@ -562,5 +562,5 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->resolveMacrosInMapElements($selements, $options);
-}
+	}
 }

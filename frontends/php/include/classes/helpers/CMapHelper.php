@@ -93,6 +93,9 @@ class CMapHelper {
 				$options['severity_min'] = $map['severity_min'];
 			}
 
+			// Populate host group elements of subtype 'SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS' with hosts.
+			$areas = self::populateHostGroupsWithHosts($map, $theme);
+
 			// Propagate map urls to map elements.
 			self::addMapUrlsToMapElements($map);
 
@@ -100,7 +103,7 @@ class CMapHelper {
 			$resolve_opt = ['resolve_element_urls' => true, 'resolve_element_label' => true];
 			$map['selements'] = CMacrosResolverHelper::resolveMacrosInMapElements($map['selements'], $resolve_opt);
 
-			self::resolveMapState($map, $options, $theme);
+			self::resolveMapState($map, $areas, $options);
 		}
 
 		return [
@@ -152,25 +155,16 @@ class CMapHelper {
 	 * Resolve map element (selements and links) state.
 	 *
 	 * @param array $sysmap                   Map data.
+	 * @param array $areas                    Areas representing array containing host group element IDs and dimention
+	 *                                        properties of area.
 	 * @param array $options                  Options used to retrieve actions.
 	 * @param int   $options['severity_min']  Minimum severity.
-	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
 	 */
-	protected static function resolveMapState(array &$sysmap, array $options, array $theme) {
+	protected static function resolveMapState(array &$sysmap, array $areas, array $options) {
 		$map_info_options = [
 			'severity_min' => array_key_exists('severity_min', $options) ? $options['severity_min'] : null
 		];
 
-		foreach ($sysmap['selements'] as &$selement) {
-			// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $selement['permission'] < PERM_READ
-					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
-			}
-		}
-		unset($selement);
-
-		$areas = populateFromMapAreas($sysmap, $theme);
 		$map_info = getSelementsInfo($sysmap, $map_info_options);
 		processAreasCoordinates($sysmap, $areas, $map_info);
 		// Adding element names and removing inaccessible triggers from readable elements.
@@ -587,5 +581,160 @@ class CMapHelper {
 		unset($selement);
 
 		return $map;
+	}
+
+	/**
+	 * Replace host groups of subtype = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP by hosts that belongs to group.
+	 *
+	 * @param array $sysmap                   Map data.
+	 * @param array $theme                    Theme used to create missing elements (like hostgroup frame).
+	 *
+	 * @return array     Array representing areas with area coordinates and selementids.
+	 */
+	protected static function populateHostGroupsWithHosts(array &$sysmap, array $theme) {
+		// Collect host groups to populate with hosts.
+		$host_groupids = [];
+		foreach ($sysmap['selements'] as &$selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					&& $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+				if ($selement['permission'] >= PERM_READ) {
+					$host_groupids[$selement['elements'][0]['groupid']] = $selement['elements'][0]['groupid'];
+				}
+				else {
+					// If user has no access to whole host group, always show it as a SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP.
+					$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
+				}
+			}
+		}
+		unset($selement);
+
+		$areas = [];
+
+		if ($host_groupids) {
+			$host_groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $host_groupids,
+				'selectHosts' => ['hostid', 'name'],
+				'preservekeys' => true
+			]);
+
+			$new_selementid = (count($sysmap['selements']) > 0) ? (int) max(array_keys($sysmap['selements'])) : 0;
+			$new_linkid = (count($sysmap['links']) > 0) ? (int) max(array_keys($sysmap['links'])) : 0;
+
+			foreach ($sysmap['selements'] as $selement_key => &$selement) {
+				if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
+						|| $selement['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+					continue;
+				}
+
+				$groupid = $selement['elements'][0]['groupid'];
+				$host_group = $host_groups[$groupid];
+				$original_selement = $selement;
+
+				// Jump to the next host group if current host group doesn't contain accessible hosts.
+				if (!$host_group['hosts']) {
+					continue;
+				}
+
+				// Sort hosts by name.
+				CArrayHelper::sort($host_group['hosts'], ['field' => 'name', 'order' => ZBX_SORT_UP]);
+
+				// Define area in which to locate hosts.
+				if ($selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM) {
+					$area = [
+						'selementids' => [],
+						'width' => $selement['width'],
+						'height' => $selement['height'],
+						'x' => $selement['x'],
+						'y' => $selement['y']
+					];
+
+					$sysmap['shapes'][] = [
+						'sysmap_shapeid' => 'e-' . $selement['selementid'],
+						'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+						'x' => $selement['x'],
+						'y' => $selement['y'],
+						'width' => $selement['width'],
+						'height' => $selement['height'],
+						'border_type' => SYSMAP_SHAPE_BORDER_TYPE_SOLID,
+						'border_width' => 3,
+						'border_color' => $theme['maingridcolor'],
+						'background_color' => '',
+						'zindex' => -1
+					];
+				}
+				else {
+					$area = [
+						'selementids' => [],
+						'width' => $sysmap['width'],
+						'height' => $sysmap['height'],
+						'x' => 0,
+						'y' => 0
+					];
+				}
+
+				// Add selected hosts as map selements.
+				foreach ($host_group['hosts'] as $host) {
+					$new_selementid++;
+
+					$area['selementids'][$new_selementid] = $new_selementid;
+					$sysmap['selements'][$new_selementid] = [
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'elementsubtype' => SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP,
+						'elements' => [
+							['hostid' => $host['hostid']]
+						],
+						'selementid' => $new_selementid
+					] + $selement;
+				}
+
+				$areas[] = $area;
+
+				// Make links.
+				$selements = zbx_toHash($sysmap['selements'], 'selementid');
+
+				foreach ($sysmap['links'] as $link) {
+					// Do not multiply links between two areas.
+					$id1 = $link['selementid1'];
+					$id2 = $link['selementid2'];
+
+					if ($selements[$id1]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+							&& $selements[$id1]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+							&& $selements[$id2]['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+							&& $selements[$id2]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+						continue;
+					}
+
+					if ($id1 == $original_selement['selementid']) {
+						$id_number = 'selementid1';
+					}
+					elseif ($id2 == $original_selement['selementid']) {
+						$id_number = 'selementid2';
+					}
+					else {
+						continue;
+					}
+
+					foreach ($area['selementids'] as $selement_id) {
+						$new_linkid++;
+						$link['linkid'] = -$new_linkid;
+						$link[$id_number] = -$selement_id;
+						$sysmap['links'][$new_linkid] = $link;
+					}
+				}
+			}
+		}
+
+		// Remove host group elements that are replaced by hosts.
+		$selements = [];
+		foreach ($sysmap['selements'] as $key => $element) {
+			if ($element['elementtype'] != SYSMAP_ELEMENT_TYPE_HOST_GROUP
+					|| $element['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+				$selements[$key] = $element;
+			}
+		}
+		$sysmap['selements'] = $selements;
+
+		return $areas;
 	}
 }
