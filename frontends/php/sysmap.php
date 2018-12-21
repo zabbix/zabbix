@@ -125,9 +125,10 @@ if (isset($_REQUEST['favobj'])) {
 		}
 		elseif (getRequest('action') === 'expand') {
 			$values = [];
+			$return = [];
 			$sources = json_decode(getRequest('source'), true);
 
-			foreach ($sources as $source) {
+			foreach ($sources as $num => $source) {
 				if (is_array($source) && (array_key_exists('label', $source) || array_key_exists('text', $source))) {
 					if (array_key_exists('inherited_label', $source) && $source['inherited_label'] !== null) {
 						$source['label'] = $source['inherited_label'];
@@ -135,20 +136,29 @@ if (isset($_REQUEST['favobj'])) {
 
 					if (array_key_exists('elementtype', $source) && array_key_exists('elements', $source)
 							&& is_array($source['elements']) && CMapHelper::checkSelementPermissions([$source])) {
-
-						$values[] = CMacrosResolverHelper::resolveMapLabelMacrosAll($source);
+						$values[$num] = $source;
 					}
 					else {
 						$label = array_key_exists('label', $source) ? $source['label'] : $source['text'];
-						$values[] = CMacrosResolverHelper::resolveMapLabelMacros($label);
+						$return[$num] = CMacrosResolverHelper::resolveMapLabelMacros($label);
 					}
 				}
 				else {
-					$values[] = null;
+					$return[$num] = null;
 				}
 			}
 
-			echo CJs::encodeJson($values);
+			if ($values) {
+				// Resolve macros in map element labels.
+				$values = CMacrosResolverHelper::resolveMacrosInMapElements($values, ['resolve_element_label' => true]);
+				foreach ($values as $num => $value) {
+					$return[$num] = $value['label'];
+				}
+			}
+
+			ksort($return);
+
+			echo CJs::encodeJson($return);
 			exit;
 		}
 	}
