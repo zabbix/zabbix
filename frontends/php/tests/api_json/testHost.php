@@ -29,38 +29,37 @@ class testHost extends CAPITest {
 	public static function host_delete() {
 		return [
 			[
-				'params' => [
+				'hostids' => [
 					'61001',
 				],
-				'expected_error' => 'Cannot delete host'.
-					' because maintenance "maintenance_has_only_host"'.
-					' must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
 			],
 			[
-				'params' => [
+				'hostids' => [
 					'61001',
 					'61003'
 				],
-				'expected_error' => 'Cannot delete selected hosts'.
-					' because maintenance "maintenance_has_only_host"'.
-					' must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete selected hosts because maintenance "maintenance_has_only_host" must contain at least one host or host group.'
 			],
 			[
-				'params' => [
+				'hostids' => [
 					'61003'
 				],
 				'expected_error' => null,
 			],
 			[
-				'params' => [
+				'hostids' => [
 					'61004',
 					'61005'
 				],
-				'expected_error' => 'Cannot delete selected hosts'.
-					' because maintenance "maintenance_two_hosts"'.
-					' must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete selected hosts because maintenance "maintenance_two_hosts" must contain at least one host or host group.'
+			],
+			[
+				'hostids' => [
+					'61004'
+				],
+				'expected_error' => null
 			]
-
 		];
 	}
 
@@ -72,8 +71,7 @@ class testHost extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['hostids'] as $id) {
-				$dbResult = 'select * from hosts where hostid='.zbx_dbstr($id);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+				$this->assertEquals(0, CDBHelper::getCount('select * from hosts where hostid='.zbx_dbstr($id)));
 			}
 		}
 	}
