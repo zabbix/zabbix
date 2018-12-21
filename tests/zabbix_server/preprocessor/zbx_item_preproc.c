@@ -101,6 +101,16 @@ static void	read_value(const char *path, unsigned char *value_type, zbx_variant_
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
 
+static void	read_history_value(const char *path, zbx_variant_t *value, zbx_timespec_t *ts)
+{
+	zbx_mock_handle_t	handle;
+
+	handle = zbx_mock_get_parameter_handle(path);
+	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
+	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
+	zbx_variant_convert(value, zbx_mock_str_to_variant(zbx_mock_get_object_member_string(handle, "variant")));
+}
+
 static void	read_step(const char *path, zbx_preproc_op_t *op)
 {
 	zbx_mock_handle_t	hop, hop_params, herror, herror_params;
@@ -140,7 +150,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
-		read_value("in.history", NULL, &history_value, &history_ts);
+		read_history_value("in.history", &history_value, &history_ts);
 	}
 	else
 	{

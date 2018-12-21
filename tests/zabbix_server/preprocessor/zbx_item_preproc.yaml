@@ -569,6 +569,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 10
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:00 +03:00
     data: 5
   step:
@@ -587,6 +588,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 5.5
   history:
+    variant: ZBX_VARIANT_DBL
     time: 2017-10-29 03:14:00 +03:00
     data: -4.5
   step:
@@ -605,6 +607,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 10
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:00 +03:00
     data: 10
   step:
@@ -623,6 +626,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 0
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:00 +03:00
     data: 10
   step:
@@ -640,6 +644,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 1.5
   history:
+    variant: ZBX_VARIANT_DBL
     time: 2017-10-29 03:14:00 +03:00
     data: 0
   step:
@@ -658,6 +663,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 1
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:50 +03:00
     data: 2
   step:
@@ -675,6 +681,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 2
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:15:10 +03:00
     data: 1
   step:
@@ -692,6 +699,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 2
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:50 +03:00
     data: 1
   step:
@@ -710,6 +718,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 3
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:50 +03:00
     data: 2
   step:
@@ -728,6 +737,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 3
   history:
+    variant: ZBX_VARIANT_UI64
     time: 2017-10-29 03:14:59 +03:00
     data: 2
   step:
@@ -1303,6 +1313,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 123
   history:
+    variant: ZBX_VARIANT_STR
     time: 2017-10-29 03:14:00 +03:00
     data: 1
   step:
@@ -1336,6 +1347,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: 123
   history:
+    variant: ZBX_VARIANT_STR
     time: 2017-10-29 03:14:00 +03:00
     data: 123
   step:
@@ -1369,6 +1381,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: abc
   history:
+    variant: ZBX_VARIANT_STR
     time: 2017-10-29 03:14:30 +03:00
     data: xyz
   step:
@@ -1388,6 +1401,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: abc
   history:
+    variant: ZBX_VARIANT_STR
     time: 2017-10-29 03:14:30 +03:00
     data: abc
   step:
@@ -1406,6 +1420,7 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: abc
   history:
+    variant: ZBX_VARIANT_STR
     time: 2017-10-29 03:14:00 +03:00
     data: abc
   step:
