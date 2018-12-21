@@ -480,25 +480,6 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve all kinds of macros in map labels.
-	 *
-	 * @static
-	 *
-	 * @param array  $selement
-	 * @param string $selement['label']						label to expand
-	 * @param int    $selement['elementtype']				element type
-	 * @param array    $selement['elements']				elements
-	 * @param string $selement['elementExpressionTrigger']	if type is trigger, then trigger expression
-	 *
-	 * @return string
-	 */
-	public static function resolveMapLabelMacrosAll(array $selement) {
-		self::init();
-
-		return self::$macrosResolver->resolveMapLabelMacrosAll($selement);
-	}
-
-	/**
 	 * Resolve macros in dashboard widget URL.
 	 *
 	 * @static
