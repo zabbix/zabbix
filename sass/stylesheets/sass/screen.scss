@@ -5629,6 +5629,7 @@ svg {
 .overrides-list {
 	display: table;
 	width: 90%;
+	max-width: 738px;
 	padding-left: 15px;
 
 	.overrides-list-item {
@@ -5732,6 +5733,10 @@ svg {
 			height: 24px;
 		}
 	}
+}
+
+.patternselect {
+	line-height: 14px;
 }
 
 .columns-wrapper {
