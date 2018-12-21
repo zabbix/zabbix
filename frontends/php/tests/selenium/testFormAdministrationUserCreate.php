@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormAdministrationUserCreate extends CLegacyWebTest {
 
 	public function testFormAdministrationUserCreate_CreateUser() {
-		$this->zbxTestLogin('users.php');
+		$this->page->login()->open('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestContentControlButtonClickTextWait('Create user');
 		$this->zbxTestInputType('alias', 'User alias');

@@ -35,7 +35,7 @@ class testPageTriggers extends CLegacyWebTest {
 	* @dataProvider data
 	*/
 	public function testPageTriggers_CheckLayout($data) {
-		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
+		$this->page->login()->open('triggers.php?hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -172,7 +172,7 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
-		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
+		$this->page->login()->open('triggers.php?hostid='.$this->hostid);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Reset');
@@ -203,7 +203,7 @@ class testPageTriggers extends CLegacyWebTest {
 	}
 
 	public function testPageTriggers_TagsResetFilter() {
-		$this->zbxTestLogin('triggers.php?hostid='.$this->hostid);
+		$this->page->login()->open('triggers.php?hostid='.$this->hostid);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Reset');

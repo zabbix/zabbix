@@ -47,7 +47,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 	}
 
 	public function testPageAdministrationMediaTypes_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
 
 		$this->zbxTestCheckHeader('Media types');
@@ -73,7 +73,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 			' WHERE mediatypeid='.$mediatype['mediatypeid']
 		);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.disable');
 		$this->zbxTestAcceptAlert();
@@ -98,7 +98,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 			' WHERE mediatypeid='.$mediatype['mediatypeid']
 		);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.enable');
 		$this->zbxTestAcceptAlert();
@@ -125,7 +125,7 @@ class testPageAdministrationMediaTypes extends CLegacyWebTest {
 		));
 		$usedInOperations = ($dbRow['count'] > 0);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestClickButton('mediatype.delete');
 		$this->zbxTestAcceptAlert();

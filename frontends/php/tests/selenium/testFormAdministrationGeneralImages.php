@@ -28,7 +28,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
-		$this->zbxTestLogin('adm.gui.php');
+		$this->page->login()->open('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Images');
 		$this->zbxTestCheckTitle('Configuration of images');
@@ -49,7 +49,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_AddImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestClickWait('form');
 
 		$this->zbxTestAssertElementPresentId('name');
@@ -70,7 +70,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$sqlIcons = 'SELECT * FROM images WHERE imagetype=1';
 		$oldHashIcons=CDBHelper::getHash($sqlIcons);
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeWait('name', $this->icon_image_name2);
 		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
@@ -83,7 +83,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
 		$this->zbxTestInputTypeOverwrite('name', $this->icon_image_name2);
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
@@ -97,7 +97,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestClickLinkTextWait($this->icon_image_name2);
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
@@ -111,7 +111,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_AddBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestInputType('name', $this->bg_image_name);
@@ -126,7 +126,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestTextPresent('Type');
 		$this->zbxTestWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
@@ -143,7 +143,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteBgImage() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickLinkTextWait($this->bg_image_name2);
 		$this->zbxTestClickWait('delete');

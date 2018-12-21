@@ -158,7 +158,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestClickButtonText('Create discovery rule');
 		$this->fillInFields($data);
 
@@ -310,7 +310,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormNetworkDiscovery_Create($data) {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestClickButtonText('Create discovery rule');
 		$this->fillInFields($data);
 
@@ -391,7 +391,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestClickLinkText($data['old_name']);
 		$this->fillInFields($data);
 
@@ -463,7 +463,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormNetworkDiscovery_Update($data) {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestClickLinkText($data['old_name']);
 		$this->fillInFields($data);
 
@@ -517,7 +517,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules', 3) as $discovery) {
 			$this->zbxTestClickLinkTextWait($discovery['name']);
 			$this->zbxTestClickWait('update');
@@ -616,7 +616,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 	public function testFormNetworkDiscovery_Delete() {
 		$name = 'Discovery rule to check delete';
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickAndAcceptAlert('delete');
@@ -630,7 +630,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	}
 
 	public function testFormNetworkDiscovery_Clone() {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules WHERE druleid IN (2,3)', 2) as $drule) {
 			$this->zbxTestClickLinkTextWait($drule['name']);
 			$this->zbxTestWaitForPageToLoad();
@@ -692,7 +692,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$sql_dchecks = 'SELECT * FROM dchecks ORDER BY druleid, dcheckid';
 		$old_dchecks = CDBHelper::getHash($sql_dchecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 
 		if ($action === 'create') {
 			$discovery = [

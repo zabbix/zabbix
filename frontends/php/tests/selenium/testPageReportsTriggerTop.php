@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageReportsTriggerTop extends CLegacyWebTest {
 
 	public function testPageReportsTriggerTop_FilterLayout() {
-		$this->zbxTestLogin('toptriggers.php');
+		$this->page->login()->open('toptriggers.php');
 		$this->zbxTestCheckTitle('100 busiest triggers');
 		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestExpandFilterTab('Filter');
@@ -190,7 +190,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
-		$this->zbxTestLogin('toptriggers.php');
+		$this->page->login()->open('toptriggers.php');
 		$this->zbxTestCheckHeader('100 busiest triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');

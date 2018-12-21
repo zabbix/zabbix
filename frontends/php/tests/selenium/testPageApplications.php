@@ -62,7 +62,7 @@ class testPageApplications extends CLegacyWebTest {
 	 */
 	public function testPageApplications_CheckApplicationList($data) {
 		// Open hosts page.
-		$this->zbxTestLogin('hosts.php');
+		$this->page->login()->open('hosts.php');
 		$this->zbxTestClickLinkTextWait('ЗАББИКС Сервер');
 
 		// Navigate to host applications.
@@ -134,7 +134,7 @@ class testPageApplications extends CLegacyWebTest {
 	}
 
 	public function selectApplications($app_names, $host) {
-		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
+		$this->page->login()->open('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestDropdownSelectWait('hostid', $host);
 		$result = [];

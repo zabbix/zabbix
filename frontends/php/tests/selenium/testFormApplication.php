@@ -54,7 +54,7 @@ class testFormApplication extends CLegacyWebTest {
 		}
 
 		// Open an application.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);
@@ -87,7 +87,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestContentControlButtonClickTextWait('Create application');
@@ -110,7 +110,7 @@ class testFormApplication extends CLegacyWebTest {
 	 */
 	public function testFormApplication_CheckValidation() {
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestContentControlButtonClickTextWait('Create application');
@@ -160,7 +160,7 @@ class testFormApplication extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait(self::$application);
@@ -185,7 +185,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);
@@ -208,7 +208,7 @@ class testFormApplication extends CLegacyWebTest {
 		$name = self::$application;
 
 		// Select hostgroup and host, open a form.
-		$this->zbxTestLogin('applications.php');
+		$this->page->login()->open('applications.php');
 		$this->zbxTestMainFilterDropdownSelectWait('groupid', '4');
 		$this->zbxTestMainFilterDropdownSelectWait('hostid', '40001');
 		$this->zbxTestClickLinkTextWait($name);

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageOverview extends CLegacyWebTest {
 	// Check that no real host or template names displayed
 	public function testPageOverview_NoHostNames() {
-		$this->zbxTestLogin('overview.php');
+		$this->page->login()->open('overview.php');
 		$this->zbxTestCheckTitle('Overview [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestCheckNoRealHostnames();
@@ -529,7 +529,7 @@ class testPageOverview extends CLegacyWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageOverview_CheclFilterResults($data) {
-		$this->zbxTestLogin('overview.php');
+		$this->page->login()->open('overview.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -712,7 +712,7 @@ class testPageOverview extends CLegacyWebTest {
 	 * @dataProvider getContextMenu
 	 */
 	public function testPageOverview_ContextMenuLinks($data) {
-		$this->zbxTestLogin('overview.php');
+		$this->page->login()->open('overview.php');
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestClickButtonText('Reset');
 
@@ -742,7 +742,7 @@ class testPageOverview extends CLegacyWebTest {
 
 	public function testPageOverview_FullScreenKioskMode() {
 		try {
-			$this->zbxTestLogin('overview.php');
+			$this->page->login()->open('overview.php');
 			$this->zbxTestCheckHeader('Overview');
 			$this->zbxTestAssertElementPresentXpath("//header");
 			$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
@@ -774,7 +774,7 @@ class testPageOverview extends CLegacyWebTest {
 		}
 		catch (Exception $e) {
 			// Reset fullscreen/kiosk mode.
-			$this->zbxTestLogin('overview.php?fullscreen=0');
+			$this->page->login()->open('overview.php?fullscreen=0');
 			$this->zbxTestCheckHeader('Overview');
 			throw $e;
 		}

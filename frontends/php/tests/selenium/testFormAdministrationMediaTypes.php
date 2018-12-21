@@ -91,7 +91,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	* @dataProvider layout
 	*/
 	public function testFormAdministrationMediaTypes_CheckLayout($data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
 
@@ -229,7 +229,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 		$oldHashMediaType = CDBHelper::getHash($sql);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('cancel');
@@ -276,7 +276,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	* @dataProvider newMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_Create($type, $data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.edit');
+		$this->page->login()->open('zabbix.php?action=mediatype.edit');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
 
@@ -330,7 +330,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
 		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
@@ -351,7 +351,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid='.zbx_dbstr($id).''));
 		$used_by_operations = ($row['cnt'] > 0);
 
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestClickLinkTextWait($name);
 
@@ -565,7 +565,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	 * @dataProvider create_options
 	 */
 	public function testFormAdministrationMediaTypes_CreateWithOptions($data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.edit');
+		$this->page->login()->open('zabbix.php?action=mediatype.edit');
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestDropdownSelect('type', $data['type']);

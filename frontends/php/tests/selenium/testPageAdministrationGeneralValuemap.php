@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralValuemap_CheckLayout() {
-		$this->zbxTestLogin('adm.valuemapping.php');
+		$this->page->login()->open('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent(['Name', 'Value map']);
@@ -49,7 +49,7 @@ class testPageAdministrationGeneralValuemap extends CLegacyWebTest {
 		$sqlMappings = 'select * from mappings order by mappingid';
 		$oldHashMappings = CDBHelper::getHash($sqlMappings);
 
-		$this->zbxTestLogin('adm.valuemapping.php');
+		$this->page->login()->open('adm.valuemapping.php');
 
 		// There is no need to check simple update of every valuemap.
 		foreach (CDBHelper::getAll('select name from valuemaps limit 10') as $valuemap) {

@@ -30,7 +30,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	private $cloned_regexp = 'test_regexp1_clone';
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->page->login()->open('adm.gui.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
@@ -80,7 +80,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	 * @dataProvider dataCreate
 	 */
 	public function testFormAdministrationGeneralRegexp_Create($result, $name, $test_string, $expression, $expression_type, $exp_delimiter, $case_sensitive) {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickWait('form');
 
@@ -104,7 +104,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddExisting() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickWait('form');
 
@@ -118,7 +118,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
 		// creating regexp without expression
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 
 		$this->zbxTestClickWait('form');
@@ -129,7 +129,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 
@@ -139,7 +139,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestFalse() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
@@ -151,7 +151,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_Clone() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestClickWait('clone');
@@ -164,7 +164,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_Update() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
@@ -176,7 +176,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_Delete() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkTextWait($this->regexp2);
 
@@ -195,7 +195,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
-		$this->zbxTestLogin('adm.regexps.php');
+		$this->page->login()->open('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestClickButton('regexp.massdelete');

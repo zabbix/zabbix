@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageQueueDetails extends CLegacyWebTest {
 	public function testPageQueueDetails_CheckLayout() {
-		$this->zbxTestLogin('queue.php?config=2');
+		$this->page->login()->open('queue.php?config=2');
 		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
 		$this->zbxTestTextNotPresent('Cannot display item queue.');
 		$this->zbxTestCheckHeader('Queue of items to be updated');

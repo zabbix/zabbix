@@ -43,7 +43,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 	 * Select host or template to open applications page.
 	 */
 	private function openApplicationsPage($host) {
-		$this->zbxTestLogin('applications.php?groupid=0&hostid=0');
+		$this->page->login()->open('applications.php?groupid=0&hostid=0');
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//select[@name="hostid"]'));
 		$this->zbxTestDropdownSelectWait('hostid', $host);
 		$this->zbxTestCheckHeader('Applications');

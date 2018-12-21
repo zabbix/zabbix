@@ -58,7 +58,7 @@ class testPageAdministrationDMProxies extends CLegacyWebTest {
 	}
 
 	public function testPageAdministrationDMProxies_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=proxy.list');
+		$this->page->login()->open('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent('Displaying');
@@ -76,7 +76,7 @@ class testPageAdministrationDMProxies extends CLegacyWebTest {
 	public function testPageAdministrationDMProxies_SimpleUpdate($proxy) {
 		$this->calculateHash($proxy['hostid']);
 
-		$this->zbxTestLogin('zabbix.php?action=proxy.list');
+		$this->page->login()->open('zabbix.php?action=proxy.list');
 		$this->zbxTestClickLinkText($proxy['host']);
 		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of proxies');

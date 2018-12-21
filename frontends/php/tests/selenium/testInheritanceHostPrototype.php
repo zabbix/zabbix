@@ -154,7 +154,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testInheritanceHostPrototype_CreateHostLinkTemplate($data) {
-		$this->zbxTestLogin('hosts.php?form=create');
+		$this->page->login()->open('hosts.php?form=create');
 		$this->zbxTestInputTypeWait('host', $data['host']);
 		$this->zbxTestClickButtonMultiselect('groups_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -528,7 +528,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.$discovery_id);
+		$this->page->login()->open('host_prototypes.php?parent_discoveryid='.$discovery_id);
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
@@ -568,7 +568,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
+		$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.$discovery_id.'&hostid='.
 				$host_prototype
 		);
 	}

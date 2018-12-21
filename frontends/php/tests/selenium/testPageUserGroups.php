@@ -26,7 +26,7 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	public function testPageUserGroups_CheckLayout() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
 
@@ -59,7 +59,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$sqlHashUsersGroups = "select * from users_groups where usrgrpid=$usrgrpid order by id";
 		$oldHashUsersGroups = CDBHelper::getHash($sqlHashUsersGroups);
 
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
@@ -84,7 +84,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
 		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
@@ -120,7 +120,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
 		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
@@ -146,7 +146,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
 		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
@@ -172,7 +172,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
 		$oldHashGroups = CDBHelper::getHash($sqlHashGroups);
 
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
 		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
@@ -189,7 +189,7 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	public function testPageUserGroups_FilterByName() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
@@ -197,7 +197,7 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	public function testPageUserGroups_FilterNone() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
@@ -207,7 +207,7 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	public function testPageUserGroups_FilterByStatus() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpath("//label[@for='filter_users_status_1']");
 		$this->zbxTestClickButtonText('Apply');
@@ -216,7 +216,7 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	public function testPageUserGroups_FilterReset() {
-		$this->zbxTestLogin('usergrps.php');
+		$this->page->login()->open('usergrps.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');

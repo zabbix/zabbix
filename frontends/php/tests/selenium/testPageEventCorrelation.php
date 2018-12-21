@@ -55,7 +55,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_CheckLayout() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckTitle('Event correlation rules');
 		$this->zbxTestCheckHeader('Event correlation');
 		// Check "Create correlation" button.
@@ -80,7 +80,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	public function testPageEventCorrelation_FilterByName() {
 		$name = 'Event correlation for cancel';
 
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckHeader('Event correlation');
 		$this->zbxTestInputType('filter_name', 'for cancel');
 		$this->zbxTestClickButtonText('Apply');
@@ -93,7 +93,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_FilterByEnabled() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Enabled']");
 		$this->zbxTestClickButtonText('Apply');
@@ -116,7 +116,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_FilterByDisabled() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickXpath("//ul[@id='filter_status']//label[text()='Disabled']");
 		$this->zbxTestClickButtonText('Apply');
@@ -139,7 +139,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_FilterReset() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckHeader('Event correlation');
 		$this->zbxTestInputType('filter_name', 'NONE');
 		$this->zbxTestClickButtonText('Apply');
@@ -174,7 +174,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	 * @dataProvider getCorrelationData
 	 */
 	public function testPageEventCorrelation_SingleEnableDisableByLink($data) {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
 		// Enable or disable correlation by its link
 		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationid[]=".$id['correlationid']."')]");
@@ -194,7 +194,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	 * @dataProvider getCorrelationData
 	 */
 	public function testPageEventCorrelation_SingleEnableDisableByCheckbox($data) {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
 		$this->zbxTestCheckboxSelect('g_correlationid_'.$id['correlationid']);
 
@@ -214,7 +214,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_DisableAll() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massenable');
 		$this->zbxTestAcceptAlert();
@@ -224,7 +224,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_EnableAll() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdisable');
 		$this->zbxTestAcceptAlert();
@@ -237,7 +237,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$name = 'Event correlation for delete';
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($name)));
 
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckboxSelect('g_correlationid_'.$id['correlationid']);
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();
@@ -247,7 +247,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	}
 
 	public function testPageEventCorrelation_DeleteAll() {
-		$this->zbxTestLogin('correlation.php');
+		$this->page->login()->open('correlation.php');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('correlation.massdelete');
 		$this->zbxTestAcceptAlert();

@@ -104,7 +104,7 @@ class testFormTemplate extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTemplate_Create($data) {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
@@ -167,7 +167,7 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->page->login()->open('templates.php');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 
 			if (isset ($data['visible_name'])) {
@@ -206,7 +206,7 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_AddMacros() {
 		$template = CDBHelper::getRow('select hostid from hosts where host='.zbx_dbstr($this->template));
 
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestClickLinkTextWait($this->template);
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
@@ -229,7 +229,7 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_UpdateTemplateName() {
 		$new_template_name = 'Changed template name';
 
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
@@ -241,7 +241,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_CloneTemplate() {
 		$cloned_template_name = 'Cloned template';
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestAssertElementPresentId('filter_name');
 		$this->zbxTestDoubleClickLinkText($this->template_clone, 'template_name');
@@ -261,7 +261,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_FullCloneTemplate() {
 		$cloned_template_name = 'Full cloned template';
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template_clone);
 		$this->zbxTestClickWait('full_clone');
@@ -281,7 +281,7 @@ class testFormTemplate extends CLegacyWebTest {
 		public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template);
 		$this->zbxTestClickWait('delete');
@@ -294,7 +294,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_DeleteAndClearTemplate() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template_full_delete);
 		$this->zbxTestClickWait('delete_and_clear');

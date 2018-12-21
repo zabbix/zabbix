@@ -60,7 +60,7 @@ class testZBX6648 extends CLegacyWebTest {
 	 * @dataProvider zbx_data
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
 		$this->zbxTestLaunchOverlayDialog('Triggers');

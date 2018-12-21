@@ -76,7 +76,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationScripts_testLayout() {
-		$this->zbxTestLogin('zabbix.php?action=script.edit');
+		$this->page->login()->open('zabbix.php?action=script.edit');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestCheckHeader('Scripts');
 
@@ -123,7 +123,7 @@ class testFormAdministrationScripts extends CLegacyWebTest {
 	 * @dataProvider providerScripts
 	 */
 	public function testFormAdministrationScripts_testCreate($data, $resultSave, $dbValues) {
-		$this->zbxTestLogin('zabbix.php?action=script.edit');
+		$this->page->login()->open('zabbix.php?action=script.edit');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestCheckHeader('Scripts');
 

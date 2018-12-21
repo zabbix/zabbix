@@ -485,7 +485,7 @@ class testFormItem extends CLegacyWebTest {
 				$templateid = $dbRow['templateid'];
 		}
 
-		$this->zbxTestLogin(
+		$this->page->login()->open(
 			'items.php?form='.(isset($itemid) ? 'update' : 'create').
 			'&hostid='.$hostid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
@@ -1188,7 +1188,7 @@ class testFormItem extends CLegacyWebTest {
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->page->login()->open('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($name);
@@ -2117,7 +2117,7 @@ class testFormItem extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItem_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
+		$this->page->login()->open('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 
@@ -2333,7 +2333,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->page->login()->open('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeping');
 
@@ -2655,7 +2655,7 @@ class testFormItem extends CLegacyWebTest {
 		$dbRow = DBfetch($dbResult);
 		$hostid = $dbRow['hostid'];
 
-		$this->zbxTestLogin('items.php?hostid='.$hostid.'&form=create');
+		$this->page->login()->open('items.php?hostid='.$hostid.'&form=create');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 
@@ -2735,7 +2735,7 @@ class testFormItem extends CLegacyWebTest {
 		$dbRowHost = DBfetch($dbResultHost);
 		$hostid = $dbRowHost['hostid'];
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid=15001');
+		$this->page->login()->open('items.php?filter_set=1&hostid=15001');
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 

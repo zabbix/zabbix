@@ -33,7 +33,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralTriggerSeverities_CheckLayout($allValues) {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->page->login()->open('adm.triggerseverities.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
@@ -89,7 +89,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralTriggerSeverities_ChangeTriggerSeverities() {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->page->login()->open('adm.triggerseverities.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
@@ -164,7 +164,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralTriggerSeverities_ResetDefaults() {
 
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->page->login()->open('adm.triggerseverities.php');
 		$this->zbxTestCheckHeader('Trigger severities');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');

@@ -729,7 +729,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			$hostid = 0;
 		}
 
-		$this->zbxTestLogin('graphs.php?groupid=0&hostid='.$hostid);
+		$this->page->login()->open('graphs.php?groupid=0&hostid='.$hostid);
 		return $hostid;
 	}
 

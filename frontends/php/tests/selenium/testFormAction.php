@@ -449,19 +449,19 @@ class testFormAction extends CLegacyWebTest {
 		$eventsource = $data['eventsource'];
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
+				$this->page->login()->open('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
 				break;
 			case 'Discovery':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY.'&form=Create+action');
+				$this->page->login()->open('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY.'&form=Create+action');
 				break;
 			case 'Auto registration':
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION.'&form=Create+action');
+				$this->page->login()->open('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION.'&form=Create+action');
 				break;
 			case 'Internal';
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL.'&form=Create+action');
+				$this->page->login()->open('actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL.'&form=Create+action');
 				break;
 			default:
-				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
+				$this->page->login()->open('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
 				break;
 		}
 
@@ -1639,7 +1639,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 		$oldHashActions = CDBHelper::getHash($sqlActions);
 
-		$this->zbxTestLogin('actionconf.php');
+		$this->page->login()->open('actionconf.php');
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
 				$this->zbxTestDropdownSelectWait('eventsource', 'Triggers');
@@ -1841,7 +1841,7 @@ class testFormAction extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormAction_SimpleCreate($data) {
-		$this->zbxTestLogin('actionconf.php?form=1&eventsource='.$data['eventsource']);
+		$this->page->login()->open('actionconf.php?form=1&eventsource='.$data['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
@@ -1995,7 +1995,7 @@ class testFormAction extends CLegacyWebTest {
 	}
 
 	public function testFormAction_Create() {
-		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
+		$this->page->login()->open('actionconf.php?form=1&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestInputTypeWait('name', 'action test');

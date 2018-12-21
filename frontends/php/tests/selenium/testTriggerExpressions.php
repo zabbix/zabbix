@@ -35,7 +35,7 @@ class testTriggerExpressions extends CLegacyWebTest {
 	*/
 	public function testTriggerExpression_SimpleTest($value, $expected, $css_class) {
 		// Open advanced editor for testing trigger expression results
-		$this->zbxTestLogin('triggers.php?form=update&hostid=10084&triggerid=13504');
+		$this->page->login()->open('triggers.php?form=update&hostid=10084&triggerid=13504');
 		$this->zbxTestCheckHeader('Triggers');
 		$this->zbxTestClickButtonText('Expression constructor');
 		$this->zbxTestClickButtonText('Test');

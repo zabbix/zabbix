@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageWeb extends CLegacyWebTest {
 	public function testPageWeb_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view');
 		$this->zbxTestCheckTitle('Web monitoring');
 		$this->zbxTestCheckHeader('Web monitoring');
 		$this->zbxTestTextPresent(['Group', 'Host']);
@@ -31,7 +31,7 @@ class testPageWeb extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageWeb_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view');
 		$this->zbxTestCheckTitle('Web monitoring');
 		$this->zbxTestCheckNoRealHostnames();
 	}

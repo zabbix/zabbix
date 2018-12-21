@@ -27,7 +27,7 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestCheckTitle('Configuration of images');
@@ -49,7 +49,7 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 // TODO: need background images
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages() {
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestAssertElementPresentId('form');
@@ -75,7 +75,7 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 		$sql_image = 'SELECT * FROM images WHERE imageid='.$image['imageid'];
 		$old_image_hash = CDBHelper::getHash($sql_image);
 
-		$this->zbxTestLogin('adm.images.php');
+		$this->page->login()->open('adm.images.php');
 		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestDropdownSelectWait('imagetype', $image['imagetype'] == IMAGE_TYPE_ICON ? 'Icon' : 'Background');
 		$this->zbxTestClickLinkTextWait($image['name']);

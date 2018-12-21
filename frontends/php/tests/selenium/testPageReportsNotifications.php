@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageReportsNotifications extends CLegacyWebTest {
 
 	public function testPageReportsNotifications_CheckLayout() {
-		$this->zbxTestLogin('report4.php');
+		$this->page->login()->open('report4.php');
 		$this->zbxTestCheckTitle('Notification report');
 		$this->zbxTestCheckHeader('Notifications');
 
@@ -150,7 +150,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 	 * @dataProvider getUsersNotificationsData
 	 */
 	public function testPageReportsNotifications_CheckFilters($data) {
-		$this->zbxTestLogin('report4.php');
+		$this->page->login()->open('report4.php');
 
 		// Select period
 		if (array_key_exists('period', $data)) {

@@ -47,7 +47,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->page->login()->open('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
@@ -104,7 +104,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 * @dataProvider dataCreate
 	 */
 	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 		$this->zbxTestCheckHeader('Templates');
 
 		$this->zbxTestClickLinkTextWait($template);
@@ -179,7 +179,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->page->login()->open('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->hostName);
 
 		$this->zbxTestTabSwitch('Templates');
@@ -200,7 +200,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTrigger() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create a trigger
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -242,7 +242,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraph() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create a graph
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -300,7 +300,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateDiscovery() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create an LLD rule
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -347,7 +347,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateItemPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create an item prototype
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -408,7 +408,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTriggerPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create a trigger prototype
 		$this->zbxTestClickLinkTextWait($this->templateName);
@@ -464,7 +464,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		$this->zbxTestLogin('templates.php');
+		$this->page->login()->open('templates.php');
 
 		// create a graph
 		$this->zbxTestClickLinkTextWait($this->templateName);

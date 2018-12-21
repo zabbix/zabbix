@@ -35,7 +35,7 @@ class testPageHistory extends CLegacyWebTest {
 	* @dataProvider checkLayoutItems
 	*/
 	public function testPageHistory_CheckLayout($item) {
-		$this->zbxTestLogin('history.php?action=showvalues&itemids[]='.$item['itemid']);
+		$this->page->login()->open('history.php?action=showvalues&itemids[]='.$item['itemid']);
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 		switch ($item['value_type']) {

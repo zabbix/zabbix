@@ -1126,7 +1126,7 @@ class testUrlParameters extends CLegacyWebTest {
 	 */
 	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
-			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
+			$this->page->login()->open($test_case['url'], $server_name_on_page);
 			$this->zbxTestCheckTitle($title, $check_server_name);
 			$this->zbxTestTextPresent($test_case['text_present']);
 			if (isset($test_case['text_not_present'])) {

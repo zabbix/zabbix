@@ -30,7 +30,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	* @dataProvider WorkingTime
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->page->login()->open('adm.gui.php');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
@@ -45,7 +45,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$sqlHash = 'SELECT * FROM config ORDER BY configid';
 		$oldHash = CDBHelper::getHash($sqlHash);
 
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->page->login()->open('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
@@ -150,7 +150,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod($work_period, $expected, $msg) {
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->page->login()->open('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 

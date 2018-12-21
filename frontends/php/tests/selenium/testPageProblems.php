@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageProblems extends CLegacyWebTest {
 
 	public function testPageProblems_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckTitle('Problems');
 		$this->zbxTestCheckHeader('Problems');
 
@@ -37,7 +37,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_History_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 
 		$this->zbxTestClickXpathWait("//label[@for='filter_show_2']");
@@ -56,7 +56,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by "AND" or "OR" tag options
 	 */
 	public function testPageProblems_FilterByTagsOptionAndOr() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 
 		// Check the default tag filter option AND and tag value option Contains
@@ -85,7 +85,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by partial or exact tag value match
 	 */
 	public function testPageProblems_FilterByTagsOptionContainsEquals() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
@@ -108,7 +108,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by partial and exact tag value match and then remove one
 	 */
 	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
@@ -140,7 +140,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search by all options in filter
 	 */
 	public function testPageProblems_FilterByAllOptions() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
@@ -190,7 +190,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_ShowTags() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 
@@ -342,7 +342,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * @dataProvider getTagPriorityData
 	 */
 	public function testPageProblems_TagPriority($data) {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestInputType('filter_name', 'trigger with tag priority');
 
@@ -380,7 +380,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_SuppressedProblems() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
 

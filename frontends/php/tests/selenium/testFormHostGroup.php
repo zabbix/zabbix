@@ -27,7 +27,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	private $hostGroup = 'Test Group';
 
 	public function testFormHostGroup_CheckLayout() {
-		$this->zbxTestLogin('hostgroups.php?form=Create+host+group');
+		$this->page->login()->open('hostgroups.php?form=Create+host+group');
 		$this->zbxTestCheckTitle('Configuration of host groups');
 		$this->zbxTestCheckHeader('Host groups');
 		$this->zbxTestTextPresent(['Group name']);
@@ -43,7 +43,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_CreateEmpty() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
@@ -52,7 +52,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_Create() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
@@ -64,7 +64,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_CreateDuplicate() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestContentControlButtonClickTextWait('Create host group');
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
@@ -74,7 +74,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_UpdateEmpty() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestClickLinkTextWait($this->hostGroup);
 
 		$this->zbxTestInputTypeOverwrite('name', ' ');
@@ -89,7 +89,7 @@ class testFormHostGroup extends CLegacyWebTest {
 			' WHERE name<>'.zbx_dbstr($this->hostGroup), 1
 		));
 
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestClickLinkTextWait($this->hostGroup);
 
 		$this->zbxTestInputTypeOverwrite('name', $hostGroup['name']);
@@ -99,7 +99,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_Update() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestClickLinkTextWait($this->hostGroup);
 
 		$this->zbxTestInputTypeOverwrite('name', $this->hostGroup.' 2');
@@ -111,7 +111,7 @@ class testFormHostGroup extends CLegacyWebTest {
 	}
 
 	public function testFormHostGroup_Delete() {
-		$this->zbxTestLogin('hostgroups.php');
+		$this->page->login()->open('hostgroups.php');
 		$this->zbxTestClickLinkTextWait($this->hostGroup.' 2');
 
 		$this->zbxTestClickWait('delete');

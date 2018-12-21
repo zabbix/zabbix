@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageLatestData extends CLegacyWebTest {
 	public function testPageLatestData_CheckLayout() {
-		$this->zbxTestLogin('latest.php');
+		$this->page->login()->open('latest.php');
 		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
 		$this->zbxTestCheckHeader('Latest data');
 		$this->zbxTestTextPresent(['Host groups', 'Hosts', 'Application', 'Name', 'Show items without data', 'Show details']);
@@ -32,7 +32,7 @@ class testPageLatestData extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageLatestData_NoHostNames() {
-		$this->zbxTestLogin('latest.php');
+		$this->page->login()->open('latest.php');
 		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
 		$this->zbxTestCheckNoRealHostnames();
 	}

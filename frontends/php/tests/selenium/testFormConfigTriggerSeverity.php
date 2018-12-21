@@ -111,7 +111,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	}
 
 	public function testFormTriggerSeverity_Layout() {
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->page->login()->open('adm.triggerseverities.php');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 
@@ -148,7 +148,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 	 * @dataProvider providerTriggerSeverity
 	 */
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
-		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->page->login()->open('adm.triggerseverities.php');
 		$this->zbxTestCheckTitle('Configuration of trigger severities');
 		$this->zbxTestCheckHeader('Trigger severities');
 

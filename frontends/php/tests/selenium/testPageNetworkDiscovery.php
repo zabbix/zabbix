@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_CheckLayout() {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 
 		$this->zbxTestCheckHeader('Discovery rules');
@@ -45,7 +45,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$oldHashDRules = CDBHelper::getHash($sqlDRules);
 		$oldHashDChecks = CDBHelper::getHash($sqlDChecks);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestClickLinkText($drule['name']);
 		$this->zbxTestClickWait('update');
@@ -63,7 +63,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	 * @backup drules
 	 */
 	public function testPageNetworkDiscovery_MassDelete($drule) {
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massdelete');
@@ -79,7 +79,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_MassDisableAll() {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestClickButton('drule.massdisable');
@@ -97,7 +97,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_MassDisable($drule) {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE.' WHERE druleid='.$drule['druleid']);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massdisable');
@@ -117,7 +117,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_MassEnableAll() {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
 		$this->zbxTestClickButton('drule.massenable');
@@ -135,7 +135,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_MassEnable($drule) {
 		DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
 
-		$this->zbxTestLogin('discoveryconf.php');
+		$this->page->login()->open('discoveryconf.php');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_druleid_'.$drule['druleid']);
 		$this->zbxTestClickButton('drule.massenable');

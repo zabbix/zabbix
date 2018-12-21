@@ -61,7 +61,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	private function selectHostPrototype($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->page->login()->open("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
 
 		if ($data['hosts'] === 'all') {
 			$this->zbxTestCheckboxSelect('all_hosts');
@@ -183,7 +183,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageHostPrototypes_SingleEnableDisable($data) {
 		$discoveryid = DBfetch(DBselect("SELECT itemid FROM items WHERE name=".zbx_dbstr($data['item'])));
-		$this->zbxTestLogin("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
+		$this->page->login()->open("host_prototypes.php?parent_discoveryid=".$discoveryid['itemid']);
 
 		$this->checkPageAction($data, 'Click on state', $data['status']);
 	}

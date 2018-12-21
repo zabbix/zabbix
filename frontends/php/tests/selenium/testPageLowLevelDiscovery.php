@@ -37,7 +37,7 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 	* @dataProvider data
 	*/
 	public function testPageLowLevelDiscovery_CheckLayout($data) {
-		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
+		$this->page->login()->open('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
@@ -86,7 +86,7 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageLowLevelDiscovery_CheckNowAll($data) {
-		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
+		$this->page->login()->open('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckHeader('Discovery rules');
 
 		$this->zbxTestClick('all_items');
@@ -108,7 +108,7 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 	public function testPageLowLevelDiscovery_SimpleDelete($data) {
 		$itemid = $data['itemid'];
 
-		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
+		$this->page->login()->open('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
 		$this->zbxTestClickButton('discoveryrule.massdelete');
@@ -147,7 +147,7 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 		);
 		$hostids = zbx_objectValues($hostids, 'hostids');
 
-		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
+		$this->page->login()->open('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('discoveryrule.massdelete');

@@ -292,7 +292,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getUrlParseData
 	 */
 	public function testFormItemHttpAgent_UrlParse($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?form=create&hostid='.self::HOSTID);
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
 		$this->zbxTestInputTypeWait('url', $data['url']);
@@ -321,7 +321,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Test form validation.
 	 */
 	private function executeValidation($data, $action) {
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 
 		switch ($action) {
 			case 'create':
@@ -1010,7 +1010,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getCreataData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
-		$this->zbxTestLogin('items.php?form=create&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?form=create&hostid='.self::HOSTID);
 		$this->zbxTestDropdownSelectWait('type', 'HTTP agent');
 
 		if (array_key_exists('request_type', $data)) {
@@ -1187,7 +1187,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$data['fields']['Name'] = $update_item;
 		}
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($update_item);
 
 		$this->fillFields($data['fields']);
@@ -1225,7 +1225,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 
 		$sql = 'SELECT name'.
 				' FROM items'.
@@ -1256,7 +1256,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE name='.zbx_dbstr($clone_item);
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($clone_item);
 		$this->zbxTestClickWait('clone');
 
@@ -1297,7 +1297,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_Delete() {
 		$name = 'Http agent item for delete';
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickAndAcceptAlert('delete');
 
@@ -1323,7 +1323,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 
 		$this->fillFields($data);
@@ -1344,7 +1344,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	private function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('items.php?filter_set=1&hostid='.self::HOSTID);
+		$this->page->login()->open('items.php?filter_set=1&hostid='.self::HOSTID);
 
 		foreach (CDBHelper::getAll('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' LIMIT 1') as $item) {
 			$name = $item['name'];

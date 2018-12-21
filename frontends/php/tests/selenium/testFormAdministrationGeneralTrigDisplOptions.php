@@ -34,7 +34,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	 * @dataProvider allValues
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
-		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->page->login()->open('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestTextPresent(
 			[
@@ -72,7 +72,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
-		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->page->login()->open('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
@@ -182,7 +182,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	 * @dataProvider ok_period
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_OKPeriod($data) {
-		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->page->login()->open('adm.triggerdisplayoptions.php');
 
 		$this->zbxTestInputTypeOverwrite('ok_period', $data['period']);
 		$this->zbxTestClickWait('update');
@@ -271,7 +271,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	 * @dataProvider blink_period
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_BlinkPeriod($data) {
-		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->page->login()->open('adm.triggerdisplayoptions.php');
 
 		$this->zbxTestInputTypeOverwrite('blink_period', $data['period']);
 		$this->zbxTestClickWait('update');
@@ -292,7 +292,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
-		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
+		$this->page->login()->open('adm.triggerdisplayoptions.php');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');

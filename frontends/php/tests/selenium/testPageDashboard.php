@@ -79,7 +79,7 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
-		$this->zbxTestLogin('charts.php');
+		$this->page->login()->open('charts.php');
 		$this->zbxTestCheckHeader('Graphs');
 		$this->zbxTestDropdownSelectWait('graphid', $this->graphCpu);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -109,7 +109,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$exception = null;
 
 		try {
-			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+			$this->page->login()->open('zabbix.php?action=dashboard.view');
 			$FavouriteGraphs = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.graphids'"));
 			foreach ($FavouriteGraphs as $FavouriteGraph) {
 				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[8]//button[@onclick=\"rm4favorites('graphid','".$FavouriteGraph['value_id']."')\"]"));
@@ -132,7 +132,7 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteMap() {
-		$this->zbxTestLogin('sysmaps.php');
+		$this->page->login()->open('sysmaps.php');
 		$this->zbxTestCheckHeader('Maps');
 		$this->zbxTestClickLinkTextWait($this->mapTest);
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[@id='addrm_fav']"));
@@ -148,7 +148,7 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$FavouriteScreens = DBfetchArray(DBselect("SELECT value_id FROM profiles WHERE idx='web.favorite.sysmapids'"));
 		foreach ($FavouriteScreens as $FavouriteScreen) {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@class='dashbrd-grid-widget-container']/div[7]//button[@onclick=\"rm4favorites('sysmapid','".$FavouriteScreen['value_id']."')\"]"));
@@ -161,7 +161,7 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_FullScreen() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
@@ -181,7 +181,7 @@ class testPageDashboard extends CLegacyWebTest {
 	 * @depends testPageDashboard_FullScreen
 	 */
 	public function testPageDashboard_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
+		$this->page->login()->open('zabbix.php?action=dashboard.view', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 
@@ -206,7 +206,7 @@ class testPageDashboard extends CLegacyWebTest {
 
 	public function testPageDashboard_KioskModeUrlParameter() {
 		// Set layout mode to kiosk view.
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&kiosk=1', false);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");

@@ -30,7 +30,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 	*/
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
 
-		$this->zbxTestLogin('triggers.php?groupid=1&hostid='.$hostId);
+		$this->page->login()->open('triggers.php?groupid=1&hostid='.$hostId);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
 		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');

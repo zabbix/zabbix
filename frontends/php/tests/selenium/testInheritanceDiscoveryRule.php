@@ -49,7 +49,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$sqlDiscovery = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
-		$this->zbxTestLogin('host_discovery.php?form=update&itemid='.$data['itemid']);
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
@@ -85,7 +85,7 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
-		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&hostid='.$this->templateid);
+		$this->page->login()->open('host_discovery.php?form=Create+discovery+rule&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
