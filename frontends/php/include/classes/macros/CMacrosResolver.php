@@ -1776,13 +1776,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'urls' => ['{MAP.ID}', '{MAP.NAME}']
 			],
 			'trigger' => [
+				'label' => ['{TRIGGER.ID}'],
+				'urls' => ['{TRIGGER.ID}']
+			],
+			'triggers' => [
 				'label' => [
 					'{TRIGGER.EVENTS.ACK}', '{TRIGGER.EVENTS.PROBLEM.ACK}', '{TRIGGER.EVENTS.PROBLEM.UNACK}',
 					'{TRIGGER.EVENTS.UNACK}', '{TRIGGER.PROBLEM.EVENTS.PROBLEM.ACK}',
-					'{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', '{TRIGGER.ID}', '{TRIGGERS.UNACK}',
+					'{TRIGGER.PROBLEM.EVENTS.PROBLEM.UNACK}', '{TRIGGERS.UNACK}',
 					'{TRIGGERS.PROBLEM.UNACK}', '{TRIGGERS.ACK}', '{TRIGGERS.PROBLEM.ACK}'
-				],
-				'urls' => ['{TRIGGER.ID}']
+				]
 			],
 			'hostgroup' => [
 				'label' => ['{HOSTGROUP.ID}'],
@@ -1805,6 +1808,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'map' => [
 						'label' => $options['resolve_element_label'] ? $supported_macros['map']['label'] : [],
 						'urls' => $options['resolve_element_urls'] ? $supported_macros['map']['urls'] : []
+					],
+					'triggers' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
 					]
 				]
 			],
@@ -1813,6 +1819,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'hostgroup' => [
 						'label' => $options['resolve_element_label'] ? $supported_macros['hostgroup']['label'] : [],
 						'urls' => $options['resolve_element_urls'] ? $supported_macros['hostgroup']['urls'] : []
+					],
+					'triggers' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
 					]
 				]
 			],
@@ -1821,6 +1830,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'host' => [
 						'label' => $options['resolve_element_label'] ? $supported_macros['host']['label'] : [],
 						'urls' => $options['resolve_element_urls'] ? $supported_macros['host']['urls'] : []
+					],
+					'triggers' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
 					],
 					'interface' => [
 						'label' => $options['resolve_element_label'] ? $supported_macros['interface']['label'] : [],
@@ -1837,6 +1849,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'trigger' => [
 						'label' => $options['resolve_element_label'] ? $supported_macros['trigger']['label'] : [],
 						'urls' => $options['resolve_element_urls'] ? $supported_macros['trigger']['urls'] : []
+					],
+					'triggers' => [
+						'label' => $options['resolve_element_label'] ? $supported_macros['triggers']['label'] : []
 					]
 				],
 				'macros_n' => [
@@ -1894,8 +1909,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				foreach ($supported_macros_types as $macros_supported) {
-					$supported_label_macros[$selement_type][$macros_type_key] = array_merge($supported_label_macros[$selement_type][$macros_type_key], $macros_supported['label']);
-					$supported_urls_macros[$selement_type][$macros_type_key] = array_merge($supported_urls_macros[$selement_type][$macros_type_key], $macros_supported['urls']);
+					if (array_key_exists('label', $macros_supported)) {
+						$supported_label_macros[$selement_type][$macros_type_key] = array_merge(
+							$supported_label_macros[$selement_type][$macros_type_key], $macros_supported['label']
+						);
+					}
+
+					if (array_key_exists('urls', $macros_supported)) {
+						$supported_urls_macros[$selement_type][$macros_type_key] = array_merge(
+							$supported_urls_macros[$selement_type][$macros_type_key], $macros_supported['urls']
+						);
+					}
 				}
 			}
 
@@ -2237,7 +2261,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						break;
 
 					case 'TRIGGER.ID':
-						$matched_macro['value'] = $trigger ? $trigger['triggerid'] : '';
+						if ($trigger) {
+							$matched_macro['value'] = $trigger['triggerid'];
+						}
 						break;
 
 					case 'TRIGGERS.UNACK':
