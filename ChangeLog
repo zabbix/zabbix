@@ -2193,6 +2193,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
 ...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
