@@ -31,13 +31,18 @@ class CHtmlUrlValidator {
 	 *
 	 * @param string $url                   URL string to validate.
 	 * @param bool   $allow_user_macro      If set to be true, URLs containing user macros will be considered as valid.
+	 * @param bool   $allow_inventory_macro Enables the usage of host inventory macros {INVENTORY.URL.A<1-9>},
+	 *                                      {INVENTORY.URL.B<1-9>} and {INVENTORY.URL.C<1-9>} in URL without specifying
+	 *                                      valid schema at the beginning of $url string.
 	 * @param bool   $validate_uri_schemes  Parameter allows to overwrite global switch VALIDATE_URI_SCHEMES for
 	 *                                      specific uses.
 	 *
 	 * @return bool
 	 */
-	public static function validate($url, $allow_user_macro = true, $validate_uri_schemes = VALIDATE_URI_SCHEMES) {
-		if ($validate_uri_schemes === false) {
+	public static function validate($url, $allow_user_macro = true, $allow_inventory_macro = false,
+			$validate_uri_schemes = VALIDATE_URI_SCHEMES) {
+		if (($allow_inventory_macro === true && preg_match('/{INVENTORY\.URL\.[A-C]\d?}/', $url))
+				|| $validate_uri_schemes === false) {
 			return true;
 		}
 
