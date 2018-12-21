@@ -612,7 +612,9 @@ static zbx_mock_error_t	zbx_mock_parameter_rec(const yaml_node_t *node, const ch
 	/* end of the path, return whatever has been found */
 	if ('\0' == *pnext)
 	{
-		*parameter = zbx_mock_handle_alloc(node);
+		if (NULL != parameter)
+			*parameter = zbx_mock_handle_alloc(node);
+
 		return ZBX_MOCK_SUCCESS;
 	}
 
@@ -660,6 +662,11 @@ static zbx_mock_error_t	zbx_mock_parameter_rec(const yaml_node_t *node, const ch
 zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *parameter)
 {
 	return zbx_mock_parameter_rec(root, path, parameter);
+}
+
+zbx_mock_error_t	zbx_mock_parameter_exists(const char *path)
+{
+	return zbx_mock_parameter_rec(root, path, NULL);
 }
 
 zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)

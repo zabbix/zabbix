@@ -1456,18 +1456,31 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
 #define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFF)
 
-#define ZBX_PREPROC_MULTIPLIER		1
-#define ZBX_PREPROC_RTRIM		2
-#define ZBX_PREPROC_LTRIM		3
-#define ZBX_PREPROC_TRIM		4
-#define ZBX_PREPROC_REGSUB		5
-#define ZBX_PREPROC_BOOL2DEC		6
-#define ZBX_PREPROC_OCT2DEC		7
-#define ZBX_PREPROC_HEX2DEC		8
-#define ZBX_PREPROC_DELTA_VALUE		9
-#define ZBX_PREPROC_DELTA_SPEED		10
-#define ZBX_PREPROC_XPATH		11
-#define ZBX_PREPROC_JSONPATH		12
+#define ZBX_PREPROC_MULTIPLIER			1
+#define ZBX_PREPROC_RTRIM			2
+#define ZBX_PREPROC_LTRIM			3
+#define ZBX_PREPROC_TRIM			4
+#define ZBX_PREPROC_REGSUB			5
+#define ZBX_PREPROC_BOOL2DEC			6
+#define ZBX_PREPROC_OCT2DEC			7
+#define ZBX_PREPROC_HEX2DEC			8
+#define ZBX_PREPROC_DELTA_VALUE			9
+#define ZBX_PREPROC_DELTA_SPEED			10
+#define ZBX_PREPROC_XPATH			11
+#define ZBX_PREPROC_JSONPATH			12
+#define ZBX_PREPROC_VALIDATE_RANGE		13
+#define ZBX_PREPROC_VALIDATE_REGEX		14
+#define ZBX_PREPROC_VALIDATE_NOT_REGEX		15
+#define ZBX_PREPROC_ERROR_FIELD_JSON		16
+#define ZBX_PREPROC_ERROR_FIELD_XML		17
+#define ZBX_PREPROC_ERROR_FIELD_REGEX		18
+#define ZBX_PREPROC_THROTTLE_VALUE		19
+#define ZBX_PREPROC_THROTTLE_TIMED_VALUE	20
+
+#define ZBX_PREPROC_FAIL_DEFAULT	0
+#define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
+#define ZBX_PREPROC_FAIL_SET_VALUE	2
+#define ZBX_PREPROC_FAIL_SET_ERROR	3
 
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
@@ -1518,6 +1531,8 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 
 int	zbx_validate_value_dbl(double value);
+int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
+
 void	zbx_update_env(double time_now);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)

@@ -5740,46 +5740,154 @@ svg {
 }
 
 .columns-wrapper {
+
+	$columns: (
+		5: 5%,
+		10: 10%,
+		20: 20%,
+		33: 33.33333%,
+		40: 40%,
+		50: 50%,
+		80: 80%,
+		90: 90%,
+		95: 95%
+	);
+
 	display: flex;
 	flex-wrap: wrap;
 
-	.column-5,
-	.column-10,
-	.column-33,
-	.column-50,
-	.column-90,
-	.column-95 {
+	[class^=column-] {
 		-webkit-box-flex: 0;
 	}
-	.column-5 {
-		-ms-flex: 0 0 5%;
-		flex: 0 0 5%;
-		max-width: 5%;
+
+	/**
+	 * Dynamically generated classes
+	 *
+	 * .column-5
+	 * .column-10
+	 * .column-20
+	 * .column-33
+	 * .column-40
+	 * .column-50
+	 * .column-80
+	 * .column-90
+	 * .column-95
+	 */
+	@each $class, $width in $columns {
+		.column-#{$class} {
+			-ms-flex: 0 0 $width;
+			flex: 0 0 $width;
+			max-width: $width;
+		}
 	}
-	.column-10 {
-		-ms-flex: 0 0 10%;
-		flex: 0 0 10%;
-		max-width: 10%;
+
+	.column-center {
+		display: flex;
+		justify-content: center;
+		text-align: center;
 	}
-	.column-33 {
-		-ms-flex: 0 0 33.33333%;
-		flex: 0 0 33.33333%;
-		max-width: 33.33333%;
+
+	.column-middle {
+		display: flex;
+		align-items: center;
 	}
-	.column-50 {
-		-ms-flex: 0 0 50%;
-		flex: 0 0 50%;
-		max-width: 50%;
+}
+
+.preprocessing-list {
+	display: table;
+	min-width: 100%;
+	padding-left: 10px;
+
+	@media screen and (min-width: 1200px) {
+		min-width: 80%;
 	}
-	.column-90 {
-		-ms-flex: 0 0 90%;
-		flex: 0 0 90%;
-		max-width: 90%;
+
+	@media screen and (min-width: 1400px) {
+		min-width: 70%;
 	}
-	.column-95 {
-		-ms-flex: 0 0 95%;
-		flex: 0 0 95%;
-		max-width: 95%;
+
+	@media screen and (min-width: 1600px) {
+		min-width: 60%;
+	}
+
+	.columns-wrapper {
+		position: relative;
+
+		[class^=column-] {
+			box-sizing: border-box;
+			padding: 5px 5px 5px 0;
+
+			&:last-child {
+				padding-right: 0;
+			}
+
+			input[type=text], select {
+				width: 100%;
+			}
+		}
+	}
+
+	.preprocessing-list-head {
+		line-height: 24px;
+
+		[class^=column-] {
+			padding: 0 5px 0 0;
+			color: $font-alt-color;
+
+			&:first-child {
+				padding-left: 20px;
+			}
+		}
+	}
+
+	.preprocessing-list-item {
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			margin-left: -20px;
+		}
+
+		.step-number {
+			width: 15px;
+			margin-right: 5px;
+			line-height: 24px;
+			text-align: right;
+		}
+
+		.preprocessing-step {
+
+			> .column-40 {
+				display: flex;
+			}
+		}
+
+		.on-fail-options {
+			margin: 0 0 5px 20px;
+
+			> .column-80 {
+
+				> div {
+					padding-right: 5px;
+
+					&:last-child {
+						flex: 1;
+					}
+				}
+			}
+		}
+	}
+
+	.preprocessing-list-foot {
+		line-height: 24px;
+
+		> div {
+			margin-left: -10px;
+		}
+	}
+
+	> li:nth-last-of-type(2) > .on-fail-options {
+		margin-bottom: 0;
 	}
 }
 

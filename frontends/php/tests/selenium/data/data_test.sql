@@ -750,6 +750,16 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (132,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (133,15093,9,9,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (134,15093,10,11,'/document/item/value/text()');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (135,15093,11,12,'$.document.item.value parameter.');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (177,15093,12,13,'-5
+3');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (178,15093,13,14,'regular expression pattern for matching');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (179,15093,14,15,'regular expression pattern for not matching');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (180,15093,15,16,'/json/path');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (181,15093,16,17,'/xml/path');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (182,15093,17,18,'regular expression pattern for error matching
+test output');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (183,15093,18,20,'7');
+
 
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (136,15094,1,1,'123');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (137,15094,2,2,'abc');
@@ -763,6 +773,16 @@ INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (143,15
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (144,15094,9,9,'');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (145,15094,10,11,'/document/item/value/text()');
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (146,15094,11,12,'$.document.item.value parameter.');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (170,15094,12,13,'-5
+3');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (171,15094,13,14,'regular expression pattern for matching');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (172,15094,14,15,'regular expression pattern for not matching');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (173,15094,15,16,'/json/path');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (174,15094,16,17,'/xml/path');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (175,15094,17,18,'regular expression pattern for error matching
+test output');
+INSERT INTO item_preproc (item_preprocid,itemid,step,type,params) VALUES (176,15094,18,20,'7');
+
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments)             VALUES (99000, '{99729}=0', 'testInheritanceTrigger1', '');

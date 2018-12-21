@@ -346,6 +346,7 @@ src/zabbix_server/poller/.deps
 src/zabbix_server/poller/Makefile
 src/zabbix_server/poller/Makefile.in
 src/zabbix_server/preprocessor/.deps
+src/zabbix_server/preprocessor/.dirstamp
 src/zabbix_server/preprocessor/Makefile
 src/zabbix_server/preprocessor/Makefile.in
 src/zabbix_server/proxypoller/.deps
@@ -387,7 +388,9 @@ tests/libs/zbxalgo/.deps
 tests/libs/zbxalgo/Makefile
 tests/libs/zbxalgo/Makefile.in
 tests/libs/zbxalgo/evaluate
+tests/libs/zbxcommon/..........[!!-~][ZBXNEXT-4724]
 tests/libs/zbxcommon/.deps
+tests/libs/zbxcommon/ADFGIJLPST
 tests/libs/zbxcommon/Makefile
 tests/libs/zbxcommon/Makefile.in
 tests/libs/zbxcommon/calculate_item_nextcheck
@@ -400,6 +403,7 @@ tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_validate_interval
+tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommshigh/.deps
 tests/libs/zbxcommshigh/Makefile
 tests/libs/zbxcommshigh/Makefile.in
@@ -456,4 +460,12 @@ tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
+tests/zabbix_server/Makefile
+tests/zabbix_server/Makefile.in
+tests/zabbix_server/preprocessor/..........[!!-~][ZBXNEXT-4724]
+tests/zabbix_server/preprocessor/.deps
+tests/zabbix_server/preprocessor/ADFGIJLPST
+tests/zabbix_server/preprocessor/Makefile
+tests/zabbix_server/preprocessor/Makefile.in
+tests/zabbix_server/preprocessor/zbx_item_preproc
 /zabbix-*.tar.gz
