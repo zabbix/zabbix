@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
 ..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
