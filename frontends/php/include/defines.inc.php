@@ -1739,6 +1739,3 @@ define('PROBLEMS_TAG_NAME_NONE',      2);
  *  - null - disable X-Frame-options header.
  */
 define('X_FRAME_OPTIONS', 'SAMEORIGIN');
-
-// PHP runtime error log file for unit tests.
-define('PHPUNIT_ERROR_LOG', '/tmp/zabbix_phpunit.err');
