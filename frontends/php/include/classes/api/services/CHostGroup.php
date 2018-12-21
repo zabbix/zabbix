@@ -1482,8 +1482,8 @@ class CHostGroup extends CApiService {
 	 * @param array $groupids
 	 */
 	protected function validateDeleteCheckMaintenances(array $groupids) {
-		$res = DBselect(
-			'SELECT m.maintenanceid, m.name'.
+		$maintenance = DBfetch(DBselect(
+			'SELECT m.name'.
 			' FROM maintenances m'.
 			' WHERE NOT EXISTS ('.
 				'SELECT NULL'.
@@ -1496,9 +1496,8 @@ class CHostGroup extends CApiService {
 					' FROM maintenances_hosts mh'.
 					' WHERE m.maintenanceid=mh.maintenanceid'.
 				')'
-		);
+		));
 
-		$maintenance = DBfetch($res);
 		if (!$maintenance) {
 			return;
 		}
