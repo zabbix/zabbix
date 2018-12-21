@@ -190,7 +190,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestClickButton('graph.massdelete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes');
-		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graphs.');
+		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graph prototype.');
 		$this->zbxTestCheckFatalErrors();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

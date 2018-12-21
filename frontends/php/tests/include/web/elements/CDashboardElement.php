@@ -70,7 +70,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function getWidget($name) {
 		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']/../../..')->asWidget()->one();
+				CXPathHelper::escapeQuotes($name).']/../../..')->waitUntilPresent()->asWidget()->one();
 	}
 
 	/**
@@ -102,12 +102,14 @@ class CDashboardElement extends CElement {
 	 * Open widget adding form.
 	 * Dashboard should be in editing mode.
 	 *
-	 * @return CFormElement
+	 * @return COverlayDialogElement
 	 */
 	public function addWidget() {
 		$controls = $this->getControls();
 		$controls->query('id:dashbrd-add-widget')->one()->click();
-		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
+				->waitUntilVisible()->asOverlayDialog()->one();
 	}
 
 	/**

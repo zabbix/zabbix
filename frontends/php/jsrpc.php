@@ -253,15 +253,23 @@ switch ($data['method']) {
 
 		switch ($data['objectName']) {
 			case 'hostGroup':
-				$hostGroups = API::HostGroup()->get([
+				$options = [
 					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null
-				]);
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'real_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null
+				];
+				$hostGroups = API::HostGroup()->get($options);
 
 				if ($hostGroups) {
+					if (array_key_exists('enrich_parent_groups', $data)) {
+						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
+							'real_hosts' => null
+						] + $options);
+					}
+
 					CArrayHelper::sort($hostGroups, [
 						['field' => 'name', 'order' => ZBX_SORT_UP]
 					]);

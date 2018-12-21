@@ -479,9 +479,6 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 #endif
 	session.peername = addr;
 
-	/* remote_port is no longer used in latest versions of Net-SNMP */
-	session.remote_port = item->interface.port;
-
 	if (SNMP_VERSION_1 == session.version || SNMP_VERSION_2c == session.version)
 	{
 		session.community = (u_char *)item->snmp_community;
