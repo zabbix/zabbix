@@ -157,10 +157,7 @@ class CControllerAuthenticationUpdate extends CController {
 			]);
 
 			if (!$login) {
-				$this->response->setMessageError($this->hasInput('test')
-					? _('LDAP login was not successful')
-					: _('Login name or password is incorrect!')
-				);
+				$this->response->setMessageError($ldap_validator->getError());
 				$is_valid = false;
 			}
 		}

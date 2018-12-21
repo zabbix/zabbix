@@ -108,7 +108,7 @@ class CGlobalRegexp {
 			}
 		}
 		else {
-			$result = (bool) preg_match('/'.$this->expression.'/', $string);
+			$result = (bool) @preg_match('/'.str_replace('/', '\/', $this->expression).'/', $string);
 		}
 
 		return $result;
@@ -187,7 +187,7 @@ class CGlobalRegexp {
 		$result = true;
 
 		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-			$patterns = explode($expression['exp_delimiter'], $expression['expression']);
+			$patterns = array_filter(explode($expression['exp_delimiter'], $expression['expression']), 'strlen');
 		}
 		else {
 			$patterns = [$expression['expression']];

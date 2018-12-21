@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup events
+ */
 class testPageAvailabilityReport extends CLegacyWebTest {
 
 	/**
@@ -81,25 +84,9 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 	}
 
 	/**
-	 * @beforeClass
+	 * Initialize test data for dataProviderSLA.
 	 */
-	public static function initializeTest() {
-		global $DB;
-
-		if (!isset($DB['DB'])) {
-			DBconnect($error);
-		}
-
-		// Clear events data.
-		$triggerids = [];
-		foreach (self::$SLA_events as $event) {
-			$triggerids[$event[0]] = true;
-		}
-
-		DBexecute('DELETE FROM events WHERE source='.EVENT_OBJECT_TRIGGER.' AND '
-			.dbConditionInt('objectid', array_keys($triggerids))
-		);
-
+	public function testInitializeTestData() {
 		// Generate events data for 'SLA host' trigger items.
 		$eventid = get_dbid('events', 'eventid');
 		$start_time = 'INSERT INTO events (eventid, objectid, clock, value) VALUES (%1$d, %2$d, %3$d, '.TRIGGER_VALUE_TRUE.')';
@@ -118,8 +105,6 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 
 			$eventid = $eventid + 2;
 		}
-
-		DBclose();
 	}
 
 	/**

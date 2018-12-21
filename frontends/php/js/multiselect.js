@@ -162,6 +162,7 @@ jQuery(function($) {
 					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
+					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button > button', $wrapper).attr('disabled', 'disabled');
 					$('input[type=text]', $wrapper).remove();
@@ -186,6 +187,7 @@ jQuery(function($) {
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
+					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button > button', $wrapper).removeAttr('disabled');
 					$obj.append($input);
@@ -467,7 +469,7 @@ jQuery(function($) {
 					hideAvailable($obj);
 				}
 			})
-			.on('keypress keydown', function(e) {
+			.on('keydown', function(e) {
 				switch (e.which) {
 
 					case KEY.TAB:

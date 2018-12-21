@@ -1074,6 +1074,7 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+		max-width: 300px;
 	}
 
 	tbody th {
@@ -1520,6 +1521,10 @@ output {
 
 	&.active {
 		border-color: $form-border-focus-color;
+	}
+
+	&[aria-disabled] {
+		@extend %form-disabled;
 	}
 
 	input[type="text"] {
@@ -2784,10 +2789,15 @@ $icon-widget-btn: (
 }
 
 %btn-disabled {
-	color: $btn-disabled-font-color;
+	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
+
+	&.icon-cal {
+		opacity: 0.3;
+		background-color: transparent;
+	}
 }
 
 %form-disabled {
@@ -5270,21 +5280,22 @@ a.overlay-close-btn {
 		cursor: pointer;
 	}
 
-	input[readonly] + div, input:disabled + div {
-		cursor: default;
+	input[readonly],
+	input:disabled {
+		color: $form-disabled-font-color !important;
+
+		+ div {
+			cursor: default;
+		}
+	}
+
+	input:disabled + div {
+		background: $form-disabled-font-color !important;
+		border: 1px solid $form-disabled-font-color;
 	}
 
 	input[type="text"] {
 		padding-left: 25px;
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		div {
-			background: $form-disabled-font-color !important;
-			border: 1px solid $form-disabled-font-color;
-		}
 	}
 }
 
