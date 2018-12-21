@@ -39,7 +39,7 @@ class testFormSlideshow extends CLegacyWebTest {
 	 */
 	public function testFormSlideshow_Create($data) {
 		// Log in.
-		$this->page->login()->open('slideconf.php?config=slides.php&form=Create+slide+show');
+		$this->zbxTestLogin('slideconf.php?config=slides.php&form=Create+slide+show');
 
 		// Test page title.
 		$this->zbxTestCheckTitle('Configuration of slide shows');
@@ -75,7 +75,7 @@ class testFormSlideshow extends CLegacyWebTest {
 		$slideshow = CDBHelper::getRow('SELECT slideshowid FROM slideshows');
 		if ($slideshow) {
 			// Log in and navigate to new slideshow form.
-			$this->page->login()->open('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
+			$this->zbxTestLogin('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
 
 			// Press clone.
 			$this->zbxTestClickWait('clone');
@@ -114,7 +114,7 @@ class testFormSlideshow extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 
 		// Log in.
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 
 		// Name must be different for 'Cancel' test because slideshow with similar name can be created by 'Create' test.
 		$data['name'] = $data['name'] . ' for cancel';
@@ -142,7 +142,7 @@ class testFormSlideshow extends CLegacyWebTest {
 	 */
 	public function testFormSlideshow_ValidateOnCreate($data) {
 		// Log in and navigate to new slideshow form.
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestClickButton('Create slide show');
 
 		// Test page title.
@@ -180,7 +180,7 @@ class testFormSlideshow extends CLegacyWebTest {
 			$data['name'] = 'Changed name of ' . $data['name'];
 
 			// Log in and navigate to new slideshow form.
-			$this->page->login()->open('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
+			$this->zbxTestLogin('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
 
 			// Test page title.
 			$this->zbxTestCheckHeader('Slide shows');
@@ -203,7 +203,7 @@ class testFormSlideshow extends CLegacyWebTest {
 		$slideshow = CDBHelper::getRow('SELECT slideshowid FROM slideshows');
 		if ($slideshow) {
 			// Log in and navigate to new slideshow form.
-			$this->page->login()->open('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
+			$this->zbxTestLogin('slideconf.php?form=update&slideshowid='.$slideshow['slideshowid']);
 
 			// Test page title.
 			$this->zbxTestCheckHeader('Slide shows');

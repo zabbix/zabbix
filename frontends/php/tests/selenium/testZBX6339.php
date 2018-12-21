@@ -48,7 +48,7 @@ class testZBX6339 extends CLegacyWebTest {
 
 		$host = $screen['host_name'];
 
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickLinkText($host);
 
 		$this->zbxTestCheckHeader('Templates');

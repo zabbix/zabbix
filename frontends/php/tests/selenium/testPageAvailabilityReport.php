@@ -117,7 +117,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 			'filter_hostid' => 50014
 		];
 
-		$this->page->login()->open('report2.php?'.http_build_query($args));
+		$this->zbxTestLogin('report2.php?'.http_build_query($args));
 		$table_rows =$this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]/tbody/tr'));
 		if (!$table_rows) {
 			$this->fail("Failed to get SLA reports table.");
@@ -137,7 +137,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 	}
 
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
-		$this->page->login()->open('report2.php?config=0');
+		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
@@ -147,13 +147,13 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByHost_NoHostNames() {
-		$this->page->login()->open('report2.php?config=0');
+		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 
 	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
-		$this->page->login()->open('report2.php?config=1');
+		$this->zbxTestLogin('report2.php?config=1');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
@@ -163,7 +163,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames() {
-		$this->page->login()->open('report2.php?config=1');
+		$this->zbxTestLogin('report2.php?config=1');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 }

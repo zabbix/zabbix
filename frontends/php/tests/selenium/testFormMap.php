@@ -68,7 +68,7 @@ class testFormMap extends CLegacyWebTest {
 		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
 		$this->assertTrue(isset($db_map['sysmapid']));
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkTextWait($map_name);
 		$this->zbxTestContentControlButtonClickTextWait('Edit map');

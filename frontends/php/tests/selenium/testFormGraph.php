@@ -186,13 +186,13 @@ class testFormGraph extends CLegacyWebTest {
 	public function testFormGraph_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->page->login()->open('templates.php');
+			$this->zbxTestLogin('templates.php');
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->page->login()->open('hosts.php');
+			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -589,7 +589,7 @@ class testFormGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->page->login()->open('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -832,7 +832,7 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-		$this->page->login()->open('graphs.php?hostid=40001&form=Create+graph');
+		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
 		if (isset($data['name'])) {

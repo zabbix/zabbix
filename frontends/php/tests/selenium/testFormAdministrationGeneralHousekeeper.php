@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
-		$this->page->login()->open('adm.housekeeper.php');
+		$this->zbxTestLogin('adm.housekeeper.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
@@ -399,7 +399,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormAdministrationGeneralHousekeeper_SimpleUpdate($data) {
-		$this->page->login()->open('adm.housekeeper.php');
+		$this->zbxTestLogin('adm.housekeeper.php');
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');

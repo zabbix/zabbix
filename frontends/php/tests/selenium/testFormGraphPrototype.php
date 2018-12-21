@@ -305,14 +305,14 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	public function testFormGraphPrototype_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->page->login()->open('templates.php');
+			$this->zbxTestLogin('templates.php');
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->page->login()->open('hosts.php');
+			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
@@ -747,7 +747,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->page->login()->open('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid=33800&hostid=40001');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
@@ -1056,7 +1056,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
 		$itemName = $this->item;
-		$this->page->login()->open('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
+		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');

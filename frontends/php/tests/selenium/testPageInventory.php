@@ -34,7 +34,7 @@ class testPageInventory extends CLegacyWebTest {
 	* @dataProvider allInventory
 	*/
 	public function testPageInventory_CheckLayout($data) {
-		$this->page->login()->open('hostinventories.php');
+		$this->zbxTestLogin('hostinventories.php');
 
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
@@ -60,7 +60,7 @@ class testPageInventory extends CLegacyWebTest {
 	* @dataProvider allInventory
 	*/
 	public function testPageInventory_ViewInventory($data) {
-		$this->page->login()->open('hostinventories.php?hostid='.$data['hostid']);
+		$this->zbxTestLogin('hostinventories.php?hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Host inventory');
 
 		$this->zbxTestClick('tab_detailsTab');

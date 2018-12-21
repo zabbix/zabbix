@@ -179,13 +179,13 @@ class testZBX6663 extends CLegacyWebTest {
 		$checkbox = $zbx_data['checkbox'];
 
 		if (isset($zbx_data['host'])) {
-			$this->page->login()->open('hosts.php');
+			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestDropdownSelectWait('groupid', 'all');
 			$this->zbxTestClickLinkText($zbx_data['host']);
 		}
 
 		if (isset($zbx_data['template'])) {
-			$this->page->login()->open('templates.php');
+			$this->zbxTestLogin('templates.php');
 			$this->zbxTestDropdownSelectWait('groupid', 'all');
 			$this->zbxTestClickLinkText($zbx_data['template']);
 		}

@@ -31,7 +31,7 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_CheckLayout() {
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestCheckHeader('Users');
 
@@ -76,7 +76,7 @@ class testPageUsers extends CLegacyWebTest {
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
 		$oldHashMedia = CDBHelper::getHash($sqlHashMedia);
 
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestTextPresent($alias);
@@ -94,7 +94,7 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterByAlias() {
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_alias', $this->userAlias);
 		$this->zbxTestClickButtonText('Apply');
@@ -103,7 +103,7 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterNone() {
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestInputTypeOverwrite('filter_alias', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
@@ -114,7 +114,7 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterByAllFields() {
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'Zabbix administrators');
 		$this->zbxTestInputTypeOverwrite('filter_alias', $this->userAlias);
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->userName);
@@ -127,7 +127,7 @@ class testPageUsers extends CLegacyWebTest {
 	}
 
 	public function testPageUsers_FilterReset() {
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
@@ -140,7 +140,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_MassDelete() {
 		$result=DBselect("SELECT userid,alias FROM users");
 
-		$this->page->login()->open('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 

@@ -65,7 +65,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	];
 
 	public function testPageReportsAudit_CheckLayout() {
-		$this->page->login()->open('auditlogs.php');
+		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 
@@ -167,7 +167,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	* @dataProvider auditActions
 	*/
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
-		$this->page->login()->open('auditlogs.php');
+		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
 		$this->zbxTestAssertElementPresentId('config');
 

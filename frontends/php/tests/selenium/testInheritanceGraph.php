@@ -56,7 +56,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->page->login()->open('graphs.php?form=update&graphid='.$data['graphid']);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid']);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
@@ -99,7 +99,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraph_SimpleCreate($data) {
-		$this->page->login()->open('graphs.php?form=Create+graph&hostid='.$this->templateid);
+		$this->zbxTestLogin('graphs.php?form=Create+graph&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));

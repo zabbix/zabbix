@@ -29,7 +29,7 @@ class testPageScreens extends CLegacyWebTest {
 	public function testPageScreens_CheckLayout() {
 		$screens = CDBHelper::getAll('SELECT name FROM screens WHERE templateid IS NULL');
 
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 
 		$this->zbxTestCheckHeader('Screens');
@@ -49,7 +49,7 @@ class testPageScreens extends CLegacyWebTest {
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_SimpleEdit($screen) {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestClickLinkText($screen['name']);
 		$this->zbxTestCheckTitle('Custom screens [refreshed every 30 sec.]');
@@ -67,7 +67,7 @@ class testPageScreens extends CLegacyWebTest {
 		$sqlScreenItems = 'SELECT * FROM screens_items WHERE screenid='.$screen['screenid'].' ORDER BY screenitemid';
 		$oldHashScreenItems = CDBHelper::getHash($sqlScreenItems);
 
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestHrefClickWait('?form=update&screenid='.$screen['screenid']);
 
@@ -85,7 +85,7 @@ class testPageScreens extends CLegacyWebTest {
 	}
 
 	public function testPageScreens_Create() {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestClickButtonText('Create screen');
 
@@ -103,7 +103,7 @@ class testPageScreens extends CLegacyWebTest {
 	 * @backup-once screens
 	 */
 	public function testPageScreens_MassDelete($screen) {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestCheckboxSelect('screens_'.$screen['screenid']);
 		$this->zbxTestClickButton('screen.massdelete');

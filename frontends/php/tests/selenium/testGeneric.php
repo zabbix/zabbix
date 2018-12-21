@@ -123,7 +123,7 @@ class testGeneric extends CLegacyWebTest {
 	* @dataProvider provider
 	*/
 	public function testGeneric_Pages($url, $title) {
-		$this->page->login()->open($url);
+		$this->zbxTestLogin($url);
 		$this->zbxTestCheckTitle($title);
 		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestCheckMandatoryStrings();

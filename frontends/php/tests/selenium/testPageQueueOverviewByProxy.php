@@ -29,7 +29,7 @@ class testPageQueueOverviewByProxy extends CLegacyWebTest {
 	* @dataProvider allProxies
 	*/
 	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
-		$this->page->login()->open('queue.php?config=1');
+		$this->zbxTestLogin('queue.php?config=1');
 		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
 		$this->zbxTestTextNotPresent('Cannot display item queue.');
 		$this->zbxTestCheckHeader('Queue of items to be updated');

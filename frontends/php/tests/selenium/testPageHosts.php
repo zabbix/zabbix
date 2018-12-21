@@ -40,7 +40,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_CheckLayout() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
@@ -110,7 +110,7 @@ class testPageHosts extends CLegacyWebTest {
 		$sqlHostInventory = "select * from host_inventory where hostid=$hostid";
 		$oldHashHostInventory = CDBHelper::getHash($sqlHostInventory);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
@@ -137,7 +137,7 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassDisableAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
@@ -161,7 +161,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
@@ -184,7 +184,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
@@ -202,7 +202,7 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassActivateAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
@@ -219,7 +219,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByName() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
 		$this->zbxTestClickButtonText('Apply');
@@ -228,7 +228,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByTemplates() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonMultiselect('filter_templates_');
@@ -242,7 +242,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByProxy() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
@@ -260,7 +260,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterNone() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestInputTypeOverwrite('filter_host', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
@@ -271,7 +271,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByAllFields() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestDropdownSelectWait('groupid', $this->HostGroup);
 		$this->zbxTestInputTypeOverwrite('filter_host', $this->HostName);
@@ -283,7 +283,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterReset() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');

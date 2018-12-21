@@ -147,7 +147,7 @@ class testPageActions extends CLegacyWebTest {
 	* @dataProvider allEventSources
 	*/
 	public function testPageActions_CheckLayout($eventsource) {
-		$this->page->login()->open('actionconf.php?eventsource='.$eventsource);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckHeader('Actions');
@@ -188,7 +188,7 @@ class testPageActions extends CLegacyWebTest {
 	public function testPageActions_SimpleUpdate($action) {
 		$this->calculateHash($action['actionid']);
 
-		$this->page->login()->open('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
@@ -205,7 +205,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->page->login()->open('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		switch ($action['status']) {
@@ -242,7 +242,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->page->login()->open('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
@@ -272,7 +272,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->page->login()->open('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 
@@ -303,7 +303,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->page->login()->open('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestCheckHeader('Actions');
 

@@ -39,7 +39,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	}
 
 	public function testPageAdministrationScripts_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 
 		$this->zbxTestCheckHeader('Scripts');
@@ -62,7 +62,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	public function testPageAdministrationScripts_SimpleUpdate($script) {
 		$this->calculateHash($script['scriptid']);
 
-		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestClickLinkText($script['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of scripts');
@@ -76,7 +76,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	 * @backup scripts
 	 */
 	public function testPageAdministrationScripts_MassDeleteAll() {
-		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('all_scripts');
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();
@@ -91,7 +91,7 @@ class testPageAdministrationScripts extends CLegacyWebTest {
 	 * @backup-once scripts
 	 */
 	public function testPageAdministrationScripts_MassDelete($script) {
-		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
 		$this->zbxTestClickButton('script.delete');
 		$this->zbxTestAcceptAlert();

@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageSearch extends CLegacyWebTest {
 	public function testPageSearch_FindZabbixServer() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Search');
@@ -37,7 +37,7 @@ class testPageSearch extends CLegacyWebTest {
 	}
 
 	public function testPageSearch_FindNotExistingHost() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'Not existing host');
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Search');
@@ -51,7 +51,7 @@ class testPageSearch extends CLegacyWebTest {
 	 * Test if the global search form is not being submitted with empty search string.
 	 */
 	public function testPageSearch_FindEmptyString() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 
 		// Do not search if the search field is empty.
 		$this->zbxTestInputTypeWait('search', '');

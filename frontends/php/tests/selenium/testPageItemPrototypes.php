@@ -39,7 +39,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$this->page->login()->open('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
@@ -71,7 +71,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$itemid = $data['itemid'];
 		$drule = $data['d_name'];
 
-		$this->page->login()->open('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestClickButton('itemprototype.massdelete');
@@ -111,7 +111,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
 		$itemids = zbx_objectValues($itemids, 'itemid');
 
-		$this->page->login()->open('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestClickButton('itemprototype.massdelete');

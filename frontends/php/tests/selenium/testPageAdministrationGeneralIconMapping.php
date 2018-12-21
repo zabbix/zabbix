@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testPageAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
-		$this->page->login()->open('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 		$strings = [];

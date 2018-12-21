@@ -42,7 +42,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
-		$this->page->login()->open('adm.other.php');
+		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownAssertSelected('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
@@ -68,7 +68,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	// checking possible values in the drop-down "Group for discovered hosts"
 	public function testFormAdministrationGeneralOtherParams_CheckHostGroupsLayout() {
 
-		$this->page->login()->open('adm.other.php');
+		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
@@ -83,7 +83,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	// checking possible values in the drop-down "User group for database down message"
 	public function testFormAdministrationGeneralOtherParams_CheckUserGroupLayout() {
 
-		$this->page->login()->open('adm.other.php');
+		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
@@ -99,7 +99,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	}
 
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
-		$this->page->login()->open('adm.other.php');
+		$this->zbxTestLogin('adm.other.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');

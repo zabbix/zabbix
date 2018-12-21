@@ -54,7 +54,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->page->login()->open('httpconf.php?form=update&hostid='.$data['hostid'].'&httptestid='.$data['httptestid']);
+		$this->zbxTestLogin('httpconf.php?form=update&hostid='.$data['hostid'].'&httptestid='.$data['httptestid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('Web scenario updated');
@@ -97,7 +97,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceWeb_SimpleCreate($data) {
-		$this->page->login()->open('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
+		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);

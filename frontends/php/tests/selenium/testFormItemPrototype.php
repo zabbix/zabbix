@@ -674,7 +674,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		$discoveryid = $dbRow['itemid'];
 
-		$this->page->login()->open(
+		$this->zbxTestLogin(
 			'disc_prototypes.php?form='.(isset($itemid) ? 'update' : 'Create+item+prototype').
 			'&parent_discoveryid='.$discoveryid.(isset($itemid) ? '&itemid='.$itemid : '')
 		);
@@ -1292,7 +1292,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->page->login()->open('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid=33800');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype updated');
@@ -2267,7 +2267,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItemPrototype_SimpleCreate($data) {
-		$this->page->login()->open('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
+		$this->zbxTestLogin('disc_prototypes.php?hostid=40001&parent_discoveryid=33800');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
@@ -2763,7 +2763,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 * @dataProvider preprocessing
 	 */
 	public function testFormItemPrototype_CreatePreprocessing($data) {
-		$this->page->login()->open('disc_prototypes.php?parent_discoveryid=33800&form=Create+item+prototype');
+		$this->zbxTestLogin('disc_prototypes.php?parent_discoveryid=33800&form=Create+item+prototype');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
 

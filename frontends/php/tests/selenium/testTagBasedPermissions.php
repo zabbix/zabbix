@@ -31,7 +31,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 	 */
 	public function setTagFilter($user_groups) {
 		foreach ($user_groups as $group_name => $hostgroups) {
-			$this->page->login()->open('usergrps.php');
+			$this->zbxTestLogin('usergrps.php');
 
 			if (empty($hostgroups)) {
 				break;

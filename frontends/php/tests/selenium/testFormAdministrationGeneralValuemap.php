@@ -25,7 +25,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralValuemap_Layout() {
 
-		$this->page->login()->open('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Value mapping');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
@@ -71,7 +71,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_AddValueMap($mapname, $value, $newvalue) {
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickWait('form');
@@ -116,7 +116,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$value3 = '3';
 		$newvalue3 = 'three';
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickWait('form');
@@ -145,7 +145,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_UpdateValueMap($oldVmName, $newVmName) {
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($oldVmName);
@@ -158,7 +158,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralValuemap_IncorrectValueMap() {
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickWait('form');
@@ -178,7 +178,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_DeleteValueMap($oldVmName, $newVmName) {
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkTextWait($newVmName);
@@ -193,7 +193,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralValuemap_CancelDeleteValueMap() {
 
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestClickLinkTextWait($this->valuemapWithMultipleMappings);
 		$this->zbxTestClickWait('cancel');
 
@@ -205,7 +205,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 	public function testFormAdministrationGeneralValuemap_DeleteRemainingValueMaps() {
 
 		// finally deleting remaining value maps
-		$this->page->login()->open('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);

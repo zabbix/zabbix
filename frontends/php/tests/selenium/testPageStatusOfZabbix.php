@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageStatusOfZabbix extends CLegacyWebTest {
 	public function testPageStatusOfZabbix_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=report.status');
+		$this->zbxTestLogin('zabbix.php?action=report.status');
 		$this->zbxTestCheckTitle('System information');
 		$this->zbxTestCheckHeader('System information');
 		$this->zbxTestTextPresent(['Parameter', 'Value', 'Details']);

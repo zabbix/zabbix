@@ -70,7 +70,7 @@ class testFormAdministrationGeneralInstallation extends CLegacyWebTest {
 	];
 
 	public function testInstallPage() {
-		$this->page->login()->open('setup.php', false);
+		$this->zbxTestLogin('setup.php', false);
 
 		// welcome page
 

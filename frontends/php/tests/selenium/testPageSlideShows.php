@@ -30,7 +30,7 @@ class testPageSlideShows extends CLegacyWebTest {
 	* @dataProvider allSlideShows
 	*/
 	public function testPageSlideShows_CheckLayout($slideshow) {
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 
 		$this->zbxTestCheckHeader('Slide shows');
@@ -54,7 +54,7 @@ class testPageSlideShows extends CLegacyWebTest {
 		$sqlSlide = "select * from slides where slideshowid=$slideshowid order by slideid";
 		$oldHashSlide = CDBHelper::getHash($sqlSlide);
 
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestHrefClickWait('?form=update&slideshowid='.$slideshow['slideshowid']);
 		$this->zbxTestCheckHeader('Slide shows');
@@ -72,7 +72,7 @@ class testPageSlideShows extends CLegacyWebTest {
 	}
 
 	public function testPageSlideShows_Create() {
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestClickWait('form');
 
@@ -92,7 +92,7 @@ class testPageSlideShows extends CLegacyWebTest {
 		$slideshowid = $slideshow['slideshowid'];
 		$name = $slideshow['name'];
 
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestCheckboxSelect('shows_'.$slideshowid);
 		$this->zbxTestClickButton('slideshow.massdelete');
@@ -112,7 +112,7 @@ class testPageSlideShows extends CLegacyWebTest {
 	 * @backup-once slideshows
 	 */
 	public function testPageSlideShows_MassDeleteAll() {
-		$this->page->login()->open('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->zbxTestCheckTitle('Configuration of slide shows');
 		$this->zbxTestCheckboxSelect('all_shows');
 		$this->zbxTestClickButton('slideshow.massdelete');

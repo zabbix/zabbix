@@ -29,7 +29,7 @@ class testFormSysmap extends CLegacyWebTest {
 	public $edit_map_name = 'Local network';
 
 	public function testFormSysmap_Layout() {
-		$this->page->login()->open('sysmaps.php?form=Create+map');
+		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Network maps');
 
@@ -234,7 +234,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$maxlength = $data['maxlength'];
 		$test_value = str_repeat('0123456789', ceil($maxlength/10) + 10);
 
-		$this->page->login()->open('sysmaps.php?form=Create+map');
+		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestInputTypeWait($data['field'], $test_value);
 		$this->zbxTestAssertElementValue($data['field'], substr($test_value, 0, $maxlength));
 	}
@@ -243,7 +243,7 @@ class testFormSysmap extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormSysmapCreate($data) {
-		$this->page->login()->open('sysmaps.php?form=Create+map');
+		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
 
@@ -334,7 +334,7 @@ class testFormSysmap extends CLegacyWebTest {
 	public function testFormSysmap_UpdateMapName() {
 		$new_map_name = 'Map name changed';
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->edit_map_name']/../..//a[text()='Properties']");
 
 		$this->zbxTestInputTypeOverwrite('name', $new_map_name);
@@ -349,7 +349,7 @@ class testFormSysmap extends CLegacyWebTest {
 	public function testFormSysmap_CloneMap() {
 		$mapName = 'Cloned map';
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->mapName']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('name', $mapName);
@@ -367,7 +367,7 @@ class testFormSysmap extends CLegacyWebTest {
 	 */
 	public function testFormSysmap_DeleteClonedMap($mapName = 'Cloned map') {
 		// Delete Map if it was created
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickXpathWait("//a[text()='".$mapName."']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();

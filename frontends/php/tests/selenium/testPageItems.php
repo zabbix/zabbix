@@ -33,7 +33,7 @@ class testPageItems extends CLegacyWebTest {
 	* @dataProvider data
 	*/
 	public function testPageItems_CheckLayout($data) {
-		$this->page->login()->open('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
 		$this->zbxTestTextPresent('Displaying');
@@ -85,7 +85,7 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->page->login()->open('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
+		$this->zbxTestLogin('items.php?filter_set=1&groupid=0&hostid='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');

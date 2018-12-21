@@ -223,13 +223,13 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->page->login()->open('templates.php');
+			$this->zbxTestLogin('templates.php');
 			$this->zbxTestClickLinkTextWait($data['template']);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->page->login()->open('hosts.php');
+			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestClickLinkTextWait($data['host']);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
@@ -671,7 +671,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
 		$oldHashDiscovery = CDBHelper::getHash($sqlDiscovery);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($name);
@@ -1622,7 +1622,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormLowLevelDiscovery_SimpleCreate($data) {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
@@ -1890,7 +1890,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getCreateFiltersData
 	 */
 	public function testFormLowLevelDiscovery_CreateFiltersMacros($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 
@@ -2031,7 +2031,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @dataProvider getCreateFiltersMacrosValidationData
 	 */
 	public function testFormLowLevelDiscovery_FiltersMacrosValidation($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid='.$this->hostid);
+		$this->zbxTestLogin('host_discovery.php?form=create&hostid='.$this->hostid);
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
 

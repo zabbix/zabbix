@@ -58,7 +58,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->page->login()->open('triggers.php?form=update&triggerid='.$data['triggerid']);
+		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid']);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
@@ -92,7 +92,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceTrigger_SimpleCreate($data) {
-		$this->page->login()->open('triggers.php?form=Create+trigger&hostid='.$this->templateid);
+		$this->zbxTestLogin('triggers.php?form=Create+trigger&hostid='.$this->templateid);
 
 		$this->zbxTestInputType('description', $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);

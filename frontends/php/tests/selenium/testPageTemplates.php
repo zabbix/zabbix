@@ -29,7 +29,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_CheckLayout() {
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
@@ -73,7 +73,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestTextPresent($name);
@@ -93,7 +93,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterTemplateByName() {
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->templateName);
 		$this->zbxTestClickButtonText('Apply');
@@ -102,7 +102,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonMultiselect('filter_templates_');
@@ -117,7 +117,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterNone() {
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestInputTypeOverwrite('filter_name', '123template!@#$%^&*()_"=');
 		$this->zbxTestClickButtonText('Apply');
@@ -128,7 +128,7 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterReset() {
-		$this->page->login()->open('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');

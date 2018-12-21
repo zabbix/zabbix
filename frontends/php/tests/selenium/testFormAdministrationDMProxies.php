@@ -38,7 +38,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
-		$this->page->login()->open('zabbix.php?action=proxy.list');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 
@@ -168,7 +168,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 	 */
 	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $ip, $dns, $connect_to, $port, $errormsgs) {
 
-		$this->page->login()->open('zabbix.php?action=proxy.list');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 
@@ -290,7 +290,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 	 */
 	public function testFormAdministrationDMProxies_UpdateProxyName($name, $newname) {
 
-		$this->page->login()->open('zabbix.php?action=proxy.list');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
@@ -338,7 +338,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 	 */
 	public function testFormAdministrationDMProxies_Clone($name, $newname) {
 
-		$this->page->login()->open('zabbix.php?action=proxy.list');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
@@ -373,7 +373,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 	 * @dataProvider dataDelete
 	 */
 	public function testFormAdministrationDMProxies_Delete($name) {
-		$this->page->login()->open('zabbix.php?action=proxy.list');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);

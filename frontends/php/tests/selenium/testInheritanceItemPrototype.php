@@ -53,7 +53,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$sqlItems = 'SELECT * FROM items ORDER BY itemid';
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 
-		$this->page->login()->open('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('disc_prototypes.php?form=update&itemid='.$data['itemid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('Item prototype updated');
@@ -88,7 +88,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceItemPrototype_SimpleCreate($data) {
-		$this->page->login()->open('disc_prototypes.php?form=Create+item+prototype&parent_discoveryid='.$this->discoveryRuleId);
+		$this->zbxTestLogin('disc_prototypes.php?form=Create+item+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->assertEquals($data['name'], $this->zbxTestGetValue("//input[@id='name']"));

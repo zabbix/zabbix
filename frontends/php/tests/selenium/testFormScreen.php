@@ -122,7 +122,7 @@ class testFormScreen extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormScreen_Create($data) {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickButton('Create screen');
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
@@ -188,7 +188,7 @@ class testFormScreen extends CLegacyWebTest {
 	}
 
 	public function testFormScreen_UpdateScreenName() {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen']/../..//a[text()='Properties']");
 
 		$this->zbxTestInputTypeOverwrite('name', $this->new_screen_name);
@@ -201,7 +201,7 @@ class testFormScreen extends CLegacyWebTest {
 	}
 
 	public function testFormScreen_CloneScreen() {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen_graph']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputType('name', $this->cloned_screen);
@@ -213,7 +213,7 @@ class testFormScreen extends CLegacyWebTest {
 	}
 
 	public function testFormScreen_DeleteScreen() {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickXpathWait("//a[text()='$this->testscreen_history']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
@@ -222,7 +222,7 @@ class testFormScreen extends CLegacyWebTest {
 	}
 
 	public function testFormScreen_ZBX6030() {
-		$this->page->login()->open('screenconf.php');
+		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickLinkTextWait($this->testscreen_);
 		$this->zbxTestClickWait('edit');
 		$this->zbxTestClickLinkTextWait('Change');

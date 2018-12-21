@@ -34,7 +34,7 @@ class testFormHost extends CLegacyWebTest {
 	public $host_for_template = 'Visible host for template linkage';
 
 	public function testFormHost_Layout() {
-		$this->page->login()->open('hosts.php?form=1');
+		$this->zbxTestLogin('hosts.php?form=1');
 
 		$this->zbxTestTabSwitch('Host inventory');
 
@@ -47,7 +47,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_Create() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $this->host);
@@ -63,7 +63,7 @@ class testFormHost extends CLegacyWebTest {
 	public function testFormHost_CreateLongHostName() {
 // 64 characters long name
 		$host="1234567890123456789012345678901234567890123456789012345678901234";
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
@@ -77,7 +77,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_SimpleUpdate() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('update');
@@ -90,7 +90,7 @@ class testFormHost extends CLegacyWebTest {
 	 * Adds two macros to an existing host.
 	 */
 	public function testFormHost_AddMacros() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestInputTypeWait('macros_0_macro', '{$TEST_MACRO}');
@@ -110,7 +110,7 @@ class testFormHost extends CLegacyWebTest {
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
@@ -130,7 +130,7 @@ class testFormHost extends CLegacyWebTest {
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
@@ -150,7 +150,7 @@ class testFormHost extends CLegacyWebTest {
 		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
 		$oldHashHosts = CDBHelper::getHash($sqlHosts);
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestContentControlButtonClickTextWait('Create host');
 		$this->zbxTestInputTypeWait('host', $host);
@@ -165,7 +165,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_CloneHost() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('clone');
@@ -181,7 +181,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_DeleteClonedHost() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
@@ -194,7 +194,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_FullCloneHost() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickWait('full_clone');
@@ -210,7 +210,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_DeleteFullClonedHost() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
@@ -223,7 +223,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_UpdateHostName() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestInputTypeOverwrite('host', $this->host_tmp);
@@ -238,7 +238,7 @@ class testFormHost extends CLegacyWebTest {
 		$hostid = CDBHelper::getValue('select hostid from hosts where host='.zbx_dbstr($this->host_tmp));
 
 		// Delete Host
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_tmp);
 		$this->zbxTestClickWait('delete');
@@ -255,7 +255,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_TemplateLink() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
@@ -289,7 +289,7 @@ class testFormHost extends CLegacyWebTest {
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 		$this->zbxTestTabSwitch('Templates');
@@ -317,7 +317,7 @@ class testFormHost extends CLegacyWebTest {
 	}
 
 	public function testFormHost_TemplateLinkUpdate() {
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
@@ -351,7 +351,7 @@ class testFormHost extends CLegacyWebTest {
 		$row2 = DBfetch(DBselect($sql2));
 		$hostid2 = $row2['hostid'];
 
-		$this->page->login()->open('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 		$this->zbxTestTabSwitch('Templates');

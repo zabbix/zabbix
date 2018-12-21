@@ -60,7 +60,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 		$sqlGraphs = 'SELECT * FROM graphs ORDER BY graphid';
 		$oldHashGraphs = CDBHelper::getHash($sqlGraphs);
 
-		$this->page->login()->open('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype updated');
@@ -102,7 +102,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
-		$this->page->login()->open('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
+		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 

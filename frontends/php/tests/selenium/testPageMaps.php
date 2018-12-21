@@ -30,7 +30,7 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	public function testPageMaps_CheckLayout() {
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Maps');
 		$this->zbxTestCheckFatalErrors();
@@ -67,7 +67,7 @@ class testPageMaps extends CLegacyWebTest {
 		$sqlLinkTriggers = "SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid AND sl.sysmapid=$sysmapid ORDER BY slt.linktriggerid";
 		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkText($name);
 
@@ -103,7 +103,7 @@ class testPageMaps extends CLegacyWebTest {
 		$sqlLinkTriggers = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
 		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickXpathWait("//a[text()='".$name."']/../..//a[text()='Properties']");
 		$this->zbxTestCheckHeader('Network maps');
@@ -127,7 +127,7 @@ class testPageMaps extends CLegacyWebTest {
 	public function testPageMaps_MassDelete($map) {
 		$sysmapid = $map['sysmapid'];
 
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckboxSelect('maps_'.$sysmapid);
 		$this->zbxTestClickButton('map.massdelete');
@@ -150,7 +150,7 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	public function testPageMaps_CreateCancel() {
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestCheckHeader('Network maps');
@@ -161,7 +161,7 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	public function testPageMaps_FilterByName() {
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', $this->mapName);
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->mapName);
@@ -171,7 +171,7 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	public function testPageMaps_FilterNone() {
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
@@ -182,7 +182,7 @@ class testPageMaps extends CLegacyWebTest {
 	}
 
 	public function testPageMaps_FilterReset() {
-		$this->page->login()->open('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
