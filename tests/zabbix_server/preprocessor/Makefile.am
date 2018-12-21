@@ -1,3 +1,4 @@
+if SERVER
 noinst_PROGRAMS = zbx_item_preproc
 
 JSON_LIBS = \
@@ -24,9 +25,8 @@ zbx_item_preproc_SOURCES = \
 
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
-if SERVER
 zbx_item_preproc_LDADD += @SERVER_LIBS@
 zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@
-endif
 
 zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
+endif
