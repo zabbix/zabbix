@@ -144,17 +144,19 @@ $eventTab = (new CTable())
 		]),
 		new CDiv([
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK,
-					makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
+				makeEventDetailsActionsTable($actions, $users, $mediatypes, $severity_config)
 			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
-				->setHeader(_('Actions'), [], false, 'tr_events.php'),
+				->setHeader(_('Actions'), [], false, 'web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state'),
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
 				make_small_eventlist($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
 			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
-				->setHeader(_('Event list [previous 20]'), [], false, 'tr_events.php')
+				->setHeader(_('Event list [previous 20]'), [], false,
+					'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state'
+				)
 		])
 	]);
 

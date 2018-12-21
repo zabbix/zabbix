@@ -717,7 +717,8 @@ output {
     position: relative;
     border-bottom: 1px solid #383838;
     line-height: 18px;
-    vertical-align: top; }
+    vertical-align: top;
+    max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {

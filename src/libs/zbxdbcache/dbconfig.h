@@ -655,7 +655,7 @@ typedef struct
 {
 	zbx_uint64_t	maintenancetagid;
 	zbx_uint64_t	maintenanceid;
-	unsigned char	operator;
+	unsigned char	op;		/* condition operator */
 	const char	*tag;
 	const char	*value;
 }
