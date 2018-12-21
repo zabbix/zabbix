@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-19 18:13+0200\n"
+"POT-Creation-Date: 2018-12-21 13:31+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -26,9 +26,15 @@ msgstr ""
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
+#: include/classes/import/validators/C42XmlValidator.php:1298
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" 预计"
+
+#: include/classes/api/services/CItemGeneral.php:1324
+#, c-format
+msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
+msgstr ""
 
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
@@ -80,7 +86,7 @@ msgid "%1$s Item"
 msgid_plural "%1$s Items"
 msgstr[0] "%1$s 监控项"
 
-#: include/classes/api/services/CItemGeneral.php:2048
+#: include/classes/api/services/CItemGeneral.php:2227
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
@@ -302,7 +308,7 @@ msgstr "与"
 msgid "Acceptable SLA"
 msgstr "可接受的SLA"
 
-#: include/func.inc.php:1816
+#: include/func.inc.php:1780
 msgid "Access denied"
 msgstr "访问拒绝"
 
@@ -389,11 +395,11 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:255
 #: include/views/configuration.httpconf.edit.php:202
 #: include/views/configuration.item.edit.php:700
-#: include/views/configuration.item.edit.php:937
+#: include/views/configuration.item.edit.php:941
 #: include/views/configuration.item.massupdate.php:344
 #: include/views/configuration.item.massupdate.php:458
 #: include/views/configuration.item.prototype.edit.php:629
-#: include/views/configuration.item.prototype.edit.php:770
+#: include/views/configuration.item.prototype.edit.php:774
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.edit.php:170
@@ -459,7 +465,7 @@ msgid_plural "Actions enabled"
 msgstr[0] "激活 启用激活 启用"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:181
-#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:164
+#: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:166
 #: include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
@@ -477,7 +483,7 @@ msgstr "动作已更新"
 #: include/classes/screens/CScreenProblem.php:896
 #: include/classes/screens/CScreenProblem.php:1112
 #: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:251
-#: include/menu.inc.php:215 include/views/configuration.action.edit.php:24
+#: include/menu.inc.php:217 include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:66
@@ -582,16 +588,16 @@ msgstr "启用直到"
 #: include/views/configuration.item.edit.php:146
 #: include/views/configuration.item.edit.php:241
 #: include/views/configuration.item.edit.php:749
-#: include/views/configuration.item.edit.php:1040
-#: include/views/configuration.item.edit.php:1087
+#: include/views/configuration.item.edit.php:1148
+#: include/views/configuration.item.edit.php:1195
 #: include/views/configuration.item.massupdate.php:158
 #: include/views/configuration.item.massupdate.php:430
 #: include/views/configuration.item.massupdate.php:496
 #: include/views/configuration.item.prototype.edit.php:134
 #: include/views/configuration.item.prototype.edit.php:229
 #: include/views/configuration.item.prototype.edit.php:665
-#: include/views/configuration.item.prototype.edit.php:873
-#: include/views/configuration.item.prototype.edit.php:906
+#: include/views/configuration.item.prototype.edit.php:981
+#: include/views/configuration.item.prototype.edit.php:1014
 #: include/views/configuration.maintenance.edit.php:137
 #: include/views/configuration.maintenance.edit.php:224
 #: include/views/configuration.maintenance.edit.php:295
@@ -732,7 +738,7 @@ msgstr ""
 msgid "Admin"
 msgstr "管理者"
 
-#: include/menu.inc.php:233
+#: include/menu.inc.php:235
 msgid "Administration"
 msgstr "管理"
 
@@ -902,7 +908,7 @@ msgstr "和（同时满足）"
 
 #: app/views/monitoring.problem.view.php:227
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:1149
 #: include/views/configuration.correlation.edit.php:93
@@ -984,7 +990,9 @@ msgstr "ID为 \"%1$s\"的应用集不在 \"%2$s\" 之中."
 msgid "Application with applicationid \"%1$s\" does not exist."
 msgstr "应用程序ID \"%1$s\" 不存在。"
 
-#: app/controllers/CControllerPopupGeneric.php:124 include/forms.inc.php:832
+#: app/controllers/CControllerPopupGeneric.php:124 app/views/search.php:34
+#: app/views/search.php:56 app/views/search.php:57 app/views/search.php:177
+#: app/views/search.php:196 app/views/search.php:197 include/forms.inc.php:832
 #: include/html.inc.php:368
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:23
@@ -999,8 +1007,6 @@ msgstr "应用程序ID \"%1$s\" 不存在。"
 #: include/views/configuration.template.list.php:86
 #: include/views/configuration.template.list.php:184
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:148
-#: search.php:133 search.php:160 search.php:189 search.php:406 search.php:431
-#: search.php:463
 msgid "Applications"
 msgstr "应用集"
 
@@ -1029,7 +1035,7 @@ msgstr "接近中"
 msgid "Apr"
 msgstr "四月"
 
-#: include/forms.inc.php:1972 include/func.inc.php:119
+#: include/forms.inc.php:1980 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:136
 msgid "April"
 msgstr "四月"
@@ -1054,7 +1060,7 @@ msgstr "区域大小"
 msgid "Area type"
 msgstr "区域类型"
 
-#: include/items.inc.php:1734
+#: include/items.inc.php:1742
 msgid "Arithmetic"
 msgstr "算法"
 
@@ -1096,7 +1102,7 @@ msgstr "在 %1$s:%2$s 的 %3$s %4$s 的每个 %5$s"
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
 msgstr "在 %1$s:%2$s 的天 %3$s 的每个 %4$s"
 
-#: include/forms.inc.php:2090
+#: include/forms.inc.php:2098
 msgid "At (hour:minute)"
 msgstr "于(时:分)"
 
@@ -1157,7 +1163,7 @@ msgstr "尝试间隔"
 msgid "Attempts"
 msgstr "尝试次数"
 
-#: include/menu.inc.php:159
+#: include/menu.inc.php:161
 #: include/views/administration.general.housekeeper.edit.php:89
 msgid "Audit"
 msgstr "审计"
@@ -1179,14 +1185,14 @@ msgstr "审计日志"
 msgid "Aug"
 msgstr "八月"
 
-#: include/forms.inc.php:1959 include/func.inc.php:123
+#: include/forms.inc.php:1967 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:140
 msgid "August"
 msgstr "八月"
 
 #: app/views/administration.authentication.edit.php:127
 #: app/views/administration.authentication.edit.php:135
-#: app/views/administration.mediatype.edit.php:89 include/menu.inc.php:263
+#: app/views/administration.mediatype.edit.php:89 include/menu.inc.php:265
 #: include/views/configuration.httpconf.edit.php:283
 #: include/views/configuration.httpconf.list.php:92
 msgid "Authentication"
@@ -1236,8 +1242,8 @@ msgstr "验证协议"
 msgid "Authentication settings updated"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
 msgctxt "history source selection method"
 msgid "Auto"
@@ -1294,7 +1300,7 @@ msgstr "自动的图标选择"
 msgid "Availability"
 msgstr "可用性"
 
-#: include/menu.inc.php:150 report2.php:26 report2.php:160
+#: include/menu.inc.php:152 report2.php:26 report2.php:160
 msgid "Availability report"
 msgstr "可用性报表"
 
@@ -1386,7 +1392,7 @@ msgstr ""
 msgid "Bold line"
 msgstr "粗线"
 
-#: include/items.inc.php:1749
+#: include/items.inc.php:1757
 msgid "Boolean to decimal"
 msgstr "布尔值到十进制"
 
@@ -1443,7 +1449,7 @@ msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:946
+#: include/classes/graph/CSvgGraph.php:974
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -1607,7 +1613,7 @@ msgstr "无法添加主机原型"
 msgid "Cannot add image"
 msgstr "无法添加图片"
 
-#: items.php:858
+#: items.php:870
 msgid "Cannot add item"
 msgstr "无法添加监控项"
 
@@ -1616,7 +1622,7 @@ msgstr "无法添加监控项"
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
 msgstr "无法添加监控项目\"%1$s\"从\"%2$s\"到分类 \"%3$s\" 从\"%4$s\"."
 
-#: disc_prototypes.php:598
+#: disc_prototypes.php:610
 msgid "Cannot add item prototype"
 msgstr "不能添加监控项原型"
 
@@ -1727,7 +1733,7 @@ msgstr ""
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
 msgstr "不能调用方法 \"%1$s.%2$s\"  未带参数。"
 
-#: httpconf.php:198 httpconf.php:504 items.php:907 items.php:1286
+#: httpconf.php:198 httpconf.php:504 items.php:919 items.php:1310
 msgid "Cannot clear history"
 msgstr "无法清除历史"
 
@@ -1771,7 +1777,7 @@ msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "无法复制图表"
 
-#: items.php:1242
+#: items.php:1266
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "无法复制监控项"
@@ -1931,11 +1937,11 @@ msgstr "无法删除监控项"
 msgid "Cannot delete item prototype"
 msgstr "无法删除监控项目模板"
 
-#: disc_prototypes.php:640
+#: disc_prototypes.php:652
 msgid "Cannot delete item prototypes"
 msgstr "无法删除监控项目模板"
 
-#: items.php:1296
+#: items.php:1320
 msgid "Cannot delete items"
 msgstr "无法删除监控项"
 
@@ -2089,7 +2095,7 @@ msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] "无法禁用主机"
 
-#: applications.php:175 items.php:1202
+#: applications.php:175 items.php:1226
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] "无法禁监控项目"
@@ -2143,7 +2149,7 @@ msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] "无法启用主机"
 
-#: applications.php:174 items.php:1201
+#: applications.php:174 items.php:1225
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] "无法启用监控项目"
@@ -2395,8 +2401,8 @@ msgstr "不能完成没有条件的更新描述式在表 \"%1$s\" 上."
 msgid "Cannot process applications from different hosts or templates."
 msgstr "无法在不同的主机或模板上执行分类"
 
-#: include/classes/api/services/CItemGeneral.php:2056
-#: include/classes/api/services/CItemGeneral.php:2083
+#: include/classes/api/services/CItemGeneral.php:2235
+#: include/classes/api/services/CItemGeneral.php:2262
 msgid "Cannot read JSON."
 msgstr ""
 
@@ -2405,8 +2411,8 @@ msgstr ""
 msgid "Cannot read JSON: %1$s."
 msgstr "无法读取JSON：%1$s 。"
 
-#: include/classes/api/services/CItemGeneral.php:2043
-#: include/classes/api/services/CItemGeneral.php:2047
+#: include/classes/api/services/CItemGeneral.php:2222
+#: include/classes/api/services/CItemGeneral.php:2226
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
@@ -2437,7 +2443,7 @@ msgstr "无法保存小构件 \"%1$s\" 。"
 msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "无法发送命令, 检查于Zabbix 服务器 \"%1$s\" 的连接."
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:875 items.php:1308
+#: host_discovery.php:284 host_discovery.php:529 items.php:887 items.php:1332
 msgid "Cannot send request"
 msgstr ""
 
@@ -2725,16 +2731,16 @@ msgstr "无法更新图片"
 msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "对于自动发现的主机\"%1$s\"无法更新其接口."
 
-#: items.php:861
+#: items.php:873
 msgid "Cannot update item"
 msgstr "无法更新监控项"
 
-#: disc_prototypes.php:601 disc_prototypes.php:627
+#: disc_prototypes.php:613 disc_prototypes.php:639
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "无法更新监控项目模板"
 
-#: items.php:1178
+#: items.php:1202
 msgid "Cannot update items"
 msgstr "无法更新监控项"
 
@@ -2888,7 +2894,7 @@ msgstr ""
 msgid "Certificate"
 msgstr "证书"
 
-#: include/items.inc.php:1740 latest.php:429 latest.php:442
+#: include/items.inc.php:1748 latest.php:429 latest.php:442
 msgctxt "noun"
 msgid "Change"
 msgstr "更改"
@@ -2908,7 +2914,7 @@ msgstr "更改"
 msgid "Change password"
 msgstr "修改密码"
 
-#: include/items.inc.php:1743
+#: include/items.inc.php:1751
 msgid "Change per second"
 msgstr "每秒更改"
 
@@ -2949,9 +2955,21 @@ msgstr "检查已存在."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "检查开始于\"%1$s\"的表达式部份."
 
+#: include/items.inc.php:1768
+msgid "Check for error in JSON"
+msgstr ""
+
+#: include/items.inc.php:1769
+msgid "Check for error in XML"
+msgstr ""
+
+#: include/items.inc.php:1770
+msgid "Check for error using regular expression"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:698
 #: include/views/configuration.host.discovery.list.php:157
-#: include/views/configuration.item.edit.php:1064
+#: include/views/configuration.item.edit.php:1172
 #: include/views/configuration.item.list.php:286
 msgid "Check now"
 msgstr ""
@@ -3066,7 +3084,7 @@ msgid "Clear history"
 msgstr "清除历史"
 
 #: include/views/configuration.httpconf.edit.php:297
-#: include/views/configuration.item.edit.php:1074
+#: include/views/configuration.item.edit.php:1182
 msgid "Clear history and trends"
 msgstr "清除历史和趋势"
 
@@ -3095,8 +3113,8 @@ msgstr "时钟"
 #: include/views/configuration.hostgroups.edit.php:58
 #: include/views/configuration.host.prototype.edit.php:436
 #: include/views/configuration.httpconf.edit.php:290
-#: include/views/configuration.item.edit.php:1061
-#: include/views/configuration.item.prototype.edit.php:896
+#: include/views/configuration.item.edit.php:1169
+#: include/views/configuration.item.prototype.edit.php:1004
 #: include/views/configuration.maintenance.edit.php:287
 #: include/views/configuration.template.edit.php:445
 #: include/views/configuration.trigger.prototype.edit.php:636
@@ -3107,7 +3125,7 @@ msgstr "时钟"
 msgid "Clone"
 msgstr "克隆"
 
-#: include/func.inc.php:1930 include/views/js/monitoring.sysmaps.js.php:275
+#: include/func.inc.php:1894 include/views/js/monitoring.sysmaps.js.php:275
 #: include/views/js/monitoring.sysmaps.js.php:424
 #: include/views/js/monitoring.sysmaps.js.php:545
 #: include/views/js/monitoring.sysmaps.js.php:641
@@ -3135,7 +3153,7 @@ msgstr "关闭过去的事件"
 msgid "Close problem"
 msgstr "关闭问题"
 
-#: include/classes/html/CCollapsibleUiWidget.php:50
+#: include/classes/html/CCollapsibleUiWidget.php:54
 #: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:205
 #: jsLoader.php:210
 msgid "Collapse"
@@ -3263,7 +3281,7 @@ msgstr "条件"
 msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "条件复制关联项 \"%1$s\"。"
 
-#: include/menu.inc.php:175 include/views/inventory.host.view.php:169
+#: include/menu.inc.php:177 include/views/inventory.host.view.php:169
 #: jsLoader.php:231
 msgid "Configuration"
 msgstr "配置"
@@ -3608,7 +3626,7 @@ msgstr ""
 #: include/views/monitoring.slideconf.list.php:37
 #: include/views/monitoring.slides.php:102
 #: include/views/monitoring.sysmap.list.php:34 latest.php:330 queue.php:80
-#: report2.php:174 srv_status.php:175 tr_events.php:168
+#: report2.php:174 srv_status.php:175 tr_events.php:170
 msgid "Content controls"
 msgstr ""
 
@@ -3959,9 +3977,17 @@ msgstr "自定义标签"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "自定义标签地图 \"%2$s\" 类型元素 \"%1$s\" 不能为空."
 
-#: include/items.inc.php:1736
+#: include/items.inc.php:1744
 msgid "Custom multiplier"
 msgstr "自定义倍数"
+
+#: include/views/configuration.item.edit.php:938
+#: include/views/configuration.item.edit.php:1099
+#: include/views/configuration.item.prototype.edit.php:771
+#: include/views/configuration.item.prototype.edit.php:932
+#: include/views/js/common.item.edit.js.php:75
+msgid "Custom on fail"
+msgstr ""
 
 #: screens.php:28
 msgid "Custom screens"
@@ -4008,10 +4034,10 @@ msgstr "DES"
 msgid "DISABLED"
 msgstr "禁用"
 
-#: app/views/administration.proxy.edit.php:50
+#: app/views/administration.proxy.edit.php:50 app/views/search.php:28
 #: include/views/configuration.host.list.php:107
 #: include/views/inventory.host.view.php:82
-#: include/views/js/configuration.host.edit.js.php:30 search.php:127
+#: include/views/js/configuration.host.edit.js.php:30
 msgid "DNS"
 msgstr "DNS"
 
@@ -4023,7 +4049,7 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS名称"
 
-#: app/views/report.services.php:34 include/forms.inc.php:1867
+#: app/views/report.services.php:34 include/forms.inc.php:1875
 #: include/maintenances.inc.php:33 report4.php:107
 msgid "Daily"
 msgstr "每日"
@@ -4107,7 +4133,7 @@ msgstr "数据不正确的编码。"
 msgid "Data overview"
 msgstr "数据概览"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:42
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:41
 #: include/classes/widgets/views/widget.svggraph.form.view.php:251
 msgid "Data set"
 msgstr ""
@@ -4160,7 +4186,7 @@ msgstr "数据库类型"
 msgid "Database user"
 msgstr "数据库用户"
 
-#: include/forms.inc.php:1996 include/forms.inc.php:2081 maintenance.php:51
+#: include/forms.inc.php:2004 include/forms.inc.php:2089 maintenance.php:51
 msgid "Date"
 msgstr "日期"
 
@@ -4184,20 +4210,20 @@ msgstr "硬件购买日期"
 msgid "Day"
 msgstr "日"
 
-#: include/func.inc.php:2676
+#: include/func.inc.php:2640
 msgid "Day before yesterday"
 msgstr ""
 
-#: include/forms.inc.php:1998 include/forms.inc.php:2059
+#: include/forms.inc.php:2006 include/forms.inc.php:2067
 msgid "Day of month"
 msgstr "月中第几日"
 
-#: include/forms.inc.php:1900 include/forms.inc.php:1999
-#: include/forms.inc.php:2007
+#: include/forms.inc.php:1908 include/forms.inc.php:2007
+#: include/forms.inc.php:2015
 msgid "Day of week"
 msgstr "星期几"
 
-#: include/forms.inc.php:2108
+#: include/forms.inc.php:2116
 msgid "Days"
 msgstr "天数"
 
@@ -4219,7 +4245,7 @@ msgstr "调试模式已更新"
 msgid "Dec"
 msgstr "十二"
 
-#: include/forms.inc.php:1991 include/func.inc.php:127
+#: include/forms.inc.php:1999 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:144
 msgid "December"
 msgstr "十二"
@@ -4400,11 +4426,11 @@ msgstr "删除所选的 web 场景历史？"
 msgid "Delete icon map?"
 msgstr "删除图标映射?"
 
-#: include/views/configuration.item.prototype.edit.php:897
+#: include/views/configuration.item.prototype.edit.php:1005
 msgid "Delete item prototype?"
 msgstr "删除监控项目模板?"
 
-#: include/views/configuration.item.edit.php:1079
+#: include/views/configuration.item.edit.php:1187
 msgid "Delete item?"
 msgstr "删除监控项?"
 
@@ -4700,7 +4726,7 @@ msgid "Description updated"
 msgstr "描述已经更新"
 
 #: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:434
-#: include/func.inc.php:1885
+#: include/func.inc.php:1849
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:439
 #: include/views/configuration.action.edit.php:443
@@ -4856,6 +4882,20 @@ msgstr "停用的"
 msgid "Disaster"
 msgstr "灾难"
 
+#: include/items.inc.php:1776
+msgid "Discard unchanged"
+msgstr ""
+
+#: include/items.inc.php:1777
+msgid "Discard unchanged with heartbeat"
+msgstr ""
+
+#: include/views/configuration.item.edit.php:1077
+#: include/views/configuration.item.prototype.edit.php:910
+#: include/views/js/common.item.edit.js.php:80
+msgid "Discard value"
+msgstr ""
+
 #: include/discovery.inc.php:138 include/forms.inc.php:698
 msgid "Discovered"
 msgstr "已发现的"
@@ -4875,15 +4915,16 @@ msgstr "已发现的设备"
 msgid "Discovered items"
 msgstr ""
 
+#: app/views/search.php:38 app/views/search.php:72 app/views/search.php:73
+#: app/views/search.php:177 app/views/search.php:216 app/views/search.php:217
 #: include/forms.inc.php:476 include/forms.inc.php:867 include/menu.inc.php:98
-#: include/menu.inc.php:224 include/views/configuration.action.list.php:33
+#: include/menu.inc.php:226 include/views/configuration.action.list.php:33
 #: include/views/configuration.host.list.php:133
 #: include/views/configuration.host.list.php:336
 #: include/views/configuration.template.list.php:91
 #: include/views/configuration.template.list.php:204
 #: include/views/inventory.host.view.php:154
-#: include/views/inventory.host.view.php:165 search.php:137 search.php:176
-#: search.php:205 search.php:411 search.php:451 search.php:468
+#: include/views/inventory.host.view.php:165
 msgid "Discovery"
 msgstr "自动发现"
 
@@ -4916,7 +4957,7 @@ msgstr "自动发现物件"
 #: app/views/monitoring.discovery.view.php:36
 #: app/views/monitoring.widget.discovery.view.php:28
 #: include/actions.inc.php:52 include/audit.inc.php:46
-#: include/forms.inc.php:1108
+#: include/forms.inc.php:1116
 #: include/views/configuration.discovery.edit.php:102
 msgid "Discovery rule"
 msgstr "自动发现规则"
@@ -5010,10 +5051,6 @@ msgstr "显示OK触发器予"
 msgid "Display graph"
 msgstr "显示数据图"
 
-#: include/classes/widgets/views/widget.svggraph.form.view.php:252
-msgid "Display options"
-msgstr ""
-
 #: include/views/monitoring.sysmap.edit.php:132
 msgid "Display problems"
 msgstr "显示问题"
@@ -5022,17 +5059,22 @@ msgstr "显示问题"
 msgid "Display stacked graph"
 msgstr "显示堆叠数据图"
 
+#: app/views/search.php:117 app/views/search.php:172 app/views/search.php:239
 #: include/actions.inc.php:1798 include/actions.inc.php:1870
-#: include/actions.inc.php:1961 include/func.inc.php:1694 jsLoader.php:286
-#: queue.php:289 search.php:255 search.php:354 search.php:495
+#: include/actions.inc.php:1961 include/func.inc.php:1658 jsLoader.php:286
+#: queue.php:289
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "显示 已自动发现的 %2$s中的%1$s"
 
-#: include/func.inc.php:1697
+#: include/func.inc.php:1661
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "在 %3$s 中打印 %1$s 到 %2$s "
+
+#: include/classes/widgets/views/widget.svggraph.form.view.php:252
+msgid "Displaying options"
+msgstr ""
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -5041,6 +5083,10 @@ msgstr "不要计算"
 #: jsLoader.php:129 jsLoader.php:234
 msgid "Do you wish to replace the conditional expression?"
 msgstr "您想要替换条件式表达式吗?"
+
+#: include/items.inc.php:1767
+msgid "Does not match regular expression"
+msgstr ""
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:701
 #: include/views/js/monitoring.sysmaps.js.php:789
@@ -5584,7 +5630,7 @@ msgstr "英语(en_US)"
 msgid "Equals"
 msgstr ""
 
-#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:584
+#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:730
 #: include/views/js/configuration.httpconf.edit.js.php:577
 #: include/views/js/configuration.httpconf.edit.js.php:652
 msgid "Error"
@@ -5595,7 +5641,7 @@ msgstr "错误"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "查找表请求出现 \"%1$s\"的错误."
 
-#: include/func.inc.php:1924
+#: include/func.inc.php:1888
 msgid "Error message"
 msgstr ""
 
@@ -5617,7 +5663,7 @@ msgstr "事件ID"
 msgid "Event acknowledged"
 msgstr "事件已确认"
 
-#: include/audit.inc.php:55 include/menu.inc.php:220
+#: include/audit.inc.php:55 include/menu.inc.php:222
 #: include/views/configuration.correlation.list.php:23
 msgid "Event correlation"
 msgstr "关联项事件"
@@ -5626,7 +5672,7 @@ msgstr "关联项事件"
 msgid "Event correlation rules"
 msgstr "关联项事件规则"
 
-#: tr_events.php:29 tr_events.php:143 tr_events.php:162
+#: tr_events.php:29 tr_events.php:143 tr_events.php:164
 msgid "Event details"
 msgstr "事件细节"
 
@@ -5663,11 +5709,11 @@ msgstr[0] ""
 msgid "Events and alerts"
 msgstr "事件和报警"
 
-#: include/forms.inc.php:1881
+#: include/forms.inc.php:1889
 msgid "Every day(s)"
 msgstr "每日"
 
-#: include/forms.inc.php:1894
+#: include/forms.inc.php:1902
 msgid "Every week(s)"
 msgstr "每周"
 
@@ -5721,7 +5767,7 @@ msgstr "已执行的脚本"
 msgid "Execution confirmation"
 msgstr "执行确认"
 
-#: include/classes/html/CCollapsibleUiWidget.php:54
+#: include/classes/html/CCollapsibleUiWidget.php:59
 #: include/classes/widgets/CWidgetHelper.php:870 jsLoader.php:206
 #: jsLoader.php:209
 msgid "Expand"
@@ -5800,8 +5846,8 @@ msgstr "表达式不能为空白"
 msgid "Expression constructor"
 msgstr "表达式构造器"
 
-#: include/forms.inc.php:1639 include/forms.inc.php:1644
-#: include/forms.inc.php:1652
+#: include/forms.inc.php:1647 include/forms.inc.php:1652
+#: include/forms.inc.php:1660
 msgid "Expression syntax error."
 msgstr "表达式语法错误。"
 
@@ -5854,7 +5900,7 @@ msgstr "已失败"
 msgid "Failed to create dashboard"
 msgstr "创建仪表盘失败"
 
-#: include/views/js/common.item.edit.js.php:586
+#: include/views/js/common.item.edit.js.php:732
 #: include/views/js/configuration.httpconf.edit.js.php:654
 msgid "Failed to parse URL."
 msgstr "无法解析URL。"
@@ -5891,7 +5937,7 @@ msgstr "常用的聚合图形"
 msgid "Feb"
 msgstr "二月"
 
-#: include/forms.inc.php:1956 include/func.inc.php:117
+#: include/forms.inc.php:1964 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:134
 msgid "February"
 msgstr "二月"
@@ -6078,7 +6124,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬兰语 (fi_FI)"
 
-#: include/func.inc.php:1654
+#: include/func.inc.php:1618
 msgctxt "page navigation"
 msgid "First"
 msgstr "首"
@@ -6149,13 +6195,13 @@ msgstr "法语 (fr_FR)"
 msgid "Fri"
 msgstr "周五"
 
-#: include/forms.inc.php:1924 include/forms.inc.php:2039
+#: include/forms.inc.php:1932 include/forms.inc.php:2047
 #: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:149
 msgid "Friday"
 msgstr "周五"
 
 #: app/views/report.services.php:68 include/classes/html/CFilter.php:283
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:87
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
 #: include/views/configuration.services.edit.php:243
 #: include/views/configuration.services.edit.php:289
 #: include/views/js/monitoring.sysmaps.js.php:673 report4.php:195
@@ -6222,7 +6268,7 @@ msgstr "界面设置"
 msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
-#: include/menu.inc.php:239
+#: include/menu.inc.php:241
 msgid "General"
 msgstr "一般"
 
@@ -6277,7 +6323,7 @@ msgstr "返回 %1$s"
 msgid "Go to"
 msgstr "到"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1829
+#: app/views/system.warning.php:26 include/func.inc.php:1793
 msgid "Go to dashboard"
 msgstr "转到仪表板"
 
@@ -6460,8 +6506,11 @@ msgstr "图表名称 \"%1$s\" 已经存在在图表或者图表原型."
 msgid "Graph with same name but other type exist."
 msgstr "同名但不同类型的图形已存在."
 
-#: app/controllers/CControllerPopupGeneric.php:227 graphs.php:400
-#: include/html.inc.php:398 include/menu.inc.php:73
+#: app/controllers/CControllerPopupGeneric.php:227 app/views/search.php:31
+#: app/views/search.php:37 app/views/search.php:68 app/views/search.php:69
+#: app/views/search.php:101 app/views/search.php:125 app/views/search.php:161
+#: app/views/search.php:177 app/views/search.php:208 app/views/search.php:209
+#: graphs.php:400 include/html.inc.php:398 include/menu.inc.php:73
 #: include/views/configuration.graph.edit.php:26
 #: include/views/configuration.graph.list.php:39
 #: include/views/configuration.host.discovery.list.php:54
@@ -6474,9 +6523,7 @@ msgstr "同名但不同类型的图形已存在."
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:138
 #: include/views/inventory.host.view.php:153
 #: include/views/inventory.host.view.php:164
-#: include/views/monitoring.charts.php:63 jsLoader.php:241 search.php:130
-#: search.php:136 search.php:172 search.php:201 search.php:239 search.php:290
-#: search.php:344 search.php:409 search.php:443 search.php:466
+#: include/views/monitoring.charts.php:63 jsLoader.php:241
 msgid "Graphs"
 msgstr "图形"
 
@@ -6690,11 +6737,11 @@ msgstr "Hebrew (he_IL)"
 msgid "Height"
 msgstr "高"
 
-#: app/views/layout.htmlpage.menu.php:62 include/views/general.login.php:76
+#: app/views/layout.htmlpage.menu.php:63 include/views/general.login.php:76
 msgid "Help"
 msgstr "帮助"
 
-#: include/items.inc.php:1751
+#: include/items.inc.php:1759
 msgid "Hexadecimal to decimal"
 msgstr "十六进制到十进制"
 
@@ -6743,7 +6790,7 @@ msgstr ""
 #: app/views/monitoring.problem.view.php:93 history.php:27
 #: include/classes/screens/CScreenProblem.php:1218
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:438 include/forms.inc.php:872
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:67
@@ -6753,16 +6800,16 @@ msgid "History"
 msgstr "历史记录"
 
 #: httpconf.php:191 httpconf.php:198 httpconf.php:492 httpconf.php:504
-#: items.php:900 items.php:907 items.php:1274 items.php:1286
+#: items.php:912 items.php:919 items.php:1298 items.php:1310
 msgid "History cleared"
 msgstr "历史已清除"
 
 #: include/views/configuration.httpconf.edit.php:298
-#: include/views/configuration.item.edit.php:1075
+#: include/views/configuration.item.edit.php:1183
 msgid "History clearing can take a long time. Continue?"
 msgstr "历史清除可能会很久。继续吗?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:55
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:54
 msgid "History data selection"
 msgstr ""
 
@@ -6799,8 +6846,8 @@ msgstr "横向对齐"
 #: app/views/monitoring.web.view.php:41
 #: app/views/monitoring.widget.problems.view.php:54
 #: app/views/popup.generic.php:53 app/views/popup.generic.php:98
-#: app/views/popup.generic.php:137 httpconf.php:191 httpconf.php:492
-#: include/actions.inc.php:50 include/audit.inc.php:27
+#: app/views/popup.generic.php:137 app/views/search.php:26 httpconf.php:191
+#: httpconf.php:492 include/actions.inc.php:50 include/audit.inc.php:27
 #: include/blocks.inc.php:554 include/classes/screens/CScreenEvents.php:32
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
@@ -6838,9 +6885,9 @@ msgstr "横向对齐"
 #: include/views/monitoring.screen.constructor.edit.php:524
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:81
-#: include/views/reports.toptriggers.php:79 items.php:900 items.php:1273
+#: include/views/reports.toptriggers.php:79 items.php:912 items.php:1297
 #: jsLoader.php:165 latest.php:421 latest.php:438 queue.php:254
-#: report2.php:409 report2.php:431 search.php:125
+#: report2.php:409 report2.php:431
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
@@ -6908,9 +6955,10 @@ msgstr[0] "主机已启用"
 #: app/views/administration.script.edit.php:77
 #: app/views/administration.script.list.php:61
 #: app/views/monitoring.widget.problemhosts.view.php:27
-#: app/views/monitoring.widget.web.view.php:26 include/actions.inc.php:48
-#: include/audit.inc.php:37 include/blocks.inc.php:340
-#: include/forms.inc.php:329 include/maps.inc.php:25
+#: app/views/monitoring.widget.web.view.php:26 app/views/search.php:122
+#: include/actions.inc.php:48 include/audit.inc.php:37
+#: include/blocks.inc.php:340 include/forms.inc.php:329
+#: include/maps.inc.php:25
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/administration.users.edit.php:473
@@ -6920,7 +6968,7 @@ msgstr[0] "主机已启用"
 #: include/views/js/monitoring.sysmaps.js.php:72
 #: include/views/js/monitoring.sysmaps.js.php:78
 #: include/views/js/monitoring.sysmaps.js.php:126 jsLoader.php:168
-#: report2.php:357 report2.php:379 search.php:287
+#: report2.php:357 report2.php:379
 msgid "Host group"
 msgstr "主机群组"
 
@@ -6961,20 +7009,20 @@ msgid "Host group with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 主机组不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:100
-#: app/views/monitoring.problem.view.php:96
+#: app/views/monitoring.problem.view.php:96 app/views/search.php:170
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:31
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:31
 #: include/classes/widgets/forms/CWidgetFormProblems.php:48
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
-#: include/menu.inc.php:184 include/views/configuration.action.edit.php:1028
+#: include/menu.inc.php:186 include/views/configuration.action.edit.php:1028
 #: include/views/configuration.copy.elements.php:51
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
 #: include/views/configuration.maintenance.edit.php:235
-#: include/views/reports.toptriggers.php:34 latest.php:340 search.php:353
-#: usergrps.php:341 usergrps.php:381
+#: include/views/reports.toptriggers.php:34 latest.php:340 usergrps.php:341
+#: usergrps.php:381
 msgid "Host groups"
 msgstr "主机群组"
 
@@ -7137,13 +7185,15 @@ msgstr "可视名称同样为 \"%s\" 的主机已存在."
 #: app/controllers/CControllerPopupGeneric.php:64
 #: app/controllers/CControllerPopupGeneric.php:88
 #: app/views/administration.proxy.list.php:72
-#: app/views/monitoring.problem.view.php:113
+#: app/views/monitoring.problem.view.php:113 app/views/search.php:115
+#: app/views/search.php:127 app/views/search.php:140 app/views/search.php:141
+#: app/views/search.php:142
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:49
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:49
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:827 include/items.inc.php:1185
-#: include/menu.inc.php:132 include/menu.inc.php:196
+#: include/menu.inc.php:134 include/menu.inc.php:198
 #: include/triggers.inc.php:906
 #: include/views/configuration.copy.elements.php:49
 #: include/views/configuration.graph.list.php:86
@@ -7155,8 +7205,7 @@ msgstr "可视名称同样为 \"%s\" 的主机已存在."
 #: include/views/configuration.host.massupdate.php:24
 #: include/views/configuration.maintenance.edit.php:251
 #: include/views/conf.import.php:29 include/views/reports.toptriggers.php:51
-#: latest.php:356 search.php:254 search.php:292 search.php:309 search.php:314
-#: search.php:330
+#: latest.php:356
 msgid "Hosts"
 msgstr "主机"
 
@@ -7176,7 +7225,7 @@ msgstr "主机位置"
 msgid "Hosts updated"
 msgstr "主机已更新"
 
-#: include/forms.inc.php:2110
+#: include/forms.inc.php:2118
 msgid "Hours"
 msgstr "时"
 
@@ -7204,11 +7253,11 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: app/views/administration.proxy.edit.php:49
+#: app/views/administration.proxy.edit.php:49 app/views/search.php:27
 #: include/views/administration.auditlogs.list.php:72
 #: include/views/configuration.host.list.php:110
 #: include/views/inventory.host.view.php:81
-#: include/views/js/configuration.host.edit.js.php:29 search.php:126
+#: include/views/js/configuration.host.edit.js.php:29
 msgid "IP"
 msgstr "IP地址"
 
@@ -7358,7 +7407,7 @@ msgstr "图标"
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
 
-#: include/func.inc.php:1819 include/func.inc.php:1838
+#: include/func.inc.php:1783 include/func.inc.php:1802
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您认为这个信息是错的, 请咨询您的管理员关于如何取得需要的权限."
 
@@ -7456,6 +7505,10 @@ msgstr "维修中"
 #: include/views/administration.auditacts.list.php:75
 msgid "In progress"
 msgstr "启用中"
+
+#: include/items.inc.php:1765
+msgid "In range"
+msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:107
 msgid "Inaccessible graph"
@@ -7746,13 +7799,18 @@ msgstr "函数传入了错误的参数"
 #: include/classes/api/services/CHostPrototype.php:392
 #: include/classes/api/services/CHostPrototype.php:413
 #: include/classes/api/services/CItemGeneral.php:258
-#: include/classes/api/services/CItemGeneral.php:1156
-#: include/classes/api/services/CItemGeneral.php:1174
+#: include/classes/api/services/CItemGeneral.php:1171
 #: include/classes/api/services/CItemGeneral.php:1196
-#: include/classes/api/services/CItemGeneral.php:1222
-#: include/classes/api/services/CItemGeneral.php:1235
-#: include/classes/api/services/CItemGeneral.php:1264
-#: include/classes/api/services/CItemGeneral.php:1278
+#: include/classes/api/services/CItemGeneral.php:1219
+#: include/classes/api/services/CItemGeneral.php:1249
+#: include/classes/api/services/CItemGeneral.php:1263
+#: include/classes/api/services/CItemGeneral.php:1289
+#: include/classes/api/services/CItemGeneral.php:1335
+#: include/classes/api/services/CItemGeneral.php:1358
+#: include/classes/api/services/CItemGeneral.php:1409
+#: include/classes/api/services/CItemGeneral.php:1420
+#: include/classes/api/services/CItemGeneral.php:1435
+#: include/classes/api/services/CItemGeneral.php:1446
 #: include/classes/api/services/CMapElement.php:46
 #: include/classes/api/services/CMapElement.php:117
 #: include/classes/api/services/CMapElement.php:129
@@ -8013,7 +8071,7 @@ msgstr ""
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
 msgstr "提供错误的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
 
-#: include/forms.inc.php:1385
+#: include/forms.inc.php:1393
 msgid "Incorrect list of items."
 msgstr "错误的监控项列表"
 
@@ -8295,7 +8353,7 @@ msgstr "错误的用户群组."
 #: include/classes/api/services/CDRule.php:558
 #: include/classes/api/services/CDRule.php:571
 #: include/classes/api/services/CItemGeneral.php:529
-#: include/classes/api/services/CItemGeneral.php:2027
+#: include/classes/api/services/CItemGeneral.php:2206
 #: include/classes/validators/CNewValidator.php:115
 #: include/classes/validators/CNewValidator.php:127
 #: include/classes/validators/CNewValidator.php:139
@@ -8431,27 +8489,36 @@ msgstr "\"%2$s\" 中 媒体值 \"%3$s\" 的 \"%1$s\" 值错误。"
 #: include/classes/api/services/CItemGeneral.php:517
 #: include/classes/api/services/CItemGeneral.php:523
 #: include/classes/api/services/CItemGeneral.php:536
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1185
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1209
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
-#: include/classes/api/services/CItemGeneral.php:1247
-#: include/classes/api/services/CItemGeneral.php:1253
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1509
-#: include/classes/api/services/CItemGeneral.php:1550
-#: include/classes/api/services/CItemGeneral.php:1556
-#: include/classes/api/services/CItemGeneral.php:1573
-#: include/classes/api/services/CItemGeneral.php:1580
-#: include/classes/api/services/CItemGeneral.php:1586
-#: include/classes/api/services/CItemGeneral.php:1671
-#: include/classes/api/services/CItemGeneral.php:1680
-#: include/classes/api/services/CItemGeneral.php:1793
-#: include/classes/api/services/CItemGeneral.php:1800
-#: include/classes/api/services/CItemGeneral.php:1966
+#: include/classes/api/services/CItemGeneral.php:1201
+#: include/classes/api/services/CItemGeneral.php:1207
+#: include/classes/api/services/CItemGeneral.php:1223
+#: include/classes/api/services/CItemGeneral.php:1232
+#: include/classes/api/services/CItemGeneral.php:1254
+#: include/classes/api/services/CItemGeneral.php:1268
+#: include/classes/api/services/CItemGeneral.php:1275
+#: include/classes/api/services/CItemGeneral.php:1281
+#: include/classes/api/services/CItemGeneral.php:1294
+#: include/classes/api/services/CItemGeneral.php:1305
+#: include/classes/api/services/CItemGeneral.php:1315
+#: include/classes/api/services/CItemGeneral.php:1322
+#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1413
+#: include/classes/api/services/CItemGeneral.php:1426
+#: include/classes/api/services/CItemGeneral.php:1439
+#: include/classes/api/services/CItemGeneral.php:1454
+#: include/classes/api/services/CItemGeneral.php:1464
+#: include/classes/api/services/CItemGeneral.php:1688
+#: include/classes/api/services/CItemGeneral.php:1729
+#: include/classes/api/services/CItemGeneral.php:1735
+#: include/classes/api/services/CItemGeneral.php:1752
+#: include/classes/api/services/CItemGeneral.php:1759
+#: include/classes/api/services/CItemGeneral.php:1765
+#: include/classes/api/services/CItemGeneral.php:1850
+#: include/classes/api/services/CItemGeneral.php:1859
+#: include/classes/api/services/CItemGeneral.php:1972
+#: include/classes/api/services/CItemGeneral.php:1979
+#: include/classes/api/services/CItemGeneral.php:2145
 #: include/classes/api/services/CItem.php:774
 #: include/classes/api/services/CItem.php:782
 #: include/classes/api/services/CItemPrototype.php:944
@@ -8805,8 +8872,8 @@ msgstr "内部存储期 %1$s 无效。"
 
 #: disc_prototypes.php:347 disc_prototypes.php:352 disc_prototypes.php:365
 #: host_discovery.php:310 host_discovery.php:315 host_discovery.php:328
-#: items.php:537 items.php:542 items.php:555 items.php:933 items.php:938
-#: items.php:951
+#: items.php:537 items.php:542 items.php:555 items.php:945 items.php:950
+#: items.php:963
 #, c-format
 msgid "Invalid interval \"%1$s\"."
 msgstr "无效的间隔 \"%1$s\"."
@@ -8864,11 +8931,11 @@ msgstr "无效的参数个数."
 #: app/controllers/CControllerDashboardUpdate.php:125
 #: app/controllers/CControllerDashboardUpdate.php:134
 #: app/controllers/CControllerDashboardUpdate.php:142
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:1997
-#: include/classes/api/services/CItemGeneral.php:2006
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:2161
+#: include/classes/api/services/CItemGeneral.php:2168
+#: include/classes/api/services/CItemGeneral.php:2176
+#: include/classes/api/services/CItemGeneral.php:2185
+#: include/classes/api/services/CItemGeneral.php:2192
 #: include/classes/api/services/CUser.php:649
 #: include/classes/api/services/CUser.php:660
 #: include/classes/validators/CApiInputValidator.php:230
@@ -8925,8 +8992,8 @@ msgstr "无效的参数个数."
 #: include/classes/validators/CApiInputValidator.php:1397
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
 #: include/classes/widgets/forms/CWidgetFormMap.php:101
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 #, c-format
 msgid "Invalid parameter \"%1$s\": %2$s."
 msgstr "无效的参数 \"%1$s\": %2$s 。"
@@ -8964,13 +9031,14 @@ msgstr "第二个参数无效."
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
+#: include/classes/import/validators/C42XmlValidator.php:1298
 #: include/classes/import/validators/CXmlValidatorGeneral.php:90
 #: include/classes/import/validators/CXmlValidatorGeneral.php:105
 #: include/classes/import/validators/CXmlValidatorGeneral.php:124
 #: include/classes/import/validators/CXmlValidatorGeneral.php:151
 #: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
-#: include/classes/import/validators/CXmlValidator.php:66
+#: include/classes/import/validators/CXmlValidator.php:67
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "标签无效 \"%1$s\": %2$s。"
@@ -9003,7 +9071,7 @@ msgstr "无效的用户会话数据存储期：%1$s 。"
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
 msgstr "所给的\"%s\"为无效的检视名称.  可用的: \"a-z\" 和 \".\"."
 
-#: include/menu.inc.php:122
+#: include/menu.inc.php:124
 #: include/views/configuration.host.massupdate.php:362
 msgid "Inventory"
 msgstr "资产记录"
@@ -9054,12 +9122,12 @@ msgstr "意大利语 (it_IT)"
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormClock.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:48
-#: include/forms.inc.php:1111 include/views/configuration.graph.edit.php:157
+#: include/forms.inc.php:1119 include/views/configuration.graph.edit.php:157
 #: include/views/configuration.graph.edit.php:238
 #: include/views/monitoring.screen.constructor.edit.php:258
 #: include/views/monitoring.screen.constructor.edit.php:427
-#: include/views/monitoring.screen.constructor.edit.php:773 items.php:899
-#: items.php:1273
+#: include/views/monitoring.screen.constructor.edit.php:773 items.php:911
+#: items.php:1297
 msgid "Item"
 msgstr "监控项"
 
@@ -9090,7 +9158,7 @@ msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "监控项\"%1$s\"不存在于模板\"%2$s\"中."
 
 #: include/classes/api/services/CDiscoveryRule.php:1359
-#: include/classes/api/services/CItemGeneral.php:1510
+#: include/classes/api/services/CItemGeneral.php:1689
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "项目 \"%1$s\" 不存在或您无权访问此项目"
@@ -9110,11 +9178,11 @@ msgstr "\"%2$s\"上的监控项\"%1$s\" : 应用集\"%3$s\"不存在."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "监控项\"%1$s:%2$s\"有无效的端口: \"%3$s\"."
 
-#: items.php:858
+#: items.php:870
 msgid "Item added"
 msgstr "监控项已添加"
 
-#: items.php:1241
+#: items.php:1265
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] "监控项复制"
@@ -9127,12 +9195,12 @@ msgstr "监控项数量"
 msgid "Item deleted"
 msgstr "监控项已删除"
 
-#: applications.php:172 items.php:1199
+#: applications.php:172 items.php:1223
 msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] "监控项目被禁用"
 
-#: applications.php:171 items.php:1198
+#: applications.php:171 items.php:1222
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "监控项目已启用"
@@ -9145,7 +9213,7 @@ msgstr "监控项在“不支持”的状态"
 msgid "Item not selected"
 msgstr "项目未被选择"
 
-#: include/classes/api/services/CItemGeneral.php:1169
+#: include/classes/api/services/CItemGeneral.php:1191
 #, c-format
 msgid "Item pre-processing is missing parameters: %1$s"
 msgstr "项目预处理缺少参数：%1$s"
@@ -9154,7 +9222,7 @@ msgstr "项目预处理缺少参数：%1$s"
 msgid "Item pre-processing is not allowed for discovery rules."
 msgstr "发现规则不允许进行项目预处理。"
 
-#: include/audit.inc.php:39 include/forms.inc.php:1111
+#: include/audit.inc.php:39 include/forms.inc.php:1119
 #: include/views/monitoring.screen.constructor.edit.php:351
 msgid "Item prototype"
 msgstr "监控项原型"
@@ -9174,7 +9242,7 @@ msgstr ""
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
 msgstr "\"%2$s\"上的项目模板\"%1$s\"已经存在."
 
-#: disc_prototypes.php:598
+#: disc_prototypes.php:610
 msgid "Item prototype added"
 msgstr "项目模板已经添加"
 
@@ -9182,7 +9250,7 @@ msgstr "项目模板已经添加"
 msgid "Item prototype deleted"
 msgstr "项目模板已删除"
 
-#: disc_prototypes.php:601 disc_prototypes.php:626
+#: disc_prototypes.php:613 disc_prototypes.php:638
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "项目模板已更新"
@@ -9201,11 +9269,11 @@ msgstr "ID为 \"%1$s\" 的项目原型不可用。"
 msgid "Item prototypes"
 msgstr "监控项原型"
 
-#: disc_prototypes.php:640
+#: disc_prototypes.php:652
 msgid "Item prototypes deleted"
 msgstr "项目模板已删除"
 
-#: items.php:861
+#: items.php:873
 msgid "Item updated"
 msgstr "监控项已更新"
 
@@ -9263,12 +9331,14 @@ msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" 为监控项."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" 为未知的监控项组件."
 
-#: include/classes/api/services/CItemGeneral.php:1402
+#: include/classes/api/services/CItemGeneral.php:1581
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" ."
 
-#: app/controllers/CControllerPopupGeneric.php:190
+#: app/controllers/CControllerPopupGeneric.php:190 app/views/search.php:35
+#: app/views/search.php:60 app/views/search.php:61 app/views/search.php:177
+#: app/views/search.php:200 app/views/search.php:201
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
 #: include/html.inc.php:378 include/items.inc.php:1164
 #: include/views/configuration.application.list.php:64
@@ -9285,13 +9355,11 @@ msgstr "键值为 \"%1$s\"的监控项已存在于\"%2$s\" ."
 #: include/views/configuration.template.list.php:87
 #: include/views/configuration.template.list.php:188
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:151
-#: include/views/inventory.host.view.php:162 items.php:1592 queue.php:109
-#: search.php:134 search.php:164 search.php:193 search.php:407 search.php:435
-#: search.php:464
+#: include/views/inventory.host.view.php:162 items.php:1616 queue.php:109
 msgid "Items"
 msgstr "监控项"
 
-#: items.php:1296
+#: items.php:1320
 msgid "Items deleted"
 msgstr "监控项已删除"
 
@@ -9303,7 +9371,7 @@ msgstr "监控项列表"
 msgid "Items location"
 msgstr ""
 
-#: items.php:1178
+#: items.php:1202
 msgid "Items updated"
 msgstr "监控项已更新"
 
@@ -9329,7 +9397,7 @@ msgstr "JMX endpoint"
 msgid "JMX interfaces"
 msgstr "JMX接口"
 
-#: include/items.inc.php:1730
+#: include/items.inc.php:1738
 msgid "JSON Path"
 msgstr "JSON 路径"
 
@@ -9374,7 +9442,7 @@ msgstr "Jabber 标识符"
 msgid "Jan"
 msgstr "一月"
 
-#: include/forms.inc.php:1948 include/func.inc.php:116
+#: include/forms.inc.php:1956 include/func.inc.php:116
 #: include/func.inc.php:253 jsLoader.php:133
 msgid "January"
 msgstr "一月"
@@ -9387,7 +9455,7 @@ msgstr "日语 (ja_JP)"
 msgid "Jul"
 msgstr "七月"
 
-#: include/forms.inc.php:1951 include/func.inc.php:122
+#: include/forms.inc.php:1959 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:139
 msgid "July"
 msgstr "七月"
@@ -9396,7 +9464,7 @@ msgstr "七月"
 msgid "Jun"
 msgstr "六月"
 
-#: include/forms.inc.php:1988 include/func.inc.php:121
+#: include/forms.inc.php:1996 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:138
 msgid "June"
 msgstr "六月"
@@ -9427,7 +9495,7 @@ msgstr "键值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"
 #: include/views/configuration.action.edit.php:987
 #: include/views/configuration.action.edit.php:1774
 #: include/views/configuration.action.edit.php:2229
-#: include/views/js/common.item.edit.js.php:372
+#: include/views/js/common.item.edit.js.php:518
 msgid "Key passphrase"
 msgstr "键值通行短语"
 
@@ -9488,42 +9556,42 @@ msgstr "标签位置"
 msgid "Language"
 msgstr "语言"
 
-#: include/func.inc.php:1681
+#: include/func.inc.php:1645
 msgctxt "page navigation"
 msgid "Last"
 msgstr "末"
 
-#: include/func.inc.php:2729
+#: include/func.inc.php:2693
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 
-#: include/func.inc.php:2723
+#: include/func.inc.php:2687
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 
-#: include/func.inc.php:2716
+#: include/func.inc.php:2680
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 
-#: include/func.inc.php:2732
+#: include/func.inc.php:2696
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 
-#: include/func.inc.php:2709
+#: include/func.inc.php:2673
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 
-#: include/func.inc.php:2735
+#: include/func.inc.php:2699
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9589,9 +9657,10 @@ msgstr "最新数据"
 msgid "Last week graph"
 msgstr "上周图形"
 
-#: include/menu.inc.php:68 include/views/inventory.host.view.php:124
-#: jsLoader.php:245 latest.php:27 latest.php:324 search.php:128 search.php:232
-#: search.php:288 search.php:337
+#: app/views/search.php:29 app/views/search.php:94 app/views/search.php:123
+#: app/views/search.php:155 include/menu.inc.php:68
+#: include/views/inventory.host.view.php:124 jsLoader.php:245 latest.php:27
+#: latest.php:324
 msgid "Latest data"
 msgstr "最新数据"
 
@@ -9622,11 +9691,11 @@ msgstr "拉脱维亚语(lv_LV)"
 msgid "Left"
 msgstr "左侧"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 msgid "Left Y"
 msgstr ""
 
-#: include/items.inc.php:1723
+#: include/items.inc.php:1731
 msgid "Left trim"
 msgstr "修整左边"
 
@@ -9821,8 +9890,8 @@ msgid "Log unmatched SNMP traps"
 msgstr "日志与SNMP采集器不符"
 
 #: app/views/administration.authentication.edit.php:115 auditlogs.php:138
-#: include/func.inc.php:1826 include/func.inc.php:1841
-#: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
+#: include/func.inc.php:1790 include/func.inc.php:1805
+#: include/menu.inc.php:294 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
 msgid "Login"
 msgstr "登录"
@@ -9952,12 +10021,12 @@ msgstr "宏已更新"
 msgid "Main filter"
 msgstr ""
 
-#: app/views/layout.htmlpage.menu.php:100
+#: app/views/layout.htmlpage.menu.php:101
 msgid "Main navigation"
 msgstr ""
 
 #: include/audit.inc.php:50 include/maps.inc.php:659 include/maps.inc.php:759
-#: include/menu.inc.php:211
+#: include/menu.inc.php:213
 #: include/views/configuration.maintenance.edit.php:275
 #: include/views/js/monitoring.sysmaps.js.php:228
 msgid "Maintenance"
@@ -9988,7 +10057,7 @@ msgstr "维护已删除"
 msgid "Maintenance period"
 msgstr "维护周期"
 
-#: include/forms.inc.php:2104
+#: include/forms.inc.php:2112
 msgid "Maintenance period length"
 msgstr "维护期间长度"
 
@@ -10135,7 +10204,7 @@ msgstr "拓扑图"
 msgid "Mar"
 msgstr "三月"
 
-#: include/forms.inc.php:1964 include/func.inc.php:118
+#: include/forms.inc.php:1972 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:135
 msgid "March"
 msgstr "三月"
@@ -10181,10 +10250,14 @@ msgstr "批量更新形状"
 msgid "Master item"
 msgstr "主要项"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
+#: include/items.inc.php:1766
+msgid "Matches regular expression"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:140
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:478
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:491
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Max"
 msgstr ""
 
@@ -10214,7 +10287,7 @@ msgstr "操作系统最大的进程数。返回整数"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:239
 #: include/classes/mvc/CController.php:208
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:444
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:445
 #: include/validate.inc.php:454
 #, c-format
 msgid "Maximum time period to display is %1$s day."
@@ -10226,7 +10299,7 @@ msgstr[0] "将要显示的最大时间区间是%1$s天"
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
 msgstr ""
 
-#: include/forms.inc.php:1980 include/func.inc.php:120
+#: include/forms.inc.php:1988 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:137
 msgid "May"
 msgstr "五月"
@@ -10287,7 +10360,7 @@ msgid "Media type with ID \"%1$s\" is not available."
 msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 
 #: app/views/administration.mediatype.edit.php:24
-#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:277
+#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:279
 msgid "Media types"
 msgstr "报警媒介类型"
 
@@ -10363,7 +10436,7 @@ msgstr "未发现方法."
 msgid "Middle"
 msgstr "居中"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:126
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:199
 msgid "Min"
 msgstr ""
@@ -10407,14 +10480,14 @@ msgstr "最小的严重级别"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:234
 #: include/classes/mvc/CController.php:201
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:439
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:440
 #: include/validate.inc.php:447
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "可显示最短的时间为 %1$s 分。"
 
-#: include/forms.inc.php:2112
+#: include/forms.inc.php:2120
 msgid "Minutes"
 msgstr "分"
 
@@ -10477,7 +10550,7 @@ msgstr "模型"
 msgid "Mon"
 msgstr "一"
 
-#: include/forms.inc.php:1904 include/forms.inc.php:2019
+#: include/forms.inc.php:1912 include/forms.inc.php:2027
 #: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:145
 msgid "Monday"
 msgstr "周一"
@@ -10504,11 +10577,11 @@ msgstr "监测中"
 msgid "Monospace"
 msgstr "等宽字体"
 
-#: app/views/report.services.php:67 include/forms.inc.php:1944 report4.php:166
+#: app/views/report.services.php:67 include/forms.inc.php:1952 report4.php:166
 msgid "Month"
 msgstr "月"
 
-#: app/views/report.services.php:36 include/forms.inc.php:1869
+#: app/views/report.services.php:36 include/forms.inc.php:1877
 #: include/maintenances.inc.php:37 report4.php:109
 msgid "Monthly"
 msgstr "每月"
@@ -10648,7 +10721,7 @@ msgstr "NTLM"
 #: include/views/configuration.item.edit.php:63
 #: include/views/configuration.item.edit.php:142
 #: include/views/configuration.item.edit.php:237
-#: include/views/configuration.item.edit.php:934
+#: include/views/configuration.item.edit.php:935
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.list.php:150
 #: include/views/configuration.item.massupdate.php:154
@@ -10656,7 +10729,7 @@ msgstr "NTLM"
 #: include/views/configuration.item.prototype.edit.php:51
 #: include/views/configuration.item.prototype.edit.php:130
 #: include/views/configuration.item.prototype.edit.php:225
-#: include/views/configuration.item.prototype.edit.php:767
+#: include/views/configuration.item.prototype.edit.php:768
 #: include/views/configuration.item.prototype.list.php:52
 #: include/views/configuration.maintenance.edit.php:40
 #: include/views/configuration.maintenance.list.php:45
@@ -11171,7 +11244,7 @@ msgstr "没有系统访问权限。"
 #: app/controllers/CControllerWidgetDiscoveryView.php:64
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
-#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:708
+#: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:720
 #: include/classes/api/services/CAction.php:1541
 #: include/classes/api/services/CAction.php:1890
 #: include/classes/api/services/CAction.php:2878
@@ -11300,7 +11373,7 @@ msgstr "没有系统访问权限。"
 #: include/classes/helpers/CMapHelper.php:83
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1794 items.php:1381 items.php:1564
+#: include/func.inc.php:1758 items.php:1405 items.php:1588
 msgid "No permissions to referred object or it does not exist!"
 msgstr "没有权限退回物件的或其不存在!"
 
@@ -11350,7 +11423,7 @@ msgstr "没有指定给动作操作命令的脚本。"
 msgid "No target selected"
 msgstr "没有选择目标"
 
-#: graphs.php:372 items.php:1246
+#: graphs.php:372 items.php:1270
 msgid "No target selected."
 msgstr "没有已选的目标"
 
@@ -11475,7 +11548,7 @@ msgstr "无事需做"
 msgid "Notification report"
 msgstr "警报汇总"
 
-#: include/menu.inc.php:169 report4.php:65
+#: include/menu.inc.php:171 report4.php:65
 msgid "Notifications"
 msgstr "警报"
 
@@ -11488,7 +11561,7 @@ msgstr ""
 msgid "Nov"
 msgstr "十一"
 
-#: include/forms.inc.php:1983 include/func.inc.php:126
+#: include/forms.inc.php:1991 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:143
 msgid "November"
 msgstr "十一月"
@@ -11551,7 +11624,7 @@ msgstr "VMware hypervisor的处理器线程数量,<url>-VMware服务URL,<uuid>-V
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机的处理器数量,<url>-VMware服务URL,<uuid>-VMware 虚拟机主机名"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:287
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:288
 msgid "Number of rows"
 msgstr ""
 
@@ -11630,7 +11703,7 @@ msgstr "VMware hypervisor管理的虚拟机数量，<url>-VMware服务URL，<uui
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "数或inode的百分比。返回数字，如果是浮点则是百分比"
 
-#: include/items.inc.php:1747
+#: include/items.inc.php:1755
 msgid "Numeral systems"
 msgstr "数字系统"
 
@@ -11709,11 +11782,11 @@ msgstr "操作系统( 简短)"
 msgid "Oct"
 msgstr "十月"
 
-#: include/items.inc.php:1750
+#: include/items.inc.php:1758
 msgid "Octal to decimal"
 msgstr "八进制转十进制"
 
-#: include/forms.inc.php:1975 include/func.inc.php:125
+#: include/forms.inc.php:1983 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:142
 msgid "October"
 msgstr "十月"
@@ -11730,7 +11803,7 @@ msgstr "关"
 #: include/classes/html/CTriggersInfo.php:76
 #: include/views/administration.users.list.php:124
 #: include/views/configuration.triggers.list.php:58
-#: include/views/js/common.item.edit.js.php:590
+#: include/views/js/common.item.edit.js.php:736
 #: include/views/js/configuration.httpconf.edit.js.php:584
 #: include/views/js/configuration.httpconf.edit.js.php:658
 #: include/views/js/conf.import.js.php:24 report2.php:431
@@ -11769,7 +11842,7 @@ msgstr "壹"
 msgid "One of the objects is left without a host group."
 msgstr "其中的一个对象被留下没有主机组."
 
-#: include/forms.inc.php:1866 include/maintenances.inc.php:31
+#: include/forms.inc.php:1874 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "一次性"
 
@@ -11828,13 +11901,18 @@ msgstr "只允许管理员设置幻灯片的所有者。"
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "只计算指派给启用的主机的监控项"
 
-#: include/classes/api/services/CItemGeneral.php:1289
+#: include/classes/api/services/CItemGeneral.php:1369
 msgid "Only one change step is allowed."
 msgstr "只允许一次更改步骤。"
 
 #: include/classes/api/services/CDRule.php:583
 msgid "Only one check can be unique."
 msgstr "只有一个检查可为唯一."
+
+#: include/classes/api/services/CItemGeneral.php:1346
+#: include/classes/api/services/CItemGeneral.php:1391
+msgid "Only one throttling step is allowed."
+msgstr ""
 
 #: app/views/monitoring.acknowledge.edit.php:49
 msgid "Only selected problem"
@@ -11940,7 +12018,7 @@ msgstr "选项"
 
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:378
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/triggers.inc.php:1332
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1151
@@ -12053,12 +12131,12 @@ msgstr "覆盖监控项历史期间"
 msgid "Override item trend period"
 msgstr "覆盖监控项趋势期间"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:409
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:410
 #: include/classes/widgets/views/widget.svggraph.form.view.php:257
 msgid "Overrides"
 msgstr ""
 
-#: include/menu.inc.php:57 include/menu.inc.php:128
+#: include/menu.inc.php:57 include/menu.inc.php:130
 #: include/views/inventory.host.view.php:183
 #: include/views/monitoring.overview.items.php:40
 #: include/views/monitoring.overview.triggers.php:77 overview.php:28
@@ -12232,7 +12310,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:941
+#: include/classes/graph/CSvgGraph.php:969
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:970
 #: include/classes/screens/CScreenProblem.php:1134 include/events.inc.php:340
@@ -12294,9 +12372,9 @@ msgid "Parameter \"%1$s\" is deprecated."
 msgstr "参数 \"%1$s\" 已被弃用。"
 
 #: include/classes/debug/CProfiler.php:182
-#: include/views/configuration.item.edit.php:935
+#: include/views/configuration.item.edit.php:936
 #: include/views/configuration.item.massupdate.php:342
-#: include/views/configuration.item.prototype.edit.php:768
+#: include/views/configuration.item.prototype.edit.php:769
 msgid "Parameters"
 msgstr "参数"
 
@@ -12375,7 +12453,7 @@ msgstr "被动式"
 #: include/views/configuration.item.prototype.edit.php:540
 #: include/views/configuration.item.prototype.edit.php:568
 #: include/views/general.login.php:64
-#: include/views/js/common.item.edit.js.php:375 items.php:190
+#: include/views/js/common.item.edit.js.php:521 items.php:190
 msgid "Password"
 msgstr "密码"
 
@@ -12435,7 +12513,7 @@ msgstr "执行DNS查询。返回字符串信息"
 msgid "Period"
 msgstr "期间"
 
-#: include/forms.inc.php:1864
+#: include/forms.inc.php:1872
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.services.edit.php:226
 msgid "Period type"
@@ -12598,14 +12676,14 @@ msgstr "发布类型"
 msgid "Pre-installation summary"
 msgstr "安装前汇总"
 
-#: include/views/configuration.item.edit.php:1053
-#: include/views/configuration.item.prototype.edit.php:886
+#: include/views/configuration.item.edit.php:1161
+#: include/views/configuration.item.prototype.edit.php:994
 msgid "Preprocessing"
 msgstr "进程"
 
-#: include/views/configuration.item.edit.php:1048
+#: include/views/configuration.item.edit.php:1156
 #: include/views/configuration.item.massupdate.php:438
-#: include/views/configuration.item.prototype.edit.php:881
+#: include/views/configuration.item.prototype.edit.php:989
 msgid "Preprocessing steps"
 msgstr "预定步骤"
 
@@ -12616,15 +12694,15 @@ msgstr "预定步骤"
 msgid "Preview"
 msgstr "预览"
 
-#: include/func.inc.php:2679
+#: include/func.inc.php:2643
 msgid "Previous month"
 msgstr ""
 
-#: include/func.inc.php:2678
+#: include/func.inc.php:2642
 msgid "Previous week"
 msgstr ""
 
-#: include/func.inc.php:2680
+#: include/func.inc.php:2644
 msgid "Previous year"
 msgstr ""
 
@@ -12705,7 +12783,7 @@ msgstr "优先权层级"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
 #: include/classes/widgets/forms/CWidgetFormProblems.php:198
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:363
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
 #: include/views/configuration.item.list.php:183
 #: include/views/configuration.trigger.prototype.list.php:129
 #: include/views/configuration.triggers.list.php:59
@@ -12730,7 +12808,7 @@ msgid "Problem expression"
 msgstr "问题表现形式"
 
 #: include/classes/widgets/CWidgetConfig.php:43
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:337
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "Problem hosts"
 msgstr ""
 
@@ -12766,8 +12844,9 @@ msgstr "问题, 如果至少一个下层有一个问题"
 #: app/views/monitoring.problem.view.php:92
 #: app/views/monitoring.problem.view.php:344 app/views/report.services.php:66
 #: app/views/report.services.php:67 app/views/report.services.php:68
-#: app/views/report.services.php:69 chart4.php:168
-#: include/classes/widgets/CWidgetConfig.php:44
+#: app/views/report.services.php:69 app/views/search.php:30
+#: app/views/search.php:95 app/views/search.php:124 app/views/search.php:156
+#: chart4.php:168 include/classes/widgets/CWidgetConfig.php:44
 #: include/classes/widgets/forms/CWidgetFormProblems.php:35
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:33
 #: include/classes/widgets/views/widget.svggraph.form.view.php:256
@@ -12776,7 +12855,6 @@ msgstr "问题, 如果至少一个下层有一个问题"
 #: include/maps.inc.php:717 include/maps.inc.php:729 include/menu.inc.php:52
 #: include/views/common.filter.trigger.php:38
 #: include/views/inventory.host.view.php:132 jsLoader.php:250 report2.php:431
-#: search.php:129 search.php:233 search.php:289 search.php:338
 msgid "Problems"
 msgstr "问题"
 
@@ -12806,7 +12884,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:112
 #: app/views/administration.proxy.edit.php:24
-#: app/views/administration.proxy.list.php:27 include/menu.inc.php:257
+#: app/views/administration.proxy.list.php:27 include/menu.inc.php:259
 msgid "Proxies"
 msgstr "agent代理程序"
 
@@ -12905,7 +12983,7 @@ msgstr "公钥文件"
 msgid "Query fields"
 msgstr "查询字段"
 
-#: include/menu.inc.php:287 queue.php:25
+#: include/menu.inc.php:289 queue.php:25
 msgid "Queue"
 msgstr "队列"
 
@@ -12914,7 +12992,7 @@ msgid "Queue of items to be updated"
 msgstr "项目队列已被更新"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:937
+#: include/classes/graph/CSvgGraph.php:965
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:956
 #: include/classes/screens/CScreenProblem.php:1122 include/events.inc.php:345
@@ -13023,8 +13101,8 @@ msgstr "恢复"
 msgid "Recovery expression"
 msgstr "恢复表达式"
 
-#: include/forms.inc.php:1682 include/forms.inc.php:1687
-#: include/forms.inc.php:1695
+#: include/forms.inc.php:1690 include/forms.inc.php:1695
+#: include/forms.inc.php:1703
 msgid "Recovery expression syntax error."
 msgstr "恢复表达式语法错误。"
 
@@ -13072,7 +13150,7 @@ msgstr "刷新不支持的项目 \"%1$s\" 。"
 msgid "Regular"
 msgstr ""
 
-#: include/audit.inc.php:49 include/items.inc.php:1720
+#: include/audit.inc.php:49 include/items.inc.php:1728
 #: include/views/configuration.host.discovery.edit.php:617
 msgid "Regular expression"
 msgstr "正则表达式"
@@ -13158,14 +13236,14 @@ msgstr "远程命令"
 #: include/views/configuration.item.edit.php:163
 #: include/views/configuration.item.edit.php:258
 #: include/views/configuration.item.edit.php:741
-#: include/views/configuration.item.edit.php:1031
+#: include/views/configuration.item.edit.php:1129
 #: include/views/configuration.item.massupdate.php:170
 #: include/views/configuration.item.massupdate.php:421
 #: include/views/configuration.item.massupdate.php:489
 #: include/views/configuration.item.prototype.edit.php:151
 #: include/views/configuration.item.prototype.edit.php:246
 #: include/views/configuration.item.prototype.edit.php:658
-#: include/views/configuration.item.prototype.edit.php:864
+#: include/views/configuration.item.prototype.edit.php:962
 #: include/views/configuration.maintenance.edit.php:95
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.maintenance.edit.php:213
@@ -13192,7 +13270,7 @@ msgstr "远程命令"
 #: include/views/js/adm.regexprs.edit.js.php:12
 #: include/views/js/common.filter.trigger.js.php:14
 #: include/views/js/common.item.edit.js.php:22
-#: include/views/js/common.item.edit.js.php:50
+#: include/views/js/common.item.edit.js.php:64
 #: include/views/js/configuration.action.edit.js.php:9
 #: include/views/js/configuration.action.edit.js.php:21
 #: include/views/js/configuration.action.edit.js.php:35
@@ -13299,7 +13377,7 @@ msgstr "替换主机群组"
 msgid "Replace tags"
 msgstr "替换标记"
 
-#: include/menu.inc.php:137
+#: include/menu.inc.php:139
 msgid "Reports"
 msgstr "报表"
 
@@ -13317,7 +13395,7 @@ msgstr ""
 msgid "Request body type"
 msgstr ""
 
-#: host_discovery.php:284 host_discovery.php:529 items.php:875 items.php:1308
+#: host_discovery.php:284 host_discovery.php:529 items.php:887 items.php:1332
 msgid "Request sent successfully"
 msgstr ""
 
@@ -13522,7 +13600,7 @@ msgstr "右"
 msgid "Right Y"
 msgstr ""
 
-#: include/items.inc.php:1722
+#: include/items.inc.php:1730
 msgid "Right trim"
 msgstr "调整右边"
 
@@ -13797,7 +13875,7 @@ msgstr "无衬线字体"
 msgid "Sat"
 msgstr "六"
 
-#: include/forms.inc.php:1929 include/forms.inc.php:2044
+#: include/forms.inc.php:1937 include/forms.inc.php:2052
 #: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:150
 msgid "Saturday"
 msgstr "周六"
@@ -13911,8 +13989,10 @@ msgid "Screen updated"
 msgstr "聚合图形已更新"
 
 #: app/controllers/CControllerPopupGeneric.php:215
-#: app/controllers/CControllerPopupGeneric.php:281 include/html.inc.php:409
-#: include/menu.inc.php:78 include/views/configuration.template.edit.php:306
+#: app/controllers/CControllerPopupGeneric.php:281 app/views/search.php:32
+#: app/views/search.php:102 app/views/search.php:177 app/views/search.php:212
+#: app/views/search.php:213 include/html.inc.php:409 include/menu.inc.php:78
+#: include/views/configuration.template.edit.php:306
 #: include/views/configuration.template.list.php:90
 #: include/views/configuration.template.list.php:200
 #: include/views/conf.import.php:39 include/views/inventory.host.view.php:139
@@ -13924,8 +14004,7 @@ msgstr "聚合图形已更新"
 #: include/views/monitoring.screen.php:28
 #: include/views/monitoring.screen.php:49
 #: include/views/monitoring.slideconf.list.php:30
-#: include/views/monitoring.slides.php:50 search.php:131 search.php:240
-#: search.php:410 search.php:447 search.php:467
+#: include/views/monitoring.slides.php:50
 msgid "Screens"
 msgstr "聚合图形"
 
@@ -13989,12 +14068,13 @@ msgstr "脚本已更新"
 
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:25
-#: app/views/administration.script.list.php:27 include/menu.inc.php:283
+#: app/views/administration.script.list.php:27 include/menu.inc.php:285
 #: jsLoader.php:253
 msgid "Scripts"
 msgstr "脚本"
 
-#: app/views/layout.htmlpage.menu.php:33 search.php:26 search.php:499
+#: app/controllers/CControllerSearch.php:95
+#: app/views/layout.htmlpage.menu.php:34 app/views/search.php:244
 msgid "Search"
 msgstr "搜索"
 
@@ -14002,7 +14082,7 @@ msgstr "搜索"
 msgid "Search attribute"
 msgstr "搜索属性"
 
-#: search.php:70
+#: app/controllers/CControllerSearch.php:74
 msgid "Search pattern is empty"
 msgstr "查找式样为空"
 
@@ -14127,7 +14207,7 @@ msgstr "删除选择的关联项"
 msgid "Selected elements"
 msgstr "所选的组件"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:324
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:325
 msgid "Selected items only"
 msgstr ""
 
@@ -14202,7 +14282,7 @@ msgstr "九月"
 msgid "Separated"
 msgstr "分开的"
 
-#: include/forms.inc.php:1967 include/func.inc.php:124
+#: include/forms.inc.php:1975 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:141
 msgid "September"
 msgstr "九月"
@@ -14317,7 +14397,7 @@ msgstr "服务类型"
 msgid "Service updated"
 msgstr "服务已更新"
 
-#: include/menu.inc.php:104 include/menu.inc.php:228
+#: include/menu.inc.php:104 include/menu.inc.php:230
 #: include/views/administration.general.housekeeper.edit.php:75
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.edit.php:117
@@ -14336,13 +14416,25 @@ msgstr "服务形成了一个环."
 msgid "Session terminated, re-login, please."
 msgstr "会话已中断, 请重新登录."
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:75
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:74
 msgid "Set custom time period"
+msgstr ""
+
+#: include/views/configuration.item.edit.php:1079
+#: include/views/configuration.item.prototype.edit.php:912
+#: include/views/js/common.item.edit.js.php:82
+msgid "Set error to"
 msgstr ""
 
 #: include/actions.inc.php:1135
 msgid "Set host inventory mode"
 msgstr "设置主机清单模式"
+
+#: include/views/configuration.item.edit.php:1078
+#: include/views/configuration.item.prototype.edit.php:911
+#: include/views/js/common.item.edit.js.php:81
+msgid "Set value to"
+msgstr ""
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Setting LDAP dereferencing mode failed."
@@ -14370,7 +14462,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:350
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
 #: include/events.inc.php:167 include/triggers.inc.php:1239
 #: include/views/configuration.item.list.php:149
 #: include/views/configuration.trigger.prototype.edit.php:65
@@ -14443,9 +14535,9 @@ msgstr ""
 
 #: app/views/monitoring.problem.view.php:89
 #: include/classes/widgets/forms/CWidgetFormProblems.php:33
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:116
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:115
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:188
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
 #: include/views/common.filter.trigger.php:35
 #: include/views/js/monitoring.sysmaps.js.php:76 report2.php:463
@@ -14471,7 +14563,7 @@ msgid "Show latest values"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:73
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:274
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:275
 #: include/views/configuration.graph.edit.php:97
 msgid "Show legend"
 msgstr "查看图例"
@@ -14486,7 +14578,7 @@ msgstr "查看图例"
 msgid "Show lines"
 msgstr "查看线条"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:307
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:308
 msgid "Show problems"
 msgstr ""
 
@@ -14562,7 +14654,7 @@ msgstr "登录"
 msgid "Sign in with HTTP"
 msgstr ""
 
-#: app/views/layout.htmlpage.menu.php:81
+#: app/views/layout.htmlpage.menu.php:82
 msgid "Sign out"
 msgstr "退出"
 
@@ -14570,7 +14662,7 @@ msgstr "退出"
 msgid "Simple"
 msgstr "简单"
 
-#: include/items.inc.php:1742
+#: include/items.inc.php:1750
 msgid "Simple change"
 msgstr "简单更改"
 
@@ -14828,7 +14920,7 @@ msgstr "Zabbix服务器的启动时间，Unix时间截."
 msgid "State"
 msgstr "状态"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:157
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:229
 msgctxt "history source selection method"
 msgid "Static"
@@ -14962,7 +15054,7 @@ msgstr "停止"
 msgid "Straight"
 msgstr "Straight"
 
-#: include/items.inc.php:1727
+#: include/items.inc.php:1735
 msgid "Structured data"
 msgstr "结构化数据"
 
@@ -14970,7 +15062,7 @@ msgstr "结构化数据"
 msgid "Style"
 msgstr "风格"
 
-#: app/views/layout.htmlpage.menu.php:107
+#: app/views/layout.htmlpage.menu.php:108
 msgid "Sub navigation"
 msgstr ""
 
@@ -15002,7 +15094,7 @@ msgstr "子拓扑图"
 msgid "Success Audit"
 msgstr "成功审计"
 
-#: include/func.inc.php:1924
+#: include/func.inc.php:1888
 msgid "Success message"
 msgstr ""
 
@@ -15015,12 +15107,12 @@ msgstr "网络接口上传下载的流量总和。返回整数"
 msgid "Sun"
 msgstr "日"
 
-#: include/forms.inc.php:1934 include/forms.inc.php:2049
+#: include/forms.inc.php:1942 include/forms.inc.php:2057
 #: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:151
 msgid "Sunday"
 msgstr "日"
 
-#: app/views/layout.htmlpage.menu.php:44 include/views/general.login.php:83
+#: app/views/layout.htmlpage.menu.php:45 include/views/general.login.php:83
 msgid "Support"
 msgstr "支持"
 
@@ -15068,7 +15160,7 @@ msgstr "系统启动时间。返回时间戳"
 msgid "System default"
 msgstr "系统默认"
 
-#: include/func.inc.php:1951
+#: include/func.inc.php:1915
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr ""
 
@@ -15084,7 +15176,7 @@ msgstr "系统主机名。返回字符串"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/report.status.php:25
 #: include/classes/screens/CScreenServerInfo.php:38
-#: include/classes/widgets/CWidgetConfig.php:48 include/menu.inc.php:145
+#: include/classes/widgets/CWidgetConfig.php:48 include/menu.inc.php:147
 #: include/screens.inc.php:37
 msgid "System information"
 msgstr ""
@@ -15182,7 +15274,7 @@ msgstr "标记值"
 #: include/classes/screens/CScreenProblem.php:897
 #: include/classes/screens/CScreenProblem.php:1113
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:376
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:235 include/events.inc.php:463
 #: include/views/administration.usergroups.edit.php:183
 #: include/views/configuration.maintenance.edit.php:267
@@ -15226,11 +15318,10 @@ msgstr "目标类型"
 msgid "Telnet"
 msgstr "Telnet"
 
-#: include/actions.inc.php:49 include/audit.inc.php:53
-#: include/forms.inc.php:460 include/forms.inc.php:857
-#: include/views/configuration.template.edit.php:40
+#: app/views/search.php:177 include/actions.inc.php:49
+#: include/audit.inc.php:53 include/forms.inc.php:460
+#: include/forms.inc.php:857 include/views/configuration.template.edit.php:40
 #: include/views/configuration.template.edit.php:334 report2.php:285
-#: search.php:405
 msgid "Template"
 msgstr "模板"
 
@@ -15330,7 +15421,9 @@ msgstr "含有相同可视名称\"%1$s\"的模板已链接到主机."
 msgid "Templated items"
 msgstr "模板的监控项"
 
-#: app/controllers/CControllerPopupGeneric.php:76 include/menu.inc.php:188
+#: app/controllers/CControllerPopupGeneric.php:76 app/views/search.php:128
+#: app/views/search.php:146 app/views/search.php:149 app/views/search.php:150
+#: app/views/search.php:237 include/menu.inc.php:190
 #: include/views/configuration.action.edit.php:1051
 #: include/views/configuration.copy.elements.php:50
 #: include/views/configuration.host.edit.php:640
@@ -15343,8 +15436,7 @@ msgstr "模板的监控项"
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.template.edit.php:22
 #: include/views/configuration.template.list.php:51
-#: include/views/conf.import.php:30 search.php:293 search.php:319
-#: search.php:324 search.php:331 search.php:494
+#: include/views/conf.import.php:30
 msgid "Templates"
 msgstr "模板"
 
@@ -15386,7 +15478,7 @@ msgid "Test string"
 msgstr "测试字符串"
 
 #: include/forms.inc.php:355 include/items.inc.php:135
-#: include/items.inc.php:1718 include/views/configuration.item.edit.php:680
+#: include/items.inc.php:1726 include/views/configuration.item.edit.php:680
 #: include/views/configuration.item.massupdate.php:281
 #: include/views/configuration.item.prototype.edit.php:609
 #: include/views/js/monitoring.sysmaps.js.php:308
@@ -15490,7 +15582,7 @@ msgstr "web 场景应用属于一个不同的主机而不是 web 场景主机."
 msgid "Theme"
 msgstr "主题"
 
-#: include/func.inc.php:2677
+#: include/func.inc.php:2641
 msgid "This day last week"
 msgstr ""
 
@@ -15499,11 +15591,11 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "这栏位是由项目\"%s\"自动填入的."
 
-#: include/func.inc.php:2685 srv_status.php:41
+#: include/func.inc.php:2649 srv_status.php:41
 msgid "This month"
 msgstr "本月"
 
-#: include/func.inc.php:2686
+#: include/func.inc.php:2650
 msgid "This month so far"
 msgstr ""
 
@@ -15515,19 +15607,19 @@ msgstr "这聚合图形-列不是空白. 删除它?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "这聚合图形-行不是空白. 删除它?"
 
-#: include/func.inc.php:2683 srv_status.php:40
+#: include/func.inc.php:2647 srv_status.php:40
 msgid "This week"
 msgstr "本周"
 
-#: include/func.inc.php:2684
+#: include/func.inc.php:2648
 msgid "This week so far"
 msgstr ""
 
-#: include/func.inc.php:2687 srv_status.php:42
+#: include/func.inc.php:2651 srv_status.php:42
 msgid "This year"
 msgstr "本年"
 
-#: include/func.inc.php:2688
+#: include/func.inc.php:2652
 msgid "This year so far"
 msgstr ""
 
@@ -15535,11 +15627,15 @@ msgstr ""
 msgid "Threshold"
 msgstr "阀值"
 
+#: include/items.inc.php:1774
+msgid "Throttling"
+msgstr ""
+
 #: include/func.inc.php:216
 msgid "Thu"
 msgstr "四"
 
-#: include/forms.inc.php:1919 include/forms.inc.php:2034
+#: include/forms.inc.php:1927 include/forms.inc.php:2042
 #: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:148
 msgid "Thursday"
 msgstr "周四"
@@ -15638,7 +15734,7 @@ msgid "Timestamp"
 msgstr "时间戳"
 
 #: include/classes/html/CFilter.php:291
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:99
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:98
 #: include/views/js/monitoring.sysmaps.js.php:673
 msgid "To"
 msgstr "到"
@@ -15647,12 +15743,12 @@ msgstr "到"
 msgid "To set a host interface select a single item type for all items"
 msgstr "要设定一个主机接口, 选择一个单一的监控项类型给所有的监控项"
 
-#: include/classes/screens/CScreenProblem.php:706 include/func.inc.php:2681
+#: include/classes/screens/CScreenProblem.php:706 include/func.inc.php:2645
 #: srv_status.php:39
 msgid "Today"
 msgstr "今天"
 
-#: include/func.inc.php:2682
+#: include/func.inc.php:2646
 msgid "Today so far"
 msgstr ""
 
@@ -15740,7 +15836,7 @@ msgstr "趋势数据存储期 \"%1$s\"。"
 msgid "Trend storage period"
 msgstr "趋势存储时间"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:58
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:57
 #: include/forms.inc.php:457 include/forms.inc.php:877
 #: include/views/administration.general.housekeeper.edit.php:135
 #: include/views/configuration.item.list.php:68
@@ -15963,7 +16059,9 @@ msgid "Trigger updated"
 msgstr "触发器已更新"
 
 #: app/controllers/CControllerPopupGeneric.php:136
-#: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
+#: app/views/monitoring.problem.view.php:145 app/views/search.php:36
+#: app/views/search.php:64 app/views/search.php:65 app/views/search.php:177
+#: app/views/search.php:204 app/views/search.php:205 include/forms.inc.php:441
 #: include/html.inc.php:388 include/triggers.inc.php:880
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
@@ -15982,9 +16080,7 @@ msgstr "触发器已更新"
 #: include/views/inventory.host.view.php:163
 #: include/views/js/monitoring.sysmaps.js.php:144
 #: include/views/monitoring.overview.items.php:56
-#: include/views/monitoring.overview.triggers.php:93 search.php:135
-#: search.php:168 search.php:197 search.php:408 search.php:439 search.php:465
-#: triggers.php:599
+#: include/views/monitoring.overview.triggers.php:93 triggers.php:599
 msgid "Triggers"
 msgstr "触发器"
 
@@ -15992,11 +16088,11 @@ msgstr "触发器"
 msgid "Triggers deleted"
 msgstr "触发器已删除"
 
-#: include/menu.inc.php:155
+#: include/menu.inc.php:157
 msgid "Triggers top 100"
 msgstr "触发器 Top 100"
 
-#: include/items.inc.php:1721
+#: include/items.inc.php:1729
 msgid "Trim"
 msgstr "修整"
 
@@ -16009,7 +16105,7 @@ msgstr "尝试读取不能存取的属性\"%s\"."
 msgid "Tue"
 msgstr "二"
 
-#: include/forms.inc.php:1909 include/forms.inc.php:2024
+#: include/forms.inc.php:1917 include/forms.inc.php:2032
 #: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:146
 msgid "Tuesday"
 msgstr "周二"
@@ -16158,7 +16254,7 @@ msgstr "URL B"
 msgid "URL C"
 msgstr "URL C"
 
-#: include/views/js/common.item.edit.js.php:586
+#: include/views/js/common.item.edit.js.php:732
 #: include/views/js/configuration.httpconf.edit.js.php:654
 msgid "URL is not properly encoded."
 msgstr "网址未正确编码。"
@@ -16240,7 +16336,7 @@ msgstr "解锁"
 msgid "Unblock selected users?"
 msgstr "解除锁定所选的用户?"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 #: include/views/configuration.item.edit.php:685
 #: include/views/configuration.item.massupdate.php:288
@@ -16458,9 +16554,9 @@ msgstr "上"
 #: include/views/configuration.host.massupdate.php:371
 #: include/views/configuration.host.prototype.edit.php:434
 #: include/views/configuration.httpconf.edit.php:306
-#: include/views/configuration.item.edit.php:1083
+#: include/views/configuration.item.edit.php:1191
 #: include/views/configuration.item.massupdate.php:721
-#: include/views/configuration.item.prototype.edit.php:895
+#: include/views/configuration.item.prototype.edit.php:1003
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:285
 #: include/views/configuration.services.edit.php:353
@@ -16712,7 +16808,7 @@ msgid "User group with ID \"%1$s\" is not available."
 msgstr "ID为\"%1$s\" 的用户组不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:164
-#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:267
+#: app/views/dashboard.sharing.edit.php:24 include/menu.inc.php:269
 #: include/views/administration.usergroups.edit.php:22
 #: include/views/administration.usergroups.list.php:22
 #: include/views/monitoring.screen.edit.php:124
@@ -16731,7 +16827,7 @@ msgstr "用户是不允许删除自己"
 msgid "User macro missing parameters: %1$s"
 msgstr "用户宏缺少参数： %1$s"
 
-#: app/views/layout.htmlpage.menu.php:40
+#: app/views/layout.htmlpage.menu.php:41
 msgid "User menu"
 msgstr ""
 
@@ -16824,7 +16920,7 @@ msgid "Username and password"
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:176
-#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:271
+#: app/views/dashboard.sharing.edit.php:45 include/menu.inc.php:273
 #: include/views/administration.usergroups.edit.php:44
 #: include/views/administration.usergroups.list.php:155
 #: include/views/administration.users.edit.php:30
@@ -17030,6 +17126,10 @@ msgstr "VMware 虚拟机非共享存储空间, <url> - VMware 服务 URL, <uuid>
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware 虚拟机在线时间, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机主机名"
+
+#: include/items.inc.php:1763
+msgid "Validation"
+msgstr ""
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
@@ -17251,15 +17351,17 @@ msgstr "设置"
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "很抱歉, 已经到了最大的组件数量."
 
-#: include/menu.inc.php:63 include/views/configuration.host.list.php:134
+#: app/views/search.php:33 app/views/search.php:39 app/views/search.php:76
+#: app/views/search.php:77 app/views/search.php:103 app/views/search.php:126
+#: app/views/search.php:162 app/views/search.php:177 app/views/search.php:220
+#: app/views/search.php:221 include/menu.inc.php:63
+#: include/views/configuration.host.list.php:134
 #: include/views/configuration.host.list.php:340
 #: include/views/configuration.template.list.php:92
 #: include/views/configuration.template.list.php:208
 #: include/views/inventory.host.view.php:121
 #: include/views/inventory.host.view.php:157
-#: include/views/inventory.host.view.php:166 search.php:132 search.php:138
-#: search.php:180 search.php:209 search.php:241 search.php:291 search.php:345
-#: search.php:412 search.php:455 search.php:469
+#: include/views/inventory.host.view.php:166
 msgid "Web"
 msgstr "Web监测"
 
@@ -17323,12 +17425,12 @@ msgstr "Web 场景"
 msgid "Wed"
 msgstr "三"
 
-#: include/forms.inc.php:1914 include/forms.inc.php:2029
+#: include/forms.inc.php:1922 include/forms.inc.php:2037
 #: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:147
 msgid "Wednesday"
 msgstr "周三"
 
-#: app/views/report.services.php:35 include/forms.inc.php:1868
+#: app/views/report.services.php:35 include/forms.inc.php:1876
 #: include/maintenances.inc.php:35 report4.php:108
 msgid "Weekly"
 msgstr "每周"
@@ -17496,7 +17598,7 @@ msgstr ""
 msgid "X"
 msgstr "X"
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:260
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 msgid "X-Axis"
 msgstr ""
 
@@ -17508,7 +17610,7 @@ msgstr "X1"
 msgid "X2"
 msgstr "X2"
 
-#: include/items.inc.php:1729
+#: include/items.inc.php:1737
 msgid "XML XPath"
 msgstr "XML XPath"
 
@@ -17519,7 +17621,7 @@ msgstr "XML XPath"
 msgid "XML data"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:2043
+#: include/classes/api/services/CItemGeneral.php:2222
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
 msgstr "XML空"
@@ -17535,8 +17637,8 @@ msgstr "纵轴最大值"
 
 #: include/classes/api/services/CGraphGeneral.php:314
 #: include/classes/graphdraw/CLineGraphDraw.php:705
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:479
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:493
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Y axis MAX value must be greater than Y axis MIN value."
 
@@ -17575,7 +17677,7 @@ msgstr "Y1"
 msgid "Y2"
 msgstr "Y2"
 
-#: include/forms.inc.php:2084
+#: include/forms.inc.php:2092
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
 #: include/views/configuration.services.edit.php:246
@@ -17588,6 +17690,7 @@ msgstr ""
 #: include/classes/import/validators/C32XmlValidator.php:1007
 #: include/classes/import/validators/C34XmlValidator.php:1111
 #: include/classes/import/validators/C40XmlValidator.php:1290
+#: include/classes/import/validators/C42XmlValidator.php:1298
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -17620,11 +17723,11 @@ msgstr "每年"
 msgid "Yes"
 msgstr "是"
 
-#: include/classes/screens/CScreenProblem.php:714 include/func.inc.php:2675
+#: include/classes/screens/CScreenProblem.php:714 include/func.inc.php:2639
 msgid "Yesterday"
 msgstr "昨天"
 
-#: include/func.inc.php:1818
+#: include/func.inc.php:1782
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\" 欢迎登入."
@@ -17633,7 +17736,7 @@ msgstr "\"%1$s\" 欢迎登入."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "您无法选择某些语言, 因为这些语言并未安装在web服务器上。"
 
-#: include/func.inc.php:1835 index_http.php:88
+#: include/func.inc.php:1799 index_http.php:88
 msgid "You are not logged in"
 msgstr "您还没有登录。"
 
@@ -17686,7 +17789,7 @@ msgstr "您没有权限来完成此操作."
 msgid "You do not have permissions to create users."
 msgstr "您没有权限来创建用户."
 
-#: include/func.inc.php:1818
+#: include/func.inc.php:1782
 msgid "You have no permissions to access this page."
 msgstr "你没有权限来访问这个页面."
 
@@ -17694,7 +17797,7 @@ msgstr "你没有权限来访问这个页面."
 msgid "You have unsaved changes."
 msgstr "您有未保存的更改。"
 
-#: include/func.inc.php:1837
+#: include/func.inc.php:1801
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
 
@@ -17714,7 +17817,7 @@ msgstr "Zabbix"
 msgid "Zabbix Admin"
 msgstr "管理员"
 
-#: app/views/layout.htmlpage.menu.php:56
+#: app/views/layout.htmlpage.menu.php:57
 msgid "Zabbix Share"
 msgstr "zabbix 共享"
 
@@ -17722,7 +17825,7 @@ msgstr "zabbix 共享"
 msgid "Zabbix Super Admin"
 msgstr "超级管理员"
 
-#: app/views/layout.htmlpage.menu.php:47
+#: app/views/layout.htmlpage.menu.php:48
 msgid "Zabbix Technical Support"
 msgstr ""
 
@@ -17865,7 +17968,9 @@ msgid "a number is too large"
 msgstr "数字过大"
 
 #: include/classes/api/services/CDRule.php:320
-#: include/classes/api/services/CItemGeneral.php:1210
+#: include/classes/api/services/CItemGeneral.php:1233
+#: include/classes/api/services/CItemGeneral.php:1306
+#: include/classes/api/services/CItemGeneral.php:1316
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
 msgstr "一个数值预计"
@@ -17934,8 +18039,8 @@ msgstr "所有介质"
 
 #: include/classes/api/services/CDRule.php:463
 #: include/classes/api/services/CDRule.php:470
-#: include/classes/api/services/CItemGeneral.php:1982
-#: include/classes/api/services/CItemGeneral.php:2006
+#: include/classes/api/services/CItemGeneral.php:2161
+#: include/classes/api/services/CItemGeneral.php:2185
 #: include/classes/import/validators/CXmlValidatorGeneral.php:207
 #: include/classes/validators/CApiInputValidator.php:370
 #: include/classes/validators/CApiInputValidator.php:508
@@ -18024,8 +18129,8 @@ msgstr "闪烁"
 msgid "both username and password should be either present or empty"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:128
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:142
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:127
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:141
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:200
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:214
 msgid "calculated"
@@ -18059,10 +18164,12 @@ msgstr "不能变更"
 #: include/classes/api/services/CItemGeneral.php:512
 #: include/classes/api/services/CItemGeneral.php:518
 #: include/classes/api/services/CItemGeneral.php:524
-#: include/classes/api/services/CItemGeneral.php:1179
-#: include/classes/api/services/CItemGeneral.php:1200
-#: include/classes/api/services/CItemGeneral.php:1227
-#: include/classes/api/services/CItemGeneral.php:1240
+#: include/classes/api/services/CItemGeneral.php:1201
+#: include/classes/api/services/CItemGeneral.php:1223
+#: include/classes/api/services/CItemGeneral.php:1254
+#: include/classes/api/services/CItemGeneral.php:1268
+#: include/classes/api/services/CItemGeneral.php:1294
+#: include/classes/api/services/CItemGeneral.php:1465
 #: include/classes/api/services/CMapElement.php:122
 #: include/classes/api/services/CMapElement.php:147
 #: include/classes/api/services/CMapElement.php:185
@@ -18095,7 +18202,7 @@ msgstr "不能变更"
 msgid "cannot be empty"
 msgstr "不能为空"
 
-#: include/classes/api/services/CItemGeneral.php:1998
+#: include/classes/api/services/CItemGeneral.php:2177
 msgid "cannot convert to JSON, result value too long"
 msgstr ""
 
@@ -18113,9 +18220,9 @@ msgid "check expression starting from \"%1$s\""
 msgstr "检查表达式从\"%1$s\"开始"
 
 #: include/classes/api/services/CHostGeneral.php:1024
-#: include/classes/api/services/CItemGeneral.php:1551
-#: include/classes/api/services/CItemGeneral.php:1557
-#: include/classes/api/services/CItemGeneral.php:1794
+#: include/classes/api/services/CItemGeneral.php:1730
+#: include/classes/api/services/CItemGeneral.php:1736
+#: include/classes/api/services/CItemGeneral.php:1973
 #: include/classes/import/CConfigurationImport.php:2612
 msgid "circular item dependency is not allowed"
 msgstr "不允许循环项依赖"
@@ -18234,6 +18341,10 @@ msgstr ""
 msgid "equals"
 msgstr ""
 
+#: include/views/js/common.item.edit.js.php:311
+msgid "error message"
+msgstr ""
+
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr "esc_step_from和esc_step_to必须一起设定."
@@ -18246,11 +18357,11 @@ msgstr "表达式为空"
 msgid "failed to parse JSON"
 msgstr ""
 
-#: include/forms.inc.php:2010 include/maintenances.inc.php:111
+#: include/forms.inc.php:2018 include/maintenances.inc.php:111
 msgid "first"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1248
+#: include/classes/api/services/CItemGeneral.php:1276
 msgid "first parameter is expected"
 msgstr "第一个参数是预设的"
 
@@ -18258,12 +18369,12 @@ msgstr "第一个参数是预设的"
 msgid "forecast() - Forecast for next t seconds based on period T"
 msgstr ""
 
-#: include/forms.inc.php:2013 include/maintenances.inc.php:114
+#: include/forms.inc.php:2021 include/maintenances.inc.php:114
 msgid "fourth"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:324
-msgid "fuzzytime() - Difference between item timestamp value and Zabbix server timestamp is over T seconds (1 - true, 0 - false)"
+msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:772
@@ -18305,11 +18416,11 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:508
 #: include/classes/widgets/CWidgetHelper.php:873
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1574
+#: include/classes/api/services/CItemGeneral.php:1753
 msgid "hostid of dependent item and master item should match"
 msgstr "依赖项目和主项目的hostid应该匹配"
 
@@ -18419,7 +18530,7 @@ msgid "key is empty"
 msgstr "关键字为空"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1846
-#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2014
+#: include/classes/graphdraw/CPieGraphDraw.php:330 include/forms.inc.php:2022
 #: include/graphs.inc.php:82 include/maintenances.inc.php:115
 #: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
@@ -18433,10 +18544,10 @@ msgstr ""
 msgid "left"
 msgstr "左"
 
-#: include/views/configuration.item.edit.php:976
+#: include/views/configuration.item.edit.php:1002
 #: include/views/configuration.item.massupdate.php:379
-#: include/views/configuration.item.prototype.edit.php:809
-#: include/views/js/common.item.edit.js.php:140
+#: include/views/configuration.item.prototype.edit.php:835
+#: include/views/js/common.item.edit.js.php:197
 #: include/views/js/configuration.item.massupdate.js.php:154
 msgid "list of characters"
 msgstr "字符列表"
@@ -18496,9 +18607,13 @@ msgstr "拓扑图"
 msgid "matches"
 msgstr "匹配"
 
+#: include/classes/api/services/CItemGeneral.php:1324
 #: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/graphdraw/CLineGraphDraw.php:1863
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:80
+#: include/views/configuration.item.edit.php:1032
+#: include/views/configuration.item.prototype.edit.php:865
+#: include/views/js/common.item.edit.js.php:237
 #: include/views/js/configuration.graph.edit.js.php:51
 #: include/views/js/configuration.graph.edit.js.php:59
 msgid "max"
@@ -18508,22 +18623,26 @@ msgstr "最大"
 msgid "max() - Maximum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1672
+#: include/classes/api/services/CItemGeneral.php:1851
 msgid "maximum dependent items count reached"
 msgstr "达到最大依赖项数"
 
 #: include/classes/api/services/CHostGeneral.php:1031
-#: include/classes/api/services/CItemGeneral.php:1587
-#: include/classes/api/services/CItemGeneral.php:1681
-#: include/classes/api/services/CItemGeneral.php:1801
+#: include/classes/api/services/CItemGeneral.php:1766
+#: include/classes/api/services/CItemGeneral.php:1860
+#: include/classes/api/services/CItemGeneral.php:1980
 #: include/classes/import/CConfigurationImport.php:2566
 #: include/classes/import/CConfigurationImport.php:2627
 msgid "maximum number of dependency levels reached"
 msgstr "达到最大数量的依赖关系"
 
+#: include/classes/api/services/CItemGeneral.php:1324
 #: include/classes/graphdraw/CLineGraphDraw.php:1847
 #: include/classes/graphdraw/CLineGraphDraw.php:1860
 #: include/classes/graphdraw/CPieGraphDraw.php:322 include/graphs.inc.php:78
+#: include/views/configuration.item.edit.php:1031
+#: include/views/configuration.item.prototype.edit.php:864
+#: include/views/js/common.item.edit.js.php:234
 #: include/views/js/configuration.graph.edit.js.php:49
 #: include/views/js/configuration.graph.edit.js.php:57
 msgid "min"
@@ -18609,8 +18728,8 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1989
-#: include/classes/api/services/CItemGeneral.php:2013
+#: include/classes/api/services/CItemGeneral.php:2168
+#: include/classes/api/services/CItemGeneral.php:2192
 msgid "nonempty key and value pair expected"
 msgstr ""
 
@@ -18621,7 +18740,7 @@ msgstr "非在"
 #: app/controllers/CControllerDashboardView.php:134
 #: hostinventoriesoverview.php:76
 #: include/classes/pagefilter/CPageFilter.php:808
-#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1126
+#: include/classes/pagefilter/CPageFilter.php:875 include/forms.inc.php:1134
 #: include/views/monitoring.screen.php:63 slides.php:199
 msgid "not selected"
 msgstr "非所选的"
@@ -18630,10 +18749,10 @@ msgstr "非所选的"
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
-#: include/views/configuration.item.edit.php:949
+#: include/views/configuration.item.edit.php:995
 #: include/views/configuration.item.massupdate.php:355
-#: include/views/configuration.item.prototype.edit.php:782
-#: include/views/js/common.item.edit.js.php:131
+#: include/views/configuration.item.prototype.edit.php:828
+#: include/views/js/common.item.edit.js.php:188
 #: include/views/js/configuration.item.massupdate.js.php:45
 #: include/views/js/configuration.item.massupdate.js.php:145
 msgid "number"
@@ -18695,27 +18814,31 @@ msgstr "于"
 msgid "other"
 msgstr "其它"
 
-#: include/views/configuration.item.edit.php:964
+#: include/views/configuration.item.edit.php:1017
 #: include/views/configuration.item.massupdate.php:368
-#: include/views/configuration.item.prototype.edit.php:797
-#: include/views/js/common.item.edit.js.php:49
+#: include/views/configuration.item.prototype.edit.php:850
+#: include/views/js/common.item.edit.js.php:58
+#: include/views/js/common.item.edit.js.php:218
 #: include/views/js/configuration.item.massupdate.js.php:46
 msgid "output"
 msgstr "输出"
 
-#: include/views/configuration.item.edit.php:982
+#: include/views/configuration.item.edit.php:1010
 #: include/views/configuration.item.massupdate.php:385
-#: include/views/configuration.item.prototype.edit.php:815
-#: include/views/js/common.item.edit.js.php:148
+#: include/views/configuration.item.prototype.edit.php:843
+#: include/views/js/common.item.edit.js.php:207
 #: include/views/js/configuration.item.massupdate.js.php:162
 msgid "path"
 msgstr "路径"
 
-#: include/views/configuration.item.edit.php:987
+#: include/views/configuration.item.edit.php:1016
+#: include/views/configuration.item.edit.php:1037
 #: include/views/configuration.item.massupdate.php:390
-#: include/views/configuration.item.prototype.edit.php:820
-#: include/views/js/common.item.edit.js.php:48
-#: include/views/js/common.item.edit.js.php:155
+#: include/views/configuration.item.prototype.edit.php:849
+#: include/views/configuration.item.prototype.edit.php:870
+#: include/views/js/common.item.edit.js.php:55
+#: include/views/js/common.item.edit.js.php:215
+#: include/views/js/common.item.edit.js.php:244
 #: include/views/js/configuration.item.massupdate.js.php:169
 msgid "pattern"
 msgstr "模式"
@@ -18728,7 +18851,7 @@ msgstr ""
 msgid "prev() - Previous value"
 msgstr ""
 
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:364
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:365
 msgid "problem pattern"
 msgstr ""
 
@@ -18765,7 +18888,7 @@ msgstr "正确"
 msgid "root"
 msgstr "root"
 
-#: include/classes/api/services/CItemGeneral.php:1581
+#: include/classes/api/services/CItemGeneral.php:1760
 msgid "ruleid of dependent item and master item should match"
 msgstr ""
 
@@ -18774,14 +18897,20 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
-#: include/forms.inc.php:2011 include/maintenances.inc.php:112
+#: include/forms.inc.php:2019 include/maintenances.inc.php:112
 msgctxt "adjective"
 msgid "second"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:1254
+#: include/classes/api/services/CItemGeneral.php:1282
 msgid "second parameter is expected"
 msgstr "预设的第二参数"
+
+#: include/views/configuration.item.edit.php:1042
+#: include/views/configuration.item.prototype.edit.php:875
+#: include/views/js/common.item.edit.js.php:251
+msgid "seconds"
+msgstr ""
 
 #: include/classes/html/CActionButtonList.php:89
 msgid "selected"
@@ -18799,9 +18928,11 @@ msgstr "简要描述"
 #: include/classes/api/services/CHttpTest.php:1078
 #: include/classes/api/services/CItemGeneral.php:499
 #: include/classes/api/services/CItemGeneral.php:537
-#: include/classes/api/services/CItemGeneral.php:1269
-#: include/classes/api/services/CItemGeneral.php:1283
-#: include/classes/api/services/CItemGeneral.php:1966
+#: include/classes/api/services/CItemGeneral.php:1340
+#: include/classes/api/services/CItemGeneral.php:1363
+#: include/classes/api/services/CItemGeneral.php:1427
+#: include/classes/api/services/CItemGeneral.php:1455
+#: include/classes/api/services/CItemGeneral.php:2145
 #: include/classes/api/services/CMaintenance.php:468
 #: include/classes/api/services/CMaintenance.php:637
 #: include/classes/api/services/CProxy.php:661
@@ -18889,7 +19020,7 @@ msgstr "找不到参数 \"%1$s\""
 msgid "the tag \"%1$s\" is missing"
 msgstr "标签 \"%1$s\" 丢失"
 
-#: include/forms.inc.php:2012 include/maintenances.inc.php:113
+#: include/forms.inc.php:2020 include/maintenances.inc.php:113
 msgid "third"
 msgstr ""
 
@@ -18923,7 +19054,7 @@ msgstr "触发器原型无法移动到另外一个模板或者主机"
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "触发器原型以及关联项无法移动到另外一个模板或者主机"
 
-#: app/views/layout.htmlpage.menu.php:30
+#: app/views/layout.htmlpage.menu.php:31
 #: include/classes/html/CMultiSelect.php:68 jsLoader.php:216
 msgid "type here to search"
 msgstr "在此输入搜索"
@@ -18964,7 +19095,9 @@ msgstr "异常的文本 \"%1$s\""
 #: include/classes/api/services/CEvent.php:905
 #: include/classes/api/services/CHost.php:1495
 #: include/classes/api/services/CHost.php:1501
-#: include/classes/api/services/CItemGeneral.php:1186
+#: include/classes/api/services/CItemGeneral.php:1208
+#: include/classes/api/services/CItemGeneral.php:1414
+#: include/classes/api/services/CItemGeneral.php:1440
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
 #: include/classes/api/services/CTriggerGeneral.php:574
@@ -18983,7 +19116,7 @@ msgstr "\"%1$s\" 值异常"
 msgid "unknown"
 msgstr "未知的"
 
-#: include/classes/import/validators/CXmlValidator.php:66
+#: include/classes/import/validators/CXmlValidator.php:67
 msgid "unsupported version number"
 msgstr "这个版本已经不被支持"
 
@@ -18992,7 +19125,7 @@ msgstr "这个版本已经不被支持"
 #: include/classes/widgets/CWidgetHelper.php:403
 #: include/classes/widgets/CWidgetHelper.php:448
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:174
-#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:246
+#: include/classes/widgets/forms/CWidgetFormSvgGraph.php:247
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.usergroups.edit.php:246
 #: include/views/configuration.action.edit.php:370
@@ -19011,6 +19144,7 @@ msgstr "这个版本已经不被支持"
 #: include/views/configuration.triggers.massupdate.php:129
 #: include/views/hostmacros.php:85
 #: include/views/js/administration.general.macros.edit.js.php:11
+#: include/views/js/common.item.edit.js.php:305
 #: include/views/js/configuration.httpconf.edit.js.php:18
 #: include/views/js/configuration.maintenance.edit.js.php:11
 #: include/views/js/configuration.maintenance.edit.js.php:35
