@@ -549,8 +549,7 @@ $tags_view = new CView('configuration.tags.tab', [
 	'source' => 'trigger',
 	'tags' => $data['tags'],
 	'show_inherited_tags' => $data['show_inherited_tags'],
-	'parent_templates' => $data['parent_templates'],
-	'readonly' => false
+	'readonly' => $discovered_trigger
 ]);
 $triggersTab->addTab('tags-tab', _('Tags'), $tags_view->render());
 

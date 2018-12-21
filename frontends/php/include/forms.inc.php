@@ -1527,8 +1527,12 @@ function getTriggerFormData(array $data) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 
+		if ($data['show_inherited_tags']) {
+			$options['selectItems'] = ['itemid', 'templateid', 'flags'];
+		}
+
 		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
 			$triggers = API::Trigger()->get($options);
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
@@ -1545,36 +1549,67 @@ function getTriggerFormData(array $data) {
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $trigger['tags'];
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
 		// Get templates.
-		$parent_templates = getTriggerParentTemplates([$trigger], $flag);
-		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'], $parent_templates, $flag);
-		$data['parent_templates'] = $parent_templates['templates'];
+		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
+			getTriggerParentTemplates([$trigger], $flag), $flag
+		);
 
 		if ($data['show_inherited_tags']) {
-			$db_templates = API::Template()->get([
-				'output' => ['templateid'],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($data['parent_templates']),
-				'preservekeys' => true
-			]);
+			if ($data['parent_discoveryid'] === null) {
+				if ($trigger['discoveryRule']) {
+					$item_parent_templates = getItemParentTemplates([$trigger['discoveryRule']],
+						ZBX_FLAG_DISCOVERY_RULE
+					)['templates'];
+				}
+				else {
+					$item_parent_templates = getItemParentTemplates($trigger['items'],
+						ZBX_FLAG_DISCOVERY_NORMAL
+					)['templates'];
+				}
+			}
+			else {
+				$items = [];
+				$item_prototypes = [];
+
+				foreach ($trigger['items'] as $item) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						$items[] = $item;
+					}
+					else {
+						$item_prototypes[] = $item;
+					}
+				}
+
+				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
+					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
+			}
+			unset($item_parent_templates[0]);
+
+			$db_templates = $item_parent_templates
+				? API::Template()->get([
+					'output' => ['templateid'],
+					'selectTags' => ['tag', 'value'],
+					'templateids' => array_keys($item_parent_templates),
+					'preservekeys' => true
+				])
+				: [];
 
 			$inherited_tags = [];
 
-			foreach ($data['parent_templates'] as $templateid => $template) {
+			foreach ($item_parent_templates as $templateid => $template) {
 				if (array_key_exists($templateid, $db_templates)) {
 					foreach ($db_templates[$templateid]['tags'] as $tag) {
 						if (!array_key_exists($tag['tag'].':'.$tag['value'], $inherited_tags)) {
 							$inherited_tags[$tag['tag'].':'.$tag['value']] = $tag + [
-								'templateids' => [$templateid => $templateid],
+								'parent_templates' => [$templateid => $template],
 								'type' => ZBX_PROPERTY_INHERITED
 							];
 						}
 						else {
-							$inherited_tags[$tag['tag'].':'.$tag['value']]['templateids'] += [
-								$templateid => $templateid
+							$inherited_tags[$tag['tag'].':'.$tag['value']]['parent_templates'] += [
+								$templateid => $template
 							];
 						}
 					}

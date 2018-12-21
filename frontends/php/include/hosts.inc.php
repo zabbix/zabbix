@@ -561,61 +561,6 @@ function updateHostStatus($hostids, $status) {
 }
 
 /**
- * Get all host/template parent templates with tags and permissions.
- *
- * @param array $templateids
- *
- * @return array
- */
-function getHostParentTemplates(array $templateids) {
-	$all_templateids = [];
-
-	while ($templateids) {
-		$db_templates = API::Template()->get([
-			'output' => ['templateid'],
-			'selectParentTemplates' => ['templateid'],
-			'templateids' => array_keys($templateids)
-		]);
-
-		$all_templateids += $templateids;
-		$templateids = [];
-
-		foreach ($db_templates as $db_template) {
-			foreach ($db_template['parentTemplates'] as $parent_template) {
-				if (!array_key_exists($parent_template['templateid'], $all_templateids)) {
-					$templateids[$parent_template['templateid']] = true;
-				}
-			}
-		}
-	}
-
-	$parent_templates = $all_templateids
-		? API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'selectTags' => ['tag', 'value'],
-			'templateids' => array_keys($all_templateids),
-			'preservekeys' => true
-		])
-		: [];
-
-	$rw_templates = $parent_templates
-		? API::Template()->get([
-			'output' => [],
-			'templateids' => array_keys($parent_templates),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
-
-	foreach ($parent_templates as $templateid => &$template) {
-		$template['permission'] = array_key_exists($templateid, $rw_templates) ? PERM_READ_WRITE : PERM_READ;
-	}
-	unset($template);
-
-	return $parent_templates;
-}
-
-/**
  * Get parent templates for each given application.
  *
  * @param array  $applications                     An array of applications.

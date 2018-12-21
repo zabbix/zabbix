@@ -76,19 +76,19 @@ foreach ($data['tags'] as $i => $tag) {
 	if ($show_inherited_tags) {
 		$template_list = [];
 
-		if (array_key_exists('templateids', $tag)) {
-			foreach ($tag['templateids'] as $templateid) {
-				$template_name = CHtml::encode($data['parent_templates'][$templateid]['name']);
+		if (array_key_exists('parent_templates', $tag)) {
+			CArrayHelper::sort($tag['parent_templates'], ['name']);
 
-				if ($data['parent_templates'][$templateid]['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template_name,
+			foreach ($tag['parent_templates'] as $templateid => $template) {
+				if ($template['permission'] == PERM_READ_WRITE) {
+					$template_list[] = (new CLink($template['name'],
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')
 							->setArgument('templateid', $templateid)
 					))->setAttribute('target', '_blank');
 				}
 				else {
-					$template_list[] = (new CSpan($template_name))->addClass(ZBX_STYLE_GREY);
+					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 				}
 
 				$template_list[] = ', ';
