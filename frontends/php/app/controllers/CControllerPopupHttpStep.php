@@ -27,7 +27,7 @@ class CControllerPopupHttpStep extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dstfrm' =>				'string|fatal',
+			'dstfrm' =>				'required|string|not_empty',
 			'stepid' =>				'int32',
 			'list_name' =>			'string',
 			'name' =>				'string|not_empty',
@@ -70,7 +70,7 @@ class CControllerPopupHttpStep extends CController {
 		$page_options = [
 			'dstfrm' => $this->getInput('dstfrm'),
 			'list_name' => $this->getInput('list_name', ''),
-			'name' => $this->getInput('name'),
+			'name' => $this->getInput('name', ''),
 			'templated' => $this->getInput('templated', 0),
 			'post_type' => $this->getInput('post_type', ZBX_POSTTYPE_FORM),
 			'posts' => $this->getInput('posts', ''),
@@ -98,13 +98,12 @@ class CControllerPopupHttpStep extends CController {
 
 			// Validate "Timeout" field manually, since it cannot be properly added into MVC validation rules.
 			$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-			$timeout = $this->getInput('timeout');
 
-			if ($simple_interval_parser->parse($timeout) != CParser::PARSE_SUCCESS) {
+			if ($simple_interval_parser->parse($page_options['timeout']) != CParser::PARSE_SUCCESS) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
 			}
-			elseif ($timeout[0] !== '{') {
-				$seconds = timeUnitToSeconds($timeout);
+			elseif ($page_options['timeout'][0] !== '{') {
+				$seconds = timeUnitToSeconds($page_options['timeout']);
 
 				if (bccomp($seconds, SEC_PER_HOUR) > 0) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a number is too large')));
