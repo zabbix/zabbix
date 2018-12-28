@@ -601,7 +601,6 @@
 			setDivPosition(data['placeholder'], data, pos, true);
 
 			if (rows != data['options']['rows']) {
-				data['options']['rows'] = rows;
 				resizeDashboardGrid($obj, data, rows);
 			}
 		}
