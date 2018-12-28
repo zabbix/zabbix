@@ -560,7 +560,7 @@
 		return;
 	}
 
-	function checkWidgetOverlap($obj, data, widget) {
+	function checkWidgetOverlap(data, widget) {
 		resetCurrentPositions(data['widgets']);
 		realignWidget(data, widget);
 
@@ -1833,7 +1833,7 @@
 				$this.append(widget['div']);
 
 				setDivPosition(widget['div'], data, widget['pos'], false);
-				checkWidgetOverlap($this, data, widget);
+				checkWidgetOverlap(data, widget);
 
 				resizeDashboardGrid($this, data);
 
