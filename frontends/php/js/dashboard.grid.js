@@ -1725,7 +1725,7 @@
 					});
 
 					if (options['kioskmode']) {
-						new_widget_placeholder = $('<h1>').text(t('Cannot add widgets in kiosk mode'));
+						new_widget_placeholder.container = $('<h1>').text(t('Cannot add widgets in kiosk mode'));
 					}
 				}
 				else {
