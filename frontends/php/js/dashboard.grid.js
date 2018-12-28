@@ -606,7 +606,7 @@
 			}
 		}
 		else {
-			setDivPosition(data['placeholder'], data, pos, false);
+			setDivPosition(data['placeholder'], data, pos, true);
 		}
 	}
 
@@ -737,12 +737,13 @@
 			scroll: false,
 			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
-			start: function(event, ui) {
+			start: function(event) {
 				data['pos-action'] = 'resize';
 				setResizableState('disable', data.widgets, widget.uniqueid);
 				startWidgetPositioning($(event.target), data);
+				doWidgetResize($obj, $(event.target), data);
 			},
-			resize: function(event, ui) {
+			resize: function(event) {
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
 				if (SF) {
 					$.each(data['widgets'], function() {
@@ -754,7 +755,7 @@
 
 				doWidgetResize($obj, $(event.target), data);
 			},
-			stop: function(event, ui) {
+			stop: function(event) {
 				data['pos-action'] = '';
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
