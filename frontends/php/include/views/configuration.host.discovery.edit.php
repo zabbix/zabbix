@@ -704,15 +704,22 @@ elseif (!hasRequest('form_refresh')) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
+if (array_key_exists('item', $data)) {
+	$templated = ($data['item']['templateid'] != 0);
+}
+else {
+	$templated = false;
+}
+
 foreach ($lld_macro_paths as $i => $lld_macro_path) {
 	$lld_macro = (new CTextBox('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'],
-		!($data['item']['templateid'] == 0), DB::getFieldLength('lld_macro_path', 'lld_macro')
+		$templated, DB::getFieldLength('lld_macro_path', 'lld_macro')
 	))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->setAttribute('placeholder', '{#MACRO}');
 
-	$path = (new CTextBox('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], !($data['item']['templateid'] == 0),
+	$path = (new CTextBox('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], $templated,
 		DB::getFieldLength('lld_macro_path', 'path')
 	))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -722,7 +729,7 @@ foreach ($lld_macro_paths as $i => $lld_macro_path) {
 		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-			->setEnabled($data['item']['templateid'] == 0)
+			->setEnabled(!$templated)
 	];
 
 	$lld_macro_paths_table->addRow([$lld_macro, $path, (new CCol($remove))->addClass(ZBX_STYLE_NOWRAP)], 'form_row');
@@ -732,7 +739,7 @@ $lld_macro_paths_table->setFooter((new CCol(
 	(new CButton('lld_macro_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
-		->setEnabled($data['item']['templateid'] == 0)
+		->setEnabled(!$templated)
 ))->setColSpan(3));
 
 $lld_macro_paths_form_list->addRow(_('LLD Macro'),
