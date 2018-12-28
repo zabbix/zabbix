@@ -324,8 +324,8 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110008,50009,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110010,50010,50022,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110011,50009,null,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,'','',1,'','');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1,110006,'{#A}','$.list[:1].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (2,110006,'{#B}','$.list[:2].type');
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (3,110006,'{#C}','$.list[:3].type');
