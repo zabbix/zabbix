@@ -1838,6 +1838,7 @@
 				resizeDashboardGrid($this, data);
 
 				showPreloader(widget);
+				data.new_widget_placeholder.container.hide();
 			});
 		},
 
