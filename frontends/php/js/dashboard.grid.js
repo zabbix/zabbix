@@ -336,12 +336,13 @@
 		affected = getAffectedTreeAsArray(axis.boundary);
 
 		var margins = {},
-			axis_pos = $.extend(widget.current_pos);
+			axis_pos = $.extend({}, widget.current_pos);
 
 		// Resize action for left/up is mirrored right/down action.
 		if (axis_key in axis) {
 			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
+				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
 			axis_pos[axis_key] = size_max - axis_pos[axis_key] - axis_pos[size_key];
 		}
@@ -434,10 +435,8 @@
 				if (collapsed) {
 					affected.each(function(box) {
 						if (box.current_pos[axis_key] > slot + scanline[size_key]) {
-							box.current_pos[axis_key] -= scanline[size_key];
-							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key], axis_key in axis
-								? size_max - box.pos[axis_key] - box.pos[size_key]
-								: box.pos[axis_key]
+							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
+								box.pos[axis_key]
 							);
 						}
 					});
@@ -462,11 +461,7 @@
 			}
 
 			affected.each(function(box) {
-				box.current_pos[axis_key] -= overlap;
-				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key], axis_key in axis
-					? size_max - box.pos[axis_key] - box.pos[size_key]
-					: box.pos[axis_key]
-				);
+				box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - overlap, box.pos[axis_key]);
 			});
 		}
 
@@ -474,6 +469,7 @@
 		if (axis_key in axis) {
 			affected.each(function(box) {
 				box.current_pos[axis_key] = size_max - box.current_pos[axis_key] - box.current_pos[size_key];
+				box.pos[axis_key] = size_max - box.pos[axis_key] - box.pos[size_key];
 			});
 		}
 	}
