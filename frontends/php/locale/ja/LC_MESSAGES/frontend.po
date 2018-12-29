@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-12-21 13:31+0200\n"
-"PO-Revision-Date: 2018-12-20 03:54+0300\n"
+"PO-Revision-Date: 2018-12-25 06:25+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1545270874.000000\n"
+"X-POOTLE-MTIME: 1545711902.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -30,7 +30,7 @@ msgstr "\"%1$s\" で指定してください"
 #: include/classes/api/services/CItemGeneral.php:1324
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\"の値は\"%2$s\"の値以下にしてください"
 
 #: include/classes/api/services/CMaintenance.php:353
 #: include/classes/api/services/CMaintenance.php:358
@@ -2953,15 +2953,15 @@ msgstr "条件式の\"%1$s\"から始まる部分を確認してください。"
 
 #: include/items.inc.php:1768
 msgid "Check for error in JSON"
-msgstr ""
+msgstr "JSON内のエラーチェック"
 
 #: include/items.inc.php:1769
 msgid "Check for error in XML"
-msgstr ""
+msgstr "XML内のエラーチェック"
 
 #: include/items.inc.php:1770
 msgid "Check for error using regular expression"
-msgstr ""
+msgstr "正規表現使用時のエラーチェック"
 
 #: include/views/configuration.host.discovery.edit.php:698
 #: include/views/configuration.host.discovery.list.php:157
@@ -3983,7 +3983,7 @@ msgstr "乗数"
 #: include/views/configuration.item.prototype.edit.php:932
 #: include/views/js/common.item.edit.js.php:75
 msgid "Custom on fail"
-msgstr ""
+msgstr "失敗時のカスタマイズ"
 
 #: screens.php:28
 msgid "Custom screens"
@@ -4880,17 +4880,17 @@ msgstr "致命的な障害"
 
 #: include/items.inc.php:1776
 msgid "Discard unchanged"
-msgstr ""
+msgstr "変化がなければ破棄"
 
 #: include/items.inc.php:1777
 msgid "Discard unchanged with heartbeat"
-msgstr ""
+msgstr "指定秒内に変化がなければ破棄"
 
 #: include/views/configuration.item.edit.php:1077
 #: include/views/configuration.item.prototype.edit.php:910
 #: include/views/js/common.item.edit.js.php:80
 msgid "Discard value"
-msgstr ""
+msgstr "値を破棄"
 
 #: include/discovery.inc.php:138 include/forms.inc.php:698
 msgid "Discovered"
@@ -5070,7 +5070,7 @@ msgstr "%3$s件のうち%1$sから%2$s件までを表示しています"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:252
 msgid "Displaying options"
-msgstr ""
+msgstr "表示オプション"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -5082,7 +5082,7 @@ msgstr "条件式を置き換えますか？"
 
 #: include/items.inc.php:1767
 msgid "Does not match regular expression"
-msgstr ""
+msgstr "正規表現と一致しない"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:701
 #: include/views/js/monitoring.sysmaps.js.php:789
@@ -7503,7 +7503,7 @@ msgstr "実行中"
 
 #: include/items.inc.php:1765
 msgid "In range"
-msgstr ""
+msgstr "値の範囲"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:107
 msgid "Inaccessible graph"
@@ -10247,7 +10247,7 @@ msgstr "マスターアイテム"
 
 #: include/items.inc.php:1766
 msgid "Matches regular expression"
-msgstr ""
+msgstr "正規表現と一致する"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:140
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:213
@@ -11907,7 +11907,7 @@ msgstr "ユニークかどうかだけチェックします。"
 #: include/classes/api/services/CItemGeneral.php:1346
 #: include/classes/api/services/CItemGeneral.php:1391
 msgid "Only one throttling step is allowed."
-msgstr ""
+msgstr "1回の絞り込みのみ使用できます。"
 
 #: app/views/monitoring.acknowledge.edit.php:49
 msgid "Only selected problem"
@@ -14419,7 +14419,7 @@ msgstr "時間範囲のカスタマイズ"
 #: include/views/configuration.item.prototype.edit.php:912
 #: include/views/js/common.item.edit.js.php:82
 msgid "Set error to"
-msgstr ""
+msgstr "エラーを設定"
 
 #: include/actions.inc.php:1135
 msgid "Set host inventory mode"
@@ -14429,7 +14429,7 @@ msgstr "インベントリモードの設定"
 #: include/views/configuration.item.prototype.edit.php:911
 #: include/views/js/common.item.edit.js.php:81
 msgid "Set value to"
-msgstr ""
+msgstr "値を設定"
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Setting LDAP dereferencing mode failed."
@@ -15624,7 +15624,7 @@ msgstr "閾値"
 
 #: include/items.inc.php:1774
 msgid "Throttling"
-msgstr ""
+msgstr "絞り込み"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -17124,7 +17124,7 @@ msgstr "VMware仮想マシンの稼働秒数、<url> - VMwareサービスURL、<
 
 #: include/items.inc.php:1763
 msgid "Validation"
-msgstr ""
+msgstr "バリデーション"
 
 #: app/views/monitoring.widget.plaintext.view.php:46
 #: app/views/popup.httpstep.php:109 app/views/popup.testtriggerexpr.php:30
@@ -18338,7 +18338,7 @@ msgstr "等しい"
 
 #: include/views/js/common.item.edit.js.php:311
 msgid "error message"
-msgstr ""
+msgstr "エラーメッセージ"
 
 #: include/classes/api/services/CAction.php:1618
 msgid "esc_step_from and esc_step_to must be set together."
@@ -18370,7 +18370,7 @@ msgstr "第4"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:324
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
-msgstr ""
+msgstr "fuzzytime() - アイテムの値(タイムスタンプとして)とZabbixサーバーのタイムスタンプとの差がT秒以下か (1 - T秒以下、0 - それ以外)"
 
 #: include/views/configuration.item.edit.php:772
 #: include/views/configuration.item.edit.php:777
@@ -18905,7 +18905,7 @@ msgstr "第2引数を指定してください"
 #: include/views/configuration.item.prototype.edit.php:875
 #: include/views/js/common.item.edit.js.php:251
 msgid "seconds"
-msgstr ""
+msgstr "秒"
 
 #: include/classes/html/CActionButtonList.php:89
 msgid "selected"
