@@ -203,7 +203,7 @@ out:
   par_l: 3
   par_r: 69
 ---
-test case: "Check that openning of LLD function macro is skipped if no macro"
+test case: "Check that opening of LLD function macro is skipped if no macro"
 in:
   param: '{{#avg("Zabbix server:trap[{#VALUE}]",600)'
 out:
@@ -221,28 +221,28 @@ out:
   par_l: 7
   par_r: 42
 ---
-test case: "Only openning of LLD macro function must fail #1"
+test case: "Only opening of LLD macro function must fail #1"
 in:
   param: '{{#'
 out:
   error: 'Incorrect function expression: {{#'
   return: 'FAIL'
 ---
-test case: "Only openning of LLD macro function must fail #2"
+test case: "Only opening of LLD macro function must fail #2"
 in:
   param: '{{'
 out:
   error: 'Incorrect function expression: {{'
   return: 'FAIL'
 ---
-test case: "Only openning of LLD macro function must fail #3"
+test case: "Only opening of LLD macro function must fail #3"
 in:
   param: '{'
 out:
   error: 'Incorrect function expression: {'
   return: 'FAIL'
 ---
-test case: "Only openning of LLD macro function must fail #4"
+test case: "Only opening of LLD macro function must fail #4"
 in:
   param: '{{#}'
 out:
