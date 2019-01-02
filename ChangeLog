@@ -16,7 +16,6 @@ A.F.....S. [ZBXNEXT-4724] added validation and throttling preprocessing rules, a
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
-........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
@@ -66,8 +65,6 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
-........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
-........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
@@ -2205,6 +2202,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
