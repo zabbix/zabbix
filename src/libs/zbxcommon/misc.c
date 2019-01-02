@@ -224,7 +224,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 			last_tick = tick;
 		}
 	}
-
 #else	/* not _WINDOWS */
 #ifdef HAVE_TIME_CLOCK_GETTIME
 	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
