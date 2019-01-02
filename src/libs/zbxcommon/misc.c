@@ -154,7 +154,7 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
-	static zbx_timespec_t	*last_ts = NULL;
+	static zbx_timespec_t	last_ts = {0, 0};
 	static int		corr = 0;
 #ifdef _WINDOWS
 	LARGE_INTEGER		tickPerSecond, tick;
@@ -168,10 +168,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	struct timespec	tp;
 #	endif
 #endif
-
-	if (NULL == last_ts)
-		last_ts = (zbx_timespec_t *)zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
-
 #ifdef _WINDOWS
 	_ftime(&tb);
 
@@ -189,14 +185,14 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				LARGE_INTEGER	qpc_tick, ntp_tick = {0};
 
 				/* _ftime () returns precision in milliseconds, but 'ns' could be increased */
-				if (ts->sec == last_ts->sec && ts->ns < last_ts->ns)
+				if (ts->sec == last_ts.sec && ts->ns < last_ts.ns)
 				{
-					ts->ns = last_ts->ns;
+					ts->ns = last_ts.ns;
 				}
 				else
 				{
-					ntp_tick.QuadPart = tickPerSecond.QuadPart * (ts->sec - last_ts->sec)
-						+ tickPerSecond.QuadPart * (ts->ns - last_ts->ns) / 1000000000;
+					ntp_tick.QuadPart = tickPerSecond.QuadPart * (ts->sec - last_ts.sec)
+						+ tickPerSecond.QuadPart * (ts->ns - last_ts.ns) / 1000000000;
 				}
 
 				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
@@ -242,7 +238,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 #endif	/* not _WINDOWS */
 
-	if (last_ts->ns == ts->ns && last_ts->sec == ts->sec)
+	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 	{
 		ts->ns += ++corr;
 
@@ -254,8 +250,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 	else
 	{
-		last_ts->sec = ts->sec;
-		last_ts->ns = ts->ns;
+		last_ts.sec = ts->sec;
+		last_ts.ns = ts->ns;
 		corr = 0;
 	}
 }
