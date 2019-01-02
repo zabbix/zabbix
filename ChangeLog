@@ -2143,6 +2143,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (yurii, Andris)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
