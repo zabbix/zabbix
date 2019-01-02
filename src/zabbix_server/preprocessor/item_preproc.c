@@ -1265,6 +1265,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(params);
+	ZBX_UNUSED(errmsg);
 	*error = zbx_dsprintf(*error, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
