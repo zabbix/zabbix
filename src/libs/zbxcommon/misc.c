@@ -157,8 +157,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	static zbx_timespec_t	last_ts = {0, 0};
 	static int		corr = 0;
 #ifdef _WINDOWS
-	LARGE_INTEGER		tickPerSecond, tick;
-	static LARGE_INTEGER	last_tick = {0};
+	LARGE_INTEGER		tick;
+	static LARGE_INTEGER	tickPerSecond = {0}, last_tick = {0};
 	BOOL			rc = FALSE;
 	struct _timeb		tb;
 #else
@@ -169,12 +169,16 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #	endif
 #endif
 #ifdef _WINDOWS
+
+	if (0 == tickPerSecond.QuadPart)
+		QueryPerformanceFrequency(&tickPerSecond);
+
 	_ftime(&tb);
 
 	ts->sec = (int)tb.time;
 	ts->ns = tb.millitm * 1000000;
 
-	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
+	if (0 != tickPerSecond.QuadPart)
 	{
 		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
 		{
