@@ -175,6 +175,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'maintenance' => 1,
 			'show_timeline' => 0,
 			'details' => 1,
+			'show_latest_values' => 0,
 			'sort_field' => '',
 			'sort_order' => ZBX_SORT_DOWN
 		];

@@ -191,23 +191,17 @@ class CSvgGraphAxis extends CSvgTag {
 
 		if ($this->type == GRAPH_YAXIS_SIDE_BOTTOM) {
 			$axis = 'x';
-			// Label margin from axis.
-			$margin = 5;
-			$y = $this->height - $margin;
+			$y = $this->height - CSvgGraph::SVG_GRAPH_X_AXIS_LABEL_MARGIN;
 		}
 		else {
 			$axis = 'y';
-			// Label margin from axis.
-			$margin = 5;
-			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT) ? $margin : $this->width - $margin;
+			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT)
+				? CSvgGraph::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN
+				: $this->width - CSvgGraph::SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN;
 		}
 
 		foreach ($this->labels as $pos => $label) {
 			$$axis = $pos;
-
-			if ($this->type == GRAPH_YAXIS_SIDE_RIGHT && $y == 0) {
-				continue;
-			}
 
 			if ($this->type == GRAPH_YAXIS_SIDE_LEFT || $this->type == GRAPH_YAXIS_SIDE_RIGHT) {
 				// Flip upside down.

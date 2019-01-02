@@ -42,7 +42,8 @@ $filter_column = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => $filterForm->getName(),
 					'dstfld1' => 'groupids_',
-					'real_hosts' => true
+					'real_hosts' => true,
+					'enrich_parent_groups' => true
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
