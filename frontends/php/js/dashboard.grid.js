@@ -336,6 +336,7 @@
 		affected = getAffectedTreeAsArray(axis.boundary);
 
 		var margins = {},
+			overlap = 0,
 			axis_pos = $.extend({}, widget.current_pos);
 
 		// Resize action for left/up is mirrored right/down action.
@@ -372,8 +373,10 @@
 			}
 		});
 
+		overlap = new_max - size_max;
+
 		// Compact widget by resizing.
-		if (new_max > size_max) {
+		if (overlap > 0) {
 			// Scanline is virtual box that utilizes whole width/height depending on its direction defined by size_key.
 			var scanline = {
 					x: 0,
@@ -381,7 +384,6 @@
 					width: 12,
 					height: 128
 				},
-				overlap = new_max - size_max,
 				slot = axis_pos[axis_key] + axis_pos[size_key],
 				next_col,
 				col,
@@ -407,7 +409,7 @@
 					box.new_pos[axis_key] = slot;
 
 					$.each(col, function(_, col_box) {
-						if (rectOverlap(col_box.current_pos, box.new_pos)) {
+						if (col_box.uniqueid == box.uniqueid || rectOverlap(col_box.current_pos, box.new_pos)) {
 							if (col_box.current_pos[size_key] > size_min) {
 								col_box.new_pos = $.extend({}, col_box.current_pos);
 								col_box.new_pos[size_key] -= scanline[size_key];
@@ -434,7 +436,7 @@
 
 				if (collapsed) {
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > slot + scanline[size_key]) {
+						if (box.current_pos[axis_key] > scanline[axis_key]) {
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
