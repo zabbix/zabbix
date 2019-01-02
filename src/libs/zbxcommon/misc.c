@@ -216,6 +216,11 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				}
 			}
 
+			/* for prevent concurrency problem with last_tick and last_ts */
+			/* and ensure a monotonous time increase */
+			if (ts->sec == last_ts.sec && ts->ns < last_ts.ns)
+				ts->ns = last_ts.ns;
+
 			last_tick = tick;
 		}
 	}
