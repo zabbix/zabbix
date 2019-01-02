@@ -1,8 +1,17 @@
 Changes for 4.0.4rc1
 
 New features:
+...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
+..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
+..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
+...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
+..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
+...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
+.........T [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
 ...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
 
 --------------------------------------------------------------------------------
@@ -2132,6 +2141,10 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
+...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
+...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions, fixed constraint error when importing new data.tmpl (kalimulin)
