@@ -3,6 +3,7 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
 A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
 
