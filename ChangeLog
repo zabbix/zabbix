@@ -22,6 +22,7 @@ A.F.....S. [ZBXNEXT-4724] added validation and throttling preprocessing rules, a
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
@@ -73,6 +74,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
 A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 ..F....... [ZBX-13804] fixed generic popup form submission (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
