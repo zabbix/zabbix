@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
+require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
@@ -142,6 +143,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageAvailabilityReport');
 		$suite->addTestSuite('testPageDashboard');
+		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageProblems');
