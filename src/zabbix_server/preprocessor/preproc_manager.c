@@ -161,7 +161,7 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 
 			zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 			zbx_vector_ptr_destroy(&vault->history);
-			zbx_hashset_remove_direct(&manager->history_cache, vault);
+			zbx_hashset_iter_remove(&iter);
 		}
 
 		/* reset preprocessing history for an item if its preprocessing step was modified */
