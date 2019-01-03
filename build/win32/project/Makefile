@@ -1,4 +1,8 @@
+!IF "$(TLS)" == ""
 all: agent sender sender_dll get
+!ELSE
+all: agent sender get
+!ENDIF
 
 agent:
 	nmake /f Makefile_agent

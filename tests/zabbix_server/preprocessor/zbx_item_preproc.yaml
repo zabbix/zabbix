@@ -1,0 +1,1437 @@
+---
+test case: string(10) * 10
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+out:
+  return: SUCCEED
+  value: 100
+---
+test case: string(10x) * 10
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10x
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+out:
+  return: FAIL
+---
+test case: string(10) * abc
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: abc
+out:
+  return: FAIL
+---
+test case: string(1.5) * 3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 3
+out:
+  return: SUCCEED
+  value: 4.5
+---
+test case: uint64(1.5) * 3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 3
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: uint64(3) * 1.5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: float(1.5) * 3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 3
+out:
+  return: SUCCEED
+  value: 4.5
+---
+test case: float(3) * 1.5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 1.5
+out:
+  return: SUCCEED
+  value: 4.5
+---
+test case: rtrim(01abc01, 01)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_RTRIM
+    params: 01
+out:
+  return: SUCCEED
+  value: 01abc
+---
+test case: rtrim(01abc01, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_RTRIM
+    params: abc
+out:
+  return: SUCCEED
+  value: 01abc01
+---
+test case: ltrim(01abc01, 01)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_LTRIM
+    params: 01
+out:
+  return: SUCCEED
+  value: abc01
+---
+test case: ltrim(01abc01, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_LTRIM
+    params: abc
+out:
+  return: SUCCEED
+  value: 01abc01
+---
+test case: trim(01abc01, 01)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_TRIM
+    params: 01
+out:
+  return: SUCCEED
+  value: abc
+---
+test case: trim(01abc01, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 01abc01
+  step:
+    type: ZBX_PREPROC_TRIM
+    params: abc
+out:
+  return: SUCCEED
+  value: 01abc01
+---
+test case: regsub("test 123 number", "([0-9]+", 1)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: test 123 number
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+\n\\1"
+out:
+  return: FAIL
+---
+test case: regsub("test 123 number", "([0-9]+)", \1)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: test 123 number
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+)\n\\1"
+out:
+  return: SUCCEED
+  value: 123
+---
+test case: regsub("test 123 number", "([0-9]+)", x\1y)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: test 123 number
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+)\nx\\1y"
+out:
+  return: SUCCEED
+  value: x123y
+---
+test case: regsub("test 123 number", "([0-9]+)", )
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: test 123 number
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+)"
+out:
+  return: FAIL
+---
+test case: regsub("test abc number", "([0-9]+)", \1)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: test abc number
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+)\n\\1"
+out:
+  return: FAIL
+---
+test case: regsub("", "([0-9]+)", \1)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "([0-9]+)\n\\1"
+out:
+  return: FAIL
+---
+test case: regsub("", "^$", ok)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: ""
+  step:
+    type: ZBX_PREPROC_REGSUB
+    params: "^$\nok"
+out:
+  return: SUCCEED
+  value: ok
+---
+test case: bool2dec()
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: ""
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: FAIL
+---
+test case: bool2dec(abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "abc"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: FAIL
+---
+test case: bool2dec(1)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "1"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(0)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "0"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(true)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "true"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(t)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "t"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(yes)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "yes"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(y)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "y"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(ok)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "ok"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(on)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "on"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: bool2dec(false)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "false"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(f)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "f"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(no)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "no"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(n)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "n"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(err)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "err"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: bool2dec(off)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "off"
+  step:
+    type: ZBX_PREPROC_BOOL2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: oct2dec(0)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
+  step:
+    type: ZBX_PREPROC_OCT2DEC
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: oct2dec(7)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 7
+  step:
+    type: ZBX_PREPROC_OCT2DEC
+out:
+  return: SUCCEED
+  value: 7
+---
+test case: oct2dec(10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_OCT2DEC
+out:
+  return: SUCCEED
+  value: 8
+---
+test case: oct2dec(8)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 8
+  step:
+    type: ZBX_PREPROC_OCT2DEC
+out:
+  return: FAIL
+---
+test case: hex2dec(F)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: F
+  step:
+    type: ZBX_PREPROC_HEX2DEC
+out:
+  return: SUCCEED
+  value: 15
+---
+test case: hex2dec(a)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: a
+  step:
+    type: ZBX_PREPROC_HEX2DEC
+out:
+  return: SUCCEED
+  value: 10
+---
+test case: hex2dec(10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_HEX2DEC
+out:
+  return: SUCCEED
+  value: 16
+---
+test case: hex2dec(g)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: g
+  step:
+    type: ZBX_PREPROC_HEX2DEC
+out:
+  return: FAIL
+---
+test case: hex2dec(ff ff)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: ff ff
+  step:
+    type: ZBX_PREPROC_HEX2DEC
+out:
+  return: SUCCEED
+  value: 65535
+---
+test case: deltavalue(5, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:00 +03:00
+    data: 5
+  step:
+    type: ZBX_PREPROC_DELTA_VALUE
+out:
+  return: SUCCEED
+  value: 5
+  history:
+    data: 10
+    time: 2017-10-29 03:15:00 +03:00
+---
+test case: deltavalue(-4.5, 5.5)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 5.5
+  history:
+    variant: ZBX_VARIANT_DBL
+    time: 2017-10-29 03:14:00 +03:00
+    data: -4.5
+  step:
+    type: ZBX_PREPROC_DELTA_VALUE
+out:
+  return: SUCCEED
+  value: 10
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 5.5
+---
+test case: deltavalue(10, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_DELTA_VALUE
+out:
+  return: SUCCEED
+  value: 0
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+---
+test case: deltavalue(10, 9)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_DELTA_VALUE
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
+---
+test case: deltavalue(0, 1.5)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
+  history:
+    variant: ZBX_VARIANT_DBL
+    time: 2017-10-29 03:14:00 +03:00
+    data: 0
+  step:
+    type: ZBX_PREPROC_DELTA_VALUE
+out:
+  return: SUCCEED
+  value: 1.5
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1.5
+---
+test case: deltaspeed(2, 1, 10s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:50 +03:00
+    data: 2
+  step:
+    type: ZBX_PREPROC_DELTA_SPEED
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+---
+test case: deltaspeed(1, 2, -10s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:15:10 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_DELTA_SPEED
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
+---
+test case: deltaspeed(1, 2, 10s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:50 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_DELTA_SPEED
+out:
+  return: SUCCEED
+  value: 0.1
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 2
+---
+test case: deltaspeed(2, 3, 10s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:50 +03:00
+    data: 2
+  step:
+    type: ZBX_PREPROC_DELTA_SPEED
+out:
+  return: SUCCEED
+  value: 0
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+---
+test case: deltaspeed(2, 3, 1s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+  history:
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:14:59 +03:00
+    data: 2
+  step:
+    type: ZBX_PREPROC_DELTA_SPEED
+out:
+  return: SUCCEED
+  value: 1
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 3
+---
+test case: xpath1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: ""
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: ""
+out:
+  return: FAIL
+---
+test case: xpath2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: ""
+out:
+  return: FAIL
+---
+test case: xpath3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: |-
+      /a["]
+out:
+  return: FAIL
+---
+test case: xpath4
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: 1 div 0
+out:
+  return: FAIL
+---
+test case: xpath5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: -a
+out:
+  return: FAIL
+---
+test case: xpath6
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: /b
+out:
+  return: SUCCEED
+  value: ""
+---
+test case: xpath7
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: 3 div 2
+out:
+  return: SUCCEED
+  value: 1.5
+---
+test case: xpath8
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a/>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: /a
+out:
+  return: SUCCEED
+  value: <a/>
+---
+test case: xpath9
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a>1</a>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: /a/text()
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: xpath10
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a>1</a>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: string(/a)
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: xpath11
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a b="10">1</a>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: string(/a/@b)
+out:
+  return: SUCCEED
+  value: 10
+---
+test case: xpath12
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><b x="1"/><c x="2"/><d x="1"/></a>
+  step:
+    type: ZBX_PREPROC_XPATH
+    params: //*[@x="1"]
+out:
+  return: SUCCEED
+  value: <b x="1"/><d x="1"/>
+---
+test case: jsonpath1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: 
+out:
+  return: FAIL
+---
+test case: jsonpath2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $abc
+out:
+  return: FAIL
+---
+test case: jsonpath3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.abc
+out:
+  return: FAIL
+---
+test case: jsonpath4
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a
+out:
+  return: SUCCEED
+  value: |-
+    {"b":[1, 2, 3]}
+---
+test case: jsonpath5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b']
+out:
+  return: SUCCEED
+  value: |-
+    [1, 2, 3]
+---
+test case: jsonpath6
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"b":[1, 2, 3]}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a['b'][1]
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: validate_range(1, 5, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_VALIDATE_RANGE
+    params: |-
+      5
+      10
+out:
+  return: FAIL
+---
+test case: validate_range(5, 5, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 5
+  step:
+    type: ZBX_PREPROC_VALIDATE_RANGE
+    params: |-
+      5
+      10
+out:
+  return: SUCCEED
+  value: 5
+---
+test case: validate_range(10, 5, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  step:
+    type: ZBX_PREPROC_VALIDATE_RANGE
+    params: |-
+      5
+      10
+out:
+  return: SUCCEED
+  value: 10
+---
+test case: validate_range(10.1, 5, 10)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10.1
+  step:
+    type: ZBX_PREPROC_VALIDATE_RANGE
+    params: |-
+      5
+      10
+out:
+  return: FAIL
+---
+test case: validate_regex(abc 123 xyz, ([0-9+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc 123 xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_REGEX
+    params: ([0-9+)
+out:
+  return: FAIL
+---
+test case: validate_regex(abc opq xyz, ([0-9]+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc opq xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_REGEX
+    params: ([0-9]+)
+out:
+  return: FAIL
+---
+test case: validate_regex(abc 123 xyz, ([0-9]+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc 123 xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_REGEX
+    params: ([0-9]+)
+out:
+  return: SUCCEED
+  value: abc 123 xyz
+---
+test case: validate_regex(abc 123 xyz, ([0-9+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc 123 xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_REGEX
+    params: ([0-9+)
+out:
+  return: FAIL
+---
+test case: validate_regex(abc opq xyz, ([0-9]+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc opq xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_REGEX
+    params: ([0-9]+)
+out:
+  return: SUCCEED
+  value: abc opq xyz
+---
+test case: validate_regex(abc 123 xyz, ([0-9]+))
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc 123 xyz
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_REGEX
+    params: ([0-9]+)
+out:
+  return: FAIL
+---
+test case: string(10) * 10 (discard)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+    error_handler: ZBX_PREPROC_FAIL_DISCARD_VALUE
+out:
+  return: SUCCEED
+---
+test case: string(10) * 10 (set value)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+    error_handler: ZBX_PREPROC_FAIL_SET_VALUE
+    error_handler_params: invalid
+out:
+  return: SUCCEED
+  value: invalid
+---
+test case: string(10) * 10 (set error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
+out:
+  return: FAIL
+  error: custom error
+---
+test case: jsonerror(x, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: x
+---
+test case: jsonerror({"error":"error message"}, $error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"error":"error message"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $error
+out:
+  return: FAIL
+---
+test case: jsonerror({"data":"123"}, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"data":"123"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: |-
+    {"data":"123"}
+---
+test case: jsonerror({"error":"error message"}, $.error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      {"error":"error message"}
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: FAIL
+  error: error message
+---
+test case: xmlerror(x, //error)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: x
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error
+out:
+  return: SUCCEED
+  value: x
+---
+test case: xmlerror(<a><error>custom error</error></a>, "//text(")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><error>custom error</error></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //text(
+out:
+  return: FAIL
+---
+test case: xmlerror(<a><error>custom error</error></a>, "//error/text()")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><error>custom error</error></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error/text()
+out:
+  return: FAIL
+  error: custom error
+---
+test case: xmlerror(<a><value>1</value></a>, "//error/text()")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: <a><value>1</value></a>
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_XML
+    params: //error/text()
+out:
+  return: SUCCEED
+  value: <a><value>1</value></a>
+---
+test case: regexerror("error:123, "error:([0-9+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: error:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: ([0-9+)
+out:
+  return: FAIL
+---
+test case: regexerror("error:123, "error:([0-9]+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: error:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: |- 
+      error:([0-9]+)
+      \1
+out:
+  return: FAIL
+  error: 123
+---
+test case: regexerror("value:123, "error:([0-9]+)")
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: value:123
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_REGEX
+    params: |- 
+      error:([0-9]+)
+      \1
+out:
+  return: SUCCEED
+  value: value:123
+---
+test case: throttle(1, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:00 +03:00
+    data: 1
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: 123
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+---
+test case: throttle(, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  value: 123
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+---
+test case: throttle(123, 123)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 123
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:00 +03:00
+    data: 123
+  step:
+    type: ZBX_PREPROC_THROTTLE_VALUE
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:14:00 +03:00
+    data: 123
+---
+test case: throttle_timed(, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+---
+test case: throttle_timed(xyz, abc)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:30 +03:00
+    data: xyz
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+---
+test case: throttle_timed(abc, abc, 30s)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:30 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  history:
+    time: 2017-10-29 03:14:30 +03:00
+    data: abc
+---
+test case: throttle_timed(abc, abc, 1m)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+  history:
+    variant: ZBX_VARIANT_STR
+    time: 2017-10-29 03:14:00 +03:00
+    data: abc
+  step:
+    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
+    params: 1m
+out:
+  return: SUCCEED
+  value: abc
+  history:
+    time: 2017-10-29 03:15:00 +03:00
+    data: abc
+...
+
+

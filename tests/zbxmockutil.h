@@ -33,6 +33,7 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 
 int	zbx_mock_str_to_return_code(const char *str);
 unsigned char	zbx_mock_str_to_value_type(const char *str);
+unsigned char	zbx_mock_str_to_variant(const char *str);
 void	zbx_mock_str_to_token_type(const char *str, int *out);
 int	zbx_mock_str_to_return_code(const char *str);
 

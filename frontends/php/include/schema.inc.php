@@ -6901,6 +6901,18 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'error_handler' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'error_handler_params' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'task_remote_command' => [

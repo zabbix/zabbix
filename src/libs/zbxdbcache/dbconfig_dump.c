@@ -485,12 +485,14 @@ static void	DCdump_preprocitem(const ZBX_DC_PREPROCITEM *preprocitem)
 	int	i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "  preprocessing:");
+	zabbix_log(LOG_LEVEL_TRACE, "  update_time:%d", preprocitem->update_time);
 
 	for (i = 0; i < preprocitem->preproc_ops.values_num; i++)
 	{
 		zbx_dc_preproc_op_t	*op = (zbx_dc_preproc_op_t *)preprocitem->preproc_ops.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "      opid:" ZBX_FS_UI64 " step:%d type:%u params:'%s'",
-				op->item_preprocid, op->step, op->type, op->params);
+		zabbix_log(LOG_LEVEL_TRACE, "      opid:" ZBX_FS_UI64 " step:%d type:%u params:'%s'"
+				" error_handler:%d error_handler_params:'%s'",
+				op->item_preprocid, op->step, op->type, op->params, op->error_handler, op->error_handler_params);
 	}
 }
 

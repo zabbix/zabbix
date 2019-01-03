@@ -938,10 +938,10 @@ jQuery(function($) {
 
 			opener.attr('data-expanded', 'true');
 
-			if (menuPopup.length > 0) {
-				// Close other action menus.
-				$('.action-menu-top').not('#' + id).menuPopup('close');
+			// Close other action menus.
+			$('.action-menu-top').not('#' + id).menuPopup('close');
 
+			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
 
 				// Hide current action menu sub-levels.

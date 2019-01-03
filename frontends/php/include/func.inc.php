@@ -1077,42 +1077,6 @@ function zbx_formatDomId($value) {
 	return str_replace(['[', ']'], ['_', ''], $value);
 }
 
-/**
- * Sort an array of objects so that the objects whose $column value matches $pattern are at the top.
- * Return the first $limit objects.
- *
- * @param array 	$table		array of objects to sort
- * @param string 	$column		name of the $column to search
- * @param string 	$pattern	string to match the value of $column against
- * @param int		$limit		number of objects to return
- *
- * @return array
- */
-function selectByPattern(array $table, $column, $pattern, $limit) {
-	$chunk_size = $limit;
-
-	$rsTable = [];
-	foreach ($table as $num => $row) {
-		if (mb_strtolower($row[$column]) === mb_strtolower($pattern)) {
-			$rsTable = [$num => $row] + $rsTable;
-		}
-		elseif ($limit > 0) {
-			$rsTable[$num] = $row;
-		}
-		else {
-			continue;
-		}
-		$limit--;
-	}
-
-	if (!empty($rsTable)) {
-		$rsTable = array_chunk($rsTable, $chunk_size, true);
-		$rsTable = $rsTable[0];
-	}
-
-	return $rsTable;
-}
-
 /************* SORT *************/
 function natksort(&$array) {
 	$keys = array_keys($array);
