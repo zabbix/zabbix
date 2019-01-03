@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-13804] fixed generic popup form submission (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
 A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
