@@ -3,6 +3,7 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 ........S. [ZBX-15400] fixed possible crash in preprocessing manager when items with change/throttle preprocessing steps were not being monitored anymore (wiper)
 ..F....... [ZBX-13804] fixed generic popup form submission (miks)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
@@ -72,6 +73,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 ..F....... [ZBX-13804] fixed generic popup form submission (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
 A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
@@ -2215,6 +2217,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
 ...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
