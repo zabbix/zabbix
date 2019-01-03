@@ -405,12 +405,8 @@ switch ($data['method']) {
 					if ($discovery_rule['applicationPrototypes']) {
 						$result = [];
 
-						CArrayHelper::sort($discovery_rule['applicationPrototypes'], [
-							['field' => 'name', 'order' => ZBX_SORT_UP]
-						]);
-
 						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
-							if (isset($data['search'])
+							if (array_key_exists('search', $data)
 									&& stripos($application_prototype['name'], $data['search']) !== false) {
 								$result[] = [
 									'id' => $application_prototype['application_prototypeid'],
@@ -419,7 +415,9 @@ switch ($data['method']) {
 							}
 						}
 
-						if (isset($data['limit'])) {
+						CArrayHelper::sort($result, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+						if (array_key_exists('limit', $data)) {
 							$result = array_slice($result, 0, $data['limit']);
 						}
 					}

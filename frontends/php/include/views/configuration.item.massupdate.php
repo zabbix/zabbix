@@ -634,7 +634,7 @@ if ($data['displayApplications']) {
 	$itemFormList->addRow(
 		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
 			->setLabel(_('Applications'))
-			->setChecked(isset($data['visible']['applications'])),
+			->setChecked(array_key_exists('applications', $data['visible'])),
 		$applications_div
 	);
 }

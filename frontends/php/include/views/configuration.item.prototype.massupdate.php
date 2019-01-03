@@ -35,7 +35,7 @@ $form_list = (new CFormList('item_form_list'))
 	->addRow(
 		(new CVisibilityBox('visible[type]', 'type', _('Original')))
 			->setLabel(_('Type'))
-			->setChecked(isset($data['visible']['type']))
+			->setChecked(array_key_exists('type', $data['visible']))
 			->setAttribute('autofocus', 'autofocus'),
 		new CComboBox('type', $data['type'], null, $data['itemTypes'])
 	);
@@ -74,12 +74,11 @@ if ($data['display_interfaces']) {
 	$span = (new CSpan(_('No interface found')))
 		->addClass(ZBX_STYLE_RED)
 		->setId('interface_not_defined')
-		->setAttribute('style', 'display: none;');
-
+		->addStyle('display: none;');
 	$form_list->addRow(
 		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
 			->setLabel(_('Host interface'))
-			->setChecked(isset($data['visible']['interfaceid']))
+			->setChecked(array_key_exists('interfaceid', $data['visible']))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([$interfaces_combo_box, $span]))->setId('interfaceDiv'),
 		'interface_row'
@@ -87,8 +86,8 @@ if ($data['display_interfaces']) {
 	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 
-// Append JMX endpoint to form list.
 $form_list
+	// Append JMX endpoint to form list.
 	->addRow(
 		(new CVisibilityBox('visible[jmx_endpoint]', 'jmx_endpoint', _('Original')))
 			->setLabel(_('JMX endpoint'))
@@ -145,7 +144,7 @@ $form_list
 			->setChecked(array_key_exists('headers', $data['visible'])),
 		(new CDiv([
 			(new CTable())
-				->setAttribute('style', 'width: 100%;')
+				->addStyle('width: 100%;')
 				->setHeader(['', _('Name'), '', _('Value'), ''])
 				->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 				->setFooter(new CRow(
@@ -171,34 +170,34 @@ $form_list
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('headers_pairs')
 			->setAttribute('data-sortable-pairs-table', '1')
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	)
 	// Append SNMP community to form list.
 	->addRow(
 		(new CVisibilityBox('visible[snmp_community]', 'snmp_community', _('Original')))
 			->setLabel(_('SNMP community'))
-			->setChecked(isset($data['visible']['snmp_community'])),
+			->setChecked(array_key_exists('snmp_community', $data['visible'])),
 		(new CTextBox('snmp_community', $data['snmp_community']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	// Append SNMPv3 contextname to form list.
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_contextname]', 'snmpv3_contextname', _('Original')))
 			->setLabel(_('Context name'))
-			->setChecked(isset($data['visible']['snmpv3_contextname'])),
+			->setChecked(array_key_exists('snmpv3_contextname', $data['visible'])),
 		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	// Append SNMPv3 securityname to form list.
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_securityname]', 'snmpv3_securityname', _('Original')))
 			->setLabel(_('Security name'))
-			->setChecked(isset($data['visible']['snmpv3_securityname'])),
+			->setChecked(array_key_exists('snmpv3_securityname', $data['visible'])),
 		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	// Append SNMPv3 securitylevel to form list.
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_securitylevel]', 'snmpv3_securitylevel', _('Original')))
 			->setLabel(_('Security level'))
-			->setChecked(isset($data['visible']['snmpv3_securitylevel'])),
+			->setChecked(array_key_exists('snmpv3_securitylevel', $data['visible'])),
 		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
@@ -209,7 +208,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_authprotocol]', 'authprotocol_div', _('Original')))
 			->setLabel(_('Authentication protocol'))
-			->setChecked(isset($data['visible']['snmpv3_authprotocol'])),
+			->setChecked(array_key_exists('snmpv3_authprotocol', $data['visible'])),
 		(new CDiv(
 			(new CRadioButtonList('snmpv3_authprotocol', (int) $data['snmpv3_authprotocol']))
 				->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
@@ -221,7 +220,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_authpassphrase]', 'snmpv3_authpassphrase', _('Original')))
 			->setLabel(_('Authentication passphrase'))
-			->setChecked(isset($data['visible']['snmpv3_authpassphrase'])),
+			->setChecked(array_key_exists('snmpv3_authpassphrase', $data['visible'])),
 		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -229,7 +228,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_privprotocol]', 'privprotocol_div', _('Original')))
 			->setLabel(_('Privacy protocol'))
-			->setChecked(isset($data['visible']['snmpv3_privprotocol'])),
+			->setChecked(array_key_exists('snmpv3_privprotocol', $data['visible'])),
 		(new CDiv(
 			(new CRadioButtonList('snmpv3_privprotocol', (int) $data['snmpv3_privprotocol']))
 				->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
@@ -241,7 +240,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[snmpv3_privpassphrase]', 'snmpv3_privpassphrase', _('Original')))
 			->setLabel(_('Privacy passphrase'))
-			->setChecked(isset($data['visible']['snmpv3_privpassphrase'])),
+			->setChecked(array_key_exists('snmpv3_privpassphrase', $data['visible'])),
 		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
@@ -249,14 +248,14 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[port]', 'port', _('Original')))
 			->setLabel(_('Port'))
-			->setChecked(isset($data['visible']['port'])),
+			->setChecked(array_key_exists('port', $data['visible'])),
 		(new CTextBox('port', $data['port']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append value type to form list.
 	->addRow(
 		(new CVisibilityBox('visible[value_type]', 'value_type', _('Original')))
 			->setLabel(_('Type of information'))
-			->setChecked(isset($data['visible']['value_type'])),
+			->setChecked(array_key_exists('value_type', $data['visible'])),
 		new CComboBox('value_type', $data['value_type'], null, [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
@@ -269,14 +268,14 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[units]', 'units', _('Original')))
 			->setLabel(_('Units'))
-			->setChecked(isset($data['visible']['units'])),
+			->setChecked(array_key_exists('units', $data['visible'])),
 		(new CTextBox('units', $data['units']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	// Append authtype to form list.
 	->addRow(
 		(new CVisibilityBox('visible[authtype]', 'authtype', _('Original')))
 			->setLabel(_('Authentication method'))
-			->setChecked(isset($data['visible']['authtype'])),
+			->setChecked(array_key_exists('authtype', $data['visible'])),
 		new CComboBox('authtype', $data['authtype'], null, [
 			ITEM_AUTHTYPE_PASSWORD => _('Password'),
 			ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
@@ -286,28 +285,28 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name'))
-			->setChecked(isset($data['visible']['username'])),
+			->setChecked(array_key_exists('username', $data['visible'])),
 		(new CTextBox('username', $data['username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append publickey to form list.
 	->addRow(
 		(new CVisibilityBox('visible[publickey]', 'publickey', _('Original')))
 			->setLabel(_('Public key file'))
-			->setChecked(isset($data['visible']['publickey'])),
+			->setChecked(array_key_exists('publickey', $data['visible'])),
 		(new CTextBox('publickey', $data['publickey']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append privatekey to form list.
 	->addRow(
 		(new CVisibilityBox('visible[privatekey]', 'privatekey', _('Original')))
 			->setLabel(_('Private key file'))
-			->setChecked(isset($data['visible']['privatekey'])),
+			->setChecked(array_key_exists('privatekey', $data['visible'])),
 		(new CTextBox('privatekey', $data['privatekey']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append password to form list.
 	->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))
 			->setLabel(_('Password'))
-			->setChecked(isset($data['visible']['password'])),
+			->setChecked(array_key_exists('password', $data['visible'])),
 		(new CTextBox('password', $data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
@@ -318,7 +317,7 @@ $preprocessing = (new CTable())
 		'',
 		new CColHeader(_('Name')),
 		new CColHeader(_('Parameters')),
-		new CColHeader(null),
+		'',
 		(new CColHeader(_('Action')))->setWidth(50)
 	]);
 
@@ -414,10 +413,10 @@ $preprocessing->addRow(
 $form_list->addRow(
 	(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 		->setLabel(_('Preprocessing steps'))
-		->setChecked(isset($data['visible']['preprocessing'])),
+		->setChecked(array_key_exists('preprocessing', $data['visible'])),
 	(new CDiv($preprocessing))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('preprocessing_div')
 );
 
@@ -437,7 +436,7 @@ $custom_intervals = (new CTable())
 		(new CColHeader(_('Action')))->setWidth(50)
 	])
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 foreach ($data['delay_flex'] as $i => $delay_flex) {
 	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
@@ -452,15 +451,15 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]'))
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
-			->setAttribute('style', 'display: none;');
+			->addStyle('display: none;');
 	}
 	else {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]'))
 			->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT)
-			->setAttribute('style', 'display: none;');
+			->addStyle('display: none;');
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]'))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
-			->setAttribute('style', 'display: none;');
+			->addStyle('display: none;');
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule']))
 			->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT);
 	}
@@ -478,7 +477,7 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 
 $update_interval->addRow(
 	(new CRow([
-		(new CCol(_('Custom intervals')))->setAttribute('style', 'vertical-align: top;'),
+		(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
 		new CCol($custom_intervals)
 	]))
 );
@@ -488,21 +487,21 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))
 			->setLabel(_('Update interval'))
-			->setChecked(isset($data['visible']['delay'])),
+			->setChecked(array_key_exists('delay', $data['visible'])),
 		(new CDiv($update_interval))->setId('update_interval_div')
 	)
 	// Append history to form list.
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history', _('Original')))
 			->setLabel(_('History storage period'))
-			->setChecked(isset($data['visible']['history'])),
+			->setChecked(array_key_exists('history', $data['visible'])),
 		(new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	// Append trends to form list.
 	->addRow(
 		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
 			->setLabel(_('Trend storage period'))
-			->setChecked(isset($data['visible']['trends'])),
+			->setChecked(array_key_exists('trends', $data['visible'])),
 		(new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	);
 
@@ -517,14 +516,14 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[status]', 'status', _('Original')))
 			->setLabel(_('Create enabled'))
-			->setChecked(isset($data['visible']['status'])),
+			->setChecked(array_key_exists('status', $data['visible'])),
 		$status_combo_box
 	)
 	// Append logtime to form list.
 	->addRow(
 		(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))
 			->setLabel(_('Log time format'))
-			->setChecked(isset($data['visible']['logtimefmt'])),
+			->setChecked(array_key_exists('logtimefmt', $data['visible'])),
 		(new CTextBox('logtimefmt', $data['logtimefmt']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
@@ -540,7 +539,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
-			->setChecked(isset($data['visible']['valuemapid'])),
+			->setChecked(array_key_exists('valuemapid', $data['visible'])),
 		(new CDiv([$valuemaps_combo_box, ' ',
 			(new CLink(_('show value mappings'), 'adm.valuemapping.php'))->setAttribute('target', '_blank')
 		]))->setId('valuemap')
@@ -566,7 +565,7 @@ if (hasRequest('applications')) {
 	$applicationids = [];
 
 	foreach (getRequest('applications') as $application) {
-		if (is_array($application) && isset($application['new'])) {
+		if (is_array($application) && array_key_exists('new', $application)) {
 			$applications[] = [
 				'id' => $application['new'],
 				'name' => $application['new'].' ('._x('new', 'new element in multiselect').')',
@@ -615,7 +614,7 @@ $applications_div = (new CDiv([
 $form_list->addRow(
 	(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
 		->setLabel(_('Applications'))
-		->setChecked(isset($data['visible']['applications'])),
+		->setChecked(array_key_exists('applications', $data['visible'])),
 	$applications_div
 );
 
@@ -626,7 +625,7 @@ if (hasRequest('application_prototypes')) {
 	$application_prototypeids = [];
 
 	foreach (getRequest('application_prototypes') as $application_prototype) {
-		if (is_array($application_prototype) && isset($application_prototype['new'])) {
+		if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
 			$application_prototypes[] = [
 				'id' => $application_prototype['new'],
 				'name' => $application_prototype['new'].' ('._x('new', 'new element in multiselect').')',
@@ -722,7 +721,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
 			->setLabel(_('Application prototypes'))
-			->setChecked(isset($data['visible']['applicationPrototypes'])),
+			->setChecked(array_key_exists('applicationPrototypes', $data['visible'])),
 		$application_prototypes_div
 	)
 	// Append master item select.
@@ -739,7 +738,7 @@ $form_list
 	->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setLabel(_('Description'))
-			->setChecked(isset($data['visible']['description'])),
+			->setChecked(array_key_exists('description', $data['visible'])),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 

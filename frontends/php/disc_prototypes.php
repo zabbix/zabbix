@@ -36,7 +36,7 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'parent_discoveryid' =>			[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'itemid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'itemid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
 										_('Name')
@@ -52,10 +52,9 @@ $fields = [
 									],
 	'delay' =>						[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO | P_ALLOW_LLD_MACRO, null,
 										'(isset({add}) || isset({update}))'.
-											' && (isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.
+											' && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.
 												' && {type} != '.ITEM_TYPE_SNMPTRAP.
-												' && {type} != '.ITEM_TYPE_DEPENDENT.
-											')',
+												' && {type} != '.ITEM_TYPE_DEPENDENT,
 										_('Update interval')
 									],
 	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
@@ -122,67 +121,63 @@ $fields = [
 										_('Port')
 									],
 	'snmpv3_securitylevel' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-										'(isset({add}) || isset({update}))'.
-											' && (isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.')'
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
 									],
 	'snmpv3_contextname' =>			[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && (isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.
-										')'
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
 									],
 	'snmpv3_securityname' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && (isset({type})'.
-											' && {type} == '.ITEM_TYPE_SNMPV3.')'
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_SNMPV3
 									],
 	'snmpv3_authprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
-										'(isset({add}) || isset({update})) && (isset({type})'.
+										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SNMPV3.
 											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
 												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
-										'))'
+										')'
 									],
 	'snmpv3_authpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && (isset({type})'.
+										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SNMPV3.
 											' && ({snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
 												' || {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.
-										'))'
+										')'
 									],
 	'snmpv3_privprotocol' =>		[T_ZBX_INT, O_OPT, null,	IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
-										'(isset({add}) || isset({update})) && (isset({type})'.
+										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-										')'
+											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
 									],
 	'snmpv3_privpassphrase' =>		[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && (isset({type})'.
+										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SNMPV3.
-											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.
-										')'
+											' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
 									],
 	'ipmi_sensor' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
-										'(isset({add}) || isset({update})) && (isset({type})'.
-											' && {type} == '.ITEM_TYPE_IPMI
-										.')',
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_IPMI,
 										_('IPMI sensor')
 									],
 	'trapper_hosts' =>				[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'
+										'(isset({add}) || isset({update})) && isset({type})'.
+											' && {type} == '.ITEM_TYPE_TRAPPER
 									],
 	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 									],
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update}))'.
-											' && (isset({value_type}) && {value_type} == 2'.
-										')'
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'new_application_prototype' =>	[T_ZBX_STR, O_OPT, null,	null,
-										'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
+										'(isset({add}) || isset({update})) && isset({parent_discoveryid})'
 									],
 	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -697,6 +692,12 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 	$item_prototypeids = getRequest('group_itemid');
 	$result = true;
 
+	$applications = getRequest('applications', []);
+	$applicationids = [];
+
+	$application_prototypes = getRequest('application_prototypes', []);
+	$application_prototypeids = [];
+
 	if (isset($visible['delay'])) {
 		$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
@@ -749,12 +750,6 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 		$delay = null;
 	}
 
-	$applications = getRequest('applications', []);
-	$applicationids = [];
-
-	$application_prototypes = getRequest('application_prototypes', []);
-	$application_prototypeids = [];
-
 	if ($result) {
 		try {
 			DBstart();
@@ -763,7 +758,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applications', $visible)) {
 				$massupdate_app_action = getRequest('massupdate_app_action');
 
-				if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE])) {
+				if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+						|| $massupdate_app_action == ZBX_MULTISELECT_REPLACE) {
 					$new_applications = [];
 
 					foreach ($applications as $application) {
@@ -798,7 +794,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applicationPrototypes', $visible)) {
 				$massupdate_app_prot_action = getRequest('massupdate_app_prot_action');
 
-				if (in_array($massupdate_app_prot_action, [ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE])) {
+				if ($massupdate_app_prot_action == ZBX_MULTISELECT_ADD
+						|| $massupdate_app_prot_action == ZBX_MULTISELECT_REPLACE) {
 					$new_application_prototypes = [];
 
 					foreach ($application_prototypes as $application_prototype) {
@@ -934,10 +931,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 											break;
 
 										case ZBX_MULTISELECT_REPLACE:
-											$upd_applicationids = array_merge(
-												array_diff($applicationids, $db_applicationids),
-												array_intersect($db_applicationids, $applicationids)
-											);
+											$upd_applicationids = $applicationids;
 											break;
 
 										case ZBX_MULTISELECT_REMOVE:
@@ -956,8 +950,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									 * No applications were submitted in form. In case we want to replace applications,
 									 * leave $item['applications'] empty, remove it otherwise.
 									 */
-									if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD,
-											ZBX_MULTISELECT_REMOVE])) {
+									if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+											|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
 										unset($item['applications']);
 									}
 								}
@@ -996,23 +990,14 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										if (($upd_application_prototypeids || $new_application_prototypes)
 												&& $ex_application_prototypes) {
 											foreach ($ex_application_prototypes as $db_application_prototype) {
-												if (!in_array($db_application_prototype['application_prototypeid'],
-														zbx_objectValues($application_prototypes,
-															'application_prototypeid'))) {
-													$application_prototypes[] = $db_application_prototype;
-												}
+												$application_prototypes[] = $db_application_prototype;
 											}
 										}
 										break;
 
 									case ZBX_MULTISELECT_REPLACE:
 										if ($application_prototypeids) {
-											$upd_application_prototypeids = array_merge(
-												array_diff($application_prototypeids, $ex_application_prototypeids),
-												array_intersect($ex_application_prototypeids,
-													$application_prototypeids
-												)
-											);
+											$upd_application_prototypeids = $application_prototypeids;
 										}
 
 										if ($new_application_prototypes) {
@@ -1041,7 +1026,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								if ($upd_application_prototypeids) {
 									// Collect existing application prototype names. Those are required by API.
 									$db_application_prototypes = DBfetchArray(DBselect(
-										'SELECT ap.application_prototypeid, ap.name'.
+										'SELECT ap.application_prototypeid,ap.name'.
 										' FROM application_prototype ap'.
 										' WHERE '.dbConditionId('ap.application_prototypeid',
 											$upd_application_prototypeids
@@ -1064,9 +1049,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									if ($massupdate_app_prot_action == ZBX_MULTISELECT_REPLACE) {
 										$item_prototype['applicationPrototypes'] = [];
 									}
-
-									if (in_array($massupdate_app_prot_action, [ZBX_MULTISELECT_ADD,
-											ZBX_MULTISELECT_REMOVE])) {
+									else {
 										unset($item_prototype['applicationPrototypes']);
 									}
 								}

@@ -172,20 +172,22 @@ $fields = [
 										_('IPMI sensor')
 									],
 	'trapper_hosts' =>				[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'
+										'(isset({add}) || isset({update}))'.
+											' && isset({type}) && {type} == '.ITEM_TYPE_TRAPPER
 									],
 	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 									],
 	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
-										'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
-										'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'
+										'isset({copy}) && isset({copy_type}) && {copy_type} == 0'
 									],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -1053,7 +1055,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 			if (array_key_exists('applications', $visible)) {
 				$massupdate_app_action = getRequest('massupdate_app_action');
 
-				if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD, ZBX_MULTISELECT_REPLACE])) {
+				if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+						|| $massupdate_app_action == ZBX_MULTISELECT_REPLACE) {
 					$new_applications = [];
 
 					foreach ($applications as $application) {
@@ -1086,8 +1089,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'flags', 'type'],
-				'selectApplications' => ['applicationid'],
 				'itemids' => $itemids,
+				'selectApplications' => ['applicationid'],
 				'preservekeys' => true
 			]);
 
@@ -1200,10 +1203,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 												break;
 
 											case ZBX_MULTISELECT_REPLACE:
-												$upd_applicationids = array_merge(
-													array_diff($applicationids, $db_applicationids),
-													array_intersect($db_applicationids, $applicationids)
-												);
+												$upd_applicationids = $applicationids;
 												break;
 
 											case ZBX_MULTISELECT_REMOVE:
@@ -1214,8 +1214,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										$item['applications'] = array_keys(array_flip($upd_applicationids));
 									}
 									else {
-										if (in_array($massupdate_app_action, [ZBX_MULTISELECT_ADD,
-												ZBX_MULTISELECT_REMOVE])) {
+										if ($massupdate_app_action == ZBX_MULTISELECT_ADD
+												|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
 											unset($item['applications']);
 										}
 									}

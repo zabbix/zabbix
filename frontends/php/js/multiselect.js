@@ -205,7 +205,7 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Modify one or more multiselect options after mutliselect object has been created.
+		 * Modify one or more multiselect options after multiselect object has been created.
 		 *
 		 * @return jQuery
 		 */
@@ -215,30 +215,28 @@ jQuery(function($) {
 					ms = $(this).data('multiSelect');
 
 				for (var ms_key in ms.options) {
-					for (var key in options) {
-						if (ms_key === key) {
-							ms.options[ms_key] = options[key];
-						}
+					if (ms_key in options) {
+						ms.options[ms_key] = options[ms_key];
+					}
 
-						/*
-						 * When changing the option "addNew" few things need to happen:
-						 *   1) previous search results must be cleared, in case same search string is requested. So
-						 *      a new request is sent and new results are received. With or without "(new)".
-						 *   2) Already selected "(new)" items must be hidden and disabled, so that they are not sent
-						 *      when form is submitted.
-						 *   3) Already visible block with results must be hidden. It will reappear on new search.
-						 */
-						if (ms_key === 'addNew') {
-							cleanLastSearch($obj);
+					/*
+					 * When changing the option "addNew" few things need to happen:
+					 *   1) previous search results must be cleared, in case same search string is requested. So
+					 *      a new request is sent and new results are received. With or without "(new)".
+					 *   2) Already selected "(new)" items must be hidden and disabled, so that they are not sent
+					 *      when form is submitted.
+					 *   3) Already visible block with results must be hidden. It will reappear on new search.
+					 */
+					if (ms_key === 'addNew') {
+						cleanLastSearch($obj);
 
-							$('input[name*="[new]"]', $obj)
-								.prop('disabled', !ms.options[ms_key])
-								.each(function() {
-									$('.selected li[data-id="' + this.value + '"]', $obj).toggle(ms.options[ms_key]);
-								});
+						$('input[name*="[new]"]', $obj)
+							.prop('disabled', !ms.options[ms_key])
+							.each(function() {
+								$('.selected li[data-id="' + this.value + '"]', $obj).toggle(ms.options[ms_key]);
+							});
 
-							hideAvailable($obj);
-						}
+						hideAvailable($obj);
 					}
 				}
 			});

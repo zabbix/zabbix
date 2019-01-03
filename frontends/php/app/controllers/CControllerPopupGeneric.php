@@ -877,8 +877,6 @@ class CControllerPopupGeneric extends CController {
 					'itemids' => [$parent_discoveryid]
 				]);
 
-				$records = [];
-
 				if ($discovery_rules) {
 					$discovery_rule = $discovery_rules[0];
 
