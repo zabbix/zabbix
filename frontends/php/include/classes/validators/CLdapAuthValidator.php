@@ -83,7 +83,7 @@ class CLdapAuthValidator extends CValidator {
 	/**
 	 * Check if connection error.
 	 *
-	 * @return integer
+	 * @return bool
 	 */
 	public function isConnectionError() {
 		return (parent::getError() !== CLdap::ERR_USER_NOT_FOUND);
