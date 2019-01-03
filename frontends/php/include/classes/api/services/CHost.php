@@ -1160,7 +1160,6 @@ class CHost extends CHostGeneral {
 		$this->validateDeleteCheckMaintenances($hostIds);
 	}
 
-
 	/**
 	 * Validates if hosts may be deleted, due to maintenance constrain.
 	 *
@@ -1185,18 +1184,15 @@ class CHost extends CHostGeneral {
 				')'
 		));
 
-		if (!$maintenance) {
-			return;
+		if ($maintenance) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete host because maintenance "%1$s" must contain at least one host or host group.',
+				'Cannot delete selected hosts because maintenance "%1$s" must contain at least one host or host group.',
+				$maintenance['name'],
+				count($hostids)
+			));
 		}
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-			'Cannot delete host because maintenance "%1$s" must contain at least one host or host group.',
-			'Cannot delete selected hosts because maintenance "%1$s" must contain at least one host or host group.',
-			$maintenance['name'],
-			count($hostids)
-		));
 	}
-
 
 	/**
 	 * Delete Host.

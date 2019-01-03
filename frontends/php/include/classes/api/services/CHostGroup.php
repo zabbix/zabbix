@@ -1498,15 +1498,13 @@ class CHostGroup extends CApiService {
 				')'
 		));
 
-		if (!$maintenance) {
-			return;
+		if ($maintenance) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _n(
+				'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
+				'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
+				$maintenance['name'],
+				count($groupids)
+			));
 		}
-
-		self::exception(ZBX_API_ERROR_PARAMETERS, _n(
-			'Cannot delete host group because maintenance "%1$s" must contain at least one host or host group.',
-			'Cannot delete selected host groups because maintenance "%1$s" must contain at least one host or host group.',
-			$maintenance['name'],
-			count($groupids)
-		));
 	}
 }
