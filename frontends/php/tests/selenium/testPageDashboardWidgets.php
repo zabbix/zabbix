@@ -48,7 +48,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Expected table values.
 		$expected = [
 			'Host group for tag permissions'	=> 1,
-			'Zabbix servers'					=> 14,
+			'Zabbix servers'					=> 15,
 			'ZBX6648 All Triggers'				=> 1,
 			'ZBX6648 Disabled Triggers'			=> 1,
 			'ZBX6648 Enabled Triggers'			=> 1
@@ -158,6 +158,7 @@ class testPageDashboardWidgets extends CWebTest {
 
 		$dashboard = CDashboardElement::find()->one();
 		// Check the name of dashboard.
+		$this->query('id:page-title-general')->waitUntilTextPresent('Dashboard create test');
 		$this->assertEquals('Dashboard create test', $dashboard->getTitle());
 
 		// Add widget.

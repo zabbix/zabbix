@@ -1533,8 +1533,8 @@ clean:
  *                                                                            *
  * Parameters:                                                                *
  *     filename_regexp - [IN] regexp to be compiled                           *
- *     re              - [OUT] compiled regexp                             *
- *     err_msg         - [OUT] error message why regexp could not be       *
+ *     re              - [OUT] compiled regexp                                *
+ *     err_msg         - [OUT] error message why regexp could not be          *
  *                       compiled                                             *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -1546,10 +1546,8 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 
 	if (SUCCEED != zbx_regexp_compile(filename_regexp, re, &regexp_err))
 	{
-		char	err_buf[MAX_STRING_LEN];
-
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
-				err_buf);
+				regexp_err);
 		return FAIL;
 	}
 
@@ -1685,8 +1683,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			/* do not make logrt[] and logrt.count[] items NOTSUPPORTED if there are no matching log */
 			/* files or they are not accessible (can happen during a rotation), just log the problem */
 #ifdef _WINDOWS
-			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"", filename_regexp,
-					directory);
+			zabbix_log(LOG_LEVEL_WARNING, "there are no recently modified files matching \"%s\" in \"%s\"",
+					filename_regexp, directory);
 
 			ret = ZBX_NO_FILE_ERROR;
 #else
@@ -1697,8 +1695,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\"",
-						filename_regexp, directory);
+				zabbix_log(LOG_LEVEL_WARNING, "there are no recently modified files matching \"%s\" in"
+						" \"%s\"", filename_regexp, directory);
 				ret = ZBX_NO_FILE_ERROR;
 			}
 #endif

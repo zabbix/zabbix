@@ -72,41 +72,22 @@ class CHistory extends CApiService {
 		];
 		$options = zbx_array_merge($def_options, $options);
 
-		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
-		}
-		else {
+		if ((USER_TYPE_SUPER_ADMIN != self::$userData['type'] && !$options['nopermissions']) ||
+				$options['hostids'] !== null) {
 			$items = API::Item()->get([
-				'itemids' => ($options['itemids'] === null) ? null : $options['itemids'],
 				'output' => ['itemid'],
+				'itemids' => $options['itemids'],
+				'hostids' => $options['hostids'],
+				'nopermissions' => $options['nopermissions'],
 				'editable' => $options['editable'],
-				'preservekeys' => true,
-				'webitems' => true
+				'webitems' => true,
+				'preservekeys' => true
 			]);
 			$options['itemids'] = array_keys($items);
 		}
 
 		if ($options['itemids'] !== null) {
 			zbx_value2array($options['itemids']);
-		}
-
-		if ($options['hostids'] !== null) {
-			$itemids = [];
-
-			$hosts = API::Host()->get([
-				'hostids' => $options['hostids'],
-				'itemids' => $options['itemids'],
-				'output' => [],
-				'selectItems' => ['output' => 'itemid']
-			]);
-
-			foreach ($hosts as $host) {
-				foreach ($host['items'] as $item) {
-					$itemids[] = $item['itemid'];
-				}
-			}
-
-			$options['itemids'] = $itemids;
 		}
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {

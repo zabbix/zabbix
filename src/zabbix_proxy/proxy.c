@@ -1087,12 +1087,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(datasender_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				poller_type = ZBX_PROCESS_TYPE_POLLER;
+				poller_type = ZBX_POLLER_TYPE_NORMAL;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				poller_type = ZBX_PROCESS_TYPE_UNREACHABLE;
+				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
@@ -1116,7 +1116,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				poller_type = ZBX_PROCESS_TYPE_JAVAPOLLER;
+				poller_type = ZBX_POLLER_TYPE_JAVA;
 				thread_args.args = &poller_type;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
