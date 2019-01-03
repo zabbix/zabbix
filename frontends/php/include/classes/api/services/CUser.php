@@ -1169,11 +1169,6 @@ class CUser extends CApiService {
 					_n('Account is blocked for %1$s second.', 'Account is blocked for %1$s seconds.', $sec_left)
 				);
 			}
-
-			DB::update('users', [
-				'values' => ['attempt_clock' => time()],
-				'where' => ['userid' => $db_user['userid']]
-			]);
 		}
 
 		try {
