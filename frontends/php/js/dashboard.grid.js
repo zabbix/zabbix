@@ -596,15 +596,13 @@
 				rows = Math.max(rows, box.current_pos.y + box.current_pos.height);
 			});
 
-			setDivPosition(data['placeholder'], data, pos, true);
-
 			if (rows != data['options']['rows']) {
 				resizeDashboardGrid($obj, data, rows);
 			}
 		}
-		else {
-			setDivPosition(data['placeholder'], data, pos, true);
-		}
+
+		setDivPosition(data['placeholder'], data, pos, true);
+		setDivPosition($div, data, pos, false);
 	}
 
 	/**
@@ -732,7 +730,6 @@
 			handles: handles,
 			autoHide: true,
 			scroll: false,
-			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
 				data['pos-action'] = 'resize';
@@ -1325,7 +1322,7 @@
 				}
 			})
 			.on('mouseleave', function(event) {
-				if (data['pos-action'] === 'add' || data['pos-action'] === 'addmodal') {
+				if (data['pos-action']) {
 					return;
 				}
 
