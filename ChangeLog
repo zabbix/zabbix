@@ -3,6 +3,14 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
+..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+........S. [ZBX-15400] fixed possible crash in preprocessing manager when items with change/throttle preprocessing steps were not being monitored anymore (wiper)
+..F....... [ZBX-13804] fixed generic popup form submission (miks)
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.0alpha2
@@ -16,6 +24,9 @@ A.F.....S. [ZBXNEXT-4724] added validation and throttling preprocessing rules, a
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
+........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
 ..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
@@ -65,6 +76,16 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
+..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+..F....... [ZBX-13804] fixed generic popup form submission (miks)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
+........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
@@ -2203,6 +2224,10 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
 ..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
 ..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
 ...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)

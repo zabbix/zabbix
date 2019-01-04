@@ -628,30 +628,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Preprocessing');
 
 		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->zbxTestClickWait('param_add');
-			$this->zbxTestDropdownSelect('preprocessing_'.$step_count.'_type', $options['type']);
-
-			switch ($options['type']) {
-				case 'Custom multiplier':
-				case 'Right trim':
-				case 'Left trim':
-				case 'Trim':
-				case 'XML XPath':
-				case 'JSON Path':
-				case 'Matches regular expression':
-				case 'Does not match regular expression':
-				case 'Check for error in JSON':
-				case 'Check for error in XML':
-				case 'Discard unchanged with heartbeat':
-					$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-					break;
-				case 'Regular expression':
-				case 'In range':
-				case 'Check for error using regular expression':
-					$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-					$this->zbxTestInputType('preprocessing_'.$step_count.'_params_1', $options['parameter_2']);
-					break;
-			}
+			$this->selectTypeAndfillParameters($step_count, $options);
 		}
 
 		$this->zbxTestClickWait('add');
@@ -740,9 +717,9 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Items');
 		$this->zbxTestClickLinkTextWait('testInheritanceItemPreprocessing');
 
-		$rowItem = CDBHelper::getRow('SELECT * FROM items WHERE itemid='.$preprocessing_itemid);
-		$this->zbxTestAssertElementValue('name', $rowItem['name']);
-		$this->zbxTestAssertElementValue('key', $rowItem['key_']);
+		$row_item = CDBHelper::getRow('SELECT * FROM items WHERE itemid='.$preprocessing_itemid);
+		$this->zbxTestAssertElementValue('name', $row_item['name']);
+		$this->zbxTestAssertElementValue('key', $row_item['key_']);
 		$this->zbxTestTabSwitch('Preprocessing');
 
 		// Check preprocessing parameters for each type in form.
@@ -752,12 +729,12 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('//input[@id="preprocessing_'.($item_preproc['step'] - 1).'_type"][@readonly]');
 			$this->zbxTestDropdownAssertSelected('preprocessing['.($item_preproc['step'] - 1).'][type]', $preprocessing_type);
 			switch ($item_preproc['type']) {
-				case 4:
+				case 1:
 				case 2:
 				case 3:
+				case 4:
 				case 11:
 				case 12:
-				case 1:
 				case 14:
 				case 15:
 				case 16:
@@ -864,8 +841,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Preprocessing');
 
 		foreach ($data['preprocessing'] as $step_count => $options) {
-			$this->zbxTestClickWait('param_add');
-			$this->zbxTestDropdownSelect('preprocessing_'.$step_count.'_type', $options['type']);
+			$this->selectTypeAndfillParameters($step_count, $options);
 
 			switch ($options['type']) {
 				case 'Regular expression':
@@ -880,28 +856,17 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 				case 'In range':
 				case 'Matches regular expression':
 				case 'Does not match regular expression':
-					if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_1', $options['parameter_2']);
-					}
-					elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2data', $options)) {
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-					}
-
-					$this->zbxTestAssertElementNotPresentXpath('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"][@disabled]');
-					$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
+					$this->zbxTestIsEnabled('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
 					$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
 
 					switch ($action) {
-						case 'discard_value':
-							break;
 						case 'set_value':
 							$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_1"]');
-							$this->zbxTestInputType('preprocessing_'.$step_count.'_error_handler_params', $custom_value);
+							$this->zbxTestInputTypeWait('preprocessing_'.$step_count.'_error_handler_params', $custom_value);
 							break;
 						case 'set_error':
 							$this->zbxTestClickXpathWait('//label[@for="preprocessing_'.$step_count.'_error_handler_2"]');
-							$this->zbxTestInputType('preprocessing_'.$step_count.'_error_handler_params', $custom_error);
+							$this->zbxTestInputTypeWait('preprocessing_'.$step_count.'_error_handler_params', $custom_error);
 							break;
 					}
 					break;
@@ -913,14 +878,6 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 				case 'Check for error using regular expression':
 				case 'Discard unchanged':
 				case 'Discard unchanged with heartbeat':
-					if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_1', $options['parameter_2']);
-					}
-					elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-						$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-					}
-
 					$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"][@disabled]');
 					break;
 			}
@@ -943,7 +900,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Preprocessing');
 		foreach ($data['preprocessing'] as $step_count => $options) {
 			// Get preprocessing from DB.
-			$rowPreproc = CDBHelper::getRow('SELECT * FROM item_preproc WHERE step='.($step_count + 1).' AND itemid = '.$itemid);
+			$row_preproc = CDBHelper::getRow('SELECT * FROM item_preproc WHERE step='.($step_count + 1).' AND itemid = '.$itemid);
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'XML XPath':
@@ -961,20 +918,22 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 					$this->assertTrue($this->zbxTestCheckboxSelected('preprocessing_'.$step_count.'_on_fail'));
 					if ($action === 'discard_value') {
 						$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_error_handler_0"][@checked]');
-						// Check preprocessing in DB.
-						$this->assertEquals(1, $rowPreproc['error_handler']);
+						// Check preprocessing in DB, where "Discard value" type is equal 1.
+						$this->assertEquals(1, $row_preproc['error_handler']);
 					}
 					elseif ($action === 'set_value') {
 						$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_error_handler_1"][@checked]');
 						$this->zbxTestAssertElementValue('preprocessing_'.$step_count.'_error_handler_params', $custom_value);
-						// Check preprocessing in DB.
-						$this->assertEquals(2, $rowPreproc['error_handler']);
+						// Check preprocessing in DB, where "Set value" type is equal 2.
+						$this->assertEquals(2, $row_preproc['error_handler']);
+						$this->assertEquals($custom_value, $row_preproc['error_handler_params']);
 					}
 					elseif ($action === 'set_error') {
 						$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_error_handler_2"][@checked]');
 						$this->zbxTestAssertElementValue('preprocessing_'.$step_count.'_error_handler_params', $custom_error);
-						// Check preprocessing in DB.
-						$this->assertEquals(3, $rowPreproc['error_handler']);
+						// Check preprocessing in DB, where "Set error message" type is equal 3.
+						$this->assertEquals(3, $row_preproc['error_handler']);
+						$this->assertEquals($custom_error, $row_preproc['error_handler_params']);
 					}
 					break;
 				case 'Right trim':
@@ -986,9 +945,10 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 				case 'Discard unchanged':
 				case 'Discard unchanged with heartbeat':
 					// Check preprocessing in DB.
-					$this->assertEquals(0, $rowPreproc['error_handler']);
+					$this->assertEquals(0, $row_preproc['error_handler']);
 					// Check preprocessing in frontend.
 					$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"][@disabled]');
+					$this->assertFalse($this->zbxTestCheckboxSelected('preprocessing_'.$step_count.'_on_fail'));
 					break;
 			}
 		}
@@ -1110,20 +1070,8 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Preprocessing');
 
 		foreach ($preprocessing as $step_count => $options) {
-			$this->zbxTestClickWait('param_add');
-			$this->zbxTestDropdownSelect('preprocessing_'.$step_count.'_type', $options['type']);
-
-			if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
-				$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-				$this->zbxTestInputType('preprocessing_'.$step_count.'_params_1', $options['parameter_2']);
-			}
-			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
-				$this->zbxTestInputType('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
-			}
-
-			$this->zbxTestAssertElementPresentXpath('//input[@id="preprocessing_'.$step_count.'_on_fail"][@type="checkbox"]');
+			$this->selectTypeAndfillParameters($step_count, $options);
 			$this->zbxTestClickWait('preprocessing_'.$step_count.'_on_fail');
-
 
 			foreach ($data['custom_on_fail'] as $error_type) {
 				switch ($error_type['option']) {
@@ -1146,10 +1094,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
 				$this->zbxTestCheckFatalErrors();
-
-				$rowItem = CDBHelper::getRow('SELECT name,key_,itemid FROM items where key_ = '.zbx_dbstr($data['key']));
-				$this->assertEquals($rowItem['name'], $data['name']);
-				$this->assertEquals($rowItem['key_'], $data['key']);
+				$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM items where key_ = '.zbx_dbstr($data['key'])));
 				break;
 
 			case TEST_BAD:
@@ -1178,6 +1123,22 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 			elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
 				$this->zbxTestAssertElementValue('preprocessing_'.$step_count.'_params_0', $options['parameter_1']);
 			}
+		}
+	}
+
+	/**
+	 * Add new preprocessing, select preprocessing type and parameters if exist.
+	 */
+	private function selectTypeAndfillParameters($step, $options) {
+		$this->zbxTestClickWait('param_add');
+		$this->zbxTestDropdownSelect('preprocessing_'.$step.'_type', $options['type']);
+
+		if (array_key_exists('parameter_1', $options) && array_key_exists('parameter_2', $options)) {
+			$this->zbxTestInputType('preprocessing_'.$step.'_params_0', $options['parameter_1']);
+			$this->zbxTestInputType('preprocessing_'.$step.'_params_1', $options['parameter_2']);
+		}
+		elseif (array_key_exists('parameter_1', $options) && !array_key_exists('parameter_2', $options)) {
+			$this->zbxTestInputType('preprocessing_'.$step.'_params_0', $options['parameter_1']);
 		}
 	}
 }

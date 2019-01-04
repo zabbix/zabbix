@@ -134,6 +134,36 @@ static void	read_step(const char *path, zbx_preproc_op_t *op)
 		op->error_handler_params = "";
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_step_supported                                                *
+ *                                                                            *
+ * Purpose: checks if the preprocessing step is supported based on build      *
+ *          configuration or other settings                                   *
+ *                                                                            *
+ * Parameters: type [IN] the preprocessing step type                          *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing step is supported                *
+ *               FAIL    - the preprocessing step is not supported and will   *
+ *                         always fail                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_step_supported(int type)
+{
+	switch (type)
+	{
+		case ZBX_PREPROC_XPATH:
+		case ZBX_PREPROC_ERROR_FIELD_XML:
+#ifdef HAVE_LIBXML2
+			return SUCCEED;
+#else
+			return FAIL;
+#endif
+		default:
+			return SUCCEED;
+	}
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_variant_t			value, history_value, history_value_copy;
@@ -162,7 +192,12 @@ void	zbx_mock_test_entry(void **state)
 	history_value_copy = history_value;
 
 	returned_ret = zbx_item_preproc(0, value_type, &value, &ts, &op, &history_value, &history_ts, &error);
-	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+
+	if (SUCCEED == is_step_supported(op.type))
+		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	else
+		expected_ret = FAIL;
+
 	zbx_mock_assert_result_eq("zbx_item_preproc() return", expected_ret, returned_ret);
 
 	if (SUCCEED == returned_ret)
@@ -200,8 +235,7 @@ void	zbx_mock_test_entry(void **state)
 				fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
 		}
 	}
-
-	if (FAIL == returned_ret && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
+	else if (SUCCEED == is_step_supported(op.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
 		zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
 
 	zbx_variant_clear(&value);
