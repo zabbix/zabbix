@@ -521,7 +521,7 @@
 				},
 				scanline: {
 					width: data.options['max-columns'],
-					height: data.options['max-rows'] * 2
+					height: data.options['max-rows']
 				},
 			};
 
@@ -543,7 +543,7 @@
 				boundary: $.extend({}, widget.current_pos),
 				scanline: {
 					width: data.options['max-columns'],
-					height: data.options['max-rows'] * 2
+					height: data.options['max-rows']
 				},
 			};
 
