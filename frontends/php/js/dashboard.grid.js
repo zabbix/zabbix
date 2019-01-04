@@ -1318,8 +1318,8 @@
 					return;
 				}
 
-				if (data['pos-action'] === '' && ($(event.target).is($obj))
-						|| $(event.target).closest(data.new_widget_placeholder.container).length) {
+				if (data['pos-action'] === '' && ($(event.target).is($obj)
+						|| $(event.target).closest(data.new_widget_placeholder.container).length)) {
 					setResizableState('disable', data.widgets, '');
 					data['pos-action'] = 'add';
 					data.new_widget_placeholder.setResizing();
