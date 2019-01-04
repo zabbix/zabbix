@@ -3,6 +3,7 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
 A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
