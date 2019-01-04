@@ -378,12 +378,10 @@
 		// Compact widget by resizing.
 		if (overlap > 0) {
 			// Scanline is virtual box that utilizes whole width/height depending on its direction defined by size_key.
-			var scanline = {
+			var scanline = $.extend({
 					x: 0,
-					y: 0,
-					width: 12,
-					height: 128
-				},
+					y: 0
+				}, axis.scanline),
 				slot = axis_pos[axis_key] + axis_pos[size_key],
 				next_col,
 				col,
@@ -520,7 +518,11 @@
 					y: widget['height' in changes ? 'pos' : 'current_pos'].y,
 					width: widget.current_pos.width,
 					height: widget['height' in changes ? 'pos' : 'current_pos'].height // it always gives same result. why?
-				}
+				},
+				scanline: {
+					width: data.options['max-columns'],
+					height: data.options['max-rows'] * 2
+				},
 			};
 
 			if ('x' in changes) {
@@ -538,7 +540,11 @@
 				size_min: data.options['widget-min-rows'],
 				size_max: data.options['max-rows'],
 				height: changes.height,
-				boundary: $.extend({}, widget.current_pos)
+				boundary: $.extend({}, widget.current_pos),
+				scanline: {
+					width: data.options['max-columns'],
+					height: data.options['max-rows'] * 2
+				},
 			};
 
 			if ('y' in changes) {
