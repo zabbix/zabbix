@@ -280,11 +280,11 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
  *             message - [IN] the received message                            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *client,
+		const zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "lld_register_worker";
-	zbx_lld_worker_t	*worker = NULL;
-
+	zbx_lld_worker_t	*worker;
 	pid_t			ppid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
