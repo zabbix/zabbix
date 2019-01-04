@@ -21,6 +21,10 @@
 #define ZABBIX_COMMS_H
 
 #ifdef _WINDOWS
+#include <VersionHelpers.h>
+#endif
+
+#ifdef _WINDOWS
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
 #	else
@@ -58,6 +62,11 @@ typedef long	ssize_t;
 typedef SOCKET	ZBX_SOCKET;
 #else
 typedef int	ZBX_SOCKET;
+#endif
+
+#ifdef _WINDOWS && !defined(WSA_FLAG_NO_HANDLE_INHERIT)
+/* allow compilation on older Windows systems */
+#define WSA_FLAG_NO_HANDLE_INHERIT	0x80
 #endif
 
 #if defined(HAVE_IPV6)
