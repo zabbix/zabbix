@@ -556,123 +556,37 @@ $form_list
 			->setLabel(_('Allowed hosts'))
 			->setChecked(array_key_exists('trapper_hosts', $data['visible'])),
 		(new CTextBox('trapper_hosts', $data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
-
-// Append applications to form list.
-$applications = [];
-
-if (hasRequest('applications')) {
-	$applicationids = [];
-
-	foreach (getRequest('applications') as $application) {
-		if (is_array($application) && array_key_exists('new', $application)) {
-			$applications[] = [
-				'id' => $application['new'],
-				'name' => $application['new'].' ('._x('new', 'new element in multiselect').')',
-				'isNew' => true
-			];
-		}
-		else {
-			$applicationids[] = $application;
-		}
-	}
-
-	$applications = array_merge($applications, $applicationids
-		? CArrayHelper::renameObjectsKeys(API::Application()->get([
-			'output' => ['applicationid', 'name'],
-			'applicationids' => $applicationids
-		]), ['applicationid' => 'id'])
-		: []);
-}
-
-$applications_div = (new CDiv([
-	(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
-		->addValue(_('Add'), ZBX_MULTISELECT_ADD)
-		->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
-		->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
-		->setModern(true),
-	(new CMultiSelect([
-		'name' => 'applications[]',
-		'object_name' => 'applications',
-		'add_new' => true,
-		'data' => $applications,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'applications',
-				'srcfld1' => 'applicationid',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'applications_',
-				'hostid' => $data['hostid'],
-				'noempty' => true
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setId('applications_div');
-
-$form_list->addRow(
-	(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
-		->setLabel(_('Applications'))
-		->setChecked(array_key_exists('applications', $data['visible'])),
-	$applications_div
+	)
+	->addRow(
+		(new CVisibilityBox('visible[applications]', 'applications_div', _('Original')))
+			->setLabel(_('Applications'))
+			->setChecked(array_key_exists('applications', $data['visible'])),
+		(new CDiv([
+			(new CRadioButtonList('massupdate_app_action', (int) $data['massupdate_app_action']))
+				->addValue(_('Add'), ZBX_MULTISELECT_ADD)
+				->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
+				->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+				->setModern(true),
+			(new CMultiSelect([
+				'name' => 'applications[]',
+				'object_name' => 'applications',
+				'add_new' => true,
+				'data' => $data['applications'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'applications',
+						'srcfld1' => 'applicationid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'applications_',
+						'hostid' => $data['hostid'],
+						'noempty' => true
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setId('applications_div')
 );
-
-// Append application prototypes to form list.
-$application_prototypes = [];
-
-if (hasRequest('application_prototypes')) {
-	$application_prototypeids = [];
-
-	foreach (getRequest('application_prototypes') as $application_prototype) {
-		if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
-			$application_prototypes[] = [
-				'id' => $application_prototype['new'],
-				'name' => $application_prototype['new'].' ('._x('new', 'new element in multiselect').')',
-				'isNew' => true
-			];
-		}
-		else {
-			$application_prototypeids[] = $application_prototype;
-		}
-	}
-
-	$application_prototypes = array_merge($application_prototypes, $application_prototypeids
-		? CArrayHelper::renameObjectsKeys(
-			DBfetchArray(DBselect(
-				'SELECT ap.application_prototypeid, ap.name'.
-				' FROM application_prototype ap'.
-				' WHERE '.dbConditionId('ap.application_prototypeid', $application_prototypeids)
-			)), ['application_prototypeid' => 'id'])
-		: []);
-}
-
-$application_prototypes_div = (new CDiv([
-	(new CRadioButtonList('massupdate_app_prot_action', (int) $data['massupdate_app_prot_action']))
-		->addValue(_('Add'), ZBX_MULTISELECT_ADD)
-		->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
-		->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
-		->setModern(true),
-	(new CMultiSelect([
-		'name' => 'application_prototypes[]',
-		'object_name' => 'application_prototypes',
-		'add_new' => true,
-		'data' => $application_prototypes,
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'application_prototypes',
-				'srcfld1' => 'application_prototypeid',
-				'dstfrm' => $form->getName(),
-				'dstfld1' => 'application_prototypes_',
-				'hostid' => $data['hostid'],
-				'parent_discoveryid' => $data['parent_discoveryid'],
-				'noempty' => true
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setId('application_prototypes_div');
 
 // Append master item select.
 $master_itemname = ($data['master_itemid'] != 0)
@@ -722,7 +636,32 @@ $form_list
 		(new CVisibilityBox('visible[applicationPrototypes]', 'application_prototypes_div', _('Original')))
 			->setLabel(_('Application prototypes'))
 			->setChecked(array_key_exists('applicationPrototypes', $data['visible'])),
-		$application_prototypes_div
+		(new CDiv([
+			(new CRadioButtonList('massupdate_app_prot_action', (int) $data['massupdate_app_prot_action']))
+				->addValue(_('Add'), ZBX_MULTISELECT_ADD)
+				->addValue(_('Replace'), ZBX_MULTISELECT_REPLACE)
+				->addValue(_('Remove'), ZBX_MULTISELECT_REMOVE)
+				->setModern(true),
+			(new CMultiSelect([
+				'name' => 'application_prototypes[]',
+				'object_name' => 'application_prototypes',
+				'add_new' => true,
+				'data' => $data['application_prototypes'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'application_prototypes',
+						'srcfld1' => 'application_prototypeid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'application_prototypes_',
+						'hostid' => $data['hostid'],
+						'parent_discoveryid' => $data['parent_discoveryid'],
+						'noempty' => true
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setId('application_prototypes_div')
 	)
 	// Append master item select.
 	->addRow(

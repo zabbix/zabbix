@@ -1205,8 +1205,8 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'privatekey' => getRequest('privatekey', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
-		'applications' => getRequest('applications', []),
-		'application_prototypes' => getRequest('application_prototypes', []),
+		'applications' => [],
+		'application_prototypes' => [],
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
@@ -1226,8 +1226,58 @@ elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massup
 		'headers' => getRequest('headers', []),
 		'allow_traps' => getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
 		'massupdate_app_action' => getRequest('massupdate_app_action', ZBX_MULTISELECT_ADD),
-		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD)
+		'massupdate_app_prot_action' => getRequest('massupdate_app_prot_action', ZBX_MULTISELECT_ADD),
 	];
+
+	if (hasRequest('applications')) {
+		$applicationids = [];
+
+		foreach (getRequest('applications') as $application) {
+			if (is_array($application) && array_key_exists('new', $application)) {
+				$data['applications'][] = [
+					'id' => $application['new'],
+					'name' => $application['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			else {
+				$applicationids[] = $application;
+			}
+		}
+
+		$data['applications'] = array_merge($data['applications'], $applicationids
+			? CArrayHelper::renameObjectsKeys(API::Application()->get([
+				'output' => ['applicationid', 'name'],
+				'applicationids' => $applicationids
+			]), ['applicationid' => 'id'])
+			: []);
+	}
+
+	if (hasRequest('application_prototypes')) {
+		$application_prototypeids = [];
+
+		foreach (getRequest('application_prototypes') as $application_prototype) {
+			if (is_array($application_prototype) && array_key_exists('new', $application_prototype)) {
+				$data['application_prototypes'][] = [
+					'id' => $application_prototype['new'],
+					'name' => $application_prototype['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			else {
+				$application_prototypeids[] = $application_prototype;
+			}
+		}
+
+		$data['application_prototypes'] = array_merge($data['application_prototypes'], $application_prototypeids
+			? CArrayHelper::renameObjectsKeys(
+				DBfetchArray(DBselect(
+					'SELECT ap.application_prototypeid,ap.name'.
+					' FROM application_prototype ap'.
+					' WHERE '.dbConditionId('ap.application_prototypeid', $application_prototypeids)
+				)), ['application_prototypeid' => 'id'])
+			: []);
+	}
 
 	if ($data['headers']) {
 		$headers = [];
