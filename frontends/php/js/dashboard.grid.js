@@ -1393,7 +1393,7 @@
 						x: Math.min(x, data.add_widget_dimension.left),
 						width: Math.abs(data.add_widget_dimension.left - x) + 1,
 						height: Math.max(2, Math.abs(data.add_widget_dimension.top - y) + 1 +
-							(data.add_widget_dimension.top > y)
+							(data.add_widget_dimension.top > y ? 1 : 0)
 						)
 					};
 
