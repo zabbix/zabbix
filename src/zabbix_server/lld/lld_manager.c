@@ -341,7 +341,7 @@ static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
  *             message - [IN] the message with LLD request                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_queue_request(zbx_lld_manager_t *manager, zbx_ipc_message_t *message)
+static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_t *message)
 {
 	const char	*__function_name = "lld_queue_request";
 
