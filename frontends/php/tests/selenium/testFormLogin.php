@@ -122,7 +122,7 @@ class testFormLogin extends CLegacyWebTest {
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		$this->zbxTestOpen('index.php');
 
-		for ($i = 1; $i <= 5; $i++) {
+		for ($i = 1; $i < 5; $i++) {
 			$this->zbxTestInputTypeWait('name', 'user-for-blocking');
 			$this->zbxTestInputTypeWait('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
