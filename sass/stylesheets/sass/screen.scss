@@ -3155,6 +3155,7 @@ $form-icon-btn: (
 .dashbrd-grid-widget-container {
 	position: relative;
 	margin: -.25rem;
+	overflow: hidden;
 }
 
 .dashbrd-grid-widget-placeholder {

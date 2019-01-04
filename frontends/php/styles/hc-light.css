@@ -2146,7 +2146,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-container {
   position: relative;
-  margin: -.25rem; }
+  margin: -.25rem;
+  overflow: hidden; }
 
 .dashbrd-grid-widget-placeholder {
   border-color: #f0f0f0 !important;
