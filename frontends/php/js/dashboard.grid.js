@@ -606,6 +606,11 @@
 
 			if (rows != data['options']['rows']) {
 				resizeDashboardGrid($obj, data, rows);
+				// Force jQuery resizable plugin to refresh parent height.
+				widget['div'].resizable('option', 'containment', false);
+			}
+			else {
+				widget['div'].resizable('option', 'containment', 'parent');
 			}
 		}
 	}
