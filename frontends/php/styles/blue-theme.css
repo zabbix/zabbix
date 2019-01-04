@@ -1104,6 +1104,11 @@ output {
   font-weight: bold;
   color: #e99003; }
 
+.suggest-new {
+  border-top: 1px solid #acbbc2; }
+  .suggest-new span:first-child {
+    font-weight: bold; }
+
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #fff;

@@ -3,6 +3,7 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
 A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
 ........S. [ZBX-15400] fixed possible crash in preprocessing manager when items with change/throttle preprocessing steps were not being monitored anymore (wiper)
@@ -75,6 +76,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
 .......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
