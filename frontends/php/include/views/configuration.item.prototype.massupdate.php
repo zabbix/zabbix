@@ -570,7 +570,7 @@ $form_list
 			(new CMultiSelect([
 				'name' => 'applications[]',
 				'object_name' => 'applications',
-				'add_new' => true,
+				'add_new' => !($data['massupdate_app_action'] == ZBX_MULTISELECT_REMOVE),
 				'data' => $data['applications'],
 				'popup' => [
 					'parameters' => [
@@ -645,7 +645,7 @@ $form_list
 			(new CMultiSelect([
 				'name' => 'application_prototypes[]',
 				'object_name' => 'application_prototypes',
-				'add_new' => true,
+				'add_new' => !($data['massupdate_app_prot_action'] == ZBX_MULTISELECT_REMOVE),
 				'data' => $data['application_prototypes'],
 				'popup' => [
 					'parameters' => [

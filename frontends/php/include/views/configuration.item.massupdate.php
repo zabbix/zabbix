@@ -614,7 +614,7 @@ if ($data['displayApplications']) {
 		(new CMultiSelect([
 			'name' => 'applications[]',
 			'object_name' => 'applications',
-			'add_new' => true,
+			'add_new' => !($data['massupdate_app_action'] == ZBX_MULTISELECT_REMOVE),
 			'data' => $applications,
 			'popup' => [
 				'parameters' => [
