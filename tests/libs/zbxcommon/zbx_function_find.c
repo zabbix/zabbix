@@ -112,8 +112,8 @@ void	zbx_mock_test_entry(void **state)
 	if (expected_result != (actual_result = zbx_function_find(init_param, &func_pos, &par_l, &par_r, error_text,
 			max_error_len)))
 	{
-		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_sysinfo_ret_string(actual_result),
-			zbx_sysinfo_ret_string(expected_result), error_text);
+		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_result_string(actual_result),
+			zbx_result_string(expected_result), error_text);
 	}
 
 	if (SUCCEED == expected_result)
@@ -136,7 +136,7 @@ void	zbx_mock_test_entry(void **state)
 				(zbx_fs_size_t)par_r, (zbx_fs_size_t)par_r_exp, error_text);
 		}
 	}
-	else /* SYSINFO_RET_FAIL == expected_result */
+	else /* FAIL == expected_result */
 	{
 		if (0 != strcmp(expected_param_value_string, error_text))
 		{

@@ -693,7 +693,8 @@ output {
     position: relative;
     border-bottom: 1px solid #ebeef0;
     line-height: 18px;
-    vertical-align: top; }
+    vertical-align: top;
+    max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -3919,6 +3920,7 @@ svg {
 .overrides-list {
   display: table;
   width: 90%;
+  max-width: 738px;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
@@ -3990,6 +3992,9 @@ svg {
       line-height: 24px;
       padding: 0px 5px;
       height: 24px; }
+
+.patternselect {
+  line-height: 14px; }
 
 .columns-wrapper {
   display: flex;

@@ -3876,6 +3876,10 @@ static size_t	zbx_no_function(const char *expr)
 		{
 			ptr += len;	/* skip to the position after and/or/not operator */
 		}
+		else if (ptr > expr && 0 != isdigit(*(ptr - 1)) && NULL != strchr(ZBX_UNIT_SYMBOLS, *ptr))
+		{
+			ptr++;	/* skip unit suffix symbol if it's preceded by a digit */
+		}
 		else
 			break;
 	}
@@ -4942,4 +4946,43 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 	memcpy(*data + offset, from, sz_from);
 
 	return (int)sz_changed;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strsplit                                                     *
+ *                                                                            *
+ * Purpose: splits string                                                     *
+ *                                                                            *
+ * Parameters: src       - [IN] source string                                 *
+ *             delimiter - [IN] delimiter                                     *
+ *             left      - [IN/OUT] first part of the string                  *
+ *             right     - [IN/OUT] second part of the string or NULL, if     *
+ *                                  delimiter was not found                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
+{
+	char	*delimiter_ptr;
+
+	if (NULL == (delimiter_ptr = strchr(src, delimiter)))
+	{
+		*left = zbx_strdup(NULL, src);
+		*right = NULL;
+	}
+	else
+	{
+		size_t	left_size;
+		size_t	right_size;
+
+		left_size = (size_t)(delimiter_ptr - src) + 1;
+		right_size = strlen(src) - (size_t)(delimiter_ptr - src);
+
+		*left = zbx_malloc(NULL, left_size);
+		*right = zbx_malloc(NULL, right_size);
+
+		memcpy(*left, src, left_size - 1);
+		(*left)[left_size - 1] = '\0';
+		memcpy(*right, delimiter_ptr + 1, right_size);
+	}
 }
