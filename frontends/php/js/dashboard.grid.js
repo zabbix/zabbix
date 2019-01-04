@@ -1000,7 +1000,7 @@
 				name: name
 			},
 			pos,
-			preloader;
+			$placeholder;
 
 		delete fields['type'];
 		delete fields['name'];
@@ -1037,8 +1037,7 @@
 				pos = findEmptyPosition($obj, data, type);
 			}
 
-			preloader = $('<div/>') // it looks more like placeholder, not preloader.
-				.css({
+			$placeholder = $('<div/>').css({
 					position: 'absolute',
 					top: (pos.y * data.options['widget-height']) + 'px',
 					left: (pos.x * data.options['widget-width']) + '%',
@@ -1118,8 +1117,8 @@
 			}
 		})
 			.always(function() {
-				if (preloader) {
-					preloader.remove();
+				if ($placeholder) {
+					$placeholder.remove();
 				}
 			});
 	}
