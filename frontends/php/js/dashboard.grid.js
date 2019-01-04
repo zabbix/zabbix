@@ -590,6 +590,8 @@
 			pos = getDivPosition($obj, data, $div),
 			rows = 0;
 
+		setDivPosition(data['placeholder'], data, pos, true);
+
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
 			realignResize(data, widget);
@@ -606,9 +608,6 @@
 				resizeDashboardGrid($obj, data, rows);
 			}
 		}
-
-		setDivPosition(data['placeholder'], data, pos, true);
-		setDivPosition($div, data, pos, false);
 	}
 
 	/**
@@ -736,6 +735,7 @@
 			handles: handles,
 			autoHide: true,
 			scroll: false,
+			containment: 'parent',
 			minWidth: getCurrentCellWidth(data),
 			start: function(event) {
 				data['pos-action'] = 'resize';
