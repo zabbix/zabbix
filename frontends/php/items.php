@@ -1089,8 +1089,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'flags', 'type'],
-				'itemids' => $itemids,
 				'selectApplications' => ['applicationid'],
+				'itemids' => $itemids,
 				'preservekeys' => true
 			]);
 
