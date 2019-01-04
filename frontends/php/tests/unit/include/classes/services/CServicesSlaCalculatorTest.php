@@ -34,11 +34,13 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'clock' => strtotime('30 March 2014 3:00'),
-						'value' => 3
+						'value' => 3,
+						'servicealarmid' => 1
 					],
 					[
 						'clock' => strtotime('30 March 2014 6:00'),
-						'value' => 0
+						'value' => 0,
+						'servicealarmid' => 2
 					],
 				],
 				[
@@ -72,11 +74,13 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 				[
 					[
 						'clock' => strtotime('30 March 2014 3:00'),
-						'value' => 3
+						'value' => 3,
+						'servicealarmid' => 1
 					],
 					[
 						'clock' => strtotime('30 March 2014 6:00'),
-						'value' => 0
+						'value' => 0,
+						'servicealarmid' => 2
 					],
 				],
 				[

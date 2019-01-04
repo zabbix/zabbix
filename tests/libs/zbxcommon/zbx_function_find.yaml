@@ -203,7 +203,7 @@ out:
   par_l: 3
   par_r: 69
 ---
-test case: "Check that openning of LLD function macro is skipped if no macro"
+test case: "Check that opening of LLD function macro is skipped if no macro"
 in:
   param: '{{#avg("Zabbix server:trap[{#VALUE}]",600)'
 out:
@@ -221,30 +221,54 @@ out:
   par_l: 7
   par_r: 42
 ---
-test case: "Only openning of LLD macro function must fail 1"
+test case: "Only opening of LLD macro function must fail #1"
 in:
   param: '{{#'
 out:
   error: 'Incorrect function expression: {{#'
   return: 'FAIL'
 ---
-test case: "Only openning of LLD macro function must fail 2"
+test case: "Only opening of LLD macro function must fail #2"
 in:
   param: '{{'
 out:
   error: 'Incorrect function expression: {{'
   return: 'FAIL'
 ---
-test case: "Only openning of LLD macro function must fail 3"
+test case: "Only opening of LLD macro function must fail #3"
 in:
   param: '{'
 out:
   error: 'Incorrect function expression: {'
   return: 'FAIL'
-test case: "Only openning of LLD macro function must fail 4"
+---
+test case: "Only opening of LLD macro function must fail #4"
 in:
   param: '{{#}'
 out:
   error: 'Incorrect function expression: {{#}'
+  return: 'FAIL'
+---
+test case: "Unit suffix support in calculated item formulas #1"
+in:
+  param: '5davg(system.cpu.intr,10m)*10m+1d/1K'
+out:
+  return: 'SUCCEED'
+  func_pos: 2
+  par_l: 5
+  par_r: 25
+---
+test case: "Unit suffix support in calculated item formulas #2"
+in:
+  param: 'm+avg(system.cpu.intr,10m)+1'
+out:
+  error: 'Incorrect function expression: m+avg(system.cpu.intr,10m)+1'
+  return: 'FAIL'
+---
+test case: "Valid expression without function"
+in:
+  param: '100+3*999'
+out:
+  error: 'Incorrect function expression: 100+3*999'
   return: 'FAIL'
 ...
