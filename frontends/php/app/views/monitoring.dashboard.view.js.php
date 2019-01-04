@@ -181,7 +181,7 @@
 
 		// Hide filter with timeline.
 		jQuery('.filter-btn-container, .filter-space').hide();
-		timeControl.removeAllSBox();
+		timeControl.disableAllSBox();
 	};
 
 	// Method to fill data in dashboard sharing form.

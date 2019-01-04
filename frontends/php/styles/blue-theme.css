@@ -2236,6 +2236,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     border-color: #ebeef0; }
   .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad {
     margin: 0 10px; }
+  .dashbrd-grid-widget-content .flickerfreescreen {
+    top: 3px; }
 
 .dashbrd-grid-widget {
   display: flex;

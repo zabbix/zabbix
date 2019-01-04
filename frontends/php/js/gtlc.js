@@ -680,13 +680,15 @@ var timeControl = {
 		}
 	},
 
-	removeAllSBox: function() {
+	disableAllSBox: function() {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
-				obj.loadSBox = 0;
-				jQuery('#'+obj.id).removeData('zbx_sbox');
+				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
 			}
 		});
+		jQuery(document).off('dblclick', 'img')
+			.off('mousedown', 'img')
+			.off('mousemove', 'img');
 	},
 
 	/**
