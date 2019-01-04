@@ -943,7 +943,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									 * $upd_applicationids now contains new and existing application IDs depeding on
 									 * operation we want to perform.
 									 */
-									$item['applications'] = array_keys(array_flip($upd_applicationids));
+									$item_prototype['applications'] = array_keys(array_flip($upd_applicationids));
 								}
 								else {
 									/*
@@ -952,7 +952,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 									 */
 									if ($massupdate_app_action == ZBX_MULTISELECT_ADD
 											|| $massupdate_app_action == ZBX_MULTISELECT_REMOVE) {
-										unset($item['applications']);
+										unset($item_prototype['applications']);
 									}
 								}
 							}
@@ -1030,7 +1030,8 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 										' FROM application_prototype ap'.
 										' WHERE '.dbConditionId('ap.application_prototypeid',
 											$upd_application_prototypeids
-									)));
+										)
+									));
 
 									// Append those application prototypes to update list.
 									foreach ($db_application_prototypes as $db_application_prototype) {
