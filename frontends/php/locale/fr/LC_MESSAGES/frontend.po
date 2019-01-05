@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-26 09:44+0300\n"
 "Last-Translator: Daudet <aremy@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2516,8 +2516,8 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour l'élément \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour l'écran de modèle \"%2$s\"."
@@ -2655,7 +2655,7 @@ msgstr "Impossible de mettre à jour la valeur \"imagetype\" pour l'image \"%1$s
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Impossible de mettre à jour la valeur \"templateid\" pour l'écran \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Impossible de mettre à jour la valeur \"templateid\" pour l'écran de modèle \"%1$s\"."
@@ -5446,7 +5446,7 @@ msgstr "Identifiant de carte vide."
 msgid "Empty media type ID."
 msgstr "Identifiant de type de média vide."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Nom vide."
 
@@ -5458,7 +5458,7 @@ msgstr "Paramètres vide"
 msgid "Empty screen ID for screen."
 msgstr "Identifiant d'écran vide pour l'écran."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Identifiant d'écran vide pour l'écran de modèle."
 
@@ -6400,7 +6400,7 @@ msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire 
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Le graphique \"%1$s\" ne peut pas hériter. Pas d'élément obligatoire sur \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Le graphique \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
@@ -7612,7 +7612,7 @@ msgstr "Valeur \"private\" \"%1$s\" incorrecte pour la carte \"%2$s\"."
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "Valeur \"private\" \"%1$s\" incorrecte pour l'écran \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Valeur du champ \"doux\" pour la dépendance du service \"%1$s\" incorrecte."
@@ -7650,7 +7650,7 @@ msgstr "OID SNMP incorrect."
 msgid "Incorrect SNMP community."
 msgstr "Communauté SNMP incorrecte."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "SLA acceptable incorrect pour le service \"%1$s\"."
@@ -7769,7 +7769,7 @@ msgstr "Utilisateur associé à l'action incorrect. L'utilisateur n'existe pas o
 msgid "Incorrect action operationid."
 msgstr "Identifiant d'opération d'action incorrect."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Algorithme incorrect pour le service \"%1$s\"."
@@ -7849,7 +7849,7 @@ msgstr "Protocole d'authentification incorrect pour l'élément \"%1$s\"."
 msgid "Incorrect bulk value for interface."
 msgstr "Valeur de masse incorrecte pour l'interface."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Valeur de calcul de SLA incorrect pour le service \"%1$s\"."
@@ -8020,7 +8020,7 @@ msgstr "Index d'image incorrect."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Paramètres d'entrée incorrects."
 
@@ -8160,12 +8160,12 @@ msgstr "Paramètres incorrects pour la condition."
 msgid "Incorrect parameters for maintenance."
 msgstr "Paramètres incorrects pour la maintenance."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Parent incorrect pour le service \"%1$s\"."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Service parent incorrect."
 
@@ -8220,7 +8220,7 @@ msgstr "Heure de début de service incorrecte."
 msgid "Incorrect service time type."
 msgstr "Type d'horaire du service incorrect."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Ordre de tri in correct pour le service \"%1$s\"."
@@ -8236,7 +8236,7 @@ msgstr "Valeur source incorrecte."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "État incorrect pour l'hôte \"%1$s\"."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "État incorrect pour le service \"%1$s\"."
@@ -8245,7 +8245,7 @@ msgstr "État incorrect pour le service \"%1$s\"."
 msgid "Incorrect style provided for screen element."
 msgstr "Style incorrect pour l'élément d'écran."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Identifiant d'écran de modèle incorrect."
 
@@ -8253,7 +8253,7 @@ msgstr "Identifiant d'écran de modèle incorrect."
 msgid "Incorrect templated web scenario step count."
 msgstr "Compte d'étapes de scénario web de template incorrect."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "ID de déclencheur incorrect pour le service \"%1$s\"."
@@ -8900,7 +8900,7 @@ msgstr "Macro \"%1$s\" invalide : %2$s."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Paramètres de la méthode invalides."
@@ -9143,7 +9143,7 @@ msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "L'élément \"%1$s\" ne peut pas remplir le champ d'inventair numéro \"%2$d\" manquant. Les choix sont : de 0 (ne pas remplir) à %3$d."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "L'élément \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
@@ -10957,7 +10957,7 @@ msgstr "Aucun \"%1$s\" donné pour le type de média."
 msgid "No \"%1$s\" given for screen."
 msgstr "Aucun \"%1$s\" donné pour l'écran."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Aucun \"%1$s\" donné pour l'écran de modèle."
@@ -11341,15 +11341,15 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13920,7 +13920,7 @@ msgstr "Étendue"
 msgid "Screen"
 msgstr "Écran"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "L'écran \"%1$s\" existe déjà dans le modèle \"%2$s\"."
@@ -14318,22 +14318,22 @@ msgstr "Temps serveur"
 msgid "Service"
 msgstr "Service"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Le service \"%1$s\" ne peut pas être effacé car un autre service en dépend."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Le service \"%1$s\" ne peut pas dépendre de lui-même."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Le service \"%1$s\" ne peut pas être lié à un déclencheur et avoir des enfants en même temps."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Le service \"%1$s\" est déjà lié à un autre service."
@@ -14343,7 +14343,7 @@ msgstr "Le service \"%1$s\" est déjà lié à un autre service."
 msgid "Service availability report"
 msgstr "Rapport de disponibilité des services"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Le service ne peut pas être parent et enfant en même temps."
 
@@ -14402,7 +14402,7 @@ msgstr "Service mis à jour"
 msgid "Services"
 msgstr "Services"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Les services forment une dépendance circulaire."
 
@@ -15357,8 +15357,8 @@ msgstr "Macros du modèle"
 msgid "Template name"
 msgstr "Nom du modèle"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "L'écran de modèle \"%1$s\" existe déjà."

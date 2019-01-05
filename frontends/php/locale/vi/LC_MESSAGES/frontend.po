@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-19 15:46+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2471,8 +2471,8 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Không thể đặt lại \"%1$s\" cho item \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr ""
@@ -2610,7 +2610,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Không thể cập nhật \"templateid\"  cho screen \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Không thể cập nhật \"templateid\" cho template screen \"%1$s\"."
@@ -5392,7 +5392,7 @@ msgstr ""
 msgid "Empty media type ID."
 msgstr ""
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Không có tên."
 
@@ -5404,7 +5404,7 @@ msgstr "Tham số rỗng"
 msgid "Empty screen ID for screen."
 msgstr "Không có screen ID cho screen."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Không có screen ID cho template screen."
 
@@ -6346,7 +6346,7 @@ msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các ite
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các item yêu cầu trên \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Đồ thị \"%1$s\" đã tồn tại trên template \"%2$s\"."
@@ -7555,7 +7555,7 @@ msgstr ""
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Giá trị trường \"soft\" không chính xác cho sự phụ thuộc đối với dịch vụ \"%1$s\"."
@@ -7593,7 +7593,7 @@ msgstr "SNMP OID không chính xác."
 msgid "Incorrect SNMP community."
 msgstr "SNMP community không chính xác."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Sự chấp nhận SLA không chính xác đối với dịch vụ \"%1$s\"."
@@ -7712,7 +7712,7 @@ msgstr "Thao tác người dùng action không chính xác. Người dùn
 msgid "Incorrect action operationid."
 msgstr "operationid action không chính xác."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Thuật toán đối với dịch vụ \"%1$s\" không chính xác."
@@ -7792,7 +7792,7 @@ msgstr "Xác thực giao thức cho item \"%1$s\" không chính xác."
 msgid "Incorrect bulk value for interface."
 msgstr ""
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Tính toán giá trị SLA cho dịch vụ \"%1$s\" không chính xác."
@@ -7963,7 +7963,7 @@ msgstr "Chỉ số hình ảnh không chính xác."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Các tham số đầu vào không chính xác."
 
@@ -8103,12 +8103,12 @@ msgstr "Các tham số cho điều kiện không chính xác."
 msgid "Incorrect parameters for maintenance."
 msgstr "Các tham số cho bảo trì không chính xác."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Dịch vụ gốc \"%1$s\" không chính xác."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Dịch vụ gốc không chính xác."
 
@@ -8163,7 +8163,7 @@ msgstr "Thời gian bắt đầu dịch vụ không chính xác."
 msgid "Incorrect service time type."
 msgstr "Kiểu thời gian dịch vụ không chính xác."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr ""
@@ -8179,7 +8179,7 @@ msgstr "Giá trị nguồn không chính xác."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
@@ -8188,7 +8188,7 @@ msgstr "Trạng thái cho dịch vụ \"%1$s\" không chính xác."
 msgid "Incorrect style provided for screen element."
 msgstr ""
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Template screen ID không chính xác."
 
@@ -8196,7 +8196,7 @@ msgstr "Template screen ID không chính xác."
 msgid "Incorrect templated web scenario step count."
 msgstr ""
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Trigger ID cho dịch vụ \"%1$s\" không chính xác."
@@ -8842,7 +8842,7 @@ msgstr ""
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Phương pháp tham số không hợp lệ."
@@ -9085,7 +9085,7 @@ msgstr "Item \"%1$s\" không tồn tại trên \"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Item \"%1$s\" không thể gắn vào một quá trình kiểm kê số trường đang bị lỗi \"%2$d\". Các lựa chọn là: từ 0 (Không được gắn vào) đến \"%3$d\"."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Item \"%1$s\" không tồn tại trên template \"%2$s\"."
@@ -10886,7 +10886,7 @@ msgstr ""
 msgid "No \"%1$s\" given for screen."
 msgstr "\"%1$s\" không được đưa ra cho screen."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "\"%1$s\" không được đưa ra cho template screen."
@@ -11270,15 +11270,15 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13847,7 +13847,7 @@ msgstr ""
 msgid "Screen"
 msgstr "Screen"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "Screen \"%1$s\" đã tồn tại trên template \"%2$s\"."
@@ -14245,22 +14245,22 @@ msgstr "thời gian máy chủ"
 msgid "Service"
 msgstr "Dịch vụ"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Dịch vụ \"%1$s\" không thể bị xóa, bởi vì nó phụ thuộc vào dịch vụ khác."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Dịch vụ \"%1$s\" không thể phụ thuộc vào chính nó."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Dịch vụ \"%1$s\" không thể liên kết đến một trigger và có sản phẩm cùng một lúc."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến một dịch vụ khác."
@@ -14270,7 +14270,7 @@ msgstr "Dịch vụ \"%1$s\" đã có liên kết tắt cứng đến mô�
 msgid "Service availability report"
 msgstr ""
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Dịch vụ không thể vừa là cha vừa là con cùng một thời điểm."
 
@@ -14329,7 +14329,7 @@ msgstr "Dịch vụ được cập nhật"
 msgid "Services"
 msgstr "Các dịch vụ"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Các dịch vụ tạo thành một quan hệ phụ thuộc vòng tròn."
 
@@ -15284,8 +15284,8 @@ msgstr ""
 msgid "Template name"
 msgstr "Tên template"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Template screen \"%1$s\" đã tồn tại."

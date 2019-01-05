@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-19 15:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -2518,8 +2518,8 @@ msgstr "Kan ikke angi \"%1$s\" for graf prototype \"%2$s\"."
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for elementet \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for malskjermbildet \"%2$s\"."
@@ -2657,7 +2657,7 @@ msgstr "Kan ikke oppdatere \"imagetype\" for bilde \"%1$s\"."
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Kan ikke oppdatere \"templateid\" for skjermbildet \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Kan ikke oppdatere \"templateid\" for malskjermbildet \"%1$s\"."
@@ -5448,7 +5448,7 @@ msgstr "Tom kart ID."
 msgid "Empty media type ID."
 msgstr "Tom medietypenavn."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Tomt navn."
 
@@ -5460,7 +5460,7 @@ msgstr "Tomme parametere"
 msgid "Empty screen ID for screen."
 msgstr "Tom skjerm ID for skjerm."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Tom skjerm ID for malskjerm."
 
@@ -6403,7 +6403,7 @@ msgstr "Graf \"%1$s\" kan ikke arve. Ingen påkrevde elementer på \"%2$s\" (Ymi
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Graf \"%1$s\" kan ikke arve. Ingen påkrevde elementer på \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Graf \"%1$s\" finnes ikke på mal \"%2$s\"."
@@ -7615,7 +7615,7 @@ msgstr "Feil \"privat\" verdi \"%1$s\" for kart \"%2$s\"."
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "Feil \"privat\" verdi \"%1$s\" for skjermbildet \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Feil \"myk\" feltverdi for avhengighet for tjenesten \"%1$s\"."
@@ -7653,7 +7653,7 @@ msgstr "Feil SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Feil SNMP-fellesskap."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Feil akseptabel SLA for service \"%1$s\"."
@@ -7772,7 +7772,7 @@ msgstr "Feil handling operatør bruker. Brukeren eksisterer ikke, eller du har i
 msgid "Incorrect action operationid."
 msgstr "Feil handlingsoperasjon."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Feil algoritme for service \"%1$s\"."
@@ -7852,7 +7852,7 @@ msgstr "Feil godkjenningsprotokoll for elementet \"%1$s\"."
 msgid "Incorrect bulk value for interface."
 msgstr "Feil masseverdi for grensesnitt."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Feil beregne SLA-verdien for tjenesten \"%1$s\"."
@@ -8023,7 +8023,7 @@ msgstr "Feil bildeindeks."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Feil innspillingsparametere."
 
@@ -8163,12 +8163,12 @@ msgstr "Feil parametere for tilstand."
 msgid "Incorrect parameters for maintenance."
 msgstr "Feil parametre for vedlikehold."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Feil foreldre for tjeneste \"%1$s\"."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Feil foreldreservice."
 
@@ -8223,7 +8223,7 @@ msgstr "Feil starttid for tjenesten."
 msgid "Incorrect service time type."
 msgstr "Feil tjenestetidstype."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Feil sorteringsrekkefølge for service \"%1$s\"."
@@ -8239,7 +8239,7 @@ msgstr "Feil kildeverdi."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Feil status for verten \"%1$s\"."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Feil status for tjenesten \"%1$s\"."
@@ -8248,7 +8248,7 @@ msgstr "Feil status for tjenesten \"%1$s\"."
 msgid "Incorrect style provided for screen element."
 msgstr "Feil stil gitt for skjermelement."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Feil malskjerm ID."
 
@@ -8256,7 +8256,7 @@ msgstr "Feil malskjerm ID."
 msgid "Incorrect templated web scenario step count."
 msgstr "Feil templated web scenarietrinnstelling."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Feil utløser ID for service \"%1$s\"."
@@ -8902,7 +8902,7 @@ msgstr "Ugyldig makro \"%1$s\" : %2$s."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Ugyldige metodeparametere."
@@ -9145,7 +9145,7 @@ msgstr "Elementet \"%1$s\" eksisterer allerede på \"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Elementet \"%1$s\" kan ikke fylle ut et manglende vertsinventarfeltnummer \"%2$d\". Valgene er: fra 0 (ikke fylle) til %3$d."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Element \"%1$s\" finnes ikke på mal \"%2$s\"."
@@ -10961,7 +10961,7 @@ msgstr "Ingen \"%1$s\" gitt for medietype."
 msgid "No \"%1$s\" given for screen."
 msgstr "Ingen \"%1$s\" gitt for skjerm."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Ingen \"%1$s\" gitt for malskjermbildet."
@@ -11345,15 +11345,15 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13924,7 +13924,7 @@ msgstr ""
 msgid "Screen"
 msgstr "Skjerm"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "Skjermbildet \"%1$s\" finnes allerede på mal \"%2$s\"."
@@ -14322,22 +14322,22 @@ msgstr "Server tid"
 msgid "Service"
 msgstr "Tjeneste"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Tjenesten \"%1$s\" kan ikke slettes, fordi den er avhengig av en annen tjeneste."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Tjenesten \"%1$s\" kan ikke være avhengig av seg selv."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Tjenesten \"%1$s\" kan ikke kobles til en utløser og ha barn samtidig."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Tjenesten \"%1$s\" er allerede hardlinket til en annen tjeneste."
@@ -14347,7 +14347,7 @@ msgstr "Tjenesten \"%1$s\" er allerede hardlinket til en annen tjeneste."
 msgid "Service availability report"
 msgstr "Tjenestestatusrapport"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Tjenesten kan ikke være forelder og barn samtidig."
 
@@ -14406,7 +14406,7 @@ msgstr "Tjeneste oppdatert"
 msgid "Services"
 msgstr "Tjenester"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Tjenester danner en sirkulær avhengighet."
 
@@ -15361,8 +15361,8 @@ msgstr "Malmekroner"
 msgid "Template name"
 msgstr "Malnavn"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Malskjermbildet \"%1$s\" eksisterer allerede."
