@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:31+0200\n"
+"POT-Creation-Date: 2019-01-06 01:45+0200\n"
 "PO-Revision-Date: 2017-10-11 11:47+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2476,8 +2476,8 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "不能设置\"%1$s\"在模板聚合图形\"%2$s\"中。"
@@ -2615,7 +2615,7 @@ msgstr "无法对图片\"%1$s\"更新\"图片类型\"."
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "无法更新 \"模板序列号\" 为聚合图形 \"%1$s\"。"
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "无法对聚合图形模板\"%1$s\"更新\"模板ID\"。"
@@ -5434,7 +5434,7 @@ msgstr "空的拓扑图ID。"
 msgid "Empty media type ID."
 msgstr "空的媒介类型ID。"
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "空名字"
 
@@ -5446,7 +5446,7 @@ msgstr "空参数"
 msgid "Empty screen ID for screen."
 msgstr "聚合图形的ID号为空"
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "聚合图形模板的聚合图形ID号为空"
 
@@ -6387,7 +6387,7 @@ msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目 (Ymin值项
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "图形\"%1$s\"不能继承. \"%2$s\"中并无所要的项目."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "图形 \"%1$s\"不存在于模板\"%2$s\"中."
@@ -7605,7 +7605,7 @@ msgstr "拓扑图 \"%2$s\" 的\"private\" “%1$s\" 值错误。"
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "聚合图形 \"%2$s\" 的\"private\" 值 \"%1$s\" 异常。"
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "在服务 \"%1$s\" 依赖了\"soft\"栏位的错误数据."
@@ -7643,7 +7643,7 @@ msgstr "错误的SNMP OID"
 msgid "Incorrect SNMP community."
 msgstr "错误的SNMP community."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "服务 \"%1$s\" 存在错误的可接受的 SLA."
@@ -7762,7 +7762,7 @@ msgstr "错误的动作操作用户. 用户不存在或您没有访问权."
 msgid "Incorrect action operationid."
 msgstr "错误的动作操作ID."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "服务\"%1$s\" 配置了错误的算法."
@@ -7847,7 +7847,7 @@ msgstr "监控项\"%1$s\" 出现了错误的身份验证协议."
 msgid "Incorrect bulk value for interface."
 msgstr "接口的值不正确"
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "服务\"%1$s\"出现了错误的计算SLA值."
@@ -8018,7 +8018,7 @@ msgstr "错误的图片索引"
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "不正确的输入参数"
 
@@ -8158,12 +8158,12 @@ msgstr "错误的条件参数."
 msgid "Incorrect parameters for maintenance."
 msgstr "错误的维护参数."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "错误的服务\"%1$s\"的上层"
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "错误的上层服务."
 
@@ -8218,7 +8218,7 @@ msgstr "错误的服务开始时间."
 msgid "Incorrect service time type."
 msgstr "错误的服务时间类型."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "服务\"%1$s\" 中的排序不正确。"
@@ -8234,7 +8234,7 @@ msgstr "错误的源值."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "主机\"%1$s\"的状态值不正确."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "服务\"%1$s\"存在错误的状态."
@@ -8243,7 +8243,7 @@ msgstr "服务\"%1$s\"存在错误的状态."
 msgid "Incorrect style provided for screen element."
 msgstr "指定的聚合图形元素样式不正确."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "模板的聚合图形ID错误。"
 
@@ -8251,7 +8251,7 @@ msgstr "模板的聚合图形ID错误。"
 msgid "Incorrect templated web scenario step count."
 msgstr "模板Web方案步骤计数不正确。"
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "服务\"%1$s\"存在错误的触发器 ID."
@@ -8908,7 +8908,7 @@ msgstr "无效的宏\"%1$s\": %2$s."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "无效的方法参数."
@@ -9152,7 +9152,7 @@ msgstr "监控项\"%1$s\"已经存在于\"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "监控项\"%1$s\"不能填入一个不存在的主机资产纪录栏位号码\"%2$d\". 选择为: 从0(不填入)到%3$d."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "监控项\"%1$s\"不存在于模板\"%2$s\"中."
@@ -10960,7 +10960,7 @@ msgstr "无\"%1$s\" 给与媒体值"
 msgid "No \"%1$s\" given for screen."
 msgstr "聚合图形的\"%1$s\"未配置"
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "聚合图形的 \"%1$s\"未配置"
@@ -11344,15 +11344,15 @@ msgstr "没有系统访问权限。"
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13923,7 +13923,7 @@ msgstr ""
 msgid "Screen"
 msgstr "聚合图形"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "聚合图形\"%1$s\"已存在于模板\"%2$s\"中."
@@ -14322,22 +14322,22 @@ msgstr "服务器时间"
 msgid "Service"
 msgstr "服务"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "服务\"%1$s\"不能被删除, 因为它依赖于另一个服务."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "服务\"%1$s\"不能依赖于自己."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "服务 \"%1$s\"不能被链接到一个触发器且同时有依赖的服务."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "服务\"%1$s\"已经硬链接到一个不同的服务."
@@ -14347,7 +14347,7 @@ msgstr "服务\"%1$s\"已经硬链接到一个不同的服务."
 msgid "Service availability report"
 msgstr "服务可用性报告"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "服务不能同时为上层与下层"
 
@@ -14406,7 +14406,7 @@ msgstr "服务已更新"
 msgid "Services"
 msgstr "服务"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "服务形成了一个环."
 
@@ -15372,8 +15372,8 @@ msgstr "模板 宏"
 msgid "Template name"
 msgstr "模版名称"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "模板图表\"%1$s\"已经存在."
