@@ -64,7 +64,7 @@ typedef SOCKET	ZBX_SOCKET;
 typedef int	ZBX_SOCKET;
 #endif
 
-#ifdef _WINDOWS && !defined(WSA_FLAG_NO_HANDLE_INHERIT)
+#if defined(_WINDOWS) && !defined(WSA_FLAG_NO_HANDLE_INHERIT)
 /* allow compilation on older Windows systems */
 #define WSA_FLAG_NO_HANDLE_INHERIT	0x80
 #endif
