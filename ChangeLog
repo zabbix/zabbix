@@ -3,6 +3,7 @@ Changes for 4.2.0alpha3
 New features:
 
 Bug fixes:
+A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
