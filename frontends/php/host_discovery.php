@@ -439,6 +439,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$newItem['lld_macro_paths'] = $lld_macro_paths;
 
+		foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
+			if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
+				unset($newItem['lld_macro_paths'][$i]);
+			}
+		}
+
 		if (hasRequest('update')) {
 			DBstart();
 
@@ -473,12 +479,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($newItem['filter']);
 			}
 
-			foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
-				if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
-					unset($newItem['lld_macro_paths'][$i]);
-				}
-			}
-
 			$lld_macro_paths_changed = false;
 
 			if (count($newItem['lld_macro_paths']) != count($item['lld_macro_paths'])) {
@@ -504,12 +504,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = DBend($result);
 		}
 		else {
-			foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
-				if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
-					unset($newItem['lld_macro_paths'][$i]);
-				}
-			}
-
 			if (!$newItem['lld_macro_paths']) {
 				unset($newItem['lld_macro_paths']);
 			}
