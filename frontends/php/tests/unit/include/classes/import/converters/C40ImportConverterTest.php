@@ -45,7 +45,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
-									'lld_macro_paths' => [],
+									'lld_macro_paths' => []
 								]
 							]
 						]
@@ -54,7 +54,7 @@ class C40ImportConverterTest extends CImportConverterTest {
 						[
 							'discovery_rules' => [
 								[
-									'lld_macro_paths' => [],
+									'lld_macro_paths' => []
 								]
 							]
 						]

@@ -689,7 +689,7 @@ $lld_macro_paths_form_list = new CFormList();
 
 $lld_macro_paths_table = (new CTable())
 	->setId('lld_macro_paths')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([_('LLD Macro'), _('JSON path'), '']);
 
 $lld_macro_paths = $data['lld_macro_paths'];
@@ -745,7 +745,7 @@ $lld_macro_paths_table->setFooter((new CCol(
 $lld_macro_paths_form_list->addRow(_('LLD Macro'),
 	(new CDiv($lld_macro_paths_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // append tabs to form

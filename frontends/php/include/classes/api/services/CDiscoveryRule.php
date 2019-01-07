@@ -1416,8 +1416,8 @@ class CDiscoveryRule extends CItemGeneral {
 						}
 						else {
 							/*
-							 * In case "lld_macro_pathid", we need to treat it as a new LLD macro with both fields
-							 * present.
+							 * In case "lld_macro_pathid" does not exist, we need to treat it as a new LLD macro with
+							 * both fields present.
 							 */
 							if (array_key_exists('lld_macro', $lld_macro_path)
 									&& !array_key_exists('path', $lld_macro_path)) {

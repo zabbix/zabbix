@@ -237,11 +237,11 @@ unset($_REQUEST[$paramsFieldName]);
  */
 if (getRequest('itemid', false)) {
 	$item = API::DiscoveryRule()->get([
-		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
+		'itemids' => getRequest('itemid', []),
 		'editable' => true
 	]);
 	$item = reset($item);

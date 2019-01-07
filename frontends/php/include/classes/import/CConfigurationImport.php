@@ -931,7 +931,7 @@ class CConfigurationImport {
 				else {
 					/*
 					 * The array key "lld_macro_paths" must exist at this point. It is processed by chain convertion.
-					 * Unlinke discoveryrule.update method, discoveryrule.create does not allow "lld_macro_paths"
+					 * Unlike discoveryrule.update method, discoveryrule.create does not allow "lld_macro_paths"
 					 * to be empty.
 					 */
 					if (!$item['lld_macro_paths']) {
