@@ -403,8 +403,6 @@ switch ($data['method']) {
 					$discovery_rule = $discovery_rules[0];
 
 					if ($discovery_rule['applicationPrototypes']) {
-						$result = [];
-
 						foreach ($discovery_rule['applicationPrototypes'] as $application_prototype) {
 							if (array_key_exists('search', $data)
 									&& stripos($application_prototype['name'], $data['search']) !== false) {

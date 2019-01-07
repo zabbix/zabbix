@@ -164,7 +164,7 @@ zbx_add_post_js('cookie.prefix = "'.$data['parent_discoveryid'].'";');
 // append table to form
 $itemForm->addItem([
 	$itemTable,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'itemprototype.massenable' => ['name' => _('Create enabled'),
@@ -178,7 +178,7 @@ $itemForm->addItem([
 				'confirm' => _('Delete selected item prototypes?')
 			]
 		],
-		$this->data['parent_discoveryid']
+		$data['parent_discoveryid']
 	)
 ]);
 
