@@ -143,17 +143,24 @@ class CItemManager {
 				' AND '.dbConditionInt('f.itemid', $del_itemids)
 		);
 
-		$del_triggerids = [];
+		$del_triggerids = [
+			ZBX_FLAG_DISCOVERY_NORMAL => [],
+			ZBX_FLAG_DISCOVERY_CREATED => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
+		];
 
 		while ($db_trigger = DBfetch($db_triggers)) {
 			$del_triggerids[$db_trigger['flags']][] = $db_trigger['triggerid'];
 		}
 
-		if (array_key_exists(ZBX_FLAG_DISCOVERY_NORMAL, $del_triggerids)) {
-			CTriggerManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL]);
+		if ($del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL] || $del_triggerids[ZBX_FLAG_DISCOVERY_CREATED]) {
+			CTriggerManager::delete(array_merge(
+				$del_triggerids[ZBX_FLAG_DISCOVERY_NORMAL],
+				$del_triggerids[ZBX_FLAG_DISCOVERY_CREATED]
+			));
 		}
 
-		if (array_key_exists(ZBX_FLAG_DISCOVERY_PROTOTYPE, $del_triggerids)) {
+		if ($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			CTriggerPrototypeManager::delete($del_triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 		}
 

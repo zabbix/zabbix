@@ -313,3 +313,21 @@ INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,pa
 INSERT INTO hosts (hostid,host,name,status,description) VALUES (120003,'Template with item and lld rule','Template with item',3,'');
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110004,0,120003,'templated-item','','agent.ping[]',30,NULL,'','','','','','');
 INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers,flags) VALUES (110005,0,120003,'templated-lld-rule','','agent.ping[-]',30,NULL,'','','','','','',1);
+
+-- testItemDelete
+INSERT INTO hstgrp (groupid, name) VALUES (50018, 'with_lld_discovery');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (120004, 'with_lld_discovery', 'with_lld_discovery', 0, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (120004, 120004, 50018);
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (2004, 120004, 1, 1, 1, '127.0.0.1', '', '10050');
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, flags) VALUES (40070, 2, 120004, 'discovery_rule', '', 'discovery', '0', NULL, '', '', '', '', '', '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (40071, 2, 120004, 'Item {#NAME}', '', 'item[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30001,'{18076}>0','Trigger {#NAME}', 2, 2, '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18076, 40071, 30001, 'last', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14045, 40071, 40070, '');
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags) VALUES (40072, 2, 120004,' Item eth0', '', 'item[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14046, 40072, 40071, 'item[{#NAME}]');
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30002,'{18077}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18077, 40072, 30002, 'last', '');
+INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001);
