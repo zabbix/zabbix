@@ -916,7 +916,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
-	zbx_timespec_t	ts;
 #endif
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
@@ -1017,8 +1016,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				" parameter or the number of active servers in ServerActive configuration parameter.");
 		exit(EXIT_FAILURE);
 	}
-
-	zbx_timespec(&ts);	/* initialize zbx_timespec() while there is only one thread */
 #endif
 	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
