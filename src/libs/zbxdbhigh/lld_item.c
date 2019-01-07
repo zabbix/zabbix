@@ -2477,14 +2477,14 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  * Purpose: escaping of a symbols in items preprocessing steps for discovery  *
  *          process                                                           *
  *                                                                            *
- * Parameters: type       - [IN] the item preprocessing step type             *
- *             lld_row    - [IN] lld source value                             *
- *             lld_macros - [IN] use json path to extract from jp_row         *
- *             sub_params - [IN/OUT] the preprocessing parameters             *
+ * Parameters: type            - [IN] the item preprocessing step type        *
+ *             lld_row         - [IN] lld source value                        *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
+ *             sub_params      - [IN/OUT] the preprocessing parameters        *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macros, char **sub_params)
+		const zbx_vector_ptr_t *lld_macro_paths, char **sub_params)
 {
 	if (ZBX_PREPROC_REGSUB == type ||
 			ZBX_PREPROC_VALIDATE_REGEX == type ||
@@ -2504,9 +2504,10 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			return;
 		}
 
-		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
-		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT,
+		substitute_lld_macros(&param1, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP,
 				NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, lld_macro_paths,
+				ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
 
 		sub_params_size = strlen(param1) + strlen(param2) + 2;
 		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
@@ -2525,7 +2526,7 @@ static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_
 			token_type |= ZBX_TOKEN_XPATH;
 		}
 
-		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macros, token_type, NULL, 0);
+		substitute_lld_macros(sub_params, &lld_row->jp_row, lld_macro_paths, token_type, NULL, 0);
 	}
 }
 
