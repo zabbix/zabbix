@@ -499,6 +499,12 @@ class C42XmlValidator {
 							]]
 						]]
 					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>				['type' => XML_ARRAY, 'rules' => [
 							'macro' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -994,6 +1000,12 @@ class C42XmlValidator {
 									'status_codes' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
+						]]
+					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
