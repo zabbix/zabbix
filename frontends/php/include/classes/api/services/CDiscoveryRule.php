@@ -1555,6 +1555,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);
