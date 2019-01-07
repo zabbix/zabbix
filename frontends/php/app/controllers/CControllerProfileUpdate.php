@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,6 +65,11 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.dashbrd.filter.active':
+				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
+				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
+				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state':
 					$ret = true;
 					break;
 

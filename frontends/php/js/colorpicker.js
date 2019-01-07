@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,8 +103,10 @@
 			init: function(options) {
 				var close = $('<button type="button" class="overlay-close-btn" title="' + t('S_CLOSE') + '"/>')
 					.click(methods.hide);
-				options = $.extend(defaults, options||{});
-				overlay = $('<div class="overlay-dialogue" id="color_picker"/>').append(close).append(
+				options = $.extend(defaults, options || {});
+				overlay = $('<div class="overlay-dialogue" id="color_picker"/>')
+					.append(close)
+					.append(
 					$.map(options.palette, function(colors) {
 						return $('<div class="color-picker"/>').append(
 							$.map(colors, function(color) {
@@ -112,15 +114,18 @@
 							})
 						);
 					})
-				).on('click', '.color-picker div', setColorHandler);
+					)
+					.on('click', '.color-picker div', setColorHandler);
 
 				overlay.appendTo($(options.appendTo));
+
 				if ($(options.appendTo).prop('tagName') !== 'BODY') {
 					$(options.appendTo).on('remove', function() {
 						overlay.remove();
 						overlay = null;
 					});
 				}
+
 				methods.hide();
 			},
 			/**

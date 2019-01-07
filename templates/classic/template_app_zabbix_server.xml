@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2018-11-20T15:59:47Z</date>
+    <date>2018-11-23T12:25:34Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -1504,7 +1504,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix[queue]</key>
-                    <delay>10m</delay>
+                    <delay>1m</delay>
                     <history>1w</history>
                     <trends>365d</trends>
                     <status>0</status>
@@ -2723,7 +2723,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2739,7 +2739,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2755,7 +2755,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2771,7 +2771,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -2787,7 +2787,7 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
-            <description/>
+            <description>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file</description>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>

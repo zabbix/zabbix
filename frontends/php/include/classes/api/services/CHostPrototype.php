@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,7 +334,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$db_host_prototypes = $this->get([
-			'output' => ['hostid', 'host', 'name', 'status', 'templateid'],
+			'output' => ['hostid', 'host', 'name', 'status'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectGroupLinks' => ['group_prototypeid', 'groupid'],
 			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
@@ -342,12 +342,6 @@ class CHostPrototype extends CHostBase {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		foreach ($db_host_prototypes as  $db_host_prototype) {
-			if ($db_host_prototype['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated host prototype.'));
-			}
-		}
 
 		$hosts_by_ruleid = [];
 		$names_by_ruleid = [];
