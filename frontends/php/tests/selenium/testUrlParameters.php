@@ -628,8 +628,8 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Latest data',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Incorrect value "Array" for "groupids" field.',
-							'Incorrect value "Array" for "hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
