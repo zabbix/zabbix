@@ -20,23 +20,27 @@
 
 
 /**
- * General Xml validator
+ * General XML validator
  */
 class CXmlValidatorGeneral {
 
 	/**
+	 * Validation rules.
+	 *
 	 * @var array
 	 */
 	private $rules;
 
 	/**
+	 * Format of import source.
+	 *
 	 * @var string
 	 */
 	private $format;
 
 	/**
-	 * @param array  $rules  validation rules
-	 * @param string $format format of import source
+	 * @param array  $rules   Validation rules.
+	 * @param string $format  Format of import source.
 	 */
 	public function __construct(array $rules, $format) {
 		$this->rules = $rules;
@@ -44,13 +48,17 @@ class CXmlValidatorGeneral {
 	}
 
 	/**
-	 * Base validation function.
+	 * Base validation method.
 	 *
-	 * @param mixed  $data	import data
-	 * @param string $path	XML path (for error reporting)
+	 * @param array|string $data  Import data.
+	 * @param string       $path  XML path (for error reporting).
 	 *
-	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
-	 *						an array, if desired. Converted array is returned.
+	 * @return array              Validator does some manipulations for the incoming data. For example, converts empty
+	 *                            tags to an array, if desired. Converted array is returned.
+	 *
+	 * @throws Exception if $data does not correspond to validation rules.
+	 *
+	 * @return array|string
 	 */
 	public function validate($data, $path) {
 		$this->validateData($this->rules, $data, null, $path);
@@ -59,14 +67,14 @@ class CXmlValidatorGeneral {
 	}
 
 	/**
-	 * Base validation function.
+	 * Validate import data.
 	 *
-	 * @param array  $rules			validation rules
-	 * @param mixed  $data			import data
-	 * @param array  $parent_data	data's parent array (used for "ex_validate" callback functions)
-	 * @param string $path			XML path (for error reporting)
+	 * @param array        $rules        Validation rules.
+	 * @param array|string $data         Import data.
+	 * @param array        $parent_data  Data's parent array (used for "ex_validate" callback functions).
+	 * @param string       $path         XML path (for error reporting).
 	 *
-	 * @throw Exception				if $data does not correspond to validation $rules
+	 * @throws Exception if $data does not correspond to validation $rules.
 	 */
 	public function validateData(array $rules, &$data, array $parent_data = null, $path) {
 		if (array_key_exists('preprocessor', $rules)) {
@@ -183,10 +191,10 @@ class CXmlValidatorGeneral {
 	/**
 	 * String validator.
 	 *
-	 * @param mixed  $value	value for validation
-	 * @param string $path	XML path (for error reporting)
+	 * @param mixed  $value  Value for validation.
+	 * @param string $path   XML path (for error reporting).
 	 *
-	 * @throw Exception		if this $value is not a character string
+	 * @throws Exception if this $value is not a character string.
 	 */
 	private function validateString($value, $path) {
 		if (!is_string($value)) {
@@ -197,10 +205,10 @@ class CXmlValidatorGeneral {
 	/**
 	 * Array validator.
 	 *
-	 * @param mixed  $value	value for validation
-	 * @param string $path	XML path (for error reporting)
+	 * @param mixed  $value  Value for validation.
+	 * @param string $path   XML path (for error reporting).
 	 *
-	 * @throw Exception		if this $value is not an array
+	 * @throws Exception if this $value is not an array.
 	 */
 	private function validateArray($value, $path) {
 		if (!is_array($value)) {

@@ -57,6 +57,7 @@ class C40ImportConverter extends CConverter {
 			if (array_key_exists('items', $host)) {
 				$host['items'] = $this->convertItems($host['items']);
 			}
+
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
