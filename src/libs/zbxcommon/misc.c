@@ -157,8 +157,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	ZBX_THREAD_LOCAL static zbx_timespec_t	last_ts = {0, 0};
 	ZBX_THREAD_LOCAL static int		corr = 0;
 #ifdef _WINDOWS
-	LARGE_INTEGER				tick;
-	ZBX_THREAD_LOCAL static LARGE_INTEGER	tickPerSecond = {0}, last_tick = {0};
+	ZBX_THREAD_LOCAL static LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
 #else
 	struct timeval	tv;
@@ -179,8 +178,11 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 	if (0 != tickPerSecond.QuadPart)
 	{
+		LARGE_INTEGER	tick;
+
 		if (TRUE == QueryPerformanceCounter(&tick))
 		{
+			ZBX_THREAD_LOCAL static LARGE_INTEGER	last_tick = {0};
 			int	ns = 0;
 
 			if (0 < last_tick.QuadPart)
