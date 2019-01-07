@@ -590,8 +590,6 @@
 			pos = getDivPosition($obj, data, $div),
 			rows = 0;
 
-		setDivPosition(data['placeholder'], data, pos, true);
-
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
 			realignResize(data, widget);
@@ -613,6 +611,8 @@
 				widget['div'].resizable('option', 'containment', 'parent');
 			}
 		}
+
+		setDivPosition(data['placeholder'], data, pos, true);
 	}
 
 	/**
