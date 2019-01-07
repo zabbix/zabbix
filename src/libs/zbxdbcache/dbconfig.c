@@ -1961,6 +1961,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
+	ZBX_DC_HOST		*host;
 
 	int			found, update_index, ret, i;
 	zbx_uint64_t		interfaceid, hostid;
@@ -1984,6 +1985,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(main_, row[3]);
 		ZBX_STR2UCHAR(useip, row[4]);
 		ZBX_STR2UCHAR(bulk, row[8]);
+
+		/* If there is no host for this interface, skip it. */
+		/* This may be possible if the host was added after we synced config for hosts. */
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
 
 		interface = (ZBX_DC_INTERFACE *)DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 		zbx_vector_ptr_append(&interfaces, interface);
@@ -2089,28 +2095,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		{
 			/* new interface - add it to a list of host interfaces in 'config->hosts' hashset */
 
-			ZBX_DC_HOST	*host;
+			int	exists = 0;
 
-			if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
+			/* It is an error if the pointer is already in the list. Detect it. */
+
+			for (i = 0; i < host->interfaces_v.values_num; i++)
 			{
-				int	exists = 0;
-
-				/* It is an error if the pointer is already in the list. Detect it. */
-
-				for (i = 0; i < host->interfaces_v.values_num; i++)
+				if (interface == host->interfaces_v.values[i])
 				{
-					if (interface == host->interfaces_v.values[i])
-					{
-						exists = 1;
-						break;
-					}
+					exists = 1;
+					break;
 				}
-
-				if (0 == exists)
-					zbx_vector_ptr_append(&host->interfaces_v, interface);
-				else
-					THIS_SHOULD_NEVER_HAPPEN;
 			}
+
+			if (0 == exists)
+				zbx_vector_ptr_append(&host->interfaces_v, interface);
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -2127,10 +2126,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	}
 
 	/* remove deleted interfaces from buffer */
+
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_HOST	*host;
-
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
@@ -4282,7 +4280,7 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
  *           3 - params                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_item_preproc(zbx_dbsync_t *sync)
+static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 {
 	const char		*__function_name = "DCsync_item_preproc";
 
@@ -4321,6 +4319,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
 			}
+
+			preprocitem->update_time = timestamp;
 		}
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
@@ -4330,6 +4330,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
 		op->step = atoi(row[4]);
+		op->error_handler = atoi(row[6]);
+		DCstrpool_replace(found, &op->error_handler_params, row[7]);
 
 		if (0 == found)
 		{
@@ -4365,6 +4367,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync)
 		}
 
 		zbx_strpool_release(op->params);
+		zbx_strpool_release(op->error_handler_params);
 		zbx_hashset_remove_direct(&config->preprocops, op);
 	}
 
@@ -4855,7 +4858,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	sec = zbx_time();
 	/* relies on items, must be after DCsync_items() */
-	DCsync_item_preproc(&itempp_sync);
+	DCsync_item_preproc(&itempp_sync, sec);
 	itempp_sec2 = zbx_time() - sec;
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
@@ -6624,6 +6627,7 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 
 	item->preproc_ops = NULL;
 	item->preproc_ops_num = 0;
+	item->update_time = 0;
 
 	return SUCCEED;
 }
@@ -6675,6 +6679,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 
 		item->preproc_ops_num = dc_preprocitem->preproc_ops.values_num;
 		item->preproc_ops = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * item->preproc_ops_num);
+		item->update_time = dc_preprocitem->update_time;
 
 		for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 		{
@@ -6682,6 +6687,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			op = &item->preproc_ops[i];
 			op->type = dc_op->type;
 			op->params = zbx_strdup(NULL, dc_op->params);
+			op->error_handler = dc_op->error_handler;
+			op->error_handler_params = zbx_strdup(NULL, dc_op->error_handler_params);
 		}
 	}
 

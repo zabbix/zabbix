@@ -142,6 +142,31 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	return ITEM_VALUE_TYPE_MAX;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_variant                                          *
+ *                                                                            *
+ * Purpose: converts variant from text format                                 *
+ *                                                                            *
+ ******************************************************************************/
+unsigned char	zbx_mock_str_to_variant(const char *str)
+{
+	if (0 == strcmp(str, "ZBX_VARIANT_NONE"))
+		return ZBX_VARIANT_NONE;
+
+	if (0 == strcmp(str, "ZBX_VARIANT_STR"))
+		return ZBX_VARIANT_STR;
+
+	if (0 == strcmp(str, "ZBX_VARIANT_DBL"))
+		return ZBX_VARIANT_DBL;
+
+	if (0 == strcmp(str, "ZBX_VARIANT_UI64"))
+		return ZBX_VARIANT_UI64;
+
+	fail_msg("Unknown variant \"%s\"", str);
+	return ZBX_VARIANT_NONE;
+}
+
 zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 {
 	zbx_mock_error_t	err;

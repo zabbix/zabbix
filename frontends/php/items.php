@@ -576,16 +576,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				case ZBX_PREPROC_TRIM:
 				case ZBX_PREPROC_XPATH:
 				case ZBX_PREPROC_JSONPATH:
+				case ZBX_PREPROC_VALIDATE_REGEX:
+				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+				case ZBX_PREPROC_ERROR_FIELD_JSON:
+				case ZBX_PREPROC_ERROR_FIELD_XML:
+				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 					$step['params'] = $step['params'][0];
 					break;
 
 				case ZBX_PREPROC_REGSUB:
+				case ZBX_PREPROC_VALIDATE_RANGE:
+				case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
 				default:
 					$step['params'] = '';
 			}
+
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
 		}
 		unset($step);
 
@@ -681,7 +693,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'verify_peer', 'verify_host', 'allow_traps'
 				],
 				'selectApplications' => ['applicationid'],
-				'selectPreprocessing' => ['type', 'params'],
+				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'itemids' => getRequest('itemid')
 			]);
 			$db_item = reset($db_items);
@@ -1110,16 +1122,28 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 							case ZBX_PREPROC_TRIM:
 							case ZBX_PREPROC_XPATH:
 							case ZBX_PREPROC_JSONPATH:
+							case ZBX_PREPROC_VALIDATE_REGEX:
+							case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+							case ZBX_PREPROC_ERROR_FIELD_JSON:
+							case ZBX_PREPROC_ERROR_FIELD_XML:
+							case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 								$step['params'] = $step['params'][0];
 								break;
 
 							case ZBX_PREPROC_REGSUB:
+							case ZBX_PREPROC_VALIDATE_RANGE:
+							case ZBX_PREPROC_ERROR_FIELD_REGEX:
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
 							default:
 								$step['params'] = '';
 						}
+
+						$step += [
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						];
 					}
 					unset($step);
 
@@ -1329,7 +1353,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 			],
 			'selectHosts' => ['status', 'name'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];

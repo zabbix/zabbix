@@ -174,6 +174,16 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		$this->fields[$field_unacknowledged->getName()] = $field_unacknowledged;
 
+		// Show last values.
+		$field_show_latest_values = (new CWidgetFieldCheckBox('show_latest_values', _('Show latest values')))
+			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
+
+		if (array_key_exists('show_latest_values', $this->data)) {
+			$field_show_latest_values->setValue($this->data['show_latest_values']);
+		}
+
+		$this->fields[$field_show_latest_values->getName()] = $field_show_latest_values;
+
 		$sort_with_enabled_show_timeline = [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => true,
 			SCREEN_SORT_TRIGGERS_TIME_ASC => true

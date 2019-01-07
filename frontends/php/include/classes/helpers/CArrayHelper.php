@@ -75,6 +75,28 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Select sub-array of array items with keys in given numeric range.
+	 *
+	 * @static
+	 *
+	 * @param array $array    Array with numeric keys to test for given range.
+	 * @param int   $start    Range start value.
+	 * @param int   $end      Range end value.
+	 *
+	 * @return array
+	 */
+	public static function getByKeysRange(array $array, $start, $end) {
+		$result = [];
+		foreach ($array as $key => $val) {
+			if ($key >= $start && $key <= $end) {
+				$result[$key] = $val;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Renames array elements keys according to given map.
 	 *
 	 * @param array $array
@@ -240,5 +262,42 @@ class CArrayHelper {
 				$uniqueValues[$value] = $value;
 			}
 		}
+	}
+
+	/**
+	 * Sort an array of objects so that the objects whose $field value matches $pattern are at the top. Return the first
+	 * $limit objects.
+	 *
+	 * @param array  $array    Array of objects to sort.
+	 * @param string $field    Name of the field to search.
+	 * @param string $pattern  String to match the value against $field.
+	 * @param int    $limit    Number of objects to return.
+	 *
+	 * @return array
+	 */
+	public static function sortByPattern(array $array, $field, $pattern, $limit) {
+		$chunk_size = $limit;
+
+		$result = [];
+
+		foreach ($array as $key => $value) {
+			if (mb_strtolower($value[$field]) === mb_strtolower($pattern)) {
+				$result = [$key => $value] + $result;
+			}
+			elseif ($limit > 0) {
+				$result[$key] = $value;
+			}
+			else {
+				continue;
+			}
+			$limit--;
+		}
+
+		if ($result) {
+			$result = array_chunk($result, $chunk_size, true);
+			$result = $result[0];
+		}
+
+		return $result;
 	}
 }

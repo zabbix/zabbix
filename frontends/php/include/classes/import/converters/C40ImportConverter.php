@@ -47,6 +47,10 @@ class C40ImportConverter extends CConverter {
 	 */
 	protected function convertHosts(array $hosts) {
 		foreach ($hosts as &$host) {
+			if (array_key_exists('items', $host)) {
+				$host['items'] = $this->convertItems($host['items']);
+			}
+
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
@@ -54,6 +58,22 @@ class C40ImportConverter extends CConverter {
 		unset($host);
 
 		return $hosts;
+	}
+
+	/**
+	 * Convert item elements.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	protected function convertItems(array $items) {
+		foreach ($items as &$item) {
+			$item['preprocessing'] = $this->convertItemPreprocessingSteps($item['preprocessing']);
+		}
+		unset($item);
+
+		return $items;
 	}
 
 	/**
@@ -68,10 +88,32 @@ class C40ImportConverter extends CConverter {
 
 		foreach ($discovery_rules as &$discovery_rule) {
 			$discovery_rule += $default;
+			$discovery_rule['item_prototypes'] = $this->convertItems($discovery_rule['item_prototypes']);
 		}
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * Convert item preprocessing step elements.
+	 *
+	 * @param array $preprocessing_steps
+	 *
+	 * @return array
+	 */
+	protected function convertItemPreprocessingSteps(array $preprocessing_steps) {
+		$default = [
+			'error_handler' => DB::getDefault('item_preproc', 'error_handler'),
+			'error_handler_params' => DB::getDefault('item_preproc', 'error_handler_params')
+		];
+
+		foreach ($preprocessing_steps as $preprocessing_step) {
+			$preprocessing_step['step'] += $default;
+		}
+		unset($preprocessing_step);
+
+		return $preprocessing_steps;
 	}
 
 	/**

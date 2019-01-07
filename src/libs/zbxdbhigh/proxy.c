@@ -2413,6 +2413,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 
 				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 				log->value = zbx_strdup(NULL, value->value);
+				zbx_replace_invalid_utf8(log->value);
 
 				if (0 == value->timestamp)
 				{
@@ -2436,7 +2437,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 				SET_LOG_RESULT(&result, log);
 			}
 			else
-				SET_TEXT_RESULT(&result, zbx_strdup(NULL, value->value));
+				set_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
 		}
 
 		if (0 != value->meta)

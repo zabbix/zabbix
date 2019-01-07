@@ -51,24 +51,24 @@ static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tag
 	zbx_mock_error_t		mock_err;
 	zbx_mock_handle_t		htag;
 	zbx_dc_maintenance_tag_t	*tag;
-	const char			*key, *value, *operator;
+	const char			*key, *value, *op;
 
 	while (ZBX_MOCK_END_OF_VECTOR != (mock_err = (zbx_mock_vector_element(handle, &htag))))
 	{
 		key = zbx_mock_get_object_member_string(htag, "tag");
 		value = zbx_mock_get_object_member_string(htag, "value");
-		operator = zbx_mock_get_object_member_string(htag, "operator");
+		op = zbx_mock_get_object_member_string(htag, "operator");
 
 		tag = (zbx_dc_maintenance_tag_t *)zbx_malloc(NULL, sizeof(zbx_dc_maintenance_tag_t));
 		tag->tag = key;
 		tag->value = value;
 
-		if (0 == strcmp(operator, "like"))
-			tag->operator = ZBX_MAINTENANCE_TAG_OPERATOR_LIKE;
-		else if (0 == strcmp(operator, "equal"))
-			tag->operator = ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL;
+		if (0 == strcmp(op, "like"))
+			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_LIKE;
+		else if (0 == strcmp(op, "equal"))
+			tag->op = ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL;
 		else
-			fail_msg("unknown maintenance tag operator '%s'", operator);
+			fail_msg("unknown maintenance tag operator '%s'", op);
 
 		zbx_vector_ptr_append(tags, tag);
 	}

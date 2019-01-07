@@ -164,8 +164,8 @@ $tab_data_set = (new CFormList())
 $scripts[] = CWidgetHelper::getGraphDataSetJavascript();
 $jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name);
 
-// Create 'Display options' tab.
-$tab_display_opt = (new CFormList())
+// Create 'Displaying options' tab.
+$tab_displaying_opt = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['source']),
 		CWidgetHelper::getRadioButtonList($fields['source'], $form_name)
 	);
@@ -249,7 +249,7 @@ $jq_templates['overrides-row'] = CWidgetHelper::getGraphOverrideTemplate($fields
 // Create CTabView.
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), $tab_data_set)
-	->addTab('display_options',  _('Display options'), $tab_display_opt)
+	->addTab('displaying_options',  _('Displaying options'), $tab_displaying_opt)
 	->addTab('time_period',  _('Time period'), $tab_time_period)
 	->addTab('axes',  _('Axes'), $tab_axes)
 	->addTab('legendtab',  _('Legend'), $tab_legend)
