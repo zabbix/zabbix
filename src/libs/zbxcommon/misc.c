@@ -154,13 +154,13 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
-	static zbx_timespec_t	last_ts = {0, 0};
-	static int		corr = 0;
+	ZBX_THREAD_LOCAL static zbx_timespec_t	last_ts = {0, 0};
+	ZBX_THREAD_LOCAL static int		corr = 0;
 #ifdef _WINDOWS
-	LARGE_INTEGER		tick;
-	static LARGE_INTEGER	tickPerSecond = {0}, last_tick = {0};
-	BOOL			rc = FALSE;
-	struct _timeb		tb;
+	LARGE_INTEGER				tick;
+	ZBX_THREAD_LOCAL static LARGE_INTEGER	tickPerSecond = {0}, last_tick = {0};
+	BOOL					rc = FALSE;
+	struct _timeb				tb;
 #else
 	struct timeval	tv;
 	int		rc = -1;
