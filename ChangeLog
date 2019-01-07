@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
 A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
 ..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
 ..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
