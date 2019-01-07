@@ -241,7 +241,7 @@ if (getRequest('itemid', false)) {
 		'selectHosts' => ['status', 'flags'],
 		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'selectLLDMacroPaths' => ['lld_macro', 'path'],
-		'itemids' => getRequest('itemid', []),
+		'itemids' => getRequest('itemid'),
 		'editable' => true
 	]);
 	$item = reset($item);
