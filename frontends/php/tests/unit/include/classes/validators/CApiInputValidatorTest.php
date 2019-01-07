@@ -1853,6 +1853,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'@^[a-z$'
 			],
 			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX, 'length' => 8],
+				'/test/i',
+				'/1/expression',
+				'/test/i'
+			],
+			[
 				['type' => API_VARIABLE_NAME, 'length' => 6],
 				'{var1}',
 				'/1/variables',

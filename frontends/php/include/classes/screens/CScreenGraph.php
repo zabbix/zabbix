@@ -106,11 +106,11 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
-			foreach ($newGraphItems as $newGraphItem) {
+			foreach ($newGraphItems as $i => $newGraphItem) {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
 				foreach ($newGraphItem as $name => $value) {
-					$this->screenitem['url']->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
+					$this->screenitem['url']->setArgument('items['.$i.']['.$name.']', $value);
 				}
 			}
 

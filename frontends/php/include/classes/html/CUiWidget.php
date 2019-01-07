@@ -79,8 +79,9 @@ class CUiWidget extends CDiv {
 	/**
 	 * Set widget header.
 	 *
-	 * @param string	$caption
-	 * @param arrayi	$controls
+	 * @param string $caption
+	 * @param array  $controls
+	 * @param bool   $cursor_move
 	 */
 	public function setHeader($caption, array $controls = [], $cursor_move = false) {
 		$this->header = (new CDiv())

@@ -1105,7 +1105,7 @@ function calculateAvailability($triggerId, $startTime, $endTime) {
 		$clock = $row['clock'];
 		$value = $row['value'];
 
-		$diff = $clock - $time;
+		$diff = max($clock - $time, 0);
 		$time = $clock;
 
 		if ($state == 0) {

@@ -1068,6 +1068,14 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if (!$data['is_discovery_rule']) {
 		$data['preprocessing'] = getRequest('preprocessing', []);
+
+		foreach ($data['preprocessing'] as &$step) {
+			$step += [
+				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+				'error_handler_params' => ''
+			];
+		}
+		unset($step);
 	}
 
 	// types, http items only for internal processes
