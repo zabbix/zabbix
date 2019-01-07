@@ -396,7 +396,7 @@ class testPageOverview extends CLegacyWebTest {
 					],
 					'result_triggers' => [
 						'1_trigger_Average', '1_trigger_Disaster', '1_trigger_High', '1_trigger_Not_classified',
-						'1_trigger_Warning', '2_trigger_Information', '3_trigger_Average'
+						'1_trigger_Warning', '2_trigger_Information', '3_trigger_Average', '3_trigger_Disaster'
 					]
 				]
 			],

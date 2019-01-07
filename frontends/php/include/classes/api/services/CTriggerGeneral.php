@@ -1114,7 +1114,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if ($class === 'CTrigger' && $changed_priority_triggerids
-				&& $this->usedInItServices($changed_priority_triggerids)) {
+				&& CTriggerManager::usedInItServices($changed_priority_triggerids)) {
 			updateItServices();
 		}
 

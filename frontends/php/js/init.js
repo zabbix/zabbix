@@ -155,13 +155,15 @@ jQuery(function($) {
 			 * passed to add.popup should be appended at the and of existing value string. Duplicates are skipped.
 			 */
 			var values = $('[name="'+data.parentId+'"]').val();
+
 			data.values.forEach(function(val) {
 				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
 					if (values !== '') {
-						values = values + ', ';
+						values += ', ';
 					}
-					values = values + val[data.object];
+					values += val[data.object];
 				}
 			});
 

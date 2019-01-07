@@ -305,3 +305,11 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (96, 1, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (96, 96, 7);
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (97,96,18,0,'16','');
+
+-- testTaskCreate
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (120001,'Has two items','Has two items',0,'');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110001,7,120001,'Agent-active','','agent.ping[]',30,NULL,'','','','','','');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110002,0,120001,'Agent-passive','','agent.ping',30,NULL,'','','','','','');
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (120003,'Template with item and lld rule','Template with item',3,'');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110004,0,120003,'templated-item','','agent.ping[]',30,NULL,'','','','','','');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers,flags) VALUES (110005,0,120003,'templated-lld-rule','','agent.ping[-]',30,NULL,'','','','','','',1);

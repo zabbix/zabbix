@@ -596,7 +596,7 @@ class CHttpTest extends CApiService {
 		}
 
 		if ($del_itemids) {
-			API::Item()->delete($del_itemids, true);
+			CItemManager::delete($del_itemids);
 		}
 
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);

@@ -53,27 +53,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			],
 			[
 				[
-					'name' => 'Icon mapping create with slash',
-					'mappings' => [
-						['expression' => '/']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			[
-				[
 					'name' => 'Icon mapping create with backslash',
 					'mappings' => [
 						['expression' => '\\']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			[
-				[
-					'name' => 'Icon mapping create with double slash',
-					'mappings' => [
-						['expression' => '//']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -170,7 +152,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				[
 					'name' => 'Icon mapping testForm create default inventory and icons',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123abc']
+						['expression' => '/!@#$%^&*()123abc']
 					],
 					'check_db' => true,
 					'check_form' => true
@@ -371,29 +353,11 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'error' => 'Icon map "Icon mapping one" already exists.'
 				]
 			],
-			// Expression with slash
-			[
-				[
-					'mappings' => [
-						['expression' => '/', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
 			// Expression with backslash
 			[
 				[
 					'mappings' => [
 						['expression' => '\\', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			// Expression with double slash
-			[
-				[
-					'mappings' => [
-						['expression' => '//', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -483,7 +447,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				[
 					'old_name' => 'Icon mapping testForm update expression',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123updated', 'action' => 'update']
+						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
 					'check_db' => true,
 				]
@@ -648,31 +612,12 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'error' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
-			[
-				[
-					'new_name' => 'CLONE: Icon mapping update expression with slash',
-					'mappings' => [
-						['expression' => '/', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
 			// Icon mapping clone with backslash.
 			[
 				[
 					'new_name' => 'CLONE: Icon mapping update expression with two backslash',
 					'mappings' => [
 						['expression' => '\\', 'action' => 'update']
-					],
-					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
-				]
-			],
-			// Icon mapping clone with double slash.
-			[
-				[
-					'new_name' => 'CLONE: Icon mapping update expression with two slash',
-					'mappings' => [
-						['expression' => '//', 'action' => 'update']
 					],
 					'error' => 'Invalid parameter "/1/mappings/1/expression": invalid regular expression.'
 				]
@@ -758,7 +703,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 					'old_name' => 'Icon mapping to check clone functionality',
 					'name' => 'Clone Icon mapping with expression update',
 					'mappings' => [
-						['expression' => '!@#$%^&*()123updated', 'action' => 'update']
+						['expression' => '/!@#$%^&*()123updated', 'action' => 'update']
 					],
 					'check_db' => '4'
 				]

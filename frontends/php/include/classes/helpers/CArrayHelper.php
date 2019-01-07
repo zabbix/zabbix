@@ -75,6 +75,28 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Select sub-array of array items with keys in given numeric range.
+	 *
+	 * @static
+	 *
+	 * @param array $array    Array with numeric keys to test for given range.
+	 * @param int   $start    Range start value.
+	 * @param int   $end      Range end value.
+	 *
+	 * @return array
+	 */
+	public static function getByKeysRange(array $array, $start, $end) {
+		$result = [];
+		foreach ($array as $key => $val) {
+			if ($key >= $start && $key <= $end) {
+				$result[$key] = $val;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Renames array elements keys according to given map.
 	 *
 	 * @param array $array

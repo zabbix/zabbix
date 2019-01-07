@@ -231,7 +231,7 @@ class CHttpTestManager {
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
 		if ($deleteStepItemIds) {
-			API::Item()->delete($deleteStepItemIds, true);
+			CItemManager::delete($deleteStepItemIds);
 		}
 
 		foreach ($httptests as $key => $httptest) {

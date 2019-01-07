@@ -143,6 +143,8 @@ typedef struct
 	char			*id;
 	char			*clusterid;
 	char			*datacenter_name;
+	char			*parent_name;
+	char			*parent_type;
 	char			**props;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
@@ -310,6 +312,11 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_TYPE_UNKNOWN	0
 #define ZBX_VMWARE_TYPE_VSPHERE	1
 #define ZBX_VMWARE_TYPE_VCENTER	2
+
+#define ZBX_VMWARE_SOAP_DATACENTER	"Datacenter"
+#define ZBX_VMWARE_SOAP_FOLDER		"Folder"
+#define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
+#define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

@@ -117,7 +117,6 @@ class CTask extends CApiService {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'type', 'hostid', 'status'],
 			'itemids' => $task['itemids'],
-			'templated' => false,
 			'editable' => true
 		]);
 
@@ -129,7 +128,6 @@ class CTask extends CApiService {
 			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => ['itemid', 'type', 'hostid', 'status'],
 				'itemids' => $task['itemids'],
-				'templated' => false,
 				'editable' => true
 			]);
 
@@ -176,6 +174,7 @@ class CTask extends CApiService {
 		$hosts = API::Host()->get([
 			'output' => ['status'],
 			'hostids' => array_keys($hostids),
+			'templated_hosts' => true,
 			'nopermissions' => true
 		]);
 

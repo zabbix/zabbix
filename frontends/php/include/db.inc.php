@@ -962,20 +962,14 @@ function DBfetchArrayAssoc($cursor, $field) {
  *
  * @param resource $cursor
  * @param string   $column
- * @param bool     $asHash
  *
  * @return array
  */
-function DBfetchColumn($cursor, $column, $asHash = false) {
+function DBfetchColumn($cursor, $column) {
 	$result = [];
 
 	while ($dbResult = DBfetch($cursor)) {
-		if ($asHash) {
-			$result[$dbResult[$column]] = $dbResult[$column];
-		}
-		else {
-			$result[] = $dbResult[$column];
-		}
+		$result[] = $dbResult[$column];
 	}
 
 	return $result;

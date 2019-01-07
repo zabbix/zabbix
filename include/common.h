@@ -1100,6 +1100,8 @@ void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char 
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 
+void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
+
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
@@ -1348,11 +1350,12 @@ int	zbx_strcmp_natural(const char *s1, const char *s2);
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 
 /* additional token flags */
-#define ZBX_TOKEN_NUMERIC	0x08000
-#define ZBX_TOKEN_JSON		0x10000
-#define ZBX_TOKEN_XML		0x20000
-#define ZBX_TOKEN_REGEXP	0x40000
-#define ZBX_TOKEN_XPATH		0x80000
+#define ZBX_TOKEN_NUMERIC	0x008000
+#define ZBX_TOKEN_JSON		0x010000
+#define ZBX_TOKEN_XML		0x020000
+#define ZBX_TOKEN_REGEXP	0x040000
+#define ZBX_TOKEN_XPATH		0x080000
+#define ZBX_TOKEN_REGEXP_OUTPUT	0x100000
 
 /* location of a substring */
 typedef struct

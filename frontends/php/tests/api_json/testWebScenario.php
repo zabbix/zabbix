@@ -651,7 +651,9 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong headers',
-					'headers' => '☺'
+					'headers' => [
+						['name' => '☺', 'value' => '']
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
 			],
@@ -1015,7 +1017,9 @@ class testWebScenario extends CAPITest {
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong variable',
-					'variables' => '☺'
+					'variables' => [
+						['name' => '☺']
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 			],
