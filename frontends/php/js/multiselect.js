@@ -897,9 +897,9 @@ jQuery(function($) {
 		// highlight matched
 		var text = item.name.toLowerCase(),
 			search = values.search.toLowerCase(),
+			is_new = item.isNew || false,
 			start = 0,
-			end = 0,
-			searchLength = search.length;
+			end = 0;
 
 		while (text.indexOf(search, end) > -1) {
 			end = text.indexOf(search, end);
@@ -911,11 +911,11 @@ jQuery(function($) {
 			}
 
 			li.append($('<span>', {
-				'class': 'suggest-found',
-				text: item.name.substring(end, end + searchLength)
-			}));
+				'class': !is_new ? 'suggest-found' : null,
+				text: item.name.substring(end, end + search.length)
+			})).toggleClass('suggest-new', is_new);
 
-			end += searchLength;
+			end += search.length;
 			start = end;
 		}
 

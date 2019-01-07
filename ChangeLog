@@ -1,10 +1,43 @@
+Changes for 4.2.0alpha3
+
+New features:
+
+Bug fixes:
+A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
+..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+........S. [ZBX-15400] fixed possible crash in preprocessing manager when items with change/throttle preprocessing steps were not being monitored anymore (wiper)
+..F....... [ZBX-13804] fixed generic popup form submission (miks)
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.0alpha2
 
 New features:
+A.F.....S. [ZBXNEXT-4724] added validation and throttling preprocessing rules, ability to discard values and set errors (agriscenko, wiper)
+..F....... [ZBXNEXT-4876] moved global search page to MVC framework (talbergs)
+...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
 ..F....... [ZBX-15202] implemented widget pausing methods in dashboard; made graph widget paused when using selection box or opening a tooltip (miks)
 ..F....PS. [ZBXNEXT-2315] implemented content matching in web monitoring headers (talbergs, vso)
 
 Bug fixes:
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
+........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
+..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
+..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
+...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
+..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
+...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
+.........T [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
+...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15067] fixed configuration sync of interfaces without hosts (kalimulin)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
@@ -37,6 +70,52 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.4rc1
+
+New features:
+...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
+
+Bug fixes:
+A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
+..F....... [ZBX-15254] fixed incorrect matching string highlight in multiselect autocomplete box (ashubin, vasilijs)
+..F....... [ZBX-15136] fixed displaying 'Plain text' on the dashboard as html (vasilijs)
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+.......PS. [ZBX-15224] fixed failed query errors when receiving non UTF-8 history values (vso)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+..F....... [ZBX-13804] fixed generic popup form submission (miks)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+A......... [ZBX-14980] fixed problem with filter by itemids and hostids in history.get (vasilijs, vmurzins)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
+........S. [ZBX-15279] fixed handling of LLD processing errors that should have resulted in not supported LLD rule state (wiper)
+........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBXNEXT-4588] renamed 'display options' tab to 'displaying options'; fixed multiple layout issues, footnote in hint-box, field value handling, calculation of mouse position, multiple issues related with Y axis and problem styling (miks)
+..F....... [ZBX-15159] fixed existing context menu closing when new one is opened (miks)
+..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
+...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
+..F....... [ZBXNEXT-4883] fixed when trigger in problem state hides all dependent triggers in history view (vasilijs)
+...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
+.........T [ZBX-15258] fixed update interval of "Zabbix queue" item in server's template to be consistent with proxy template, added missing units in proxy template (asitals)
+...G...... [ZBX-15225] improved handling of timeouts in "vfs.dir.size" and "vfs.dir.count" items on Windows agent (asitals)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3
+
+4.0.3rc3 was released as 4.0.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc3
+
+New features:
+..F....... [ZBXNEXT-4792] added column "Latest values" in Monitoring->Problems and Dashboard (ashubin, gcalenko, vasilijs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.3rc2
+
+Bug fixes:
+..F....... [ZBX-15333] fixed zoomout on doubleclick in graph widget (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.3rc1
@@ -2148,6 +2227,15 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
+........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
+A.F....... [ZBX-14592] fixed calculation of SLA and availability report when problem has negative duration (miks)
+A......... [ZBX-15156] fixed undefined offset error in host screen with web item (talbergs)
+...G...... [ZBX-14624] fixed agent collector not releasing connection to missing/removed disk devices (Andris, yurii)
+..F....... [ZBX-14604] fixed displayng of the graph name on screens (miks)
+..F....... [ZBX-15233] renamed fuzzytime() function description in dropdown list (Ivo)
+...G...... [ZBX-12801] excluded zabbix_sender.dll from MS Windows builds with TLS (viktors)
+...G...... [ZBX-15260] improved misleading warning message when agent fails to find log file during processing logrt[] item (asitals)
 .......PS. [ZBX-15206] fixed deprecated net-snmp attribute (MVekslers)
 .......PS. [ZBX-15238] fixed updating nextcheck time in discovery rules to avoid overlaps between discovery executions (asitals)
 ....I....T [ZBX-8383] updated Tomcat template for compatibility with recent Tomcat versions, fixed constraint error when importing new data.tmpl (kalimulin)

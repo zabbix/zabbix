@@ -697,7 +697,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// Misc
 			[[
-				'url' => 'search.php?search=server',
+				'url' => 'zabbix.php?action=search&search=server',
 				'title' =>	'Search',
 				'header' => 'Search: server',
 				'users' => [

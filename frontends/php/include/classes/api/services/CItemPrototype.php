@@ -893,7 +893,7 @@ class CItemPrototype extends CItemGeneral {
 			'output' => $output,
 			'selectApplications' => ['applicationid'],
 			'selectApplicationPrototypes' => ['name'],
-			'selectPreprocessing' => ['type', 'params'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);

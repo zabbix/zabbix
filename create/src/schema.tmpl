@@ -1508,6 +1508,8 @@ FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|params		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|0
 INDEX		|1		|itemid,step
 
 TABLE|task_remote_command|taskid|0
@@ -1659,4 +1661,4 @@ INDEX|1|hostid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4010002	|4010002
+ROW		|4010007	|4010007

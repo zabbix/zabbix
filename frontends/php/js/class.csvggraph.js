@@ -582,6 +582,7 @@ jQuery(function ($) {
 
 					graph
 						.on('dblclick', function() {
+							hintBox.hideHint(graph, true);
 							$.publish('timeselector.zoomout');
 							return false;
 						})

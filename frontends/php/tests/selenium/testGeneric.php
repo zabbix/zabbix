@@ -114,7 +114,7 @@ class testGeneric extends CLegacyWebTest {
 			['report4.php?period=yearly',		'Notification report'],
 
 			// Misc
-			['search.php?search=server',		'Search'],
+			['zabbix.php?action=search&search=server',		'Search'],
 			['profile.php',					'User profile']
 		];
 	}

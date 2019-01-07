@@ -103,6 +103,11 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
 	CWidgetHelper::getCheckBox($fields['unacknowledged'])
 );
 
+// Show latest values.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
+	CWidgetHelper::getCheckBox($fields['show_latest_values'])
+);
+
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
 	CWidgetHelper::getComboBox($fields['sort_triggers'])
