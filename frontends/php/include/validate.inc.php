@@ -351,8 +351,11 @@ function check_field(&$fields, &$field, $checks) {
 			info(_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
 				$_REQUEST[$field], $caption, $result[1], $result[2]));
 		}
-		else {
+		elseif (is_scalar($_REQUEST[$field])) {
 			info(_s('Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+		}
+		else {
+			info(_s('Incorrect value for "%1$s" field.', $caption));
 		}
 
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
