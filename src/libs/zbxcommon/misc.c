@@ -189,7 +189,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				LARGE_INTEGER	qpc_tick = {0}, ntp_tick = {0};
 
 				/* _ftime () returns precision in milliseconds, but 'ns' could be increased up to 1ms*/
-				if (ts->sec == last_ts.sec && ts->ns < last_ts.ns && 1000000 > (last_ts.ns - ts->ns))
+				if (last_ts.sec == ts->sec && last_ts.ns > ts->ns && 1000000 > (last_ts.ns - ts->ns))
 				{
 					ts->ns = last_ts.ns;
 				}
