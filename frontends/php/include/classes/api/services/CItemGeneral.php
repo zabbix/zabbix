@@ -750,17 +750,12 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		if ($this instanceof CItem) {
-			if ($ins_items) {
-				static::validateInventoryLinks($ins_items, false); // false means 'create'
-			}
-			if ($upd_items) {
-				static::validateInventoryLinks($upd_items, true); // true means 'update'
-			}
-		}
-
 		// Save the new items.
 		if ($ins_items) {
+			if ($this instanceof CItem) {
+				static::validateInventoryLinks($ins_items, false); // false means 'create'
+			}
+
 			$this->createReal($ins_items);
 
 			if ($this instanceof CItem || $this instanceof CItemPrototype) {
@@ -770,6 +765,10 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($upd_items) {
+			if ($this instanceof CItem) {
+				static::validateInventoryLinks($upd_items, true); // true means 'update'
+			}
+
 			$this->updateReal($upd_items);
 
 			if ($this instanceof CItem || $this instanceof CItemPrototype) {
@@ -800,7 +799,6 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 
-		// Inheriting items from the templates.
 		$this->inherit($new_items);
 	}
 
