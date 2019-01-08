@@ -706,22 +706,14 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error)
 {
 	const char			*__function_name = "zbx_preprocess_item_value";
-	zbx_preproc_item_value_t	value;
+	zbx_preproc_item_value_t	value = {.itemid = itemid, .item_value_type = item_value_type, .result = result,
+					.error = error, .item_flags = item_flags, .state = state, .ts = ts};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	value.itemid = itemid;
-	value.item_value_type = item_value_type;
-	value.result = result;
-	value.error = error;
-	value.item_flags = item_flags;
-	value.state = state;
-	value.ts = ts;
-
 	preprocessor_pack_value(&cached_message, &value);
-	cached_values++;
 
-	if (MAX_VALUES_LOCAL < cached_values)
+	if (MAX_VALUES_LOCAL < ++cached_values)
 		zbx_preprocessor_flush();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
