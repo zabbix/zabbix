@@ -264,6 +264,7 @@ class CSvgGraphXAxis extends CSvgTag {
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_SUB => [
 				'text-anchor' => 'end',
+				'fill' => $this->text_color,
 				'font-size' => '10px'
 			]
 		];
