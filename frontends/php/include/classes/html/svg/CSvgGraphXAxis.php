@@ -257,15 +257,21 @@ class CSvgGraphXAxis extends CSvgTag {
 	 */
 	public function makeStyles() {
 		$styles = [
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' path' => [
+				'stroke' => $this->line_color,
+				'fill' => 'transparent'
+			],
+			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' text' => [
+				'dominant-baseline' => 'middle',
+				'font-size' => '11px'
+			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN => [
 				'text-anchor' => 'end',
-				'fill' => $this->highlight_color,
-				'font-size' => '11px'
+				'fill' => $this->highlight_color
 			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AXIS.' .'.CSvgTag::ZBX_STYLE_GRAPH_LABEL_SUB => [
 				'text-anchor' => 'end',
-				'fill' => $this->text_color,
-				'font-size' => '10px'
+				'fill' => $this->text_color
 			]
 		];
 
