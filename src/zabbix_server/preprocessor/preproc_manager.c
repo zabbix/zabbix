@@ -414,12 +414,12 @@ static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
  *                                                                            *
  * Function: preprocessor_flush_value                                         *
  *                                                                            *
- * Purpose: add new value to the local history cache                          *
+ * Purpose: add new value to the local history cache or send to LLD manager   *
  *                                                                            *
- * Parameters: value - [IN] value to be added                                 *
+ * Parameters: value - [IN] value to be added or sent                         *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
+static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 {
 	if (0 == (value->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
