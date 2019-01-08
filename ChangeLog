@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
 A......... [ZBX-14331] fixed error allowed to change interface type  which is already used by items (gcalenko)
 ........S. [ZBX-15241] fixed escaping regexp symbols in preprocessing output parameter when creating item by LLD (asitals)
