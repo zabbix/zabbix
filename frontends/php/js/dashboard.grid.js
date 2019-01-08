@@ -335,6 +335,12 @@
 		// Get array containing only widgets affected by resize operation.
 		affected = getAffectedTreeAsArray(axis.boundary);
 
+		if (axis_key == 'x') {
+			widgets.each(function(b) {b.div.css('background-color', '')});
+		}
+		//widgets.each(function(b) { (b.header == 'F1') && (b.div.css('background-color', 'rgba(255, 0, 0, 0.5)'))});
+		affected.each(function(b) {b.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)')});
+
 		var margins = {},
 			overlap = 0,
 			axis_pos = $.extend({}, widget.current_pos);
@@ -352,28 +358,33 @@
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 		});
 
-		// Compact widget and it affected siblings by removing empty columns.
 		affected.each(function(box) {
 			var new_pos = axis_pos[axis_key] + axis_pos[size_key],
-				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
+				last = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key],
+				i;
 
-			for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
+			for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
 				if (i in margins) {
 					new_pos = Math.max(new_pos, margins[i]);
 				}
 			}
 
-			for (var i = box.current_pos[opposite_axis_key]; i < last; i++) {
+			if (box.current_pos[axis_key] > new_pos) {
+				// Should keep widget original position if compacted value is less than original.
+				return;
+			}
+
+			for (i = box.current_pos[opposite_axis_key]; i < last; i++) {
 				margins[i] = new_pos + box.current_pos[size_key];
 			}
 
-			if (box.current_pos[axis_key] <= new_pos) {
-				box.current_pos[axis_key] = new_pos;
-				new_max = Math.max(new_max, new_pos + box.current_pos[size_key]);
-			}
+			box.current_pos[axis_key] = new_pos;
+			new_max = Math.max(new_max, new_pos + box.current_pos[size_key]);
 		});
 
 		overlap = new_max - size_max;
+		console
+			.log(`\t\t `);
 
 		// Compact widget by resizing.
 		if (overlap > 0) {
@@ -385,22 +396,35 @@
 				slot = axis_pos[axis_key] + axis_pos[size_key],
 				next_col,
 				col,
-				collapsed;
+				collapsed,
+				collapsed_pos,
+				margins_backup;
 			scanline[size_key] = 1;
 
 			while (slot < new_max && overlap > 0) {
+				margins_backup = $.extend({}, margins);
+				collapsed_pos = {};
 				scanline[axis_key] = slot;
 				col = getAffectedInBounds(scanline);
 				scanline[axis_key] += scanline[size_key];
 
 				if (scanline[axis_key] == new_max) {
-					next_col = [{current_pos: scanline}];
+					next_col = [{current_pos: $.extend({}, scanline), header: 'LAST'}];
 					collapsed = false;
 				}
 				else {
 					next_col = getAffectedInBounds(scanline);
 					collapsed = next_col.length > 0;
 				}
+
+				console
+					.log(`slot=${slot}, overlap=${overlap}`);
+				console
+					.log('current pos:'+(function(d){ return $.map(d, function(b){return `${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}`}).join(', ')})(col));
+				console
+					.log('next    pos:'+(function(d){ return $.map(d, function(b){return `${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}`}).join(', ')})(next_col));
+				console
+					.log(`\tmargins    :`,JSON.stringify(margins));
 
 				$.each(next_col, function(_, box) {
 					box.new_pos = $.extend({}, box.current_pos);
@@ -409,8 +433,39 @@
 					$.each(col, function(_, col_box) {
 						if (col_box.uniqueid == box.uniqueid || rectOverlap(col_box.current_pos, box.new_pos)) {
 							if (col_box.current_pos[size_key] > size_min) {
+								var start_pos = col_box.current_pos[opposite_axis_key],
+									stop_pos = start_pos + col_box.current_pos[opposite_size_key],
+									margin = col_box.current_pos[axis_key] + col_box.current_pos[size_key],
+									i;
+
+								// Find max overlap position value for checked widget.
+								for (i = start_pos; i < stop_pos; i++) {
+									if (i in margins) {
+										margin = Math.max(margin, margins[i]);
+									}
+								}
+
+								if (margin && margin <= size_max) {
+									console
+										.log(`${box.header} check on ${col_box.header} ignore collapse resize step, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
+									box.new_pos[axis_key] = box.current_pos[axis_key];
+									return true;
+								}
+								else {
+									for (i = start_pos; i < stop_pos; i++) {
+										margins[i] = margins_backup[i] - scanline[size_key];
+									}
+									console
+										.log(`${box.header} check on ${col_box.header} will be collapsed, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
+								}
+
 								col_box.new_pos = $.extend({}, col_box.current_pos);
 								col_box.new_pos[size_key] -= scanline[size_key];
+
+								// Mark opposite axis widget coordinates as moveable.
+								for (i = start_pos; i < stop_pos; i++) {
+									collapsed_pos[i] = 1;
+								}
 							}
 							else {
 								collapsed = false;
@@ -423,29 +478,36 @@
 					return collapsed;
 				});
 
-				next_col.concat(col).each(function(box) {
-					if (collapsed && 'new_pos' in box) {
-						box.current_pos = box.new_pos;
-						box.current_pos[axis_key] = Math.max(box.pos[axis_key], box.current_pos[axis_key]);
-					}
-
-					delete box.new_pos;
-				});
-
 				if (collapsed) {
+					console
+						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > scanline[axis_key]) {
+						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
+							console
+								.log(`${box.header} moved to ${box.current_pos[axis_key]}`);
 						}
 					});
 
 					overlap -= 1;
 				}
 				else {
+					margins = margins_backup;
 					slot += scanline[size_key];
 				}
+
+				next_col.concat(col).each(function(box) {
+					if (collapsed && 'new_pos' in box) {
+						box.current_pos = box.new_pos;
+						console
+							.log(`${box.header} was moved or resized`);
+						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 255, 0, 1)');
+					}
+
+					delete box.new_pos;
+				});
 			}
 		}
 
