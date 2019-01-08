@@ -385,6 +385,9 @@
 		overlap = new_max - size_max;
 		console
 			.log(`\t\t `);
+		console
+			.log(`affected widgets after compact step (${axis_key}, ${opposite_axis_key}, ${size_key}):`,
+				JSON.parse(JSON.stringify((function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected))))
 
 		// Compact widget by resizing.
 		if (overlap > 0) {
@@ -435,12 +438,13 @@
 							if (col_box.current_pos[size_key] > size_min) {
 								var start_pos = box.current_pos[opposite_axis_key],
 									stop_pos = start_pos + box.current_pos[opposite_size_key],
-									margin = new_max,
+									margin = 0,
 									i;
 
 								// Find max overlap position value for checked widget.
 								for (i = start_pos; i < stop_pos; i++) {
-									margin = Math.min(margin, margins[i]);
+									//margin = Math.min(margin, margins[i]);
+									margin = Math.max(margin, margins[i]);
 								}
 
 								if (margin && margin <= size_max) {
@@ -502,6 +506,30 @@
 						console
 							.log(`${box.header} was moved or resized`);
 						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 255, 0, 1)');
+
+						// Find widgets affected by current and update margin.
+						var affect_box = $.extend({}, box.current_pos),
+							margin = margins[box.current_pos[opposite_axis_key]],
+							top = affect_box[opposite_axis_key],
+							bottom = top + affect_box[opposite_size_key];
+						affect_box[size_key] = new_max - affect_box[axis_key];
+						var fix_margin = getAffectedInBounds(affect_box);
+						console
+							.log(`${box.header} fixing margin of affected by collapse: top=${top}, bottom=${bottom}, margin=${margin}`);
+						console
+							.log(`\tfixing widgets:`, fix_margin);
+
+						fix_margin.each(function(box1) {
+							top = Math.min(top, box1.current_pos[opposite_axis_key]);
+							bottom = Math.max(bottom, box1.current_pos[opposite_axis_key] + box1.current_pos[opposite_size_key]);
+						});
+
+						console
+							.log(`\tnew values: top=${top}, bottom=${bottom}`);
+						while(top < bottom) {
+							margins[top] = margin;
+							++top;
+						}
 					}
 
 					delete box.new_pos;
