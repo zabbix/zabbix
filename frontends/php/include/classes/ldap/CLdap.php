@@ -163,7 +163,7 @@ class CLdap {
 		if ($dn) {
 			// user/password bind
 			if (!@ldap_bind($this->ds, $dn, $pass)) {
-				$this->error = static::ERR_BIND_FAILED;
+				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
@@ -185,7 +185,7 @@ class CLdap {
 
 			// try to bind with the dn provided
 			if (!@ldap_bind($this->ds, $dn, $pass)) {
-				$this->error = static::ERR_BIND_FAILED;
+				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
