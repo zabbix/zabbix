@@ -186,7 +186,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 			if (0 < last_tick.QuadPart)
 			{
-				LARGE_INTEGER	qpc_tick, ntp_tick = {0};
+				LARGE_INTEGER	qpc_tick = {0}, ntp_tick = {0};
 
 				/* _ftime () returns precision in milliseconds, but 'ns' could be increased */
 				if (ts->sec == last_ts.sec && ts->ns < last_ts.ns)
@@ -199,7 +199,9 @@ void	zbx_timespec(zbx_timespec_t *ts)
 						+ tickPerSecond.QuadPart * (ts->ns - last_ts.ns) / 1000000000;
 				}
 
-				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
+				/* host system time can shift backwards, then correction is not reasonable */
+				if (0 <= ntp_tick.QuadPart)
+					qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
 				if (0 < qpc_tick.QuadPart && qpc_tick.QuadPart < tickPerSecond.QuadPart)
 				{
