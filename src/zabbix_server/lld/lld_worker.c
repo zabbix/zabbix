@@ -64,17 +64,17 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 {
 	const char		*__function_name = "lld_process_task";
 
-	zbx_uint64_t		itemid;
+	zbx_uint64_t		itemid, lastlogsize;
 	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
 	DC_ITEM			item;
-	int			errcode;
-	unsigned char		state;
+	int			errcode, mtime;
+	unsigned char		state, meta;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_lld_deserialize_item_value(message->data, &itemid, &value, &ts, &error);
+	zbx_lld_deserialize_item_value(message->data, &itemid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 	if (SUCCEED != errcode)
@@ -82,7 +82,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "processing discovery rule:" ZBX_FS_UI64, itemid);
 
-	if (NULL == error && SUCCEED == lld_process_discovery_rule(itemid, value, &error))
+	if (NULL == error && (NULL == value || SUCCEED == lld_process_discovery_rule(itemid, value, &error)))
 		state = ITEM_STATE_NORMAL;
 	else
 		state = ITEM_STATE_NOTSUPPORTED;
@@ -122,34 +122,38 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 	}
 
+	if (0 != meta)
+	{
+		if (item.lastlogsize != lastlogsize)
+		{
+			diff.lastlogsize = lastlogsize;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE;
+		}
+		if (item.mtime != mtime)
+		{
+			diff.mtime = mtime;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
+		}
+	}
+
 	if (ZBX_FLAGS_ITEM_DIFF_UNSET != diff.flags)
 	{
 		zbx_vector_ptr_t	diffs;
-		char			*sql = NULL, delim = ' ';
+		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 
 		zbx_vector_ptr_create(&diffs);
 		diff.itemid = itemid;
 		zbx_vector_ptr_append(&diffs, &diff);
-		DCconfig_items_apply_changes(&diffs);
-		zbx_vector_ptr_destroy(&diffs);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set");
-		if (0 != (diff.flags & ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstate=%d", delim, (int)diff.state);
-			delim = ',';
-		}
-		if (0 != (diff.flags & ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR))
-		{
-			char	*error_esc;
-
-			error_esc = DBdyn_escape_field("items", "error", diff.error);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cerror='%s'", delim, error_esc);
-			zbx_free(error_esc);
-		}
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, itemid);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs);
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
+
+		DCconfig_items_apply_changes(&diffs);
+
+		zbx_vector_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 

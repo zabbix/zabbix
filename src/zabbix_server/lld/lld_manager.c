@@ -51,6 +51,10 @@ typedef struct zbx_lld_value
 	char			*error;
 	zbx_timespec_t		ts;
 
+	zbx_uint64_t		lastlogsize;
+	int			mtime;
+	unsigned char		meta;
+
 	struct	zbx_lld_value	*next;
 }
 zbx_lld_data_t;
@@ -353,7 +357,8 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 
 	data = (zbx_lld_data_t *)zbx_malloc(NULL, sizeof(zbx_lld_data_t));
 	data->next = NULL;
-	zbx_lld_deserialize_item_value(message->data, &itemid, &data->value, &data->ts, &data->error);
+	zbx_lld_deserialize_item_value(message->data, &itemid, &data->value, &data->ts, &data->meta, &data->lastlogsize,
+			&data->mtime, &data->error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "queuing discovery rule:" ZBX_FS_UI64, itemid);
 
@@ -397,7 +402,8 @@ static void	lld_process_next_request(zbx_lld_manager_t *manager, zbx_lld_worker_
 	zbx_binary_heap_remove_min(&manager->rule_queue);
 
 	data = worker->rule->head;
-	buf_len = zbx_lld_serialize_item_value(&buf, worker->rule->itemid, data->value, &data->ts, data->error);
+	buf_len = zbx_lld_serialize_item_value(&buf, worker->rule->itemid, data->value, &data->ts, data->meta,
+			data->lastlogsize, data->mtime, data->error);
 	zbx_ipc_client_send(worker->client, ZBX_IPC_LLD_TASK, buf, buf_len);
 	zbx_free(buf);
 }

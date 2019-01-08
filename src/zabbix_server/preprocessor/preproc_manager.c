@@ -428,10 +428,25 @@ static void	preprocessor_flush_value(zbx_preproc_item_value_t *value)
 	}
 	else
 	{
-		const char	*value_text;
+		const char	*value_text = NULL;
+		unsigned char	meta = 0;
+		zbx_uint64_t	lastlogsize = 0;
+		int		mtime = 0;
 
-		value_text = (NULL != value->result ? *GET_TEXT_RESULT(value->result) : NULL);
-		zbx_lld_process_value(value->itemid, value_text, value->ts, value->error);
+		if (NULL != value->result)
+		{
+			if (NULL != GET_TEXT_RESULT(value->result))
+				value_text = *(GET_TEXT_RESULT(value->result));
+
+			if (0 != ISSET_META(value->result))
+			{
+				meta = 1;
+				lastlogsize = value->result->lastlogsize;
+				mtime = value->result->mtime;
+			}
+		}
+
+		zbx_lld_process_value(value->itemid, value_text, value->ts, meta, lastlogsize, mtime, value->error);
 	}
 }
 

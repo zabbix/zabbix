@@ -768,4 +768,6 @@ zbx_proxy_diff_t;
 
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff);
+
 #endif

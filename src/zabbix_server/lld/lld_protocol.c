@@ -29,15 +29,22 @@
  *                                                            goto cleanup;                *
  ******************************************************************************/
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
-		const zbx_timespec_t *ts, const char *error)
+		const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, value_len, error_len;
 
 	zbx_serialize_prepare_value(data_len, itemid);
 	zbx_serialize_prepare_str(data_len, value);
-	zbx_serialize_prepare_value(data_len, zbx_timespec_t);
+	zbx_serialize_prepare_value(data_len, *ts);
 	zbx_serialize_prepare_str(data_len, error);
+
+	zbx_serialize_prepare_value(data_len, meta);
+	if (0 != meta)
+	{
+		zbx_serialize_prepare_value(data_len, lastlogsize);
+		zbx_serialize_prepare_value(data_len, mtime);
+	}
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -45,7 +52,13 @@ zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t ite
 	ptr += zbx_serialize_value(ptr, itemid);
 	ptr += zbx_serialize_str(ptr, value, value_len);
 	ptr += zbx_serialize_value(ptr, *ts);
-	(void)zbx_serialize_str(ptr, error, error_len);
+	ptr += zbx_serialize_str(ptr, error, error_len);
+	ptr += zbx_serialize_value(ptr, meta);
+	if (0 != meta)
+	{
+		ptr += zbx_serialize_value(ptr, lastlogsize);
+		(void)zbx_serialize_value(ptr, mtime);
+	}
 
 	return data_len;
 }
@@ -56,14 +69,20 @@ zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t ite
  *                                                                            *
  ******************************************************************************/
 void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, char **value,
-		zbx_timespec_t *ts, char **error)
+		zbx_timespec_t *ts, unsigned char *meta, zbx_uint64_t *lastlogsize, int *mtime, char **error)
 {
 	zbx_uint32_t	value_len, error_len;
 
 	data += zbx_deserialize_value(data, itemid);
 	data += zbx_deserialize_str(data, value, value_len);
 	data += zbx_deserialize_value(data, ts);
-	(void)zbx_deserialize_str(data, error, error_len);
+	data += zbx_deserialize_str(data, error, error_len);
+	data += zbx_deserialize_value(data, meta);
+	if (0 != *meta)
+	{
+		data += zbx_deserialize_value(data, lastlogsize);
+		(void)zbx_deserialize_value(data, mtime);
+	}
 }
 
 /******************************************************************************
@@ -78,7 +97,8 @@ void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *ite
  *             error  - [IN] the error message (can be NULL)                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_timespec_t *ts, const char *error)
+void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_timespec_t *ts, unsigned char meta,
+		zbx_uint64_t lastlogsize, int mtime, const char *error)
 {
 	static zbx_ipc_socket_t	socket = {0};
 	char			*errmsg = NULL;
@@ -92,7 +112,7 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
 		exit(EXIT_FAILURE);
 	}
 
-	data_len = zbx_lld_serialize_item_value(&data, itemid, value, ts, error);
+	data_len = zbx_lld_serialize_item_value(&data, itemid, value, ts, meta, lastlogsize, mtime, error);
 
 	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_LLD_REQUEST, data, data_len))
 	{

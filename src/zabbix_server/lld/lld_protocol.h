@@ -38,9 +38,9 @@
 #define ZBX_IPC_LLD_QUEUE		1300
 
 zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t itemid, const char *value,
-		const zbx_timespec_t *ts, const char *error);
+		const zbx_timespec_t *ts, unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error);
 
 void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, char **value,
-		zbx_timespec_t *ts, char **error);
+		zbx_timespec_t *ts, unsigned char *meta, zbx_uint64_t *lastlogsize, int *mtime, char **error);
 
 #endif
