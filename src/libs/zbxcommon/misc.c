@@ -183,7 +183,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		if (TRUE == QueryPerformanceCounter(&tick))
 		{
 			ZBX_THREAD_LOCAL static LARGE_INTEGER	last_tick = {0};
-			int	ns = 0;
 
 			if (0 < last_tick.QuadPart)
 			{
@@ -203,17 +202,19 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
 				if (0 < qpc_tick.QuadPart && qpc_tick.QuadPart < tickPerSecond.QuadPart)
-					ns = (int)(1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart);
-			}
-
-			if (0 < ns && 1000000 > ns)	/*  value less than 1 millisecond */
-			{
-				ts->ns += ns;
-
-				while (ts->ns >= 1000000000)
 				{
-					ts->sec++;
-					ts->ns -= 1000000000;
+					int	ns = (int)(1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart);
+
+					if (ns < 1000000)	/* value less than 1 millisecond */
+					{
+						ts->ns += ns;
+
+						while (ts->ns >= 1000000000)
+						{
+							ts->sec++;
+							ts->ns -= 1000000000;
+						}
+					}
 				}
 			}
 
