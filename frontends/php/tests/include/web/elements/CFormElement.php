@@ -79,6 +79,10 @@ class CFormElement extends CElement {
 					$element = $label->query($selector.'/ul[@class="radio-segmented"]')->asSegmentedRadio()->one(false);
 				}
 
+				if ($element === null) {
+					$element = $label->query($selector.'/div[@class="range-control"]')->asRangeControl()->one(false);
+				}
+
 				if ($element !== null) {
 					$fields[$label->getText()] = $element;
 				}
@@ -116,7 +120,10 @@ class CFormElement extends CElement {
 	 */
 	public function selectTab($name) {
 		$xpath = './/ul[contains(@class, "ui-tabs-nav")]//a[text()='.CXPathHelper::escapeQuotes($name).']';
-		return $this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+		$this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+		$this->query('xpath://li[@aria-selected="true"]/a[text()='.CXPathHelper::escapeQuotes($name).']')->waitUntilPresent();
+
+		return $this;
 	}
 
 	/**
