@@ -205,7 +205,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 				{
 					int	ns = (int)(1000000000 * qpc_tick.QuadPart / tickPerSecond.QuadPart);
 
-					if (ns < 1000000)	/* value less than 1 millisecond */
+					if (1000000 > ns)	/* value less than 1 millisecond */
 					{
 						ts->ns += ns;
 
