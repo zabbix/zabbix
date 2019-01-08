@@ -100,7 +100,7 @@ void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *ite
 void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_timespec_t *ts, unsigned char meta,
 		zbx_uint64_t lastlogsize, int mtime, const char *error)
 {
-	static zbx_ipc_socket_t	socket = {0};
+	static zbx_ipc_socket_t	socket;
 	char			*errmsg = NULL;
 	unsigned char		*data;
 	zbx_uint32_t		data_len;
