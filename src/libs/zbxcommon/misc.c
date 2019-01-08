@@ -184,7 +184,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 		{
 			ZBX_THREAD_LOCAL static LARGE_INTEGER	last_tick = {0};
 
-			if (0 < last_tick.QuadPart)
+			/* host system time can shift backwards, then correction is not reasonable */
+			if (0 < last_tick.QuadPart && ts->sec >= last_ts.sec)
 			{
 				LARGE_INTEGER	qpc_tick = {0}, ntp_tick = {0};
 
@@ -199,9 +200,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 						+ tickPerSecond.QuadPart * (ts->ns - last_ts.ns) / 1000000000;
 				}
 
-				/* host system time can shift backwards, then correction is not reasonable */
-				if (0 <= ntp_tick.QuadPart)
-					qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
+				qpc_tick.QuadPart = tick.QuadPart - last_tick.QuadPart - ntp_tick.QuadPart;
 
 				if (0 < qpc_tick.QuadPart && qpc_tick.QuadPart < tickPerSecond.QuadPart)
 				{
