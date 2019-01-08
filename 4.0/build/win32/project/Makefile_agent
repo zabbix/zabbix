@@ -1,0 +1,106 @@
+# detect target architecture
+!IF "$(CPU)" == ""
+CPU=$(PROCESSOR_ARCHITECTURE)
+!ENDIF
+
+!IF "$(CPU)" == "i386"
+TARGETDIR = ..\..\..\bin\win32
+ADD_LFLAGS = /MACHINE:X86
+
+!ELSEIF "$(CPU)" == "AMD64"
+TARGETDIR = ..\..\..\bin\win64
+ADD_LFLAGS = /MACHINE:X64
+
+!ELSE
+!ERROR Unsupported CPU architecture: $(CPU)
+!ENDIF
+
+PROJECTNAME = zabbix_agent
+PROJECTDIR = ..\..\..\src\$(PROJECTNAME)
+TARGETNAME = zabbix_agentd
+TARGETEXT = exe
+PROGNAME = $(TARGETDIR)\$(TARGETNAME).$(TARGETEXT)
+
+PDBS = $(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).$(TARGETEXT).pdb
+
+ADD_CFLAGS = $(ADD_CFLAGS) /D WITH_AGENT_METRICS /D WITH_COMMON_METRICS \
+	/D WITH_SPECIFIC_METRICS /D WITH_HOSTNAME_METRIC /D WITH_SIMPLE_METRICS \
+	/Zi /D DEFAULT_CONFIG_FILE="\"C:\\zabbix_agentd.conf\"" \
+	/Fd$(TARGETNAME).$(TARGETEXT).pdb
+
+ADD_LFLAGS = $(ADD_LFLAGS) /DEBUG /OPT:REF /DELAYLOAD:wevtapi.dll
+
+ADD_RFLAGS = /d "ZABBIX_AGENT"
+
+!INCLUDE Makefile_common.inc
+
+OBJS = \
+	..\..\..\src\libs\zbxalgo\algodefs.o \
+	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxcommon\alias.o \
+	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
+	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxcommon\xml.o \
+	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
+	..\..\..\src\libs\zbxcommon\file.o \
+	..\..\..\src\libs\zbxcomms\comms.o \
+	..\..\..\src\libs\zbxcomms\telnet.o \
+	..\..\..\src\libs\zbxcompress\compress.o \
+	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxjson\json.o \
+	..\..\..\src\libs\zbxjson\json_parser.o \
+	..\..\..\src\libs\zbxlog\log.o \
+	..\..\..\src\libs\zbxsys\mutexs.o \
+	..\..\..\src\libs\zbxsys\symbols.o \
+	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
+	..\..\..\src\libs\zbxsysinfo\common\common.o \
+	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
+	..\..\..\src\libs\zbxsysinfo\common\dir.o \
+	..\..\..\src\libs\zbxsysinfo\common\file.o \
+	..\..\..\src\libs\zbxsysinfo\common\http.o \
+	..\..\..\src\libs\zbxsysinfo\common\net.o \
+	..\..\..\src\libs\zbxsysinfo\common\system.o \
+	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
+	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
+	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \
+	..\..\..\src\libs\zbxsysinfo\win32\diskio.o \
+	..\..\..\src\libs\zbxsysinfo\win32\diskspace.o \
+	..\..\..\src\libs\zbxsysinfo\win32\memory.o \
+	..\..\..\src\libs\zbxsysinfo\win32\net.o \
+	..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o \
+	..\..\..\src\libs\zbxsysinfo\win32\proc.o \
+	..\..\..\src\libs\zbxsysinfo\win32\services.o \
+	..\..\..\src\libs\zbxsysinfo\win32\swap.o \
+	..\..\..\src\libs\zbxsysinfo\win32\uptime.o \
+	..\..\..\src\libs\zbxsysinfo\win32\win32.o \
+	..\..\..\src\libs\zbxsysinfo\win32\wmi.o \
+	..\..\..\src\libs\zbxsysinfo\sysinfo.o \
+	..\..\..\src\libs\zbxsysinfo\win32\software.o \
+	..\..\..\src\libs\zbxsysinfo\win32\system.o \
+	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
+	..\..\..\src\libs\zbxwin32\perfmon.o \
+	..\..\..\src\libs\zbxwin32\service.o \
+	..\..\..\src\zabbix_agent\active.o \
+	..\..\..\src\zabbix_agent\cpustat.o \
+	..\..\..\src\zabbix_agent\eventlog.o \
+	..\..\..\src\zabbix_agent\listener.o \
+	..\..\..\src\zabbix_agent\logfiles.o \
+	..\..\..\src\zabbix_agent\perfstat.o \
+	..\..\..\src\zabbix_agent\stats.o \
+	..\..\..\src\zabbix_agent\zabbix_agentd.o \
+	..\..\..\src\zabbix_agent\zbxconf.o \
+	..\..\..\src\libs\zbxregexp\zbxregexp.o \
+	..\..\..\src\libs\zbxwin32\fatal.o \
+	..\..\..\src\libs\zbxwin32\disk.o
+
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib
+
+!INCLUDE Makefile_pcre.inc
+!INCLUDE Makefile_tls.inc
+!INCLUDE Makefile_targets.inc

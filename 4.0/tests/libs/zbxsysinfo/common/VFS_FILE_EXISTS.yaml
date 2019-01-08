@@ -1,0 +1,34 @@
+---
+test case: file exists
+files:
+  file.txt: |
+    123456
+in:
+  key: "vfs.file.exists[file.txt]"
+out:
+  result: SYSINFO_RET_OK
+  file_exists: 1
+---
+test case: file does not exist
+files:
+  file.txt: |
+    123456
+in:
+  key: "vfs.file.exists[nonexistent.txt]"
+out:
+  result: SYSINFO_RET_OK
+  file_exists: 0
+---
+test case: empty file name
+in:
+  key: "vfs.file.exists[]"
+out:
+  result: SYSINFO_RET_FAIL
+  error: "Invalid first parameter."
+---
+test case: too many parameters
+in:
+  key: "vfs.file.exists[foo, bar]"
+out:
+  result: SYSINFO_RET_FAIL
+  error: "Too many parameters."

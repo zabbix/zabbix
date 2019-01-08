@@ -1,0 +1,3508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>3.4</version>
+   <date>2015-12-30T14:41:30Z</date>
+   <groups>
+      <group>
+         <name>Templates/Server hardware</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <template>Template Server HP iLO SNMPv2</template>
+         <name>Template Server HP iLO SNMPv2</name>
+         <description>Template Server HP iLO version: 0.15&#13;
+Overview: for HP iLO adapters that support SNMP get. Or via operating system, using SNMP HP subagent&#13;
+MIBs used:&#13;
+CPQSINFO-MIB&#13;
+CPQHLTH-MIB&#13;
+CPQIDA-MIB</description>
+         <groups>
+            <group>
+               <name>Templates/Server hardware</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Disk arrays</name>
+            </application>
+            <application>
+               <name>Fans</name>
+            </application>
+            <application>
+               <name>Inventory</name>
+            </application>
+            <application>
+               <name>Physical disks</name>
+            </application>
+            <application>
+               <name>Power supply</name>
+            </application>
+            <application>
+               <name>Status</name>
+            </application>
+            <application>
+               <name>Temperature</name>
+            </application>
+            <application>
+               <name>Virtual disks</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>System: Temperature status</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.232.6.2.6.1.0</snmp_oid>
+               <key>sensor.temp.status[cpqHeThermalCondition.0]</key>
+               <delay>3m</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>3</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: CPQHLTH-MIB&#13;
+This value specifies the overall condition of the system's thermal environment.&#13;
+This value will be one of the following:&#13;
+other(1)  Temperature could not be determined.&#13;
+ok(2)  The temperature sensor is within normal operating range.&#13;
+degraded(3)  The temperature sensor is outside of normal operating range.&#13;
+failed(4)  The temperature sensor detects a condition that could  permanently damage the system.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Temperature</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>CPQSINFO-MIB::status</name>
+               </valuemap>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Overall system health status</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.232.2.1.3.0</snmp_oid>
+               <key>system.status[cpqSiMibCondition.0]</key>
+               <delay>30s</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>3</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: CPQSINFO-MIB&#13;
+The overall condition. This object represents the overall status of the server information represented by this MIB.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>Status</name>
+                  </application>
+               </applications>
+               <valuemap>
+                  <name>CPQSINFO-MIB::status</name>
+               </valuemap>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware model name</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.232.2.2.4.2.0</snmp_oid>
+               <key>system.hw.model</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: CPQSINFO-MIB&#13;
+The machine product name.The name of the machine used in this system.</description>
+               <inventory_link>29</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.232.2.2.2.1.0</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0d</trends>
+               <status>0</status>
+               <value_type>1</value_type>
+               <allowed_hosts/>
+               <units/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <description>MIB: CPQSINFO-MIB&#13;
+The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.</description>
+               <inventory_link>8</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing/>
+               <jmx_endpoint/>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <name>Temperature Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>(4|8|9|12|13)</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]</key>
+                     <delay>6m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: {#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#SNMPINDEX}: Temperature sensor location</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+This specifies the location of the temperature sensor present in the system.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQHLTH-MIB::cpqHeTemperatureLocale</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"{#SNMPINDEX}"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"{#SNMPINDEX}"}-3</recovery_expression>
+                     <name>{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"{#SNMPINDEX}"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPINDEX}"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"{#SNMPINDEX}"}-3</recovery_expression>
+                     <name>{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"{#SNMPINDEX}"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}+3</recovery_expression>
+                     <name>{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"{#SNMPINDEX}"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery Ambient</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.ambient</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPINDEX}</macro>
+                        <value>0\.1</value>
+                        <operator>8</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>11</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Ambient: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: Ambient</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Ambient"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
+                     <name>Ambient: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                     <name>Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
+                     <name>Ambient: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery CPU</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.cpu</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>6</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>CPU-{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: CPU-{#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"CPU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
+                     <name>CPU-{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>CPU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                     <name>CPU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
+                     <name>CPU-{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery Memory</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.memory</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>7</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Memory-{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]</key>
+                     <delay>6m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: Memory-{#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Memory"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Memory"}-3</recovery_expression>
+                     <name>Memory-{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Memory"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Memory-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Memory"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Memory"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Memory"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Memory"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Memory"}-3</recovery_expression>
+                     <name>Memory-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Memory"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Memory"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"Memory"}+3</recovery_expression>
+                     <name>Memory-{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Memory"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery PSU</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.psu</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>10</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>PSU-{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]</key>
+                     <delay>6m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: PSU-{#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"PSU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"PSU"}-3</recovery_expression>
+                     <name>PSU-{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"PSU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>PSU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"PSU"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"PSU"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"PSU"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"PSU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"PSU"}-3</recovery_expression>
+                     <name>PSU-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"PSU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"PSU"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"PSU"}+3</recovery_expression>
+                     <name>PSU-{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"PSU"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery I/O</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.io</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>5</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>I/O-{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]</key>
+                     <delay>6m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: I/O-{#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&gt;{$TEMP_WARN:"I/O"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].max(5m)}&lt;{$TEMP_WARN:"I/O"}-3</recovery_expression>
+                     <name>I/O-{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"I/O"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>I/O-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"I/O"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&gt;{$TEMP_CRIT:"I/O"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].max(5m)}&lt;{$TEMP_CRIT:"I/O"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&gt;{$TEMP_CRIT:"I/O"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].max(5m)}&lt;{$TEMP_CRIT:"I/O"}-3</recovery_expression>
+                     <name>I/O-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"I/O"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].avg(5m)}&lt;{$TEMP_CRIT_LOW:"I/O"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"].min(5m)}&gt;{$TEMP_CRIT_LOW:"I/O"}+3</recovery_expression>
+                     <name>I/O-{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"I/O"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature Discovery System</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.8.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.232.6.2.6.8.1.3]</snmp_oid>
+               <key>tempDescr.discovery.io</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions>
+                     <condition>
+                        <macro>{#SENSOR_LOCALE}</macro>
+                        <value>3</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>System-{#SNMPINDEX}: Temperature</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]</key>
+                     <delay>6m</delay>
+                     <history>30d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>0</value_type>
+                     <allowed_hosts/>
+                     <units>°C</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+Temperature readings of testpoint: System-{#SNMPINDEX}</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
+                     <name>System-{#SNMPINDEX}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Device"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>System-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                           <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                     <name>System-{#SNMPINDEX}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
+                     <recovery_mode>1</recovery_mode>
+                     <recovery_expression>{Template Server HP iLO SNMPv2:sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
+                     <name>System-{#SNMPINDEX}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Device"}</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>PSU Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.9.3.1.5,{#CHASSIS_NUM},1.3.6.1.4.1.232.6.2.9.3.1.1,{#BAY_NUM},1.3.6.1.4.1.232.6.2.9.3.1.2]</snmp_oid>
+               <key>psu.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>CPQHLTH-MIB::cpqHeFltTolPowerSupplyStatus</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+The condition of the power supply. This value will be one of the following:&#13;
+other(1)  The status could not be determined or not present.&#13;
+ok(2)  The power supply is operating normally.&#13;
+degraded(3)  A temperature sensor, fan or other power supply component is  outside of normal operating range.&#13;
+failed(4)  A power supply component detects a condition that could  permanently damage the system.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Power supply</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQSINFO-MIB::status</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the power supply unit for errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>FAN Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.6.2.6.7.1.9]</snmp_oid>
+               <key>fan.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>CPQHLTH-MIB::cpqHeFltTolFanCondition</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Fan {#SNMPINDEX}: Fan status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQHLTH-MIB&#13;
+The condition of the fan.&#13;
+This value will be one of the following:&#13;
+other(1)  Fan status detection is not supported by this system or driver.&#13;
+ok(2)  The fan is operating properly.&#13;
+degraded(2)  A redundant fan is not operating properly.&#13;
+failed(4)  A non-redundant fan is not operating properly.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Fans</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQSINFO-MIB::status</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Fan {#SNMPINDEX}: Fan is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Fan {#SNMPINDEX}: Fan is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the fan unit</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Fan {#SNMPINDEX}: Fan is in critical state</name>
+                           <expression>{Template Server HP iLO SNMPv2:sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Array Controller Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.2.1.1.1,{#CNTLR_SLOT},1.3.6.1.4.1.232.3.2.2.1.1.5,{#CNTLR_LOCATION},1.3.6.1.4.1.232.3.2.2.1.1.20]</snmp_oid>
+               <key>array.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Array controllers: CPQIDA-MIB::cpqDaCntlrTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#CNTLR_LOCATION}: Disk array controller status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+This value represents the overall condition of this controller,&#13;
+and any associated logical drives,physical drives, and array accelerators.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQSINFO-MIB::status</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#CNTLR_LOCATION}: Disk array controller model</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]</key>
+                     <delay>1d</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Array Controller Model. The type of controller card.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaCntlrModel</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#CNTLR_LOCATION}: Disk array controller is in critical state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#CNTLR_LOCATION}: Disk array controller is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#CNTLR_LOCATION}: Disk array controller is in critical state</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Array Controller Cache Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#CACHE_STATUS},1.3.6.1.4.1.232.3.2.2.2.1.2,{#CACHE_CNTRL_INDEX},1.3.6.1.4.1.232.3.2.2.2.1.1]</snmp_oid>
+               <key>array.cache.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning table of Array controllers: CPQIDA-MIB::cpqDaAccelTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.&#13;
+Note that for some controller models, a cache module board that physically attaches to the controller or chipset may not be an available option.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaAccelStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>1w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.&#13;
+The backup power source can only recharge when the system has power applied. The type of backup power source used is indicated by cpqDaAccelBackupPowerSource.&#13;
+The following values are valid:&#13;
+Other (1)  Indicates that the instrument agent does not recognize  backup power status.  You may need to update your software.&#13;
+&#13;
+Ok (2)  The backup power source is fully charged.&#13;
+&#13;
+Recharging (3)  The array controller has one or more cache module backup power  sources that are recharging.&#13;
+Cache module operations such as Battery/Flash Backed Write Cache, Expansion, Extension and Migration are temporarily suspended until the backup power source is fully charged.&#13;
+Cache module operations will automatically resume  when charging is complete.&#13;
+&#13;
+Failed (4)  The battery pack is below the sufficient voltage level and  has not recharged in 36 hours.&#13;
+Your Cache Module board  needs to be serviced.&#13;
+&#13;
+Degraded (5)  The battery is still operating, however, one of the batteries  in the pack has failed to recharge properly.&#13;
+Your Cache  Module board should be serviced as soon as possible.&#13;
+&#13;
+NotPresent (6)  A backup power source is not present on the cache module board. Some controllers do not have backup power sources.&#13;
+&#13;
+Capacitor Failed (7)  The flash backed cache module capacitor is below the sufficient voltage level and has not recharged in 10 minutes.  Your Cache Module board needs to be serviced.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Disk arrays</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaAccelBattery</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                        <dependency>
+                           <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>3</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"notPresent"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for faults</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Physical Disk Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.5.1.1.5,{#DISK_LOCATION},1.3.6.1.4.1.232.3.2.5.1.1.64]</snmp_oid>
+               <key>physicalDisk.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>Scanning  table of physical drive entries CPQIDA-MIB::cpqDaPhyDrvTable.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Physical disk status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:&#13;
+other (1)  Indicates that the instrument agent does not recognize  the drive.&#13;
+You may need to upgrade your instrument agent  and/or driver software.&#13;
+ok (2)  Indicates the drive is functioning properly.&#13;
+failed (3)  Indicates that the drive is no longer operating and  should be replaced.&#13;
+predictiveFailure(4)  Indicates that the drive has a predictive failure error and  should be replaced.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Physical disk S.M.A.R.T. status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Physical Drive S.M.A.R.T Status.The following values are defined:&#13;
+other(1)  The agent is unable to determine if the status of S.M.A.R.T  predictive failure monitoring for this drive.&#13;
+ok(2)  Indicates the drive is functioning properly.&#13;
+replaceDrive(3)  Indicates that the drive has a S.M.A.R.T predictive failure  error and should be replaced.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Physical disk serial number</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]</key>
+                     <delay>1d</delay>
+                     <history>30d</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Physical Drive Serial Number.&#13;
+This is the serial number assigned to the physical drive.&#13;
+This value is based upon the serial number as returned by the SCSI inquiry command&#13;
+but may have been modified due to space limitations.  This can be used for identification purposes.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Physical disk model name</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>1</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Physical Drive Model.This is a text description of the physical drive.&#13;
+The text that appears depends upon who manufactured the drive and the drive type.&#13;
+If a drive fails, note the model to identify the type of drive necessary for replacement.&#13;
+If a model number is not present, you may not have properly initialized the drive array to which the physical drive is attached for monitoring.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Physical disk media type</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Drive Array Physical Drive Media Type.The following values are defined:&#13;
+other(1)  The instrument agent is unable to determine the physical drive’s media type.&#13;
+rotatingPlatters(2)  The physical drive media is composed of rotating platters.&#13;
+solidState(3)  The physical drive media is composed of solid state electronics.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#DISK_LOCATION}: Disk size</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: CPQIDA-MIB&#13;
+Physical Drive Size in MB.&#13;
+This is the size of the physical drive in megabytes.&#13;
+This value is calculated using the value 1,048,576 (2^20) as a megabyte.&#13;
+Drive manufacturers sometimes use the number 1,000,000 as a megabyte when giving drive capacities so this value may differ&#13;
+from the advertised size of a drive. This field is only applicable for controllers which support SCSI drives,&#13;
+and therefore is not supported by the IDA or IDA-2 controllers. The field will contain 0xFFFFFFFF if the drive capacity cannot be calculated&#13;
+or if the controller does not support SCSI drives.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Physical disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>1048576</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_LOCATION}: Physical disk failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check physical disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_WARN_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_LOCATION}: Physical disk is in warning state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check physical disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#DISK_LOCATION}: Physical disk failed</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}].count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDrive"},eq)}=1 or {Template Server HP iLO SNMPv2:system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}].count(#1,{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Disk probably requires replacement.</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#DISK_LOCATION}: Physical disk failed</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}].diff()}=1 and {Template Server HP iLO SNMPv2:system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}].strlen()}&gt;0</expression>
+                     <recovery_mode>2</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#DISK_LOCATION}: Disk has been replaced (new serial number received)</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>1</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Disk serial number has changed. Ack to close</description>
+                     <type>0</type>
+                     <manual_close>1</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Virtual Disk Discovery</name>
+               <type>4</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.232.3.2.3.1.1.2,{#DISK_NAME},1.3.6.1.4.1.232.3.2.3.1.1.14]</snmp_oid>
+               <key>virtualdisk.discovery</key>
+               <delay>1h</delay>
+               <status>0</status>
+               <allowed_hosts/>
+               <snmpv3_contextname/>
+               <snmpv3_securityname/>
+               <snmpv3_securitylevel>0</snmpv3_securitylevel>
+               <snmpv3_authprotocol>0</snmpv3_authprotocol>
+               <snmpv3_authpassphrase/>
+               <snmpv3_privprotocol>0</snmpv3_privprotocol>
+               <snmpv3_privpassphrase/>
+               <params/>
+               <ipmi_sensor/>
+               <authtype>0</authtype>
+               <username/>
+               <password/>
+               <publickey/>
+               <privatekey/>
+               <port/>
+               <filter>
+                  <evaltype>0</evaltype>
+                  <formula/>
+                  <conditions/>
+               </filter>
+               <lifetime>30d</lifetime>
+               <description>CPQIDA-MIB::cpqDaLogDrvTable</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>Disk {#SNMPINDEX}({#DISK_NAME}): Status</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>Logical Drive Status.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaLogDrvStatus</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPINDEX}({#DISK_NAME}): Layout type</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units/>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>Logical Drive Fault Tolerance.&#13;
+This shows the fault tolerance mode of the logical drive.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap>
+                        <name>CPQIDA-MIB::cpqDaLogDrvFaultTol</name>
+                     </valuemap>
+                     <logtimefmt/>
+                     <preprocessing/>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Disk {#SNMPINDEX}({#DISK_NAME}): Disk size</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}</snmp_oid>
+                     <key>system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]</key>
+                     <delay>1h</delay>
+                     <history>2w</history>
+                     <trends>0d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>Logical Drive Size.&#13;
+This is the size of the logical drive in megabytes.  This value&#13;
+is calculated using the value 1,048,576 (2^20) as a megabyte.&#13;
+Drive manufacturers sometimes use the number 1,000,000 as a&#13;
+megabyte when giving drive capacities so this value may&#13;
+differ from the advertised size of a drive.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications>
+                        <application>
+                           <name>Virtual disks</name>
+                        </application>
+                     </applications>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>1048576</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes/>
+                     <master_item_prototype/>
+                  </item_prototype>
+               </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>4</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check virtual disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Server HP iLO SNMPv2:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_OK_STATUS},ne)}=1</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check virtual disk for warnings or errors</description>
+                     <type>0</type>
+                     <manual_close>0</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</name>
+                           <expression>{Template Server HP iLO SNMPv2:system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}].count(#1,{$VDISK_CRIT_STATUS},eq)}=1</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
+                     <tags/>
+                  </trigger_prototype>
+               </trigger_prototypes>
+               <graph_prototypes/>
+               <host_prototypes/>
+               <jmx_endpoint/>
+            </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"capacitorFailed"}</macro>
+               <value>7</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:"failed"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"degraded"}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:"notPresent"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_CRIT_STATUS:"cacheModCriticalFailure"}</macro>
+               <value>8</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_OK_STATUS:"enabled"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModDegradedFailsafeSpeed"}</macro>
+               <value>7</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheModFlashMemNotAttached"}</macro>
+               <value>6</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_WARN_STATUS:"cacheReadCacheNotMapped"}</macro>
+               <value>9</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_CRIT_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_ARRAY_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_FAIL_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_SMART_FAIL_STATUS:"replaceDrive"}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_SMART_FAIL_STATUS:"replaceDriveSSDWearOut"}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$DISK_WARN_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_CRIT_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$FAN_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_CRIT_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$HEALTH_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_CRIT_STATUS}</macro>
+               <value>4</value>
+            </macro>
+            <macro>
+               <macro>{$PSU_WARN_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT:"Ambient"}</macro>
+               <value>35</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT_LOW}</macro>
+               <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT}</macro>
+               <value>60</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN:"Ambient"}</macro>
+               <value>30</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_WARN}</macro>
+               <value>50</value>
+            </macro>
+            <macro>
+               <macro>{$VDISK_CRIT_STATUS}</macro>
+               <value>3</value>
+            </macro>
+            <macro>
+               <macro>{$VDISK_OK_STATUS}</macro>
+               <value>2</value>
+            </macro>
+         </macros>
+         <templates>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+         </templates>
+         <screens/>
+      </template>
+   </templates>
+   <graphs/>
+   <triggers>
+      <trigger>
+         <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in critical state</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>4</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for errors</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_WARN_STATUS},eq)}=1</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>System status is in warning state</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Please check the device for warnings</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies>
+            <dependency>
+               <name>System status is in critical state</name>
+               <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+               <recovery_expression/>
+            </dependency>
+         </dependencies>
+         <tags/>
+      </trigger>
+      <trigger>
+         <expression>{Template Server HP iLO SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Server HP iLO SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
+         <recovery_mode>2</recovery_mode>
+         <recovery_expression/>
+         <name>Device has been replaced (new serial number received)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>1</priority>
+         <description>Last value: {ITEM.LASTVALUE1}.&#13;
+Device serial number has changed. Ack to close</description>
+         <type>0</type>
+         <manual_close>1</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
+   <value_maps>
+      <value_map>
+         <name>CPQSINFO-MIB::status</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQHLTH-MIB::cpqHeTemperatureLocale</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>system</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>systemBoard</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>ioBoard</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>cpu</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>memory</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>storage</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>removableMedia</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>powerSupply</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>ambient</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>chassis</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>bridgeCard</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaCntlrModel</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ida</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>idaExpansion</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>ida-2</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>smart</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>smart-2e</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>smart-2p</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>smart-2sl</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>smart-3100es</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>smart-3200</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>smart-2dh</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>smart-221</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>sa-4250es</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>sa-4200</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>sa-integrated</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>sa-431</newvalue>
+            </mapping>
+            <mapping>
+               <value>17</value>
+               <newvalue>sa-5300</newvalue>
+            </mapping>
+            <mapping>
+               <value>18</value>
+               <newvalue>raidLc2</newvalue>
+            </mapping>
+            <mapping>
+               <value>19</value>
+               <newvalue>sa-5i</newvalue>
+            </mapping>
+            <mapping>
+               <value>20</value>
+               <newvalue>sa-532</newvalue>
+            </mapping>
+            <mapping>
+               <value>21</value>
+               <newvalue>sa-5312</newvalue>
+            </mapping>
+            <mapping>
+               <value>22</value>
+               <newvalue>sa-641</newvalue>
+            </mapping>
+            <mapping>
+               <value>23</value>
+               <newvalue>sa-642</newvalue>
+            </mapping>
+            <mapping>
+               <value>24</value>
+               <newvalue>sa-6400</newvalue>
+            </mapping>
+            <mapping>
+               <value>25</value>
+               <newvalue>sa-6400em</newvalue>
+            </mapping>
+            <mapping>
+               <value>26</value>
+               <newvalue>sa-6i</newvalue>
+            </mapping>
+            <mapping>
+               <value>27</value>
+               <newvalue>sa-generic</newvalue>
+            </mapping>
+            <mapping>
+               <value>29</value>
+               <newvalue>sa-p600</newvalue>
+            </mapping>
+            <mapping>
+               <value>30</value>
+               <newvalue>sa-p400</newvalue>
+            </mapping>
+            <mapping>
+               <value>31</value>
+               <newvalue>sa-e200</newvalue>
+            </mapping>
+            <mapping>
+               <value>32</value>
+               <newvalue>sa-e200i</newvalue>
+            </mapping>
+            <mapping>
+               <value>33</value>
+               <newvalue>sa-p400i</newvalue>
+            </mapping>
+            <mapping>
+               <value>34</value>
+               <newvalue>sa-p800</newvalue>
+            </mapping>
+            <mapping>
+               <value>35</value>
+               <newvalue>sa-e500</newvalue>
+            </mapping>
+            <mapping>
+               <value>36</value>
+               <newvalue>sa-p700m</newvalue>
+            </mapping>
+            <mapping>
+               <value>37</value>
+               <newvalue>sa-p212</newvalue>
+            </mapping>
+            <mapping>
+               <value>38</value>
+               <newvalue>sa-p410</newvalue>
+            </mapping>
+            <mapping>
+               <value>39</value>
+               <newvalue>sa-p410i</newvalue>
+            </mapping>
+            <mapping>
+               <value>40</value>
+               <newvalue>sa-p411</newvalue>
+            </mapping>
+            <mapping>
+               <value>41</value>
+               <newvalue>sa-b110i</newvalue>
+            </mapping>
+            <mapping>
+               <value>42</value>
+               <newvalue>sa-p712m</newvalue>
+            </mapping>
+            <mapping>
+               <value>43</value>
+               <newvalue>sa-p711m</newvalue>
+            </mapping>
+            <mapping>
+               <value>44</value>
+               <newvalue>sa-p812</newvalue>
+            </mapping>
+            <mapping>
+               <value>45</value>
+               <newvalue>sw-1210m</newvalue>
+            </mapping>
+            <mapping>
+               <value>46</value>
+               <newvalue>sa-p220i</newvalue>
+            </mapping>
+            <mapping>
+               <value>47</value>
+               <newvalue>sa-p222</newvalue>
+            </mapping>
+            <mapping>
+               <value>48</value>
+               <newvalue>sa-p420</newvalue>
+            </mapping>
+            <mapping>
+               <value>49</value>
+               <newvalue>sa-p420i</newvalue>
+            </mapping>
+            <mapping>
+               <value>50</value>
+               <newvalue>sa-p421</newvalue>
+            </mapping>
+            <mapping>
+               <value>51</value>
+               <newvalue>sa-b320i</newvalue>
+            </mapping>
+            <mapping>
+               <value>52</value>
+               <newvalue>sa-p822</newvalue>
+            </mapping>
+            <mapping>
+               <value>53</value>
+               <newvalue>sa-p721m</newvalue>
+            </mapping>
+            <mapping>
+               <value>54</value>
+               <newvalue>sa-b120i</newvalue>
+            </mapping>
+            <mapping>
+               <value>55</value>
+               <newvalue>hps-1224</newvalue>
+            </mapping>
+            <mapping>
+               <value>56</value>
+               <newvalue>hps-1228</newvalue>
+            </mapping>
+            <mapping>
+               <value>57</value>
+               <newvalue>hps-1228m</newvalue>
+            </mapping>
+            <mapping>
+               <value>58</value>
+               <newvalue>sa-p822se</newvalue>
+            </mapping>
+            <mapping>
+               <value>59</value>
+               <newvalue>hps-1224e</newvalue>
+            </mapping>
+            <mapping>
+               <value>60</value>
+               <newvalue>hps-1228e</newvalue>
+            </mapping>
+            <mapping>
+               <value>61</value>
+               <newvalue>hps-1228em</newvalue>
+            </mapping>
+            <mapping>
+               <value>62</value>
+               <newvalue>sa-p230i</newvalue>
+            </mapping>
+            <mapping>
+               <value>63</value>
+               <newvalue>sa-p430i</newvalue>
+            </mapping>
+            <mapping>
+               <value>64</value>
+               <newvalue>sa-p430</newvalue>
+            </mapping>
+            <mapping>
+               <value>65</value>
+               <newvalue>sa-p431</newvalue>
+            </mapping>
+            <mapping>
+               <value>66</value>
+               <newvalue>sa-p731m</newvalue>
+            </mapping>
+            <mapping>
+               <value>67</value>
+               <newvalue>sa-p830i</newvalue>
+            </mapping>
+            <mapping>
+               <value>68</value>
+               <newvalue>sa-p830</newvalue>
+            </mapping>
+            <mapping>
+               <value>69</value>
+               <newvalue>sa-p831</newvalue>
+            </mapping>
+            <mapping>
+               <value>70</value>
+               <newvalue>sa-p530</newvalue>
+            </mapping>
+            <mapping>
+               <value>71</value>
+               <newvalue>sa-p531</newvalue>
+            </mapping>
+            <mapping>
+               <value>72</value>
+               <newvalue>sa-p244br</newvalue>
+            </mapping>
+            <mapping>
+               <value>73</value>
+               <newvalue>sa-p246br</newvalue>
+            </mapping>
+            <mapping>
+               <value>74</value>
+               <newvalue>sa-p440</newvalue>
+            </mapping>
+            <mapping>
+               <value>75</value>
+               <newvalue>sa-p440ar</newvalue>
+            </mapping>
+            <mapping>
+               <value>76</value>
+               <newvalue>sa-p441</newvalue>
+            </mapping>
+            <mapping>
+               <value>77</value>
+               <newvalue>sa-p741m</newvalue>
+            </mapping>
+            <mapping>
+               <value>78</value>
+               <newvalue>sa-p840</newvalue>
+            </mapping>
+            <mapping>
+               <value>79</value>
+               <newvalue>sa-p841</newvalue>
+            </mapping>
+            <mapping>
+               <value>80</value>
+               <newvalue>sh-h240ar</newvalue>
+            </mapping>
+            <mapping>
+               <value>81</value>
+               <newvalue>sh-h244br</newvalue>
+            </mapping>
+            <mapping>
+               <value>82</value>
+               <newvalue>sh-h240</newvalue>
+            </mapping>
+            <mapping>
+               <value>83</value>
+               <newvalue>sh-h241</newvalue>
+            </mapping>
+            <mapping>
+               <value>84</value>
+               <newvalue>sa-b140i</newvalue>
+            </mapping>
+            <mapping>
+               <value>85</value>
+               <newvalue>sh-generic</newvalue>
+            </mapping>
+            <mapping>
+               <value>88</value>
+               <newvalue>sa-p840ar</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>predictiveFailure</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvSmartStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>replaceDrive</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>replaceDriveSSDWearOut</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaAccelStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>invalid</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>enabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>tmpDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>permDisabled</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>cacheModFlashMemNotAttached</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>cacheModDegradedFailsafeSpeed</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>cacheModCriticalFailure</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>cacheReadCacheNotMapped</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaAccelBattery</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Recharging</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Not Present</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Capacitor failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaPhyDrvMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>rotatingPlatters</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>solidState</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaLogDrvFaultTol</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>none</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>RAID-1/RAID-10</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>RAID-4</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>RAID-5</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>RAID-6</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>RAID-50</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>RAID-60</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>RAID-1 ADM</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>RAID-10 ADM</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>CPQIDA-MIB::cpqDaLogDrvStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>unconfigured</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>recovering</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>readyForRebuild</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>rebuilding</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>wrongDrive</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>badConnect</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>overheating</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>shutdown</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>expanding</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>notAvailable</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>queuedForExpansion</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>multipathAccessDegraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>erasing</newvalue>
+            </mapping>
+            <mapping>
+               <value>17</value>
+               <newvalue>predictiveSpareRebuildReady</newvalue>
+            </mapping>
+            <mapping>
+               <value>18</value>
+               <newvalue>rapidParityInitInProgress</newvalue>
+            </mapping>
+            <mapping>
+               <value>19</value>
+               <newvalue>rapidParityInitPending</newvalue>
+            </mapping>
+            <mapping>
+               <value>20</value>
+               <newvalue>noAccessEncryptedNoCntlrKey</newvalue>
+            </mapping>
+            <mapping>
+               <value>21</value>
+               <newvalue>unencryptedToEncryptedInProgress</newvalue>
+            </mapping>
+            <mapping>
+               <value>22</value>
+               <newvalue>newLogDrvKeyRekeyInProgress</newvalue>
+            </mapping>
+            <mapping>
+               <value>23</value>
+               <newvalue>noAccessEncryptedCntlrEncryptnNotEnbld</newvalue>
+            </mapping>
+            <mapping>
+               <value>24</value>
+               <newvalue>unencryptedToEncryptedNotStarted</newvalue>
+            </mapping>
+            <mapping>
+               <value>25</value>
+               <newvalue>newLogDrvKeyRekeyRequestReceived</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
+</zabbix_export>

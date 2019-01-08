@@ -1,0 +1,234 @@
+---
+test case: "successfully found low-level discovery function macros token"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  token_l: 0
+  token_r: 39
+  macro_l: 1
+  macro_r: 10
+  func_l: 12
+  func_r: 38
+  func_param_l: 18
+  func_param_r: 38
+---
+test case: "invalid low-level discovery function macros token"
+in:
+  expression: '{{#}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found function macros token"
+in:
+  expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  token_l: 0
+  token_r: 55
+  macro_l: 1
+  macro_r: 16
+  func_l: 18
+  func_r: 54
+  func_param_l: 24
+  func_param_r: 54
+---
+test case: "invalid function macros token"
+in:
+  expression: '{{}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found user macros token"
+in:
+  expression: '{$MACRO:"A"}'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_USER_MACRO
+  token_l: 0
+  token_r: 11
+  name_l: 2
+  name_r: 6
+  context_l: 8
+  context_r: 10
+---
+test case: "invalid user macros token"
+in:
+  expression: '{$:"A"}'
+out:
+  return: 'FAIL'
+---
+test case: "LLD macro with function"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: 'SUCCEED'
+---
+test case: "LLD macro with function, with text before"
+in:
+  expression: 'Dummy {{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: 'SUCCEED'
+---
+test case: "LLD macro with function, with text after"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}dummy'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: 'SUCCEED'
+---
+test case: "LLD macro with function with text around"
+in:
+  expression: 'foo{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}bar'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: 'SUCCEED'
+---
+test case: "Nested macro with spaces after after param"
+in:
+  expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")    }'
+out:
+  return: 'SUCCEED'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  token: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")    }'
+  macro: '{ITEM.LASTVALUE}'
+  func: 'regsub("App([0-9]) ([a-z]+)","App\1")'
+  param: '("App([0-9]) ([a-z]+)","App\1")'
+---
+test case: "LLD macro with spaces after after param"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)    }'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)    }'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: 'SUCCEED'
+---
+test case: "LLD macro"
+in:
+  expression: '{#VALUE}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "LLD macro used as simple macro"
+in:
+  expression: '{{#VALUE}:key.func(param)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "Macro not started"
+in:
+  expression: '{{#'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro"
+in:
+  expression: '{{#}'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro full"
+in:
+  expression: '{{#}}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid macro char"
+in:
+  expression: '{{##VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid function delimiter"
+in:
+  expression: '{{#VALUE}#regsub(^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "Ordinary LLD function macro"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  token: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub(^[0-9]+, Problem)'
+  param: '(^[0-9]+, Problem)'
+  return: 'SUCCEED'
+---
+test case: "Ordinary LLD function macro 2"
+in:
+  expression: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+out:
+  token: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub("^([0-9]+)", Problem ID: \1)'
+  param: '("^([0-9]+)", Problem ID: \1)'
+  return: 'SUCCEED'
+---
+test case: "User macro with LLD function macro context"
+in:
+  expression: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+out:
+  token_type: ZBX_TOKEN_USER_MACRO
+  token: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+  name: 'MACRO'
+  context: '"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"'
+  return: 'SUCCEED'
+---
+test case: "LLD function macro missing closing bracket"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+---
+test case: "LLD function macro missing openning bracket"
+in:
+  expression: '{{#VALUE}.regsub^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: 'SUCCEED'
+...

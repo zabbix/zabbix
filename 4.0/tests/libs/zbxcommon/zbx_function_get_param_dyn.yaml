@@ -1,0 +1,155 @@
+---
+test case: valid 1 parameter
+in:
+  params: 'p'
+  num: 1
+out:
+  param: 'p'
+---
+test case: valid 2 parameter
+in:
+  params: 'p1,p2'
+  num: 2
+out:
+  param: 'p2'
+---
+test case: valid 2 empty parameter
+in:
+  params: 'p1,,p2'
+  num: 2
+out:
+  param: ''
+---
+test case: valid last empty parameter
+in:
+  params: 'p1,,p2,'
+  num: 4
+out:
+  param: ''
+---
+test case: non-existent 4 parameter
+in:
+  params: 'p1,p2'
+  num: 4
+out:
+  param: 'NULL'
+---
+test case: valid 1 parameter with []
+in:
+  params: '[p1],p2'
+  num: 1
+out:
+  param: '[p1]'
+---
+test case: valid 2 parameter with []
+in:
+  params: '[p1],[p2],p3'
+  num: 2
+out:
+  param: '[p2]'
+---
+test case: invalid params with empty 1 value
+in:
+  params: ''
+  num: 1
+out:
+  param: ''
+---
+test case: invalid params with empty 2 value
+in:
+  params: ''
+  num: 2
+out:
+  param: NULL
+---
+test case: valid param with quoted 'a' in brackets
+in:
+  params: '"a"'
+  num: 1
+out:
+  param: 'a'
+---
+test case: valid param with quoted '[a]' in brackets
+in:
+  params: '"[a]"'
+  num: 1
+out:
+  param: '[a]'
+---
+test case: valid param with quoted 'a' followed by comma
+in:
+  params: '"[a]",'
+  num: 1
+out:
+  param: '[a]'
+---
+test case: valid param with quoted 'a' prefixed by comma
+in:
+  params: ',"[a]"'
+  num: 2
+out:
+  param: '[a]'
+---
+test case: valid param with unquoted 'a' followed by comma
+in:
+  params: 'a,'
+  num: 1
+out:
+  param: 'a'
+---
+test case: valid param with multiple quoted parameters
+in:
+  params: '"a","b","c"'
+  num: 3
+out:
+  param: 'c'
+---
+test case: valid param with first unquoted parameter and second array parameter containing two unquoted parameters
+in:
+  params: 'a,[b,c]'
+  num: 2
+out:
+  param: '[b'
+---
+test case: valid param with first unquoted parameter and second array parameter containing unquoted and empty parameter
+in:
+  params: 'a,[b,]'
+  num: 2
+out:
+  param: '[b'
+---
+test case: valid param with two unquoted parameters where second parameter contains opening square bracket
+in:
+  params: 'a,b[c'
+  num: 2
+out:
+  param: 'b[c'
+---
+test case: valid param with multiple quoted parameters and array  # array contains multiple quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
+in:
+  params: '"a","b",["c","d\",]"]'
+  num: 3
+out:
+  param: '["c"'
+---
+test case: valid param with multiple quoted parameters and multiple arrays        # arrays contains multiple unquoted and quoted parameters which containing escaping and characters that are not allowed in unquoted parameters
+in:
+  params: '"a","b",["c","d\",]"],[e,f]'
+  num: 3
+out:
+  param: '["c"'
+---
+test case: valid param, single parameter with unquoted string containing double quote characters
+in:
+  params: 'a"b"'
+  num: 1
+out:
+  param: 'a"b"'
+---
+test case: valid param, multiple different type parameters where one is unquoted string containing double quote characters
+in:
+  params: '"a",b"c",d'
+  num: 2
+out:
+  param: 'b"c"'
+...
