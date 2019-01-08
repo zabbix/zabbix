@@ -65,7 +65,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	const char		*__function_name = "lld_process_task";
 
 	zbx_uint64_t		itemid, lastlogsize;
-	char			*value = NULL, *error = NULL;
+	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
 	DC_ITEM			item;
