@@ -65,7 +65,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	const char		*__function_name = "lld_process_task";
 
 	zbx_uint64_t		itemid, lastlogsize;
-	char			*value, *error;
+	char			*value = NULL, *error = NULL;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
 	DC_ITEM			item;
@@ -157,11 +157,11 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		zbx_free(sql);
 	}
 
+	DCconfig_clean_items(&item, &errcode, 1);
+out:
 	zbx_free(value);
 	zbx_free(error);
 
-	DCconfig_clean_items(&item, &errcode, 1);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
