@@ -28,6 +28,17 @@ class CDiscoveryRule extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
 
+	/**
+	 * Define a set of supported pre-processing rules.
+	 *
+	 * @var array
+	 *
+	 * 5.6 would allow this to be defined constant.
+	 */
+	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE
+	];
+
 	public function __construct() {
 		parent::__construct();
 
@@ -79,6 +90,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectGraphs'				=> null,
 			'selectHostPrototypes'		=> null,
 			'selectFilter'				=> null,
+			'selectPreprocessing'		=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
 			'preservekeys'				=> false,
@@ -906,6 +918,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $itemConditions[$item['itemid']]);
 			}
 		}
+
+		$this->createItemPreprocessing($items);
 	}
 
 	protected function updateReal($items) {
@@ -976,6 +990,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
 			}
 		}
+
+		$this->updateItemPreprocessing($items);
 	}
 
 	/**
@@ -1134,10 +1150,6 @@ class CDiscoveryRule extends CItemGeneral {
 				_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
 			);
 		}
-
-		if (array_key_exists('preprocessing', $item)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Item pre-processing is not allowed for discovery rules.'));
-		}
 	}
 
 	protected function inherit(array $items, array $hostids = null) {
@@ -1217,6 +1229,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);

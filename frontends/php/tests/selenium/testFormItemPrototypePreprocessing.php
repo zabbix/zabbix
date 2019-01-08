@@ -649,7 +649,7 @@ class testFormItemPrototypePreprocessing extends CLegacyWebTest {
 
 				// Check results in DB.
 				foreach ($data['preprocessing'] as $key => $options) {
-					$dbType = get_preprocessing_types($type[$key]);
+					$dbType = get_preprocessing_types($type[$key], false, CItemPrototype::$supported_preprocessing_types);
 					$this->assertEquals($options['type'], $dbType);
 
 					switch ($options['type']) {

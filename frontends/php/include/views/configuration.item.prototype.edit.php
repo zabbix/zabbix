@@ -786,7 +786,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 	// Create a combo box with preprocessing types.
 	if ($readonly) {
 		$preproc_types_cbbox = (new CTextBox('preprocessing['.$i.'][type_name]',
-			get_preprocessing_types($step['type']))
+			get_preprocessing_types($step['type'], false, CItemPrototype::$supported_preprocessing_types))
 		)->setReadonly(true);
 
 		$itemForm->addVar('preprocessing['.$i.'][type]', $step['type']);
@@ -794,7 +794,7 @@ foreach ($data['preprocessing'] as $i => $step) {
 	else {
 		$preproc_types_cbbox = new CComboBox('preprocessing['.$i.'][type]', $step['type']);
 
-		foreach (get_preprocessing_types() as $group) {
+		foreach (get_preprocessing_types(null, true, CItemPrototype::$supported_preprocessing_types) as $group) {
 			$cb_group = new COptGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {

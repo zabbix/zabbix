@@ -34,7 +34,7 @@
 	<?php
 		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
-		foreach (get_preprocessing_types() as $group) {
+		foreach (get_preprocessing_types(null, true, CItem::$supported_preprocessing_types) as $group) {
 			$cb_group = new COptGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {

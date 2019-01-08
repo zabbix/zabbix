@@ -651,7 +651,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 
 				// Check results in DB.
 				foreach ($data['preprocessing'] as $key => $options) {
-					$db_type = get_preprocessing_types($type[$key]);
+					$db_type = get_preprocessing_types($type[$key], false, CItem::$supported_preprocessing_types);
 					$this->assertEquals($options['type'], $db_type);
 
 					switch ($options['type']) {
@@ -725,7 +725,7 @@ class testFormItemPreprocessing extends CLegacyWebTest {
 		// Check preprocessing parameters for each type in form.
 		$db_items_preproc = CDBHelper::getAll('SELECT * FROM item_preproc WHERE itemid='.$preprocessing_itemid);
 		foreach ($db_items_preproc as $item_preproc) {
-			$preprocessing_type = get_preprocessing_types($item_preproc['type']);
+			$preprocessing_type = get_preprocessing_types($item_preproc['type'], false, CItem::$supported_preprocessing_types);
 			$this->zbxTestAssertElementNotPresentXpath('//input[@id="preprocessing_'.($item_preproc['step'] - 1).'_type"][@readonly]');
 			$this->zbxTestDropdownAssertSelected('preprocessing['.($item_preproc['step'] - 1).'][type]', $preprocessing_type);
 			switch ($item_preproc['type']) {
