@@ -105,7 +105,7 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
 	unsigned char		*data;
 	zbx_uint32_t		data_len;
 
-	/* each process has a permanent connection to preprocessing manager */
+	/* each process has a permanent connection to manager */
 	if (0 == socket.fd && FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_LLD, SEC_PER_MIN, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to LLD manager service: %s", errmsg);
@@ -122,7 +122,6 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, const char *value, const zbx_tim
 
 	zbx_free(data);
 }
-
 
 /******************************************************************************
  *                                                                            *
