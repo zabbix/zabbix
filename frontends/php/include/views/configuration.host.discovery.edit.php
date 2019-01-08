@@ -579,11 +579,10 @@ $itemFormList->addRow(_('Custom intervals'),
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Enabled'),
+		(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE)
 	);
-
-// status
-$enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);
-$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 /*
  * Condition tab
@@ -684,8 +683,17 @@ $conditionFormList->addRow(_('Filters'),
 
 // append tabs to form
 $itemTab = (new CTabView())
-	->addTab('itemTab', $this->data['caption'], $itemFormList)
+	->addTab('itemTab', $data['caption'], $itemFormList)
+	->addTab('preprocTab', _('Preprocessing'),
+		(new CFormList('item_preproc_list'))
+			->addRow(_('Preprocessing steps'),
+				getItemPreprocessing($itemForm, $data['preprocessing'], $data['limited'],
+					CDiscoveryRule::$supported_preprocessing_types
+				)
+			)
+	)
 	->addTab('macroTab', _('Filters'), $conditionFormList);
+
 if (!hasRequest('form_refresh')) {
 	$itemTab->setSelected(0);
 }

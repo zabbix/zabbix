@@ -28,79 +28,97 @@
 		|| (array_key_exists('item', $data) && array_key_exists('flags', $data['item'])
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 	);
-?>
-<?php if (!$data['is_discovery_rule'] && !$readonly) : ?>
-	<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
-	<?php
-		$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
-		foreach (get_preprocessing_types(null, true, CItem::$supported_preprocessing_types) as $group) {
-			$cb_group = new COptGroup($group['label']);
+	if (!$readonly):
+		// Locate caller of common file.
+		foreach (get_included_files() as $path) {
+			if (strpos($path, 'configuration.item.prototype.edit.js.php') !== false) {
+				$types = CItemPrototype::$supported_preprocessing_types;
+				break;
+			}
+			elseif (strpos($path, 'configuration.host.discovery.edit.js.php') !== false) {
+				$types = CDiscoveryRule::$supported_preprocessing_types;
+				break;
+			}
+			elseif (strpos($path, 'configuration.item.edit.js.php') !== false) {
+				$types = CItem::$supported_preprocessing_types;
+				break;
+			}
+		}
+		?>
+		<script type="text/x-jquery-tmpl" id="preprocessing_steps_row">
+			<?php
+			$preproc_types_cbbox = new CComboBox('preprocessing[#{rowNum}][type]', '');
 
-			foreach ($group['types'] as $type => $label) {
-				$cb_group->addItem(new CComboItem($type, $label));
+			foreach (get_preprocessing_types(null, true, $types) as $group) {
+				$cb_group = new COptGroup($group['label']);
+
+				foreach ($group['types'] as $type => $label) {
+					$cb_group->addItem(new CComboItem($type, $label));
+				}
+
+				$preproc_types_cbbox->addItem($cb_group);
 			}
 
-			$preproc_types_cbbox->addItem($cb_group);
-		}
-
-		echo (new CListItem([
-			(new CDiv([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			echo (new CListItem([
 				(new CDiv([
-					(new CDiv())->addClass('step-number'),
-					$preproc_types_cbbox
-				]))->addClass(ZBX_STYLE_COLUMN_40),
-				(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
-					->setAttribute('placeholder', _('pattern'))
-				))->addClass(ZBX_STYLE_COLUMN_20),
-				(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
-					->setAttribute('placeholder', _('output'))
-				))->addClass(ZBX_STYLE_COLUMN_20),
-				(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
-					->addClass(ZBX_STYLE_COLUMN_10)
-					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-					->addClass(ZBX_STYLE_COLUMN_CENTER),
-				(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-				))
-					->addClass(ZBX_STYLE_COLUMN_10)
-					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
-			]))
-				->addClass(ZBX_STYLE_COLUMNS)
-				->addClass('preprocessing-step'),
-			(new CDiv([
-				(new CDiv([
-					new CDiv(new CLabel(_('Custom on fail'))),
-					new CDiv(
-						(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]',
-							ZBX_PREPROC_FAIL_DISCARD_VALUE
-						))
-							->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
-							->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
-							->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
-							->setModern(true)
-							->setEnabled(false)
-					),
-					new CDiv(
-						(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
-							->setEnabled(false)
-							->addStyle('display: none;')
-					)
+					(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+					(new CDiv([
+						(new CDiv())->addClass('step-number'),
+						$preproc_types_cbbox
+					]))->addClass(ZBX_STYLE_COLUMN_40),
+					(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+						->setAttribute('placeholder', _('pattern'))
+					))->addClass(ZBX_STYLE_COLUMN_20),
+					(new CDiv((new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+						->setAttribute('placeholder', _('output'))
+					))->addClass(ZBX_STYLE_COLUMN_20),
+					(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))
+						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+						->addClass(ZBX_STYLE_COLUMN_CENTER),
+					(new CDiv((new CButton('preprocessing[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+					))
+						->addClass(ZBX_STYLE_COLUMN_10)
+						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
 				]))
-					->addClass(ZBX_STYLE_COLUMN_80)
-					->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass('preprocessing-step'),
+				(new CDiv([
+					(new CDiv([
+						new CDiv(new CLabel(_('Custom on fail'))),
+						new CDiv(
+							(new CRadioButtonList('preprocessing[#{rowNum}][error_handler]',
+								ZBX_PREPROC_FAIL_DISCARD_VALUE
+							))
+								->addValue(_('Discard value'), ZBX_PREPROC_FAIL_DISCARD_VALUE)
+								->addValue(_('Set value to'), ZBX_PREPROC_FAIL_SET_VALUE)
+								->addValue(_('Set error to'), ZBX_PREPROC_FAIL_SET_ERROR)
+								->setModern(true)
+								->setEnabled(false)
+						),
+						new CDiv(
+							(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+								->setEnabled(false)
+								->addStyle('display: none;')
+						)
+					]))
+						->addClass(ZBX_STYLE_COLUMN_80)
+						->addClass(ZBX_STYLE_COLUMN_MIDDLE)
+				]))
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass('on-fail-options')
+					->addStyle('display: none;')
 			]))
-				->addClass(ZBX_STYLE_COLUMNS)
-				->addClass('on-fail-options')
-				->addStyle('display: none;')
-		]))
-			->addClass('preprocessing-list-item')
-			->addClass('sortable')
-	?>
-	</script>
-<?php endif ?>
+				->addClass('preprocessing-list-item')
+				->addClass('sortable')
+			?>
+		</script>
+	<?php
+	endif
+?>
 <script type="text/javascript">
 	jQuery(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
@@ -122,7 +140,7 @@
 			template: '#delayFlexRow'
 		});
 
-		<?php if (!$data['is_discovery_rule'] && !$readonly): ?>
+		<?php if (!$readonly): ?>
 			function updateStepNumbers() {
 				$('.preprocessing-list-item .step-number').each(function(i) {
 					$(this).text(++i + ':');
