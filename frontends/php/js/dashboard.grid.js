@@ -433,16 +433,14 @@
 					$.each(col, function(_, col_box) {
 						if (col_box.uniqueid == box.uniqueid || rectOverlap(col_box.current_pos, box.new_pos)) {
 							if (col_box.current_pos[size_key] > size_min) {
-								var start_pos = col_box.current_pos[opposite_axis_key],
-									stop_pos = start_pos + col_box.current_pos[opposite_size_key],
-									margin = col_box.current_pos[axis_key] + col_box.current_pos[size_key],
+								var start_pos = box.current_pos[opposite_axis_key],
+									stop_pos = start_pos + box.current_pos[opposite_size_key],
+									margin = new_max,
 									i;
 
 								// Find max overlap position value for checked widget.
 								for (i = start_pos; i < stop_pos; i++) {
-									if (i in margins) {
-										margin = Math.max(margin, margins[i]);
-									}
+									margin = Math.min(margin, margins[i]);
 								}
 
 								if (margin && margin <= size_max) {
@@ -482,7 +480,7 @@
 					console
 						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > slot && box.current_pos[opposite_axis_key] in collapsed_pos) {
+						if (box.current_pos[axis_key] > slot && collapsed_pos[box.current_pos[opposite_axis_key]]) {
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
