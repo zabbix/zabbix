@@ -331,3 +331,14 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30002,'{18077}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18077, 40072, 30002, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30002, 30001);
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40073, 18, 120004, 'Item_child {#NAME}', '', 'item_child[{#NAME}]', '0', NULL, '', '', '', '', '', '', 3, 2, 40070);
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments) VALUES (30003,'{18078}>0','Trigger {#NAME}', 2, 2, '');
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18078, 40073, 30003, 'last', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14047, 40073, 40070, '');
+
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers, value_type, flags, master_itemid) VALUES (40074, 18, 120004,' Item_child eth0', '', 'item_child[eth0]', '0', NULL, '', '', '', '', '', '', 3, 4, 40072);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES (14048, 40074, 40073, 'item[{#NAME}]');
+INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30004,'{18079}>0','Trigger eth0', 2, 4, '', 1);
+INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (18079, 40074, 30004, 'last', '');
+INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);

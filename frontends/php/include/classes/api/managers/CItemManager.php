@@ -51,8 +51,10 @@ class CItemManager {
 		} while ($parent_itemids);
 
 		// Selecting all dependent items.
+		// Note: We are not separating normal from discovered items at this point.
 		$dep_itemids = [
 			ZBX_FLAG_DISCOVERY_NORMAL => $del_itemids,
+			ZBX_FLAG_DISCOVERY_CREATED => [],
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		$del_itemids = [];
@@ -63,14 +65,19 @@ class CItemManager {
 				' FROM items i'.
 				' WHERE i.type='.ITEM_TYPE_DEPENDENT.
 					' AND '.dbConditionInt('i.master_itemid',
-						array_keys($dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL] + $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE])
+						array_keys($dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL]
+							+ $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED]
+							+ $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+						)
 					)
 			);
 
 			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL];
+			$del_itemids += $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED];
 			$del_item_prototypeids += $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE];
 			$dep_itemids = [
 				ZBX_FLAG_DISCOVERY_NORMAL => [],
+				ZBX_FLAG_DISCOVERY_CREATED => [],
 				ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 			];
 
@@ -82,12 +89,21 @@ class CItemManager {
 						}
 						break;
 
+					case ZBX_FLAG_DISCOVERY_CREATED:
+						if (!array_key_exists($db_item['itemid'], $del_itemids)) {
+							$dep_itemids[ZBX_FLAG_DISCOVERY_CREATED][$db_item['itemid']] = true;
+						}
+						break;
+
 					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 						$dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE][$db_item['itemid']] = true;
 						break;
 				}
 			}
-		} while ($dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL] || $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+		} while ($dep_itemids[ZBX_FLAG_DISCOVERY_NORMAL]
+			|| $dep_itemids[ZBX_FLAG_DISCOVERY_CREATED]
+			|| $dep_itemids[ZBX_FLAG_DISCOVERY_PROTOTYPE]
+		);
 
 		$del_itemids = array_keys($del_itemids);
 
