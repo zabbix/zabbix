@@ -278,8 +278,8 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
 					$popup_parameters['enrich_parent_groups'] = '1';
 					$autocomplete_parameters['enrich_parent_groups'] = '1';
+				}
 			}
-		}
 		}
 
 		$mapped_options['popup']['parameters'] = $popup_parameters;
