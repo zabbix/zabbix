@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3372,7 +3372,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_maintenance_tag(const zbx_dc_maintenance_tag_t *maintenance_tag, const DB_ROW dbrow)
 {
-	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->operator))
+	if (FAIL == dbsync_compare_int(dbrow[2], maintenance_tag->op))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[3], maintenance_tag->tag))

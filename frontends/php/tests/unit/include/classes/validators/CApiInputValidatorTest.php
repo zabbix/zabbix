@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1851,6 +1851,18 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'@^[a-z$',
 				'/1/expression',
 				'@^[a-z$'
+			],
+			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX, 'length' => 8],
+				'/test/i',
+				'/1/expression',
+				'/test/i'
 			],
 			[
 				['type' => API_VARIABLE_NAME, 'length' => 6],

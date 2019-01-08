@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -828,7 +828,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 	if (0 != non_zero && 0 == *value)
 		return FAIL;
 
-	if (0 != *value && value_min > *value)
+	if (0 != *value && (value_min > *value || ZBX_HK_PERIOD_MAX < *value))
 		return FAIL;
 
 	return SUCCEED;
@@ -1961,6 +1961,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
+	ZBX_DC_HOST		*host;
 
 	int			found, update_index, ret, i;
 	zbx_uint64_t		interfaceid, hostid;
@@ -1984,6 +1985,11 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		ZBX_STR2UCHAR(main_, row[3]);
 		ZBX_STR2UCHAR(useip, row[4]);
 		ZBX_STR2UCHAR(bulk, row[8]);
+
+		/* If there is no host for this interface, skip it. */
+		/* This may be possible if the host was added after we synced config for hosts. */
+		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			continue;
 
 		interface = (ZBX_DC_INTERFACE *)DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE), &found);
 		zbx_vector_ptr_append(&interfaces, interface);
@@ -2089,28 +2095,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 		{
 			/* new interface - add it to a list of host interfaces in 'config->hosts' hashset */
 
-			ZBX_DC_HOST	*host;
+			int	exists = 0;
 
-			if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
+			/* It is an error if the pointer is already in the list. Detect it. */
+
+			for (i = 0; i < host->interfaces_v.values_num; i++)
 			{
-				int	exists = 0;
-
-				/* It is an error if the pointer is already in the list. Detect it. */
-
-				for (i = 0; i < host->interfaces_v.values_num; i++)
+				if (interface == host->interfaces_v.values[i])
 				{
-					if (interface == host->interfaces_v.values[i])
-					{
-						exists = 1;
-						break;
-					}
+					exists = 1;
+					break;
 				}
-
-				if (0 == exists)
-					zbx_vector_ptr_append(&host->interfaces_v, interface);
-				else
-					THIS_SHOULD_NEVER_HAPPEN;
 			}
+
+			if (0 == exists)
+				zbx_vector_ptr_append(&host->interfaces_v, interface);
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -2127,10 +2126,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync)
 	}
 
 	/* remove deleted interfaces from buffer */
+
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_DC_HOST	*host;
-
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
@@ -7113,6 +7111,9 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					(trigger->timespec.sec == timespecs[i].sec &&
 					trigger->timespec.ns < timespecs[i].ns))
 			{
+				/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+				/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+				/* same time, so its safe to update trigger timespec within read lock.             */
 				trigger->timespec = timespecs[i];
 			}
 		}
@@ -7205,6 +7206,10 @@ void	zbx_dc_get_timer_triggers_by_triggerids(zbx_hashset_t *trigger_info, zbx_ve
 			trigger_local.triggerid = dc_trigger->triggerid;
 			trigger = (DC_TRIGGER *)zbx_hashset_insert(trigger_info, &trigger_local, sizeof(trigger_local));
 			DCget_trigger(trigger, dc_trigger);
+
+			/* DCconfig_get_triggers_by_itemids() function is called during trigger processing */
+			/* when syncing history cache. A trigger cannot be processed by two syncers at the */
+			/* same time, so its safe to update trigger timespec within read lock.             */
 			trigger->timespec = *ts;
 			trigger->flags = flags;
 
@@ -9281,10 +9286,10 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.token.l, &name, &context, &len))
+		if (SUCCEED != zbx_user_macro_parse_dyn(text + token.loc.l, &name, &context, &len))
 			continue;
 
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.token.l - last_pos);
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
 		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
 		if (NULL != value && NULL != validator_func && FAIL == validator_func(value))
@@ -9298,14 +9303,14 @@ char	*zbx_dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hos
 		}
 		else
 		{
-			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.token.l,
-					token.token.r - token.token.l + 1);
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
 		}
 
 		zbx_free(name);
 		zbx_free(context);
 
-		pos = token.token.r;
+		pos = token.loc.r;
 		last_pos = pos + 1;
 	}
 
@@ -9781,7 +9786,7 @@ zbx_uint64_t	DCget_item_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9813,7 +9818,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid)
 	zbx_uint64_t		count;
 	const ZBX_DC_HOST	*dc_host;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 
@@ -9840,7 +9845,7 @@ zbx_uint64_t	DCget_trigger_count(void)
 {
 	zbx_uint64_t	count;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 
 	dc_status_update();
 

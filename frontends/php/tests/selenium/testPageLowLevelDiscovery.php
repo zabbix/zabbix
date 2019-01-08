@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,13 @@ class testPageLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClick('all_items');
 		$this->zbxTestClickButtonText('Check now');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot send request');
+			$this->zbxTestTextPresentInMessageDetails('Cannot send request: host is not monitored.');
+		}
+		else {
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+		}
 		$this->zbxTestCheckFatalErrors();
 	}
 

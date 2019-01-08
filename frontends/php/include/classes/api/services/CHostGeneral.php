@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -309,11 +309,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]) {
 			if ($clear) {
-				$result = API::Trigger()->delete($triggerids[ZBX_FLAG_DISCOVERY_NORMAL], true);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-				}
+				CTriggerManager::delete($triggerids[ZBX_FLAG_DISCOVERY_NORMAL]);
 			}
 			else {
 				DB::update('triggers', [
@@ -325,11 +321,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
 			if ($clear) {
-				$result = API::TriggerPrototype()->delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE], true);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
-				}
+				CTriggerPrototypeManager::delete($triggerids[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			else {
 				DB::update('triggers', [
@@ -384,8 +376,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])) {
 			if ($clear) {
-				$result = API::Item()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear items'));
+				CItemManager::delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]));
 			}
 			else{
 				DB::update('items', [
@@ -404,11 +395,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($clear) {
 				// This will include deletion of linked application prototypes.
-				$result = API::ItemPrototype()->delete($item_prototypeids, true);
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
-				}
+				CItemPrototypeManager::delete($item_prototypeids);
 			}
 			else {
 				DB::update('items', [
@@ -514,8 +501,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
+				CGraphPrototypeManager::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
 			}
 			else{
 				DB::update('graphs', [
@@ -531,8 +517,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if (!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])) {
 			if ($clear) {
-				$result = API::Graph()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graphs.'));
+				CGraphManager::delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_NORMAL]));
 			}
 			else{
 				DB::update('graphs', [

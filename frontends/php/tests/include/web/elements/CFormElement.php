@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,6 +79,10 @@ class CFormElement extends CElement {
 					$element = $label->query($selector.'/ul[@class="radio-segmented"]')->asSegmentedRadio()->one(false);
 				}
 
+				if ($element === null) {
+					$element = $label->query($selector.'/div[@class="range-control"]')->asRangeControl()->one(false);
+				}
+
 				if ($element !== null) {
 					$fields[$label->getText()] = $element;
 				}
@@ -116,7 +120,10 @@ class CFormElement extends CElement {
 	 */
 	public function selectTab($name) {
 		$xpath = './/ul[contains(@class, "ui-tabs-nav")]//a[text()='.CXPathHelper::escapeQuotes($name).']';
-		return $this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+		$this->query('xpath', $xpath)->waitUntilPresent()->one()->click();
+		$this->query('xpath://li[@aria-selected="true"]/a[text()='.CXPathHelper::escapeQuotes($name).']')->waitUntilPresent();
+
+		return $this;
 	}
 
 	/**
@@ -127,6 +134,16 @@ class CFormElement extends CElement {
 	public function getSelectedTab() {
 		return $this->query('xpath:.//ul[contains(@class, "ui-tabs-nav")]'.
 				'//li[@aria-selected="true"]/a')->waitUntilPresent()->one()->getText();
+	}
+
+	/**
+	 * Get message of form in overlay dialog.
+	 *
+	 * @return CMessageElement
+	 */
+	public function getOverlayMessage() {
+		return $this->parents('class:overlay-dialogue-body')->one()
+				->query('tag:output')->waitUntilPresent()->asMessage()->one();
 	}
 
 	/**

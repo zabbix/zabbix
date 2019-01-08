@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,21 @@
 
 
 class CLdap {
+
+	const ERR_PHP_EXTENSION = 1;
+	const ERR_SERVER_UNAVAILABLE = 2;
+	const ERR_BIND_FAILED = 3;
+	const ERR_BIND_ANON_FAILED = 4;
+	const ERR_USER_NOT_FOUND = 5;
+	const ERR_OPT_PROTOCOL_FAILED = 10;
+	const ERR_OPT_TLS_FAILED = 11;
+	const ERR_OPT_REFERRALS_FAILED = 12;
+	const ERR_OPT_DEREF_FAILED = 13;
+
+	/**
+	 * @var int
+	 */
+	public $error;
 
 	public function __construct($arg = []) {
 		$this->ds = false;
@@ -48,15 +63,23 @@ class CLdap {
 			$this->cnf = zbx_array_merge($this->cnf, $arg);
 		}
 
-		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
+		$this->error = $this->moduleEnabled() ? 0 : static::ERR_PHP_EXTENSION;
+	}
 
-		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			error($ldap_status['error']);
-			return false;
-		}
+	/**
+	 * Check is the PHP extension enabled.
+	 *
+	 * @return bool
+	 */
+	public function moduleEnabled() {
+		return function_exists('ldap_connect') && function_exists('ldap_set_option') && function_exists('ldap_bind')
+			&& function_exists('ldap_search') && function_exists('ldap_get_entries')
+			&& function_exists('ldap_free_result') && function_exists('ldap_start_tls');
 	}
 
 	public function connect() {
+		$this->error = 0;
+
 		// connection already established
 		if ($this->ds) {
 			return true;
@@ -65,7 +88,7 @@ class CLdap {
 		$this->bound = 0;
 
 		if (!$this->ds = @ldap_connect($this->cnf['host'], $this->cnf['port'])) {
-			error('Cannot connect to LDAP server.');
+			$this->error = static::ERR_SERVER_UNAVAILABLE;
 
 			return false;
 		}
@@ -73,28 +96,28 @@ class CLdap {
 		// set protocol version and dependend options
 		if ($this->cnf['version']) {
 			if (!@ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
-				error('Setting LDAP Protocol version '.$this->cnf['version'].' failed.');
+				$this->error = static::ERR_OPT_PROTOCOL_FAILED;
 			}
 			else {
 				// use TLS (needs version 3)
 				if (isset($this->cnf['starttls']) && !@ldap_start_tls($this->ds)) {
-					error('Starting TLS failed.');
+					$this->error = static::ERR_OPT_TLS_FAILED;
 				}
 
 				// needs version 3
 				if (!zbx_empty($this->cnf['referrals'])
 						&& !@ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
-					error('Setting LDAP referrals to off failed.');
+					$this->error = static::ERR_OPT_REFERRALS_FAILED;
 				}
 			}
 		}
 
 		// set deref mode
 		if (isset($this->cnf['deref']) && !@ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
-			error('Setting LDAP Deref mode '.$this->cnf['deref'].' failed.');
+			$this->error = static::ERR_OPT_DEREF_FAILED;
 		}
 
-		return true;
+		return !$this->error;
 	}
 
 	public function checkPass($user, $pass) {
@@ -112,7 +135,7 @@ class CLdap {
 		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])) {
 			// use superuser credentials
 			if (!@ldap_bind($this->ds, $this->cnf['bind_dn'], $this->cnf['bind_password'])) {
-				error(ldap_error($this->ds));
+				$this->error = static::ERR_BIND_FAILED;
 
 				return false;
 			}
@@ -130,7 +153,7 @@ class CLdap {
 		else {
 			// anonymous bind
 			if (!@ldap_bind($this->ds)) {
-				error('Cannot bind anonymously.');
+				$this->error = static::ERR_BIND_ANON_FAILED;
 
 				return false;
 			}
@@ -139,7 +162,9 @@ class CLdap {
 		// try to bind to with the dn if we have one.
 		if ($dn) {
 			// user/password bind
-			if (!ldap_bind($this->ds, $dn, $pass)) {
+			if (!@ldap_bind($this->ds, $dn, $pass)) {
+				$this->error = static::ERR_BIND_FAILED;
+
 				return false;
 			}
 
@@ -160,6 +185,8 @@ class CLdap {
 
 			// try to bind with the dn provided
 			if (!@ldap_bind($this->ds, $dn, $pass)) {
+				$this->error = static::ERR_BIND_FAILED;
+
 				return false;
 			}
 
@@ -179,6 +206,8 @@ class CLdap {
 		// force superuser bind if wanted and not bound as superuser yet
 		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password']) && ($this->bound < 2)) {
 			if (!@ldap_bind($this->ds, $this->cnf['bind_dn'], $this->cnf['bind_password'])) {
+				$this->error = static::ERR_BIND_FAILED;
+
 				return false;
 			}
 			$this->bound = 2;
@@ -197,12 +226,12 @@ class CLdap {
 		else {
 			$filter = '(ObjectClass=*)';
 		}
-		$sr = ldap_search($this->ds, $base, $filter);
-		$result = ldap_get_entries($this->ds, $sr);
+		$sr = @ldap_search($this->ds, $base, $filter);
+		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
-		if ($result['count'] != 1) {
-			error('User not found.');
+		if (!$result || $result['count'] != 1) {
+			$this->error = $result ? static::ERR_USER_NOT_FOUND : static::ERR_BIND_FAILED;
 
 			return false;
 		}

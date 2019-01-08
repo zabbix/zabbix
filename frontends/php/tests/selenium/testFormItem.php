@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1298,7 +1298,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "".'
 					]
 				]
 			],
@@ -1313,7 +1313,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-11,00:00-24:00".'
 					]
 				]
 			],
@@ -1328,7 +1328,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,00:00-25:00".'
 					]
 				]
 			],
@@ -1343,7 +1343,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "delay": invalid delay'
+						'Invalid interval "1-7,24:00-00:00".'
 					]
 				]
 			],

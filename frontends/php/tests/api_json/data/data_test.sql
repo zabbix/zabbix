@@ -336,3 +336,11 @@ INSERT INTO items (itemid, hostid, templateid, interfaceid, type, value_type, na
 INSERT INTO items (itemid, hostid, templateid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, flags, master_itemid, posts, headers) VALUES (40582, 99010, NULL, NULL, 18, 3, 'C', 'item.C', '0', '90d', 0, '', '', 0, 40581, '', '');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (90006, 99009, 1, 0, 4,'Dependent items LLD #1','di.lld','1d','90d',0,'','',1,'','');
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (90007, 99010, 1, 0, 4,'Dependent items LLD #2','di.lld','1d','90d',0,'','',1,'','');
+
+-- testTaskCreate
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (120001,'Has two items','Has two items',0,'');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110001,7,120001,'Agent-active','','agent.ping[]',30,NULL,'','','','','','');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110002,0,120001,'Agent-passive','','agent.ping',30,NULL,'','','','','','');
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (120003,'Template with item and lld rule','Template with item',3,'');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers) VALUES (110004,0,120003,'templated-item','','agent.ping[]',30,NULL,'','','','','','');
+INSERT INTO items (itemid,type,hostid,name,description,key_,delay,interfaceid,params,formula,url,posts,query_fields,headers,flags) VALUES (110005,0,120003,'templated-lld-rule','','agent.ping[-]',30,NULL,'','','','','','',1);

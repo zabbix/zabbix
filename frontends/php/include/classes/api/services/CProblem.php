@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ class CProblem extends CApiService {
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
 			'recent'					=> null,
+			'any'						=> null,	// (internal) true if need not filtred by r_eventid
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -291,7 +292,7 @@ class CProblem extends CApiService {
 
 			$sqlParts['where'][] = '(p.r_eventid IS NULL OR p.r_clock>'.$ok_events_from.')';
 		}
-		else {
+		elseif ($options['any'] === null) {
 			$sqlParts['where'][] = 'p.r_eventid IS NULL';
 		}
 

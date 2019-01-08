@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ else {
 			'reason' => _('Reason'),
 			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
 			'sla2' => null,
-			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla3' => _('SLA').' / '._('Acceptable SLA')
 		]
 	);
 

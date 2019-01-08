@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -375,10 +375,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
-	DBstart();
-
 	$result = API::Trigger()->delete([getRequest('triggerid')]);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
