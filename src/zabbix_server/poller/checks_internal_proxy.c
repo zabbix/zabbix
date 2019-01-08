@@ -41,28 +41,18 @@
  ******************************************************************************/
 int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	nparams, ret = NOTSUPPORTED;
-
-	nparams = get_rparams_num(request);
-
 	if (0 == strcmp(param1, "proxy_history"))
 	{
-		if (1 != nparams)
+		if (1 != get_rparams_num(request))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-			goto out;
+			return NOTSUPPORTED;
 		}
 
 		SET_UI64_RESULT(result, proxy_get_history_count());
 	}
 	else
-	{
-		ret = FAIL;
-		goto out;
-	}
+		return FAIL;
 
-	ret = SUCCEED;
-
-out:
-	return ret;
+	return SUCCEED;
 }
