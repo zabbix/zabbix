@@ -514,7 +514,7 @@ class CSvgGraphXAxis extends CSvgTag {
 			$position += $delta_x;
 
 			if ($draw_main) {
-				$time_formatted = $dt['main']->format($format['main']);
+				$time_formatted = $dt['sub']->format($format['main']);
 				$label_style = CSvgTag::ZBX_STYLE_GRAPH_LABEL_MAIN;
 				$this->main_grid_positions[] = $position;
 			}
