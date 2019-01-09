@@ -31,7 +31,7 @@ function validateHttpStep(formname, dialogueid) {
 		url = new Curl(jQuery(form).attr('action')),
 		dialogueid = dialogueid || null;
 
-	jQuery(form).trimValues(['#name', '#url', '#timeout', '#required', '#status_codes']);
+	jQuery(form).trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 
 	url.setArgument('validate', 1);
 
