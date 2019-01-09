@@ -491,7 +491,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	double			time_stat, time_idle = 0, time_now, sec;
+	double			time_stat, time_now, sec;
 	int			ret;
 	zbx_lld_manager_t	manager;
 	zbx_uint64_t		processed_num = 0;
@@ -541,9 +541,6 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 		sec = zbx_time();
 		zbx_update_env(sec);
-
-		if (ZBX_IPC_RECV_IMMEDIATE != ret)
-			time_idle += sec - time_now;
 
 		if (NULL != message)
 		{
