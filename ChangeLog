@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-4873] implemented single dot datasets to be drawn as points in line vector graphs (miks)
 
 Bug fixes:
+..F....... [ZBX-15372] fixed SQL and PHP errors on "Slide shows" page when enter slides.php witout GET parameters (Sasha)
 A......... [ZBX-15359] fixed undefined index in maintenance.create and maintenance.update API calls (Sasha)
 A......... [ZBX-15358] fixed undefined index in configuration.import API call without one or several rules (Sasha)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
