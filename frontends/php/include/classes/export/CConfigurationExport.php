@@ -532,6 +532,7 @@ class CConfigurationExport {
 		$discovery_rules = API::DiscoveryRule()->get([
 			'output' => $this->dataFields['drule'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true

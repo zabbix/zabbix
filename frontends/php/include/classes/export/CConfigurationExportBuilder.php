@@ -363,7 +363,8 @@ class CConfigurationExportBuilder {
 				'ssl_key_file' => $discoveryRule['ssl_key_file'],
 				'ssl_key_password' => $discoveryRule['ssl_key_password'],
 				'verify_peer' => $discoveryRule['verify_peer'],
-				'verify_host' => $discoveryRule['verify_host']
+				'verify_host' => $discoveryRule['verify_host'],
+				'preprocessing' => $discoveryRule['preprocessing'],
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
