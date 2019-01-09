@@ -928,7 +928,8 @@ static int	send_internal_stats_json(zbx_socket_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED == (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
+	if (NULL != CONFIG_STATS_ALLOWED_IP &&
+			SUCCEED == (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
 	{
 		struct zbx_json	json;
 

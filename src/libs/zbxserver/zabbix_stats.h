@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STATS_H_
-#define ZABBIX_STATS_H_
+#ifndef ZABBIX_ZABBIX_STATS_H_
+#define ZABBIX_ZABBIX_STATS_H_
 
 extern int	CONFIG_SERVER_STARTUP_TIME;
 
 void	zbx_get_zabbix_stats(struct zbx_json *json);
 
-#endif /* ZABBIX_STATS_H_ */
+#endif /* ZABBIX_ZABBIX_STATS_H_ */
