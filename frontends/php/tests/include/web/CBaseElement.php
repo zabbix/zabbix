@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,5 +220,27 @@ abstract class CBaseElement extends RemoteWebElement {
 	 */
 	public function isSelected($selected = true) {
 		return (parent::isSelected() === $selected);
+	}
+
+	/**
+	 * Highlight the value in the field.
+	 *
+	 * @return $this
+	 */
+	public function selectValue() {
+		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+
+		return $this;
+	}
+
+	/**
+	 * Ovewrvrite value in field.
+	 *
+	 * @param $text text to be written into the field.
+	 *
+	 * @return $this
+	 */
+	public function overwrite($text) {
+		return $this->selectValue()->type($text);
 	}
 }

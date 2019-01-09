@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,18 +48,25 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	public function getJavascript($form_name, $onselect = '') {
 		return
 			'var input = jQuery("[name=\"'.$this->getName().'\"]", jQuery("#'.$form_name.'")).get(0);'.
+
 			'jQuery("#'.$this->getName().'_dp")'.
 				'.data("clndr", create_calendar(input, null))'.
 				'.data("input", input)'.
 				'.click(function() {'.
 					'var b = jQuery(this),'.
 						'o = b.offset(),'.
-						'h = jQuery(b.data("clndr").clndr.clndr_calendar).outerHeight(),'. // Calendar height.
-						'd = jQuery("#overlay_dialogue").offset(),'. // Dialog offset.
-						't = parseInt(o.top + b.outerHeight() - h - d.top, 10),'. // Calculated calendar top position.
-						'l = parseInt(o.left - d.left + b.outerWidth(), 10);'. // Calculated calendar left position.
+						// h - calendar height.
+						'h = jQuery(b.data("clndr").clndr.clndr_calendar).outerHeight(),'.
+						// d - dialog offset.
+						'd = jQuery("#overlay_dialogue").offset(),'.
+						// t - calculated calendar top position.
+						't = parseInt(o.top + b.outerHeight() - h - d.top, 10),'.
+						// l - calculated calendar left position.
+						'l = parseInt(o.left - d.left + b.outerWidth(), 10);'.
+
 					'b.data("clndr").clndr.clndrshow(t, l, b.data("input"));'.
 					($onselect !== '' ? 'b.data("clndr").clndr.onselect = function() {'.$onselect.'};' : '').
+
 					'return false;'.
 				'})';
 	}

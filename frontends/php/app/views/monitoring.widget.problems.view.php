@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ $table = (new CTableInfo())
 			' &bullet; ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
+		$data['fields']['show_latest_values'] ? _('Latest values') : null,
 		_('Duration'),
 		_('Ack'),
 		_('Actions'),
@@ -215,6 +216,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
+		$data['fields']['show_latest_values'] ? CScreenProblem::getLatestValues($trigger['items']) : null,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))
