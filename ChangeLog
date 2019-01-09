@@ -5,6 +5,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15376] fixed "Undefined index: refresh" on several pages with disabled guest user (Sasha)
 ..F....... [ZBX-15375] fixed web scenario step name can consist only of whitespaces (agriscenko)
 ..F....... [ZBX-15375] fixed undefined index on Web scenario configuration page (Sasha)
 ..F....... [ZBX-15372] fixed SQL and PHP errors on "Slide shows" page when enter slides.php witout GET parameters (Sasha)
