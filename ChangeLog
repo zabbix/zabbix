@@ -83,6 +83,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
 A......... [ZBX-14926] fixed empty "inventory" property being returned by API if inventory mode is disabled (agriscenko)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 ...G...PS. [ZBX-15399] fixed IPv4 connections not being accepted when IPv6 mask is used (akozlovs)
