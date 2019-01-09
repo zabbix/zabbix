@@ -86,6 +86,7 @@ New features:
 ...G...... [ZBX-14876] added a new optional parameter <regex_excl_dir> to items vfs.dir.size[] and vfs.dir.count[] (viktors)
 
 Bug fixes:
+..F....... [ZBX-15372] fixed SQL and PHP errors on "Slide shows" page when enter slides.php witout GET parameters (Sasha)
 A......... [ZBX-15359] fixed undefined index in maintenance.create and maintenance.update API calls (Sasha)
 A......... [ZBX-15358] fixed undefined index in configuration.import API call without one or several rules (Sasha)
 A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
