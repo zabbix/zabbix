@@ -178,6 +178,37 @@ static int	hc_queue_get_size(void);
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_stats_all                                                  *
+ *                                                                            *
+ * Purpose: retrieves all internal metrics of the database cache              *
+ *                                                                            *
+ * Parameters: stats - [OUT] write cache metrics                              *
+ *                                                                            *
+ ******************************************************************************/
+
+void	DCget_stats_all(zbx_wcache_info_t *stats)
+{
+	LOCK_CACHE;
+
+	stats->values_all = cache->stats.history_counter;
+	stats->values_float = cache->stats.history_float_counter;
+	stats->values_uint = cache->stats.history_uint_counter;
+	stats->values_str = cache->stats.history_str_counter;
+	stats->values_log = cache->stats.history_log_counter;
+	stats->values_text = cache->stats.history_text_counter;
+	stats->values_notsupported = cache->stats.notsupported_counter;
+	stats->history_free = hc_mem->free_size;
+	stats->history_total = hc_mem->total_size;
+	stats->index_free = hc_index_mem->free_size;
+	stats->index_total = hc_index_mem->total_size;
+	stats->trend_free = trend_mem->free_size;
+	stats->trend_total = trend_mem->orig_size;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCget_stats                                                      *
  *                                                                            *
  * Purpose: get statistics of the database cache                              *

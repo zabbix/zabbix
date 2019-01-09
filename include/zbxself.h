@@ -31,6 +31,20 @@
 
 #define ZBX_SELFMON_DELAY		1
 
+/* the process statistics */
+typedef struct
+{
+	int	process_type;
+	double	busy_max;
+	double	busy_min;
+	double	busy_avg;
+	double	idle_max;
+	double	idle_min;
+	double	idle_avg;
+	int	count;
+}
+zbx_process_info_t;
+
 int	get_process_type_forks(unsigned char process_type);
 
 #ifndef _WINDOWS
@@ -40,6 +54,7 @@ void	update_selfmon_counter(unsigned char state);
 void	collect_selfmon_stats(void);
 void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 		unsigned char state, double *value);
+void	zbx_get_all_process_stats(zbx_process_info_t *stats);
 void	zbx_sleep_loop(int sleeptime);
 void	zbx_sleep_forever(void);
 void	zbx_wakeup(void);

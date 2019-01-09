@@ -540,6 +540,36 @@ typedef struct
 }
 zbx_preproc_item_t;
 
+/* the configuration cache statistics */
+typedef struct
+{
+	zbx_uint64_t	hosts;
+	zbx_uint64_t	items;
+	zbx_uint64_t	items_unsupported;
+	zbx_uint64_t	triggers;
+	double		requiredperformance;
+}
+zbx_config_cache_info_t;
+
+/* the write cache statistics */
+typedef struct
+{
+	zbx_uint64_t	values_all;
+	zbx_uint64_t	values_float;
+	zbx_uint64_t	values_uint;
+	zbx_uint64_t	values_str;
+	zbx_uint64_t	values_log;
+	zbx_uint64_t	values_text;
+	zbx_uint64_t	values_notsupported;
+	zbx_uint64_t	history_free;
+	zbx_uint64_t	history_total;
+	zbx_uint64_t	index_free;
+	zbx_uint64_t	index_total;
+	zbx_uint64_t	trend_free;
+	zbx_uint64_t	trend_total;
+}
+zbx_wcache_info_t;
+
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -573,6 +603,7 @@ void	free_database_cache(void);
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 void	*DCget_stats(int request);
+void	DCget_stats_all(zbx_wcache_info_t *stats);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
@@ -682,6 +713,7 @@ zbx_uint64_t	DCget_item_unsupported_count(zbx_uint64_t hostid);
 zbx_uint64_t	DCget_trigger_count(void);
 double		DCget_required_performance(void);
 zbx_uint64_t	DCget_host_count(void);
+void		DCget_count_stats_all(zbx_config_cache_info_t *stats);
 
 void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not_monitored,
 		zbx_vector_ptr_t *items_active_normal, zbx_vector_ptr_t *items_active_notsupported,

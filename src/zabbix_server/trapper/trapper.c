@@ -38,6 +38,7 @@
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
+#include "../../libs/zbxserver/zabbix_stats.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -911,6 +912,47 @@ out:
 #undef ZBX_GET_STATUS_FULL
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: send_internal_stats_json                                         *
+ *                                                                            *
+ * Purpose: process Zabbix stats request                                      *
+ *                                                                            *
+ * Parameters: sock  - [IN] the request socket                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_internal_stats_json(zbx_socket_t *sock)
+{
+	const char	*__function_name = "send_internal_stats_json";
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (SUCCEED == (ret = zbx_tcp_check_allowed_peers(sock,CONFIG_STATS_ALLOWED_IP)))
+	{
+		struct zbx_json	json;
+
+		zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
+
+		zbx_get_zabbix_stats(&json);
+
+		zbx_json_close(&json);
+
+		(void)zbx_tcp_send(sock, json.buffer);
+
+		zbx_json_free(&json);
+	}
+	else
+		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
 static void	active_passive_misconfig(zbx_socket_t *sock)
 {
 	char   *msg = NULL;
@@ -1040,6 +1082,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					ret = recv_getstatus(sock, &jp);
+			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
+			{
+				ret = send_internal_stats_json(sock);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

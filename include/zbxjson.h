@@ -127,6 +127,8 @@
 #define ZBX_PROTO_VALUE_GET_STATUS_PING		"ping"
 #define ZBX_PROTO_VALUE_GET_STATUS_FULL		"full"
 
+#define ZBX_PROTO_VALUE_ZABBIX_STATS		"zabbix.stats"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,

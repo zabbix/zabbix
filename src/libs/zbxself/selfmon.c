@@ -535,6 +535,109 @@ unlock:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_all_process_stats                                        *
+ *                                                                            *
+ * Purpose: retrieves internal metrics of all running processes based on      *
+ *          process type                                                      *
+ *                                                                            *
+ * Parameters: stats - [OUT] process metrics                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_all_process_stats(zbx_process_info_t *stats)
+{
+	const char		*__function_name = "zbx_get_all_process_stats";
+	int			current;
+	unsigned char		proc_type;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_SM;
+
+	if (1 >= collector->count)
+		goto unlock;
+
+	if (MAX_HISTORY <= (current = (collector->first + collector->count - 1)))
+		current -= MAX_HISTORY;
+
+	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
+	{
+		int			process_forks, proc_num;
+		zbx_process_info_t	process_info;
+		unsigned int		total_avg = 0, counter_avg_busy = 0, counter_avg_idle = 0,
+					total_max = 0, counter_max_busy = 0, counter_max_idle = 0,
+					total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
+
+		process_forks = get_process_type_forks(proc_type);
+
+		for (proc_num = 0; proc_num < process_forks; proc_num++)
+		{
+			zbx_stat_process_t	*process;
+			unsigned short		one_total = 0, busy_counter, idle_counter;
+			unsigned char		s;
+
+			process = &collector->process[proc_type][proc_num];
+
+			for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
+				one_total += process->h_counter[s][current] - process->h_counter[s][collector->first];
+
+			busy_counter = process->h_counter[ZBX_PROCESS_STATE_BUSY][current] -
+					process->h_counter[ZBX_PROCESS_STATE_BUSY][collector->first];
+
+			idle_counter = process->h_counter[ZBX_PROCESS_STATE_IDLE][current] -
+					process->h_counter[ZBX_PROCESS_STATE_IDLE][collector->first];
+
+			total_avg += one_total;
+			counter_avg_busy += busy_counter;
+			counter_avg_idle += idle_counter;
+
+			if (0 == proc_num || busy_counter > counter_max_busy)
+			{
+				counter_max_busy = busy_counter;
+				total_max = one_total;
+			}
+
+			if (0 == proc_num || idle_counter > counter_max_idle)
+			{
+				counter_max_idle = idle_counter;
+				total_max = one_total;
+			}
+
+			if (0 == proc_num || busy_counter < counter_min_busy)
+			{
+				counter_min_busy = busy_counter;
+				total_min = one_total;
+			}
+
+			if (0 == proc_num || idle_counter < counter_min_idle)
+			{
+				counter_min_idle = idle_counter;
+				total_min = one_total;
+			}
+		}
+
+		process_info.process_type = proc_type;
+
+		process_info.busy_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_busy / (double)total_avg);
+		process_info.busy_max = (0 == total_max ? 0 : 100. * (double)counter_max_busy / (double)total_max);
+		process_info.busy_min = (0 == total_min ? 0 : 100. * (double)counter_min_busy / (double)total_min);
+
+		process_info.idle_avg = (0 == total_avg ? 0 : 100. * (double)counter_avg_idle / (double)total_avg);
+		process_info.idle_max = (0 == total_max ? 0 : 100. * (double)counter_max_idle / (double)total_max);
+		process_info.idle_min = (0 == total_min ? 0 : 100. * (double)counter_min_idle / (double)total_min);
+
+		process_info.count = process_forks;
+
+		stats[proc_type] = process_info;
+	}
+
+unlock:
+	UNLOCK_SM;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 static int	sleep_remains;
 
 /******************************************************************************

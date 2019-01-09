@@ -19,14 +19,16 @@
 
 #include "common.h"
 #include "checks_internal.h"
+
 #include "checks_java.h"
 #include "dbcache.h"
 #include "zbxself.h"
 #include "valuecache.h"
 #include "proxy.h"
 #include "preproc.h"
-
 #include "../vmware/vmware.h"
+#include "../../libs/zbxserver/zabbix_stats.h"
+#include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 
 extern unsigned char	program_type;
 
@@ -151,11 +153,6 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	zbx_free(interfaces);
 
 	return SUCCEED;
-}
-
-int	get_value_internal_stats(DC_ITEM *item, AGENT_RESULT *result)
-{
-
 }
 
 /******************************************************************************
@@ -852,6 +849,50 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
+	}
+	else if (0 == strcmp(tmp, "stats"))			/* zabbix[stats,<ip>,<port>] */
+	{
+		unsigned short	port_number;
+
+		if (3 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		tmp = get_rparam(&request, 1);
+		tmp1 = get_rparam(&request, 2);
+
+		if (NULL == tmp || '\0' == *tmp)
+			tmp = "127.0.0.1";
+
+		if (NULL == tmp1 || '\0' == *tmp1)
+		{
+			port_number = ZBX_DEFAULT_SERVER_PORT;
+		}
+		else if (SUCCEED != is_ushort(tmp1, &port_number))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
+
+		if (0 == strcmp(tmp, "127.0.0.1") || 0 == strcmp(tmp, "localhost"))
+		{
+			struct zbx_json	json;
+
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+			zbx_get_zabbix_stats(&json);
+
+			set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+
+			zbx_json_free(&json);
+		}
+		else
+			zbx_get_remote_zabbix_stats(tmp, port_number, result);
+
+		if (0 != ISSET_MSG(result))
+			goto out;
 	}
 	else
 	{

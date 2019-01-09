@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_H
-#define ZABBIX_TRAPPER_H
+#ifndef ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_
+#define ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_
 
-#include "comms.h"
-#include "threads.h"
-
+extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
-extern char	*CONFIG_STATS_ALLOWED_IP;
 
-ZBX_THREAD_ENTRY(trapper_thread, args);
+void	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result);
 
-#endif
+int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#endif /* ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_ */
