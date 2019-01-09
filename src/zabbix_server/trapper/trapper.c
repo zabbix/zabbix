@@ -955,7 +955,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock)
 
 static void	active_passive_misconfig(zbx_socket_t *sock)
 {
-	char   *msg = NULL;
+	char	*msg = NULL;
 
 	msg = zbx_dsprintf(msg, "misconfiguration error: the proxy is running in the active mode but server at \"%s\""
 			" sends requests to it as to proxy in passive mode", sock->peer);

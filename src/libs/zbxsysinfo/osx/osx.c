@@ -21,10 +21,10 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC,	NULL},
 
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
@@ -32,8 +32,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"net.tcp.listen",      CF_HAVEPARAMS,	NET_TCP_LISTEN, 	"80"},
-	{"net.udp.listen",      CF_HAVEPARAMS,	NET_UDP_LISTEN, 	"68"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN, 	"80"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN, 	"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"en0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"en0,bytes"},

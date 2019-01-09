@@ -36,17 +36,17 @@
 #endif
 
 ZBX_METRIC	parameters_simple[] =
-/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ssh,127.0.0.1,22"},
-	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ssh,127.0.0.1,22"},
-	{"net.udp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ntp,127.0.0.1,123"},
-	{"net.udp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ntp,127.0.0.1,123"},
+	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE,		"ssh,127.0.0.1,22"},
+	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF,	"ssh,127.0.0.1,22"},
+	{"net.udp.service",	CF_HAVEPARAMS,	CHECK_SERVICE,		"ntp,127.0.0.1,123"},
+	{"net.udp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF,	"ntp,127.0.0.1,123"},
 	{NULL}
 };
 
 #ifdef HAVE_LDAP
-static int    check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
+static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
@@ -147,7 +147,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 static int	check_https(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	const char	*__function_name = "check_https";
-	CURL            *easyhandle;
+	CURL		*easyhandle;
 	CURLoption	opt;
 	CURLcode	err;
 	char		https_host[MAX_STRING_LEN];

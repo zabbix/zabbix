@@ -21,12 +21,12 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL},
 
-	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE, 		"/"},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
