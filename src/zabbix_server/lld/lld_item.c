@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2018 Zabbix SIA
+** Copyright (C) 2001-2019 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2475,27 +2475,46 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  ******************************************************************************/
 static void	substitute_lld_macors_in_preproc_params(int type, const zbx_lld_row_t *lld_row, char **sub_params)
 {
-	int	token_type = ZBX_MACRO_ANY;
-
-	switch (type)
+	if (ZBX_PREPROC_REGSUB == type ||
+			ZBX_PREPROC_VALIDATE_REGEX == type ||
+			ZBX_PREPROC_VALIDATE_NOT_REGEX == type ||
+			ZBX_PREPROC_ERROR_FIELD_REGEX == type)
 	{
-		case ZBX_PREPROC_REGSUB:
-			/* break; is not missing here */
-		case ZBX_PREPROC_VALIDATE_REGEX:
-			/* break; is not missing here */
-		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			/* break; is not missing here */
-		case ZBX_PREPROC_ERROR_FIELD_REGEX:
-			token_type |= ZBX_TOKEN_REGEXP;
-			break;
-		case ZBX_PREPROC_XPATH:
-			/* break; is not missing here */
-		case ZBX_PREPROC_ERROR_FIELD_XML:
-			token_type |= ZBX_TOKEN_XPATH;
-			break;
-	}
+		char	*param1 = NULL, *param2 = NULL;
+		size_t	sub_params_size;
 
-	substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
+		zbx_strsplit(*sub_params, '\n', &param1, &param2);
+
+		if (NULL == param2)
+		{
+			zbx_free(param1);
+			zabbix_log(LOG_LEVEL_ERR, "Invalid preprocessing parameters: %s.", *sub_params);
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
+		}
+
+		substitute_lld_macros(&param1, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP, NULL, 0);
+		substitute_lld_macros(&param2, &lld_row->jp_row, ZBX_MACRO_ANY | ZBX_TOKEN_REGEXP_OUTPUT, NULL, 0);
+
+		sub_params_size = strlen(param1) + strlen(param2) + 2;
+		*sub_params = (char*)zbx_realloc(*sub_params, sub_params_size);
+
+		zbx_snprintf(*sub_params, sub_params_size, "%s\n%s", param1, param2);
+
+		zbx_free(param1);
+		zbx_free(param2);
+	}
+	else
+	{
+		int	token_type = ZBX_MACRO_ANY;
+
+		if (ZBX_PREPROC_XPATH == type || ZBX_PREPROC_ERROR_FIELD_XML == type)
+		{
+			token_type |= ZBX_TOKEN_XPATH;
+		}
+
+		substitute_lld_macros(sub_params, &lld_row->jp_row, token_type, NULL, 0);
+	}
 }
 
 /******************************************************************************
