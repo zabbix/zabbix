@@ -479,6 +479,10 @@
 					.log(`\tmargins    :`,JSON.stringify(margins));
 
 				$.each(next_col, function(_, box) {
+					if ('pos' in box && box.pos[axis_key] > slot) {
+						return;
+					}
+
 					box.new_pos = $.extend({}, box.current_pos);
 					box.new_pos[axis_key] = slot;
 
