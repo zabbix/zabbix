@@ -697,7 +697,6 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
-
 out:
 	zbx_free(info);
 	zbx_free(discovery_key);
