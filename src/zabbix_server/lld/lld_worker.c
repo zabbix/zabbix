@@ -82,44 +82,48 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "processing discovery rule:" ZBX_FS_UI64, itemid);
 
-	if (NULL == error && (NULL == value || SUCCEED == lld_process_discovery_rule(itemid, value, &error)))
-		state = ITEM_STATE_NORMAL;
-	else
-		state = ITEM_STATE_NOTSUPPORTED;
-
 	diff.flags = ZBX_FLAGS_ITEM_DIFF_UNSET;
 
-	if (state != item.state)
+	if (NULL != error || NULL != value)
 	{
-		diff.state = state;
-		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
-
-		if (ITEM_STATE_NORMAL == state)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became supported", item.host.host,
-					item.key_orig);
-
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts, ITEM_STATE_NORMAL,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
-		}
+		if (NULL == error && SUCCEED == lld_process_discovery_rule(itemid, value, &error))
+			state = ITEM_STATE_NORMAL;
 		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became not supported: %s",
-					item.host.host, item.key_orig, error);
+			state = ITEM_STATE_NOTSUPPORTED;
 
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts, ITEM_STATE_NOTSUPPORTED,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, error);
+		if (state != item.state)
+		{
+			diff.state = state;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
+
+			if (ITEM_STATE_NORMAL == state)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became supported",
+						item.host.host, item.key_orig);
+
+				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
+						ITEM_STATE_NORMAL, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s:%s\" became not supported: %s",
+						item.host.host, item.key_orig, error);
+
+				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
+						ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
+						error);
+			}
+
+			zbx_process_events(NULL, NULL);
+			zbx_clean_events();
 		}
 
-		zbx_process_events(NULL, NULL);
-		zbx_clean_events();
-	}
-
-	/* with successful LLD processing LLD error will be set to empty string */
-	if (NULL != error && 0 != strcmp(error, item.error))
-	{
-		diff.error = error;
-		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		/* with successful LLD processing LLD error will be set to empty string */
+		if (NULL != error && 0 != strcmp(error, item.error))
+		{
+			diff.error = error;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		}
 	}
 
 	if (0 != meta)

@@ -446,7 +446,11 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 			}
 		}
 
-		zbx_lld_process_value(value->itemid, value_text, value->ts, meta, lastlogsize, mtime, value->error);
+		if (NULL != value_text || NULL != value->error || 0 != meta)
+		{
+			zbx_lld_process_value(value->itemid, value_text, value->ts, meta, lastlogsize, mtime,
+					value->error);
+		}
 	}
 }
 
