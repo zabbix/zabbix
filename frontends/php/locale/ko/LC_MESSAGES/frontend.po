@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2464,8 +2464,8 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "아이템\"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "템플릿 스크린 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
@@ -2603,7 +2603,7 @@ msgstr "이미지 \"%1$s\"의 \"imagetype\"를 갱신할 수 없습니다"
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "스크린\"%1$s\"의 \"templateid\"를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "템플릿스크린\"%1$s\"의 \"templateid\"를 갱신할 수 없습니다"
@@ -5383,7 +5383,7 @@ msgstr "맵ID가 공백입니다."
 msgid "Empty media type ID."
 msgstr "미디어 타입ID가 공백입니다."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "이름이 공백입니다."
 
@@ -5395,7 +5395,7 @@ msgstr "파라미터가 공백입니다."
 msgid "Empty screen ID for screen."
 msgstr "스크린의 스크린ID가 공백입니다."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "템플릿 스크린의 스크린ID가 공백입니다."
 
@@ -6336,7 +6336,7 @@ msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 계승할 수 없습니다. 지정된 아이템은 \"%2$s\"에 존재하지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
@@ -7542,7 +7542,7 @@ msgstr "맵 \"%2$s\"의 \"private\"값 \"%1$s\"가 올바르지 않습니다."
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"의 \"private\"의 값 \"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의존관계의 항목 \"soft\"의 값이 올바르지 않습니다."
@@ -7580,7 +7580,7 @@ msgstr "SNMP OID의 값이 올바르지 않습니다."
 msgid "Incorrect SNMP community."
 msgstr "SNMP커뮤니티의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 SLA의 허가값이 올바르지 않습니다."
@@ -7699,7 +7699,7 @@ msgstr "실행하는 액션의 유저 값이 올바르지 않습니다. 사용�
 msgid "Incorrect action operationid."
 msgstr "실행하는 액션의 설정이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 알고리즘이 올바르지 않습니다."
@@ -7779,7 +7779,7 @@ msgstr "아이템 \"%1$s\"의 인증 프로토콜이 올바르지 않습니다."
 msgid "Incorrect bulk value for interface."
 msgstr "인터페이스의 bulk의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 SLA의 값의 계산이 올바르지 않습니다."
@@ -7950,7 +7950,7 @@ msgstr "이미지의 인덱스가 올바르지 않습니다."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "입력된 파라미터가 올바르지 않습니다."
 
@@ -8090,12 +8090,12 @@ msgstr "액션의 실행조건의 파라미터가 올바르지 않습니다."
 msgid "Incorrect parameters for maintenance."
 msgstr "메인터넌스의 파라미터가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 상위가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "상위 서비스가 올바르지 않습니다."
 
@@ -8150,7 +8150,7 @@ msgstr "서비스 시작시간이 올바르지 않습니다."
 msgid "Incorrect service time type."
 msgstr "서비스 시간의 종류가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 정렬이 올바르지 않습니다."
@@ -8166,7 +8166,7 @@ msgstr "소스 값이 올바르지 않습니다."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "호스트 \"%1$s\" 상태가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "서비스 \"%1$s\" 상태가 올바르지 않습니다."
@@ -8175,7 +8175,7 @@ msgstr "서비스 \"%1$s\" 상태가 올바르지 않습니다."
 msgid "Incorrect style provided for screen element."
 msgstr "스크린 요소 스타일이 올바르지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "템플릿 스크린ID가 올바르지 않습니다."
 
@@ -8183,7 +8183,7 @@ msgstr "템플릿 스크린ID가 올바르지 않습니다."
 msgid "Incorrect templated web scenario step count."
 msgstr "템플릿의 웹 시나리오의 스텝 카운트가 올바르지 않습니다."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"의 트리거 ID가 올바르지 않습니다."
@@ -8829,7 +8829,7 @@ msgstr "매크로 \"%1$s\": %2$s가 올바르지 않습니다."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "메소드의 파라미터가 올바르지 않습니다."
@@ -9072,7 +9072,7 @@ msgstr "아이템\"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "아이템\"%1$s\"는 항목번호가 존재하지 않는 호스트 인벤토리\"%2$d\"를 자동설정할 수 없습니다. 0 (자동설정안함)에서 %3$d의 사이로 설정해 주십시오."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "아이템\"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
@@ -10871,7 +10871,7 @@ msgstr "미디어 타입에 \"%1$s\"이 정의되어 있지 않습니다."
 msgid "No \"%1$s\" given for screen."
 msgstr "스크린에 \"%1$s\"가 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "템플릿스크린에 \"%1$s\"가 정의되어 있지 않습니다."
@@ -11255,15 +11255,15 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13831,7 +13831,7 @@ msgstr "범위"
 msgid "Screen"
 msgstr "스크린"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "스크린 \"%1$s\"은 템플릿\"%2$s\"에 이미 존재합니다."
@@ -14228,22 +14228,22 @@ msgstr "서버 시간"
 msgid "Service"
 msgstr "서비스"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "서비스\"%1$s\"는 삭제할 수 없습니다. 다른 서비스에서의 의존관계가 있습니다."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "서비스 \"%1$s\"는 자기자신을 의존할 수 없습니다."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "서비스 \"%1$s\"는 트리거에 링크와 자식을 지니는 것을 동시에 할 수 없습니다."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "서비스 \"%1$s\"는 이미 다른 서비스에 하드링크되어 있습니다."
@@ -14253,7 +14253,7 @@ msgstr "서비스 \"%1$s\"는 이미 다른 서비스에 하드링크되어 있�
 msgid "Service availability report"
 msgstr "서비스 가동 레포트"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "서비스는 동시에 상위와 하위가 될 수 없습니다."
 
@@ -14312,7 +14312,7 @@ msgstr "서비스를 갱신하였습니다"
 msgid "Services"
 msgstr "서비스"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "서비스의 의존관계가 모순되어있습니다."
 
@@ -15267,8 +15267,8 @@ msgstr "템플릿 매크로"
 msgid "Template name"
 msgstr "템플릿 이름"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "템플릿스크린\"%1$s\"이 이미 존재합니다."

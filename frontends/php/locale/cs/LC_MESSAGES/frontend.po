@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-11-05 13:37+0300\n"
 "Last-Translator: martinds <kotyk@datasys.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2568,8 +2568,8 @@ msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro položku \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro šablonu obrazovky \"%2$s\"."
@@ -2707,7 +2707,7 @@ msgstr "Není možné aktualizovat \"imagetype\" pro obrázek \"%1$s\"."
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Nelze aktualizovat \"templateid\" pro obrazovku \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Není možné aktualizovat \"templateid\" pro šablonu obrazovky \"%1$s\"."
@@ -5508,7 +5508,7 @@ msgstr "Prázdné ID mapy."
 msgid "Empty media type ID."
 msgstr "Prázdný typ média ID."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Prázdné jméno."
 
@@ -5520,7 +5520,7 @@ msgstr "Prázdné parametry"
 msgid "Empty screen ID for screen."
 msgstr "Prázdné ID pro obrazovku."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Prázdné ID obrazovky pro šablonu obrazovky."
 
@@ -6463,7 +6463,7 @@ msgstr "Graf \"%1$s\" nemůže dědit. Na \"%2$s\" nejsou požadované položky 
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "Graf \"%1$s\" nemůže dědit. Na \"%2$s\" nejsou požadované položky."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Graf \"%1$s\" neexistuje v šabloně \"%2$s\"."
@@ -7681,7 +7681,7 @@ msgstr "Nesprávná hodnota \"soukromé\" \"%1$s\" pro mapu \"%2$s\"."
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "Nesprávná hodnota \"%1$s\" \"private\" pro obrazovku \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Neplatná hodnota pole \"soft\" pro závislost na službě \"%1$s\"."
@@ -7719,7 +7719,7 @@ msgstr "Nesprávná hodnota SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Nesprávná SNMP komunita."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Neplatná akceptovatelná SLA pro službu \"%1$s\"."
@@ -7838,7 +7838,7 @@ msgstr "Neplatná operace uživatele. Uživatel neexistuje nebo k němu nemáte 
 msgid "Incorrect action operationid."
 msgstr "Neplatné akce operace ID."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Neplatný algoritmus pro službu \"%1$s\"."
@@ -7918,7 +7918,7 @@ msgstr "Neplatný přihlašovací protokol pro položku \"%1$s\"."
 msgid "Incorrect bulk value for interface."
 msgstr "Neplatná hromadná hodnota pro rozhraní."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Nesprávně vypočítaná hodnota SLA pro službu \"%1$s\"."
@@ -8089,7 +8089,7 @@ msgstr "Neplatný obrázkový index."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Nesprávné vstupní parametry."
 
@@ -8229,12 +8229,12 @@ msgstr "Neplatné parametry pro podmínku."
 msgid "Incorrect parameters for maintenance."
 msgstr "Neplatné parametry pro údržbu."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Neplatný nadřízený pro službu \"%1$s\"."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Neplatná nadřízená služba."
 
@@ -8289,7 +8289,7 @@ msgstr "Neplatný čas začátku služby."
 msgid "Incorrect service time type."
 msgstr "Neplatný typ času služby."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Neplatné pořadí řazení pro službu \"%1$s\"."
@@ -8305,7 +8305,7 @@ msgstr "Neplatná hodnota zdroje."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Neplatný stav pro hosta \"%1$s\"."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Neplatný stav pro službu \"%1$s\"."
@@ -8314,7 +8314,7 @@ msgstr "Neplatný stav pro službu \"%1$s\"."
 msgid "Incorrect style provided for screen element."
 msgstr "Neplatný styl prvku obrazovky."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Neplatné ID šablony obrazovky."
 
@@ -8322,7 +8322,7 @@ msgstr "Neplatné ID šablony obrazovky."
 msgid "Incorrect templated web scenario step count."
 msgstr "Neplatný počet kroků šablony web scénáře."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Neplatné ID spouštěče pro službu \"%1$s\"."
@@ -8968,7 +8968,7 @@ msgstr "Neplatné makro \"%1$s\": %2$s."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Neplatné parametry metody."
@@ -9211,7 +9211,7 @@ msgstr "Položka \"%1$s\" již existuje na \"%2$s\"."
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Položka \"%1$s\" nemůže být naplněná chybějícím inventárním polem číslo \"%2$d\". Možnosti: od 0 (nenaplňuje) do %3$d."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Položka \"%1$s\" neexistuje v šabloně \"%2$s\"."
@@ -11040,7 +11040,7 @@ msgstr "Ne \"%1$s\" vzhledem k tomu, typu média."
 msgid "No \"%1$s\" given for screen."
 msgstr "Žádné \"%1$s\" dané pro obrazovku."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Žádné \"%1$s\" dané pro šablonu obrazovky."
@@ -11424,15 +11424,15 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -14006,7 +14006,7 @@ msgstr "Rozsah"
 msgid "Screen"
 msgstr "Obrazovka"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "Obrazovka \"%1$s\" už existuje v šabloně \"%2$s\"."
@@ -14405,22 +14405,22 @@ msgstr "Čas na serveru"
 msgid "Service"
 msgstr "Služba"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Služba \"%1$s\" nemůže být smazána, protože na ní závisí jiná služba."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Služba \"%1$s\" nemůže záviset sama na sobě."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Služba \"%1$s\" nemůže být připojená k spouštěči a mít zároveň podřízené služby."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Služba \"%1$s\" je již připojená k dalším službám."
@@ -14430,7 +14430,7 @@ msgstr "Služba \"%1$s\" je již připojená k dalším službám."
 msgid "Service availability report"
 msgstr "Report dostupnosti služeb"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Služba nemůže být nadřazená i podřazená zároveň."
 
@@ -14489,7 +14489,7 @@ msgstr "Služba byla aktualizována"
 msgid "Services"
 msgstr "Služby"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Služby tvoří kruhovou závislost."
 
@@ -15444,8 +15444,8 @@ msgstr "Makra šablon"
 msgid "Template name"
 msgstr "Jméno šablony"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Šablona obrazovky \"%1$s\" již existuje."

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
 "PO-Revision-Date: 2018-12-19 15:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -2568,8 +2568,8 @@ msgstr "Не удалось установить \"%1$s\" для прототи�
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для элемента данных \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" шаблонному комплексному экрану \"%2$s\"."
@@ -2707,7 +2707,7 @@ msgstr "Не удалось обновить \"imagetype\" для изображ
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для комплексного экрана \"%1$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "Не удалось обновить \"templateid\" для шаблонного комплексного экрана \"%1$s\"."
@@ -5508,7 +5508,7 @@ msgstr "Пустой ID карты сети."
 msgid "Empty media type ID."
 msgstr "Пустой ID типа оповещений."
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "Пустое имя."
 
@@ -5520,7 +5520,7 @@ msgstr "Пустые параметры"
 msgid "Empty screen ID for screen."
 msgstr "Пустой screen ID для комплексного экрана."
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "Пустой screen ID для шаблонного комплексного экрана."
 
@@ -6463,7 +6463,7 @@ msgstr "График \"%1$s\" не может быть унаследован. �
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\"."
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "График \"%1$s\" не существует у шаблона \"%2$s\"."
@@ -7681,7 +7681,7 @@ msgstr "Некорректное значение \"private\" \"%1$s\" у кар
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "Некорректное значение \"private\" \"%1$s\" у комплексного экрана \"%2$s\"."
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Некорректное значение поля \"нежесткая\" для зависимости у услуги \"%1$s\"."
@@ -7719,7 +7719,7 @@ msgstr "Некорректный SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Некорректное SNMP community."
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Некорректное значение допустимого SLA для услуги \"%1$s\"."
@@ -7838,7 +7838,7 @@ msgstr "Некорректный пользователь для операци�
 msgid "Incorrect action operationid."
 msgstr "Некорректный operationid действия."
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Некорректный алгоритм для услуги \"%1$s\"."
@@ -7918,7 +7918,7 @@ msgstr "Некорректный протокол аутентификации �
 msgid "Incorrect bulk value for interface."
 msgstr "Некорректное значение массового опроса для интерфейса."
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
@@ -8089,7 +8089,7 @@ msgstr "Некорректный индекс изображения."
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Некорректные входные параметры."
 
@@ -8229,12 +8229,12 @@ msgstr "Некорректные параметры для условии."
 msgid "Incorrect parameters for maintenance."
 msgstr "Некорректные параметры для обслуживания."
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Некорректный родитель для услуги \"%1$s\"."
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "Некорректная родительская услуга."
 
@@ -8289,7 +8289,7 @@ msgstr "Некорректное время начала услуги."
 msgid "Incorrect service time type."
 msgstr "Некорректный тип времени услуги."
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "Некорректный порядок сортировки у услуги \"%1$s\"."
@@ -8305,7 +8305,7 @@ msgstr "Некорректное значение источника."
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Некорректное состояние для узла сети \"%1$s\"."
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Некорректное состояние для услуги \"%1$s\"."
@@ -8314,7 +8314,7 @@ msgstr "Некорректное состояние для услуги \"%1$s\"
 msgid "Incorrect style provided for screen element."
 msgstr "Указан некорректный стиль для элемента комплексного экрана."
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "Некорректный ID шаблонного комплексного экрана."
 
@@ -8322,7 +8322,7 @@ msgstr "Некорректный ID шаблонного комплексног�
 msgid "Incorrect templated web scenario step count."
 msgstr "Некорректное количество шагов у шаблонного веб-сценария."
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Некорректный ID триггера для услуги \"%1$s\"."
@@ -8968,7 +8968,7 @@ msgstr "Ошибочный макрос \"%1$s\": %2$s."
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "Ошибочные параметры метода."
@@ -9211,7 +9211,7 @@ msgstr "Элемент данных \"%1$s\" уже существует у \"%2
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Элемент данных \"%1$s\" не может заполнять отсутствующее поле под номером \"%2$d\" инвентарных данных узла сети. Выберите из: от 0 (не заполнять) до %3$d."
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "Элемент данных \"%1$s\" не существует у шаблона \"%2$s\"."
@@ -11040,7 +11040,7 @@ msgstr "Не указан \"%1$s\" у типа оповещений."
 msgid "No \"%1$s\" given for screen."
 msgstr "Не указан \"%1$s\" для комплексного экрана."
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "Не указан \"%1$s\" для шаблона комплексного экрана."
@@ -11424,15 +11424,15 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -14006,7 +14006,7 @@ msgstr "Границы"
 msgid "Screen"
 msgstr "Комплексный экран"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "Комплексный экран \"%1$s\" уже существует у шаблона \"%2$s\"."
@@ -14405,22 +14405,22 @@ msgstr "Время на сервере"
 msgid "Service"
 msgstr "Услуга"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не может быть удалена, потому что другая услуга зависит от неё."
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не может зависеть сама от себя."
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не может быть связана с триггером и быть подчиненной одновременно."
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" уже жестко связана с другой услугой."
@@ -14430,7 +14430,7 @@ msgstr "Услуга \"%1$s\" уже жестко связана с другой
 msgid "Service availability report"
 msgstr "Отчет доступности услуг"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услуга не может быть родительской и подчиненной одновременно."
 
@@ -14489,7 +14489,7 @@ msgstr "Услуга обновлена"
 msgid "Services"
 msgstr "Услуги"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "Услуги образуют круговую зависимость."
 
@@ -15444,8 +15444,8 @@ msgstr "Шаблонные макросы"
 msgid "Template name"
 msgstr "Имя шаблона"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "Шаблонный комплексный экран \"%1$s\" уже существует."

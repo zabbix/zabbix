@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-21 13:29+0200\n"
-"PO-Revision-Date: 2018-12-20 03:42+0300\n"
+"POT-Creation-Date: 2019-01-06 01:44+0200\n"
+"PO-Revision-Date: 2018-12-25 01:42+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1545270124.000000\n"
+"X-POOTLE-MTIME: 1545694956.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -2464,8 +2464,8 @@ msgstr "グラフのプロトタイプ\"%2$s\"に\"%1$s\"を設定できませ�
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "アイテム\"%2$s\"に\"%1$s\"を設定できません。"
 
-#: include/classes/api/services/CTemplateScreen.php:603
-#: include/classes/api/services/CTemplateScreen.php:701
+#: include/classes/api/services/CTemplateScreen.php:605
+#: include/classes/api/services/CTemplateScreen.php:703
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
 msgstr "テンプレートスクリーン\"%2$s\"に\"%1$s\"を設定できません。"
@@ -2603,7 +2603,7 @@ msgstr "イメージ\"%1$s\"の\"imagetype\"を更新できません。"
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "スクリーン\"%1$s\"の\"templateid\"を更新できません。"
 
-#: include/classes/api/services/CTemplateScreen.php:691
+#: include/classes/api/services/CTemplateScreen.php:693
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
 msgstr "テンプレートスクリーン\"%1$s\"の\"templateid\"を更新できません。"
@@ -5026,7 +5026,7 @@ msgstr "%3$s件のうち%1$sから%2$s件までを表示しています"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:252
 msgid "Displaying options"
-msgstr ""
+msgstr "表示オプション"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -5382,7 +5382,7 @@ msgstr "マップIDが空白です。"
 msgid "Empty media type ID."
 msgstr "メディアタイプIDが空白です。"
 
-#: include/classes/api/services/CService.php:857
+#: include/classes/api/services/CService.php:853
 msgid "Empty name."
 msgstr "名前が空白です。"
 
@@ -5394,7 +5394,7 @@ msgstr "パラメータが空白です"
 msgid "Empty screen ID for screen."
 msgstr "スクリーンのスクリーンIDが空白です。"
 
-#: include/classes/api/services/CTemplateScreen.php:658
+#: include/classes/api/services/CTemplateScreen.php:660
 msgid "Empty screen ID for template screen."
 msgstr "プンプレートスクリーンのスクリーンIDが空白です。"
 
@@ -6335,7 +6335,7 @@ msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテム�
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
 msgstr "グラフ\"%1$s\"は継承できません。指定されたアイテムは\"%2$s\"に存在しません。"
 
-#: include/classes/api/services/CTemplateScreen.php:544
+#: include/classes/api/services/CTemplateScreen.php:546
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "グラフ\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
@@ -7541,7 +7541,7 @@ msgstr "マップ\"%2$s\"の\"private\"の値\"%1$s\"が正しくありません
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
 msgstr "スクリーン\"%2$s\"の\"private\"の値\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CService.php:1078
+#: include/classes/api/services/CService.php:1074
 #, c-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "サービス\"%1$s\"依存関係のフィールド\"soft\"の値が正しくありません。"
@@ -7579,7 +7579,7 @@ msgstr "SNMP OIDの値が正しくありません。"
 msgid "Incorrect SNMP community."
 msgstr "SNMPコミュニティの値が正しくありません。"
 
-#: include/classes/api/services/CService.php:903
+#: include/classes/api/services/CService.php:899
 #, c-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のSLAの許容値が正しくありません。"
@@ -7698,7 +7698,7 @@ msgstr "実行するアクションのユーザーの値が正しくありませ
 msgid "Incorrect action operationid."
 msgstr "実行するアクションの設定が正しくありません。"
 
-#: include/classes/api/services/CService.php:870
+#: include/classes/api/services/CService.php:866
 #, c-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のアルゴリズムが正しくありません。"
@@ -7778,7 +7778,7 @@ msgstr "アイテム\"%1$s\"の認証プロトコルが正しくありません�
 msgid "Incorrect bulk value for interface."
 msgstr "インターフェースのbulkの値が正しくありません。"
 
-#: include/classes/api/services/CService.php:887
+#: include/classes/api/services/CService.php:883
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のSLAの値の計算が正しくありません。"
@@ -7949,7 +7949,7 @@ msgstr "イメージのインデックスが正しくありません。"
 #: include/classes/api/services/CScreen.php:455
 #: include/classes/api/services/CTemplate.php:406
 #: include/classes/api/services/CTemplate.php:534
-#: include/classes/api/services/CTemplateScreen.php:594
+#: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "入力されたパラメータが正しくありません。"
 
@@ -8089,12 +8089,12 @@ msgstr "アクションの実行条件のパラメータが正しくありませ
 msgid "Incorrect parameters for maintenance."
 msgstr "メンテナンスのパラメータが正しくありません。"
 
-#: include/classes/api/services/CService.php:945
+#: include/classes/api/services/CService.php:941
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "サービス\"%1$s\"の親が正しくありません。"
 
-#: include/classes/api/services/CService.php:948
+#: include/classes/api/services/CService.php:944
 msgid "Incorrect parent service."
 msgstr "親サービスが正しくありません。"
 
@@ -8149,7 +8149,7 @@ msgstr "サービス開始時刻が正しくありません。"
 msgid "Incorrect service time type."
 msgstr "サービスタイムの種別が正しくありません。"
 
-#: include/classes/api/services/CService.php:918
+#: include/classes/api/services/CService.php:914
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のソート順序が正しくありません。"
@@ -8165,7 +8165,7 @@ msgstr "ソースの値が正しくありません。"
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "ホスト\"%1$s\"のステータスが正しくありません。"
 
-#: include/classes/api/services/CService.php:966
+#: include/classes/api/services/CService.php:962
 #, c-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のステータスが正しくありません。"
@@ -8174,7 +8174,7 @@ msgstr "サービス\"%1$s\"のステータスが正しくありません。"
 msgid "Incorrect style provided for screen element."
 msgstr "スクリーンの要素のスタイルが正しくありません。"
 
-#: include/classes/api/services/CTemplateScreen.php:659
+#: include/classes/api/services/CTemplateScreen.php:661
 msgid "Incorrect template screen ID."
 msgstr "テンプレートスクリーンIDが正しくありません。"
 
@@ -8182,7 +8182,7 @@ msgstr "テンプレートスクリーンIDが正しくありません。"
 msgid "Incorrect templated web scenario step count."
 msgstr "テンプレートのWebシナリオのステップ数が正しくありません。"
 
-#: include/classes/api/services/CService.php:931
+#: include/classes/api/services/CService.php:927
 #, c-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のトリガーIDが正しくありません。"
@@ -8828,7 +8828,7 @@ msgstr "マクロ\"%1$s\": %2$sが正しくありません。"
 #: include/classes/api/services/CScreenItem.php:337
 #: include/classes/api/services/CService.php:200
 #: include/classes/api/services/CService.php:371
-#: include/classes/api/services/CService.php:1207
+#: include/classes/api/services/CService.php:1203
 #: include/classes/core/CJsonRpc.php:199
 msgid "Invalid method parameters."
 msgstr "メソッドのパラメータが正しくありません。"
@@ -9071,7 +9071,7 @@ msgstr "アイテム\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "アイテム\"%1$s\"はフィールド番号が存在しないホストインベントリ\"%2$d\"を自動設定することができません。0 (自動設定しない)から%3$dの間で設定してください。"
 
-#: include/classes/api/services/CTemplateScreen.php:562
+#: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません。"
@@ -10870,7 +10870,7 @@ msgstr "メディアタイプに\"%1$s\"が定義されていません。"
 msgid "No \"%1$s\" given for screen."
 msgstr "スクリーンに\"%1$s\"が定義されていません。"
 
-#: include/classes/api/services/CTemplateScreen.php:657
+#: include/classes/api/services/CTemplateScreen.php:659
 #, c-format
 msgid "No \"%1$s\" given for template screen."
 msgstr "テンプレートスクリーンに\"%1$s\"が定義されていません。"
@@ -11254,15 +11254,15 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CScript.php:547
 #: include/classes/api/services/CScript.php:592
 #: include/classes/api/services/CScript.php:601
-#: include/classes/api/services/CService.php:993
-#: include/classes/api/services/CService.php:1017
+#: include/classes/api/services/CService.php:989
+#: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
 #: include/classes/api/services/CTemplate.php:722
 #: include/classes/api/services/CTemplate.php:744
-#: include/classes/api/services/CTemplateScreen.php:629
-#: include/classes/api/services/CTemplateScreen.php:680
-#: include/classes/api/services/CTemplateScreen.php:743
-#: include/classes/api/services/CTemplateScreen.php:754
+#: include/classes/api/services/CTemplateScreen.php:631
+#: include/classes/api/services/CTemplateScreen.php:682
+#: include/classes/api/services/CTemplateScreen.php:745
+#: include/classes/api/services/CTemplateScreen.php:756
 #: include/classes/api/services/CTriggerGeneral.php:722
 #: include/classes/api/services/CTrigger.php:633
 #: include/classes/api/services/CTrigger.php:673
@@ -13830,7 +13830,7 @@ msgstr "範囲"
 msgid "Screen"
 msgstr "スクリーン"
 
-#: include/classes/api/services/CTemplateScreen.php:776
+#: include/classes/api/services/CTemplateScreen.php:778
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr "スクリーン\"%1$s\"はテンプレート\"%2$s\"にすでに存在します。"
@@ -14227,22 +14227,22 @@ msgstr "サーバー時間"
 msgid "Service"
 msgstr "サービス"
 
-#: include/classes/api/services/CService.php:1048
+#: include/classes/api/services/CService.php:1044
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "サービス\"%1$s\"は削除できません。他のサービスからの依存関係があります。"
 
-#: include/classes/api/services/CService.php:1067
+#: include/classes/api/services/CService.php:1063
 #, c-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "サービス\"%1$s\"は自分自身に依存できません。"
 
-#: include/classes/api/services/CService.php:1142
+#: include/classes/api/services/CService.php:1138
 #, c-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "サービス\"%1$s\"はトリガーへのリンクと子を持つことを同時にできません。"
 
-#: include/classes/api/services/CService.php:1119
+#: include/classes/api/services/CService.php:1115
 #, c-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "サービス\"%1$s\"はすでに他のサービスにハードリンクされています。"
@@ -14252,7 +14252,7 @@ msgstr "サービス\"%1$s\"はすでに他のサービスにハードリンク�
 msgid "Service availability report"
 msgstr "サービス稼働レポート"
 
-#: include/classes/api/services/CService.php:953
+#: include/classes/api/services/CService.php:949
 msgid "Service cannot be parent and child at the same time."
 msgstr "サービスは同時に親と子になることはできません"
 
@@ -14311,7 +14311,7 @@ msgstr "サービスを更新しました"
 msgid "Services"
 msgstr "サービス"
 
-#: include/classes/api/services/CService.php:1189
+#: include/classes/api/services/CService.php:1185
 msgid "Services form a circular dependency."
 msgstr "サービスの依存関係が循環設定されています。"
 
@@ -15266,8 +15266,8 @@ msgstr "テンプレートのマクロ"
 msgid "Template name"
 msgstr "テンプレート名"
 
-#: include/classes/api/services/CTemplateScreen.php:638
-#: include/classes/api/services/CTemplateScreen.php:718
+#: include/classes/api/services/CTemplateScreen.php:640
+#: include/classes/api/services/CTemplateScreen.php:720
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
 msgstr "テンプレートスクリーン\"%1$s\"がすでに存在します。"
@@ -18248,7 +18248,7 @@ msgstr "第4"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:324
 msgid "fuzzytime() - Difference between item value (as timestamp) and Zabbix server timestamp is less than or equal to T seconds (1 - true, 0 - false)"
-msgstr ""
+msgstr "fuzzytime() - アイテムの値(タイムスタンプとして)とZabbixサーバーのタイムスタンプとの差がT秒以下か (1 - T秒以下、0 - それ以外)"
 
 #: include/views/configuration.item.edit.php:772
 #: include/views/configuration.item.edit.php:777
