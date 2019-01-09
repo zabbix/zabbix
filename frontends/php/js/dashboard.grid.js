@@ -459,15 +459,8 @@
 				scanline[axis_key] = slot;
 				col = getAffectedInBounds(scanline);
 				scanline[axis_key] += scanline[size_key];
-
-				if (scanline[axis_key] == new_max) {
-					next_col = [{current_pos: $.extend({}, scanline), header: 'LAST'}];
-					collapsed = false;
-				}
-				else {
-					next_col = getAffectedInBounds(scanline);
-					collapsed = next_col.length > 0;
-				}
+				next_col = getAffectedInBounds(scanline);
+				collapsed = next_col.length > 0;
 
 				console
 					.log(`slot=${slot}, overlap=${overlap}`);
@@ -553,6 +546,7 @@
 					});
 
 					overlap -= 1;
+					new_max -= 1;
 				}
 				else {
 					margins = margins_backup;
@@ -561,9 +555,13 @@
 
 				next_col.concat(col).each(function(box) {
 					if (collapsed && 'new_pos' in box) {
-						box.current_pos = box.new_pos;
 						console
 							.log(`${box.header} was moved or resized`);
+						console
+							.log(`\tcurrent_pos`, JSON.parse(JSON.stringify(box.current_pos)));
+						console
+							.log(`\tnew_pos`, JSON.parse(JSON.stringify(box.new_pos)));
+						box.current_pos = box.new_pos;
 						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 255, 0, 1)');
 					}
 
