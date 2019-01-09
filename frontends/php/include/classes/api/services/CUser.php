@@ -1189,9 +1189,13 @@ class CUser extends CApiService {
 			}
 		}
 		catch (APIException $e) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
+				++$db_user['attempt_failed'];
+			}
+
 			DB::update('users', [
 				'values' => [
-					'attempt_failed' => ++$db_user['attempt_failed'],
+					'attempt_failed' => $db_user['attempt_failed'],
 					'attempt_clock' => time(),
 					'attempt_ip' => substr($db_user['userip'], 0, 39)
 				],
