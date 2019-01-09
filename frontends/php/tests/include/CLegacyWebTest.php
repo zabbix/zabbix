@@ -661,7 +661,7 @@ class CLegacyWebTest extends CWebTest {
 				"//nav[@aria-label='Content controls']".
 					"//button[text()='{$text}']";
 
-		$this->zbxTestClickXpath($xpath);
+		$this->zbxTestClickXpathWait($xpath);
 	}
 
 	/**
