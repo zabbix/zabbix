@@ -536,7 +536,7 @@
 					console
 						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
-						if (box.current_pos[axis_key] > slot && collapsed_pos[box.current_pos[opposite_axis_key]]) {
+						if (box.current_pos[axis_key] > slot) {
 							var old_value = box.current_pos[axis_key];
 
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
@@ -544,18 +544,12 @@
 							);
 							console
 								.log(`${box.header} moved from ${old_value} to ${box.current_pos[axis_key]}, pos.${axis_key}=${box.pos[axis_key]}`);
-
-							if (old_value > box.current_pos[axis_key]) {
-								// Find widgets affected by current and update margin.
-								var start_pos = axis_boundaries[box.uniqueid].min,
-									stop_pos = axis_boundaries[box.uniqueid].max;
-
-								while (start_pos < stop_pos) {
-									margins[start_pos] = margins_backup[start_pos] - scanline[size_key];
-									++start_pos;
-								}
-							}
 						}
+					});
+
+					// Update margin values for collapsed lines on opposite axis.
+					$.each(collapsed_pos, function(index) {
+						margins[index] = margins_backup[index] - scanline[size_key];
 					});
 
 					overlap -= 1;
