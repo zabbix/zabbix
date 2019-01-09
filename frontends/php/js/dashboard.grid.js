@@ -302,15 +302,11 @@
 					return rectOverlap(bounds, box.current_pos) ? box : null;
 				});
 			},
-			getAffectedTreeAsArray = function(pos) {
+			markAffectedWidgets = function(pos) {
 				$.map(widgets, function(box) {
 					return (!('affected_axis' in box) && rectOverlap(pos, box.pos)) ? box : null;
 				})
 				.each(function(box) {
-					if ('affected_axis' in box && box.affected_axis !== axis_key) {
-						return;
-					}
-
 					var boundary = $.extend({}, box.pos);
 
 					if (axis_key in axis) {
@@ -322,18 +318,17 @@
 					}
 
 					box.affected_axis = axis_key;
-
-					getAffectedTreeAsArray(boundary);
-				});
-
-				return $.map(widgets, function(box) {
-					return ('affected_axis' in box && box.affected_axis === axis_key
-								&& box.uniqueid !== widget.uniqueid) ? box : null;
+					markAffectedWidgets(boundary);
 				});
 			};
 
 		// Get array containing only widgets affected by resize operation.
-		affected = getAffectedTreeAsArray(axis.boundary);
+		markAffectedWidgets(axis.boundary);
+		affected = $.map(widgets, function(box) {
+			return ('affected_axis' in box && box.affected_axis === axis_key && box.uniqueid !== widget.uniqueid)
+				? box
+				: null;
+		});
 
 		if (axis_key == 'x') {
 			widgets.each(function(b) {b.div.css('background-color', '')});
@@ -384,7 +379,7 @@
 
 		overlap = new_max - size_max;
 		console
-			.log(`\t\t `);
+			.error(`\t\t\t\t\tcollapsing widgets`);
 		console
 			.log(`affected widgets after compact step (${axis_key}, ${opposite_axis_key}, ${size_key}):`,
 				JSON.parse(JSON.stringify((function(d){ return $.map(d, function(b){return `"${b.header}: ${b.current_pos[axis_key]}, ${b.current_pos[opposite_axis_key]}, ${b.current_pos[size_key]}"`}).join(', ')})(affected))))
@@ -403,6 +398,85 @@
 				collapsed_pos,
 				margins_backup;
 			scanline[size_key] = 1;
+
+			/**
+			 * Build affected boundaries object with minimum and maximum value on opposite axis for every widget.
+			 * Key in axis_boundaries object will be widget uniqueid and value boundaries object described above.
+			 */
+			var axis_boundaries = {};
+			affected.each(function(box) {
+				var min = box.current_pos[opposite_axis_key],
+					max = min + box.current_pos[opposite_size_key],
+					size = box.current_pos[size_key],
+					affected_box = $.extend({}, box.current_pos),
+					boxes = [],
+					bounds_changes = true,
+					rprevent = 20;
+
+				affected_box[size_key] = new_max - affected_box[axis_key] - affected_box[size_key];
+
+				while (bounds_changes && rprevent--) {
+					bounds_changes = false;
+					affected_box[axis_key] += size;
+					affected_box[opposite_axis_key] = min;
+					affected_box[opposite_size_key] = max - min;
+					size = new_max;
+					boxes = getAffectedInBounds(affected_box);
+
+					boxes.each(function(box) {
+						if (min > box.current_pos[opposite_axis_key]) {
+							min = box.current_pos[opposite_axis_key];
+							bounds_changes = true;
+						}
+
+						if (max < box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key]) {
+							max = box.current_pos[opposite_axis_key] + box.current_pos[opposite_size_key];
+							bounds_changes = true;
+						}
+
+						size = Math.min(size, box.current_pos[size_key]);
+					});
+				}
+
+				if (!rprevent) {
+					console
+						.error('!!! possible recursion break on 20 iterations');
+				}
+
+				axis_boundaries[box.uniqueid] = {debug: box.header, min: min, max: max};
+			});
+
+			console
+				.log('axis_boundaries', axis_boundaries);
+
+			// console
+			// 		.groupCollapsed('margins preinitialization');
+			// affected.each(function(box) {
+			// 	// Find widgets affected by current and update margin.
+			// 	var affect_box = $.extend({}, box.current_pos),
+			// 		margin = margins[box.current_pos[opposite_axis_key]],
+			// 		top = affect_box[opposite_axis_key],
+			// 		bottom = top + affect_box[opposite_size_key];
+			// 	affect_box[size_key] = new_max - affect_box[axis_key];
+			// 	var fix_margin = getAffectedInBounds(affect_box);
+			// 	console
+			// 		.log(`${box.header} fixing margin of affected by collapse: top=${top}, bottom=${bottom}, margin=${margin}`);
+			// 	console
+			// 		.log(`\tfixing widgets:`, fix_margin);
+
+			// 	fix_margin.each(function(box1) {
+			// 		top = Math.min(top, box1.current_pos[opposite_axis_key]);
+			// 		bottom = Math.max(bottom, box1.current_pos[opposite_axis_key] + box1.current_pos[opposite_size_key]);
+			// 	});
+
+			// 	console
+			// 		.log(`\tnew values: top=${top}, bottom=${bottom}`);
+			// 	while(top < bottom) {
+			// 		margins[top] = Math.max(margin, margins[top]);
+			// 		++top;
+			// 	}
+			// });
+			// console.groupEnd();
 
 			while (slot < new_max && overlap > 0) {
 				margins_backup = $.extend({}, margins);
@@ -441,13 +515,15 @@
 									margin = 0,
 									i;
 
+								start_pos = axis_boundaries[col_box.uniqueid].min;
+								stop_pos = axis_boundaries[col_box.uniqueid].max;
+
 								// Find max overlap position value for checked widget.
 								for (i = start_pos; i < stop_pos; i++) {
-									//margin = Math.min(margin, margins[i]);
 									margin = Math.max(margin, margins[i]);
 								}
 
-								if (margin && margin <= size_max) {
+								if (margin && margin < size_max) {
 									console
 										.log(`${box.header} check on ${col_box.header} ignore collapse resize step, margin=${margin}, start_pos=${start_pos}, stop_pos=${stop_pos}`);
 									box.new_pos[axis_key] = box.current_pos[axis_key];
@@ -464,7 +540,7 @@
 								col_box.new_pos = $.extend({}, col_box.current_pos);
 								col_box.new_pos[size_key] -= scanline[size_key];
 
-								// Mark opposite axis widget coordinates as moveable.
+								// Mark opposite axis coordinates as moveable.
 								for (i = start_pos; i < stop_pos; i++) {
 									collapsed_pos[i] = 1;
 								}
@@ -485,11 +561,15 @@
 						.log(`\tcollapsed_pos:`, JSON.parse(JSON.stringify(collapsed_pos)));
 					affected.each(function(box) {
 						if (box.current_pos[axis_key] > slot && collapsed_pos[box.current_pos[opposite_axis_key]]) {
+							var dbg_from = box.current_pos[axis_key],
+								dbg_ch = box.current_pos[axis_key] - scanline[size_key];
+							console
+								.log(`!!!\t${box.header} current_pos, pos: ${dbg_ch}, ${box.pos[axis_key]}`);
 							box.current_pos[axis_key] = Math.max(box.current_pos[axis_key] - scanline[size_key],
 								box.pos[axis_key]
 							);
 							console
-								.log(`${box.header} moved to ${box.current_pos[axis_key]}`);
+								.log(`${box.header} moved from ${dbg_from} to ${box.current_pos[axis_key]}`);
 						}
 					});
 
@@ -508,27 +588,12 @@
 						box.div.css('background-color', axis_key == 'x' ? 'rgba(255, 0, 0, 1)' : 'rgba(0, 255, 0, 1)');
 
 						// Find widgets affected by current and update margin.
-						var affect_box = $.extend({}, box.current_pos),
-							margin = margins[box.current_pos[opposite_axis_key]],
-							top = affect_box[opposite_axis_key],
-							bottom = top + affect_box[opposite_size_key];
-						affect_box[size_key] = new_max - affect_box[axis_key];
-						var fix_margin = getAffectedInBounds(affect_box);
-						console
-							.log(`${box.header} fixing margin of affected by collapse: top=${top}, bottom=${bottom}, margin=${margin}`);
-						console
-							.log(`\tfixing widgets:`, fix_margin);
+						var start_pos = axis_boundaries[box.uniqueid].min,
+							stop_pos = axis_boundaries[box.uniqueid].max;
 
-						fix_margin.each(function(box1) {
-							top = Math.min(top, box1.current_pos[opposite_axis_key]);
-							bottom = Math.max(bottom, box1.current_pos[opposite_axis_key] + box1.current_pos[opposite_size_key]);
-						});
-
-						console
-							.log(`\tnew values: top=${top}, bottom=${bottom}`);
-						while(top < bottom) {
-							margins[top] = margin;
-							++top;
+						while (start_pos < stop_pos) {
+							margins[start_pos] = margins_backup[start_pos] - scanline[size_key];
+							++start_pos;
 						}
 					}
 
