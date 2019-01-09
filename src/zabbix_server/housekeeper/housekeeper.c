@@ -84,8 +84,8 @@ typedef struct
 }
 zbx_hk_cleanup_table_t;
 
-static unsigned char poption_mode_enabled 	= ZBX_HK_OPTION_ENABLED;
-static unsigned char poption_mode_disabled	= ZBX_HK_OPTION_DISABLED;
+static unsigned char poption_mode_regular 	= ZBX_HK_MODE_REGULAR;
+static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* Housekeeper table mapping to housekeeping configuration values.    */
 /* This mapping is used to exclude disabled tables from housekeeping  */
@@ -99,7 +99,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
-	{"events",		&poption_mode_enabled,	&poption_mode_disabled},
+	{"events",		&poption_mode_regular,	&poption_global_disabled},
 	{NULL}
 };
 
@@ -137,9 +137,6 @@ typedef struct
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
 	unsigned char		*poption_mode;
-
-	/* a reference to the previous value for poption_mode if we need to temporarily change it */
-	unsigned char		*poption_mode_prev;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
 	unsigned char		*poption_global;
@@ -360,7 +357,7 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uin
 {
 	zbx_hk_item_cache_t	*item_record;
 
-	if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
+	if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
 		return;
 
 	item_record = (zbx_hk_item_cache_t *)zbx_hashset_search(&rule->item_cache, &itemid);
@@ -474,14 +471,11 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  *                                                                            *
  * Function: hk_history_delete_queue_prepare_global                           *
  *                                                                            *
- * Purpose: prepares history housekeeping delete queue for the given history  *
- *          history rule if global housekeeping period is on                  *
+ * Purpose: prepares history housekeeping delete queue for a history rule     *
+ *          if global housekeeping period is on                               *
  *                                                                            *
  * Parameters: rule   - [IN/OUT] the history housekeeping rule                *
  *             now    - [IN] the current timestamp                            *
- *                                                                            *
- * Comments: This function also handles history rule initializing/releasing   *
- *           when the rule just became enabled/disabled.                      *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_prepare_global(zbx_hk_history_rule_t *rule, int now)
@@ -541,7 +535,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_OPTION_ENABLED == *rule->poption_mode)
+		if (ZBX_HK_MODE_REGULAR == *rule->poption_mode)
 		{
 			/* if Override item history/trends period is on then use simplified */
 			/* procedure without item_cache and items table scans for individual */
@@ -597,92 +591,36 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  * Return value: the number of tables processed                               *
  *                                                                            *
  ******************************************************************************/
-static int	hk_history_and_trends_partitioned(zbx_hk_history_rule_t *rules, int now)
+static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
-	const char		*__function_name = "hk_history_and_trends_partitioned";
+	const char		*__function_name = "hk_drop_partition_for_rule";
 
-	int			deleted = 0, keep_from;
+	int			keep_from, history_seconds;
 	DB_RESULT		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	for (int i = 0; NULL != rules[i].table; i++)
+	history_seconds = *rule->poption;
+
+	if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
 	{
-		if (ZBX_HK_OPTION_ENABLED == *rules[i].poption_mode &&
-				ZBX_HK_OPTION_ENABLED == *rules[i].poption_global)
-		{
-			int history = *rules[i].poption;
-
-			if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'",
-						rules[i].table);
-				continue;
-			}
-
-			keep_from = now - history;
-
-			zabbix_log(LOG_LEVEL_TRACE, "rule=%d keep_from=%d", i, keep_from);
-
-			result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rules[i].table);
-			if (NULL == result)
-				zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rules[i].table);
-			else
-				deleted++; /* TimescaleDB does not provide affected rows for drop_chunks */
-			DBfree_result(result);
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
+		return;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	keep_from = now - history_seconds;
+	zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __function_name, rule->table, keep_from);
 
-	return deleted;
-}
+	result = DBselect("SELECT drop_chunks(%d,'%s')", keep_from, rule->table);
 
-/******************************************************************************
- *                                                                            *
- * Function: hk_disable_rules_for_part_tables                                 *
- *                                                                            *
- * Purpose: temporarily disable history/trends housekeeping rules             *
- *                                                                            *
- * Parameters: rules       - [IN/OUT] history housekeeping rules              *
- *             hst_enabled - [IN] whether partitioning enabled for history    *
- *             tr_enabled  - [IN] whether partitioning enabled for trends     *
- *                                                                            *
- ******************************************************************************/
-static void	hk_disable_rules_for_part_tables(zbx_hk_history_rule_t *rules, int hst_enabled, int tr_enabled)
-{
-	for (int i = 0; NULL != rules[i].table; i++)
-	{
-		if ((0 != hst_enabled && ITEM_VALUE_TYPE_MAX > i) ||
-			(0 != tr_enabled && ITEM_VALUE_TYPE_MAX <= i))
-		{
-			rules[i].poption_mode_prev = rules[i].poption_mode;
-			rules[i].poption_mode = &poption_mode_disabled;
-		}
-	}
-}
+	if (NULL == result)
+		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
+	else
+		DBfree_result(result);
 
-/******************************************************************************
- *                                                                            *
- * Function: hk_restore_rules_for_part_tables                                 *
- *                                                                            *
- * Purpose: restore history/trends housekeeping rules to the initial state    *
- *                                                                            *
- * Parameters: rules       - [IN/OUT] history housekeeping rules              *
- *             hst_enabled - [IN] whether partitioning enabled for history    *
- *             tr_enabled  - [IN] whether partitioning enabled for trends     *
- *                                                                            *
- ******************************************************************************/
-static void	hk_restore_rules_for_part_tables(zbx_hk_history_rule_t *rules, int hst_enabled, int tr_enabled)
-{
-	for (int i = 0; NULL != rules[i].table; i++)
-	{
-		if ((0 != hst_enabled && ITEM_VALUE_TYPE_MAX > i)
-			|| (0 != tr_enabled && ITEM_VALUE_TYPE_MAX <= i))
-		{
-			rules[i].poption_mode = rules[i].poption_mode_prev;
-		}
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return;
 }
 
 /******************************************************************************
@@ -702,25 +640,8 @@ static int	housekeeping_history_and_trends(int now)
 
 	int			deleted = 0, i, rc;
 	zbx_hk_history_rule_t	*rule;
-#if defined(HAVE_POSTGRESQL)
-	int			timescaledb_enabled =
-		0 == zbx_strcmp_null(cfg.db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE);
-	int			hst_part_enabled = timescaledb_enabled && ZBX_HK_OPTION_ENABLED == cfg.hk.history_global;
-	int			tr_part_enabled = timescaledb_enabled && ZBX_HK_OPTION_ENABLED == cfg.hk.trends_global;
-#else
-	int			hst_part_enabled = 0, tr_part_enabled = 0;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
-
-	/* If partitioning enabled for history and/or trends then drop partitions containing expired history. */
-	/* After that we need to disable corresponding hk_history_rules so these are not picked up during */
-	/* the regular housekeeping deletions (tables w/o partitioning). We will restore rules at the end. */
-	if (hst_part_enabled || tr_part_enabled)
-	{
-		deleted += hk_history_and_trends_partitioned(hk_history_rules, now);
-		hk_disable_rules_for_part_tables(hk_history_rules, hst_part_enabled, tr_part_enabled);
-	}
 
 	/* prepare delete queues for all history housekeeping rules */
 	hk_history_delete_queue_prepare_all(hk_history_rules, now);
@@ -729,8 +650,18 @@ static int	housekeeping_history_and_trends(int now)
 	/* we need to clear records from */
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode || FAIL == zbx_history_requires_trends(rule->type))
+		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode || FAIL == zbx_history_requires_trends(rule->type))
 			continue;
+
+		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */
+		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
+		/* 1. "Override item history (or trend) period" must be on 2. DB must be PostgreSQL */
+		/* 3. config.db_extension must be set to "timescaledb" */
+		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
+		{
+			hk_drop_partition_for_rule(rule, now);
+			continue;
+		}
 
 		/* process delete queue for the housekeeping rule */
 
@@ -749,9 +680,6 @@ static int	housekeeping_history_and_trends(int now)
 		/* clear history rule delete queue so it's ready for the next housekeeping cycle */
 		hk_history_delete_queue_clear(rule);
 	}
-
-	if (hst_part_enabled || tr_part_enabled)
-		hk_restore_rules_for_part_tables(hk_history_rules, hst_part_enabled, tr_part_enabled);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
@@ -1020,7 +948,7 @@ static int	housekeeping_cleanup(void)
 	/* assemble list of tables included in the housekeeping procedure */
 	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_OPTION_ENABLED != *table->poption_mode || ZBX_HK_OPTION_ENABLED == *table->poption_global)
+		if (ZBX_HK_MODE_REGULAR != *table->poption_mode || ZBX_HK_OPTION_ENABLED == *table->poption_global)
 			continue;
 
 		table_name_esc = DBdyn_escape_string(table->name);

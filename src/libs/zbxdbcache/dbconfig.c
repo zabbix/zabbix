@@ -963,9 +963,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
-		config->config->hk.history_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
 		config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
+			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	{
+		config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
+	}
+#endif
 
 	config->config->hk.trends_mode = atoi(row[23]);
 	if (ZBX_HK_OPTION_ENABLED == (config->config->hk.trends_global = atoi(row[24])) &&
@@ -973,9 +982,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
-		config->config->hk.trends_mode = ZBX_HK_OPTION_DISABLED;
+		config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
 		config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
+			0 == zbx_strcmp_null(config->config->db_extension, ZBX_CONFIG_DB_EXTENSION_TIMESCALE))
+	{
+		config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
+	}
+#endif
 
 	if (SUCCEED == ret && SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))	/* table must have */
 		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");	/* only one record */

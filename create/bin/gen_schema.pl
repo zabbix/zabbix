@@ -163,16 +163,6 @@ my %postgresql = (
 	"t_varchar"	=>	"varchar"
 );
 
-my %timescaledb = %postgresql;
-for ("history", "history_uint", "history_log", "history_text", "history_str", "trends", "trends_uint")
-{
-	$timescaledb{"after"} .= <<EOF
-SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400);
-SELECT set_adaptive_chunking('$_', chunk_target_size => 'estimate');
-EOF
-;
-}
-
 my %sqlite3 = (
 	"type"		=>	"sql",
 	"database"	=>	"sqlite3",
@@ -633,6 +623,24 @@ sub process_row
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
+sub timescaledb
+{
+	for ("history", "history_uint", "history_log", "history_text", 
+			"history_str", "trends", "trends_uint")
+	{
+		print<<EOF
+SELECT create_hypertable('$_', 'clock', chunk_time_interval => 86400);
+SELECT set_adaptive_chunking('$_', chunk_target_size => 'estimate');
+EOF
+		;
+	}
+	print<<EOF
+UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+EOF
+	;
+	exit;
+}
+
 sub usage
 {
 	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
@@ -704,7 +712,7 @@ sub main
 	elsif ($format eq 'oracle')		{ %output = %oracle; }
 	elsif ($format eq 'postgresql')		{ %output = %postgresql; }
 	elsif ($format eq 'sqlite3')		{ %output = %sqlite3; }
-	elsif ($format eq 'timescaledb')	{ %output = %timescaledb; }
+	elsif ($format eq 'timescaledb')	{ timescaledb(); }
 	else					{ usage(); }
 
 	process();

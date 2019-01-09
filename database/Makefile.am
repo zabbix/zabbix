@@ -5,8 +5,7 @@ SUBDIRS = \
 	mysql \
 	oracle \
 	postgresql \
-	sqlite3 \
-	timescaledb
+	sqlite3
 
 EXTRA_DIST = \
 	elasticsearch

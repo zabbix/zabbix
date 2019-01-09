@@ -50,13 +50,6 @@ my %postgresql = (
 	"exec_cmd"	=>	";\n"
 );
 
-my %timescaledb = %postgresql;
-$timescaledb{"after"} = <<EOF
-UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-COMMIT;
-EOF
-;
-
 my %sqlite3 = (
 	"database"	=>	"sqlite3",
 	"before"	=>	"BEGIN TRANSACTION;\n",
@@ -199,7 +192,7 @@ sub process_row
 
 sub usage
 {
-	print "Usage: $0 [ibm_db2|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
+	print "Usage: $0 [ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -227,7 +220,6 @@ sub main
 	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($ARGV[0] eq 'timescaledb')	{ %output = %timescaledb; }
 	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
 	else					{ usage(); }
 

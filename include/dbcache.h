@@ -624,6 +624,11 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
+/* options for hk.history_mode, trends_mode */
+#define ZBX_HK_MODE_DISABLED		ZBX_HK_OPTION_DISABLED
+#define ZBX_HK_MODE_REGULAR		ZBX_HK_OPTION_ENABLED
+#define ZBX_HK_MODE_PARTITION		2
+
 #define ZBX_HK_HISTORY_MIN	SEC_PER_HOUR
 #define ZBX_HK_TRENDS_MIN	SEC_PER_DAY
 #define ZBX_HK_PERIOD_MAX	(25 * SEC_PER_YEAR)
