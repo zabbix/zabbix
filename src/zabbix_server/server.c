@@ -481,9 +481,6 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_IPMIPOLLER_FORKS)
 		CONFIG_IPMIMANAGER_FORKS = 1;
-
-	if (NULL == CONFIG_STATS_ALLOWED_IP)
-		CONFIG_STATS_ALLOWED_IP = zbx_strdup(CONFIG_STATS_ALLOWED_IP, "127.0.0.1");
 }
 
 /******************************************************************************
