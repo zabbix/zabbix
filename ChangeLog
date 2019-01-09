@@ -2235,6 +2235,7 @@ Changes for 3.0.25rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-15355] fixed undefined index in configuration.import API call (Sasha)
 A......... [ZBX-15354] fixed undefined index in API calls without "auth" parameter (Sasha)
 A......... [ZBX-14331] fixed error allowed to change interface type which is already used by items (gcalenko)
 ........S. [ZBX-15313] fixed unit suffix support in calculated item expressions (kalimulin)
