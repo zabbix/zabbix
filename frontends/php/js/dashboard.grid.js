@@ -269,6 +269,7 @@
 	 */
 	function dragPrepare(widgets, widget, max_rows) {
 		var pos = $.extend({}, widget.pos);
+
 		pos.height = max_rows - pos.y;
 
 		widgets
@@ -280,12 +281,16 @@
 				box.current_pos.y = box.pos.y - widget.pos.height;
 
 				widgets.each(function(b) {
-					if (b.uniqueid == box.uniqueid || !rectOverlap(b.current_pos, box.current_pos)) {
+					if (b.uniqueid == box.uniqueid || b.uniqueid == widget.uniqueid
+							|| !rectOverlap(b.current_pos, box.current_pos)) {
 						return;
 					}
 
 					box.current_pos.y = Math.max(box.current_pos.y, b.current_pos.y + b.current_pos.height);
 				});
+
+				console
+					.log(`${box.pos.y - widget.pos.height != box.current_pos.y ? '! ' : ''}${box.header} desired position ${box.pos.y - widget.pos.height} actual ${box.current_pos.y}`);
 			});
 	}
 
