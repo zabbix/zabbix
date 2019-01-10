@@ -1401,19 +1401,20 @@
 			if (data['pos-action'] === 'addmodal' && widget.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 				data.add_widget_dimension = {};
+				data.new_widget_placeholder.setDefault(function(e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
+				});
 
 				if (data.widgets.length) {
 					data.new_widget_placeholder.container.hide();
+					data.new_widget_placeholder.setPositioning();
 				}
 				else {
 					data.new_widget_placeholder.container.removeAttr('style');
 				}
 
 				resizeDashboardGrid($obj, data);
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
 			}
 		});
 
@@ -1440,21 +1441,17 @@
 
 		$obj
 			.on('mousedown', function(event) {
-				/**
-				 * 'mousedown' event is fired also when mouse right or middle buttons are pressed.
-				 * event.which == 1 is exclusive for mouse left button only.
-				 */
-				if (event.which != 1) {
+				if (event.which != 1 || data['pos-action'] !== ''
+						|| ($(event.target).not(data.new_widget_placeholder.container)
+						&& data.new_widget_placeholder.container.has(event.target).length == 0)) {
 					return;
 				}
 
-				if (data['pos-action'] === '' && ($(event.target).is($obj)
-						|| $(event.target).closest(data.new_widget_placeholder.container).length)) {
-					setResizableState('disable', data.widgets, '');
-					data['pos-action'] = 'add';
-					data.new_widget_placeholder.setResizing();
-					return cancelEvent(event);
-				}
+				setResizableState('disable', data.widgets, '');
+				data['pos-action'] = 'add';
+				data.new_widget_placeholder.setResizing();
+
+				return cancelEvent(event);
 			})
 			.on('mouseleave', function(event) {
 				if (data['pos-action']) {
@@ -1462,25 +1459,26 @@
 				}
 
 				data.add_widget_dimension = {};
+				data.new_widget_placeholder.setDefault(function(e) {
+					methods.addNewWidget.call($obj, this);
+					return cancelEvent(e);
+				});
 
 				if (data.widgets.length) {
 					data.new_widget_placeholder.container.hide();
+					data.new_widget_placeholder.setPositioning();
 				}
 				else {
 					data.new_widget_placeholder.container.removeAttr('style');
 				}
 
 				resizeDashboardGrid($obj, data);
-				data.new_widget_placeholder.setDefault(function(e) {
-					methods.addNewWidget.call($obj, this);
-					return cancelEvent(e);
-				});
-
 			})
 			.on('mouseenter mousemove', function(event) {
-				var drag = (data['pos-action'] === 'add');
+				var drag = (data['pos-action'] === 'add'),
+					$target = $(event.target);
 
-				if (data['pos-action'] !== '' && !drag) {
+				if (!drag && data['pos-action'] !== '') {
 					return;
 				}
 
@@ -1488,9 +1486,8 @@
 					data.new_widget_placeholder.container.show();
 					data.new_widget_placeholder.setPositioning();
 				}
-
-				if (!drag && !$(event.target).is($obj)
-						&& !$(event.target).closest(data.new_widget_placeholder.container)) {
+				else if (!drag && !$target.is($obj) && !$target.is(data.new_widget_placeholder.container)
+						&& data.new_widget_placeholder.container.has($target).length == 0) {
 					resizeDashboardGrid($obj, data);
 					data.add_widget_dimension = {};
 					data.new_widget_placeholder.container.hide();
