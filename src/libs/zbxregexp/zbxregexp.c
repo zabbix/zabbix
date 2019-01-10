@@ -265,9 +265,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 void	zbx_regexp_free(zbx_regexp_t *regexp)
 {
 #ifdef PCRE_CONFIG_JIT
-		pcre_free_study(regexp->extra);
+	pcre_free_study(regexp->extra);
 #else
-		pcre_free(regexp->extra);
+	pcre_free(regexp->extra);
 #endif
 	pcre_free(regexp->pcre_regexp);
 	zbx_free(regexp);
