@@ -240,41 +240,53 @@
 	 * @param {object} widget  Moved widget object.
 	 */
 	function realignWidget(data, widget) {
-		var initial_pos = widget.current_pos,
-			realignDrag = function(widget) {
-				var pos = widget.current_pos,
-					to_row = pos.y + pos.height;
+		var to_row = widget['current_pos']['y'] + widget['current_pos']['height'],
+			overlapped_widgets = [];
 
-				$.map(data.widgets, function(box) {
-					return (widget.uniqueid != box.uniqueid && rectOverlap(widget.current_pos, box.current_pos))
-						? box
-						: null;
-				})
-				.sort(function(box1, box2) {
-					return box2.current_pos.y - box1.current_pos.y;
-				})
-				.each(function(box) {
-					if (box.current_pos.y < to_row && pos.y - box.current_pos.height >= 0
-							&& rectOverlap(box.current_pos, initial_pos)) {
-						var free;
-						box.current_pos.y = pos.y - box.current_pos.height;
+		$.each(data['widgets'], function() {
+			if (widget.uniqueid != this.uniqueid && rectOverlap(widget['current_pos'], this['current_pos'])) {
+				overlapped_widgets.push(this);
+			}
+		});
 
-						$.each(data.widgets, function() {
-							free = !(box.uniqueid != this.uniqueid && rectOverlap(box.current_pos, this.current_pos));
-							return free;
-						});
+		overlapped_widgets.sort(function (widget1, widget2) {
+			return widget2['current_pos']['y'] - widget1['current_pos']['y'];
+		});
 
-						if (free) {
-							return true;
-						}
+		for (var i = 0; i < overlapped_widgets.length; i++) {
+			overlapped_widgets[i]['current_pos']['y'] = to_row;
+
+			realignWidget(data, overlapped_widgets[i]);
+		}
+	}
+
+	/**
+	 * Collapse dragged widget position moving widgets below to it position.
+	 *
+	 * @param {array}  widgets   Array of widget objects.
+	 * @param {object} widget    Dragged widget object.
+	 * @param {number} max_rows  Dashboard rows count.
+	 */
+	function dragPrepare(widgets, widget, max_rows) {
+		var pos = $.extend({}, widget.pos);
+		pos.height = max_rows - pos.y;
+
+		widgets
+			.each(function(box) {
+				if (widget.uniqueid == box.uniqueid || !rectOverlap(pos, box.pos)) {
+					return;
+				}
+
+				box.current_pos.y = box.pos.y - widget.pos.height;
+
+				widgets.each(function(b) {
+					if (b.uniqueid == box.uniqueid || !rectOverlap(b.current_pos, box.current_pos)) {
+						return;
 					}
-					box.current_pos.y = to_row;
 
-					realignDrag(box);
+					box.current_pos.y = Math.max(box.current_pos.y, b.current_pos.y + b.current_pos.height);
 				});
-			};
-
-		realignDrag(widget);
+			});
 	}
 
 	/**
@@ -749,6 +761,7 @@
 			resetCurrentPositions(data['widgets']);
 			widget['current_pos'] = pos;
 
+			dragPrepare(data.widgets, widget, data['options']['max-rows']);
 			realignWidget(data, widget);
 
 			data.widgets.each(function(box) {
